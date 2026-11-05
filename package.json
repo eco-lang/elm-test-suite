@@ -1,0 +1,27 @@
+{
+  "name": "elm-test-suite",
+  "version": "0.1.0",
+  "private": true,
+  "description": "End-to-end tests of Elm 0.19.x compilers: real Elm programs, run and checked against their expected output",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "test": "node runner/run.js",
+    "test:elm-0.19.1": "node runner/run.js --compiler elm-0.19.1",
+    "test:elm-0.19.2": "node runner/run.js --compiler elm-0.19.2",
+    "test:elm-0.19.3": "node runner/run.js --compiler elm-0.19.3",
+    "test:lamdera-1.5.0": "node runner/run.js --compiler lamdera-1.5.0",
+    "test:all": "node runner/run-all.js",
+    "report": "node runner/run-all.js --report-only",
+    "compilers": "node runner/run.js --list-compilers"
+  },
+  "devDependencies": {
+    "elm-0.19.1": "npm:elm@0.19.1-6",
+    "elm-0.19.2": "npm:elm@0.19.2-0",
+    "elm-0.19.3": "npm:elm@0.19.3-0",
+    "lamdera-1.5.0": "npm:lamdera@0.19.3-1.5.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@12.9.1"
+}

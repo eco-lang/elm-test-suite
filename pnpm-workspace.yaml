@@ -1,0 +1,5 @@
+# The compiler packages fetch their binaries in an install script, which pnpm runs only for the
+# packages listed here.
+allowBuilds:
+  elm: true
+  lamdera: true
