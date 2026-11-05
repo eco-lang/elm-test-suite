@@ -17,9 +17,11 @@ report of where their outcomes differ. Out of the box it installs and runs:
 Adding another compiler (a new Elm release, a release candidate, a fork) is one entry in
 `compilers.json`; see [Adding a compiler](#adding-a-compiler).
 
-The tests come from the end-to-end suite of eco, an Elm compiler with a native back end. Every test here passes under Elm 0.19.1. eco's tests of the places where it
-deliberately behaves differently from Elm (64-bit `Int`, IEEE `Float` comparisons, and so on) are
-not part of this suite.
+The tests come from the end-to-end suite of eco, an Elm compiler with a native back end. Every
+test passes under Elm 0.19.1, except those in `elm-bug-fixes`: they expect the behaviour of a bug
+fixed in a later Elm release, so they fail under 0.19.1 and pass from the release that fixed it.
+eco's tests of the places where it deliberately behaves differently from Elm (64-bit `Int`, IEEE
+`Float` comparisons, and so on) are not part of this suite.
 
 ## Requirements
 
@@ -98,11 +100,11 @@ report and writes it to `.work/report.md`:
 
 ## The tests
 
-`tests/` holds 11 Elm projects, each with its own `elm.json`:
+`tests/` holds 12 Elm projects, each with its own `elm.json`:
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 788 | the language and elm/core: every construct, closures, recursion, pattern matching, records, custom types, numbers, strings |
+| `elm` | 787 | the language and elm/core: every construct, closures, recursion, pattern matching, records, custom types, numbers, strings |
 | `elm-core` | 114 | the elm/core modules, function by function |
 | `elm-bytes` | 129 | elm/bytes encoders and decoders |
 | `elm-json` | 37 | elm/json |
@@ -112,7 +114,8 @@ report and writes it to `.work/report.md`:
 | `elm-url` | 3 | elm/url |
 | `elm-html` | 3 | elm/html |
 | `elm-conformance` | 36 | edge cases recorded from Elm on Node: Unicode and case mapping, JSON number and string formats, Float edge values, regex and URL encoding details |
-| `elm-compile-errors` | 217 | programs the compiler must reject, checked by the title of the error report |
+| `elm-compile-errors` | 216 | programs the compiler must reject, checked by the title of the error report |
+| `elm-bug-fixes` | 2 | bugs in Elm 0.19.1 fixed in a later release; each test expects the fixed behaviour and says in its comment which release fixed it |
 
 A test is a module in `src/` with a top-level `main` (or a `-- COMPILE-ERROR:` line). Modules
 without either are helpers that tests import.
