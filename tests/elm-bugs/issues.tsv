@@ -559,7 +559,7 @@ core	964	String.toFloat doesn't show decimal if nuls	NOT_BUG	LOW	no	NOT_ATTEMPTE
 core	968	Add hyperbolic trig functions	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: hyperbolic functions
 core	977	String.slice is broken on strings with multi-byte Unicode characters	LIKELY	MEDIUM	yes	NOT_ATTEMPTED			String.dropLeft/slice split surrogate pairs; debatable since String.length etc. count UTF-16 units (see #1061)
 core	987	Elm compiler does not like '0xFFFFFFFF' hexadecimal literal (on 32-bit Windows)	LIKELY	LOW	no	NOT_E2E			0xFFFFFFFF literal breaks compile only on 32-bit hosts
-core	988	Inconsistant equality for objects containing NaN	CERTAIN	LOW	yes	REPRODUCED	CoreIssue988NanEqualityReferenceTest		Equality of structures containing NaN depends on reference identity
+core	988	Inconsistant equality for objects containing NaN	CERTAIN	LOW	yes	REPRODUCED	CoreIssue988NanEqualityReferenceTest CoreIssue988NanContainerSelfEqualityTest		Equality of structures containing NaN depends on reference identity; any container holding NaN equals itself
 core	989	Ports called asynchronously if inside Cmd.batch	LIKELY	MEDIUM	no	NOT_E2E			Port in Cmd.batch called asynchronously; needs DOM events and same-tick timing
 core	1001	Char.toUpper('ß') returns two characters as Char	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1001CharToUpperSharpSTest		Char.toUpper 'ß' returns the two-character Char 'SS'
 core	1003	Int operator inconsistency: some return 32bit truncated ints, some don't.	WEAK	MEDIUM	yes	NOT_ATTEMPTED			truncate wraps to 32 bits; Int is documented as well-defined only in 32-bit range, so expected behaviour is debatable

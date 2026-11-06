@@ -126,7 +126,7 @@ report and writes it to `.work/report.md`:
 | `elm-conformance` | 36 | edge cases recorded from Elm on Node: Unicode and case mapping, JSON number and string formats, Float edge values, regex and URL encoding details |
 | `elm-compile-errors` | 216 | programs the compiler must reject, checked by the title of the error report |
 | `elm-bug-fixes` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
-| `elm-bugs` | 124 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues; each test links its issue and expects the correct behaviour |
+| `elm-bugs` | 125 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues; each test links its issue and expects the correct behaviour |
 
 ### elm-bugs and its issue triage
 
@@ -139,7 +139,7 @@ github.com/elm repositories but `elm-lang.org` and `package.elm-lang.org`, one l
 | `impact` | `HIGH`, `MEDIUM`, `LOW` |
 | `e2e` | whether a test of this suite could show it: `yes`, `maybe`, `no` (needs a browser, network, the REPL, ...) |
 | `outcome` | `REPRODUCED` (a test of `elm-bugs`), `FIXED` (a test of `elm-bug-fixes`), `NOT_REPRODUCED` (Elm 0.19.1 behaves correctly), `NOT_E2E`, `NOT_ATTEMPTED` (not a bug, or the correct behaviour is debatable) |
-| `test` | the test, for `REPRODUCED` and `FIXED` |
+| `test` | the test (or tests, space-separated), for `REPRODUCED` and `FIXED` |
 | `fixed_in` | the compilers under which that test passes |
 | `note` | why |
 

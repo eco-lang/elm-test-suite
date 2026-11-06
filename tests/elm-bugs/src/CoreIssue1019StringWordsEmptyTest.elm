@@ -11,6 +11,8 @@ has no words: the result must be `[]`.
 
 -- CHECK: words empty: []
 -- CHECK: words blank: []
+-- CHECK: words spaces: []
+-- CHECK: words tab newline return: []
 
 import Html exposing (text)
 
@@ -22,5 +24,11 @@ main =
 
         _ =
             Debug.log "words blank" (String.words "  \n ")
+
+        _ =
+            Debug.log "words spaces" (String.words "   ")
+
+        _ =
+            Debug.log "words tab newline return" (String.words "\t\n\u{000D} ")
     in
     text "done"
