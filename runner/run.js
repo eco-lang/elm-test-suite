@@ -4,7 +4,7 @@
 // Usage:
 //   node runner/run.js [--compiler <name>] [--project <name>[,<name>...]]
 //        [--filter <substr>[,<substr>...]] [--jobs <n>] [--compile-jobs <n>] [--timeout <seconds>]
-//        [--compile-timeout <seconds>]
+//        [--compile-timeout <seconds>] [--compile-memory <MB>]
 //        [--json <file>] [--list-compilers]
 //   node runner/run.js --compiler <name> --project <name> --record <TestName>
 //
@@ -24,7 +24,10 @@
 //
 // For every tests/<project>/src/*.elm that has a top-level `main` or a `-- COMPILE-ERROR:` line:
 //   1. The project is mirrored into one directory per compile worker, .work/<compiler>/<project>/
-//      project-<k> (a compiler is not safe to run twice at once in one project).
+//      project-<k> (a compiler is not safe to run twice at once in one project). A compiler
+//      that crashes can leave elm-stuff corrupt, so elm-stuff is cleared after a compile that
+//      crashed or was killed, and a compile that hangs, is killed or reports a corrupt cache is
+//      tried once more with an empty elm-stuff.
 //   2. The test is compiled (debug mode: the tests use Debug.log) to .work/<compiler>/<project>/out/.
 //      A test is recompiled when its output is older than the test, a helper module, elm.json,
 //      this runner, compilers.json or the compiler. A COMPILE-ERROR test is always compiled and
@@ -63,6 +66,7 @@ function parseArgs(argv) {
         compileJobs: Math.max(1, Math.min(8, os.cpus().length)),
         timeoutSec: 60,
         compileTimeoutSec: 60,
+        compileMemoryMB: 4096,
         projects: [],
         record: null,
         json: null,
@@ -86,6 +90,7 @@ function parseArgs(argv) {
             case '--compile-jobs': opts.compileJobs = Math.max(1, parseInt(val(), 10) || 1); break;
             case '--timeout': opts.timeoutSec = Math.max(1, parseInt(val(), 10) || 60); break;
             case '--compile-timeout': opts.compileTimeoutSec = Math.max(1, parseInt(val(), 10) || 60); break;
+            case '--compile-memory': opts.compileMemoryMB = Math.max(64, parseInt(val(), 10) || 4096); break;
             case '--record': opts.record = val(); break;
             case '--json': opts.json = path.resolve(val()); break;
             case '--list-compilers': opts.listCompilers = true; break;
@@ -134,19 +139,58 @@ function resolveCompiler(cfg, name) {
 
 // --- Child processes ---------------------------------------------------------------------------
 
-// With timeoutSec, the child is killed after that many seconds and the result has timedOut set.
-function run(cmd, args, options, timeoutSec) {
+// The resident memory, in MB, of a process and its descendants, from /proc (Linux); null where
+// /proc is not available.
+function treeRssMB(pid) {
+    try {
+        let kb = 0;
+        const visit = (p) => {
+            const m = /VmRSS:\s+(\d+)/.exec(fs.readFileSync('/proc/' + p + '/status', 'utf8'));
+            if (m) kb += parseInt(m[1], 10);
+            for (const t of fs.readdirSync('/proc/' + p + '/task')) {
+                const kids = fs.readFileSync('/proc/' + p + '/task/' + t + '/children', 'utf8').trim();
+                if (kids) kids.split(/\s+/).forEach(visit);
+            }
+        };
+        visit(pid);
+        return kb / 1024;
+    } catch (e) {
+        return null;
+    }
+}
+
+// The command line that runs argv without leaving a core dump: a compiler that crashes, or a test
+// that runs out of memory on purpose, would otherwise write hundreds of MB into .work on every run.
+// `exec` keeps the pid, so killing the child and measuring its memory still reach the command.
+function noCoreDumps(argv) {
+    return process.platform === 'win32' ? argv : ['/bin/sh', '-c', 'ulimit -c 0 && exec "$@"', 'sh', ...argv];
+}
+
+// With limits.timeoutSec, the child is killed after that many seconds and the result has timedOut
+// set. With limits.memoryMB, it is killed once it (with its descendants) holds more memory than that,
+// checked every 250 ms, and the result has outOfMemory set: a compiler that loops while allocating
+// would otherwise take the machine's memory before the timeout.
+function run(cmd, args, options, limits = {}) {
     return new Promise((resolve) => {
-        const child = spawn(cmd, args, Object.assign({ stdio: ['ignore', 'pipe', 'pipe'] }, options));
-        let timedOut = false;
-        const timer = timeoutSec ? setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, timeoutSec * 1000) : null;
+        const argv = noCoreDumps([cmd, ...args]);
+        const child = spawn(argv[0], argv.slice(1), Object.assign({ stdio: ['ignore', 'pipe', 'pipe'] }, options));
+        let timedOut = false, outOfMemory = false;
+        const timer = limits.timeoutSec
+            ? setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, limits.timeoutSec * 1000) : null;
+        const poll = limits.memoryMB ? setInterval(() => {
+            const mb = treeRssMB(child.pid);
+            if (mb === null || mb <= limits.memoryMB) return;
+            outOfMemory = true;
+            child.kill('SIGKILL');
+        }, 250) : null;
         const chunks = [];
         child.stdout.on('data', (d) => chunks.push(d));
         child.stderr.on('data', (d) => chunks.push(d));
         child.on('error', (e) => chunks.push(Buffer.from(String(e))));
         child.on('close', (code, signal) => {
             if (timer) clearTimeout(timer);
-            resolve({ code, signal, timedOut, output: Buffer.concat(chunks).toString('utf8') });
+            if (poll) clearInterval(poll);
+            resolve({ code, signal, timedOut, outOfMemory, output: Buffer.concat(chunks).toString('utf8') });
         });
     });
 }
@@ -342,10 +386,27 @@ async function runProject(spec, opts, compiler) {
     const env = Object.assign({}, process.env, compiler.env, { ELM_HOME: elmHome });
     const compileOne = async (t, k) => {
         const out = outFile(t);
-        const r = await run(compiler.command, [...compiler.args, 'src/' + t.name + '.elm', '--output=' + out],
-            { cwd: projects[k], env }, opts.compileTimeoutSec);
+        const compile = () => run(compiler.command, [...compiler.args, 'src/' + t.name + '.elm', '--output=' + out],
+            { cwd: projects[k], env }, { timeoutSec: opts.compileTimeoutSec, memoryMB: opts.compileMemoryMB });
+        // A compiler that crashes can leave elm-stuff half-written, and the next compile in it then
+        // reports a CORRUPT CACHE (Elm 0.19.2, Lamdera) or hangs (Elm 0.19.3). So elm-stuff is cleared
+        // after a compile that crashed or was killed, and a compile that hangs, is killed or finds a
+        // corrupt cache is tried once more with an empty elm-stuff.
+        const elmStuff = path.join(projects[k], 'elm-stuff');
+        if (!elmStuff.startsWith(path.join(ROOT, '.work') + path.sep)) throw new Error('unexpected path ' + elmStuff);
+        const killed = (r) => r.timedOut || r.outOfMemory || r.signal;
+        const corruptCache = (r) => /^-- CORRUPT CACHE|Corrupt File:/m.test(r.output);
+        const crashed = (r) => /bypassed the normal error reporting|CallStack \(from HasCallStack\)/.test(r.output);
+        let r = await compile();
+        if ((killed(r) || corruptCache(r)) && fs.existsSync(elmStuff)) {
+            fs.rmSync(elmStuff, { recursive: true, force: true });
+            console.log('  retrying ' + t.name + ' with an empty elm-stuff');
+            r = await compile();
+        }
+        if (killed(r) || corruptCache(r) || crashed(r)) fs.rmSync(elmStuff, { recursive: true, force: true });
         const produced = fs.existsSync(out);
-        const died = r.timedOut ? 'compiler timed out after ' + opts.compileTimeoutSec + ' s'
+        const died = r.outOfMemory ? 'compiler used more than ' + opts.compileMemoryMB + ' MB of memory'
+            : r.timedOut ? 'compiler timed out after ' + opts.compileTimeoutSec + ' s'
             : r.signal ? 'compiler killed by ' + r.signal : null;
         if (died) {
             try { fs.unlinkSync(out); } catch (e) { /* none */ }
@@ -390,7 +451,7 @@ async function runProject(spec, opts, compiler) {
             const piped = t.stdin !== null || t.stdinDelay !== null;
             const stdin = piped ? 'pipe' : fs.openSync(os.devNull, 'r');
             const base = compiler.target === 'js' ? [process.execPath, t.name + '.run.js'] : [outFile(t)];
-            const argv = t.fsize === null ? base : [D.findPrlimit(), '--fsize=' + t.fsize + ':' + t.fsize, ...base];
+            const argv = noCoreDumps(t.fsize === null ? base : [D.findPrlimit(), '--fsize=' + t.fsize + ':' + t.fsize, ...base]);
             const child = spawn(argv[0], argv.slice(1), { cwd: outDir, stdio: [stdin, 'pipe', 'pipe'], env: childEnv });
             if (typeof stdin === 'number') fs.closeSync(stdin);
             const chunks = [];

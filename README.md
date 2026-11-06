@@ -17,9 +17,12 @@ report of where their outcomes differ. Out of the box it installs and runs:
 Adding another compiler (a new Elm release, a release candidate, a fork) is one entry in
 `compilers.json`; see [Adding a compiler](#adding-a-compiler).
 
-The tests come from the end-to-end suite of eco, an Elm compiler with a native back end. Every test here passes under Elm 0.19.1. eco's tests of the places where it
-deliberately behaves differently from Elm (64-bit `Int`, IEEE `Float` comparisons, and so on) are
-not part of this suite.
+Most of the tests come from the end-to-end suite of eco, an Elm compiler with a native back end,
+and pass under Elm 0.19.1. Two projects expect the correct behaviour where Elm 0.19.1 has a bug,
+so they fail under 0.19.1 by design: `elm-bug-fixes` (bugs fixed in a later release; each test
+passes from that release) and `elm-bugs` (bugs reported in open issues of the github.com/elm
+repositories). eco's tests of the places where it deliberately behaves differently from Elm (64-bit `Int`, IEEE
+`Float` comparisons, and so on) are not part of this suite.
 
 ## Requirements
 
@@ -62,8 +65,14 @@ pnpm test:all -- --compilers elm-0.19.1,elm-0.19.3         # compare two compile
 | `--compile-jobs <n>` | compiles at once (default: the CPU count, at most 8) |
 | `--timeout <s>` | seconds a program may run (default 60) |
 | `--compile-timeout <s>` | seconds a compile may take (default 60); a compiler that hangs fails the test |
+| `--compile-memory <MB>` | memory a compile may use (default 4096; Linux only); a compiler that exceeds it is killed and fails the test |
 | `--record <Name>` | run one test (with exactly one `--project`) and print its output as CHECK lines |
 | `--json <file>` | also write every test's outcome to a file |
+
+A compiler that crashes can leave `elm-stuff` corrupt, and the next compile in it then reports a
+CORRUPT CACHE (Elm 0.19.2, Lamdera) or hangs (Elm 0.19.3). So the runner clears `elm-stuff`
+after a compile that crashed or was killed, and tries a compile that hangs, is killed or reports
+a corrupt cache once more with an empty `elm-stuff`; the test fails only if the retry fails too.
 
 `run-all.js` (`pnpm test:all`) takes the same options except `--compiler` and `--json`, plus
 `--compilers <a,b>`. The exit status of `run.js` is 1 when a test failed.
@@ -82,7 +91,10 @@ For each test, the runner:
 2. Runs the program in its own process: on Node for a compiler that writes JavaScript, directly for
    one that writes an executable. Most tests are `main = Html.text ...` programs that print with
    `Debug.log` while `main` is evaluated; a minimal DOM (`runner/dom.js`) lets them start on Node.
-   Others are `Platform.worker` programs.
+   Others are `Platform.worker` programs, or `Browser.element` programs whose view changes. Where
+   elm/virtual-dom can hit a browser error (a read-only `type` property, an invalid attribute
+   name, a node method given something that is not a node), the minimal DOM throws as a browser
+   does, so a program that would crash in a browser crashes here too.
 3. Passes the test if the program exits on its own within the timeout, with the expected exit
    status, and its output (stdout and stderr together) satisfies the CHECK lines.
 
@@ -98,11 +110,11 @@ report and writes it to `.work/report.md`:
 
 ## The tests
 
-`tests/` holds 11 Elm projects, each with its own `elm.json`:
+`tests/` holds 13 Elm projects, each with its own `elm.json`:
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 788 | the language and elm/core: every construct, closures, recursion, pattern matching, records, custom types, numbers, strings |
+| `elm` | 787 | the language and elm/core: every construct, closures, recursion, pattern matching, records, custom types, numbers, strings |
 | `elm-core` | 114 | the elm/core modules, function by function |
 | `elm-bytes` | 129 | elm/bytes encoders and decoders |
 | `elm-json` | 37 | elm/json |
@@ -112,7 +124,31 @@ report and writes it to `.work/report.md`:
 | `elm-url` | 3 | elm/url |
 | `elm-html` | 3 | elm/html |
 | `elm-conformance` | 36 | edge cases recorded from Elm on Node: Unicode and case mapping, JSON number and string formats, Float edge values, regex and URL encoding details |
-| `elm-compile-errors` | 217 | programs the compiler must reject, checked by the title of the error report |
+| `elm-compile-errors` | 216 | programs the compiler must reject, checked by the title of the error report |
+| `elm-bug-fixes` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
+| `elm-bugs` | 124 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues; each test links its issue and expects the correct behaviour |
+
+### elm-bugs and its issue triage
+
+`tests/elm-bugs/issues.tsv` records a triage of every open issue (883, in November 2026) of the
+github.com/elm repositories but `elm-lang.org` and `package.elm-lang.org`, one line each:
+
+| Column | Meaning |
+|---|---|
+| `likelihood` | that the issue is a real bug in Elm 0.19.1 or its packages: `CERTAIN`, `LIKELY`, `WEAK`, `NOT_BUG` |
+| `impact` | `HIGH`, `MEDIUM`, `LOW` |
+| `e2e` | whether a test of this suite could show it: `yes`, `maybe`, `no` (needs a browser, network, the REPL, ...) |
+| `outcome` | `REPRODUCED` (a test of `elm-bugs`), `FIXED` (a test of `elm-bug-fixes`), `NOT_REPRODUCED` (Elm 0.19.1 behaves correctly), `NOT_E2E`, `NOT_ATTEMPTED` (not a bug, or the correct behaviour is debatable) |
+| `test` | the test, for `REPRODUCED` and `FIXED` |
+| `fixed_in` | the compilers under which that test passes |
+| `note` | why |
+
+A bug counts as fixed once a later official Elm release (not a fork such as Lamdera) fixes it: its
+test then moves from `elm-bugs` to `elm-bug-fixes`, its comment says which release fixed it, and
+its outcome becomes `FIXED`. A bug fixed only in a fork stays in `elm-bugs`.
+
+Some compiler bugs in `elm-bugs` make the compiler loop while its memory grows: the runner kills a
+compile at `--compile-memory` (4096 MB), so they fail within seconds.
 
 A test is a module in `src/` with a top-level `main` (or a `-- COMPILE-ERROR:` line). Modules
 without either are helpers that tests import.

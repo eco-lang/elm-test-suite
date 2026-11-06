@@ -1,0 +1,884 @@
+repo	number	title	likelihood	impact	e2e	outcome	test	fixed_in	note
+compiler	1008	"more flexibility for comparable types"	NOT_BUG	LOW	no	NOT_ATTEMPTED			meta issue collecting feature requests for more comparable types
+compiler	1039	type system extensions	NOT_BUG	LOW	no	NOT_ATTEMPTED			meta issue collecting type-system feature requests
+compiler	1145	Runtime error when comparing functions	NOT_BUG	MEDIUM	yes	NOT_ATTEMPTED			function equality throws at runtime by design (documented in Basics.(==)); making it a type error is a language proposal
+compiler	1246	Int literals over "max unsigned 32bit" produce bad JS	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1246LargeIntLiteralTest		integer literals beyond 64 bits wrap silently (1e20 -> 7766279631452242000, 2^63 -> -2^63)
+compiler	1261	Negative numbers in pattern matches are syntax errors	LIKELY	LOW	yes	NOT_ATTEMPTED			negative literal patterns: 0.19.1 rejects them with an explicit "not possible at this time" message; deliberate limitation (same as 1773)
+compiler	1375	parser suggestions	NOT_BUG	LOW	no	NOT_ATTEMPTED			meta list of parser syntax suggestions
+compiler	1377	potential crashes due to code gen corner cases	CERTAIN	HIGH	yes	NOT_ATTEMPTED			meta issue; open items tested separately: TCO closure capture (1813), </script> escaping (2039, NOT_E2E); x² identifiers now get a clean parse error in 0.19.1
+compiler	1450	Modules cannot have ports with same name	LIKELY	LOW	no	NOT_E2E			needs two port modules compiled into one JS file (elm make A.elm B.elm); runner compiles one main per output
+compiler	1491	Type checking a phantom type succeeds when it should not	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue1491PhantomTupleUnsoundTest		unsoundness: phantom (m, m) accepted for (OnePlus m, m)
+compiler	1530	Operator precedence in negative exponentials	NOT_BUG	LOW	yes	NOT_ATTEMPTED			precedence of unary minus vs ^ is a language-design proposal; current behaviour is documented
+compiler	1550	Duplicate fields with record extensions	LIKELY	MEDIUM	yes	REPRODUCED	CompilerIssue1550RecordExtensionDuplicateFieldTest		record extension with an already present field is accepted (listed as active kind-check bug in 1684); expected behaviour is a compile error
+compiler	1557	Could not find type constructor `WebGL.Shader`	WEAK	MEDIUM	no	NOT_E2E			0.18 GLSL module crash; needs elm-explorations/webgl which is not in the test project
+compiler	1558	No warnings from child module when compiling second time	NOT_BUG	LOW	no	NOT_ATTEMPTED			0.18 warnings caching; 0.19 has no warnings
+compiler	1572	Improve GLSL experience	NOT_BUG	LOW	no	NOT_ATTEMPTED			GLSL tooling suggestions
+compiler	1611	Public values are allowed to have private types	NOT_BUG	LOW	no	NOT_ATTEMPTED			suggestion: warn about exposed values with unexposed types
+compiler	1614	Infinite type error on type that does not appear to be infinite	NOT_BUG	LOW	yes	NOT_ATTEMPTED			the program is ill-typed (Array.get returns Maybe); only the wording INFINITE TYPE is questioned
+compiler	1625	Allow disambiguation when two packages expose modules with the same name	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: disambiguate same-named modules from two packages
+compiler	1639	crash when unannotated definition has type variable in sub-annotation	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1639LetAnnotationTypeVarCrashTest		compiler crash ([rank = 2]) on let annotation with a type var in an unannotated function
+compiler	1648	Large-ish numbers not parsed correctly in Elm 0.18, Windows x64	WEAK	MEDIUM	yes	NOT_REPRODUCED			2147483648 literal is printed correctly by 0.19.1 on Linux (Windows/GHCJS-only in 0.18); see 1246 for >64-bit literals
+compiler	1649	Name conflict with non-exported module in dependency	WEAK	LOW	no	NOT_E2E			0.18 elm-stuff caching collision with elm-test; needs a repeated build with a package dependency
+compiler	1665	Warning for leaving off argument names	NOT_BUG	LOW	no	NOT_ATTEMPTED			proposal for a new warning
+compiler	1669	infinite type causes compiler hang	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1669InfiniteTypeArrayGetSetHangTest		infinite type through Array.get/set: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	1684	Errors due to lack of kind checking	CERTAIN	MEDIUM	yes	NOT_ATTEMPTED			meta issue on missing kind checking for record extension; its reports are tested individually (1550 overlapping fields; 1785/1896/1952/2064/2072/2083 non-record extension)
+compiler	1687	allow more stuff through ports	NOT_BUG	LOW	no	NOT_ATTEMPTED			meta: requests to allow more types through ports
+compiler	1691	Impossible record extension inference causes out of memory crash	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1691ContradictoryExtensibleRecordHangTest	lamdera-1.5.0	contradictory extensible-record annotation: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	1700	Compiler hangs on infinite type in badly written foldl lambda	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1700InfiniteTypeFoldrLambdaHangTest		infinite type in a foldr lambda: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	1724	The pdf agreement link from CONTRIBUTING.md 404's	NOT_BUG	LOW	no	NOT_ATTEMPTED			broken link in CONTRIBUTING.md
+compiler	1736	Problem parsing == in expressions in REPL	LIKELY	LOW	no	NOT_E2E			REPL-only parse problem with top-level ==
+compiler	1748	Compiler gives an error on destructuring a non existent record field	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1748DestructureMissingFieldCrashTest		compiler crash (index out of bounds) on destructuring a missing field
+compiler	1763	Code generation creates identifiers starting with invalid characters	CERTAIN	MEDIUM	no	NOT_E2E			needs a package whose author name starts with a digit (e.g. 1602/elm-feather); generated JS identifiers start with a digit
+compiler	1766	Compiler does not match 2 identical types.	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue1766LetMutualRecursionMismatchTest		valid program rejected: SearchResult state does not match SearchResult state
+compiler	1771	elm publish does not require the bumped elm.json to be pushed to GitHub	LIKELY	LOW	no	NOT_E2E			elm publish does not check the pushed elm.json; publishing/network
+compiler	1773	Matching on negative literals results in a parser error	LIKELY	LOW	yes	NOT_ATTEMPTED			negative literal patterns: 0.19.1 rejects them with an explicit "not possible at this time" message; deliberate limitation, a feature request
+compiler	1777	`elm bump` claims breaking type change as a PATCH change	LIKELY	MEDIUM	no	NOT_E2E			elm bump/diff misclassifies a type change; needs package diffing
+compiler	1780	elm reactor web page is corrupt if README includes <script> tag	LIKELY	LOW	no	NOT_E2E			elm reactor README rendering
+compiler	1782	"Install What": Misleading help when running `elm install`	NOT_BUG	LOW	no	NOT_ATTEMPTED			help text wording for elm install
+compiler	1785	Problem with toAnnotation when kind error with record type aliases	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1785ExtensibleAliasOfUnitTest		extending () crashes elm-0.19.1/0.19.2 (toAnnotation not well-formed) but hangs with unbounded memory growth under elm-0.19.3 (>1.5 GB in 0.5 s): compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	1788	REPL crashes with elm.json without "elm/json" dependency	LIKELY	LOW	no	NOT_E2E			REPL in a package project crashes (Map.!); REPL
+compiler	1789	elm-19: thread blocked indefinitely in an MVar operation	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1789RankCrashMissingJustTest		compiler crash ([rank = 1]) on a missing Just (akoppela SSCCE)
+compiler	1792	`CORRUPT JSON` when installing a 0.18 package on 0.19	LIKELY	LOW	no	NOT_E2E			elm install of a 0.18 package reports CORRUPT JSON; network/install
+compiler	1793	Compiler crash on generic comparable tuples in let-bindings	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue1793ComparableTupleLetCrashTest		compiler crash (index out of bounds) on a valid program comparing comparable tuples in a let
+compiler	1797	[Windows]'Access violation in generated code' when running any elm command	WEAK	HIGH	no	NOT_E2E			Windows-only access violation of the 0.19.0 binary
+compiler	1799	Elm App History Export Corrupted in some 0.19 apps	LIKELY	LOW	no	NOT_E2E			debugger history export; needs a browser
+compiler	1804	0.19 Elm repl --no-colors outputs some colors	LIKELY	LOW	no	NOT_E2E			elm repl --no-colors still prints colours; REPL
+compiler	1809	Compiler reporting success despite a change in a module which invalidates another module	LIKELY	HIGH	no	NOT_E2E			incremental build misses a dependent module; needs editing a file between two builds
+compiler	1813	Tail Call Optimized arguments can be exposed as not immutable...	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue1813TcoClosureCapturesMutatedArgTest		wrong JS: closures in a TCO loop capture the mutated argument ([0,0,0] instead of [1,2,3])
+compiler	1815	Allow output of html pages with the htm extension	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: allow .htm output
+compiler	1816	Idea for flag to make it easier to try SPAs in reactor	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request for elm reactor
+compiler	1822	A type alias of an alias fails as a constructor.	LIKELY	LOW	yes	REPRODUCED	CompilerIssue1822AliasOfRecordAliasConstructorTest		alias of a record alias has no record constructor (NAMING ERROR); expected: same constructor as the aliased record
+compiler	1831	Improvement: A single incorrect dependency in elm.json gives "The dependencies in your elm.json are not compatible."	NOT_BUG	LOW	no	NOT_ATTEMPTED			error-message improvement request for incompatible dependencies
+compiler	1833	Renamed module can not be imported to the REPL unless it is re-launched	WEAK	LOW	no	NOT_E2E			REPL import stack after renaming a module
+compiler	1839	Rigid variables in internal annotations need top-level annotation	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1839RigidLetAnnotationCrashTest		compiler crash ([rank = 2]) on a rigid let annotation in an unannotated function
+compiler	1845	Point to "how to make CI fast" link when cache is messed up	NOT_BUG	LOW	no	NOT_ATTEMPTED			request to link CI docs from the CORRUPT BINARY message (caching)
+compiler	1846	Somehow help people learn about ELM_HOME when they need it	NOT_BUG	LOW	no	NOT_ATTEMPTED			documentation request for ELM_HOME
+compiler	1858	0.19 Overrestrictive Type Inference?	LIKELY	MEDIUM	yes	REPRODUCED	CompilerIssue1858AnnotatedPolymorphicRecursionTest		annotated polymorphic recursion rejected (accepted by 0.18); arguably a limitation rather than a bug
+compiler	1859	Error on quiting repl 'hGetChar: hardware fault (Input/output error)'	LIKELY	LOW	no	NOT_E2E			REPL Ctrl-C terminal handling
+compiler	1860	elm install can produce incompatible dependencies for elm-test	WEAK	LOW	no	NOT_E2E			elm install vs elm-test dependency merging; install/network
+compiler	1862	Color use in error messages	NOT_BUG	LOW	no	NOT_ATTEMPTED			error messages rely on colour; suggestion
+compiler	1863	Colors in repl make values and type annotations impossible or hard to see	NOT_BUG	LOW	no	NOT_ATTEMPTED			REPL colour scheme suggestion
+compiler	1865	`elm install` unexpectedly updates "test-dependencies"	LIKELY	LOW	no	NOT_E2E			elm install puts elm/json in test-dependencies; install/network
+compiler	1866	Compiler freezes on a program using a phantom type with extensible records	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1866PhantomExtensibleRecordHangTest	lamdera-1.5.0	phantom type over extensible records: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	1869	elm.json should not be allowed to contain fields from wrong type	NOT_BUG	LOW	no	NOT_ATTEMPTED			suggestion: reject foreign fields in elm.json
+compiler	1875	Corrupt dependency on published packages due to lowercase folders	LIKELY	MEDIUM	no	NOT_E2E			case-insensitive filesystem lets a package publish with wrong directory case; publishing
+compiler	1887	Module name conflict: 'Force' from gampleman/elm-visualization and ianmackenzie/elm-units	NOT_BUG	LOW	no	NOT_ATTEMPTED			another module-name collision example for 1625
+compiler	1890	Compiler crash (index out of bounds)	CERTAIN	HIGH	yes	FIXED	CompilerIssue1890RecordUpdateMutualRecursionCrashTest	elm-0.19.3,lamdera-1.5.0	compiler crash (index out of bounds) on a valid program with mutual recursion and record update
+compiler	1893	REPL should report about network operations when evaluate first expression	NOT_BUG	LOW	no	NOT_ATTEMPTED			REPL should announce downloads; suggestion
+compiler	1895	Changing opaque type to type alias results in MAJOR bump	WEAK	LOW	no	NOT_E2E			elm diff classification of opaque type -> alias; package diffing
+compiler	1896	Using union type in extensible record: "Used toErrorType on a type that is not well-formed"	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1896ExtendCustomTypeCrashTest		compiler crash (toErrorType not well-formed) while reporting a custom type used as record extension
+compiler	1897	Compilation time is O(2^n) when composing ext. records	CERTAIN	MEDIUM	maybe	NOT_E2E			confirmed by hand in 0.19.1: memory is exponential in composed extensible aliases (0.2 GB at 16, >4 GB at 20); a failing test would need tens of GB, unsafe here
+compiler	1901	Move ~/.elm to $XDG_DATA_HOME	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: XDG directories
+compiler	1906	It is not obvious how a package is supposed to be removed	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs: how to remove a package
+compiler	1910	URLs in stdout surrounded by '<' and '>' cause problems with some environments.	NOT_BUG	LOW	no	NOT_ATTEMPTED			terminal link formatting suggestion
+compiler	1916	compiler crash with (phantom type + extensible record + type alias)	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue1916PhantomExtensibleAliasCrashTest		compiler crash (Map.!) on a valid program with phantom extensible-record alias
+compiler	1918	elm make refuses to write to standard output	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: --output=/dev/stdout
+compiler	1931	Add a way to induce a warning or error when a pattern match against a record doesn't match all fields	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: warn on partial record patterns
+compiler	1946	SPDX -or-later and -only suffixes for GPL-family licenses are not recognized.	LIKELY	LOW	no	NOT_E2E			elm.json license field rejects SPDX -only/-or-later ids; package elm.json only
+compiler	1947	Compiler can't parse multi-line strings in a binary expression inside a let	LIKELY	LOW	yes	REPRODUCED	CompilerIssue1947MultilineStringInLetBinopTest		parse error when ++ follows a multi-line string closed left of the let definition column; layout should not depend on string contents
+compiler	1950	Import of packages with same name - use case	NOT_BUG	LOW	no	NOT_ATTEMPTED			same-named modules from two packages; feature request (1625)
+compiler	1951	crash when unifying open record types within let expression	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1951OpenRecordLetCrashTest		compiler crash (index out of bounds) unifying open/closed records in a let
+compiler	1952	Compiler crash when trying to do invalid record extension	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1952ExtendIntCrashTest		compiler crash (toErrorType) on extending Int
+compiler	1959	problem with extensible record type annotation on higher-order function	NOT_BUG	LOW	yes	NOT_ATTEMPTED			correct rejection: the annotation quantifies a over the caller (explained in comments)
+compiler	1964	Incorrect type mismatch when recursing with a wrapped type variable	LIKELY	MEDIUM	yes	REPRODUCED	CompilerIssue1964AnnotatedPolymorphicRecursionWrapperTest		annotated polymorphic recursion at Nested (Wrapper a) rejected; same root as 1858
+compiler	1969	Inference issue	LIKELY	MEDIUM	yes	NOT_ATTEMPTED			same bug as 1550 (duplicate field through record extension alias silently overrides); covered by CompilerIssue1550 test
+compiler	1970	Uniform bool value in WebGL shader is always set to false when code is optimized	CERTAIN	MEDIUM	no	NOT_E2E			bool GLSL uniform dropped under --optimize; needs elm-explorations/webgl and WebGL
+compiler	1971	Eagerly evaluate intermediate values when partially applying functions	NOT_BUG	LOW	no	NOT_ATTEMPTED			optimization proposal
+compiler	1972	Elm reactor doesn't serve large files correctly	CERTAIN	LOW	no	NOT_E2E			elm reactor serves binary files with a text mime type
+compiler	1973	Compiler message request for --docs. Related to #1835	NOT_BUG	LOW	no	NOT_ATTEMPTED			request: warn when --docs is used with an application
+compiler	1974	Incorrect type signature causing [rank = 1] error	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1974RankCrashWrongAnnotationTest		compiler crash ([rank = 1]) on a wrong argument annotation
+compiler	1975	"index out of bounds" based on alphabetical order in let expression	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1975LetOrderCrashTest		compiler crash (index out of bounds) depending on let names order
+compiler	1978	Extracting function-argument as type-alias is a API-breaking change	WEAK	LOW	no	NOT_E2E			elm diff classification; package diffing
+compiler	1979	Opaque types can have it's constructors exposed from import	LIKELY	LOW	yes	REPRODUCED	CompilerIssue1979ImportOpaqueConstructorsTest		import exposing Opaque(..) of an opaque type is accepted silently; expected an import error
+compiler	1982	Broken package documentation when @docs does not start a line	LIKELY	LOW	no	NOT_E2E			@docs not at line start accepted but breaks package docs; docs generation
+compiler	1984	CONTRIBUTING.md mentions a non existing stable branch	NOT_BUG	LOW	no	NOT_ATTEMPTED			CONTRIBUTING.md mentions a missing branch
+compiler	1985	Order of imports affects type definitions	LIKELY	MEDIUM	yes	REPRODUCED	CompilerIssue1985ImportOrderTypeAmbiguityTest		two imports exposing the same type name: last one silently wins; expected ambiguity error
+compiler	1986	Maybe check for case mismatch between modules and files?	NOT_BUG	LOW	no	NOT_ATTEMPTED			suggestion: detect module/file case mismatch
+compiler	1988	No message from compiler about dead code elimination	NOT_BUG	LOW	no	NOT_ATTEMPTED			suggestion: report dead-code-eliminated ports
+compiler	1997	Exposed imported variables can be shadowed	NOT_BUG	LOW	yes	NOT_ATTEMPTED			shadowing of exposed imports is allowed on purpose (see elm/compiler#1806)
+compiler	1998	Lowercase file name a detectable discrepancy going from 0.19.0 to 0.19.1	WEAK	LOW	no	NOT_E2E			lowercase file names rejected by 0.19.1 on case-insensitive macOS; deliberate
+compiler	2001	Rank compiler bug with parametric types	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2001RankCrashParametricLetAnnotationTest		compiler crash ([rank = 2]) on a parametric let annotation
+compiler	2006	Crashing while performing type inference in function	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2006IndexOutOfBoundsMaybeWithDefaultTest		compiler crash (index out of bounds) on a type error through Maybe.withDefault
+compiler	2007	What are use-cases for more binaries? (32-bit, ARM, BSD, etc.)	NOT_BUG	LOW	no	NOT_ATTEMPTED			meta: binaries for more platforms
+compiler	2012	Name Clash output unreadable due to extra spaces	CERTAIN	LOW	yes	FIXED	CompilerIssue2012NameClashCaretSpacesTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	NAME CLASH report: single caret at the wrong column followed by ~65k spaces
+compiler	2013	Compiler bug [rank = 1]	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2013RankCrashLambdaLetAnnotationTest		compiler crash ([rank = 1]) on let annotation b : h in a piped lambda
+compiler	2014	Compiler bug [ rank = 2 ] and [ rank = 3 ]	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2014RankCrashIdentityLetAnnotationTest		compiler crash ([rank = 2]) on let annotation b : h in a lambda
+compiler	2017	Closures in recursive calls get shadowed, causing stack overflows	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2017TcoContinuationShadowedTest		wrong JS: continuation passed through a TCO call calls itself, stack overflow
+compiler	2018	Colliding module name causes crash instead of reporting a nice error	LIKELY	MEDIUM	maybe	NOT_E2E			crash needs a local module named like a dependency module (Fuzz from elm-explorations/test); would collide with the shared test project
+compiler	2019	Alias of generic sometimes is not equivalent to the generic itself	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2019AliasOfTypeVariableTest		alias MyType k = k not equivalent to k in result/right-hand positions
+compiler	2020	Consider new way to emit `let` functions	NOT_BUG	LOW	no	NOT_ATTEMPTED			code-generation optimization proposal for let functions
+compiler	2021	Unclear error message when try publish package with not matching name and slug	LIKELY	LOW	no	NOT_E2E			elm publish error when repo slug differs from name; publishing
+compiler	2022	Newer package version not recognised	WEAK	LOW	no	NOT_E2E			elm publish with a stale package cache; publishing
+compiler	2026	Repl storing code blocks for easier tweaking	NOT_BUG	LOW	no	NOT_ATTEMPTED			REPL feature request
+compiler	2027	Infinite loop during type inference	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2027IncompatibleExtensibleRecordsHangTest	lamdera-1.5.0	incompatible extensible records (Tricky x x): compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	2028	Ill-typed program is accepted with an incorrect inferred type	NOT_BUG	LOW	yes	NOT_ATTEMPTED			maintainers explain the accepted program is intended (extension fields are unioned); the hang variant in the comments is the same bug as 2027
+compiler	2029	0.19.0 -> 0.19.1 regression: compiler goes into infinite lool	CERTAIN	HIGH	yes	NOT_REPRODUCED			0.19.1 (npm 0.19.1-6) compiles X2 {} = X1 t t without looping
+compiler	2030	Make copy + paste into REPL easier by giving option to autowrite function name	NOT_BUG	LOW	no	NOT_ATTEMPTED			REPL feature request
+compiler	2032	Incompatible Html.Attributes.class for Svg.svg doesn't throw an error at compile time	LIKELY	MEDIUM	no	NOT_E2E			Html.Attributes.class on an svg element throws in the browser (className is read-only); needs a real DOM (also an elm/virtual-dom issue)
+compiler	2035	Elm 0.19.1 compiler reports a bug in itself	LIKELY	MEDIUM	maybe	NOT_ATTEMPTED			no SSCCE: repro is an external package repo depending on third-party packages; same crash class as 1974/2013
+compiler	2036	Infinite loop of the compiler in 0.19.0 and 0.19.1	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2036LensRecordUpdateHangTest		ill-typed lens record update: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	2039	Closing script tag in string causes data to be injected into the DOM	CERTAIN	MEDIUM	no	NOT_E2E			</script> in a string literal breaks --output=*.html; runner only produces JS
+compiler	2042	Elm make error when trying to create a directory due to permissions	WEAK	LOW	no	NOT_E2E			elm make --output to an unwritable directory reports an internal error; filesystem
+compiler	2043	Problem building dependencies after installing abinayasudhir/html-parser	NOT_BUG	LOW	no	NOT_ATTEMPTED			the package uses kernel code; not a compiler bug
+compiler	2045	Elm Init Typography	NOT_BUG	LOW	no	NOT_ATTEMPTED			wording of elm init
+compiler	2049	Understanding the cause behind the package name collision issue (#1625)	NOT_BUG	LOW	no	NOT_ATTEMPTED			discussion of package module-name collisions
+compiler	2050	elm install corrupts elm.json - `ERROR IN DEPENDENCIES`	LIKELY	LOW	no	NOT_E2E			elm install misplaces elm-explorations/test; install/network
+compiler	2054	Move roadmap here	NOT_BUG	LOW	no	NOT_ATTEMPTED			roadmap documentation
+compiler	2055	error with bump/diff when docs.json line is longer than 65535 (in 0.19.1 but not 0.19.0)	CERTAIN	MEDIUM	no	NOT_E2E			elm bump/diff fail on docs.json lines over 65535 bytes; network/package diffing
+compiler	2056	Unsupported WebGL types are silently ignored	LIKELY	LOW	no	NOT_E2E			unsupported GLSL uniform types silently ignored; needs elm-explorations/webgl
+compiler	2057	Call sites can change inferred type of called function	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2057CallSiteChangesInferredTypeTest		valid program rejected: rigid vars of different functions unified via locally recursive sortWith
+compiler	2060	Runtime exception when applying className property on SVG element	LIKELY	MEDIUM	no	NOT_E2E			same as 2032: class on svg throws in a real DOM
+compiler	2064	"elm.exe: not enough bytes" -> compiler error on very specific record type / type usage	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2064ExtendStringNotEnoughBytesTest	lamdera-1.5.0	compiler crash (toAnnotation not well-formed) on Named String extension
+compiler	2065	Subscription support for ports	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: port subscriptions with arguments
+compiler	2066	Compiler bug when mixing `number` and `Float`: [rank = 1]	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2066RankCrashNumberFloatTest		compiler crash ([rank = 1]) mixing number and Float
+compiler	2067	Type mismatch when applying local function on extensible record	NOT_BUG	LOW	yes	NOT_ATTEMPTED			correct rejection: the let annotation reuses the outer rigid m, and argFunc is monomorphic
+compiler	2069	Wrong message dispatched with debugger	WEAK	MEDIUM	no	NOT_E2E			debugger dispatches a wrong message with a third-party JS component; needs a browser
+compiler	2070	Module name conflict interfering with package updating	NOT_BUG	LOW	no	NOT_ATTEMPTED			module-name collision between packages (1625)
+compiler	2072	Compiler crashes due to wrong extensible record annotation	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2072ExtendUnitInResultCrashTest	lamdera-1.5.0	compiler crash (toErrorType) on Tagged () result annotation
+compiler	2077	Crash when inferring function signature with extensible records	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2077RankCrashExtensibleLetAnnotationTest		compiler crash ([rank = 2]) on extensible-record let annotations
+compiler	2078	Strict Float Type Arithmetic Operators	NOT_BUG	LOW	no	NOT_ATTEMPTED			language proposal: float-only operators
+compiler	2081	corrupt file message in console	WEAK	LOW	no	NOT_E2E			corrupt elm-stuff after Ctrl-C during a build
+compiler	2083	Used toErrorType on a type that is not well-formed	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2083ExtendCustomTypeFieldAccessCrashTest		compiler crash (toErrorType) on extending a custom type, no report printed
+compiler	2092	Invalid bytes could cause a better error message	WEAK	LOW	no	NOT_ATTEMPTED			error-message suggestion (form feed / NBSP bytes in source); no wrong behaviour beyond a vague message
+compiler	2093	Confusing error message in elm reactor when missing main	NOT_BUG	LOW	no	NOT_ATTEMPTED			elm reactor message for module without main; tooling
+compiler	2094	Inconsistent types comparisons between records built from extensible records aliases	LIKELY	MEDIUM	yes	NOT_ATTEMPTED			debatable: Named {name:String} has a duplicate field; whether x==y should type-check or x annotation be rejected is unclear
+compiler	2095	Packages LICENSE or README.md may be missing in local cache	LIKELY	LOW	no	NOT_E2E			package cache drops lowercase readme/license; package download tooling
+compiler	2097	Compiler error with malformed type (involves extensible records)	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2097ExtensibleUnitArgCrashTest	lamdera-1.5.0	compiler crashes (toAnnotation not well-formed) on extensible alias applied to (); lamdera reports an error
+compiler	2098	error with bump/diff when docs.json line is longer than 65535 (in 0.19.1 but not 0.19.0)	CERTAIN	MEDIUM	no	NOT_E2E			elm diff/bump fails on docs.json lines >65535 cols; network/publishing; reportedly fixed in 0.19.2
+compiler	2099	Allow package authors to request major versions if API is the same, but behavior is not	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: allow larger version bumps
+compiler	2100	Thread blocked indefinitely in an MVar operation with incorrect function signature within let	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2100LetAnnotationRank2CrashTest		crash (rank = 2) on wrong let annotation; 0.19.3 hangs instead
+compiler	2102	elm reactor documentation specifies listener is on localhost, it's on 0.0.0.0	NOT_BUG	LOW	no	NOT_ATTEMPTED			elm reactor bind address; tooling/docs
+compiler	2104	Incorrect reported type in type mismatch	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2104IfBranchWrongTypeReportedTest		TYPE MISMATCH shows polluted type Thing a (Thing a b) for if-branch
+compiler	2105	Compiler crashes when attempting to give type for extensible record	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2105ExtensibleFoldlCrashTest		type error report crashes (toErrorType not well-formed); needs withWindows exposed
+compiler	2106	Compiler hangs when compiling code with extensible records in type signature	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2106FoldlExtensibleRecordHangTest		reproduced manually under 0.19.1: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	2107	Type mismatch gives wrong and confusing error	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2107PipeIfInfiniteTypeReportedTest		TYPE MISMATCH report shows bogus infinite type Thing ∞
+compiler	2108	Compiler hangs when comparing functions with extensible records in type signature	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2108IfBranchExtensibleRecordHangTest	lamdera-1.5.0	reproduced manually under 0.19.1: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	2109	Compiler hangs forever if elm.json's dependencies field is an empty object	CERTAIN	LOW	no	NOT_E2E			hang on malformed elm.json; harness uses a fixed elm.json
+compiler	2111	Broken package documentation when @docs is on the first line of the module documentation	LIKELY	LOW	no	NOT_E2E			docs generation/parsing of @docs on first line; package docs tooling
+compiler	2112	Compiler hangs while compiling broken code, related to infinite type	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2112CaseBranchInfiniteTypeHangTest		reproduced manually under 0.19.1: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	2114	Using two packages exposing common module names	NOT_BUG	LOW	no	NOT_ATTEMPTED			known limitation: ambiguous module names across packages; feature request
+compiler	2116	Tuple size limitation is too small	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: larger tuples
+compiler	2119	Map.! when exposing mutually recursive function without type annotations	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2119MutualRecursionUnannotatedTest		Map.! crash using exposed unannotated mutually recursive fn from another module (helper module CompilerIssue2119View)
+compiler	2121	Moving an opaque custom type and replacing it by an alias to the moved custom type is considered a breaking change	LIKELY	LOW	no	NOT_E2E			elm diff semver classification; publishing tooling
+compiler	2122	Support using `deno` as interpreter for `elm repl` and Document how to do it	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: deno for repl
+compiler	2123	--docs flag does not work on elm/* packages with cross-package kernel imports	CERTAIN	LOW	no	NOT_E2E			--docs on kernel packages; package tooling
+compiler	2129	Emit named functions in DEV mode for easier profiling	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: named functions in dev output
+compiler	2131	CSS class on the debugger floating window	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: CSS class on debugger
+compiler	2132	error with bump/diff when docs.json line is longer than 65535 (in 0.19.1 but not 0.19.0)	CERTAIN	MEDIUM	no	NOT_E2E			duplicate of 2098/2055: elm diff docs.json line >65535
+compiler	2133	debugger runtime exception: Uncaught RangeError: Maximum call stack size exceeded	LIKELY	MEDIUM	no	NOT_E2E			debugger stack overflow in Chrome; elm/browser debugger, needs browser
+compiler	2135	Compiler error naming module `Matrix` when using a linear-algebra dependency	CERTAIN	MEDIUM	yes	REPRODUCED	File		a root module named like a dependency module (File, elm/file) crashes: Error from File should have been reported already; no third-party package needed
+compiler	2136	Improve error message when writing port type wrong	NOT_BUG	LOW	no	NOT_ATTEMPTED			error-message suggestion for port types
+compiler	2139	lock on d.dat somehow outlives `elm repl` session	LIKELY	LOW	no	NOT_E2E			elm repl lock on d.dat; REPL
+compiler	2143	Using Browser.element and Reactor leads to Error	NOT_BUG	LOW	no	NOT_ATTEMPTED			reactor does not pass flags; tooling
+compiler	2144	calling attribute with empty strings leads to runtime error	WEAK	LOW	no	NOT_E2E			attribute "" "" throws in real DOM; elm/virtual-dom, needs real browser DOM
+compiler	2145	elm diff / publish is unaware of breaking visual changes	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: allow manual major bump
+compiler	2146	thread blocked indefinitely in an MVar operation	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2146RoseLambdaPatternCrashTest		crash (? [rank = 1]) instead of type error
+compiler	2147	Compiler outputs pages of whitespace in middle of 'name clash' error report	CERTAIN	LOW	yes	FIXED	CompilerIssue2147NameClashWhitespaceTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	NAME CLASH report prints ~65000 spaces (column wraps at 16 bits)
+compiler	2148	Compiler error: index out of bound (3,3) somewhere in Data/Vector/Generic/Mutable.hs	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2148RecordUpdateFoldrCrashTest		crash index out of bounds (3,3) instead of type error
+compiler	2149	Explicitly setting "_self" for anchor tags triggers a page reload without triggering onUrlRequest	LIKELY	MEDIUM	no	NOT_E2E			target=_self link bypasses onUrlRequest; elm/browser navigation, needs browser
+compiler	2152	Compiler error: Mutable.hs:703: index out of bounds (3,3)	CERTAIN	HIGH	no	NOT_E2E			same crash as 2148 (reproduced there); SSCCE needs aforemny/material-components-web-elm
+compiler	2153	Compiler bug: "? [rank = 1]" in Type/Solve.hs	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2153RecursiveCallWrongArgCrashTest		crash (? [rank = 1]) instead of TYPE MISMATCH
+compiler	2155	Syntax Error due to case indentation (when a multiline string wrapped in parentheses ends without enough indentation)	WEAK	LOW	yes	NOT_ATTEMPTED			debatable: the closing paren is at a column that ends the case branch under the layout rule; consistent with indentation rules
+compiler	2160	Network access required during compilation	NOT_BUG	LOW	no	NOT_ATTEMPTED			building the compiler needs network; packaging
+compiler	2161	Is there a way to avoid the 5s hang when there is no network?	NOT_BUG	LOW	no	NOT_ATTEMPTED			offline 5s delay; network tooling
+compiler	2163	Debug usages not failing in optimized compilation if outputting to /dev/null	LIKELY	MEDIUM	no	NOT_E2E			--optimize with --output=/dev/null skips Debug check; harness compiles in debug mode to a file
+compiler	2171	error with bump/diff when docs.json line is longer than 65535 (in 0.19.1 but not 0.19.0)	CERTAIN	MEDIUM	no	NOT_E2E			duplicate of 2098: elm bump docs.json line >65535
+compiler	2173	Confusing error when trying to compile a module with a duplicate name	CERTAIN	MEDIUM	no	NOT_E2E			crash compiling a module named like an elm/core module (Process); entry module must be named Process, impossible in harness naming
+compiler	2174	repo ivadzy/bbase64 was renamed and it's breaking the "download source code" phase of `elm make`	NOT_BUG	LOW	no	NOT_ATTEMPTED			renamed GitHub repo of a package; ecosystem/network
+compiler	2176	thread blocked indefinitely in an MVar operation	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2176ExtensibleUnitAliasCrashTest	lamdera-1.5.0	toAnnotation crash for extensible alias applied to (); lamdera reports an error
+compiler	2177	Import cycle error shows odd import cycles	LIKELY	LOW	yes	NOT_REPRODUCED			attempted with the 3-module SSCCE (test module + 2 helpers, both import orders): 0.19.1 reported a valid cycle
+compiler	2179	Unable to preventDefault inside passive event listener due to target being treated as passive	WEAK	LOW	no	NOT_E2E			debugger passive listener warning in Chrome; browser
+compiler	2180	calling function recursively with different type arguments	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: polymorphic recursion
+compiler	2182	Unexpected elm: Map.!: given key is not an element in the map	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2182ExtensibleFunctionAliasCrashTest		Map.! crash on puzzle rec = rec with Goal alias while solution = identity is accepted (shows in elm make too)
+compiler	2183	Feature Request: Add binary literal	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: binary literals
+compiler	2184	Error called at Type/Solve.hs:206:15 -- thread blocked indefinitely in an MVar operation -- caused by two or more examples of recursion with wrong number of args	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2184LetRecursionTooManyArgsCrashTest		crash (? [rank = 1]) on two let recursions with too many args
+compiler	2185	Error called at Type/Solve.hs:206:15 -- thread blocked indefinitely in an MVar operation -- caused by type signature with type variable with wrapped phantom types	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2185PhantomWrapperLetAnnotationTest		valid code crashes the compiler (a [rank = 2])
+compiler	2186	Type variables don't unify correctly in top level declarations	NOT_BUG	LOW	yes	NOT_ATTEMPTED			f is monomorphic inside its own body (no polymorphic recursion); rejection is standard HM behaviour
+compiler	2187	Parallel elm make calls corrupt elm-stuff/0.19.1/i.dat	CERTAIN	MEDIUM	no	NOT_E2E			parallel elm make corrupts i.dat; concurrency
+compiler	2197	Feature request: emit compiled JS to stdout	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: output JS to stdout
+compiler	2200	fails to preduce error message on certain extended record `type alias` argument types	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2200ConstrainedExtensibleErrorCrashTest		TYPE MISMATCH report crashes with toErrorType not well-formed for constrained row variable
+compiler	2201	Old mac; clock woes	NOT_BUG	LOW	no	NOT_ATTEMPTED			old macOS lacks clock_gettime; platform
+compiler	2203	Possible to publish packages with removed dependencies.	NOT_BUG	LOW	no	NOT_ATTEMPTED			publishing with stale cached deps; package server
+compiler	2204	Error message oddity for types 	LIKELY	LOW	yes	NOT_ATTEMPTED			debatable: report prints { a  } for an empty record pattern; the right fix (and expected text) is open
+compiler	2205	Unhelpful "elm bump" error message	NOT_BUG	LOW	no	NOT_ATTEMPTED			elm bump message suggestion
+compiler	2206	Compiler crash (thread blocked indefinitely in an MVar operation) instead of type error	CERTAIN	HIGH	yes	FIXED	CompilerIssue2206RecordUpdateLetCrashTest	elm-0.19.3,lamdera-1.5.0	crash index out of bounds (3,3) depending on let binding name
+compiler	2207	"Map.!: given key is not an element in the map" with mutual recursion and exposed functions	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2207MutualRecursionSecondFunctionTest		REPL crash Map.! also hits elm make when using g of exposed unannotated mutual recursion (helper CompilerIssue2207Mutual)
+compiler	2208	non-breaking type changes should be minor/patch	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: semver rules
+compiler	2210	weird behavior for "type alias of open record + extensions introducing field name overlap"	LIKELY	MEDIUM	yes	NOT_ATTEMPTED			debatable: aliases with overlapping row fields; unclear whether annotations should be rejected or u == v accepted
+compiler	2211	elm update/upgrade	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: elm upgrade
+compiler	2212	elm install foo/bar@v	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: install specific version
+compiler	2214	Compiler hangs and uses more and more memory on type error.	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2214LensSetterArgumentOrderHangTest		reproduced manually under 0.19.1: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	2216	Missing information in `elm init` text	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs: elm init text
+compiler	2219	Prevent publishing packages that don't expose types used in public signatures	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: publish checks
+compiler	2220	Prevent publishing packages with unused dependencies	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: publish checks
+compiler	2221	`RangeError` occurs in CP styled functions	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2221TcoContinuationTest		TCO loop rebinds captured cont/value: CPS factorial overflows the stack
+compiler	2223	Failure to run elm bump/diff	CERTAIN	MEDIUM	no	NOT_E2E			duplicate of 2098: elm diff docs.json line >65535
+compiler	2224	Compiler crash on external module name duplicate	CERTAIN	MEDIUM	no	NOT_E2E			crash when local module name clashes with a dependency module; needs third-party package or a colliding module in the shared project
+compiler	2225	Constrained type variables in type aliases aren't respected	LIKELY	LOW	yes	NOT_ATTEMPTED			debatable: whether constrained names in alias params must be enforced; no unsoundness
+compiler	2226	Debugger: show commands	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: debugger shows Cmds
+compiler	2228	Add line and column numbers to file path in compilation errors	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: line:col in paths
+compiler	2230	Newbies and the evil of import aliases	NOT_BUG	LOW	no	NOT_ATTEMPTED			error-message suggestion: expand import aliases
+compiler	2231	Confusing "Module name mismatch" error when the import uses the wrong casing	WEAK	LOW	no	NOT_E2E			misleading error only on case-insensitive filesystems (macOS); Linux reports module not found
+compiler	2237	Failed to find working directory	NOT_BUG	LOW	no	NOT_ATTEMPTED			error-message suggestion for deleted cwd
+compiler	2238	Different type syntax	NOT_BUG	LOW	no	NOT_ATTEMPTED			syntax proposal
+compiler	2240	Error message from generic signature with records is inconsistent with other errors from generic signatures	NOT_BUG	LOW	no	NOT_ATTEMPTED			error-message wording suggestion
+compiler	2241	`elm make` hang then runaway memory usage from orphan process	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2241FoldMapInfiniteTypeHangTest		reproduced manually under 0.19.1: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
+compiler	2242	Unhelpful error message when initializing app without passing in the node	NOT_BUG	LOW	no	NOT_ATTEMPTED			JS init error message suggestion; browser
+compiler	2243	When two packages use the same Module.Name, neither can be used.	NOT_BUG	LOW	no	NOT_ATTEMPTED			known limitation: two packages exposing same module
+compiler	2245	Adding type_ attribute to textarea throws error in runtime	WEAK	LOW	yes	REPRODUCED	VirtualDomIssue181TextareaTypeTest	lamdera-1.5.0	same bug as virtual-dom#181 (textarea type_ throws)
+compiler	2249	The compiler should not include non-Elm resources from the src/ folder	NOT_BUG	LOW	no	NOT_ATTEMPTED			packaging: non-Elm files in package src
+compiler	2250	Proposal: Allow installing the latest package of a major version	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: install by major version
+compiler	2251	Elm Reactor should pass `flags: null`	NOT_BUG	LOW	no	NOT_ATTEMPTED			reactor flags; tooling request
+compiler	2252	error on correct code using `Identity a = a`	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2252IdentityAliasTest		type alias Identity a = a not unified with a; valid program rejected
+compiler	2255	Parse error from string escapes in `elm.json`	CERTAIN	LOW	no	NOT_E2E			elm.json JSON escape \/ not parsed; harness uses fixed elm.json
+compiler	2256	Bug: It's possible to compile a main function as an application when the project is a package	WEAK	LOW	no	NOT_E2E			elm make on a package project; harness projects are applications; arguably intended
+compiler	2257	Windows Installer lacks version metadata	NOT_BUG	LOW	no	NOT_ATTEMPTED			Windows installer metadata
+compiler	2258	openBinaryFile: resource busy	LIKELY	MEDIUM	no	NOT_E2E			d.dat file lock races; concurrency/environment
+compiler	2259	`--report json` prints invalid JSON on "NO TABS" error	CERTAIN	LOW	no	NOT_E2E			--report json with raw tab; harness does not use --report json
+compiler	2260	Allow `.` in `import` alias	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: dotted import aliases
+compiler	2262	Cannot run `elm install m-mullins/elm-console`	NOT_BUG	LOW	no	NOT_ATTEMPTED			package repo deleted; ecosystem
+compiler	2263	Better error message for error: What node should I take over?	NOT_BUG	LOW	no	NOT_ATTEMPTED			JS init error message suggestion
+compiler	2264	`--report=json` emits a non-JSON nicely formatted error	LIKELY	LOW	no	NOT_E2E			--report json mixes text for corrupt cache; harness does not use it
+compiler	2265	`installers/mac/preinstall` wrongly assumes `/usr/local/bin` exists and is on PATH	NOT_BUG	LOW	no	NOT_ATTEMPTED			mac installer
+compiler	2267	elm repl can't have empty line in multiline comments	LIKELY	LOW	no	NOT_E2E			elm repl multiline comment with blank line; REPL
+compiler	2268	Tail Call Optimization produces bad closures 	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2268TcoClosureCaptureTest		TCO closures all capture the last loop value: [3,3,3] instead of [3,2,1]
+compiler	2269	elm compiler freezes while eating all the RAM	LIKELY	HIGH	no	NOT_E2E			hang with memory growth like 2241 but repro needs an external repository
+compiler	2273	elm: Network.Socket.bind: resource busy (Address in use)	NOT_BUG	LOW	no	NOT_ATTEMPTED			reactor port-in-use message suggestion
+compiler	2274	Transmute value to arbitrary type with mutually recursive functions	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2274MutualRecursionTransmuteTest		unsound: mutual recursion inferred a -> b -> c, eraseType : a -> b compiles
+compiler	2275	Type error for correct code using a polymorphic recursive function	NOT_BUG	LOW	yes	NOT_ATTEMPTED			feature request: polymorphic recursion (Elm does not support it)
+compiler	2276	Unexpected infinite loop with strange workaround	WEAK	LOW	maybe	NOT_ATTEMPTED			no SSCCE; described code recomputes subterms (exponential), likely slow rather than a compiler bug
+compiler	2277	Shadowing is allowed for importing types	LIKELY	LOW	yes	NOT_ATTEMPTED			debatable: whether importing two types of the same name should be an error is a design question
+compiler	2279	Elm crashes while initializing elm-stuff on highly contended multithreaded CPU	LIKELY	MEDIUM	no	NOT_E2E			crash initialising elm-stuff under heavy contention; concurrency
+compiler	2280	Use a better error when using `true` and `false` instead of `True` and `False`	NOT_BUG	LOW	no	NOT_ATTEMPTED			error-message suggestion for true/false
+compiler	2281	Long list formatted all on one line causes a parser error (trailing comma)	CERTAIN	MEDIUM	yes	FIXED	CompilerIssue2281LongLineListTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	list on one line >65535 columns gives UNFINISHED LIST parse error
+compiler	2285	It's possible to publish new packages with old GitHub username	NOT_BUG	LOW	no	NOT_ATTEMPTED			publishing under old GitHub name; package server
+compiler	2290	exposing variants → major version; should be minor	LIKELY	LOW	no	NOT_E2E			elm diff classifies exposing variants as MAJOR; publishing tooling
+compiler	2292	`type alias A a = a` should unify with `a`	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2298IdentityAliasResultTest		same bug as 2298 (a -> A a with type alias A a = a rejected); covered by that test
+compiler	2293	Re-releasing packages with different github usernames (and not v1.0.0) breaks package download endpoints	NOT_BUG	LOW	no	NOT_ATTEMPTED			package renamed on GitHub; ecosystem
+compiler	2295	in a lambda, wrong `let` types can cause "thread blocked indefinitely"	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2295LambdaLetAnnotationCrashTest		crash (b [rank = 2]) on let annotation inside lambda
+compiler	2296	Type annotation crashes the compiler	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2296LetAnnotationFreeVarCrashTest		crash (msg [rank = 2]) on let annotation with free var
+compiler	2297	Don't print Ansi escape sequences if NO_COLOR set or TERM=dumb	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: NO_COLOR/TERM=dumb
+compiler	2298	Identity type alias causes problems	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2298IdentityAliasResultTest		a -> Msg a with type alias Msg a = a rejected; valid program
+compiler	2299	elm publish - tried to fetch https://package.elm-lang.org... "But it came back as 413 Request Entity Too Large"	WEAK	LOW	no	NOT_E2E			package server 413 on publish; network
+compiler	2300	`elm publish` hangs indefinitely at GitHub tag check with large package	LIKELY	LOW	no	NOT_E2E			elm publish hangs on large package; network/publishing
+compiler	2301	Compiler panic when unifying inner skolem with an outer unification variable	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2301InnerSkolemOuterVarCrashTest		crash (a [rank = 2]) when let annotation var unifies with outer var
+compiler	2302	Compiler error produces unexpected output when rendered in a terminal	CERTAIN	LOW	yes	FIXED	CompilerIssue2302NameClashListPatternWhitespaceTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	NAME CLASH report prints 65532 spaces for [ a, a ]
+compiler	2304	Package opvasger/comparable has been deleted & can no longer be installed	NOT_BUG	LOW	no	NOT_ATTEMPTED			package repo deleted; ecosystem
+compiler	2312	record extended with additional field not accepted as extensible record with record with same fields	LIKELY	LOW	yes	NOT_ATTEMPTED			debatable: Base (Specific other) has field base twice; whether specific should unify is unclear
+compiler	2320	elm publish under zsh not printing error message	WEAK	LOW	no	NOT_E2E			segfault under zsh during publish with TLS failure; environment/network
+compiler	2324	Bug?: Confusing behaviour when combining `--optimize` with `--output=/dev/null`	LIKELY	MEDIUM	no	NOT_E2E			--optimize with --output=/dev/null skips Debug check (dup of 2163); harness compiles in debug mode
+compiler	2332	"Annotation vs. Internal Annotation" is essentially variable shadowing (and the solution is to disallow it)	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs/design proposal; the documented example already compiles
+compiler	2333	elm init missing -y option	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: elm init -y
+compiler	2334	deadlock with malformed elm.json	CERTAIN	LOW	no	NOT_E2E			hang on malformed elm.json; harness uses a fixed elm.json
+compiler	2338	Compiler Bug: Pathological example	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2338LambdaLetAnnotationTupleCrashTest		crash (x [rank = 2]); mapAccuml inlined from list-extra
+compiler	2341	Execute tasks in REPL	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: tasks in REPL
+compiler	2345	"Prelude.last: empty list" crash when module path appears to conflict with core module	CERTAIN	MEDIUM	no	NOT_E2E			Prelude.last crash with src file named like an implicitly imported core module; would break every test in the shared project
+compiler	2346	Message: not enough bytes	WEAK	LOW	no	NOT_E2E			corrupt d.dat / cache issues; environment
+compiler	2357	Ports leak between apps when compiled together	LIKELY	LOW	no	NOT_E2E			ports leak when compiling two mains into one file; harness compiles one entry
+compiler	2360	Elm 0.19.2: U+2028 and U+2029 are no longer escaped in char literals	WEAK	LOW	no	NOT_E2E			0.19.2 regression (U+2028/9 unescaped); 0.19.1 escapes correctly and Node accepts both
+compiler	2361	Missing container image of releases	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: container images
+compiler	2362	Float equality is inconsistent.	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2362NanTupleEqualityTest		(nan,1) == itself is True via identity shortcut in _Utils_eq while equal copies give False
+compiler	2364	Windows binaries of 0.19.2 and 0.19.3 emit CRLF in the runtime helper preamble	WEAK	LOW	no	NOT_E2E			Windows 0.19.2/0.19.3 binaries emit CRLF; not a 0.19.1 bug, platform
+compiler	2365	Branch 0.19.4: omits def's of recursive functions...	WEAK	HIGH	no	NOT_E2E			unreleased 0.19.4 branch omits recursive defs; not 0.19.1
+error-message-catalog	2	Add recommendation for type vs. type alias	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	25	Documentation comment before module definition leads to misleading error message	NOT_BUG	LOW	yes	NOT_ATTEMPTED			comment/doc comment above module: request for clearer message
+error-message-catalog	34	Inaccurate error: "qualifier not in scope" when it meant "Cannot find type"	CERTAIN	LOW	yes	NOT_REPRODUCED			0.19.1 says the module does not expose the type (correct); the false "qualifier/module not in scope" claim was 0.17/0.18
+error-message-catalog	50	Missing module error message	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	52	Assigning to constants will give partial pattern error	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	65	Malformed @docs list generates confusing error message	NOT_BUG	LOW	no	NOT_ATTEMPTED			@docs parsing message during publish (0.16); suggestion
+error-message-catalog	66	Assigning one value to a tuple	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	67	No record creation function for type aliases built with extensible types	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	72	Error message only mentions one of the two type arguments	WEAK	LOW	maybe	NOT_REPRODUCED			cannot arise in 0.19.1: an annotation missing type args is TOO FEW ARGS first
+error-message-catalog	73	Comparability of composite structures and an example in tuples	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 says the tuple containing a function is not comparable; no identical-type message
+error-message-catalog	80	Don't suggest Basics.something	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	81	"inferring a weird self-referential type when" missing whitespace	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 reports "value is not a function" for ship.powerLevel -1, no infinite type
+error-message-catalog	82	Typo between type annotation and definition gives bad message	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	84	Unexpected "duplicate definition" error	NOT_BUG	LOW	yes	NOT_ATTEMPTED			record alias constructor genuinely clashes with variant Baz; 0.19.1 explains the clash
+error-message-catalog	85	Accidental list wrapping causes INFINITE TYPE "weird self-referential type" error	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 reports a plain TYPE MISMATCH, no weird self-referential type
+error-message-catalog	86	"Cannot find variable" -> "Cannot find value"	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	87	Disallow Type(..) in imports when no tags exported	NOT_BUG	LOW	yes	NOT_ATTEMPTED			request to reject Type(..) import of an opaque type; 0.19.1 accepts it silently by design
+error-message-catalog	88	Importing a type alias as a union type	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1: "The Value type alias cannot be followed by (..)"
+error-message-catalog	89	import Lorem exposing (ipsum, sit) as Amet	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	91	Report line that is the source of type inference when type mismatch occurs	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	92	Keyword for pattern matching variable, error is confusing	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	93	importing a module from itself	NOT_BUG	LOW	yes	NOT_ATTEMPTED			self import reported as import cycle; request for a specific message
+error-message-catalog	94	`exposing` makes arguments fragile	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	95	Missing equals sign on function definition	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	99	case producing different types of values when accessing a field that does not exist	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	100	Doc comment above `module` results in unhelpful error message	NOT_BUG	LOW	yes	NOT_ATTEMPTED			comment/doc comment above module: request for clearer message
+error-message-catalog	103	Imported module without name assumed to be Main	LIKELY	LOW	maybe	NOT_REPRODUCED			0.19.1 reports missing module line / spaces before module, not a module-name mismatch claiming Main
+error-message-catalog	106	Naming error didn't suggest missing dot between module name and function	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	107	Importing module with no function	WEAK	LOW	yes	NOT_ATTEMPTED			debatable: 0.19.1 rejects a module with no declarations; whether empty modules are valid is a design question
+error-message-catalog	117	type inference gives overconfident error message about what type a function should be	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	119	Suggest missing function arguments	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	123	Compiler hint suggests programWithFlags when maybe beginnerProgram would be more appropriate	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	127	Forgot to add a type argument	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	128	Could help more with missing imports	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	134	Invalid ports direct to a page that doesn't help	NOT_BUG	LOW	yes	NOT_ATTEMPTED			port type message/link: improved in 0.19 (BAD PORT); further wording request
+error-message-catalog	144	REPL doesn't say that filename and module name might not be the same	NOT_BUG	LOW	no	NOT_ATTEMPTED			REPL message (201 already fixed in 0.19.1); wording request
+error-message-catalog	145	Top-level named function is called "anonymous"	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 names the function (namedFunction/f) instead of calling it anonymous
+error-message-catalog	147	Misleading error message when nested module is referred to in two ways	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	150	*No* error given when the base module's name doesn't match its file name.	LIKELY	LOW	maybe	NOT_REPRODUCED			0.19.1 reports module name out of sync for the root file too
+error-message-catalog	151	`Json.Value` mentioned, but only `Json.(En/De)code.Value` really exist	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	153	"Weird self-referential type" when types just mismatch	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 reports a plain TYPE MISMATCH, no weird self-referential type
+error-message-catalog	158	*No* error given when importing the same module twice	NOT_BUG	LOW	yes	NOT_ATTEMPTED			request to reject duplicate imports (allowed by the language)
+error-message-catalog	159	Nested record update message	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	165	Typo checker for type aliases using built-in types	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	166	Multiple parameters to port	NOT_BUG	LOW	yes	NOT_ATTEMPTED			port type message/link: improved in 0.19 (BAD PORT); further wording request
+error-message-catalog	170	The same module names from different packages	NOT_BUG	LOW	no	NOT_ATTEMPTED			question about same module names across packages
+error-message-catalog	172	No args port gives link to irrelevant page	NOT_BUG	LOW	yes	NOT_ATTEMPTED			port type message/link: improved in 0.19 (BAD PORT); further wording request
+error-message-catalog	173	Port type error	NOT_BUG	LOW	yes	NOT_ATTEMPTED			port type message/link: improved in 0.19 (BAD PORT); further wording request
+error-message-catalog	174	Infinite type error message has an unclear sentance	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	175	`comparable` gets unified out of type error	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 shows the type against comparable, no longer "expected T but it is T"
+error-message-catalog	178	Redundant pattern caused by matching on bound value	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	179	Suggest parameters out of order	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	180	Incorrect naming error message	CERTAIN	LOW	yes	NOT_REPRODUCED			0.19.1 says the module does not expose the type (correct); the false "qualifier/module not in scope" claim was 0.17/0.18
+error-message-catalog	181	Errors about "expected (something), got Maybe a" could use hints	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	182	number doesn't seem to be comparable	LIKELY	MEDIUM	yes	NOT_REPRODUCED			number > number compiles in 0.19.1
+error-message-catalog	183	bad recursion error: bad characters displayed on windows/cmd (letÔÇÖs)	WEAK	LOW	no	NOT_E2E			Windows console encoding/path separators (0.18, environment)
+error-message-catalog	186	Confusing description of missing cases when matching values	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	187	Confusing type annotation error	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 qualifies the conflicting same-named types (Bytes.Decode.Decoder vs Decoder)
+error-message-catalog	188	foo : () String Float parses but gives confusing type mismatch	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 rejects foo : () String Float with a parse error, no nonsensical type mismatch
+error-message-catalog	189	Confusing error for Json.Decode.oneOf	NOT_BUG	LOW	no	NOT_ATTEMPTED			Json.Decode error text length suggestion
+error-message-catalog	190	Compiler doesn't catch partially redundant case..of branch	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	192	Floating comma instead floating point error message	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	194	Missing parentheses in type union lead to ugly message	CERTAIN	MEDIUM	yes	NOT_REPRODUCED			0.18 crash; 0.19.1 reports TOO FEW ARGS for the bare type constructor
+error-message-catalog	197	Mention the arrow in type mismatch errors	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	198	Possibly improve hints for type mismatches due to incorrect function/variable used	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	199	Redundancy error in case..of could be clearer	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	201	Fix strange `t_s_o_l` error message	NOT_BUG	LOW	no	NOT_ATTEMPTED			REPL message (201 already fixed in 0.19.1); wording request
+error-message-catalog	202	Ambiguous variable due to `as`	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	203	"type applications should start with a type atom" caused by	CERTAIN	MEDIUM	yes	NOT_REPRODUCED			0.18 crash; 0.19.1 reports TOO FEW ARGS for the bare type constructor
+error-message-catalog	205	space is required on new line in the repl	NOT_BUG	LOW	no	NOT_ATTEMPTED			REPL message (201 already fixed in 0.19.1); wording request
+error-message-catalog	206	The compiler should warn when it hits invalid whitespace	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	207	Confusing error for (\a -> a, ())	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	209	It would be helpful if --warn notified of unused arguments in functions	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	210	Redundant pattern for Bool	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	212	Different names but same types	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	213	Detect wrong function call syntax	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 shows the type against comparable, no longer "expected T but it is T"
+error-message-catalog	214	Record mismatch could give more specification error	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	215	"Cannot find variable `X.T`. No module called X has been imported." when X has been imported but not exposing type correctly	CERTAIN	LOW	yes	NOT_REPRODUCED			0.19.1 says the module does not expose the variant (also via an as-alias); false "no module imported" claim fixed
+error-message-catalog	216	Error Messages can they be made more intuitive?	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	218	min is ambiguous: Basics -vs- Html.Attributes	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 reports AMBIGUOUS NAME Basics.min vs Html.Attributes.min
+error-message-catalog	219	Importing union tag as a type	NOT_BUG	LOW	yes	NOT_REPRODUCED			0.19.1 explains importing a variant by name; suggestion already implemented
+error-message-catalog	221	Inconsistent slashes in paths	WEAK	LOW	no	NOT_E2E			Windows console encoding/path separators (0.18, environment)
+error-message-catalog	223	Whitespace before module definition - confusing error message	LIKELY	LOW	maybe	NOT_REPRODUCED			0.19.1 reports missing module line / spaces before module, not a module-name mismatch claiming Main
+error-message-catalog	224	Debug.log with one argument should maybe emit a warning that it won't execute the side effect	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	226	Expecting T but it is T	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 shows the type against comparable, no longer "expected T but it is T"
+error-message-catalog	228	Non-descriptive error when encountering a typeclass mismatch	LIKELY	LOW	yes	REPRODUCED	ErrorMessagesIssue228ComparableListHintTest		Set of List of custom type: 0.19.1 hint falsely says it cannot compare List values (the custom type is the problem); original 0.18 nonsensical message is gone
+error-message-catalog	230	When argument used with inconsistent types, compiler only points out one use.	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	231	Capitalization mistakes	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	232	Undefined Maybe type field in inbound port gives incorrect error message	NOT_BUG	LOW	no	NOT_ATTEMPTED			runtime port decode message; Maybe fields need null (by design), wording request
+error-message-catalog	233	"I cannot find module X": it would be nice to show the client module’s file path	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	234	Html.div expects both 2 and 3 arguments.	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 reports one error (div expects 2 args, got 4)
+error-message-catalog	237	Set insert a Tuple containing a Type, error message confusing	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 shows the type against comparable, no longer "expected T but it is T"
+error-message-catalog	238	Misleading error message when trying to use tuple type alias as constructor	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	239	Kebab case	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	240	intuitive usage of a function	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	242	Record type suggestion causes crash	CERTAIN	MEDIUM	yes	NOT_REPRODUCED			0.18 type-inference crash; 0.19.1 reports ordinary TYPE MISMATCH for rigid a/b
+error-message-catalog	243	Minor improvement to case type errors	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	245	Possible improvement for misuse of (::) operator	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	246	Pattern matching on literals only	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	250	Misleading error message when deconstructing value taken out of a record	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 says the field value cannot be destructured as a tuple (correct problem)
+error-message-catalog	252	Typo in module definition	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	254	Deconstructing tuple from record inside record.	LIKELY	LOW	yes	NOT_REPRODUCED			0.19.1 says the field value cannot be destructured as a tuple (correct problem)
+error-message-catalog	256	importing an empty module	WEAK	LOW	yes	NOT_ATTEMPTED			debatable: 0.19.1 rejects a module with no declarations; whether empty modules are valid is a design question
+error-message-catalog	257	Should have a 'did you mean' sugguestion when typo in module import	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	258	Typos, "did you mean" errors - filter the candidates using type information	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	262	Error message not helping when pattern matching `Set.empty` in case expression	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	263	Which dependencies in elm.json are not compatible?	NOT_BUG	LOW	no	NOT_ATTEMPTED			CLI/package-tool message suggestion
+error-message-catalog	266	Compiler hint for toString	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	267	Reactor gives cryptic error on malformed Elm application	LIKELY	LOW	no	NOT_E2E			elm reactor "thread killed" on a program without main (reactor only)
+error-message-catalog	268	Misleading TYPE MISMATCH error on the body of a function	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	275	Missing argument reported as problem with different function	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	276	Dict.insert given type mismatch error when it should be given Arg count error.	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	277	^^^'s are misaligned when line contains emojis	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	279	Error message when miscapitalizing a boolean value could be clearer	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	281	Unused assignment, either in let assignments or unused args	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	284	Error points to the wrong function (when missing type annotations)	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	288	Confusing error message with type alias and incorrect list item type	LIKELY	LOW	yes	REPRODUCED	ErrorMessagesIssue288ConsOntoListAliasTest		second report claims (::) needs a List on the right when the value is an alias of List Int (false claim)
+error-message-catalog	291	Confusing error message when constructing a line-charts axis	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	297	Non-Optimal error message for GLSL on extrenous space	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	298	Unhelpful compiler error message: "and" should suggest "&&"	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	299	Suggest longer names with same prefix on naming errors	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	300	Package name not matching github repo name produces misleading error	NOT_BUG	LOW	no	NOT_ATTEMPTED			CLI/package-tool message suggestion
+error-message-catalog	301	Error message doesn't say that issue is due to conflict between same-named functions from different modules	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	302	Unclear hint for parsing errors involving incorrect arity in complex types.	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	303	Get constructor argument error when bigger problem is duplicate constructor cases	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	304	elm make "can't find file" that's there	NOT_BUG	LOW	no	NOT_ATTEMPTED			CLI/package-tool message suggestion
+error-message-catalog	305	No suggestion that value may be in another module in same package	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	306	Importing two types with the same name doesn't error out on ambiguous names	LIKELY	MEDIUM	yes	REPRODUCED	ErrorMessagesIssue306AmbiguousImportedTypeTest		type name exposed by two imports is silently resolved to the last import instead of AMBIGUOUS NAME (as for values); shown with Json.Decode/Bytes.Decode Decoder
+error-message-catalog	307	Confusing message for `UNEXPECTED CAPITAL LETTER`	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	308	Dict should require comparable and Dict.get error messages can be more specific	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	309	Display a warning when no js is emitted	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	310	Missing code location for unknown import	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	311	Using "type" instead of "type_"	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	312	using ^ to indicate position in a line is bad for accessibility	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	313	Add line number next to File path separated by a ":"	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	314	When package.elm-lang.org is not accessible, `elm make` does not tell which dependencies it is trying to fetch	NOT_BUG	LOW	no	NOT_ATTEMPTED			CLI/package-tool message suggestion
+error-message-catalog	315	Adding a plus sign to numbers is not explicit about pluses not being allowed	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	317	Confusing error when function that takes "number"s must take "Int"s	NOT_BUG	LOW	yes	NOT_REPRODUCED			request for clearer number/Int hint; the doubled backtick in the report did not reproduce in 0.19.1 (likely the build tool)
+error-message-catalog	318	Compiling an empty model gives unhelpful error message	WEAK	LOW	yes	NOT_ATTEMPTED			debatable: 0.19.1 rejects a module with no declarations; whether empty modules are valid is a design question
+error-message-catalog	319	elm install breaks with multiple package names	NOT_BUG	LOW	no	NOT_ATTEMPTED			elm install with several packages: 0.19.1 no longer crashes, wording request
+error-message-catalog	320	Which error messages should exist?	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	321	error when publishing package with non-root elm.json	LIKELY	LOW	no	NOT_E2E			elm publish internal error with elm.json not at repo root (publishing)
+error-message-catalog	322	Recursive calls in `let` fail cryptically when using arrays/records	LIKELY	MEDIUM	yes	REPRODUCED	ErrorMessagesIssue322LetRecursiveRecordLambdaTest		let-bound record whose lambda field recurses through another lambda is rejected as CYCLIC VALUE; same code compiles at top level
+error-message-catalog	323	Confusing error when main documentation comment comes after import	WEAK	LOW	yes	NOT_ATTEMPTED			debatable: doc comment not followed by a declaration is rejected; 0.19.1 report points at the next doc comment; correct report/title unclear
+error-message-catalog	324	Generic error message when type alias is missing 'alias'	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	325	Unclear message when elements in list produce non-homogeneous Html values	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	326	When given argument of wrong type, error message is sometimes overzealous in its assumptions about the correct type.	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	327	unlear (?) error messages when working with tuples	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	328	Type alias should be expanded or diffed to figure out problematic areas	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	329	Be more specific about port type signature issue	NOT_BUG	LOW	yes	NOT_ATTEMPTED			port type message/link: improved in 0.19 (BAD PORT); further wording request
+error-message-catalog	330	Vertical bar error message wrong	NOT_BUG	LOW	yes	NOT_ATTEMPTED			hint wording (vertical bars "only in custom types") for record update missing braces; unchanged in 0.19.2/0.19.3
+error-message-catalog	331	Type alias should be expanded to show the details	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	332	Difficulty understanding Type Mismatch error for beginner	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	333	Decimals starting with `.` have confusing error message.	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	334	Confusing error when attempting to install a pre-0.19 package	NOT_BUG	LOW	no	NOT_ATTEMPTED			CLI/package-tool message suggestion
+error-message-catalog	335	Naming error when tuple result on lambda has no parens	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	336	lambda expression = something is really tripping me up	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	337	Inverted arguments by mistake	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	338	Report of incorrect/extraneous fields should not suggest already present fields	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	339	Got type X instead of type Y having single variant X	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	340	Using `Maybe` instead of `Just`	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	341	Error message for UNKNOWN EXPORT	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	342	more informative Maybe error	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	343	Improve error when using type alias instead of type	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	344	confusing error when running `elm install` on a read-only elm.json	WEAK	LOW	no	NOT_E2E			internal error on read-only elm.json during elm install (environment)
+error-message-catalog	345	Elm repl gives bad error messages for incorrect capitaliztion	NOT_BUG	LOW	no	NOT_ATTEMPTED			REPL message (201 already fixed in 0.19.1); wording request
+error-message-catalog	346	there should be a hint when swapping arguments	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	347	Record typo suggested fix could be better	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	348	Subtraction without whitespace gives non-intuitive error	NOT_BUG	LOW	yes	NOT_REPRODUCED			a-a compiles in 0.19.1; message wording only
+error-message-catalog	349	Confusion between type name and variant name shadowing	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	350	Better error message when attempting Haskell-style pattern matching	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	351	Two multiline comments without code between them trigger a parsing error	WEAK	LOW	yes	NOT_ATTEMPTED			debatable: doc comment not followed by a declaration is rejected; 0.19.1 report points at the next doc comment; correct report/title unclear
+error-message-catalog	352	An extra space in one of the items in the case statement yields a weird error message	WEAK	LOW	no	NOT_ATTEMPTED			no reproduction given
+error-message-catalog	353	better guidance for stack overflows	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	354	Debug.todo could report types of the holes	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	355	Trying to use non-exposed constructors	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	356	Bad unicode escape – bad suggestion :)	CERTAIN	LOW	yes	REPRODUCED	ErrorMessagesIssue356UnicodeEscapeBadSuggestionTest		BAD UNICODE ESCAPE for \u{01} suggests \u{001}, itself invalid (needs 4 digits)
+error-message-catalog	357	argument order errors overwhelming.	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	358	No hint that you've defined a type that you're now confusing with another type	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	359	No `-- comments` above module: isn't so clear for a beginner?	NOT_BUG	LOW	yes	NOT_ATTEMPTED			comment/doc comment above module: request for clearer message
+error-message-catalog	361	Issue with extensible records and unit type	CERTAIN	HIGH	yes	REPRODUCED	ErrorMessagesIssue361ExtensibleAliasOfUnitCrashTest		compiler crashes (toAnnotation internal error) on extensible-record alias applied to (); with exposing (main) it even compiles
+error-message-catalog	362	A silly mistake but the compiler wasn't helpful with `type` error	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	363	Bad function signature leads to 'EXPECTING DEFINITION'	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	364	Pattern parser not hinting at missing comma	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	365	Suboptimal error for mising function arguments	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	366	Hint on using types / type aliases	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	367	bad error message when programmer does not know about unary -1 yet	NOT_BUG	LOW	yes	NOT_ATTEMPTED			1 -1 is application of a negative literal by language design; wording request
+error-message-catalog	368	Error message should be more informative when integer literal is being used as both integer and float	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	369	Permission Denied Error Due to Unset `ELM_HOME` Environment Variable in `Stuff` Module	NOT_BUG	LOW	no	NOT_ATTEMPTED			CLI/package-tool message suggestion
+error-message-catalog	370	I cannot find a `return` variable better error message	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	371	Confusing wording on syntax error	NOT_BUG	LOW	yes	NOT_ATTEMPTED			error-message wording/hint suggestion, not a misbehaviour
+error-message-catalog	372	Malformed record modify `{ key | }` creates EXTRA COMMA error	CERTAIN	LOW	yes	FIXED	ErrorMessagesIssue372EmptyRecordUpdateExtraCommaTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	{ key | } reported as EXTRA COMMA (delete the comma) though there is no comma
+browser	20	Browser.application programs cannot handle URLs with uncommon protocols like dat://	LIKELY	MEDIUM	no	NOT_E2E			Browser.application crashes on dat:// URLs (Url.fromString rejects the protocol); needs window.location
+browser	34	`a` tags without `href` generate a navigation event	LIKELY	MEDIUM	no	NOT_E2E			a tags without href produce External "" UrlRequest; needs click events
+browser	38	API feature request: expose HTMLElement.offsetTop	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: offsetTop
+browser	39	Jumping to fragments does not work in a good way in `Browser.application`	NOT_BUG	LOW	no	NOT_ATTEMPTED			behaviour discussion of fragment links in application
+browser	41	Debugger seems to not register any click events	WEAK	LOW	no	NOT_E2E			debugger click issue in fullscreen macOS browsers
+browser	43	Browser.element with navigation	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: navigation in Browser.element
+browser	47	Svg.a and Svg.Attributes.xlinkHref bypass SPA features and cause a pageload	LIKELY	MEDIUM	no	NOT_E2E			Svg.a with xlinkHref causes full page load; needs click events
+browser	48	Allow custom rules of what is considered Internal/External URL	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: custom Internal/External rules
+browser	50	Please document how to handle key press events in Elm 0.19 with subscriptions	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs request
+browser	52	Add functionality for generating `UrlRequest`s explicitly	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: generate UrlRequest
+browser	55	clicking links (<a> elements) with href omitted or with an empty href incorrectly generates External UrlRequest's	LIKELY	MEDIUM	no	NOT_E2E			empty/missing href produces External UrlRequest; needs click events
+browser	62	Example in Browser.Events.onClick doc does not work (click event evaluated twice)	WEAK	LOW	no	NOT_E2E			docs example of onClick subscription fires immediately; needs events and arguably expected
+browser	63	Browser.Dom.NotFound is not a function	WEAK	HIGH	no	NOT_E2E			0.19.0 --optimize init-order of Dom.NotFound; harness builds debug only and stub lacks getElementById
+browser	64	clicking link with download "" generates Browser.Internal event	LIKELY	LOW	no	NOT_E2E			download "" link generates Internal request; needs click events
+browser	66	Why can't Browser.application have an element mount point?	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: application mount point
+browser	67	TypeError in Debugger	LIKELY	MEDIUM	no	NOT_E2E			debugger TypeError in addDomNodesHelp; needs --debug UI and real DOM
+browser	71	pushUrl without triggering onUrlChange	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: pushUrl without onUrlChange
+browser	73	Drag example is not valid for elm 0.19	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs: example out of date
+browser	74	Unable to preventDefault on 'a' tag in Browser.application	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: preventDefault on links in application
+browser	77	Currently no way of using preventDefault on window events	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: preventDefault on window events
+browser	83	Proposal: Auto fix target _blank vulnerability	NOT_BUG	LOW	no	NOT_ATTEMPTED			proposal: auto rel=noopener
+browser	84	Back/Forward navigation broken in navigation-in-elements.md sample code	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs bug in navigation-in-elements notes
+browser	86	`getElement` returning document's scene instead of that of the target?	WEAK	LOW	no	NOT_E2E			getElement returns document scene; arguably intended/docs, needs real DOM
+browser	89	Way to `preventDefault` on `Browser.Events` needed	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: preventDefault in Browser.Events
+browser	90	Maximum call stack size exceeded when running --debug	CERTAIN	HIGH	no	NOT_E2E			debugger stack overflow on large lists; needs --debug build (harness does not use the debugger)
+browser	94	Debugger hard to use for game development	NOT_BUG	LOW	no	NOT_ATTEMPTED			debugger feature request for games
+browser	96	Mouse wheel scrolling unresponsive when debugger is open and you've navigated back in time	WEAK	LOW	no	NOT_E2E			debugger scroll issue; needs real browser
+browser	98	onResize not returning the right height when embedded in "Chrome Custom Tabs"	WEAK	LOW	no	NOT_E2E			onResize height 0 in Chrome Custom Tabs; needs real browser
+browser	99	Unable to preventDefault on `a` tag in Browser.application (alternative use case)	NOT_BUG	LOW	no	NOT_ATTEMPTED			preventDefault ignored on links in application (design, same as #74)
+browser	100	About SSR	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: SSR
+browser	101	some field of getViewport returns 0 instead of the actual value	WEAK	LOW	no	NOT_E2E			getViewport y 0 in popstate; needs real browser
+browser	102	Navigation.back generates two `UrlChange` events	LIKELY	MEDIUM	no	NOT_E2E			Navigation.back produces two UrlChange; needs history API
+browser	104	Debugger crashes when msg is triggered with large list in model	CERTAIN	HIGH	no	NOT_E2E			debugger stack overflow on large list model; needs --debug build
+browser	105	Broken links in `Browser.application` with prerendered content	LIKELY	MEDIUM	no	NOT_E2E			prerendered links not intercepted after virtualize; needs real DOM and clicks
+browser	106	Browser.Dom.Focus returns an Ok on disabled element	WEAK	LOW	no	NOT_E2E			focus on disabled element returns Ok; needs real DOM focus
+browser	107	If target "_self" is set, the url is loaded even if it's an internal request	WEAK	LOW	no	NOT_E2E			target _self links are loaded; arguably intended, needs click events
+browser	108	Not explained that pushUrl doesn't need whole URL to work	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs request
+browser	109	Clipboard API support	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: clipboard API
+browser	110	Selection API support	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: selection API
+browser	111	A platform detection API	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: platform detection
+browser	113	Runtime exception in compiled elm script	WEAK	MEDIUM	no	NOT_E2E			runtime exception on redirect without leading slash; thin report, needs navigation
+browser	114	Expose "on" -function	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: expose Browser.Events.on
+browser	115	Alike javascript getBBox() function	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: getBBox
+browser	118	getViewport returns incorrect viewport height	WEAK	LOW	no	NOT_E2E			getViewport height equals scene height; not reproducible in Ellie, needs real browser
+browser	119	Ability to distinguish source of url change in onUrlChange	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: source of url change
+browser	121	Elm Application Crashes ... using a ScreenReader	LIKELY	MEDIUM	no	NOT_E2E			screen-reader extensions inserting DOM nodes crash Elm; needs real browser
+browser	122	Developer experience: Not always clear how to init from JS	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs request
+browser	123	`keypress` event is deprecated	NOT_BUG	LOW	no	NOT_ATTEMPTED			deprecation note: keypress
+browser	126	navigator.userAgent changing soon in Chrome	NOT_BUG	LOW	no	NOT_ATTEMPTED			browser deprecation warning: userAgent
+browser	128	Browser.Navigation.load doesn't actually cause a page load when url contains an #	LIKELY	LOW	no	NOT_E2E			Navigation.load with only a fragment does not reload; needs real navigation
+browser	131	Support View Transitions API	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: View Transitions
+browser	132	Debugger stack overflow crash when msg triggered with large Set in model	CERTAIN	HIGH	no	NOT_E2E			debugger stack overflow on large Set; needs --debug build
+browser	133	let the Debugger not interfere with contrast checks	NOT_BUG	LOW	no	NOT_ATTEMPTED			debugger contrast/accessibility request
+browser	141	Debugger displays custom type variants starting with non-ASCII as `<internals>`	CERTAIN	LOW	no	NOT_E2E			debugger shows non-ASCII variants as <internals>; needs debugger UI
+browser	143	Debugger pause button does nothing	CERTAIN	LOW	no	NOT_E2E			debugger pause button does nothing; needs debugger UI
+browser	146	Browser #aqTeam Google Style Russian	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam
+browser	147	Nox	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam
+bytes	9	Decoder suppresses stack overflow	LIKELY	MEDIUM	yes	REPRODUCED	BytesIssue9DecoderSwallowsExceptionTest		decode catches any exception in a decoder (e.g. Debug.todo in map) and returns Nothing
+bytes	13	Support for simple serialization to more generally useful type	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+bytes	15	Comparing two `Byte` values always result in `True`, regardless of the actual bytes	CERTAIN	MEDIUM	yes	REPRODUCED	BytesIssue15BytesEqualityTest		== on Bytes is always True
+bytes	16	Add `Bytes.decoder : Json.Decode.Decoder Bytes`	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: Bytes JSON decoder
+bytes	17	Unclear documentation for Decode.decode	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation
+bytes	19	Decoding long strings can lead to large heap footprint	WEAK	LOW	no	NOT_E2E			Heap footprint of string decoding (performance)
+bytes	20	Invalid utf8 can be (wrongly) decoded into a string	LIKELY	MEDIUM	yes	REPRODUCED	BytesIssue20InvalidUtf8StringTest		string decoder accepts invalid UTF-8 (C0 00 decodes to "\0")
+bytes	22	Decoders with custom offset	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+bytes	23	Display undecoded byte values in elm app debugger	NOT_BUG	LOW	no	NOT_ATTEMPTED			Debugger display request
+bytes	24	Decoder: detect end of content	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+color	1	Publishing timeline?	NOT_BUG	LOW	no	NOT_ATTEMPTED			Publishing question
+core	322	API Ideas	NOT_BUG	LOW	no	NOT_ATTEMPTED			Meta issue collecting API ideas
+core	377	potential runtime exceptions	NOT_BUG	LOW	no	NOT_ATTEMPTED			Meta tracking issue of runtime exceptions
+core	633	expose more debugging features, like console.group	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: richer Debug console output
+core	721	Math and numbers	NOT_BUG	LOW	no	NOT_ATTEMPTED			Meta issue organizing math issues
+core	870	Bitwise should mention that it always truncates to 32bit integers	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation request (Bitwise truncation)
+core	886	justification for adding app.kill()	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: app.kill()
+core	904	Equality check on Json.Decode.oneOf always returns true	CERTAIN	MEDIUM	no	NOT_E2E			_Json_equality on oneOf decoders always true; only visible through virtual-dom event handler diffing with user events (same as json#13/#15)
+core	913	HTMLCollections cannot be accessed with the `index` JSON Parser 	WEAK	LOW	no	NOT_E2E			Json index on HTMLCollection; needs a real DOM; more a feature request
+core	916	Array.shift() causing bad perf when there are lots of tasks	NOT_BUG	LOW	no	NOT_ATTEMPTED			Performance of Array.shift in Chrome scheduler queue
+core	930	Have toString show escape code for \u{0001}	WEAK	LOW	maybe	NOT_ATTEMPTED			Debug.toString does not escape control chars; expected rendering is debatable (cosmetic)
+core	942	Char.isUpper only handles ascii a-z, unlike Char.toUpper	NOT_BUG	LOW	yes	NOT_ATTEMPTED			Char.isUpper is documented as ASCII-only
+core	945	Comparing nested arrays stored in Json.Value can result in runtime error	WEAK	MEDIUM	yes	NOT_ATTEMPTED			(==) on Json values crashes; Basics docs say do not use == on JSON values (it will crash if possible)
+core	955	Trying to kill a Process that has already run will cause Javascript Error	CERTAIN	MEDIUM	yes	REPRODUCED	CoreIssue955KillProcessTwiceTest		Killing a finished process twice throws TypeError in the scheduler
+core	958	List.sortBy produces different order between Chromium/Chrome and Firefox	LIKELY	MEDIUM	yes	NOT_REPRODUCED			sortBy instability was an engine issue; Node (ES2019 stable sort) gives the stable order
+core	960	(^) can return 0.5 typed as an Int	CERTAIN	MEDIUM	yes	REPRODUCED	CoreIssue960PowNegativeExponentIntTest		Int ^ negative Int gives 0.5 typed as Int (String.fromInt prints "0.5")
+core	964	String.toFloat doesn't show decimal if nuls	NOT_BUG	LOW	no	NOT_ATTEMPTED			Float display without decimals is not a bug
+core	968	Add hyperbolic trig functions	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: hyperbolic functions
+core	977	String.slice is broken on strings with multi-byte Unicode characters	LIKELY	MEDIUM	yes	NOT_ATTEMPTED			String.dropLeft/slice split surrogate pairs; debatable since String.length etc. count UTF-16 units (see #1061)
+core	987	Elm compiler does not like '0xFFFFFFFF' hexadecimal literal (on 32-bit Windows)	LIKELY	LOW	no	NOT_E2E			0xFFFFFFFF literal breaks compile only on 32-bit hosts
+core	988	Inconsistant equality for objects containing NaN	CERTAIN	LOW	yes	REPRODUCED	CoreIssue988NanEqualityReferenceTest		Equality of structures containing NaN depends on reference identity
+core	989	Ports called asynchronously if inside Cmd.batch	LIKELY	MEDIUM	no	NOT_E2E			Port in Cmd.batch called asynchronously; needs DOM events and same-tick timing
+core	1001	Char.toUpper('ß') returns two characters as Char	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1001CharToUpperSharpSTest		Char.toUpper 'ß' returns the two-character Char 'SS'
+core	1003	Int operator inconsistency: some return 32bit truncated ints, some don't.	WEAK	MEDIUM	yes	NOT_ATTEMPTED			truncate wraps to 32 bits; Int is documented as well-defined only in 32-bit range, so expected behaviour is debatable
+core	1005	Problem when setting "Date.prototype._nth = null;" from JS	LIKELY	LOW	no	NOT_E2E			Debugger crash when Date.prototype._nth = null; needs host JS and --debug
+core	1013	Dict.get works unreliably when keys are lists and --optimize is enabled	WEAK	HIGH	no	NOT_E2E			Dict with List keys under --optimize; no SSCCE and harness does not use --optimize
+core	1019	String.words and String.lines don't return empty list for blank string	LIKELY	MEDIUM	yes	REPRODUCED	CoreIssue1019StringWordsEmptyTest		String.words "" and of blank string return [""] instead of []
+core	1037	No placeholder def for `List` type	NOT_BUG	LOW	no	NOT_ATTEMPTED			Request for a placeholder List type definition (tooling)
+core	1038	Proposal for parallel execution of Tasks	NOT_BUG	LOW	no	NOT_ATTEMPTED			Proposal: parallel Tasks
+core	1043	Bad error message when sending the wrong thing through a port: [object Object]	LIKELY	LOW	yes	REPRODUCED	CoreIssue1043PortErrorObjectObjectTest		Port type error message prints [object Object] instead of the decode error
+core	1046	Side effects stop working when runtime exception in subscribe	LIKELY	MEDIUM	no	NOT_E2E			Exception inside JS port subscriber stops effects; needs host JS that throws
+core	1048	logBase implementation is insufficiently precise for base 10	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1048LogBaseTenTest		logBase 10 1000 = 2.9999999999999996
+core	1050	NaN > NaN and NaN >= NaN do not adhere to IEEE-754	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1050NanGreaterThanNanTest		NaN > NaN and NaN >= NaN are True
+core	1052	modify String.repeat to give more predictable results for very large numbers	WEAK	LOW	maybe	NOT_ATTEMPTED			String.repeat with huge counts; correct behaviour (crash vs limit) is debatable
+core	1060	Infinite loop in `String.toList` for non UTF-8 encoded string like "\u{dd56}"	CERTAIN	MEDIUM	yes	REPRODUCED	CoreIssue1060StringToListLoneSurrogateTest		String.toList on a lone low surrogate loops until out of memory
+core	1061	Invalid or incomplete documentation in many String functions (characters vs UTF-16 code units)	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation (characters vs UTF-16 code units)
+core	1066	Bitwise shifts should mention that only 5 lowest bits of shift value are used	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation (shift amounts use 5 bits)
+core	1072	Non Standard behavior on division by zero	WEAK	MEDIUM	yes	NOT_ATTEMPTED			Division-by-zero semantics discussion; behaviour is a design choice (#377)
+core	1076	Documentation missing example for String.any and String.all	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation example request
+core	1079	truncate overflows when handling times in milliseconds	WEAK	MEDIUM	yes	NOT_ATTEMPTED			truncate 32-bit overflow (duplicate of #591/#1003); Int range documented as 32-bit, debatable
+core	1080	Basics.clamp doesn't passthrough NaN	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1080ClampNanTest		clamp -100 100 NaN returns 100 instead of NaN
+core	1082	Debug.log could be more intuitive for beginners and less misuse prone	NOT_BUG	LOW	no	NOT_ATTEMPTED			Debug.log API proposal
+core	1088	Math module	NOT_BUG	LOW	no	NOT_ATTEMPTED			Proposal: Math module
+core	1095	Dict.update is confusing	NOT_BUG	LOW	no	NOT_ATTEMPTED			Dict.update docs/API discussion
+core	1097	Basics docs TYPE MISMATCH: sqrt >> isEven >> not	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation example does not type check
+core	1098	Request: Parellelize 2 Or more Tasks And Emit One Single Msg	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: parallel tasks
+core	1100	Consider adding "recoverWith" to the Result-module	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: Result.recoverWith
+core	1103	Recent updates to the node-test-runner have broken the run-tests.sh script	NOT_BUG	LOW	no	NOT_ATTEMPTED			elm/core test script tooling
+core	1105	Perf optimization: check length/size of lists/sets/dicts/arrays in _Utils_eq	NOT_BUG	LOW	no	NOT_ATTEMPTED			Performance suggestion for _Utils_eq
+core	1107	List.repeat fails (in an ugly way) when given Infinity	WEAK	LOW	maybe	NOT_ATTEMPTED			List.repeat with Infinity runs out of memory; expected behaviour debatable
+core	1109	Dict/Set.fold*ByOrder proposal	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: fold by order
+core	1110	Order of port declarations in resulting JS influences behaviour	CERTAIN	HIGH	yes	REPRODUCED	CoreIssue1110PortDeclarationOrderTest		Generated port order decides whether a new subscription sees a command reply (root cause shared with #1141/#1154)
+core	1111	Task.andAlwaysThen proposal	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request / question about Task combinators
+core	1112	`Array` sorting	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: Array sorting
+core	1115	NaN compares as equal to zero in several cases involving literal 0	CERTAIN	MEDIUM	yes	REPRODUCED	CoreIssue1115NanEqualsLiteralZeroTest		x == 0 compiled to !x so NaN == 0 is True
+core	1116	List.map foldl-version	NOT_BUG	LOW	no	NOT_ATTEMPTED			Performance suggestion for List.map
+core	1117	Support partial folds over `Dict`	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: partial Dict folds
+core	1123	_Platform_gatherEffects can throw runtime exception - Maximum call stack size exceeded	LIKELY	MEDIUM	yes	REPRODUCED	CoreIssue1123NestedCmdBatchStackOverflowTest		Deeply nested Cmd.batch overflows the stack in _Platform_gatherEffects
+core	1126	Enhance documentation for `Dict.fromList`	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation request
+core	1128	Subscription bug in the latest core libraries	LIKELY	HIGH	no	NOT_E2E			Port reply lost after browser back navigation; needs browser history; likely same root cause as #1154 (reproduced there)
+core	1140	Case sensitivity when sorting strings is difficult to deal with	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: case-insensitive sorting
+core	1141	Unused port call breaks subscriptions	CERTAIN	HIGH	yes	REPRODUCED	CoreIssue1141UnusedPortCallBreaksSubscriptionTest		An unused port call in init reorders port managers and drops a port reply
+core	1142	Overflow issue when converting integers near maxint	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1142StringToIntMaxSafeTest		String.toInt off by one near 2^53
+core	1147	modBy runtime error when passing 0 as an argument	NOT_BUG	MEDIUM	yes	NOT_ATTEMPTED			modBy 0 crash is a known, deliberate design limitation (#377); not a bug report per se
+core	1148	[String] No way to access nth character of string	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: String.get
+core	1149	Add ability to crash with a runtime exception on purpose for Platform.worker programs.	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: Platform.crash
+core	1150	NaN integers can be returned by `Char.toCode`	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1150CharToCodeLoneSurrogateTest		Char.toCode (Char.fromCode 0xD800) is NaN typed as Int
+core	1151	Dict.foldr documentation possibly incorrect	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation typo
+core	1153	`_Debug_crash__DEBUG(0)` and `_Debug_crash__PROD(0)` out of sync	LIKELY	LOW	no	NOT_E2E			Production crash message 0 out of sync with debug; needs --optimize
+core	1154	Subscribing to a port can suddenly stop working due to generated code order	CERTAIN	HIGH	yes	REPRODUCED	CoreIssue1154PortSubscribedWithCmdTest		Port subscription returned with a command misses the synchronous reply depending on port order
+editor-plugins	2	New package for Atom	NOT_BUG	LOW	no	NOT_ATTEMPTED			Announcement of an editor package
+file	3	Should there be a way to share file-blob reference to the outside-js-code?	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: expose File as Json.Value / blob ref
+file	13	Consider adding support for "capture" attribute	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: capture attribute for file select
+file	17	Problem with File.Download.bytes on Mobile Safari and Chrome	WEAK	MEDIUM	no	NOT_E2E			File.Download.bytes on mobile Safari/Chrome; browser download-attribute support, needs real browser
+file	18	Big files: support sliced read	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: sliced reads of big files
+file	22	File.mime is returning an empty string in IE Edge	WEAK	LOW	no	NOT_E2E			File.mime empty in old Edge; browser-specific, needs real File
+file	23	Cannot set filter to custom extension	NOT_BUG	LOW	no	NOT_ATTEMPTED			question: extensions work as filters (answered)
+file	24	Impossible to run selenium tests on `elm/file`	NOT_BUG	LOW	no	NOT_ATTEMPTED			testing/selenium tooling request
+file	25	File.toString causes a runtime exception	LIKELY	MEDIUM	no	NOT_E2E			toString/toBytes succeed with null on FileReader error; needs real FileReader and failing file
+file	26	Adding width, height reading functions for images uploads	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: image width/height
+file	27	PROBLEM BUILDING DEPENDENCIES	NOT_BUG	LOW	no	NOT_ATTEMPTED			dependency-resolution/installer problem, not a package bug
+file	28	Creating Files Not Possible	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: create File values
+file	29	File.toString only works on UTF-8 files	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: non-UTF-8 encodings in toString
+file	30	Document that File.Select.file/files' Mime type argument might not be respected	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs request
+file	31	File.toBytes causes Memory leak	LIKELY	MEDIUM	no	NOT_E2E			File.toBytes memory leak in browser FileReader; needs real browser
+file	35	ㅇ	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/empty issue
+forum-rules	1	No information on or link to Elm's goals	NOT_BUG	LOW	no	NOT_ATTEMPTED			Forum rules documentation
+html	44	chrome extensions can cause runtime exceptions due to elm.fullscreen	WEAK	MEDIUM	no	NOT_E2E			extensions injecting into body break fullscreen apps (0.18); needs real browser
+html	53	Suggestions and Feature Requests	NOT_BUG	LOW	no	NOT_ATTEMPTED			meta: suggestions and feature requests
+html	91	Html.Attributes.value does not work as <select value="">	WEAK	LOW	no	NOT_E2E			select value "" placeholder (0.17); needs real DOM
+html	102	Crash when removing <main> nodes	WEAK	MEDIUM	maybe	NOT_REPRODUCED			crash when switching away from a view with main (0.18); switching views with main_ on 0.19.1 renders without error
+html	136	Html.optgroup lacks "label" attribute	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: optgroup label (old package version)
+html	137	Add a way to preventDefault without producing a message	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: preventDefault without message
+html	141	Attribute equivalent for `Html.text ""` is missing	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: empty attribute
+html	143	an input with a type_ of "date" causes an "invalid argument" script error in IE.	WEAK	LOW	no	NOT_E2E			input type date crashes IE11; browser-specific
+html	144	Doc correction: Html.Attributes.checked	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs correction
+html	145	Html output can depend on history of app states: the case of CSS borders	LIKELY	LOW	no	NOT_E2E			border styles depend on DOM reuse history; stub cannot show styles
+html	148	`for` should be an `attribute` rather than a `property`	LIKELY	LOW	no	NOT_E2E			for as property leaves for="" after reuse; not observable with the stub
+html	150	Html.Lazy documentation could be clearer	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs request for Html.Lazy
+html	154	video attributes missing	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: video attributes
+html	155	missing audio attribute "muted"	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: muted
+html	156	Bug on IE (11,10) - nested Html.map(ed) submodule	WEAK	MEDIUM	no	NOT_E2E			nested Html.map bug in IE10/11; needs IE
+html	160	`onBlur` is producing an "alien" message when user go back to history in Chrome	LIKELY	MEDIUM	no	NOT_E2E			onBlur alien message on history back (0.18); needs events
+html	167	onMouse{Over,Out,Enter,Leave} docs	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs request
+html	177	Bug: CSS Custom Properties can't be set	LIKELY	MEDIUM	no	NOT_E2E			CSS custom properties via style are dropped (style[key]= ignores --vars); stub style object accepts them
+html	179	String sanitizer on <input> causes weird text duplications on input in Firefox mobile for Android	WEAK	LOW	no	NOT_E2E			Firefox Android keyboard duplication; browser/keyboard
+html	182	Better doc for on.	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs request
+html	184	Uncaught TypeError: Cannot assign to read only property 'type' of object '#<HTMLSelectElement>'	LIKELY	MEDIUM	yes	REPRODUCED	HtmlIssue184SelectTypeTest	lamdera-1.5.0	select type_ throws: the type property has only a getter
+html	185	Html.Attributes.attribute renaming of attribute to data-attribute is not documented	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs: on* attributes renamed to data-on*
+html	186	Autofocus attribute doesn't work reliably	WEAK	LOW	no	NOT_E2E			autofocus only works on page load; browser semantics
+html	188	stopPropagation breaks onCheck value	LIKELY	MEDIUM	no	NOT_E2E			stopPropagation breaks onCheck value; needs events
+html	189	Autocomplete attribute should be more complex	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: autocomplete values
+html	192	Custom element extended built-in support and special `is` attribute	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: is attribute (see virtual-dom#156)
+html	196	Integration with elm/time	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: elm/time integration
+html	197	Suggestion: A stronger typed 'on' function	NOT_BUG	LOW	no	NOT_ATTEMPTED			API suggestion: typed on
+html	199	Html.input [ onInput Msg ] doesn't dispatch messages when a browser plugin add dom elements on top of it	WEAK	MEDIUM	no	NOT_E2E			1Password extension breaks inputs; third-party DOM mutation
+html	200	Html msg ++ Html msg	NOT_BUG	LOW	no	NOT_ATTEMPTED			language/API proposal
+html	201	Html.Lazy always recomputes inner functions	NOT_BUG	LOW	no	NOT_ATTEMPTED			Html.Lazy with let-defined functions is a known limitation, not a bug
+html	203	Lacking picture element	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: picture element
+html	204	Html.map documentation refers to https://guide.elm-lang.org/reuse/ which does not exists	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs: broken link
+html	205	Setting the value of number input elements	WEAK	LOW	no	NOT_E2E			number input invalid value cannot be cleared; browser semantics
+html	209	Value vs Attribute "value"	LIKELY	LOW	no	NOT_E2E			value property vs attribute on option; needs real DOM and events
+html	215	Runtime error when assigning type_ to textarea	LIKELY	MEDIUM	yes	REPRODUCED	HtmlIssue215TextareaTypeOnPatchTest	lamdera-1.5.0	adding type_ to a rendered textarea throws when patching
+html	224	Iframe element children are put outside of the inner html/body	WEAK	LOW	no	NOT_E2E			iframe children placement; iframe content is browser-defined
+html	228	The href attribute cannot be removed once added	LIKELY	MEDIUM	no	NOT_E2E			href cannot be removed once added (set to ""); property removal not observable with stub
+html	230	Broken link in Events.elm	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs: broken link
+html	232	Add empty attribute that does absolutely nothing	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: empty attribute
+html	236	input type="range" renders incorrectly depending on the order of attributes	LIKELY	LOW	no	NOT_E2E			range input value applied before step; attribute order, needs real DOM
+html	240	There is no picture tag	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: picture element
+html	246	Iframe's srcDoc allow arbitrary scripts which can result in unsafe packages published	NOT_BUG	MEDIUM	no	NOT_ATTEMPTED			security proposal: iframe srcdoc scripts
+html	249	Document for Attributes.value confuses attribute and property	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs: value attribute vs property
+html	251	Runtime exception when using invalid characters or "" as attribute name	LIKELY	MEDIUM	yes	REPRODUCED	HtmlIssue251EmptyAttributeNameTest		attribute "" throws InvalidCharacterError in setAttribute
+html	255	Recursive type alias in Html module's documentation	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs rendering of alias
+html	257	API proposal: Lazy function with a record argument	NOT_BUG	LOW	no	NOT_ATTEMPTED			API proposal: lazy with record
+html	260	Add loading lazy to `Html.Attribute`	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: loading attribute
+html	343	Nobananas	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	344	กรอบฝึกงาน	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	345	Best Diesel Generator Dealers – Professional Diesel	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	346	Ina-isef	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	347	elsdvkndefahjc	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	348	web	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	349	ee	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	350	Boshshsialwf	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	351	pag	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	352	https://www.skyverge.co.in/	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	353	vitinjs	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	354	ac service booking	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	355	ATIVIDADE 4	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	356	title	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	357	空き缶&ペットボトル潰し器	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+html	358	c	NOT_BUG	LOW	no	NOT_ATTEMPTED			spam/unrelated content
+http	21	More information about NetworkError	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: more detail in NetworkError (browser hides it)
+http	31	Headers now lowercase in Chrome 60	WEAK	LOW	no	NOT_E2E			header-name case from browsers; needs real XHR
+http	32	XMLHttpRequest `response` property doesn't exist in IE9	WEAK	LOW	no	NOT_E2E			IE9 lacks xhr.response; obsolete browser, needs real XHR
+http	33	Failed xhr.open gives BadUrl, but may be caused by security restrictions	WEAK	LOW	no	NOT_E2E			BadUrl reported for CSP failures in cordova (0.18); needs real XHR
+http	34	Http.Error not caught for invalid protocol in Firefox	WEAK	MEDIUM	no	NOT_E2E			Firefox throws for invalid protocol (0.18); needs real XHR
+http	39	For `PUT` requests, `Response.url` is `undefined` for IE 11 and Edge <= 13	WEAK	LOW	no	NOT_E2E			IE11/Edge PUT Response.url undefined; needs real XHR
+http	49	Add Upgrade guide from 1.0.0 to 2.0.0	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs: upgrade guide
+http	52	Example where parallel requests may be ideal	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: parallel requests (use-case collection)
+http	53	Runtime exception when empty header name is given	LIKELY	MEDIUM	no	NOT_E2E			Http.header "" throws in setRequestHeader instead of an Http.Error; Node has no XMLHttpRequest
+http	54	Expect and the "Accept:" header	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: Accept header from Expect
+http	55	Support Server Sent Events (SSE) ?	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: Server-Sent Events
+http	59	Add examples for handling BadStatus Http.Error with Response Body	NOT_BUG	LOW	no	NOT_ATTEMPTED			docs/question: BadStatus body
+http	60	Support custom multipart body types for Google Drive API file upload	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: custom multipart content type
+http	61	Task requests and tracking progress	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: tracker for Http.task
+http	62	'GET' requests don't seem to include body	NOT_BUG	LOW	no	NOT_ATTEMPTED			GET body dropped by XHR spec; wontfix/docs
+http	63	No method for creating fileParts from non-File types	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: named parts from bytes/strings
+http	64	Http.cancel cancelling subsequent requests	LIKELY	MEDIUM	no	NOT_E2E			Http.cancel cancels a later request with the same tracker; needs real HTTP
+http	67	Http.Request fails with `patch` method	WEAK	LOW	no	NOT_E2E			lowercase "patch" method not normalised by browser XHR; needs real HTTP
+http	68	Incorect filename in Content-Disposition using bytesPart	LIKELY	LOW	no	NOT_E2E			bytesPart always sends filename "blob"; needs real HTTP/FormData
+http	69	CORS handling seems broken	WEAK	LOW	no	NOT_E2E			CORS reported as NetworkError; server/browser config, needs real HTTP
+http	70	Uncaught TypeError: Failed to execute 'setRequestHeader' on 'XMLHttpRequest': Value is not a valid ByteString	LIKELY	MEDIUM	no	NOT_E2E			non-ByteString header value throws in setRequestHeader instead of Http.Error; Node has no XMLHttpRequest
+http	71	Can Http.Receiving not handle data that is more than 1023 byte?	WEAK	LOW	no	NOT_E2E			Receiving size Nothing for >1023 bytes; server/compression behaviour, needs real HTTP
+http	72	Accessing `Http.Error` with task requests	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: Http.Error from task with body
+http	75	Impossible to specify "Content-Type: application/json;charset=utf-8" when using Http.jsonBody	LIKELY	LOW	no	NOT_E2E			jsonBody Content-Type concatenated with user header; needs real HTTP to observe
+http	78	Support for application/x-www-form-urlencoded ?	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: urlencoded bodies
+http	79	How to handle 304 Not Modified results?	NOT_BUG	LOW	no	NOT_ATTEMPTED			question: 304 handling (browser transparent)
+json	5	Encoding an object with circular dependencies throws an Error.	WEAK	LOW	no	NOT_E2E			Circular JS value encode crash; needs host JS (flags are JSON); wants nicer error
+json	13	Invalid list equality check.	CERTAIN	MEDIUM	no	NOT_E2E			_Json_listEquality compares Elm lists as arrays; only visible through virtual-dom handler diffing with events
+json	14	Chooses a more positive example	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation wording
+json	15	Json equality for oneOf decoders always returns true	CERTAIN	MEDIUM	no	NOT_E2E			oneOf decoder equality always true (dup of #13); needs DOM events
+json	16	Detect attempts to install packages for an older version of elm	NOT_BUG	LOW	no	NOT_ATTEMPTED			elm-json tool issue
+json	17	Encode.dict & Decode.dict are asymmetrical	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: Decode.dict key decoder
+json	18	Json.Decode.index checks for too large index but not too small	LIKELY	LOW	yes	REPRODUCED	JsonIssue18IndexNegativeTest		index -1 is not bounds-checked (index -1 (succeed ()) on [1] succeeds)
+json	24	Runtime exception when using Decode.dict on a JSON created with Object.create(null)	CERTAIN	MEDIUM	no	NOT_REPRODUCED			Object.create(null) dict decode crash; fixed in elm/json 1.1.4 (uses Object.prototype.hasOwnProperty.call)
+json	25	Add a function to create a Decoder from an Error value	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: decoder from Error
+json	26	Decoder error even-though it's correct	WEAK	LOW	no	NOT_ATTEMPTED			User support question; no reproducible bug
+json	27	Doesn't compile if a decoder for a recursive structure is not defined at top level	WEAK	LOW	maybe	NOT_ATTEMPTED			Recursive decoder not at top level; repro only in an Ellie link, likely the documented bad-recursion restriction
+json	29	Using `==` on `Json.Decode.Value`s can throw runtime exceptions	WEAK	MEDIUM	yes	NOT_ATTEMPTED			(==) on Json values throws; Basics docs say do not use == on JSON values
+json	30	Using == on Json.Decode.Values can return `True` for values that aren’t equal	WEAK	LOW	yes	NOT_ATTEMPTED			(==) on Json values wrongly True; documented as unsupported
+json	31	Json.Json!	NOT_BUG	LOW	no	NOT_ATTEMPTED			API proposal
+json	33	Add function to parse JSON string as a number instead. ("42" -> 42)	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+json	37	Consider adding a fast path for encode where indentation = 0	NOT_BUG	LOW	no	NOT_ATTEMPTED			Performance suggestion
+json	38	Support BigInteger	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: BigInt
+parser	2	Parser.multiComment does not chomp comment terminator in NotNestable mode	CERTAIN	MEDIUM	yes	REPRODUCED	ParserIssue2MultiCommentNotNestableTest		multiComment NotNestable leaves the offset before */ so |. end fails
+parser	9	No implementation for deadEndsToString	CERTAIN	MEDIUM	yes	REPRODUCED	ParserIssue9DeadEndsToStringTodoTest		deadEndsToString returns "TODO deadEndsToString"
+parser	12	Example for Parser.float does not type check	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation example does not type check
+parser	14	int parser fails on trailing decimal separator	LIKELY	MEDIUM	yes	NOT_ATTEMPTED			int fails on "42."; docs say int "1.34" fails, so expected behaviour is debatable
+parser	15	float parser consumes decimal separator without fractional part	WEAK	LOW	yes	NOT_ATTEMPTED			float consuming "42." is arguably intended
+parser	18	Documentation for `int` shows succeeding examples as failing	CERTAIN	MEDIUM	yes	REPRODUCED	ParserIssue18IntLeadingZeroTest		int "0123" and "123a" succeed although the docs say Err
+parser	20	chompUntil does not consume the last string	CERTAIN	MEDIUM	yes	REPRODUCED	ParserIssue20ChompUntilChompedStringTest		After chompUntil the chomped string and position disagree (symptom of #53)
+parser	24	Indent default value is 1, not 0	LIKELY	LOW	yes	REPRODUCED	ParserIssue24GetIndentDefaultTest		getIndent default is 1, docs say 0 and (4,0)
+parser	25	Parser.int accepts input starting with `e`	CERTAIN	MEDIUM	yes	REPRODUCED	ParserIssue25IntCommitsOnLeadingETest		int commits on input starting with e so oneOf cannot fall back
+parser	26	No documentation for commit	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation of commit
+parser	28	int parser fails on trailing "e"	LIKELY	MEDIUM	yes	NOT_ATTEMPTED			int fails on "42efg"; docs say "1e31" and "123a" are Err, so expected behaviour is debatable
+parser	33	Feature request: mapProblem	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: mapProblem
+parser	34	Feature Request: recover	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: recover
+parser	40	Unused chompRest in sequenceEndForbidden	NOT_BUG	LOW	no	NOT_ATTEMPTED			Unused code (cleanup)
+parser	41	Incorrect problem propagated from finalizeFloat	CERTAIN	LOW	yes	REPRODUCED	ParserIssue41NumberFloatProblemTest		number with float = Err x reports invalid instead of x
+parser	44	Float parser comitting to leading 'e'	CERTAIN	MEDIUM	yes	REPRODUCED	ParserIssue44FloatCommitsOnLeadingETest		float commits on leading e so oneOf cannot fall back
+parser	45	Parser.int and Parser.float handle leading Zeros unexpectedly	CERTAIN	MEDIUM	yes	REPRODUCED	ParserIssue18IntLeadingZeroTest		Duplicate of #18 (int "0123" gives Ok 0); covered by the #18 test
+parser	46	lineComment messes up newline tracking	CERTAIN	MEDIUM	yes	REPRODUCED	ParserIssue46LineCommentNewlineTest		lineComment counts the newline in the row but leaves it in the input
+parser	47	Add some examples that show a parser alternative for regex	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation examples request
+parser	49	Parse.Primitives comments	NOT_BUG	LOW	no	NOT_ATTEMPTED			Code comments request
+parser	50	lazy doesn't work with always instead of (\_ -> ..)	NOT_BUG	LOW	no	NOT_ATTEMPTED			lazy (always p) is eagerly evaluated by design; hint request
+parser	51	Code documentation for Parser.Advanced inContext	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation example does not compile
+parser	53	Inconsistent internal parser state	CERTAIN	MEDIUM	yes	REPRODUCED	ParserIssue53ChompUntilOffsetPositionTest		findSubString leaves offset and row/col out of sync
+parser	57	jeanniebragg01@gmail.com	NOT_BUG	LOW	no	NOT_ATTEMPTED			Spam / unrelated
+parser	58	Parser.float doesn't support large floats (above max int)	CERTAIN	LOW	yes	REPRODUCED	ParserIssue58FloatAboveMaxIntTest		Parser.float loses precision above 2^53 (String.toFloat is exact)
+project-metadata-utils	5	Add min/max functions to Constraint	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+project-metadata-utils	15	Add Elm.Constraint.checkConstraint	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+project-metadata-utils	16	Add Package.user and Package.project	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+project-metadata-utils	17	Rename Elm.Module to Elm.Module.Name?	NOT_BUG	LOW	no	NOT_ATTEMPTED			API naming proposal
+project-metadata-utils	18	change Elm.Docs.Module.name type from String to Elm.Module.Name	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+projects	29	elm-find	NOT_BUG	LOW	no	NOT_ATTEMPTED			Tooling idea
+random	2	Request: use better source of entropy	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: better entropy
+random	9	lazy+andThen+map3 overflowing the stack	WEAK	LOW	maybe	NOT_ATTEMPTED			Stack overflow from an unbounded recursive generator; expected depth is huge, not a library bug
+random	13	Feature Request: Random.generateTask	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: generateTask
+random	16	broken link in README	NOT_BUG	LOW	no	NOT_ATTEMPTED			Broken README link
+random	17	How can I encode a seed as JSON?	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: encode Seed
+random	20	Why are the docs not updated?	NOT_BUG	LOW	no	NOT_ATTEMPTED			Docs not updated
+random	21	`Random.float` lacks sanitization of input and emits invalid numbers when bounds are swapped	LIKELY	LOW	yes	REPRODUCED	RandomIssue21FloatSwappedBoundsTest		Random.float 100 -100 produces values in [100,300]
+random	26	Provide access to construct a generator from `Seed -> (a, Seed)`	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+regex	5	Regression: capture groups should be able to match empty string	CERTAIN	MEDIUM	yes	REPRODUCED	RegexIssue5EmptyCaptureGroupTest		A capture group matching "" is reported as Nothing instead of Just ""
+regex	6	JavaScript heap out of memory error with empty string regex	CERTAIN	MEDIUM	yes	REPRODUCED	RegexIssue6SplitEmptyRegexTest		split with an empty-matching regex loops until out of memory
+regex	7	`split` should include capture groups in results	WEAK	LOW	yes	NOT_ATTEMPTED			split omitting capture groups is a deliberate 0.19 API choice; feature request
+regex	8	Feature request: "escape" function	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: escape
+regex	9	Feature request: Some way to get invalid regex error message	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: error message
+regex	10	Deceptive documentation	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation
+regex	13	Regex.find with too lose regex	LIKELY	MEDIUM	yes	REPRODUCED	RegexIssue13FindStopsAtEmptyMatchTest		find stops at the first empty match (returns only "simon")
+regex	14	Regex.Options.unicode	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: unicode flag
+regex	15	Regex.toString	NOT_BUG	LOW	no	NOT_ATTEMPTED			Question/feature: Regex.toString
+regex	16	Debug.log for Regexes does not show the regex	WEAK	LOW	yes	NOT_ATTEMPTED			Debug.log shows {} for a Regex; cosmetic, expected rendering undefined
+regex	18	Regex.split gives RangeError when regex matches a zero length string	CERTAIN	MEDIUM	yes	REPRODUCED	RegexIssue18SplitWordBoundaryTest		split on \b never terminates (RangeError/out of memory); dup of #6 with a different regex
+svg	3	Runtime error when passing `class` attribute from Html package.	LIKELY	MEDIUM	no	NOT_E2E			Html.Attributes.class on SVG sets read-only className and throws; the DOM stub has no read-only properties
+svg	17	Add Svg.Attributes.classList	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: Svg.Attributes.classList
+svg	21	Svg.Attributes.style not consistent with Html.Attributes.style	NOT_BUG	LOW	no	NOT_ATTEMPTED			API consistency proposal for style; also not observable without a DOM
+svg	22	Use of deprecated xlink prefixed attributes (e.g. xlinkHref instead of href)	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: non-xlink href
+svg	23	Getting point information from SVG.	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: SVG point coordinates
+svg	29	Serializing SVG	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: serialize SVG
+svg	30	[Suggestion] viewBox : Int -> Int -> Int -> Int -> Attribute msg	NOT_BUG	LOW	no	NOT_ATTEMPTED			API suggestion: typed viewBox
+svg	31	Use of xlink:href in SVG causes rendering problems	WEAK	LOW	no	NOT_E2E			xlink:href rendering in shadow DOM; needs real browser rendering
+svg	32	Runtime issue in compiled code	LIKELY	MEDIUM	no	NOT_E2E			duplicate of #3: Html class on svg throws on read-only className; stub cannot show
+svg	33	PROBLEM BUILDING DEPENDENCIES	NOT_BUG	LOW	no	NOT_ATTEMPTED			dependency-resolution/installer problem
+svg	34	Runtime error with blank nodes	LIKELY	MEDIUM	no	NOT_E2E			Svg.node "" throws in createElementNS in browsers; the DOM stub accepts any tag
+time	6	Allow `Posix` to flow through ports	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: Posix through ports
+time	7	Zone transitions should take effect on their start times	CERTAIN	MEDIUM	yes	REPRODUCED	TimeIssue7ZoneTransitionStartTest		Zone transition not applied at its start minute (< instead of <=)
+time	8	Zone and Era for package developers	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: expose Zone/Era
+time	11	Add a `Time.secondsToPosix`	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: secondsToPosix
+time	14	Example human time displayed is missing zero-padding	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation example
+time	16	customZone requirement to sort exceptions from latest to earliest?	LIKELY	MEDIUM	yes	REPRODUCED	TimeIssue16CustomZoneEraOrderTest		customZone only uses the nearest start if eras are sorted latest first
+time	18	Time offsets	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+time	21	Comparing times	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+time	22	Zone type documentation references Browser.Env type that doesnt exist	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation
+time	24	Add getZoneOffset function	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+time	25	Time.every has incorrect or at least unintuitive behaviour	WEAK	LOW	no	NOT_E2E			Time.every subscriptions with equal intervals are shared; timing-dependent, arguably by design
+time	27	Time.Posix has insufficient range	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation of Int range
+time	28	Time.here practically useless	NOT_BUG	LOW	no	NOT_ATTEMPTED			Limitation of Time.here (fixed offset), by design
+time	29	Time.getZoneName incorrectly handles missing Intl support in ie11	LIKELY	LOW	no	NOT_E2E			getZoneName on IE11 without Intl; needs that browser
+time	30	[Bug] This library does not handle leap seconds	NOT_BUG	LOW	no	NOT_ATTEMPTED			Leap seconds: POSIX time ignores them by definition
+url	9	Allow parsing the complete 'pathname' at once	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+url	10	Support protocols different from http / https	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: other protocols
+url	12	Parsing URLs with IPv6 host	CERTAIN	MEDIUM	yes	REPRODUCED	UrlIssue12Ipv6HostTest		Url.fromString rejects IPv6 hosts like http://[::1]:7272/
+url	14	add alternative methods to handle a basepath like "some/path/"	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: base path
+url	16	Url.Parser.string does not decode the value	LIKELY	MEDIUM	yes	NOT_ATTEMPTED			Url.Parser.string does not percent-decode; whether it should is debated in #42
+url	17	Allow ignoring the path / Just parsing query parameters	WEAK	LOW	yes	NOT_ATTEMPTED			Query-only parsing requires matching the path; works as designed (docs issue #36)
+url	19	Allow ignoring the rest of path	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+url	24	Support Hash-Routing (again)	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: hash routing
+url	25	path should also be escaped	LIKELY	MEDIUM	yes	NOT_ATTEMPTED			Builder does not percent-encode path segments; maintainer says the current behaviour may be preferred (debatable)
+url	36	Incorrect docs for Url.Parser.query	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation
+url	37	Two "?"s added to url	WEAK	LOW	yes	NOT_ATTEMPTED			toQuery includes the leading ? by design; usability complaint
+url	41	Use percentEncode on path segments in Url.Builder	LIKELY	MEDIUM	yes	NOT_ATTEMPTED			Same as #25: path segments not encoded; debatable (#42)
+url	42	When should percent decoding occur by default with paths?	NOT_BUG	LOW	no	NOT_ATTEMPTED			Design discussion
+url	43	Document that only query parameters are percent-encoded	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation
+url	46	Relative links	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: relative links
+url	47	Support for username and password	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: userinfo
+url	48	Build relative URLs with "dirty" paths	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: path cleaning
+url	52	missing </> import in docs for Url.Parser.parse	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation
+url	53	s : Maybe String -> Parser a a	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request
+url	54	Url.percentEncode can throw errors	CERTAIN	LOW	yes	REPRODUCED	UrlIssue54PercentEncodeLoneSurrogateTest		percentEncode throws URIError on a lone surrogate
+url	56	URL	NOT_BUG	LOW	no	NOT_ATTEMPTED			Spam / unrelated
+virtual-dom	16	Multiple attributes with same name but different namespaces	WEAK	LOW	no	NOT_E2E			same-name attributes in different namespaces clobber each other; not observable without a DOM
+virtual-dom	17	Multiple event handlers with the same key	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: multiple handlers for one event
+virtual-dom	29	WIP: server-side rendering	NOT_BUG	LOW	no	NOT_ATTEMPTED			WIP feature: server-side rendering
+virtual-dom	43	Add something like VirtualDom.comment (document.createComment)	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: comment nodes
+virtual-dom	62	Using xlink:href in SVG can cause pointless style recalculations	LIKELY	LOW	no	NOT_E2E			xlink:href causes needless style recalculation (namespaced facts compared by reference); performance, not observable
+virtual-dom	98	debugger - performance, interface, bugs, etc.	NOT_BUG	LOW	no	NOT_ATTEMPTED			debugger meta issue
+virtual-dom	99	Flickering <input style="position: absolute"> in SVG foreignObject	WEAK	LOW	no	NOT_E2E			input flicker in foreignObject; rendering, needs real browser
+virtual-dom	104	contenteditable: requests and problems	LIKELY	MEDIUM	no	NOT_E2E			contenteditable meta issue (crash removing contentEditable); stub has no such property
+virtual-dom	105	Problems with VirtualDom.map	LIKELY	MEDIUM	no	NOT_E2E			Html.map meta issue; event tagging problems need real events
+virtual-dom	106	Runtime exception on invalid (type_ "xyz") attribute	LIKELY	MEDIUM	yes	REPRODUCED	HtmlIssue184SelectTypeTest	lamdera-1.5.0	meta issue on type_ crashes; the select case is tested (textarea in virtual-dom#181; input date was IE only)
+virtual-dom	107	Unreliable <input> value due to requestAnimationFrame	LIKELY	MEDIUM	no	NOT_E2E			requestAnimationFrame drops keystrokes; needs real input events
+virtual-dom	108	Some things must be handled synchronously	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: synchronous handlers
+virtual-dom	110	Lazy top-level view crashes when patches happen after the rootnode changed	CERTAIN	HIGH	yes	REPRODUCED	VirtualDomIssue110LazyRootRedrawTest	lamdera-1.5.0	lazy root view with a redrawn root loses the root DOM node; next patch crashes
+virtual-dom	112	Performance optimization for CSS	NOT_BUG	LOW	no	NOT_ATTEMPTED			performance proposal for CSS
+virtual-dom	114	Possible bug with fully qualified types and exporting state	WEAK	LOW	no	NOT_E2E			debugger export complains about tasks in Msg; needs debugger
+virtual-dom	118	Default behavior can accidentally expose user passwords	LIKELY	MEDIUM	no	NOT_E2E			positional DOM reuse leaks input values; needs real input state
+virtual-dom	119	`option` with empty `value` and nonempty content misbehaves	LIKELY	LOW	no	NOT_E2E			option with empty value misbehaves; needs real DOM and events
+virtual-dom	122	Phantom pattern on reused input field	LIKELY	MEDIUM	no	NOT_E2E			removed properties set to "" leave phantom pattern/href; not observable with the stub
+virtual-dom	141	Empty string as attribute name causes exception.	LIKELY	MEDIUM	no	NOT_E2E			attribute "" "" throws in setAttribute; the DOM stub accepts it
+virtual-dom	144	VirtualDom_virtualize causes flashes on <img>	LIKELY	LOW	no	NOT_E2E			virtualize treats img src as attribute, causing flicker; needs real DOM
+virtual-dom	146	Task not performed as expected during synchronous event processing	WEAK	MEDIUM	no	NOT_E2E			Task not performed during synchronous event processing; needs events, reportedly fixed by core 1.0.5
+virtual-dom	147	Elm update fails when using 1Password X Chrome extension	LIKELY	MEDIUM	no	NOT_E2E			1Password extension DOM changes break patching; needs real browser
+virtual-dom	148	Uncaught TypeError: domNode.replaceData is not a function	WEAK	MEDIUM	no	NOT_E2E			replaceData not a function due to JSON Viewer extension; environment
+virtual-dom	149	Checkbox "checked" value un-toggled before event handler is triggered	LIKELY	MEDIUM	no	NOT_E2E			stopPropagation sync render resets checked before onCheck; needs events
+virtual-dom	150	Uncaught TypeError: Cannot read property 'b' of undefined	WEAK	MEDIUM	no	NOT_E2E			TypeError with no repro; likely extension DOM mutation
+virtual-dom	151	Runtime Error: replacing element with property contentEditable	LIKELY	MEDIUM	no	NOT_E2E			removing contentEditable property throws; stub has no such property
+virtual-dom	153	Browser.Navigation.pushUrl to come after DOM update	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: pushUrl after DOM update
+virtual-dom	156	Custom element extended built-in support and special `is` attribute	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: customized built-ins (is attribute)
+virtual-dom	158	onInput for select's not firing on Edge	WEAK	LOW	no	NOT_E2E			onInput on select in old Edge; browser bug
+virtual-dom	160	Run time error when trying the example from billstclair/elm-sortable-table.	LIKELY	HIGH	yes	NOT_REPRODUCED			the elm-sortable-table travel example re-sorted by price then rating renders correctly with elm/virtual-dom 1.0.5, in runner/dom.js and in jsdom
+virtual-dom	161	Elm uses invalid value in `domNode.insertBefore`	LIKELY	LOW	no	NOT_E2E			insertBefore(node, undefined) invalid in IE10; stub and modern browsers accept undefined
+virtual-dom	162	Wrong Msg tag used when using <img> onLoad event	LIKELY	MEDIUM	no	NOT_E2E			wrong Msg tag for img onLoad after view change; needs events
+virtual-dom	164	Styles get lost after model update	LIKELY	MEDIUM	no	NOT_E2E			styles lost when one style key is removed after a related one; stub style object cannot show
+virtual-dom	165	`javascript:` ban disallows legitimate use for bookmarklets	NOT_BUG	LOW	no	NOT_ATTEMPTED			javascript: URL ban is intended security design
+virtual-dom	167	Html.map with IE11: Unable to get property 'j' of undefined or null reference	LIKELY	MEDIUM	no	NOT_E2E			Html.map crash in IE11; needs IE events
+virtual-dom	169	Reusing anchor node leaves empty href attr	LIKELY	MEDIUM	no	NOT_E2E			reused anchor keeps empty href; property removal not observable with the stub
+virtual-dom	170	Node re-use carries over DOM state like :focus	WEAK	LOW	no	NOT_E2E			DOM reuse keeps :focus; needs real browser
+virtual-dom	171	Html.map + timeupdate event after DOM removal creates invalid Msg	LIKELY	MEDIUM	no	NOT_E2E			Html.map + timeupdate after removal creates invalid Msg; needs media events
+virtual-dom	172	Uncaught TypeError: Cannot assign to read only property 'className' of object [DOM mutations from FontAwesome]	WEAK	MEDIUM	no	NOT_E2E			className read-only after FontAwesome mutates DOM; third-party DOM mutation
+virtual-dom	173	textarea [type_ "text"] [] blows up Elm	LIKELY	MEDIUM	no	NOT_E2E			textarea type_ throws on read-only property; stub has no read-only properties
+virtual-dom	174	Lack of good error message when HTML document is malformed	NOT_BUG	LOW	no	NOT_ATTEMPTED			better error for malformed HTML document
+virtual-dom	175	node removal in `_VirtualDom_diffKeyedKids` when prepending items	LIKELY	LOW	no	NOT_E2E			re-inserted keyed nodes keep their properties; only browser state (selection, animation) is lost, which a program cannot observe here
+virtual-dom	176	`</script>` in string literals is not escaped for embedding elm.js directly in HTML	LIKELY	MEDIUM	no	NOT_E2E			</script> in strings breaks inline HTML embedding of elm make output; harness runs the .js
+virtual-dom	178	Redundant removal and reinsertion of node breaks focus on element	LIKELY	LOW	no	NOT_E2E			keyed diff needlessly detaches nodes, losing focus; needs real focus
+virtual-dom	181	Adding type_ attribute to textarea throws error in runtime	LIKELY	MEDIUM	yes	REPRODUCED	VirtualDomIssue181TextareaTypeTest	lamdera-1.5.0	textarea type_ throws: the type property has only a getter (runner/dom.js models it, as jsdom does)
+virtual-dom	183	Html.Keyed.node does not preserve scroll positions across children	LIKELY	LOW	no	NOT_E2E			keyed reorder resets scroll positions; needs real browser
+virtual-dom	184	lazy can cause loss of user's input focus	WEAK	LOW	no	NOT_E2E			lazy/node switch recreates DOM losing focus; intended bail-out, needs real browser
+virtual-dom	185	Child elements not added to <template> elements	LIKELY	LOW	no	NOT_E2E			template children not put in .content; needs real DOM
+virtual-dom	186	Failed to execute 'removeChild' on 'Node': parameter 1 is not of type 'Node'.	WEAK	MEDIUM	no	NOT_E2E			removeChild on corrupted state, no repro; likely external DOM mutation
+virtual-dom	188	Virtualize `value` of form controls	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: virtualize form values
+virtual-dom	189	Lazy is too lazy for inputs	LIKELY	MEDIUM	no	NOT_E2E			lazy skips resetting input value; needs real input
+virtual-dom	192	Edge case with changing `name` and `checked` for radio buttons	WEAK	LOW	no	NOT_E2E			radio name/checked edge case; browser semantics
