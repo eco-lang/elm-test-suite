@@ -114,16 +114,16 @@ report and writes it to `.work/report.md`:
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 787 | the language and elm/core: every construct, closures, recursion, pattern matching, records, custom types, numbers, strings |
-| `elm-core` | 114 | the elm/core modules, function by function |
-| `elm-bytes` | 129 | elm/bytes encoders and decoders |
-| `elm-json` | 37 | elm/json |
+| `elm` | 605 | the language and elm/core: every construct, closures, recursion, pattern matching, records, custom types, numbers, strings |
+| `elm-core` | 106 | the elm/core modules, function by function |
+| `elm-bytes` | 84 | elm/bytes encoders and decoders |
+| `elm-json` | 32 | elm/json |
 | `elm-parser` | 39 | elm/parser |
-| `elm-regex` | 7 | elm/regex |
+| `elm-regex` | 5 | elm/regex |
 | `elm-time` | 4 | elm/time |
 | `elm-url` | 3 | elm/url |
 | `elm-html` | 3 | elm/html |
-| `elm-conformance` | 36 | edge cases recorded from Elm on Node: Unicode and case mapping, JSON number and string formats, Float edge values, regex and URL encoding details |
+| `elm-conformance` | 33 | edge cases recorded from Elm on Node: Unicode and case mapping, JSON number and string formats, Float edge values, regex and URL encoding details |
 | `elm-compile-errors` | 216 | programs the compiler must reject, checked by the title of the error report |
 | `elm-bug-fixes` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
 | `elm-bugs` | 125 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues; each test links its issue and expects the correct behaviour |
