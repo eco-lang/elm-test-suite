@@ -1,5 +1,5 @@
 # Runs the suite under every compiler on Linux, builds the results website (site/, elm-pages) and
-# publishes it to Netlify. Pushes to master deploy to production; a pull request gets a draft deploy
+# publishes it to Netlify. Runs on master deploy to production; a pull request gets a draft deploy
 # when the Netlify secrets are available (not for pull requests from forks). The site is also kept
 # as a workflow artifact either way.
 #
@@ -84,14 +84,15 @@ jobs:
           name: site
           path: site/dist/
 
-      # A push to master deploys to production; a pull request gets a draft deploy at its own URL.
+      # A run on master (a push or a manual run) deploys to production; a pull request gets a draft
+      # deploy at its own URL.
       - name: Deploy to Netlify
         if: env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
         uses: nwtgck/actions-netlify@v3
         with:
           publish-dir: site/dist
           production-branch: master
-          production-deploy: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+          production-deploy: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
           alias: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || '' }}
           deploy-message: ${{ github.event.head_commit.message || github.event.pull_request.title || github.sha }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -100,6 +101,7 @@ jobs:
           enable-github-deployment: false
 
       # elm-bugs and elm-bug-fixes fail under Elm 0.19.1 by design; anything else failing is a
-      # regression in the suite or the runner.
+      # regression in the suite or the runner. It runs even when a step above failed (a deploy).
       - name: Check Elm 0.19.1 passes every test it should
+        if: always()
         run: node runner/check-baseline.js

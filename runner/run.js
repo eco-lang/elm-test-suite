@@ -393,14 +393,17 @@ async function runProject(spec, opts, compiler) {
         // A compiler that crashes can leave elm-stuff half-written, and the next compile in it then
         // reports a CORRUPT CACHE (Elm 0.19.2, Lamdera) or hangs (Elm 0.19.3). So elm-stuff is cleared
         // after a compile that crashed or was killed, and a compile that hangs, is killed or finds a
-        // corrupt cache is tried once more with an empty elm-stuff.
+        // corrupt cache is tried once more with an empty elm-stuff. So is one that trips over its own
+        // lock on an elm-stuff file ("d.dat: withBinaryFile: resource busy (file is locked)"): a race
+        // between the threads of one Elm 0.19.2 or 0.19.3 process, seen on GitHub's runners.
         const elmStuff = path.join(projects[k], 'elm-stuff');
         if (!elmStuff.startsWith(path.join(ROOT, '.work') + path.sep)) throw new Error('unexpected path ' + elmStuff);
         const killed = (r) => r.timedOut || r.outOfMemory || r.signal;
         const corruptCache = (r) => /^-- CORRUPT CACHE|Corrupt File:/m.test(r.output);
+        const selfLocked = (r) => /resource busy \(file is locked\)/.test(r.output);
         const crashed = (r) => /bypassed the normal error reporting|CallStack \(from HasCallStack\)/.test(r.output);
         let r = await compile();
-        if ((killed(r) || corruptCache(r)) && fs.existsSync(elmStuff)) {
+        if ((killed(r) || corruptCache(r) || selfLocked(r)) && fs.existsSync(elmStuff)) {
             fs.rmSync(elmStuff, { recursive: true, force: true });
             console.log('  retrying ' + t.name + ' with an empty elm-stuff');
             r = await compile();
