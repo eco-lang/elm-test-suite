@@ -44,8 +44,10 @@
 //   `-- LINUX-ONLY:` skips the test on other hosts.
 // --record <TestName> runs one test without checking it and prints each non-empty output line as
 // `-- CHECK: <line>`. Each test's output is kept in .work/<compiler>/<project>/out/<Name>.log.
-// --json writes every test's outcome to a file (run-all.js reads it). The exit status is 1 if any
-// test failed, 2 on a usage or setup error, else 0.
+// --json writes every test's outcome, its failure message and up to 4000 characters of its output
+// (the program's, or the compiler's for a COMPILE-ERROR test) to a file (run-all.js and
+// runner/site-data.js read it). The exit status is 1 if any test failed, 2 on a usage or setup
+// error, else 0.
 'use strict';
 
 const fs = require('fs');
@@ -416,7 +418,8 @@ async function runProject(spec, opts, compiler) {
             let message = r.code === 0 || produced ? 'compiled, but a compile error was expected'
                 : D.verifyPatterns(r.output, t.patterns);
             if (message) message += '\n--- compiler output ---\n' + r.output.slice(0, 4000);
-            results.set(t.name, { status: message ? 'fail' : 'pass', message, compileError: true });
+            results.set(t.name, { status: message ? 'fail' : 'pass', message, compileError: true,
+                output: r.output.slice(0, 4000) });
         } else if (r.code !== 0 || !produced) {
             try { fs.unlinkSync(out); } catch (e) { /* none */ }
             results.set(t.name, { status: 'fail', message: 'compile failed (exit ' + r.code + '):\n' + r.output.slice(0, 4000) });
@@ -481,7 +484,8 @@ async function runProject(spec, opts, compiler) {
         else if (r.code !== t.exit) message = 'exit code ' + r.code + ', expected ' + t.exit;
         if (!message && !opts.record) message = D.verifyPatterns(r.output, t.patterns);
         if (message) message += '\n--- output ---\n' + r.output.slice(0, 4000);
-        results.set(t.name, { status: message ? 'fail' : 'pass', message, ms: Date.now() - started });
+        results.set(t.name, { status: message ? 'fail' : 'pass', message, ms: Date.now() - started,
+            output: r.output.slice(0, 4000) });
     });
 
     // --record: print the run's output as CHECK lines.
@@ -504,7 +508,9 @@ async function runProject(spec, opts, compiler) {
     const json = {};
     for (const t of selected) {
         const r = results.get(t.name);
-        json[t.name] = { status: r.status, reason: r.status === 'pass' ? '' : (r.message || '').split('\n')[0] };
+        json[t.name] = { status: r.status, reason: r.status === 'pass' ? '' : (r.message || '').split('\n')[0],
+            message: r.status === 'pass' ? '' : (r.message || ''), output: r.output || '' };
+        if (r.ms !== undefined) json[t.name].ms = r.ms;
         if (r.status === 'pass') passed++;
         else if (r.status === 'skip') { skipped++; console.log('  SKIP ' + spec.name + '/' + t.name + ': ' + r.message); }
         else {

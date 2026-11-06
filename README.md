@@ -281,6 +281,31 @@ a native executable otherwise, so it can be added twice, once per back end. With
 On a native target, tests that need a JavaScript host (`-- FLAGS:`, or a port module) are
 skipped.
 
+## The results website
+
+`site/` is an [elm-pages](https://elm-pages.com) site built from a run's results: each compiler's
+totals, each project's totals per compiler, the tests whose outcome differs between compilers, and
+a page per test with its description, issue link, source, and per compiler its outcome, failure
+message and output. To build it after `pnpm test:all`:
+
+```sh
+node runner/site-data.js          # writes site/data/ from .work/results/ and tests/
+cd site && npm install && npm start      # dev server; or `npm run build` for site/dist/
+```
+
+The site is built for the root of its domain: the elm-pages it uses does not route pages under a
+base path, so it cannot be served from a GitHub project page (`<owner>.github.io/<repo>/`).
+Styling is elm-css global snippets in `site/src/Style.elm`, used through `ts-` classes.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on Linux for each push to `master` and each pull request:
+`pnpm test:all`, the comparison report into the job summary, the website, then
+`runner/check-baseline.js`, which fails the job when Elm 0.19.1 fails a test outside `elm-bugs`
+and `elm-bug-fixes`. The results and the built site are kept as workflow artifacts. With the
+repository secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` set, a push to `master` publishes the
+site to Netlify, and a pull request gets a draft deploy linked in a comment.
+
 ## Layout
 
 ```
@@ -291,6 +316,10 @@ runner/run.js         runs the suite with one compiler
 runner/run-all.js     runs it with several and writes the comparison report
 runner/directives.js  reads a test's directives and checks its output
 runner/dom.js         the minimal DOM that lets Html programs start on Node
+runner/site-data.js   writes the results website's data from the last results
+runner/check-baseline.js  fails when Elm 0.19.1 fails a test it should pass (CI)
+site/                 the results website (elm-pages)
+.github/workflows/    CI: run the suite, build and publish the website
 tests/<project>/      the test projects (elm.json and src/)
 .work/                compiled programs, logs, package caches and results (not tracked)
 ```

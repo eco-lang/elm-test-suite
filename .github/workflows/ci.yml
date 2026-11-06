@@ -1,0 +1,105 @@
+# Runs the suite under every compiler on Linux, builds the results website (site/, elm-pages) and
+# publishes it to Netlify. Pushes to master deploy to production; a pull request gets a draft deploy
+# when the Netlify secrets are available (not for pull requests from forks). The site is also kept
+# as a workflow artifact either way.
+#
+# Netlify setup: create a site (no build settings needed: CI uploads the built files), then add the
+# repository secrets NETLIFY_AUTH_TOKEN (a personal access token) and NETLIFY_SITE_ID (the site's
+# API ID). Without them every step but the deploy runs.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # Each compiler's Elm package cache (ELM_HOME) and the site's.
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .work/*/elm-home
+            ~/.elm
+          key: elm-home-${{ hashFiles('tests/*/elm.json', 'package.json', 'site/elm.json') }}
+          restore-keys: elm-home-
+
+      - name: Install the compilers
+        run: pnpm install --frozen-lockfile
+
+      # run-all.js exits 0 whatever the tests' outcomes; the baseline check at the end decides.
+      - name: Run the suite under every compiler
+        run: pnpm test:all 2>&1 | tee test-output.txt
+
+      - name: Write the comparison report to the job summary
+        if: always()
+        run: test -f .work/report.md && cat .work/report.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Keep the results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results
+          path: |
+            .work/results/
+            .work/report.md
+            test-output.txt
+          if-no-files-found: ignore
+
+      - name: Write the site data
+        run: node runner/site-data.js
+
+      - name: Build the site
+        working-directory: site
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: Keep the site
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site/dist/
+
+      # A push to master deploys to production; a pull request gets a draft deploy at its own URL.
+      - name: Deploy to Netlify
+        if: env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
+        uses: nwtgck/actions-netlify@v3
+        with:
+          publish-dir: site/dist
+          production-branch: master
+          production-deploy: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+          alias: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || '' }}
+          deploy-message: ${{ github.event.head_commit.message || github.event.pull_request.title || github.sha }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          enable-pull-request-comment: true
+          enable-commit-comment: false
+          enable-github-deployment: false
+
+      # elm-bugs and elm-bug-fixes fail under Elm 0.19.1 by design; anything else failing is a
+      # regression in the suite or the runner.
+      - name: Check Elm 0.19.1 passes every test it should
+        run: node runner/check-baseline.js
