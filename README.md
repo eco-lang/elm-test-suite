@@ -126,7 +126,7 @@ report and writes it to `.work/report.md`:
 | `elm-conformance` | 33 | edge cases recorded from Elm on Node: Unicode and case mapping, JSON number and string formats, Float edge values, regex and URL encoding details |
 | `elm-compile-errors` | 216 | programs the compiler must reject, checked by the title of the error report |
 | `elm-bug-fixes` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
-| `elm-bugs` | 125 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues; each test links its issue and expects the correct behaviour |
+| `elm-bugs` | 126 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues; each test links its issue and expects the correct behaviour |
 
 ### elm-bugs and its issue triage
 
