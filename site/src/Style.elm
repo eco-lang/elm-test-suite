@@ -45,6 +45,11 @@ fontBody =
     "Inter, system-ui, sans-serif"
 
 
+fontBook : String
+fontBook =
+    "'Source Serif 4', Georgia, 'Times New Roman', serif"
+
+
 fontCode : String
 fontCode =
     "'Roboto Mono', ui-monospace, monospace"
@@ -72,6 +77,7 @@ style =
         , codeStyles
         , filterStyles
         , resultStyles
+        , standardStyles
         ]
 
 
@@ -136,10 +142,16 @@ layoutStyles =
         [ p "display" "inline-block"
         , p "width" "14px"
         , p "height" "14px"
-        , p "border-radius" "3px"
-        , p "background-color" colors.accent
         , p "transform" "rotate(45deg)"
         ]
+    , Css.Global.class "ts-github"
+        [ p "margin-left" "auto"
+        , p "display" "flex"
+        , p "align-items" "center"
+        , p "color" colors.heading
+        ]
+    , Css.Global.selector ".ts-github:hover" [ p "color" colors.accentDark ]
+    , Css.Global.class "ts-github-mark" [ p "width" "22px", p "height" "22px" ]
     , Css.Global.class "ts-nav"
         [ p "display" "flex"
         , p "gap" "18px"
@@ -447,4 +459,309 @@ resultStyles =
     , Css.Global.class "ts-result-pass" [ p "border-left" ("4px solid " ++ colors.accent) ]
     , Css.Global.class "ts-result-skip" [ p "border-left" ("4px solid " ++ colors.skip) ]
     , Css.Global.class "ts-result-missing" [ p "border-left" ("4px solid " ++ colors.missing) ]
+    ]
+
+
+
+-- THE DEFINITION OF STANDARD ELM
+
+
+standardStyles : List Snippet
+standardStyles =
+    [ Css.Global.class "sd-book"
+        [ p "font-family" fontBook
+        , p "font-size" "17px"
+        , p "line-height" "1.6"
+        , p "max-width" "880px"
+        , p "margin" "0 auto"
+        ]
+    , Css.Global.selector ".sd-book .katex" [ p "font-size" "1.08em" ]
+    , Css.Global.class "sd-title"
+        [ p "font-weight" "700"
+        , p "font-size" "36px"
+        , p "line-height" "1.2"
+        , p "text-align" "center"
+        , p "margin" "24px 0 6px"
+        ]
+    , Css.Global.class "sd-edition" [ p "text-align" "center", p "color" colors.heading, p "font-size" "18px" ]
+    , Css.Global.class "sd-author" [ p "text-align" "center", p "color" colors.muted, p "margin-bottom" "28px" ]
+    , Css.Global.class "sd-lede" [ p "color" colors.heading ]
+    , Css.Global.class "sd-licence"
+        [ p "margin-top" "40px"
+        , p "padding-top" "12px"
+        , p "border-top" ("1px solid " ++ colors.border)
+        , p "font-size" "13px"
+        , p "color" colors.muted
+        ]
+    , Css.Global.class "sd-draft-note"
+        [ p "background-color" "#FFF8E1"
+        , p "border-left" "4px solid #F9A825"
+        , p "padding" "10px 14px"
+        , p "border-radius" "4px"
+        , p "font-size" "15px"
+        ]
+    , Css.Global.class "sd-actions" [ p "display" "flex", p "gap" "12px", p "flex-wrap" "wrap", p "margin" "20px 0 8px" ]
+    , Css.Global.class "sd-button"
+        [ p "font-family" fontBody
+        , p "font-size" "14px"
+        , p "font-weight" "600"
+        , p "padding" "8px 16px"
+        , p "border-radius" "999px"
+        , p "background-color" colors.accentDark
+        , p "color" colors.bgWhite
+        ]
+    , Css.Global.selector ".sd-button:hover" [ p "text-decoration" "none", p "background-color" colors.text ]
+    , Css.Global.class "sd-button-quiet"
+        [ p "background-color" colors.bgWhite
+        , p "color" colors.heading
+        , p "border" ("1px solid " ++ colors.border)
+        ]
+    , Css.Global.selector ".sd-button-quiet:hover" [ p "background-color" colors.bgSubtle ]
+    , Css.Global.class "sd-contents-head" [ p "font-size" "24px", p "margin" "36px 0 8px" ]
+    , Css.Global.class "sd-contents-sub" [ p "font-size" "19px", p "margin" "24px 0 8px" ]
+    , Css.Global.class "sd-contents" [ p "list-style" "none", p "padding" "0", p "margin" "0" ]
+    , Css.Global.class "sd-contents-chapter"
+        [ p "padding" "10px 0"
+        , p "border-bottom" ("1px solid " ++ colors.border)
+        ]
+    , Css.Global.class "sd-contents-title" [ p "font-weight" "600", p "font-size" "18px", p "color" colors.text ]
+    , Css.Global.class "sd-contents-rules" [ p "margin-left" "12px", p "font-family" fontBody, p "font-size" "13px" ]
+    , Css.Global.class "sd-contents-sections"
+        [ p "list-style" "none"
+        , p "padding" "0"
+        , p "margin" "4px 0 0 2.2em"
+        , p "font-size" "15px"
+        , p "columns" "2 300px"
+        , p "column-gap" "28px"
+        ]
+    , Css.Global.selector ".sd-contents-sections a" [ p "color" colors.heading ]
+    , Css.Global.class "sd-num"
+        [ p "display" "inline-block"
+        , p "min-width" "2.2em"
+        , p "font-variant-numeric" "tabular-nums"
+        , p "color" colors.muted
+        , p "font-weight" "600"
+        ]
+    , Css.Global.class "sd-chapter-title"
+        [ p "font-size" "32px"
+        , p "line-height" "1.25"
+        , p "margin" "6px 0 18px"
+        , p "display" "flex"
+        , p "align-items" "baseline"
+        , p "gap" "4px 14px"
+        , p "flex-wrap" "wrap"
+        ]
+    , Css.Global.selector ".sd-chapter-title .sd-num" [ p "min-width" "0", p "color" colors.accentDark ]
+    , Css.Global.class "sd-edition-chip"
+        [ p "font-family" fontBody
+        , p "font-size" "11px"
+        , p "font-weight" "600"
+        , p "margin-left" "8px"
+        , p "padding" "1px 8px"
+        , p "border-radius" "999px"
+        , p "background-color" "#FFF8E1"
+        , p "color" "#8D6E00"
+        ]
+    , Css.Global.class "sd-toc"
+        [ p "background-color" colors.bgWhite
+        , p "border" ("1px solid " ++ colors.border)
+        , p "border-radius" "8px"
+        , p "padding" "10px 18px"
+        , p "font-size" "15px"
+        , p "margin-bottom" "24px"
+        ]
+    , Css.Global.selector ".sd-toc ol" [ p "list-style" "none", p "padding" "0", p "margin" "0", p "columns" "2 280px" ]
+    , Css.Global.selector ".sd-toc a" [ p "color" colors.heading ]
+    , Css.Global.class "sd-p" [ p "margin" "0 0 0.85em" ]
+    , Css.Global.class "sd-h" [ p "line-height" "1.3", p "position" "relative" ]
+    , Css.Global.class "sd-h1" [ p "font-size" "24px", p "margin" "1.8em 0 0.6em" ]
+    , Css.Global.class "sd-h2" [ p "font-size" "19px", p "margin" "1.5em 0 0.5em" ]
+    , Css.Global.class "sd-h3" [ p "font-size" "17px", p "margin" "1.2em 0 0.4em" ]
+    , Css.Global.class "sd-pilcrow"
+        [ p "margin-left" "8px"
+        , p "color" colors.border
+        , p "font-weight" "400"
+        , p "opacity" "0"
+        ]
+    , Css.Global.selector ".sd-h:hover .sd-pilcrow" [ p "opacity" "1" ]
+    , Css.Global.selector ".sd-pilcrow:hover" [ p "color" colors.accentDark, p "text-decoration" "none" ]
+    , Css.Global.selector ":target" [ p "scroll-margin-top" "16px" ]
+    , Css.Global.selector ".sd-rule:target, .sd-figure:target, .sd-h:target"
+        [ p "background-color" "#FFF8E1"
+        , p "box-shadow" "0 0 0 6px #FFF8E1"
+        , p "border-radius" "2px"
+        ]
+    , Css.Global.class "sd-display" [ p "overflow-x" "auto", p "overflow-y" "hidden", p "margin" "0.4em 0 1em" ]
+    , Css.Global.class "sd-kw" [ p "font-family" fontCode, p "font-size" "0.86em" ]
+    , Css.Global.class "sd-ref" [ p "white-space" "nowrap" ]
+    , Css.Global.class "sd-ref-missing" [ p "color" colors.fail ]
+    , Css.Global.class "sd-raw"
+        [ p "color" colors.fail
+        , p "font-family" fontCode
+        , p "font-size" "0.85em"
+        , p "white-space" "pre-wrap"
+        ]
+    , Css.Global.class "sd-list" [ p "margin" "0 0 0.85em", p "padding-left" "1.6em" ]
+    , Css.Global.selector ".sd-list > li > .sd-p:last-child" [ p "margin-bottom" "0.3em" ]
+    , Css.Global.class "sd-quote" [ p "margin" "0.6em 0 1em 2em" ]
+    , Css.Global.class "sd-center" [ p "text-align" "center" ]
+    , Css.Global.selector ".sd-center .sd-table-wrap" [ p "display" "flex", p "justify-content" "center" ]
+    , Css.Global.class "sd-right" [ p "text-align" "right" ]
+    , Css.Global.class "sd-minipage" [ p "display" "inline-block", p "vertical-align" "top", p "margin" "0 12px" ]
+
+    -- Rules and rule groups.
+    , Css.Global.class "sd-rulegroup"
+        [ p "display" "flex"
+        , p "justify-content" "space-between"
+        , p "align-items" "center"
+        , p "flex-wrap" "wrap"
+        , p "gap" "8px 16px"
+        , p "margin" "2em 0 0.6em"
+        , p "padding-bottom" "6px"
+        , p "border-bottom" ("1px solid " ++ colors.border)
+        ]
+    , Css.Global.class "sd-rulegroup-title" [ p "font-weight" "700", p "font-size" "18px" ]
+    , Css.Global.class "sd-judgement"
+        [ p "border" ("1px solid " ++ colors.heading)
+        , p "padding" "2px 10px"
+        , p "max-width" "100%"
+        , p "overflow-x" "auto"
+        ]
+    , Css.Global.class "sd-rule"
+        [ p "display" "flex"
+        , p "align-items" "center"
+        , p "gap" "12px"
+        , p "margin" "0.3em 0"
+        ]
+    , Css.Global.class "sd-rule-math" [ p "flex" "1 1 auto", p "min-width" "0", p "overflow-x" "auto", p "overflow-y" "hidden" ]
+    , Css.Global.selector ".sd-rule-math .katex-display" [ p "margin" "0.5em 0" ]
+
+    -- KaTeX centres display mathematics as a block, so a formula wider than its box overflows on
+    -- both sides and its left part cannot be scrolled to. As an inline block in a centred line it
+    -- is centred when it fits and overflows to the right when it does not.
+    , Css.Global.selector ".sd-rule-math .katex-display, .sd-display .katex-display" [ p "text-align" "center" ]
+    , Css.Global.selector ".sd-rule-math .katex-display > .katex, .sd-display .katex-display > .katex"
+        [ p "display" "inline-block"
+        , p "text-align" "left"
+        ]
+    , Css.Global.class "sd-rule-num"
+        [ p "flex" "0 0 auto"
+        , p "font-variant-numeric" "tabular-nums"
+        , p "color" colors.heading
+        , p "min-width" "3em"
+        , p "text-align" "right"
+        ]
+    , Css.Global.class "sd-rule-single"
+        [ p "background-color" colors.bgWhite
+        , p "border" ("1px solid " ++ colors.border)
+        , p "border-radius" "8px"
+        , p "padding" "8px 18px"
+        , p "margin" "16px 0"
+        ]
+    , Css.Global.class "sd-item-chip"
+        [ p "font-family" fontCode
+        , p "font-size" "12px"
+        , p "color" colors.muted
+        , p "border" ("1px solid " ++ colors.border)
+        , p "border-radius" "4px"
+        , p "padding" "0 5px"
+        , p "margin-left" "6px"
+        , p "white-space" "nowrap"
+        , p "text-decoration" "none"
+        ]
+    , Css.Global.selector ".sd-item-chip:hover" [ p "color" colors.accentDark, p "border-color" colors.accentDark ]
+    , Css.Global.selector "li.sd-item > .sd-p:last-of-type" [ p "display" "inline" ]
+    , Css.Global.class "sd-item-cell" [ p "vertical-align" "top", p "padding-left" "8px" ]
+    , Css.Global.class "sd-item-meta" [ p "color" colors.muted, p "margin" "4px 0 20px" ]
+    , Css.Global.class "sd-item-place" [ p "margin-bottom" "18px" ]
+    , Css.Global.class "sd-item-source" [ p "margin-top" "-4px" ]
+    , Css.Global.class "sd-also" [ p "color" colors.muted, p "font-size" "15px" ]
+    , Css.Global.class "sd-nowrap" [ p "white-space" "nowrap", p "vertical-align" "top" ]
+    , Css.Global.class "sd-basis-row" [ p "display" "flex", p "gap" "12px", p "margin" "6px 0", p "align-items" "baseline" ]
+    , Css.Global.class "sd-basis-label" [ p "flex" "0 0 56px", p "color" colors.muted, p "font-size" "14px" ]
+    , Css.Global.class "sd-basis-names" [ p "display" "flex", p "flex-wrap" "wrap", p "gap" "6px 14px" ]
+    , Css.Global.class "sd-basis-name" [ p "font-family" fontCode, p "font-size" "14px" ]
+    , Css.Global.class "sd-rule-slug"
+        [ p "font-family" fontCode
+        , p "font-size" "16px"
+        , p "font-weight" "400"
+        , p "color" colors.heading
+        , p "background-color" colors.bgSubtle
+        , p "padding" "2px 8px"
+        , p "border-radius" "4px"
+        ]
+    , Css.Global.class "sd-rule-actions"
+        [ p "display" "flex"
+        , p "gap" "10px"
+        , p "flex-wrap" "wrap"
+        , p "font-family" fontBody
+        , p "font-size" "13px"
+        ]
+    , Css.Global.class "sd-comments" [ p "font-size" "15.5px", p "margin" "0.6em 0 1.4em" ]
+    , Css.Global.class "sd-comments-head" [ p "font-style" "italic", p "margin-bottom" "4px" ]
+    , Css.Global.class "sd-comment"
+        [ p "display" "grid"
+        , p "grid-template-columns" "3.4em 1fr"
+        , p "gap" "4px"
+        ]
+    , Css.Global.class "sd-comment-num" [ p "font-variant-numeric" "tabular-nums" ]
+    , Css.Global.selector ".sd-comment-body .sd-p" [ p "margin-bottom" "0.6em" ]
+
+    -- Figures and tables.
+    , Css.Global.class "sd-figure"
+        [ p "margin" "1.6em 0"
+        , p "padding" "12px 0 8px"
+        , p "border-top" ("1px solid " ++ colors.border)
+        , p "border-bottom" ("1px solid " ++ colors.border)
+        ]
+    , Css.Global.class "sd-figure-body" [ p "overflow-x" "auto", p "font-size" "15.5px" ]
+    , Css.Global.selector ".sd-figure-body > .sd-table-wrap" [ p "display" "flex", p "justify-content" "center" ]
+    , Css.Global.selector ".sd-figure-body > .sd-p" [ p "margin" "0.6em 0 0.2em" ]
+    , Css.Global.selector ".sd-figure figcaption"
+        [ p "text-align" "center"
+        , p "font-size" "15px"
+        , p "margin-top" "10px"
+        , p "color" colors.heading
+        ]
+    , Css.Global.class "sd-figure-num" [ p "font-weight" "600", p "color" colors.heading ]
+    , Css.Global.class "sd-table-wrap" [ p "overflow-x" "auto", p "margin" "0.4em 0" ]
+    , Css.Global.class "sd-table" [ p "border-collapse" "collapse" ]
+    , Css.Global.selector ".sd-table td"
+        [ p "padding" "2px 10px"
+        , p "vertical-align" "top"
+        , p "white-space" "nowrap"
+        , p "text-align" "left"
+        ]
+    , Css.Global.selector ".sd-table td.sd-wrap" [ p "white-space" "normal", p "min-width" "9em" ]
+    , Css.Global.selector ".sd-table tr.sd-rule-above > td" [ p "border-top" ("1px solid " ++ colors.heading) ]
+    , Css.Global.selector ".sd-table.sd-rule-below tr:last-child > td" [ p "border-bottom" ("1px solid " ++ colors.heading) ]
+    , Css.Global.class "sd-pre"
+        [ p "font-family" fontCode
+        , p "font-size" "13px"
+        , p "background-color" colors.bgSubtle
+        , p "padding" "10px 14px"
+        , p "border-radius" "6px"
+        , p "overflow-x" "auto"
+        ]
+
+    -- Paging between chapters and rules.
+    , Css.Global.class "sd-pager"
+        [ p "display" "flex"
+        , p "justify-content" "space-between"
+        , p "gap" "16px"
+        , p "margin-top" "48px"
+        , p "padding-top" "16px"
+        , p "border-top" ("1px solid " ++ colors.border)
+        ]
+    , Css.Global.class "sd-pager-link" [ p "display" "flex", p "flex-direction" "column", p "max-width" "48%" ]
+    , Css.Global.selector ".sd-pager-link:last-child" [ p "text-align" "right", p "margin-left" "auto" ]
+    , Css.Global.class "sd-pager-label"
+        [ p "font-family" fontBody
+        , p "font-size" "12px"
+        , p "text-transform" "uppercase"
+        , p "letter-spacing" "0.04em"
+        , p "color" colors.muted
+        ]
+    , Css.Global.selector ".sd-rules-table td" [ p "font-family" fontBody ]
+    , Css.Global.selector ".sd-pager .sd-num" [ p "min-width" "0", p "margin-right" "0.4em" ]
     ]

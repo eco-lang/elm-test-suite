@@ -1,0 +1,822 @@
+% Values: PRECISE, FAITHFUL, TRACTABLE, ILLUMINATING, ECONOMICAL
+% Evidence planned:
+% - PRECISE: a rule (or an option instance of one) for every production of the
+%   bare Core in the book plan's "Bare Constructs" table: 45 rules in 12 groups;
+%   every object and operation defined in the sections before the rules.
+% - FAITHFUL: classes and admissible types exactly as the survey's tables (A19,
+%   A36); rows with unique labels (A23); finite types (A22); explicit variables
+%   scoped over nested annotations (A21) and never escaping (A20); groups
+%   monomorphic within themselves (A24); no value restriction; Int constants of
+%   class number, Int patterns of type Int; unrestricted equality (A35);
+%   exhaustiveness, redundancy by value (A31), defaulting of number (A27).
+% - TRACTABLE: the property that Adm is monotone in the class order and closed
+%   under substitutions that respect classes, so that instances compose.
+% - ILLUMINATING: comments on instantiation, the freedom of integer constants,
+%   record update, the two rules for tyvar, the escape condition, the group rule
+%   and the absence of a value restriction, constructor status in patterns.
+% - ECONOMICAL: options merge annotated and unannotated value bindings and
+%   optional rows; derived forms (if, &&, ||, negation, lists, accessors, access,
+%   multi-pattern lambdas, function definitions) have no rules here.
+
+\chapter{Static Semantics for the Core}\label{ch:static-core}
+
+This chapter defines the semantic objects of the static semantics of the Core
+and the rules by which Core phrases elaborate. The simple objects are type
+variables, each with a class, row variables, type names and identifier status
+descriptors. From them we build types, record types, type functions, type
+schemes, environments and contexts, and on these we define substitution,
+instantiation and closure. The rules infer sentences $\jdg{C}{\mathit{phrase}}{A}$,
+in which $C$ is a context and $A$ is a type, a row, a value environment, or a
+value environment paired with a type. A Core phrase is legal when it satisfies
+the syntactic restrictions of Chapter~\ref{ch:syntax-core}, elaborates by the
+rules of Section~\ref{sec:static-core-rules}, and meets the further restrictions
+of Section~\ref{sec:static-core-further}.
+
+\section{Simple Objects}\label{sec:static-core-simple}
+
+All semantic objects of the static semantics are built from identifiers
+(Chapter~\ref{ch:syntax-core}), labels among them, and four further kinds of
+simple object: type variables, row variables, type names and identifier status
+descriptors, together with the classes that type variables carry. Type names
+are the values taken by type constructors; they are distinct from type
+variables and from type constructors. The simple object classes, and the
+metavariables ranging over them, are shown in Figure~\ref{fig:static-core-simple}.
+We include $\TyVar$ in the figure to show that $\alpha$ ranges over it.
+
+\begin{figure}[ht]
+\centering
+\begin{objtable}
+  \objrow{\alpha\ \text{or}\ \tyvar}{\TyVar}{type variables}
+  \objrow{\epsilon}{\RowVar}{row variables}
+  \objrow{t}{\TyName}{type names}
+  \objrow{\kappa}{\Class}{classes}
+  \objrow{\is}{\IdStatus = \{\isc, \isv\}}{identifier status descriptors}
+\end{objtable}
+\caption{Simple Semantic Objects}\label{fig:static-core-simple}
+\end{figure}
+
+The classes are
+\[
+  \Class = \{\kany, \knum, \kcomp, \kapp, \kcapp\}.
+\]
+Each $\alpha \in \TyVar$ has a class $\clsof(\alpha) \in \Class$, and there
+are infinitely many type variables of each class. A row variable has no class.
+Each $t \in \TyName$ has an arity $k \ge 0$; we write $\TyName^{(k)}$ for the
+type names of arity $k$.
+
+A type variable $\tyvar$ of the syntax names one type variable, also written
+$\tyvar$, whose class is fixed by the beginning of its name: $\knum$ if the
+name begins with \kw{number}, $\kcomp$ if it begins with \kw{comparable},
+$\kapp$ if it begins with \kw{appendable}, $\kcapp$ if it begins with
+\kw{compappend}, and $\kany$ otherwise. % A19
+When that class is $\kany$, $\tyvar$ also names one row variable; a type
+variable of the syntax of any other class names no row variable. % A36
+We write $\tyvar = \alpha$ and $\tyvar = \epsilon$ when $\alpha$, respectively
+$\epsilon$, is the variable named by $\tyvar$. No other type or row variable is
+named by a type variable of the syntax.
+
+A label and a value variable may be spelt alike. For a label $\lab$ we write
+$\var = \lab$ when $\var$ is spelt as $\lab$.
+
+The rules mention a few type names directly. They are shown in
+Figure~\ref{fig:static-core-builtin}; they belong to the initial basis
+(Appendix~\ref{ch:appendix-static-basis}), and a rule that names one of them
+means that type name, whatever a program binds to the type constructor of the
+same spelling.
+
+\begin{figure}[ht]
+\centering
+\begin{objtable}
+  \objrow{\tInt,\ \tFloat}{\TyName^{(0)}}{integers, floats}
+  \objrow{\tChar,\ \tString}{\TyName^{(0)}}{characters, strings}
+  \objrow{\tunit}{\TyName^{(0)}}{unit}
+  \objrow{\tList}{\TyName^{(1)}}{lists}
+  \objrow{\tTuple{2}}{\TyName^{(2)}}{pairs}
+  \objrow{\tTuple{3}}{\TyName^{(3)}}{triples}
+\end{objtable}
+\caption{Built-in Type Names}\label{fig:static-core-builtin}
+\end{figure}
+
+\section{Compound Objects}\label{sec:static-core-compound}
+
+When $A$ and $B$ are sets, $\Fin A$ denotes the set of finite subsets of $A$,
+and $A \finmap B$ denotes the set of \emph{finite maps} (partial functions with
+finite domain) from $A$ to $B$. The domain and range of a finite map $f$ are
+denoted $\Dom f$ and $\Ran f$. A finite map is written explicitly as
+$\{a_1 \mapsto b_1, \cdots, a_k \mapsto b_k\}$, $k \ge 0$; in particular the
+empty map is $\emptymap$. We write $\{x \mapsto e \,;\, \phi\}$ for the finite
+map $f$ whose domain is the set of $x$ satisfying the condition $\phi$ and whose
+value on that domain is $f(x) = e$. A finite map is regarded as the set of its
+pairs, so $f \subseteq g$ means that $\Dom f \subseteq \Dom g$ and that $g$
+agrees with $f$ on $\Dom f$.
+
+When $f$ and $g$ are finite maps, the map $f + g$, called $f$
+\emph{modified} by $g$, is the finite map with domain $\Dom f \cup \Dom g$ and
+values
+\[
+  (f + g)(a) = \text{if } a \in \Dom g \text{ then } g(a) \text{ else } f(a).
+\]
+
+The compound objects of the static semantics of the Core are shown in
+Figure~\ref{fig:static-core-compound}. We take $\cup$ to mean disjoint union
+over semantic object classes, and we understand all the defined object classes
+to be disjoint. The classes $\Type$, $\Row$, $\RecType$, $\FunType$ and
+$\ConsType$ are the smallest sets satisfying their equations; hence every type
+is finite, and no type occurs within itself. % A22
+A sequence $(\tau_1, \cdots, \tau_k)$ of types is also written $\tau^{(k)}$, and
+a sequence $(\tyrowvar_1, \cdots, \tyrowvar_k)$ of type and row variables
+$\tyrowvar^{(k)}$; the metavariable $\tyrowvar$ ranges over $\TyVar \cup
+\RowVar$. In a context, $T \in \Fin(\TyName)$ and $U \in \Fin(\TyVar \cup
+\RowVar)$.
+
+\begin{figure}[ht]
+\centering
+\footnotesize
+\begin{objtable}
+  \objdef{\tau}{\Type}{\TyVar \cup \RecType \cup \FunType \cup \ConsType}
+  \objdef{\varrho}{\Row}{\cls{Lab} \finmap \Type}
+  \objdef{\rec{\varrho}\ \text{or}\ \orec{\varrho}{\epsilon}}{\RecType}{\Row \times (\RowVar \cup \{\emptyrow\})}
+  \objdef{\tau \rightarrow \tau'}{\FunType}{\Type \times \Type}
+  \objdef{}{\ConsType}{\textstyle\bigcup_{k \ge 0} \ConsType^{(k)}}
+  \objdef{\tau^{(k)} t}{\ConsType^{(k)}}{\Type^k \times \TyName^{(k)}}
+  \objdef{\theta\ \text{or}\ \Lambda\tyrowvar^{(k)}.\tau}{\TypeFcn}{\textstyle\bigcup_{k \ge 0} (\TyVar \cup \RowVar)^k \times \Type}
+  \objdef{\sigma\ \text{or}\ \forall\tyrowvar^{(k)}.\tau}{\TypeScheme}{\textstyle\bigcup_{k \ge 0} (\TyVar \cup \RowVar)^k \times \Type}
+  \objdef{(\theta, \VE)}{\TyStr}{\TypeFcn \times \ValEnv}
+  \objdef{\TE}{\TyEnv}{\cls{TyCon} \finmap \TyStr}
+  \objdef{\VE}{\ValEnv}{(\cls{Var} \cup \cls{Con}) \finmap \TypeScheme \times \IdStatus}
+  \objdef{\QE}{\QualEnv}{\cls{ModId} \finmap \Env}
+  \objdef{E\ \text{or}\ \QE, \TE, \VE}{\Env}{\QualEnv \times \TyEnv \times \ValEnv}
+  \objdef{C\ \text{or}\ T, U, E}{\Context}{\Fin(\TyName) \times \Fin(\TyVar \cup \RowVar)}
+  & & & \quad{}\times \Env & \\
+\end{objtable}
+\caption{Compound Semantic Objects}\label{fig:static-core-compound}
+\end{figure}
+
+A record type is a pair of a row and either a row variable or $\emptyrow$. The
+record type $(\varrho, \emptyrow)$, written $\rec{\varrho}$, is \emph{closed}:
+its fields are exactly those of $\varrho$. The record type $(\varrho,
+\epsilon)$, written $\orec{\varrho}{\epsilon}$, is \emph{open}: its fields are
+those of $\varrho$ together with those that $\epsilon$ stands for, none of which
+has a label in $\Dom\varrho$ (Section~\ref{sec:static-core-types}). % A23
+The unit type is the constructed type $()\tunit$, and the type of $k$-tuples
+with components $\tau_1, \cdots, \tau_k$ is $(\tau_1, \cdots,
+\tau_k)\tTuple{k}$. When $t$ has arity 0 we write $t$ for the type $()t$; thus
+$\tInt$, $\tunit$ and so on are types.
+
+Note that $\Lambda$ and $\forall$ bind type and row variables. For any
+semantic object $A$, $\tynames A$ and $\tyvars A$ denote respectively the set
+of type names and the set of type and row variables occurring free in $A$. For
+a context we take $\tyvars C = \tyvars(E \of C) \cup (U \of C)$. For a type
+expression $\ty$, $\tyvars \ty$ denotes the set of type variables of the
+syntax occurring in $\ty$.
+
+A value environment maps value variables and value constructors to a pair of a
+type scheme and an identifier status. If $\VE(\var) = (\sigma, \is)$ or
+$\VE(\con) = (\sigma, \is)$, we say that $\var$, respectively $\con$, \emph{has
+status} $\is$ in $\VE$. Value variables have status $\isv$. The constructors of
+custom types have status $\isc$, and only they may occur in patterns; the
+constructor that a record type alias defines has status $\isv$
+(Chapter~\ref{ch:static-modules}). We take $\cls{Con}$ to contain, besides
+the constructors spelt by identifiers, the two list constructor names \kw{[]}
+and \kw{::}, which no identifier spells; the initial basis binds them with
+status $\isc$ to $\forall\alpha.\alpha\,\tList$ and $\forall\alpha.\alpha
+\rightarrow \alpha\,\tList \rightarrow \alpha\,\tList$, where $\clsof(\alpha) =
+\kany$ (Appendix~\ref{ch:appendix-static-basis}).
+
+A qualified environment maps each qualifier to the environment of the names it
+qualifies; every environment in the range of a qualified environment has the
+empty qualified environment. In a context $C = T, U, E$, $T$ is the set of type
+names generated so far, and $U$ is the set of explicit type and row variables in
+scope (Section~\ref{sec:static-core-explicit}).
+
+\section{Projection, Injection and Modification}\label{sec:static-core-projection}
+
+\textbf{Projection:} We often select a component of a tuple of objects, and we
+rely on metavariable names to say which component. For instance ``$\VE \of
+E$'' means the value environment component of $E$, and, for a record type
+$\tau$, ``$\varrho \of \tau$'' means its row.
+
+When a tuple contains a finite map we apply the tuple to an argument, relying
+on the syntactic class of the argument to select the map. Thus $C(\var)$ means
+$(\VE \of (E \of C))(\var)$, and likewise $C(\con)$; $C(\tycon)$
+means $(\TE \of (E \of C))(\tycon)$. A long identifier is looked up through the
+qualified environment: if $\longvar = \modid.\var$ then $E(\longvar)$ means
+$(\VE \of (\QE \of E)(\modid))(\var)$, and likewise for $\longcon$ and
+$\longtycon$; an unqualified $\longvar$ is a $\var$. $C(\longvar)$ means $(E
+\of C)(\longvar)$. The identifiers that the equivalent forms of derived forms
+introduce (Appendix~\ref{ch:appendix-derived-forms}) are looked up in the same
+way. Because only an import of the module \kw{Basics} provides the qualifier
+\kw{Basics} (Section~\ref{sec:syntax-modules-restrictions}), \kw{Basics.True},
+\kw{Basics.False} and \kw{Basics.negate} always denote the bindings of the
+initial basis (Appendix~\ref{ch:appendix-static-basis}); the constructor
+\kw{::} is bound in the initial environment $E_0$ of that appendix, from which
+every module is elaborated. % audit X18, V3; A89
+
+Operators are not in the domain of an environment, and $C(\opv)$ is not
+defined. Since no program declares an operator, the operators are fixed by the
+initial basis: Appendix~\ref{ch:appendix-static-basis} gives the \emph{static
+operator table}
+\[
+  \OTstat : \cls{Op} \finmap \TypeScheme \times \IdStatus ,
+\]
+which maps each operator of Figure~\ref{fig:core-fixities} to the type scheme
+and status of the identifier that the operator stands for; in particular
+$\OTstat(\kw{::})$ is the type scheme of the list constructor \kw{::}, with
+status $\isc$. The operators of library modules outside the initial basis are
+outside the definition. % A16; audit X1
+
+\textbf{Injection:} Components may be injected into tuple classes; for example,
+``$\VE$ in $\Env$'' means the environment $(\emptymap, \emptymap, \VE)$.
+
+\textbf{Modification:} The modification of one map by another has been defined
+above. It is extended to environments component by component, $E + E'$, and
+empty components are left implicit: $E + \VE$ means $E + (\emptymap,
+\emptymap, \VE)$. For set components modification means union, so that $C +
+(T, U, \VE)$ means
+\[
+  \big((T \of C) \cup T,\ (U \of C) \cup U,\ (E \of C) + \VE\big),
+\]
+and $C + \VE$ and $C + U$ leave the other components unchanged. Finally,
+$C \oplus \TE$ means $C + (\tynames \TE, \TE)$: the type environment is added
+and $T$ is extended with its type names.
+
+\section{Classes and Admissible Types}\label{sec:static-core-classes}
+
+The classes are ordered by $\leq$, the least partial order on $\Class$ such
+that
+\[
+\begin{array}{@{}c@{}}
+  \knum \leq \kcomp, \qquad \kcapp \leq \kcomp,\\
+  \kcapp \leq \kapp, \qquad \kappa \leq \kany\ \text{for every}\ \kappa \in \Class.
+\end{array}
+\]
+For each class $\kappa$, the set $\Adm{\kappa} \subseteq \Type$ of types
+\emph{admissible} for $\kappa$ is defined in Figure~\ref{fig:static-core-admissible};
+$\Adm{\kcomp}$ is the smallest set satisfying its equation. A type variable of
+class $\kappa$ may stand only for a type in $\Adm{\kappa}$
+(Section~\ref{sec:static-core-types}). A type variable belongs to
+$\Adm{\kappa}$ exactly when its class is at most $\kappa$; no record type and no
+function type is admissible for any class but $\kany$.
+
+\begin{figure}[ht]
+\centering
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{}}
+  \Adm{\kany} & = & \Type\\[2pt]
+  \Adm{\knum} & = & \{\tInt, \tFloat\} \cup \{\alpha \,;\, \clsof(\alpha) = \knum\}\\[2pt]
+  \Adm{\kcomp} & = & \{\tInt, \tFloat, \tChar, \tString\}\\
+  & \cup & \{\alpha \,;\, \clsof(\alpha) \leq \kcomp\}\\
+  & \cup & \{\tau\,\tList \,;\, \tau \in \Adm{\kcomp}\}\\
+  & \cup & \{(\tau_1, \tau_2)\tTuple{2} \,;\, \tau_1, \tau_2 \in \Adm{\kcomp}\}\\
+  & \cup & \{(\tau_1, \tau_2, \tau_3)\tTuple{3} \,;\, \tau_1, \tau_2, \tau_3 \in \Adm{\kcomp}\}\\[2pt]
+  \Adm{\kapp} & = & \{\tString\} \cup \{\tau\,\tList \,;\, \tau \in \Type\}\\
+  & \cup & \{\alpha \,;\, \clsof(\alpha) \leq \kapp\}\\[2pt]
+  \Adm{\kcapp} & = & \{\tString\} \cup \{\tau\,\tList \,;\, \tau \in \Adm{\kcomp}\}\\
+  & \cup & \{\alpha \,;\, \clsof(\alpha) = \kcapp\}
+\end{array}
+\]
+\caption{Admissible Types}\label{fig:static-core-admissible}
+\end{figure}
+
+There is no class of types that admit equality. The initial basis gives the
+equality operators the type scheme $\forall\alpha.\alpha \rightarrow \alpha
+\rightarrow \tBool$ with $\clsof(\alpha) = \kany$
+(Appendix~\ref{ch:appendix-static-basis}), so equality elaborates at every
+type, function types included. % A35
+
+\section{Types and Type Functions}\label{sec:static-core-types}
+
+\textbf{Substitution.} Let $\tyrowvar^{(k)}$ be distinct type and row
+variables, and $\tau^{(k)}$ types such that $\tau_i \in \RecType$ whenever
+$\tyrowvar_i \in \RowVar$. For a type $\tau$, the type $\tau\{\tau^{(k)} /
+\tyrowvar^{(k)}\}$ is the result of replacing each $\tyrowvar_i$ by $\tau_i$
+throughout $\tau$. Writing $\tau\{\cdot\}$ for $\tau\{\tau^{(k)} /
+\tyrowvar^{(k)}\}$, and $\varrho\{\cdot\}$ for $\{\lab \mapsto
+\varrho(\lab)\{\cdot\} \,;\, \lab \in \Dom\varrho\}$, it is defined by
+\[
+\begin{array}{@{}r@{\ =\ }l@{\qquad}l@{}}
+  \alpha\{\cdot\} & \tau_i & \text{if}\ \alpha = \tyrowvar_i\\
+  \alpha\{\cdot\} & \alpha & \text{if}\ \alpha \notin \{\tyrowvar_1, \cdots, \tyrowvar_k\}\\
+  \rec{\varrho}\{\cdot\} & \rec{\varrho\{\cdot\}} &\\
+  \orec{\varrho}{\epsilon}\{\cdot\} & \rec{\varrho\{\cdot\} + \varrho'} & \text{if}\ \epsilon = \tyrowvar_i\ \text{and}\ \tau_i = \rec{\varrho'}\\
+  \orec{\varrho}{\epsilon}\{\cdot\} & \orec{\varrho\{\cdot\} + \varrho'}{\epsilon'} & \text{if}\ \epsilon = \tyrowvar_i\ \text{and}\ \tau_i = \orec{\varrho'}{\epsilon'}\\
+  \orec{\varrho}{\epsilon}\{\cdot\} & \orec{\varrho\{\cdot\}}{\epsilon} & \text{if}\ \epsilon \notin \{\tyrowvar_1, \cdots, \tyrowvar_k\}\\
+  (\tau \rightarrow \tau')\{\cdot\} & \tau\{\cdot\} \rightarrow \tau'\{\cdot\} &\\
+  (\tau'_1, \cdots, \tau'_l)t\{\cdot\} & (\tau'_1\{\cdot\}, \cdots, \tau'_l\{\cdot\})t &
+\end{array}
+\]
+The result is defined only if, wherever a row variable is replaced, $\Dom\varrho
+\cap \Dom\varrho' = \emptyset$. Thus a row variable can never give a record
+type a second field with a label it already has. % A23
+The substitution \emph{respects classes} if $\tau_i \in
+\Adm{\clsof(\tyrowvar_i)}$ for each $\tyrowvar_i \in \TyVar$. Substitution is
+extended to rows, as above, and to other objects in the obvious way, renaming
+bound variables where necessary.
+
+The rules rely on the following property, which may easily be demonstrated.
+
+\begin{property}
+If $\kappa \leq \kappa'$ then $\Adm{\kappa} \subseteq \Adm{\kappa'}$.
+If $\tau \in \Adm{\kappa}$, and $\tau\{\tau^{(k)}/\tyrowvar^{(k)}\}$ is defined
+and respects classes, then $\tau\{\tau^{(k)}/\tyrowvar^{(k)}\} \in
+\Adm{\kappa}$.
+\end{property}
+
+\textbf{Type functions.} A type function $\theta = \Lambda\tyrowvar^{(k)}.\tau$
+has arity $k$; the bound variables must be distinct. Two type functions are
+equal if they differ only in their choice of bound variables, a type variable
+being renamed to a type variable and a row variable to a row variable. The class
+of a bound type variable of a type function has no significance.
+% DECIDED: the arguments of a type function (a type alias or a type name) are not
+% required to be admissible for the classes of its parameters, as in the
+% implementation, which substitutes alias arguments directly
+% (compiler/src/Compiler/Type/Instantiate.elm).
+If $t$ has arity $k$, then we write $t$ for the type function
+$\Lambda\alpha^{(k)}.\alpha^{(k)}t$, where the $\alpha_i$ are distinct type
+variables; thus $\TyName \subseteq \TypeFcn$.
+
+The application of $\theta = \Lambda\tyrowvar^{(k)}.\tau$ to types
+$\tau^{(k)}$ is
+\[
+  \theta(\tau^{(k)}) = \tau\{\tau^{(k)}/\tyrowvar^{(k)}\},
+\]
+defined when the substitution is defined; it need not respect classes. In
+particular a parameter of $\theta$ that is a row variable accepts only a record
+type.
+
+\section{Type Schemes}\label{sec:static-core-schemes}
+
+A type scheme $\sigma = \forall\tyrowvar^{(k)}.\tau$ \emph{generalises} a type
+$\tau'$, written $\sigma \succ \tau'$, if $\tau' =
+\tau\{\tau^{(k)}/\tyrowvar^{(k)}\}$ for some $\tau^{(k)}$ for which the
+substitution is defined and respects classes; $\tau'$ is then an
+\emph{instance} of $\sigma$. If $\sigma' = \forall\tyrowvar'^{(l)}.\tau'$, then
+$\sigma$ generalises $\sigma'$, written $\sigma \succ \sigma'$, if $\sigma \succ
+\tau'$ and no $\tyrowvar'_j$ occurs free in $\sigma$. By the property of
+Section~\ref{sec:static-core-types}, if $\sigma \succ \sigma'$ and $\sigma' \succ
+\tau''$ then $\sigma \succ \tau''$.
+
+Two type schemes are equal if they can be obtained from each other by renaming
+and reordering bound variables, and by deleting bound variables that do not
+occur in the body. In renaming, a type variable is replaced by a type variable
+of the same class and a row variable by a row variable. We consider a type
+$\tau$ to be a type scheme, identifying it with $\forall().\tau$. For a finite
+set $U$ of type and row variables, $\forall U.\tau$ means
+$\forall\tyrowvar^{(k)}.\tau$ where $\tyrowvar^{(k)}$ is any enumeration of $U$.
+
+With each special constant $\scon$ we associate a type scheme $\typeof(\scon)$:
+it is $\forall\alpha.\alpha$, where $\clsof(\alpha) = \knum$, if $\scon$ is an
+integer constant, and the type $\tFloat$, $\tChar$ or $\tString$ if $\scon$ is
+a floating point, character or string constant. Thus the instances of
+$\typeof(\scon)$ for an integer constant are the types in $\Adm{\knum}$.
+
+\section{Scope of Explicit Type Variables}\label{sec:static-core-explicit}
+
+The type variables written in a type annotation are \emph{explicit}: within the
+annotated definition each stands for one type or row variable that the
+definition may not instantiate. Explicit variables in scope are recorded in $U
+\of C$.
+
+For a set $U$ of type and row variables, $\names U$ is the set of type
+variables $\tyvar$ of the syntax such that $\tyvar = \tyrowvar$ for some
+$\tyrowvar \in U$. The set $U$ is \emph{unambiguous} if no $\tyvar$ names two
+members of $U$. We consider only contexts $C$ in which $U \of C$ is
+unambiguous; the rules preserve this.
+
+Let $\ty$ be the type expression of an annotation elaborated in context $C$. A
+set $U'$ of type and row variables is \emph{new for $\ty$ in $C$} if
+\[
+\begin{array}{@{}l@{}}
+  \names U' = (\tyvars \ty) \setminus \names(U \of C)\ \text{and}\\
+  (U \of C) \cup U'\ \text{is unambiguous}.
+\end{array}
+\]
+Thus $U'$ holds, for each type variable of $\ty$ that is not already explicit
+in $C$, the type variable or the row variable that it names; which of the two
+is fixed by the rules for type expressions, which accept only variables of $U
+\of C$. The members of $U'$ are added to $U$ while the annotation and the body of
+its definition elaborate, so that an annotation nested within the body that
+writes one of these names means the same variable. % A21
+They are bound in the type scheme of the annotated variable, and they must not
+occur free in the context of the definition: an explicit variable does not
+escape its annotation. % A20
+
+\section{Closure}\label{sec:static-core-closure}
+
+Let $A$ be a semantic object and $\sigma = \forall\tyrowvar^{(k)}.\tau$ a type
+scheme. Then $\Clos_A \sigma$, the \emph{closure} of $\sigma$ with respect to
+$A$, is the type scheme $\forall\tyrowvar^{(k)}\tyrowvar'^{(l)}.\tau$, where
+$\tyrowvar'^{(l)}$ enumerates $\tyvars\sigma \setminus \tyvars A$. In
+particular, for a type $\tau$, $\Clos_A \tau = \forall\tyrowvar^{(l)}.\tau$
+where $\tyrowvar^{(l)}$ enumerates $\tyvars\tau \setminus \tyvars A$. For a
+value environment, $\Clos_A \VE$ is the value environment obtained from $\VE$
+by replacing each pair $(\sigma, \is)$ in its range by $(\Clos_A \sigma, \is)$.
+
+Commonly $A$ is a context $C$. Since $U \of C \subseteq \tyvars C$, closure
+never generalises an explicit variable in scope. Closure applies to every group
+of value bindings, pattern bindings included, whatever the form of their
+expressions.
+
+\section{Inference Rules}\label{sec:static-core-rules}
+
+Each rule of the semantics allows inferences among sentences of the form
+\[
+  \jdg{A}{\mathit{phrase}}{A'}
+\]
+where $A$ is usually a context, $\mathit{phrase}$ is a phrase of the Core, and
+$A'$ is a semantic object, usually a type, a row, a value environment, or a pair
+of a value environment and a type. It is pronounced ``$\mathit{phrase}$
+elaborates to $A'$ in (context) $A$''. Some rules have extra hypotheses not of
+this form; they are called \emph{side conditions}.
+
+In the presentation of the rules, phrases within single angle brackets
+$\opt{\ }$ are called \emph{first options}, and those within double angle
+brackets $\optt{\ }$ are called \emph{second options}. To reduce the number of
+rules, we have adopted the following convention:
+\begin{quote}
+In each instance of a rule, the first options must be either all present or all
+absent; similarly the second options must be either all present or all absent.
+\end{quote}
+
+No Core phrase generates type names, so $T \of C$ is the same in every sentence
+of a derivation for a Core phrase; it is used by the static semantics of
+Modules (Chapter~\ref{ch:static-modules}). A phrase elaborates to $A'$ when some
+derivation of the sentence exists; where the premises of a rule leave a type in
+its conclusion undetermined, the derivation may choose any type that satisfies
+them. The relation $\vdash$ is overloaded for all syntactic classes.
+
+\rulegroup{Atomic Expressions}{\jdg{C}{\atexp}{\tau}}
+
+\defnrule[r:s-atexp-scon]{\typeof(\scon) \succ \tau}{\jdg{C}{\scon}{\tau}}
+
+\defnrule[r:s-atexp-longvar]{C(\longvar) = (\sigma, \is) \premsep \sigma \succ \tau}{\jdg{C}{\longvar}{\tau}}
+
+\defnrule[r:s-atexp-longcon]{C(\longcon) = (\sigma, \is) \premsep \sigma \succ \tau}{\jdg{C}{\longcon}{\tau}}
+
+\defnrule[r:s-atexp-op]{\OTstat(\opv) = (\sigma, \is) \premsep \sigma \succ \tau}{\jdg{C}{\kw{(}\opv\kw{)}}{\tau}}
+
+\defnrule[r:s-atexp-unit]{}{\jdg{C}{\kw{()}}{\tunit}}
+
+\defnrule[r:s-atexp-tuple]{\jdg{C}{\expm_i}{\tau_i} \quad (1 \le i \le k)}{\jdg{C}{\kw{(}\,\expm_1\kw{,}\ \cdots\kw{,}\ \expm_k\,\kw{)}}{(\tau_1, \cdots, \tau_k)\tTuple{k}}}
+
+\defnrule[r:s-atexp-nil]{}{\jdg{C}{\kw{[}\ \kw{]}}{\tau\,\tList}}
+
+\defnrule[r:s-atexp-record]{\opt{\jdg{C}{\exprow}{\varrho}}}{\jdg{C}{\kw{\kwlb}\,\opt{\exprow}\,\kw{\kwrb}}{\rec{\emptymap\opt{{}+\varrho}}}}
+
+\defnrule[r:s-atexp-update]{\jdg{C}{\var}{\tau} \premsep \tau \in \RecType \premsep \jdg{C}{\exprow}{\varrho} \premsep \varrho \subseteq (\varrho \of \tau)}{\jdg{C}{\kw{\kwlb}\ \var\ \kw{|}\ \exprow\ \kw{\kwrb}}{\tau}}
+
+\defnrule[r:s-atexp-let]{\jdg{C}{\dec}{\VE} \premsep \jdg{C + \VE}{\expm}{\tau}}{\jdg{C}{\kw{let}\ \dec\ \kw{in}\ \expm}{\tau}}
+
+\defnrule[r:s-atexp-paren]{\jdg{C}{\expm}{\tau}}{\jdg{C}{\kw{(}\,\expm\,\kw{)}}{\tau}}
+
+\begin{rulecomments}
+\rcomment{r:s-atexp-scon} For an integer constant, $\tau$ may be any type in
+$\Adm{\knum}$: $\tInt$, $\tFloat$ or a type variable of class $\knum$. A
+floating point, character or string constant has exactly its type. Where a
+program leaves the type of an integer constant undetermined, restriction~3 of
+Section~\ref{sec:static-core-further} applies.
+
+\rcomment{r:s-atexp-longvar} The instantiation of type schemes allows different
+occurrences of one $\longvar$ to take different types. The identifier status is
+not used in this rule, nor in rules \ruleref{r:s-atexp-longcon} and
+\ruleref{r:s-atexp-op}; in particular the constructor of a record type alias,
+of status $\isv$, elaborates by rule \ruleref{r:s-atexp-longcon} as any
+constructor does.
+
+\rcomment{r:s-atexp-op} Infixed applications of operators are derived forms of
+this phrase (Appendix~\ref{ch:appendix-derived-forms}), so this rule gives the
+type of every application of an operator. The context $C$ is absent from the
+premise, so an operator has the same type scheme in every module, whatever the
+module declares or imports: a declaration of \kw{add} in a program does not
+change the meaning of \kw{+}.
+
+\rcomment{r:s-atexp-tuple} By the grammar $k$ is 2 or 3.
+
+\rcomment{r:s-atexp-nil} Note that $\tau$ does not occur in any premise; thus
+\kw{[ ]} has type $\tau\,\tList$ for every $\tau$.
+
+\rcomment{r:s-atexp-record} A record expression has a closed record type: its
+fields are exactly those written.
+
+\rcomment{r:s-atexp-update} The side conditions require the type of $\var$ to be
+a record type that has every updated field, each at the type of its new
+value. The result has the type of $\var$, so an update neither adds a field
+nor changes the type of one: if $\kw{r}$ has type $\rec{\{\kw{x} \mapsto
+\tInt\}}$ then \kw{\kwlb\ r | x = "s" \kwrb} does not elaborate. The type of
+$\var$ may be open, so a function may update a field of any record that has it.
+
+\rcomment{r:s-atexp-let} The variables bound by $\dec$ are in scope in $\expm$
+at the type schemes that rule \ruleref{r:s-dec-group} gives them, so $\expm$ may
+use them polymorphically.
+\end{rulecomments}
+
+\rulegroup{Expression Rows}{\jdg{C}{\exprow}{\varrho}}
+
+\defnrule[r:s-exprow]{\jdg{C}{\expm}{\tau} \premsep \opt{\jdg{C}{\exprow}{\varrho}}}{\jdg{C}{\lab\ \kw{=}\ \expm\ \opt{\kw{,}\ \exprow}}{\{\lab \mapsto \tau\}\opt{{}+\varrho}}}
+
+\begin{rulecomments}
+\rcomment{r:s-exprow} The syntactic restrictions ensure $\lab \notin
+\Dom\varrho$.
+\end{rulecomments}
+
+\rulegroup{Expressions}{\jdg{C}{\expm}{\tau}}
+
+\defnrule[r:s-exp-atexp]{\jdg{C}{\atexp}{\tau}}{\jdg{C}{\atexp}{\tau}}
+
+\defnrule[r:s-exp-app]{\jdg{C}{\expm}{\tau' \rightarrow \tau} \premsep \jdg{C}{\atexp}{\tau'}}{\jdg{C}{\expm\ \atexp}{\tau}}
+
+\defnrule[r:s-exp-lambda]{\jdg{C}{\atpat}{(\VE, \tau)} \premsep \jdg{C + \VE}{\expm}{\tau'}}{\jdg{C}{\kw{\textbackslash}\ \atpat\ \kw{->}\ \expm}{\tau \rightarrow \tau'}}
+
+\defnrule[r:s-exp-case]{\jdg{C}{\expm}{\tau} \premsep \jdg{C}{\match}{\tau \rightarrow \tau'}}{\jdg{C}{\kw{case}\ \expm\ \kw{of}\ \match}{\tau'}}
+
+\begin{rulecomments}
+\rcomment{r:s-exp-atexp} The relational symbol $\vdash$ is overloaded for all
+syntactic classes (here atomic expressions and expressions).
+
+\rcomment{r:s-exp-lambda} The variables bound by $\atpat$ receive types, not
+type schemes, so a parameter has one type throughout $\expm$. Restriction~2 of
+Section~\ref{sec:static-core-further} requires $\atpat$ to be exhaustive.
+\end{rulecomments}
+
+\rulegroup{Matches}{\jdg{C}{\match}{\tau}}
+
+\defnrule[r:s-match]{\jdg{C}{\mrule}{\tau} \premsep \opt{\jdg{C}{\match}{\tau}}}{\jdg{C}{\mrule\ \opt{\kw{;}\ \match}}{\tau}}
+
+\rulegroup{Match Rules}{\jdg{C}{\mrule}{\tau}}
+
+\defnrule[r:s-mrule]{\jdg{C}{\pat}{(\VE, \tau)} \premsep \jdg{C + \VE}{\expm}{\tau'}}{\jdg{C}{\pat\ \kw{->}\ \expm}{\tau \rightarrow \tau'}}
+
+\begin{rulecomments}
+\rcomment{r:s-mrule} This rule lets new free type variables enter the context:
+the types of the variables of $\pat$ are chosen in elaborating $\pat$, and they
+may have to agree with the explicit variables of annotations within $\expm$.
+\end{rulecomments}
+
+\rulegroup{Declarations}{\jdg{C}{\dec}{\VE}}
+
+\defnrule[r:s-dec-group]{\jdg{C + \VE}{\valbind}{\VE} \premsep \VE' = \Clos_C \VE}{\jdg{C}{\valbind}{\VE'}}
+
+\begin{rulecomments}
+\rcomment{r:s-dec-group} A declaration is one group of mutually dependent
+bindings; a \kw{let} with several definitions is a derived form that divides
+them into groups (Appendix~\ref{ch:appendix-derived-forms}). Modifying $C$ by
+$\VE$ on the left puts every member of the group in scope in every member's
+expression. Since $\VE$ is the same on both sides, an unannotated member has one
+type throughout the group: it is monomorphic within the group, and is
+generalised only by the closure, for the body of the \kw{let}. % A24
+An annotated member enters $\VE$ with the type scheme of its annotation, so it
+may be used polymorphically within the group, in its own body included.
+
+The closure applies to every member whatever its expression, so there is no
+value restriction: in \kw{let n = 5 in ( n // 2, n / 2 )} the variable
+\kw{n} is used at $\tInt$ and at $\tFloat$. The closure leaves the scheme of an
+annotated member unchanged, since its free variables are explicit variables of
+$C$.
+\end{rulecomments}
+
+\rulegroup{Value Bindings}{\jdg{C}{\valbind}{\VE}}
+
+\defnrule[r:s-valbind-var]{\opt{U' \text{ is new for } \ty \text{ in } C \premsep \jdg{C + U'}{\ty}{\tau} \premsep U' \cap \tyvars C = \emptyset} \\ \jdg{C\opt{{}+U'}}{\expm}{\tau} \premsep \optt{\jdg{C}{\valbind}{\VE}}}{\jdg{C}{\var\ \opt{\kw{:}\ \ty}\ \kw{=}\ \expm\ \optt{\kw{and}\ \valbind}}{\{\var \mapsto (\opt{\forall U'.}\tau, \isv)\}\ \optt{{}+\VE}}}
+
+\defnrule[r:s-valbind-pat]{\jdg{C}{\atpat}{(\VE, \tau)} \premsep \jdg{C}{\expm}{\tau}}{\jdg{C}{\atpat\ \kw{=}\ \expm}{\VE}}
+
+\begin{rulecomments}
+\rcomment{r:s-valbind-var} When the second option is present,
+$\var \notin \Dom\VE$ by the syntactic restrictions. With an annotation, $U'$ holds the variables of $\ty$
+not already explicit in $C$ (Section~\ref{sec:static-core-explicit}). They are
+in $U$ while $\ty$ and $\expm$ elaborate, so an annotation nested in $\expm$
+that writes one of their names means the same variable. % A21
+Since $\tau$ is fixed by $\ty$, $\expm$ must have exactly that type, with the
+variables of $U'$ uninstantiated: an annotation may be less general than the
+type $\expm$ could have, but never more general. Thus \kw{f : a -> a} with
+\kw{f x = x + 1} does not elaborate, nor does \kw{g : number -> number} with
+\kw{g x = x // 2}.
+
+The condition $U' \cap \tyvars C = \emptyset$ prevents an explicit variable
+from escaping its annotation. % A20
+In \kw{f x = let g : a -> a ; g y = x in g x}, the body of \kw{g} has type
+\kw{a -> a} only if \kw{x} has the explicit type \kw{a}, which is then free in
+the context of \kw{g}; so the expression does not elaborate.
+
+\rcomment{r:s-valbind-pat} A pattern binding is a group by itself. The variables
+of $\atpat$ receive types here and are generalised by rule
+\ruleref{r:s-dec-group}. That rule also puts them in scope in $\expm$, but the
+syntactic restrictions forbid $\expm$ to use them, since no pattern binding
+lies on a cycle of definitions. % A26
+A binding $\var\ \kw{=}\ \expm$ is read by rule \ruleref{r:s-valbind-var}.
+\end{rulecomments}
+
+\rulegroup{Type Expressions}{\jdg{C}{\ty}{\tau}}
+
+\defnrule[r:s-ty-tyvar]{\tyvar = \alpha \premsep \alpha \in U \of C}{\jdg{C}{\tyvar}{\alpha}}
+
+
+\defnrule[r:s-ty-rowvar]{\tyvar = \epsilon \premsep \epsilon \in U \of C}{\jdg{C}{\tyvar}{\orec{\emptymap}{\epsilon}}}
+
+
+\defnrule[r:s-ty-record]{\opt{\jdg{C}{\tyrow}{\varrho}}}{\jdg{C}{\kw{\kwlb}\,\opt{\tyrow}\,\kw{\kwrb}}{\rec{\emptymap\opt{{}+\varrho}}}}
+
+
+\defnrule[r:s-ty-openrecord]{\tyvar = \epsilon \premsep \epsilon \in U \of C \premsep \jdg{C}{\tyrow}{\varrho}}{\jdg{C}{\kw{\kwlb}\ \tyvar\ \kw{|}\ \tyrow\ \kw{\kwrb}}{\orec{\varrho}{\epsilon}}}
+
+
+\defnrule[r:s-ty-unit]{}{\jdg{C}{\kw{()}}{\tunit}}
+
+
+\defnrule[r:s-ty-tuple]{\jdg{C}{\ty_i}{\tau_i} \quad (1 \le i \le k)}{\jdg{C}{\kw{(}\,\ty_1\kw{,}\ \cdots\kw{,}\ \ty_k\,\kw{)}}{(\tau_1, \cdots, \tau_k)\tTuple{k}}}
+
+
+\defnrule[r:s-ty-con]{C(\longtycon) = (\theta, \VE) \premsep \jdg{C}{\ty_i}{\tau_i} \quad (1 \le i \le k)}{\jdg{C}{\longtycon\ \ty_1 \cdots \ty_k}{\theta(\tau_1, \cdots, \tau_k)}}
+
+
+\defnrule[r:s-ty-fun]{\jdg{C}{\ty}{\tau} \premsep \jdg{C}{\ty'}{\tau'}}{\jdg{C}{\ty\ \kw{->}\ \ty'}{\tau \rightarrow \tau'}}
+
+
+\defnrule[r:s-ty-paren]{\jdg{C}{\ty}{\tau}}{\jdg{C}{\kw{(}\,\ty\,\kw{)}}{\tau}}
+
+\begin{rulecomments}
+\rcomment{r:s-ty-tyvar} Rules \ruleref{r:s-ty-tyvar} and \ruleref{r:s-ty-rowvar}
+both cover the phrase $\tyvar$. Since $U \of C$ is unambiguous, at most one of
+them applies, according to whether the variable of $U \of C$ named by $\tyvar$
+is a type variable or a row variable. A type variable that is not explicit in
+$C$ does not elaborate: every type variable of an annotation is made explicit by
+rule \ruleref{r:s-valbind-var}, and Chapter~\ref{ch:static-modules} makes the
+parameters of type declarations explicit in the same way.
+
+\rcomment{r:s-ty-rowvar} A row variable written alone denotes the open record
+type with no fields of its own: the record of the fields that $\epsilon$ stands
+for.
+
+\rcomment{r:s-ty-openrecord} Only a type variable of class $\kany$ names a row
+variable, so \kw{\kwlb\ number | x : Int \kwrb} does not elaborate. % A36
+
+\rcomment{r:s-ty-tuple} By the grammar $k$ is 2 or 3.
+
+\rcomment{r:s-ty-con} For $\theta(\tau_1, \cdots, \tau_k)$ to be defined,
+$\theta$ must have arity $k$, so a type constructor is never partially applied.
+Application of a type function performs the substitution, so a type alias
+denotes its expansion, and an alias with a row parameter applies only to a
+record type.
+\end{rulecomments}
+
+\rulegroup{Type-expression Rows}{\jdg{C}{\tyrow}{\varrho}}
+
+\defnrule[r:s-tyrow]{\jdg{C}{\ty}{\tau} \premsep \opt{\jdg{C}{\tyrow}{\varrho}}}{\jdg{C}{\lab\ \kw{:}\ \ty\ \opt{\kw{,}\ \tyrow}}{\{\lab \mapsto \tau\}\opt{{}+\varrho}}}
+
+\begin{rulecomments}
+\rcomment{r:s-tyrow} The syntactic restrictions ensure $\lab \notin
+\Dom\varrho$.
+\end{rulecomments}
+
+\rulegroup{Atomic Patterns}{\jdg{C}{\atpat}{(\VE, \tau)}}
+
+\defnrule[r:s-atpat-wild]{}{\jdg{C}{\kw{\_}}{(\emptymap, \tau)}}
+
+
+\defnrule[r:s-atpat-scon]{\typeof(\scon) \succ \tau \premsep \tau \in \{\tInt, \tChar, \tString\}}{\jdg{C}{\scon}{(\emptymap, \tau)}}
+
+
+\defnrule[r:s-atpat-var]{}{\jdg{C}{\var}{(\{\var \mapsto (\tau, \isv)\}, \tau)}}
+
+\defnrule[r:s-atpat-con]{C(\longcon) = (\sigma, \isc) \premsep \sigma \succ \tau^{(k)}t}{\jdg{C}{\longcon}{(\emptymap, \tau^{(k)}t)}}
+
+\defnrule[r:s-atpat-unit]{}{\jdg{C}{\kw{()}}{(\emptymap, \tunit)}}
+
+\defnrule[r:s-atpat-tuple]{\jdg{C}{\pat_i}{(\VE_i, \tau_i)} \quad (1 \le i \le k)}{\jdg{C}{\kw{(}\,\pat_1\kw{,}\ \cdots\kw{,}\ \pat_k\,\kw{)}}{(\VE_1 + \cdots + \VE_k,\ (\tau_1, \cdots, \tau_k)\tTuple{k})}}
+
+\defnrule[r:s-atpat-nil]{}{\jdg{C}{\kw{[}\ \kw{]}}{(\emptymap, \tau\,\tList)}}
+
+\defnrule[r:s-atpat-record]{\opt{\jdg{C}{\patrow}{(\VE, \varrho)}} \premsep \tau \in \RecType \premsep \emptymap\opt{{}+\varrho} \subseteq (\varrho \of \tau)}{\jdg{C}{\kw{\kwlb}\,\opt{\patrow}\,\kw{\kwrb}}{(\emptymap\opt{{}+\VE},\ \tau)}}
+
+\defnrule[r:s-atpat-paren]{\jdg{C}{\pat}{(\VE, \tau)}}{\jdg{C}{\kw{(}\,\pat\,\kw{)}}{(\VE, \tau)}}
+
+\begin{rulecomments}
+\rcomment{r:s-atpat-scon} The side conditions give an integer constant the type
+$\tInt$ in a pattern, never $\tFloat$ or a type variable of class $\knum$; a
+character or string constant has its own type. Thus \kw{case 1.5 of 1 -> 0 ; \_
+-> 1} does not elaborate. Floating point constants are not patterns, by the
+grammar.
+
+\rcomment{r:s-atpat-var} The variable receives a type, not a type scheme.
+Constructors and variables are spelt differently, so no status test is needed
+here.
+
+\rcomment{r:s-atpat-con} Only status $\isc$ is accepted, so the constructor of a
+record type alias, of status $\isv$, cannot occur in a pattern. The instance
+must be a constructed type, so this rule accepts only a constructor without
+arguments; a constructor with arguments is covered by rule
+\ruleref{r:s-pat-con}.
+
+\rcomment{r:s-atpat-tuple} By the grammar $k$ is 2 or 3, and by the syntactic
+restrictions the domains of the $\VE_i$ are disjoint.
+
+\rcomment{r:s-atpat-nil} As in rule \ruleref{r:s-atexp-nil}, $\tau$ is
+arbitrary.
+
+\rcomment{r:s-atpat-record} The record type $\tau$ may have fields besides those
+the pattern names, and it may be open: a record pattern matches every record
+with the fields it names.
+\end{rulecomments}
+
+\rulegroup{Pattern Rows}{\jdg{C}{\patrow}{(\VE, \varrho)}}
+
+\defnrule[r:s-patrow]{\var = \lab \premsep \opt{\jdg{C}{\patrow}{(\VE, \varrho)}}}{\jdg{C}{\lab\ \opt{\kw{,}\ \patrow}}{(\{\var \mapsto (\tau, \isv)\}\opt{{}+\VE},\ \{\lab \mapsto \tau\}\opt{{}+\varrho})}}
+
+\begin{rulecomments}
+\rcomment{r:s-patrow} A field of a record pattern binds the variable spelt as its
+label. The syntactic restrictions ensure $\lab \notin \Dom\varrho$, and hence
+$\var \notin \Dom\VE$.
+\end{rulecomments}
+
+\rulegroup{Patterns}{\jdg{C}{\pat}{(\VE, \tau)}}
+
+\defnrule[r:s-pat-atpat]{\jdg{C}{\atpat}{(\VE, \tau)}}{\jdg{C}{\atpat}{(\VE, \tau)}}
+
+\defnrule[r:s-pat-con]{C(\longcon) = (\sigma, \isc) \premsep \sigma \succ \tau_1 \rightarrow \cdots \rightarrow \tau_n \rightarrow \tau'^{(k)}t \\ \jdg{C}{\atpat_i}{(\VE_i, \tau_i)} \quad (1 \le i \le n)}{\jdg{C}{\longcon\ \atpat_1 \cdots \atpat_n}{(\VE_1 + \cdots + \VE_n,\ \tau'^{(k)}t)}}
+
+\defnrule[r:s-pat-cons]{\jdg{C}{\pat_1}{(\VE_1, \tau)} \premsep \jdg{C}{\pat_2}{(\VE_2, \tau\,\tList)}}{\jdg{C}{\pat_1\ \kw{::}\ \pat_2}{(\VE_1 + \VE_2,\ \tau\,\tList)}}
+
+\defnrule[r:s-pat-as]{\jdg{C}{\pat}{(\VE, \tau)}}{\jdg{C}{\pat\ \kw{as}\ \var}{(\VE + \{\var \mapsto (\tau, \isv)\},\ \tau)}}
+
+\begin{rulecomments}
+\rcomment{r:s-pat-con} The instance must be a constructed type after exactly $n$
+arguments, so a constructor in a pattern is applied to as many patterns as it
+takes. Thus a constructed pattern with too few or too many arguments does not
+elaborate. The syntactic restrictions ensure that the domains of the $\VE_i$
+are disjoint. % audit Y7
+
+\rcomment{r:s-pat-cons} The type name is $\tList$ of the initial basis, whatever
+the program binds to \kw{List}.
+
+\rcomment{r:s-pat-as} The syntactic restrictions ensure $\var \notin \Dom\VE$.
+\end{rulecomments}
+
+\section{Further Restrictions}\label{sec:static-core-further}
+
+There are a few restrictions on programs which are better expressed apart from
+the inference rules. A phrase that elaborates by the rules but breaks one of
+them is not legal; it is treated as a phrase that does not elaborate.
+
+The first two restrictions speak of the \emph{inhabitants} of a type, which are
+phrases built from constructors and special constants, and of the patterns
+that \emph{cover} them. The \emph{constructors} of a type name $t$ are those
+that the declaration of the custom type with type name $t$ binds with status
+$\isc$ (Chapter~\ref{ch:static-modules}), or, for a type name of the initial
+basis, those that Appendix~\ref{ch:appendix-static-basis} gives it; the
+constructors of $\tList$ are \kw{[]} and \kw{::}. The inhabitants of a type
+$\tau$ are given by the first of the following clauses that applies:
+\begin{itemize}
+\item if $\tau$ is $\tInt$, $\tChar$ or $\tString$, each special constant
+  $\scon$ such that $\typeof(\scon) \succ \tau$;
+\item if $\tau = \tunit$, the phrase \kw{()};
+\item if $\tau = (\tau_1, \cdots, \tau_k)\tTuple{k}$, the phrases
+  $\kw{(}h_1\kw{,}\allowbreak\ \cdots\kw{,}\allowbreak\ h_k\kw{)}$, where each
+  $h_i$ is an inhabitant of $\tau_i$;
+\item if $\tau = \tau'^{(k)}t$ and $t$ has constructors, the phrases
+  $\con\ h_1 \cdots h_n$ (written $h_1\ \kw{::}\ h_2$ when $\con$ is
+  \kw{::}), where $\con$ is a constructor of $t$ whose type scheme $\sigma$
+  satisfies $\sigma \succ \tau_1 \rightarrow \cdots \rightarrow \tau_n
+  \rightarrow \tau$, and each $h_i$ is an inhabitant of $\tau_i$;
+\item otherwise (a function type, a record type, a type variable, or a type
+  whose type name has no constructors), the single phrase \kw{\_}.
+\end{itemize}
+The wildcard \kw{\_}, a variable and a record pattern cover every inhabitant.
+A special constant covers each special constant that denotes the same
+character or string or, for integer constants, has the same value as an
+$\tInt$ (Chapter~\ref{ch:syntax-core}), however the two are written. % A31
+A pattern $\longcon\ \atpat_1 \cdots \atpat_n$ ($n \geq 0$) covers $\con\ h_1
+\cdots h_n$ when $\longcon$ is $\con$ or $\modid.\con$ and each $\atpat_i$
+covers $h_i$; likewise \kw{[\ ]} covers \kw{[]}, and $\pat_1\ \kw{::}\ \pat_2$
+covers $h_1\ \kw{::}\ h_2$ when $\pat_1$ covers $h_1$ and $\pat_2$ covers
+$h_2$. The pattern \kw{()} covers \kw{()}, a tuple pattern covers a tuple
+component by component, and $\pat\ \kw{as}\ \var$ and $\kw{(}\pat\kw{)}$ cover
+what $\pat$ covers. The restrictions are:
+
+\begin{enumerate}
+\item\citelabel{res:core-irredundancy} \emph{Irredundancy.} In a match $\pat_1\ \kw{->}\ \expm_1\ \kw{;}\ \cdots\
+  \kw{;}\ \pat_n\ \kw{->}\ \expm_n$ whose patterns elaborate with type $\tau$,
+  each $\pat_j$ must cover some inhabitant of $\tau$ that no $\pat_i$ with $i <
+  j$ covers. % A31
+
+\item\citelabel{res:core-exhaustiveness} \emph{Exhaustiveness.} In a match as above, every inhabitant of $\tau$
+  must be covered by some $\pat_i$. Likewise, in a pattern binding
+  $\atpat\ \kw{=}\ \expm$ and in a lambda
+  $\kw{\textbackslash}\ \atpat\ \kw{->}\ \expm$, the pattern $\atpat$ must
+  cover every inhabitant of its type. The
+  restrictions are inherited by derived forms: in a function definition
+  $\var\ \atpat_1 \cdots \atpat_n\ \kw{=}\ \expm$, each $\atpat_i$ must be
+  exhaustive by itself. In deciding exhaustiveness, no set of special
+  constants covers every inhabitant of $\tInt$, $\tChar$ or $\tString$, whatever the range of $\tInt$
+  (Appendix~\ref{ch:appendix-implementation}).
+
+\item\citelabel{res:core-number-default} \emph{Defaulting of number.} Where a derivation uses a type variable of
+  class $\knum$ that no closure generalises, that variable is taken to be
+  $\tInt$: the derivation is the one in which $\tInt$ is substituted for it.
+  % A27
+  A variable of class $\knum$ that a closure generalises is not affected; the
+  evaluation of the values whose type schemes have such variables is given in
+  Section~\ref{sec:dynamic-core-numbers}.
+  % Audit X8, V (X8 remainder): the clause on main is removed; Dflt
+  % (Chapter 9) and the specialisation default are the only other defaults
+  % to Int.
+\end{enumerate}

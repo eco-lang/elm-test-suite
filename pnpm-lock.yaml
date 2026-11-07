@@ -175,6 +175,9 @@ importers:
       elm-0.19.3:
         specifier: npm:elm@0.19.3-0
         version: elm@0.19.3-0
+      katex:
+        specifier: 0.19.1
+        version: 0.19.1
       lamdera-1.5.0:
         specifier: npm:lamdera@0.19.3-1.5.0
         version: lamdera@0.19.3-1.5.0
@@ -276,6 +279,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  commander@15.0.0:
+    resolution: {integrity: sha512-z67u4ZhzCL/Tydu1lJARtEZYWbWaN7oYLHbsuzocr6y4N6WZAagG3RQ4FW61V1/0+jImpj293XfrcYnd1qxtPg==}
+    engines: {node: '>=22.12.0'}
+
   elm@0.19.1-6:
     resolution: {integrity: sha512-mKYyierHICPdMx/vhiIacdPmTPnh889gjHOZ75ZAoCxo3lZmSWbGP8HMw78wyctJH0HwvTmeKhlYSWboQNYPeQ==}
     engines: {node: '>=7.0.0'}
@@ -289,6 +296,10 @@ packages:
   elm@0.19.3-0:
     resolution: {integrity: sha512-k7M033Vbzsi4w7G0kByQToRnVK5yaEddzNXTZynRXaJYzwhMI17RRP7GGxdieiIL5kurl2w07ht6/4yQudJ9HA==}
     engines: {node: '>=7.0.0'}
+    hasBin: true
+
+  katex@0.19.1:
+    resolution: {integrity: sha512-jG8uKntjSEcm2EpQOh0XturpPuuC9r3Sq5HLHdsFdWZT27E672SF19QEi+of0/YeOy15lDgRhKvr5614uRrEfA==}
     hasBin: true
 
   lamdera@0.19.3-1.5.0:
@@ -354,6 +365,8 @@ snapshots:
   '@lamdera/compiler-win32-x64@0.19.3-1.5.0':
     optional: true
 
+  commander@15.0.0: {}
+
   elm@0.19.1-6:
     optionalDependencies:
       '@elm_binaries/darwin_arm64': 0.19.1-0
@@ -376,6 +389,10 @@ snapshots:
       '@elm_binaries/linux_arm64': 0.19.3-0
       '@elm_binaries/linux_x64': 0.19.3-0
       '@elm_binaries/win32_x64': 0.19.3-0
+
+  katex@0.19.1:
+    dependencies:
+      commander: 15.0.0
 
   lamdera@0.19.3-1.5.0:
     optionalDependencies:

@@ -1,0 +1,110 @@
+module Route.Standard.Basis.SPLAT_ exposing (ActionData, Data, Model, Msg, RouteParams, route)
+
+{-| One entry of the initial basis, at its qualified name with the dots as slashes:
+`/standard/basis/Platform/Cmd/none`.
+-}
+
+import BackendTask exposing (BackendTask)
+import FatalError exposing (FatalError)
+import Head
+import Head.Seo as Seo
+import Pages.Url
+import PagesMsg exposing (PagesMsg)
+import RouteBuilder exposing (App, StatelessRoute)
+import Shared
+import Site
+import Standard exposing (Index, Item, ItemKind(..))
+import Standard.ItemView as ItemView
+import Standard.Render as Render
+import View exposing (View)
+
+
+type alias Model =
+    {}
+
+
+type alias Msg =
+    ()
+
+
+type alias RouteParams =
+    { splat : ( String, List String ) }
+
+
+{-| `index` and `item` are used only inside `View.freeze`, so elm-pages leaves them out of the data
+sent to the browser; the page title and description are kept apart for that reason.
+-}
+type alias Data =
+    { title : String
+    , description : String
+    , index : Index
+    , item : Item
+    }
+
+
+type alias ActionData =
+    {}
+
+
+route : StatelessRoute RouteParams Data ActionData
+route =
+    RouteBuilder.preRender
+        { head = head
+        , pages = pages
+        , data = data
+        }
+        |> RouteBuilder.buildNoState { view = view }
+
+
+pages : BackendTask FatalError (List RouteParams)
+pages =
+    Standard.index
+        |> BackendTask.map
+            (.items
+                >> List.filter (\it -> it.kind == BasisEntry)
+                >> List.filterMap (\it -> case String.split "." it.slug of
+                            first :: rest ->
+                                Just { splat = ( first, rest ) }
+
+                            [] ->
+                                Nothing)
+            )
+
+
+data : RouteParams -> BackendTask FatalError Data
+data params =
+    BackendTask.map2
+        (\idx it ->
+            { title = Render.itemKindName it.kind ++ " " ++ it.slug ++ " · " ++ idx.title
+            , description = ItemView.description idx it
+            , index = idx
+            , item = it
+            }
+        )
+        Standard.index
+        (Standard.item BasisEntry (String.join "." (Tuple.first params.splat :: Tuple.second params.splat)))
+
+
+head : App Data ActionData RouteParams -> List Head.Tag
+head app =
+    Seo.summary
+        { canonicalUrlOverride = Nothing
+        , siteName = Site.title
+        , image =
+            { url = Pages.Url.external ""
+            , alt = app.data.title
+            , dimensions = Nothing
+            , mimeType = Nothing
+            }
+        , description = app.data.description
+        , locale = Nothing
+        , title = app.data.title
+        }
+        |> Seo.website
+
+
+view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
+view app _ =
+    { title = app.data.title
+    , body = [ View.freeze (ItemView.itemPage app.data.index app.data.item) ]
+    }

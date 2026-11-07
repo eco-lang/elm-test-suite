@@ -6,10 +6,12 @@ import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Html exposing (Html)
 import Html.Attributes as Attr
+import Icons
 import Pages.Flags
 import Pages.PageUrl exposing (PageUrl)
 import Route exposing (Route)
 import SharedTemplate exposing (SharedTemplate)
+import Site
 import Style
 import UrlPath exposing (UrlPath)
 import View exposing (View)
@@ -92,15 +94,24 @@ view report _ _ _ pageView =
         , Html.header [ Attr.class "ts-header" ]
             [ Html.div [ Attr.class "ts-header-inner" ]
                 [ Route.link [ Attr.class "ts-brand" ]
-                    [ Html.span [ Attr.class "ts-brand-mark" ] []
-                    , Html.text "Elm test suite"
+                    [ Icons.elmTangram "ts-brand-mark"
+                    , Html.text Site.title
                     ]
                     Route.Index
                 , Html.nav [ Attr.class "ts-nav" ]
                     [ Route.link [] [ Html.text "Results" ] Route.Index
                     , Html.a [ Attr.href (Route.toString Route.Index ++ "#differing") ] [ Html.text "Differences" ]
-                    , externalLink (repoUrl report) "Source"
+                    , Route.link [] [ Html.text "Standard" ] Route.Standard
                     ]
+                , Html.a
+                    [ Attr.class "ts-github"
+                    , Attr.href (repoUrl report)
+                    , Attr.target "_blank"
+                    , Attr.rel "noopener noreferrer"
+                    , Attr.title "Source on GitHub (opens in a new tab)"
+                    , Attr.attribute "aria-label" "Source on GitHub (opens in a new tab)"
+                    ]
+                    [ Icons.github "ts-github-mark" ]
                 ]
             ]
         , Html.main_ [ Attr.class "ts-main" ] pageView.body

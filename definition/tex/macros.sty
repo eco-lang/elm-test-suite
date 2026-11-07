@@ -1,0 +1,274 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{macros}[2026/11/07 Notation for The Definition of Standard Elm, generated from notation.md]
+\RequirePackage{defn}
+% ---- Syntactic classes
+\newcommand{\scon}{\mv{scon}} % SCon: special constants
+\newcommand{\var}{\mv{var}} % Var: value variables (lower-case identifiers)
+\newcommand{\con}{\mv{con}} % Con: value constructors (upper-case identifiers)
+\newcommand{\tyvar}{\mv{tyvar}} % TyVar: type variables
+\newcommand{\tycon}{\mv{tycon}} % TyCon: type constructors
+\newcommand{\lab}{\mv{lab}} % Lab: record labels (field names)
+\newcommand{\modid}{\mv{modid}} % ModId: module identifiers and qualifiers (dotted upper-case names)
+\newcommand{\opv}{\mv{op}} % Op: operator symbols
+\newcommand{\longvar}{\mv{longvar}} % LongVar: possibly qualified variables `modid.var`
+\newcommand{\longcon}{\mv{longcon}} % LongCon: possibly qualified constructors
+\newcommand{\longtycon}{\mv{longtycon}} % LongTyCon: possibly qualified type constructors
+\newcommand{\atexp}{\mv{atexp}} % AtExp: atomic expressions
+\newcommand{\expm}{\mv{exp}} % Exp: expressions (macro has suffix m: `\exp` is the exponential)
+\newcommand{\exprow}{\mv{exprow}} % ExpRow: expression rows (record fields)
+\newcommand{\match}{\mv{match}} % Match: matches (case branches)
+\newcommand{\mrule}{\mv{mrule}} % MRule: match rules
+\newcommand{\dec}{\mv{dec}} % Dec: declarations (the definitions of a let)
+\newcommand{\valbind}{\mv{valbind}} % ValBind: value bindings
+\newcommand{\atpat}{\mv{atpat}} % AtPat: atomic patterns
+\newcommand{\pat}{\mv{pat}} % Pat: patterns
+\newcommand{\patrow}{\mv{patrow}} % PatRow: pattern rows (record pattern fields)
+\newcommand{\ty}{\mv{ty}} % Ty: type expressions
+\newcommand{\tyrow}{\mv{tyrow}} % TyRow: type-expression rows
+\newcommand{\tyvarseq}{\mv{tyvarseq}} % TyVarSeq: type-variable sequences (parameters of type declarations)
+\newcommand{\modm}{\mv{module}} % Module: modules
+\newcommand{\header}{\mv{header}} % Header: module headers
+\newcommand{\imports}{\mv{imports}} % Imports: import lists
+\newcommand{\explist}{\mv{explist}} % ExpList: exposing lists
+\newcommand{\expitem}{\mv{item}} % ExpItem: exposing items
+\newcommand{\topdec}{\mv{topdec}} % TopDec: top-level declarations
+\newcommand{\datbind}{\mv{datbind}} % DatBind: custom-type bindings
+\newcommand{\conbind}{\mv{conbind}} % ConBind: constructor bindings
+\newcommand{\typbind}{\mv{typbind}} % TypBind: type-alias bindings
+\newcommand{\program}{\mv{program}} % Program: programs
+% ---- Semantic classes (class names, and metavariables that need a macro)
+\newcommand{\TyVar}{\cls{TyVar}} % TyVar
+\newcommand{\RowVar}{\cls{RowVar}} % RowVar
+\newcommand{\TyName}{\cls{TyName}} % TyName
+\newcommand{\Class}{\cls{Class}} % Class
+\newcommand{\IdStatus}{\cls{IdStatus}} % IdStatus
+\newcommand{\is}{\mv{is}} % metavariable of IdStatus
+\newcommand{\Type}{\cls{Type}} % Type
+\newcommand{\Row}{\cls{Row}} % Row
+\newcommand{\RecType}{\cls{RecType}} % RecType
+\newcommand{\FunType}{\cls{FunType}} % FunType
+\newcommand{\ConsType}{\cls{ConsType}} % ConsType
+\newcommand{\TypeFcn}{\cls{TypeFcn}} % TypeFcn
+\newcommand{\TypeScheme}{\cls{TypeScheme}} % TypeScheme
+\newcommand{\TyStr}{\cls{TyStr}} % TyStr
+\newcommand{\TyEnv}{\cls{TyEnv}} % TyEnv
+\newcommand{\TE}{\mathit{TE}} % metavariable of TyEnv
+\newcommand{\ValEnv}{\cls{ValEnv}} % ValEnv
+\newcommand{\VE}{\mathit{VE}} % metavariable of ValEnv
+\newcommand{\QualEnv}{\cls{QualEnv}} % QualEnv
+\newcommand{\QE}{\mathit{QE}} % metavariable of QualEnv
+\newcommand{\Env}{\cls{Env}} % Env
+\newcommand{\Context}{\cls{Context}} % Context
+\newcommand{\Interface}{\cls{Interface}} % Interface
+\newcommand{\ModEnv}{\cls{ModEnv}} % ModEnv
+\newcommand{\ME}{\mathit{ME}} % metavariable of ModEnv
+\newcommand{\PortEnv}{\cls{PortEnv}} % PortEnv
+\newcommand{\PE}{\mathit{PE}} % metavariable of PortEnv
+\newcommand{\Basis}{\cls{Basis}} % Basis
+\newcommand{\SVal}{\cls{SVal}} % SVal
+\newcommand{\sv}{\mathit{sv}} % metavariable of SVal
+\newcommand{\BasVal}{\cls{BasVal}} % BasVal
+\newcommand{\Val}{\cls{Val}} % Val
+\newcommand{\BasApp}{\cls{BasApp}} % BasApp
+\newcommand{\ConVal}{\cls{ConVal}} % ConVal
+\newcommand{\Record}{\cls{Record}} % Record
+\newcommand{\Tuple}{\cls{Tuple}} % Tuple
+\newcommand{\Closure}{\cls{Closure}} % Closure
+\newcommand{\FAILcls}{\cls{\{FAIL\}}} % FAIL
+\newcommand{\FAIL}{\mathrm{FAIL}} % metavariable of FAIL
+\newcommand{\EffVal}{\cls{EffVal}} % EffVal
+\newcommand{\ev}{\mathit{ev}} % metavariable of EffVal
+\newcommand{\TaskVal}{\cls{TaskVal}} % TaskVal
+\newcommand{\tk}{\mathit{tk}} % metavariable of TaskVal
+\newcommand{\CmdVal}{\cls{CmdVal}} % CmdVal
+\newcommand{\cm}{\mathit{cm}} % metavariable of CmdVal
+\newcommand{\SubVal}{\cls{SubVal}} % SubVal
+\newcommand{\sbv}{\mathit{sb}} % metavariable of SubVal
+\newcommand{\ProcId}{\cls{ProcId}} % ProcId
+\newcommand{\pid}{\mathit{pid}} % metavariable of ProcId
+\newcommand{\ProgVal}{\cls{ProgVal}} % ProgVal
+\newcommand{\pv}{\mathit{pv}} % metavariable of ProgVal
+\newcommand{\JVal}{\cls{JVal}} % JVal
+\newcommand{\Config}{\cls{Config}} % Config
+\newcommand{\Event}{\cls{Event}} % Event
+% ---- Operations
+\newcommand{\finmap}{\xrightarrow{\mathrm{fin}}} % finite maps
+\newcommand{\Dom}{\mathrm{Dom}\,} % domain
+\newcommand{\Ran}{\mathrm{Ran}\,} % range
+\newcommand{\Fin}{\mathrm{Fin}\,} % finite subsets
+\newcommand{\of}{\mathrel{\mathrm{of}}} % projection
+\newcommand{\Adm}[1]{\mathrm{Adm}_{#1}} % admissible types
+\newcommand{\clsof}{\mathrm{class}} % class of
+\newcommand{\tyvars}{\mathrm{tyvars}\,} % type variables
+\newcommand{\tynames}{\mathrm{tynames}\,} % type names
+\newcommand{\Clos}{\mathrm{Clos}} % closure
+\newcommand{\rec}[1]{\{#1\}} % row join
+\newcommand{\orec}[2]{\{#1 \mid #2\}} % open record
+\newcommand{\Port}{\mathrm{Port}} % port payload
+\newcommand{\Expose}{\mathrm{Expose}} % interface of
+\newcommand{\valof}{\mathrm{val}} % value of constant
+\newcommand{\typeof}{\mathrm{type}} % type of constant
+\newcommand{\APPLY}{\mathrm{APPLY}} % apply
+\newcommand{\Rec}{\mathrm{Rec}\,} % recursive closures
+\newcommand{\arity}{\mathrm{arity}} % arity
+\newcommand{\Enc}[1]{\mathrm{Enc}_{#1}} % encode
+\newcommand{\Dec}[1]{\mathrm{Dec}_{#1}} % decode
+\newcommand{\norm}{\mathrm{norm}} % Int normalisation
+\newcommand{\IntRange}{\mathrm{IntRange}} % Int range
+\newcommand{\step}[1]{\xrightarrow{#1}} % transition
+\newcommand{\OTstat}{\mathrm{OT}_{\mathrm{STAT}}} % static operator table
+\newcommand{\OTdyn}{\mathrm{OT}_{\mathrm{DYN}}} % dynamic operator table
+% ---- Judgment forms
+\newcommand{\jdg}[3]{#1 \vdash #2 \Rightarrow #3} % A |- phrase => A'
+\newcommand{\jdgv}[4]{#1, #2 \vdash #3 \Rightarrow #4} % E, v |- phrase => A
+\newcommand{\jstat}[3]{#1 \vdash_{\mathrm{STAT}} #2 \Rightarrow #3} % static judgment, Chapter 9
+\newcommand{\jdyn}[3]{#1 \vdash_{\mathrm{DYN}} #2 \Rightarrow #3} % dynamic judgment, Chapter 9
+\newcommand{\jnot}[2]{#1 \vdash #2 \not\Rightarrow} % does not elaborate
+% ---- Special symbols
+\newcommand{\kany}{\mathrm{any}} % the unconstrained class
+\newcommand{\knum}{\mathrm{number}} % class number
+\newcommand{\kcomp}{\mathrm{comparable}} % class comparable
+\newcommand{\kapp}{\mathrm{appendable}} % class appendable
+\newcommand{\kcapp}{\mathrm{compappend}} % class compappend
+\newcommand{\isc}{\mathrm{c}} % identifier status: constructor
+\newcommand{\isv}{\mathrm{v}} % identifier status: value
+\newcommand{\tInt}{\mathtt{Int}} % built-in type name Int
+\newcommand{\tFloat}{\mathtt{Float}} % built-in type name Float
+\newcommand{\tChar}{\mathtt{Char}} % built-in type name Char
+\newcommand{\tString}{\mathtt{String}} % built-in type name String
+\newcommand{\tList}{\mathtt{List}} % built-in type name List
+\newcommand{\tBool}{\mathtt{Bool}} % the type name of Bool (a custom type of the basis)
+\newcommand{\tunit}{\mathtt{()}} % the unit type
+\newcommand{\tMaybe}{\mathtt{Maybe}} % the type name of Maybe (a custom type of the basis)
+\newcommand{\tArray}{\mathtt{Array}} % the abstract type name Array of the basis
+\newcommand{\tBytes}{\mathtt{Bytes}} % the abstract type name Bytes of the basis (elm/bytes), a port payload type (A92)
+\newcommand{\tValue}{\mathtt{Value}} % the abstract type name Json.Encode.Value (= Json.Decode.Value) of the basis
+\newcommand{\emptymap}{\{\}} % the empty map
+\newcommand{\emptyrow}{\emptyset} % no row variable (closed record type)
+% ---- requests from appendix-dynamic-basis
+\newcommand{\dbChr}{\cls{Chr}} % class Chr (simple): the characters of SVal, an implementation parameter (A52) (appendix-dynamic-basis)
+\newcommand{\dbch}{\mathit{ch}} % metavariable of Chr: ch; a character (appendix-dynamic-basis)
+\newcommand{\dbcode}{\mathrm{code}} % operation code(ch): the injective map Chr -> Z, the library's Char.toCode (A52, A53) (appendix-dynamic-basis)
+\newcommand{\dbNaN}{\mathrm{NaN}} % special symbol: NaN, the one not-a-number float of Flt (appendix-dynamic-basis)
+\newcommand{\dbfl}{\mathrm{fl}} % operation fl(r): the real r rounded to a float, to nearest with ties to even, overflowing to an infinity; fl(0) = +0 (appendix-dynamic-basis)
+\newcommand{\dbtrunc}{\mathrm{trunc}} % operation trunc(r): the integer part of the real r, rounding toward zero (appendix-dynamic-basis)
+\newcommand{\dbsat}{\mathrm{sat}} % operation sat(k): k in Z or an infinity, saturated into IntRange (A44) (appendix-dynamic-basis)
+\newcommand{\dbsgn}{\mathrm{sgn}} % operation sgn(x): the sign, +1 or -1, of a float other than NaN (appendix-dynamic-basis)
+\newcommand{\dbFun}{\cls{Fun}} % class Fun: Closure u BasApp u the constructor values awaiting arguments; the function values (A51) (appendix-dynamic-basis)
+\newcommand{\dbEq}{\mathrm{Eq}} % operation Eq(v, v'): the non-empty subset of {True, False} of results of comparing v and v' for equality (A50, A51) (appendix-dynamic-basis)
+\newcommand{\dbcmp}{\mathrm{cmp}} % operation cmp(v, v'): LT, EQ or GT, the order of two comparable values (A46, A47, A53) (appendix-dynamic-basis)
+\newcommand{\dbarr}{\mathrm{array}} % constructor name array, arity 1, spelt by no identifier: array l is the array of the elements of the list l (appendix-dynamic-basis)
+\newcommand{\dbeuler}{\mathrm{e}} % special symbol: the real number e, the base of natural logarithms (appendix-dynamic-basis)
+\newcommand{\dbpinum}{\pi} % special symbol: the real number pi, the circle constant (not the primitive metavariable pi of Chapter 8) (appendix-dynamic-basis)
+% ---- requests from appendix-grammar-sml
+\newcommand{\fgderived}{\textsuperscript{$\dagger$}} % layout mark: dagger after the right-hand label of a derived alternative in the full grammar; marks "derived form, Appendix A"; appendix-full-grammar
+% ---- requests from appendix-static-basis
+\newcommand{\sbtOrder}{\mathtt{Order}} % TyName (special symbol): Order, arity 0; the type name of Basics.Order (appendix-static-basis; may be merged with another chapter's type-name macro)
+\newcommand{\sbtNever}{\mathtt{Never}} % TyName (special symbol): Never, arity 0; the type name of Basics.Never (appendix-static-basis)
+\newcommand{\sbtResult}{\mathtt{Result}} % TyName (special symbol): Result, arity 2; the type name of Result.Result (appendix-static-basis)
+\newcommand{\sbtCmd}{\mathtt{Cmd}} % TyName (special symbol): Cmd, arity 1; the type name of Platform.Cmd.Cmd (appendix-static-basis)
+\newcommand{\sbtSub}{\mathtt{Sub}} % TyName (special symbol): Sub, arity 1; the type name of Platform.Sub.Sub (appendix-static-basis)
+\newcommand{\sbtTask}{\mathtt{Task}} % TyName (special symbol): Task, arity 2; the type name of Platform.Task, also Task.Task (appendix-static-basis)
+\newcommand{\sbtProcessId}{\mathtt{ProcessId}} % TyName (special symbol): ProcessId, arity 0; the type name of Platform.ProcessId, also Process.Id (appendix-static-basis)
+\newcommand{\sbtProgram}{\mathtt{Program}} % TyName (special symbol): Program, arity 3; the type name of Platform.Program (appendix-static-basis)
+\newcommand{\sbtNode}{\mathtt{Node}} % TyName (special symbol): Node, arity 1; the type name of VirtualDom.Node, also Html.Html (appendix-static-basis)
+% ---- requests from dynamic-core
+\newcommand{\japp}[3]{\vdash #1\,#2 \Rightarrow #3} % judgment form (dynamic, Core, application of values); written |- v1 v2 => v; v1 applied to v2 gives v (Section sec:dynamic-core-apply)
+\newcommand{\dcoreFV}{\mathrm{FV}} % operation free variables; written FV(valbind); the set of variables occurring free (Appendix A sense) in the right-hand sides of valbind
+% ---- requests from dynamic-modules
+\newcommand{\dmConEnv}{\cls{ConEnv}} % class ConEnv (dynamic, Modules): TyCon ->fin ValEnv; constructor environments: the constructors of each custom type, by type
+\newcommand{\dmCE}{\mathit{CE}} % metavariable of ConEnv: CE (dynamic, Modules)
+\newcommand{\dmRA}{\mathit{RA}} % metavariable of Fin(TyCon): RA; the record aliases whose constructors an interface exposes (dynamic, Modules)
+\newcommand{\dmmerge}{\mathbin{\boxplus}} % operation E1 [+] E2 (boxed plus): modification of environments that merges the environments of a qualifier common to both (dynamic, Modules)
+\newcommand{\dmrecord}{\mathrm{record}} % basic value record(lab1...labn), n >= 1, arity n: the constructor of a record alias; record() stands for the empty record (dynamic, Modules)
+\newcommand{\dmthunk}[1]{#1^{\bullet}} % operation valbind^bullet, exp^bullet: the translation of a top-level value group in which each member is reached through a function of unit (dynamic, Modules)
+% ---- requests from effects-a92
+\newcommand{\BVal}{\cls{BVal}} % class BVal (compound), metavariable j: boundary values, the JSON values in which a byte sequence may stand wherever a value may; JVal is a subset (A92) (effects)
+\newcommand{\effByt}{\cls{Byt}} % class Byt (simple): byte sequences, the finite sequences of integers from 0 to 255, written bytes(o1...ok); not JSON values (A92) (effects)
+\newcommand{\effbytes}{\mathrm{bytes}} % byte sequence bytes(o1...ok), each oi an integer from 0 to 255: a member of Byt (A92) (effects)
+\newcommand{\dbbin}{\mathrm{binary}} % constructor name binary, arity 1, spelt by no identifier: binary l, l a list of Int values from 0 to 255, is the value of type Bytes holding that byte sequence (A92) (appendix-dynamic-basis)
+% ---- requests from effects
+\newcommand{\effp}{\mathit{p}} % metavariable of Var used for port names: p; a port name (Chapter 8, effects)
+\newcommand{\effPrim}{\cls{Prim}} % class Prim (simple), metavariable pi: primitives of tasks, {sleep, spawn, kill} u Prim_plat (effects)
+\newcommand{\effPrimPlat}{\cls{Prim}_{\mathrm{plat}}} % class Prim_plat: the platform's further primitives, a parameter of the platform (A83) (effects)
+\newcommand{\effMgr}{\cls{Manager}} % class Manager (compound), metavariable m: {task} u ({out} x Var) u ({in} x Var x Type) u Manager_plat (effects)
+\newcommand{\effMgrPlat}{\cls{Manager}_{\mathrm{plat}}} % class Manager_plat (simple): the platform's further managers, a parameter of the platform (A83) (effects)
+\newcommand{\effm}{\mathit{m}} % metavariable of Manager: m (effects)
+\newcommand{\effAction}{\cls{Action}} % class Action (compound): union over k of Prim x Val^k x TaskVal, written pi(v1...vk) ⇓ tk (effects)
+\newcommand{\effa}{\mathit{a}} % metavariable of Action: a; the label of a task reduction (effects)
+\newcommand{\effJNum}{\cls{JNum}} % class JNum (simple): JSON numbers, the rationals m x 10^e (m, e integers) (effects)
+\newcommand{\effStr}{\cls{Str}} % class Str: the strings of SVal, also the JSON strings and the keys of JSON objects (effects)
+\newcommand{\effFlt}{\cls{Flt}} % class Flt: the floating-point numbers of SVal (effects)
+\newcommand{\effFltFin}{\cls{Flt}_{\mathrm{fin}}} % class Flt_fin: the finite floating-point numbers of SVal (effects)
+\newcommand{\effnull}{\mathtt{null}} % special symbol: JSON null (effects)
+\newcommand{\efftrue}{\mathtt{true}} % special symbol: JSON true (effects)
+\newcommand{\efffalse}{\mathtt{false}} % special symbol: JSON false (effects)
+\newcommand{\effJarr}[1]{\mathtt{[}#1\mathtt{]}} % JSON array, written [j1,...,jn] in typewriter brackets: a member of JVal^n (effects)
+\newcommand{\effsucceed}{\mathrm{succeed}} % task value succeed v: a task that has succeeded with v (effects)
+\newcommand{\efffail}{\mathrm{fail}} % task value fail v: a task that has failed with v (effects)
+\newcommand{\effandThen}{\mathrm{andThen}} % task value andThen(v, tk): tk, then v applied to its success value (effects)
+\newcommand{\effonError}{\mathrm{onError}} % task value onError(v, tk): tk, then v applied to its failure value (effects)
+\newcommand{\effprim}{\mathrm{prim}} % task value prim(pi, v1...vk): a primitive task (effects)
+\newcommand{\effsleep}{\mathrm{sleep}} % primitive sleep (Process.sleep) (effects)
+\newcommand{\effspawn}{\mathrm{spawn}} % primitive spawn (Process.spawn) (effects)
+\newcommand{\effkill}{\mathrm{kill}} % primitive kill (Process.kill) (effects)
+\newcommand{\effOut}{\mathrm{Out}} % operation Out(pi, v1...vk): the set of possible outcomes of a primitive (effects)
+\newcommand{\effred}[1]{\xrightarrow{#1}} % judgment form tk --a--> tk' (or unlabelled, silent): task reduction (effects)
+\newcommand{\effdone}[2]{#1\Downarrow #2} % action pi(v1...vk) ⇓ tk: primitive performed with outcome tk (effects)
+\newcommand{\effbatch}{\mathrm{batch}} % command or subscription value batch(cm1...cmn) (effects)
+\newcommand{\effnone}{\mathrm{none}} % the command or subscription value batch() with no components (effects)
+\newcommand{\effmap}{\mathrm{map}} % command or subscription value map(v, cm) (effects)
+\newcommand{\effleaf}{\mathrm{leaf}} % command or subscription value leaf(m, v): a request to manager m (effects)
+\newcommand{\effmtask}{\mathrm{task}} % manager name: the task manager (effects)
+\newcommand{\effmout}{\mathrm{out}} % manager out p: the outgoing port p (effects)
+\newcommand{\effmin}{\mathrm{in}} % manager in(p, tau): the incoming port p of payload type tau (effects)
+\newcommand{\effFlat}{\mathrm{Flat}} % operation Flat(cm), Flat(sb): the finite multiset of leaf commands (subscriptions) of a command (subscription) (effects)
+\newcommand{\effmset}[1]{\{\!|\,#1\,|\!\}} % finite multiset {| x1, ..., xn |}; multiset union is \uplus (effects)
+\newcommand{\effrecv}[3]{\vdash #1 \triangleleft #2 \Rightarrow #3} % judgment form |- c <| x => v: leaf command c, receiving input x, gives the message v (effects)
+\newcommand{\efffloat}{\mathrm{float}} % operation float(j): the floating-point number nearest the JSON number j, rounded as a floating-point constant (effects)
+\newcommand{\effprog}{\mathrm{prog}} % program value prog r: ProgVal = {prog} x Record (effects)
+\newcommand{\effoutport}{\mathrm{outport}} % basic value outport(p, tau), arity 1: the value of an outgoing port (effects)
+\newcommand{\effinport}{\mathrm{inport}} % basic value inport(p, tau), arity 1: the value of an incoming port (effects)
+\newcommand{\effc}{\mathit{c}} % metavariable of leaf commands and leaf subscriptions (members of CmdVal u SubVal with no batch): c (effects)
+\newcommand{\effx}{\mathit{x}} % metavariable of inputs to a leaf: x, a value or a pair (p, j) of a port name and a JSON value (effects)
+% ---- requests from programs
+\newcommand{\pgStaticBasis}{\cls{StaticBasis}} % class StaticBasis: the class Basis of the static semantics of Modules (Chapter 5), Fin(TyName) x ModEnv x PortEnv, renamed in Chapter 9 (programs)
+\newcommand{\pgDynamicBasis}{\cls{DynamicBasis}} % class DynamicBasis: the class Basis of the dynamic semantics of Modules (Chapter 7), ModEnv, renamed in Chapter 9 (programs)
+\newcommand{\pgBstat}{B_{\mathrm{STAT}}} % metavariable of StaticBasis: B_STAT; B or (B_STAT, B_DYN) ranges over Basis = StaticBasis x DynamicBasis (programs)
+\newcommand{\pgBdyn}{B_{\mathrm{DYN}}} % metavariable of DynamicBasis: B_DYN (programs)
+\newcommand{\pgDflt}{\mathrm{Dflt}\,} % operation Dflt sigma: the body of the type scheme sigma with Int for each bound type variable of class number (A27) (programs)
+\newcommand{\pgTime}{\cls{Time}} % class Time = {x in R | x >= 0}, metavariables s (instants, milliseconds since the program started) and d (durations) (programs)
+\newcommand{\pgProc}{\cls{Proc}} % class Proc: (TaskVal x Time x (CmdVal u {spawned})) u {ended}; the state of a process (programs)
+\newcommand{\pgProcMap}{\cls{ProcMap}} % class ProcMap = ProcId ->fin Proc, metavariable P (plain): the processes started so far (programs)
+\newcommand{\pgOutQueue}{\cls{OutQueue}} % class OutQueue = Var ->fin JVal^*, metavariable Q (plain): the values awaiting delivery on each outgoing port (programs)
+\newcommand{\pgPending}{\cls{Pending}} % class Pending = CmdVal ->fin {1,2,...} (finite multisets), metavariable H (plain): the leaf commands handed to the platform's managers (programs)
+\newcommand{\pgorig}{\mathit{o}} % metavariable o of CmdVal u {spawned}: the origin of a process (programs)
+\newcommand{\pgspawned}{\mathrm{spawned}} % special symbol: spawned; the origin of a process started by Process.spawn (programs)
+\newcommand{\pgended}{\mathrm{ended}} % special symbol: ended; the state of a process that has ended or been killed (programs)
+\newcommand{\pgnil}{\mathrm{nil}} % special symbol: nil; the empty finite sequence; sequences are concatenated with \cdot (programs)
+\newcommand{\pgLeaf}{\mathrm{Leaf}} % operation Leaf(m, v): the set of leaf commands (or subscriptions) map(v_n, ... map(v_1, leaf(m, v)) ...), n >= 0 (programs)
+\newcommand{\pgFlags}[1]{\mathrm{Flags}_{#1}} % operation Flags_tau(j), partial: the flags value of j at tau: () if tau is the unit type (A77), Dec_tau(j) otherwise (programs)
+\newcommand{\pgQinit}{Q_{\mathrm{init}}} % object Q_init: the outgoing queues of a program at start, each empty (programs)
+\newcommand{\pgEvIn}{\mathrm{in}} % event in(p, j): the host sends j on the incoming port p (programs)
+\newcommand{\pgEvOut}{\mathrm{out}} % event out(p, j): the program delivers j on the outgoing port p (programs)
+\newcommand{\pgwait}{\mathrm{wait}} % event wait d: d milliseconds pass (programs)
+\newcommand{\pgEventPlat}{\cls{Event}_{\mathrm{plat}}} % class Event_plat (simple): the events of the platform's managers, a parameter of the platform (A83) (programs)
+\newcommand{\pgplatstep}[1]{\xrightarrow{#1}_{\mathrm{plat}}} % judgment form K --ell-->plat K': a platform step, given by the platform (A83) (programs)
+\newcommand{\pgTr}{\mathrm{Tr}} % operation Tr(program, j): the set of traces of program started with flags j (programs)
+% ---- requests from static-core
+\newcommand{\tTuple}[1]{\mathtt{Tuple}_{#1}} % TyName (special symbol): Tuple_k; the built-in type name of k-tuples (k = 2, 3), arity k; static-core
+\newcommand{\tyrowvar}{\xi} % metavariable of TyVar u RowVar: xi; a type variable or a row variable (binders of type functions and type schemes); static-core
+\newcommand{\names}{\mathrm{names}\,} % operation: names U; the set of syntactic type variables tyvar that name a member of U (U a set of type and row variables); static-core
+% ---- requests from static-modules
+\newcommand{\smProvMap}{\cls{ProvMap}} % class ProvMap (compound), metavariable pi (plain): LongId ->fin (Fin(ModId) \ {emptyset}); provider maps: the modules that provide each identifier to a module (static-modules)
+\newcommand{\smId}{\cls{Id}} % class Id: (Var u Con) u TyCon, a disjoint union; the unqualified identifiers that an environment binds (static-modules)
+\newcommand{\smid}{\mv{id}} % metavariable of Id: id (static-modules)
+\newcommand{\smLongId}{\cls{LongId}} % class LongId: (LongVar u LongCon) u LongTyCon, a disjoint union; long identifiers of the three classes (static-modules)
+\newcommand{\smlongid}{\mv{longid}} % metavariable of LongId: longid (static-modules)
+\newcommand{\smmerge}{\uplus} % operation: written pi (+)_modid (N, N'); the provider map pi in which modid replaces the providers of N and joins those of N' (static-modules)
+\newcommand{\smenv}{\mathrm{env}} % operation: written env(ME, pi); the environment that the provider map pi gives in ME, ambiguous identifiers omitted (static-modules)
+\newcommand{\smops}{\mathrm{ops}} % operation: written ops(modid); the operators that the module modid declares, empty for every module of a program (static-modules)
+\newcommand{\smlabs}{\mathrm{labs}} % operation: written labs(ty), partial; the labels of a record alias body in the order written (static-modules)
+\newcommand{\smdirout}{\mathrm{out}} % special symbol: out; direction of an outgoing port in a PortEnv (static-modules)
+\newcommand{\smdirin}{\mathrm{in}} % special symbol: in; direction of an incoming port in a PortEnv (static-modules)
+\endinput

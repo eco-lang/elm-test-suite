@@ -1,0 +1,15 @@
+The Definition of Standard Elm
+Copyright 2026-present Rupert Smith
+
+The text of The Definition of Standard Elm, in this directory as LaTeX sources and as PDF, is
+licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
+
+You may share and adapt it for any purpose, including commercially, provided you give appropriate
+credit, provide a link to the license, and indicate if changes were made.
+
+The full license text is at https://creativecommons.org/licenses/by/4.0/legalcode
+A summary is at https://creativecommons.org/licenses/by/4.0/
+
+The code in this repository, including the LaTeX style files defn.sty and macros.sty considered as
+software and the programs that turn these sources into the website, is under the repository's
+BSD 3-Clause license (../LICENSE).

@@ -86,6 +86,11 @@ view app _ =
             , Html.code [] [ Html.text "elm-bug-fixes" ]
             , Html.text ", expect the correct behaviour where Elm 0.19.1 has a bug, so they fail under 0.19.1 by design."
             ]
+        , Html.p [ Attr.class "ts-lede" ]
+            [ Html.text "The site also carries "
+            , Route.link [] [ Html.em [] [ Html.text "The Definition of Standard Elm" ] ] Route.Standard
+            , Html.text ", a formal definition of the language with a page for every rule."
+            ]
         , Html.section [ Attr.class "ts-section" ]
             [ Html.h2 [ Attr.class "ts-h2" ] [ Html.text "Compilers" ]
             , Html.div [ Attr.class "ts-cards" ] (List.map compilerCard report.compilers)

@@ -1,0 +1,704 @@
+% Values: PRECISE, FAITHFUL, ILLUMINATING, ECONOMICAL
+% Evidence planned:
+% - PRECISE: a rule for every bare production of AtExp, ExpRow, Exp, Match,
+%   MRule, Dec, ValBind, AtPat, PatRow and Pat (book plan "Bare Constructs",
+%   with Ty and TyRow removed by the reduced syntax); every object and
+%   operation defined before its first use (Val, Rec, FV, APPLY as a finite
+%   set); one place, the group "Application of Values", defining application.
+% - FAITHFUL: number specialisation and typed integer constants (A87, A27);
+%   no state and no exceptions (D2); total arithmetic through APPLY
+%   (D3, A40, A9); APPLY as a set for function equality (A51) and Debug.todo
+%   (A62), Debug.log returns its argument (A62); premise order carries no
+%   meaning (A57, A58); strict prefix (&&) and (||) (A56); closures capture
+%   their own call's values (A63); no rule for a forced delayed
+%   self-reference (A25) or resource exhaustion (A61).
+% - ILLUMINATING: comments on why APPLY is a set, why two rules cover Dec,
+%   the absent rules for failed matches, strictness of let, the order of
+%   match rules, and why constructor application has no arity side
+%   condition.
+% - ECONOMICAL: options merge tuples, records and binding sequences; derived
+%   forms carry no rules; equality and ordering are left to APPLY.
+\chapter{Dynamic Semantics for the Core}\label{ch:dynamic-core}
+
+The dynamic semantics of the Core defines the values that phrases evaluate
+to, the environments that declarations and patterns produce, and the closures
+by which functions are represented. Its sentences infer that a phrase
+evaluates to a value or an environment in a given environment, or that a
+pattern, matched against a value, gives an environment or fails. Evaluation
+in Standard Elm has no state and no exceptions: sentences carry no states,
+and no rule produces an exception packet (Section~\ref{sec:dynamic-core-rules}).
+% D2
+Every phrase evaluated here is assumed to have elaborated in the static
+semantics of Chapter~\ref{ch:static-core}. % S4
+
+\section{Reduced Syntax}\label{sec:dynamic-core-reduced}
+
+Types play no part in evaluation, so for the dynamic semantics the Core
+syntax is reduced as follows:
+% D1 (definition-style)
+\begin{itemize}
+\item The type annotation ``$\kw{:}\ \ty$'' is omitted from every value
+  binding, which thus has the form
+  $\var\ \kw{=}\ \expm\ \opt{\kw{and}\ \valbind}$ or
+  $\atpat\ \kw{=}\ \expm$.
+\item The Core phrase classes Ty and TyRow are omitted.
+\end{itemize}
+
+\section{Number Specialisation}\label{sec:dynamic-core-numbers}
+
+Erasing types would leave the value of an integer constant undetermined when
+its type is Float or a type variable of class $\knum$. The dynamic semantics
+of every level is therefore given for the elaborated program after
+\emph{number specialisation}, a translation of the whole program, which we
+define here, where the dynamic semantics begins. % A87
+Each declaration, of a \kw{let} or at the top level of a module, whose
+bindings have type schemes that quantify type variables of class $\knum$ is
+replaced by the following copies of it:
+\begin{itemize}
+\item the copy that assigns $\tInt$ to each of those variables, the
+  \emph{default copy}, which binds the variables of the declaration under
+  their own names; and
+\item one copy for each other assignment of $\tInt$ or $\tFloat$ to those
+  variables at which the program uses the declaration, the copies binding
+  distinct new variables.
+\end{itemize}
+Each occurrence of a variable the declaration binds is made to refer to the
+copy for the instance at which that occurrence was elaborated. A declaration
+whose bindings quantify no type variable of class $\knum$ is not copied, and
+is its own default copy. Since the
+default copy is made whether or not the program uses the declaration at that
+instance, every declaration has a copy: in particular every top-level value
+of a module, including \kw{main} and every value that no phrase uses, has a
+copy and is evaluated when its module is evaluated. % A59, A87
+The default copy of the declaration of \kw{main} is the one that
+Chapter~\ref{ch:programs} names by $\pgDflt$, at the instance
+$\pgDflt\sigma$ of the scheme $\sigma$ of \kw{main}. % A27
+Copies are made from the outside in, so that a variable of class $\knum$
+that a declaration does not quantify is already fixed by the copy of the
+declaration that encloses it, and a variable of class $\knum$ left free in
+the program is $\tInt$ (Section~\ref{sec:static-core-further}). % A27
+After specialisation every integer constant has the type $\tInt$ or
+$\tFloat$. The specialisation is finite: $\Adm{\knum}$ contains only $\tInt$
+and $\tFloat$ (Section~\ref{sec:static-core-classes}), so a declaration with
+$k$ variables of class $\knum$ has at most $2^k$ copies, even when a binding
+is used recursively at an instance other than its own.
+% DECIDED (audit X6, X7, decision 4): every declaration keeps its default
+% copy, so that main and unused values are evaluated (A59); for a let
+% declaration this keeps the Comment on rule r:d-atexp-let true.
+
+Where the type of an occurrence of an integer constant matters below, it is
+its type after specialisation.
+
+\section{Simple Objects}\label{sec:dynamic-core-simple}
+
+The dynamic semantics builds its objects from the identifier classes of
+Chapter~\ref{ch:syntax-core} and the simple object classes of
+Figure~\ref{fig:dynamic-core-simple}.
+
+\begin{figure}[htbp]
+\centering
+\begin{objtable}
+\objrow{\sv}{\SVal}{special values}
+\objrow{b}{\BasVal}{basic values}
+\objrow{\con}{\cls{Con}}{constructor names}
+& & \FAILcls & & failure\\
+\end{objtable}
+\caption{Simple Semantic Objects}
+\label{fig:dynamic-core-simple}
+\end{figure}
+
+SVal is the class of \emph{special values}: the integers of the Int range
+$\IntRange$, the floating-point numbers (among them the two infinities and
+NaN), the characters, and the strings, which are finite sequences of
+characters. The range $\IntRange$ and the representation of characters are
+implementation parameters, given in Appendix~\ref{ch:appendix-implementation}.
+% D8, A40, A52
+Each occurrence of a special constant $\scon$ denotes a special value,
+written $\valof(\scon)$. An integer constant spells an integer $n$, and its
+value depends on the type of the occurrence after number specialisation
+(Section~\ref{sec:dynamic-core-numbers}): at $\tInt$,
+$\valof(\scon)=\norm(n)$, where $\norm$ maps an integer into $\IntRange$ by
+the same normalisation as Int arithmetic
+(Section~\ref{sec:appendix-implementation-int}); % A9, A40
+at $\tFloat$, $\valof(\scon)$ is the floating-point number nearest to $n$,
+rounded as Appendix~\ref{ch:appendix-dynamic-basis} prescribes. % A87
+A floating-point constant denotes the real number it spells, rounded to the
+nearest floating-point number; a character constant denotes a character, and
+a string constant a sequence of characters, as explained in
+Chapter~\ref{ch:syntax-core}.
+
+BasVal is the class of \emph{basic values}: the names of the operations of
+the initial basis, listed in Appendix~\ref{ch:appendix-dynamic-basis}. Each
+basic value $b$ has an \emph{arity} $\arity(b)\geq 1$, the number of
+arguments it takes before it acts (Section~\ref{sec:dynamic-core-basic}).
+
+The class Con of value constructors serves also as the class of
+\emph{constructor names}. We take Con to contain, besides the constructors
+spelt by identifiers, the two list constructor names \kw{[]} and \kw{::},
+which no identifier spells.
+% DECIDED: list values are constructor values built from two constructor
+% names [] and :: that are not identifiers; the registry's Val has no list
+% class of its own, and the operator table of Appendix D gives (::) the
+% constructor :: (audit X1, X5).
+Each constructor $\con$ has an \emph{arity} $\arity(\con)\geq 0$, the number
+of arguments it takes: for a constructor of a custom type, the number of
+types that follow it in its declaration (Chapter~\ref{ch:syntax-modules});
+$\arity(\kw{[]})=0$ and $\arity(\kw{::})=2$. Constructors of different custom
+types may be spelt alike and have different arities; $\arity(\con)$ always
+means the arity of $\con$ in the custom type of the value at hand, which
+elaboration determines. Since only phrases that elaborate are evaluated, a
+constructor value is only ever compared with the constructors of its own
+custom type, whose names are distinct, so no confusion arises.
+% DECIDED: constructor names are not qualified by their module; two
+% constructor values meet in a rule only at one custom type.
+
+FAIL is the outcome of matching a value against a pattern that does not fit
+it. It is not a value: it serves only within the rules, to record that a
+match has not succeeded.
+
+\section{Compound Objects}\label{sec:dynamic-core-compound}
+
+The compound objects of the dynamic semantics are shown in
+Figure~\ref{fig:dynamic-core-compound}. The classes Val, Closure, Env, QualEnv
+and ValEnv are defined together; they are the smallest classes closed under
+the constructions of the figure.
+
+\begin{figure}[htbp]
+\centering\small
+\begin{objtable}
+\objdef{v}{\Val}{\{()\}\cup\SVal\cup\BasApp\cup\ConVal\cup\Record}
+& & & \phantom{{}={}}\cup\Tuple\cup\Closure\cup\EffVal\cup\JVal & \\
+\objdef{(b, v_1\cdots v_k)}{\BasApp}{\textstyle\bigcup_{k\geq 0}\BasVal\times\Val^k}
+\objdef{\con\ v_1\cdots v_k}{\ConVal}{\textstyle\bigcup_{k\geq 0}\cls{Con}\times\Val^k}
+\objdef{r}{\Record}{\cls{Lab}\finmap\Val}
+\objdef{(v_1,v_2\opt{,v_3})}{\Tuple}{\Val^2\cup\Val^3}
+\objdef{(\atpat,\expm,E,\VE)}{\Closure}{\cls{AtPat}\times\cls{Exp}\times\Env\times\ValEnv}
+\objdef{(\QE,\VE)\ \text{or}\ E}{\Env}{\QualEnv\times\ValEnv}
+\objdef{\QE}{\QualEnv}{\cls{ModId}\finmap\Env}
+\objdef{\VE}{\ValEnv}{(\cls{Var}\cup\cls{Con})\finmap\Val}
+\end{objtable}
+\caption{Compound Semantic Objects}
+\label{fig:dynamic-core-compound}
+\end{figure}
+
+The value $()$ is the unit value. A member $(b, v_1\cdots v_k)$ of BasApp is
+a basic value applied to the arguments it has received so far, and always has
+$k<\arity(b)$; we identify $(b)$ with $b$, so that $\BasVal\subseteq\BasApp$.
+A member $\con\ v_1\cdots v_k$ of ConVal is a \emph{constructor value}, and
+always has $k\leq\arity(\con)$: when $k=\arity(\con)$ it is complete, and
+when $k<\arity(\con)$ it is a constructor awaiting further arguments. A
+constructor name $\con$ with $k=0$ is itself a constructor value. We write
+$v_1\mathbin{\kw{::}}v_2$ for the constructor value $\kw{::}\ v_1\ v_2$; the
+lists are thus the constructor values $\kw{[]}$ and $v_1\mathbin{\kw{::}}v_2$
+with $v_2$ a list. Records are finite maps from labels to values; the
+empty record is $\emptymap$. A tuple has two or three components.
+The classes EffVal of effect values (task, command, subscription,
+process-identifier and program values) and JVal of JSON values are defined
+in Chapter~\ref{ch:effects}; this chapter uses only the fact that their
+members are values. % D10, audit X11
+
+Projection, injection and modification are as defined for the static
+semantics (Chapter~\ref{ch:static-core}); the convention that a decorated
+metavariable ranges over the class of the undecorated one is stated in
+Chapter~\ref{ch:introduction}. % O5, audit X14
+The
+unions in Figure~\ref{fig:dynamic-core-compound} are disjoint unions, and the
+classes defined there are disjoint from one another; the injections into Val
+are left implicit. An environment $E$ is modified by a
+value environment as $E+\VE$, meaning $E+(\emptymap,\VE)$.
+The names $E$, $\VE$, Env and the like denote dynamic objects here and
+static objects in Chapter~\ref{ch:static-core}; the two semantics are
+presented apart, so the reuse is harmless.
+
+A long identifier is looked up in an environment $E=(\QE,\VE)$ as follows:
+\[
+  E(\var)=\VE(\var),\qquad
+  E(\modid\kw{.}\var)=(\QE(\modid))(\var),
+\]
+and likewise for constructors. The identifiers that the equivalent forms of
+derived forms introduce (Appendix~\ref{ch:appendix-derived-forms}) are looked
+up in the same way. Because only an import of the module \kw{Basics} provides
+the qualifier \kw{Basics} (Section~\ref{sec:syntax-modules-restrictions}),
+\kw{Basics.True}, \kw{Basics.False} and \kw{Basics.negate} always denote the
+values of the initial dynamic basis
+(Appendix~\ref{ch:appendix-dynamic-basis}); the constructor \kw{::} is bound
+in the initial environment $E_0$ of that appendix, from which every module is
+evaluated. % audit X18, V3; A89
+Operators are not looked up in $E$, and are
+not in the domain of a value environment. Since no program declares an
+operator, every operator is one of the initial basis, and its value is the
+same in every environment: the value $\OTdyn(\opv)$ that the dynamic
+operator table of Appendix~\ref{ch:appendix-dynamic-basis}
+(Figure~\ref{fig:dynamic-basis-operators}) gives it. For \kw{::} this value
+is the list constructor \kw{::}. % A16, audit X1, X5
+
+\section{Basic Values}\label{sec:dynamic-core-basic}
+
+The meaning of the basic values is represented by a function $\APPLY$ which,
+for a basic value $b$ of arity $n$ and values $v_1,\ldots,v_n$, gives a finite
+set of values:
+\[
+  \APPLY(b, v_1\cdots v_n)\in\Fin\Val .
+\]
+$\APPLY$ is defined in Appendix~\ref{ch:appendix-dynamic-basis}
+(Section~\ref{sec:appendix-dynamic-basis-apply}), which also gives the arity
+of every basic value. Equality and the order relations of the initial basis
+are basic values, and their meaning on structured values is defined there,
+not in this chapter. % A50, A53
+
+$\APPLY$ gives a set, rather than a value, so that the definition is exact
+about the two operations of the initial basis that do not determine one
+result. For every basic value the set has exactly one member, with two
+exceptions. First, when an equality test reaches two functions its result is
+an unspecified Bool, so that the set may hold both \kw{True} and \kw{False};
+evaluation is then non-deterministic. % A51
+Second, for the basic value $b$ bound to \kw{Debug.todo}, $\APPLY(b,v)$ is
+empty, so that an application of \kw{Debug.todo} has no result. % A62
+Every other basic value gives a result for every argument: arithmetic gives a
+defined value even where no mathematically correct one exists, % D3
+and \kw{Debug.log} returns its second argument, any output it makes lying
+outside the definition. % A62
+Thus no evaluation ends in a run-time error: a phrase either has a value or
+has none. % D2, D3
+
+\section{Function Closures}\label{sec:dynamic-core-closures}
+
+A \emph{function closure} $(\atpat,\expm,E,\VE)$ is applied to a value $v$ by
+matching $v$ against $\atpat$ and evaluating $\expm$ in the resulting
+environment. The environment is not $E+\VE$ but $E+\Rec\VE$, where the
+domain of the fourth component $\VE$ holds the variables treated recursively,
+and
+\[
+  \Rec : \ValEnv\to\ValEnv
+\]
+is defined by:
+\begin{itemize}
+\item $\Dom(\Rec\VE)=\Dom\VE$;
+\item if $\VE(\var)\notin\Closure$, then $(\Rec\VE)(\var)=\VE(\var)$;
+\item if $\VE(\var)=(\atpat,\expm,E,\VE')$, then\\
+  $(\Rec\VE)(\var)=(\atpat,\expm,E,\VE)$.
+\end{itemize}
+Thus $\Rec\VE$ gives each closure in $\Ran\VE$ the bindings of $\VE$ afresh,
+so that a recursive application made during the evaluation of $\expm$ finds
+them; the recursion is unwound one step at a time, and every semantic object
+stays finite. $\Rec$ is used in two places in the rules: for a recursive
+declaration, and for the application of a closure.
+
+A declaration is recursive when one of its bindings refers to a variable it
+binds. For a value binding $\valbind$, $\dcoreFV(\valbind)$ is the set of
+variables that occur free in the right-hand sides of the bindings of
+$\valbind$, with ``free'' and ``right-hand side'' as defined in
+Section~\ref{sec:appendix-derived-forms-let}; the variables bound by
+$\valbind$ are the domain of the value environment it evaluates to. By the
+restrictions of Section~\ref{sec:syntax-core-restrictions}, every binding of
+a recursive declaration has the form
+$\var\ \kw{=}\ \kw{\textbackslash}\,\atpat\ \kw{->}\ \expm$. % A26
+
+\section{Inference Rules}\label{sec:dynamic-core-rules}
+
+The rules infer sentences of the forms
+\[
+  \jdg{E}{\mathit{phrase}}{A},\qquad
+  \jdgv{E}{v}{\mathit{phrase}}{A},\qquad
+  \japp{v_1}{v_2}{v}
+\]
+where $E$ is an environment, $v$ is a value against which the
+phrase is matched ($r$, a record, for pattern rows), and $A$ is the result: a
+value, a record, a value environment, or FAIL (a pattern row gives a value
+environment, never FAIL). The first form is pronounced
+``$\mathit{phrase}$ evaluates to $A$ in $E$'', the second
+``$\mathit{phrase}$, matched against $v$, gives $A$ in $E$'', and the third
+``$v_1$ applied to $v_2$ gives $v$''. The hypotheses of a rule that are not
+sentences are its \emph{side conditions}. The convention for
+options is the same as for the Core static semantics: in each instance of a
+rule, the phrases in first options $\opt{\ }$ are either all present or all
+absent. % R6
+
+Sentences have no states, and there are no exception packets: the Core has
+neither assignable references nor exceptions. Hence no state convention and
+no exception convention is needed, and every rule is given in full. % D2
+In particular the order of the premises of a rule carries no meaning. A rule
+says which results the parts of a phrase must have, and the conclusion holds
+only when all of them do; since nothing but the result is observable, an
+implementation may evaluate the parts of a phrase in any order. % A57, A58
+Only the parts that some premise names are evaluated: the body of a lambda is
+evaluated when the closure is applied, and a \kw{case} evaluates the body of
+the chosen match rule only.
+
+We allow compound variables, built from the variables of
+Figures~\ref{fig:dynamic-core-simple} and~\ref{fig:dynamic-core-compound}
+with ``/'', to range over unions of classes: $v/\FAIL$ ranges over
+$\Val\cup\FAILcls$ and $\VE/\FAIL$ over $\ValEnv\cup\FAILcls$. We extend
+modification to failure:
+\[
+  \VE+\FAIL \;=\; \FAIL+\VE \;=\; \FAIL+\FAIL \;=\; \FAIL .
+\]
+
+A phrase has no result in $E$ when no sentence with it on the left of
+$\Rightarrow$ can be inferred. This is so when its evaluation does not
+terminate, and when it needs an application of \kw{Debug.todo}. % A25, A62, audit X12
+The rules place no bound on the resources evaluation uses; an implementation
+that stops for lack of resources is outside the definition. % A61
+
+\rulegroup{Atomic Expressions}{\jdg{E}{\atexp}{v}}
+
+\defnrule[r:d-atexp-scon]{}{\jdg{E}{\scon}{\valof(\scon)}}
+
+\defnrule[r:d-atexp-var]{E(\longvar)=v}{\jdg{E}{\longvar}{v}}
+
+\defnrule[r:d-atexp-con]{E(\longcon)=v}{\jdg{E}{\longcon}{v}}
+
+\defnrule[r:d-atexp-op]{}{\jdg{E}{\kw{(}\opv\kw{)}}{\OTdyn(\opv)}}
+
+\defnrule[r:d-atexp-unit]{}{\jdg{E}{\kw{()}}{()}}
+
+\defnrule[r:d-atexp-tuple]
+  {\jdg{E}{\expm_1}{v_1}\premsep\jdg{E}{\expm_2}{v_2}\premsep
+   \opt{\jdg{E}{\expm_3}{v_3}}}
+  {\jdg{E}{\kw{(}\expm_1\kw{,}\ \expm_2\ \opt{\kw{,}\ \expm_3}\kw{)}}
+       {(v_1,v_2\opt{,v_3})}}
+
+\defnrule[r:d-atexp-nil]{}{\jdg{E}{\kw{[}\ \kw{]}}{\kw{[]}}}
+
+\defnrule[r:d-atexp-record]
+  {\opt{\jdg{E}{\exprow}{r}}}
+  {\jdg{E}{\kw{\kwlb}\ \opt{\exprow}\ \kw{\kwrb}}{\emptymap\opt{+\,r}}}
+
+\defnrule[r:d-atexp-update]
+  {E(\var)=r\premsep\jdg{E}{\exprow}{r'}}
+  {\jdg{E}{\kw{\kwlb}\ \var\ \kw{|}\ \exprow\ \kw{\kwrb}}{r+r'}}
+
+\defnrule[r:d-atexp-paren]{\jdg{E}{\expm}{v}}{\jdg{E}{\kw{(}\expm\kw{)}}{v}}
+
+\defnrule[r:d-atexp-let]
+  {\jdg{E}{\dec}{\VE}\premsep\jdg{E+\VE}{\expm}{v}}
+  {\jdg{E}{\kw{let}\ \dec\ \kw{in}\ \expm}{v}}
+
+\begin{rulecomments}
+\rcomment{r:d-atexp-scon} The value of an integer constant depends on the
+type of its occurrence after number specialisation
+(Section~\ref{sec:dynamic-core-numbers}). Thus, with \kw{x :\ Float} defined
+by \kw{x = 2}, the constant denotes a floating-point number and
+\kw{x \textasciicircum{} -1} evaluates to \kw{0.5}; and with
+\kw{inc n = n + 1}, the application \kw{inc 0.5} uses the copy of \kw{inc} at
+$\tFloat$, in which \kw{1} denotes a floating-point number, and evaluates to
+\kw{1.5}. % A87
+\rcomment{r:d-atexp-var} As in the static semantics, long variables are
+looked up in the environment. The identifier status of the static semantics
+plays no part.
+\rcomment{r:d-atexp-con} A constructor of a custom type is bound to the
+constructor value $\con$, awaiting all its arguments; the value bound to the
+constructor of a record type alias is given in
+Chapter~\ref{ch:dynamic-modules}.
+\rcomment{r:d-atexp-op} The value of an operator does not depend on $E$, so
+a variable that a program declares cannot capture an operator: a top-level
+\kw{add} of a module leaves \kw{(+)} unchanged. The operator values
+\kw{(\&\&)} and \kw{(||)} denote
+functions of the initial basis, which receive both arguments as values: in
+\kw{(\&\&) False e} the expression \kw{e} is evaluated. Only the infixed forms
+\kw{e1 \&\& e2} and \kw{e1 || e2}, which are derived forms
+(Appendix~\ref{ch:appendix-derived-forms}), evaluate their second operand
+conditionally. % A56
+\rcomment{r:d-atexp-update} By elaboration, $\Dom r'\subseteq\Dom r$, so the
+result has the fields of $r$, with the values of the fields named in
+$\exprow$ replaced. The record bound to $\var$ is unaffected, there being no
+state.
+\rcomment{r:d-atexp-let} Every binding of $\dec$ is evaluated, whether or not
+$\expm$ uses it: \kw{let \_ = Debug.todo "x" in 1} has no value. A \kw{let}
+binds a single group of bindings (Appendix~\ref{ch:appendix-derived-forms}),
+so the evaluation of the groups of a \kw{let} as written is ordered by the
+nesting of the equivalent form, and within a group the order does not
+matter. % A57
+\end{rulecomments}
+
+\rulegroup{Expression Rows}{\jdg{E}{\exprow}{r}}
+
+\defnrule[r:d-exprow-field]
+  {\jdg{E}{\expm}{v}\premsep\opt{\jdg{E}{\exprow}{r}}}
+  {\jdg{E}{\lab\ \kw{=}\ \expm\ \opt{\kw{,}\ \exprow}}{\{\lab\mapsto v\}\opt{+\,r}}}
+
+\begin{rulecomments}
+\rcomment{r:d-exprow-field} The fields are evaluated in no specified order,
+neither as written nor by label (Section~\ref{sec:dynamic-core-rules}). % A58
+\end{rulecomments}
+
+\rulegroup{Expressions}{\jdg{E}{\expm}{v}}
+
+\defnrule[r:d-exp-atexp]{\jdg{E}{\atexp}{v}}{\jdg{E}{\atexp}{v}}
+
+\defnrule[r:d-exp-app]
+  {\jdg{E}{\expm}{v_1}\premsep\jdg{E}{\atexp}{v_2}\premsep\japp{v_1}{v_2}{v}}
+  {\jdg{E}{\expm\ \atexp}{v}}
+
+\defnrule[r:d-exp-lambda]
+  {}
+  {\jdg{E}{\kw{\textbackslash}\,\atpat\ \kw{->}\ \expm}{(\atpat,\expm,E,\emptymap)}}
+
+\defnrule[r:d-exp-case]
+  {\jdg{E}{\expm}{v}\premsep\jdgv{E}{v}{\match}{v'}}
+  {\jdg{E}{\kw{case}\ \expm\ \kw{of}\ \match}{v'}}
+
+\begin{rulecomments}
+\rcomment{r:d-exp-app} The argument is evaluated whether or not the
+function uses it: \kw{(\textbackslash\_ -> 1) (Debug.todo "x")} has no
+value.
+\rcomment{r:d-exp-lambda} The fourth component of the closure is empty
+because a lambda introduces no recursively defined values;
+rule~\ruleref{r:d-dec-rec} supplies it for a recursive declaration. The
+closure holds the environment $E$ of this evaluation, so closures made in
+successive calls of a function hold the values of their own calls. Two
+evaluations of one lambda give closures that no rule distinguishes from one
+another by identity. % A63, A50
+\rcomment{r:d-exp-case} There is no rule in which $\match$ gives FAIL: the
+static semantics requires every match of a \kw{case} to be exhaustive
+(Chapter~\ref{ch:static-core}), so for a value of the right type some match
+rule applies.
+\end{rulecomments}
+
+\phantomsection\label{sec:dynamic-core-apply}
+\rulegroup{Application of Values}{\japp{v_1}{v_2}{v}}
+
+\defnrule[r:d-app-closure]
+  {\jdgv{E+\Rec\VE}{v}{\atpat}{\VE'}\premsep
+   \jdg{E+\Rec\VE+\VE'}{\expm}{v'}}
+  {\japp{(\atpat,\expm,E,\VE)}{v}{v'}}
+
+\defnrule[r:d-app-con]
+  {}
+  {\japp{(\con\ v_1\cdots v_k)}{v}{\con\ v_1\cdots v_k\ v}}
+
+\defnrule[r:d-app-basic-partial]
+  {k+1<\arity(b)}
+  {\japp{(b,v_1\cdots v_k)}{v}{(b,v_1\cdots v_k\,v)}}
+
+\defnrule[r:d-app-basic-apply]
+  {k+1=\arity(b)\premsep v'\in\APPLY(b,v_1\cdots v_k\,v)}
+  {\japp{(b,v_1\cdots v_k)}{v}{v'}}
+
+\begin{rulecomments}
+\rcomment{r:d-app-closure} There is no rule in which $\atpat$, matched
+against $v$, gives FAIL: the static semantics requires the pattern of a
+lambda to be exhaustive (Chapter~\ref{ch:static-core}). Were it to fail, no
+rule would apply.
+\rcomment{r:d-app-con} No side condition $k<\arity(\con)$ is needed: in a
+program that elaborates a constructor value is applied only while it awaits
+arguments. Thus \kw{Just} applied to \kw{1} gives the complete constructor
+value \kw{Just 1}.
+\rcomment{r:d-app-basic-apply} The result is any member of the set
+$\APPLY(b,v_1\cdots v_k\,v)$
+(Section~\ref{sec:dynamic-core-basic}). When the set has two members the rule
+does not determine the result: this happens only when an equality test
+reaches two functions, as in \kw{(\textbackslash x -> x) == (\textbackslash
+x -> x)}, which may evaluate to \kw{True} or to \kw{False}. When the set is
+empty, as for \kw{Debug.todo}, the rule never applies, and the application
+has no result. % A51, A62, R9
+\end{rulecomments}
+
+No rule applies the unit value, a special value, a complete constructor
+value, a record, a tuple or an effect value: in a program that elaborates the
+function of an application is always a closure, a constructor value awaiting
+arguments, or a basic value awaiting arguments. The rules of this group are
+the only definition of application; Chapters~\ref{ch:effects}
+and~\ref{ch:programs} use the sentence $\japp{v_1}{v_2}{v}$ to apply function
+values outside any phrase.
+
+\rulegroup{Matches}{\jdgv{E}{v}{\match}{v'/\FAIL}}
+
+\defnrule[r:d-match-first]
+  {\jdgv{E}{v}{\mrule}{v'}}
+  {\jdgv{E}{v}{\mrule\ \opt{\kw{;}\ \match}}{v'}}
+
+\defnrule[r:d-match-fail]
+  {\jdgv{E}{v}{\mrule}{\FAIL}}
+  {\jdgv{E}{v}{\mrule}{\FAIL}}
+
+\defnrule[r:d-match-next]
+  {\jdgv{E}{v}{\mrule}{\FAIL}\premsep\jdgv{E}{v}{\match}{v'/\FAIL}}
+  {\jdgv{E}{v}{\mrule\ \kw{;}\ \match}{v'/\FAIL}}
+
+\begin{rulecomments}
+\rcomment{r:d-match-first} The value being matched stands to the left of
+the turnstile. The match rules are tried in the
+order written, and the first whose pattern matches gives the result; the
+match rules after it are not evaluated, even when their patterns would also
+match. This order is part of the meaning, and is unaffected by the freedom of
+evaluation order (Section~\ref{sec:dynamic-core-rules}), since a rule for a
+later match rule requires every earlier one to give FAIL.
+\end{rulecomments}
+
+\rulegroup{Match Rules}{\jdgv{E}{v}{\mrule}{v'/\FAIL}}
+
+\defnrule[r:d-mrule-match]
+  {\jdgv{E}{v}{\pat}{\VE}\premsep\jdg{E+\VE}{\expm}{v'}}
+  {\jdgv{E}{v}{\pat\ \kw{->}\ \expm}{v'}}
+
+\defnrule[r:d-mrule-fail]
+  {\jdgv{E}{v}{\pat}{\FAIL}}
+  {\jdgv{E}{v}{\pat\ \kw{->}\ \expm}{\FAIL}}
+
+\begin{rulecomments}
+\rcomment{r:d-mrule-fail} The body $\expm$ is not evaluated, so the result
+is FAIL even when $\expm$ has no value.
+\end{rulecomments}
+
+\rulegroup{Declarations}{\jdg{E}{\dec}{\VE}}
+
+\defnrule[r:d-dec-nonrec]
+  {\jdg{E}{\valbind}{\VE}\premsep\Dom\VE\cap\dcoreFV(\valbind)=\emptyset}
+  {\jdg{E}{\valbind}{\VE}}
+
+\defnrule[r:d-dec-rec]
+  {\jdg{E}{\valbind}{\VE}\premsep\Dom\VE\cap\dcoreFV(\valbind)\neq\emptyset}
+  {\jdg{E}{\valbind}{\Rec\VE}}
+
+\begin{rulecomments}
+\rcomment{r:d-dec-nonrec} Rules~\ruleref{r:d-dec-nonrec}
+and~\ruleref{r:d-dec-rec} cover the one production, distinguished by whether the declaration is recursive
+(Section~\ref{sec:dynamic-core-closures}). The right-hand sides are evaluated
+in $E$, without the variables the declaration binds; in a recursive
+declaration every right-hand side is a lambda, and $\Rec$ gives each of its
+closures the bindings of the whole declaration. $\Rec$ is not applied to a
+declaration that is not recursive, since a closure it binds may have been
+made elsewhere, in an environment where a variable spelt as one that the
+declaration binds denotes something else. A \kw{let} declaration needs only
+$\Rec$ because every binding of a recursive \kw{let} declaration is a
+function (Section~\ref{sec:syntax-core-restrictions}); top-level declarations,
+whose recursive members need not be functions, are treated in
+Chapter~\ref{ch:dynamic-modules}. % A26
+\end{rulecomments}
+
+\rulegroup{Value Bindings}{\jdg{E}{\valbind}{\VE}}
+
+\defnrule[r:d-valbind-var]
+  {\jdg{E}{\expm}{v}\premsep\opt{\jdg{E}{\valbind}{\VE}}}
+  {\jdg{E}{\var\ \kw{=}\ \expm\ \opt{\kw{and}\ \valbind}}{\{\var\mapsto v\}\opt{+\,\VE}}}
+
+\defnrule[r:d-valbind-pat]
+  {\jdg{E}{\expm}{v}\premsep\jdgv{E}{v}{\atpat}{\VE}}
+  {\jdg{E}{\atpat\ \kw{=}\ \expm}{\VE}}
+
+\begin{rulecomments}
+\rcomment{r:d-valbind-pat} There is no rule in which $\atpat$, matched
+against $v$, gives FAIL: the static semantics requires the pattern of a value
+binding to be exhaustive (Chapter~\ref{ch:static-core}).
+\end{rulecomments}
+
+\rulegroup{Atomic Patterns}{\jdgv{E}{v}{\atpat}{\VE/\FAIL}}
+
+\defnrule[r:d-atpat-wild]{}{\jdgv{E}{v}{\kw{\_}}{\emptymap}}
+
+\defnrule[r:d-atpat-scon]
+  {v=\valof(\scon)}
+  {\jdgv{E}{v}{\scon}{\emptymap}}
+
+\defnrule[r:d-atpat-scon-fail]
+  {v\neq\valof(\scon)}
+  {\jdgv{E}{v}{\scon}{\FAIL}}
+
+\defnrule[r:d-atpat-var]{}{\jdgv{E}{v}{\var}{\{\var\mapsto v\}}}
+
+\defnrule[r:d-atpat-con]
+  {E(\longcon)=\con\premsep v=\con}
+  {\jdgv{E}{v}{\longcon}{\emptymap}}
+
+\defnrule[r:d-atpat-con-fail]
+  {E(\longcon)=\con\premsep v\neq\con}
+  {\jdgv{E}{v}{\longcon}{\FAIL}}
+
+\defnrule[r:d-atpat-unit]{}{\jdgv{E}{()}{\kw{()}}{\emptymap}}
+
+\defnrule[r:d-atpat-tuple]
+  {v=(v_1,v_2\opt{,v_3})\premsep
+   \jdgv{E}{v_1}{\pat_1}{\VE_1/\FAIL}\\
+   \jdgv{E}{v_2}{\pat_2}{\VE_2/\FAIL}\premsep
+   \opt{\jdgv{E}{v_3}{\pat_3}{\VE_3/\FAIL}}}
+  {\jdgv{E}{v}{\kw{(}\pat_1\kw{,}\ \pat_2\ \opt{\kw{,}\ \pat_3}\kw{)}}
+        {\VE_1/\FAIL+\VE_2/\FAIL\opt{+\,\VE_3/\FAIL}}}
+
+\defnrule[r:d-atpat-nil]{v=\kw{[]}}{\jdgv{E}{v}{\kw{[}\ \kw{]}}{\emptymap}}
+
+\defnrule[r:d-atpat-nil-fail]{v\neq\kw{[]}}{\jdgv{E}{v}{\kw{[}\ \kw{]}}{\FAIL}}
+
+\defnrule[r:d-atpat-record]
+  {v=r\premsep\opt{\jdgv{E}{r}{\patrow}{\VE}}}
+  {\jdgv{E}{v}{\kw{\kwlb}\ \opt{\patrow}\ \kw{\kwrb}}{\emptymap\opt{+\,\VE}}}
+
+\defnrule[r:d-atpat-paren]
+  {\jdgv{E}{v}{\pat}{\VE/\FAIL}}
+  {\jdgv{E}{v}{\kw{(}\pat\kw{)}}{\VE/\FAIL}}
+
+\begin{rulecomments}
+\rcomment{r:d-atpat-scon} A constant in a pattern is an
+integer, character or string constant, never a floating-point one, so the
+test $v=\valof(\scon)$ is identity of special values. An integer constant
+matches the normalised integer it denotes. % A7, A9
+\rcomment{r:d-atpat-var} A variable pattern always binds: constructors and
+variables are spelt differently (Chapter~\ref{ch:syntax-core}), so no
+identifier status is consulted.
+\rcomment{r:d-atpat-unit} For rules~\ruleref{r:d-atpat-unit},
+\ruleref{r:d-atpat-tuple} and~\ruleref{r:d-atpat-record}: in a program that elaborates the value matched has the
+form the pattern requires, so no rule for these patterns gives FAIL on its
+own account; a tuple fails only when a component pattern fails. A record
+pattern matches a record with any further fields.
+\end{rulecomments}
+
+\rulegroup{Pattern Rows}{\jdgv{E}{r}{\patrow}{\VE}}
+
+\defnrule[r:d-patrow-field]
+  {\lab\in\Dom r\premsep\opt{\jdgv{E}{r}{\patrow}{\VE}}}
+  {\jdgv{E}{r}{\lab\ \opt{\kw{,}\ \patrow}}{\{\lab\mapsto r(\lab)\}\opt{+\,\VE}}}
+
+\begin{rulecomments}
+\rcomment{r:d-patrow-field} In the result, $\lab$ stands for the variable
+spelt as the label, which the pattern row binds. The side condition
+$\lab\in\Dom r$ makes the rule apply exactly when $r$ has the field; by
+elaboration it always holds, since a record of the type the pattern requires
+has every field the pattern row names. Hence a pattern row cannot fail, and
+its result is a value environment, never FAIL, as
+rule~\ruleref{r:d-atpat-record} expects. % D5, mechanisation F3, F5
+\end{rulecomments}
+
+\rulegroup{Patterns}{\jdgv{E}{v}{\pat}{\VE/\FAIL}}
+
+\defnrule[r:d-pat-atpat]
+  {\jdgv{E}{v}{\atpat}{\VE/\FAIL}}
+  {\jdgv{E}{v}{\atpat}{\VE/\FAIL}}
+
+\defnrule[r:d-pat-con]
+  {E(\longcon)=\con\premsep v=\con\ v_1\cdots v_n\\
+   \jdgv{E}{v_1}{\atpat_1}{\VE_1/\FAIL}\ \ \cdots\ \
+   \jdgv{E}{v_n}{\atpat_n}{\VE_n/\FAIL}}
+  {\jdgv{E}{v}{\longcon\ \atpat_1\cdots\atpat_n}
+        {\VE_1/\FAIL+\cdots+\VE_n/\FAIL}}
+
+\defnrule[r:d-pat-con-fail]
+  {E(\longcon)=\con\premsep v\notin\{\con\}\times\Val^n}
+  {\jdgv{E}{v}{\longcon\ \atpat_1\cdots\atpat_n}{\FAIL}}
+
+\defnrule[r:d-pat-cons]
+  {v=v_1\mathbin{\kw{::}}v_2\\
+   \jdgv{E}{v_1}{\pat_1}{\VE_1/\FAIL}\premsep
+   \jdgv{E}{v_2}{\pat_2}{\VE_2/\FAIL}}
+  {\jdgv{E}{v}{\pat_1\ \kw{::}\ \pat_2}{\VE_1/\FAIL+\VE_2/\FAIL}}
+
+\defnrule[r:d-pat-cons-fail]
+  {v=\kw{[]}}
+  {\jdgv{E}{v}{\pat_1\ \kw{::}\ \pat_2}{\FAIL}}
+
+\defnrule[r:d-pat-as]
+  {\jdgv{E}{v}{\pat}{\VE/\FAIL}}
+  {\jdgv{E}{v}{\pat\ \kw{as}\ \var}{\VE/\FAIL+\{\var\mapsto v\}}}
+
+\begin{rulecomments}
+\rcomment{r:d-pat-con} Here $n\geq 1$, and by elaboration $n=\arity(\con)$.
+All the argument patterns are matched, and the result is FAIL when any of
+them fails. Since matching has no effect and always has a result, the order
+in which the arguments are matched is immaterial.
+\rcomment{r:d-pat-con-fail} Rules~\ruleref{r:d-atpat-scon-fail},
+\ruleref{r:d-atpat-con-fail}, \ruleref{r:d-atpat-nil-fail},
+\ruleref{r:d-pat-con-fail} and~\ruleref{r:d-pat-cons-fail} are the only rules
+that give FAIL without a premise giving FAIL; every other FAIL comes from
+one of them.
+\rcomment{r:d-pat-as} By the syntactic restrictions, $\var$ is not bound by
+$\pat$, so the modification adds a binding and replaces none.
+\end{rulecomments}

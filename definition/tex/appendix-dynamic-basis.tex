@@ -1,0 +1,1167 @@
+% Values: PRECISE, FAITHFUL
+% Evidence planned:
+% - PRECISE: B0 = ME0 and E0 given module by module, every interface as a
+%   triple (RA, CE, VE) of Chapter 7, the dynamic operator table OT_DYN, every
+%   identifier of the initial static basis (Appendix C) with its value, every
+%   basic value with its arity; APPLY defined for every basic value by displayed definitions:
+%   the floats built from their significands and exponents and rounded by fl;
+%   Int arithmetic through the parameters IntRange and norm; IEEE binary64
+%   arithmetic case by case; powers and elementary functions with their
+%   special values; conversions with saturation; equality (Eq) and order
+%   (cmp) by structural recursion; min, max and clamp (A48, A49);
+%   Booleans, append, Debug, arrays and
+%   byte sequences (A92); the
+%   values written in Elm given by their elm/core 1.0.5 text and evaluated
+%   by the rules of Chapter 6; effect values by reference to Chapter 8.
+% - FAITHFUL: D3 (every operation total: 3 // 0 is 0), D4 (the basic
+%   mathematics defined here, not in a library), D8 (IntRange, norm,
+%   characters, accuracy and Debug.toString left to Appendix E); rulings
+%   A40 to A65 cited beside the definitions they shape; I2: the same
+%   identifiers as Appendix C, module by module.
+
+\chapter{The Initial Dynamic Basis}\label{ch:appendix-dynamic-basis}
+
+We indicate components of the initial basis by the subscript 0, as in
+Appendix~\ref{ch:appendix-static-basis}; in this appendix $\ME_0$, $E_0$ and
+$\VE_0$ denote dynamic objects. The initial dynamic basis is the module
+environment
+\[
+  B_0=\ME_0 ,
+\]
+whose domain is the domain of the static $\ME_0$
+(Section~\ref{sec:appendix-static-basis-modenv}). For each $\modid$ in that
+domain, $\ME_0(\modid)=(\dmRA,\dmCE,\VE)$ is a dynamic interface
+(Section~\ref{sec:dynamic-modules-compound}), given in
+Section~\ref{sec:appendix-dynamic-basis-env}. Every module is evaluated
+starting from the environment
+\[
+  E_0=(\emptymap,\VE_0),\qquad
+  \VE_0=\{\kw{[]}\mapsto\kw{[]},\ \kw{::}\mapsto\kw{::}\},
+\]
+to which its imports add (Chapter~\ref{ch:dynamic-modules}), as statically it
+starts from the environment $E_0$ of
+Section~\ref{sec:appendix-static-basis-modenv}. $E_0$ is an environment of
+Chapter~\ref{ch:dynamic-core}, with an empty qualified environment; it binds
+the two list constructor names to the constructor values they name
+(Section~\ref{sec:dynamic-core-simple}). % decision 2 (audit X4)
+Every identifier of the initial static basis is bound in the initial dynamic
+basis, and the reverse; the hidden identifiers of
+Section~\ref{sec:appendix-static-basis-modenv} are bound only in the
+environments of the texts of Section~\ref{sec:appendix-dynamic-basis-elm}. % I2
+
+The values of the basis are constructor values, special values, closures
+given by the text of the library \kw{elm/core} 1.0.5, and basic values, whose
+meaning is the function $\APPLY$ of Section~\ref{sec:appendix-dynamic-basis-apply}.
+The basic mathematical operations are defined there in full, on the special
+values defined in Section~\ref{sec:appendix-dynamic-basis-svals}; every one
+of them has a result for every argument, a defined value being given even
+where no mathematically correct one exists. % D3, D4
+Three things are left to the implementation and recorded in
+Appendix~\ref{ch:appendix-implementation}: the range of Int with its
+normalisation, the accuracy of the elementary functions on floats, and the
+string that \kw{Debug.toString} gives. % D8
+
+% ===========================================================================
+\section{Special Values}\label{sec:appendix-dynamic-basis-svals}
+
+The class of special values (Section~\ref{sec:dynamic-core-simple}) is the
+disjoint union
+\[
+  \SVal=\IntRange\cup\effFlt\cup\dbChr\cup\effStr
+\]
+of the \emph{Int values}, the \emph{floats}, the \emph{characters} and the
+\emph{strings}, defined below. The union is disjoint: the Int value $3$ and
+the float $3$ are different special values. We write $\mathbb{Z}$ for the set
+of integers and $\mathbb{R}$ for the set of real numbers.
+
+\subsection{Int Values}\label{sec:appendix-dynamic-basis-ints}
+
+The set $\IntRange\subseteq\mathbb{Z}$ of Int values and the
+\emph{normalisation} $\norm:\mathbb{Z}\to\IntRange$ are parameters of the
+definition. Every implementation chooses them so that:
+% A40, A45
+\begin{itemize}
+\item $\IntRange$ has a least member $\min\IntRange$ and a greatest member
+  $\max\IntRange$, and contains every integer between them;
+\item $\min\IntRange\leq -2^{31}$ and $2^{31}-1\leq\max\IntRange$;
+\item if $n\in\IntRange$ and $n\neq\min\IntRange$, then $-n\in\IntRange$;
+\item $\norm(n)=n$ for every $n\in\IntRange$.
+\end{itemize}
+% DECIDED: IntRange is an interval with a least and a greatest member; the
+% saturating conversions of A44 need both bounds.
+The choices of the implementations are given in
+Section~\ref{sec:appendix-implementation-int}. Int values are integers, so Int
+has one zero. % A45
+
+\subsection{Floats}\label{sec:appendix-dynamic-basis-floats}
+
+The \emph{finite non-zero floats} are the real numbers $m\cdot 2^{q}$ and
+$-m\cdot 2^{q}$, where $m$ and $q$ are integers with either
+\[
+  2^{52}\leq m<2^{53}\ \text{and}\ -1074\leq q\leq 971,
+  \quad\text{or}\quad
+  1\leq m<2^{52}\ \text{and}\ q=-1074 .
+\]
+Each has exactly one such representation, and $m$ is its \emph{significand}.
+They are the finite non-zero numbers of the binary64 format of the standard
+IEEE 754-2019. The set of floats is
+\[
+  \effFlt=\{\text{finite non-zero floats}\}\cup\{+0,-0,+\infty,-\infty,\dbNaN\},
+\]
+and $\effFltFin=\effFlt\setminus\{+\infty,-\infty,\dbNaN\}$ is the set of
+\emph{finite} floats. The two zeros are different floats, and so are the two
+infinities. There is one NaN.
+% DECIDED: the many NaNs of the binary64 format are one float here: no basic
+% value of the initial basis distinguishes them.
+In this appendix $x$, $y$ and $z$ range over $\effFlt$.
+
+In a formula, a float other than NaN stands for the number it denotes on the
+extended real line, both zeros denoting $0$; thus $x<y$ and $x=y$ compare
+numbers, and $+0=-0$ holds as a comparison of numbers. That $x$ \emph{is} a
+particular float, such as $-0$, is said in words. For $x\neq\dbNaN$, the
+\emph{sign} $\dbsgn(x)$ is $+1$ when $x$ is $+0$, $+\infty$ or positive, and
+$-1$ when $x$ is $-0$, $-\infty$ or negative. For $s\in\{+1,-1\}$, $s\cdot 0$
+and $s\cdot\infty$ are the zero and the infinity of sign $s$, and for a float
+$z\neq\dbNaN$, $s\cdot z$ is $z$ when $s=+1$ and $z$ with its sign reversed
+when $s=-1$.
+
+Real numbers are rounded to floats by $\dbfl:\mathbb{R}\to\effFlt$, rounding
+to nearest with ties to even as IEEE 754-2019 defines it:
+\begin{itemize}
+\item $\dbfl(r)=+\infty$ if $r\geq 2^{1024}-2^{970}$, and
+  $\dbfl(r)=-\infty$ if $r\leq -(2^{1024}-2^{970})$;
+\item otherwise, if $r\neq 0$, $\dbfl(r)$ is the finite float nearest to $r$
+  and, of two equally near, the one whose significand is even (a zero counting
+  as even); when that float is a zero, it is the zero of the sign of $r$;
+\item $\dbfl(0)=+0$.
+\end{itemize}
+Every Int value $n$ with $|n|\leq 2^{53}$ is a float exactly:
+$\dbfl(n)=n$.
+
+\subsection{Characters and Strings}\label{sec:appendix-dynamic-basis-chars}
+
+The set $\dbChr$ of characters is a parameter of the definition
+(Section~\ref{sec:appendix-implementation-chars}), with an injective function
+\[
+  \dbcode:\dbChr\to\mathbb{Z},
+\]
+the function that the library calls \kw{Char.toCode}. Nothing else is
+required of characters: the initial basis has no operation on characters
+other than equality and order. % A52
+A string is a finite sequence $\dbch_1\cdots\dbch_k$ of characters
+($k\geq 0$), its \emph{length} being $k$; $\effStr$ is the set of strings, and
+$s$ ranges over $\effStr$. A character constant denotes a character and a
+string constant a string (Chapter~\ref{ch:syntax-core}). % A53
+
+% ===========================================================================
+\section{The Value Environments}\label{sec:appendix-dynamic-basis-env}
+
+Every interface of $\ME_0$ has $\dmRA=\emptyset$, since the basis has no
+record alias. The constructor environments are
+\[
+\begin{array}{@{}l@{\ =\ }l@{}}
+  \dmCE\of\ME_0(\kw{Basics}) &
+    \{\kw{Bool}\mapsto\{\kw{True}\mapsto\kw{True},\ \kw{False}\mapsto\kw{False}\},\\
+  \multicolumn{1}{l}{} & \phantom{\{}\kw{Order}\mapsto\{\kw{LT}\mapsto\kw{LT},\
+    \kw{EQ}\mapsto\kw{EQ},\ \kw{GT}\mapsto\kw{GT}\},\\
+  \multicolumn{1}{l}{} & \phantom{\{}\kw{Never}\mapsto\emptymap\},\\
+  \dmCE\of\ME_0(\kw{Maybe}) &
+    \{\kw{Maybe}\mapsto\{\kw{Just}\mapsto\kw{Just},\ \kw{Nothing}\mapsto\kw{Nothing}\}\},\\
+  \dmCE\of\ME_0(\kw{Result}) &
+    \{\kw{Result}\mapsto\{\kw{Ok}\mapsto\kw{Ok},\ \kw{Err}\mapsto\kw{Err}\}\},
+\end{array}
+\]
+and $\dmCE\of\ME_0(\modid)=\emptymap$ for every other $\modid$. Thus $\dmCE$
+maps every custom type that a module of the basis exposes to the constructors
+it exposes, the closed type \kw{Never} to the empty map; the abstract types
+are in the domain of no $\dmCE$. % decision 3 (audit X2, Y2)
+The value environments of the interfaces of $\ME_0$ are shown in
+Figures~\ref{fig:dynamic-basis-basics} to~\ref{fig:dynamic-basis-others}.
+In the figures, a constructor is bound to the constructor value it names,
+whose arity is shown. An identifier shown with an arity is bound to the basic
+value of the same name, which has that arity; we write the basic values of
+\kw{Basics} unqualified (\kw{add}) and those of other modules qualified
+(\kw{Debug.log}), and the basic values of
+Figures~\ref{fig:dynamic-basis-basics} to~\ref{fig:dynamic-basis-others} are
+all distinct. An identifier marked ``Elm'' is bound to the value of its
+elm/core text (Section~\ref{sec:appendix-dynamic-basis-elm}); for \kw{abs},
+to that of its default copy, the copy at $\tFloat$ being bound to a new
+variable (Section~\ref{sec:appendix-dynamic-basis-elm}). % A49
+The identifiers
+\kw{e} and \kw{pi} are bound to floats.
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{|r@{\ }c@{\ }l@{\qquad}c|}
+\hline
+\var\ \text{or}\ \con & \mapsto & v & \arity\\
+\hline
+\kw{True}\citealso{b:Basics.Bool},\ \kw{False}\citealso{b:Basics.Bool} & \mapsto & \kw{True},\ \kw{False} & 0\\
+\kw{LT}\citealso{b:Basics.Order},\ \kw{EQ}\citealso{b:Basics.Order},\ \kw{GT}\citealso{b:Basics.Order} & \mapsto & \kw{LT},\ \kw{EQ},\ \kw{GT} & 0\\
+\hline
+\kw{toFloat}\citealso{b:Basics.toFloat},\ \kw{round}\citealso{b:Basics.round},\ \kw{floor}\citealso{b:Basics.floor},\ \kw{ceiling}\citealso{b:Basics.ceiling},\ \kw{truncate}\citealso{b:Basics.truncate} & \mapsto & \text{basic value} & 1\\
+\kw{compare}\citealso{b:Basics.compare} & \mapsto & \text{basic value} & 2\\
+\kw{min}\citealso{b:Basics.min},\ \kw{max}\citealso{b:Basics.max} & \mapsto & \text{basic value} & 2\\
+\kw{clamp}\citealso{b:Basics.clamp} & \mapsto & \text{basic value} & 3\\
+\kw{not}\citealso{b:Basics.not} & \mapsto & \text{basic value} & 1\\
+\kw{xor}\citealso{b:Basics.xor} & \mapsto & \text{basic value} & 2\\
+\kw{modBy}\citealso{b:Basics.modBy},\ \kw{remainderBy}\citealso{b:Basics.remainderBy} & \mapsto & \text{basic value} & 2\\
+\kw{negate}\citealso{b:Basics.negate} & \mapsto & \text{basic value} & 1\\
+\kw{sqrt}\citealso{b:Basics.sqrt} & \mapsto & \text{basic value} & 1\\
+\kw{cos}\citealso{b:Basics.cos},\ \kw{sin}\citealso{b:Basics.sin},\ \kw{tan}\citealso{b:Basics.tan},\ \kw{acos}\citealso{b:Basics.acos},\ \kw{asin}\citealso{b:Basics.asin},\ \kw{atan}\citealso{b:Basics.atan} & \mapsto & \text{basic value} & 1\\
+\kw{atan2}\citealso{b:Basics.atan2} & \mapsto & \text{basic value} & 2\\
+\kw{isNaN}\citealso{b:Basics.isNaN},\ \kw{isInfinite}\citealso{b:Basics.isInfinite} & \mapsto & \text{basic value} & 1\\
+\hline
+\kw{e}\citealso{b:Basics.e} & \mapsto & \dbfl(\dbeuler) & \\
+\kw{pi}\citealso{b:Basics.pi} & \mapsto & \dbfl(\dbpinum) & \\
+\hline
+\kw{abs}\citealso{b:Basics.abs} & \mapsto & \text{Elm} & \\
+\kw{logBase}\citealso{b:Basics.logBase},\ \kw{degrees}\citealso{b:Basics.degrees},\ \kw{radians}\citealso{b:Basics.radians},\ \kw{turns}\citealso{b:Basics.turns} & \mapsto & \text{Elm} & \\
+\kw{fromPolar}\citealso{b:Basics.fromPolar},\ \kw{toPolar}\citealso{b:Basics.toPolar} & \mapsto & \text{Elm} & \\
+\kw{identity}\citealso{b:Basics.identity},\ \kw{always}\citealso{b:Basics.always},\ \kw{never}\citealso{b:Basics.never} & \mapsto & \text{Elm} & \\
+\hline
+\end{array}
+\]
+\caption{Dynamic $\VE$ of $\ME_0(\kw{Basics})$}\label{fig:dynamic-basis-basics}
+\end{figure}
+
+Each operator of the initial basis stands for a hidden variable of
+\kw{Basics} or, for \kw{::}, the list constructor
+(Figure~\ref{fig:static-basis-operators}). The \emph{dynamic operator table}
+\[
+  \OTdyn : \cls{Op} \finmap \Val
+\]
+maps each operator of Figure~\ref{fig:core-fixities} to the value of the
+identifier it stands for, and is given in
+Figure~\ref{fig:dynamic-basis-operators}. The value of an operator is
+$\OTdyn(\opv)$ in every environment: it is looked up in no environment and
+reached through no interface. % A16, A56; decision 1 (audit X1)
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{|c@{\quad}l@{\ }c@{\ }l@{\qquad}c|}
+\hline
+\opv & \text{stands for} & \mapsto & \OTdyn(\opv) & \arity\\
+\hline
+\kw{<<},\ \kw{>>} & \kw{composeL}\citealso{b:Basics.composeL},\ \kw{composeR}\citealso{b:Basics.composeR} & \mapsto & \text{Elm} & \\
+\kw{\textasciicircum} & \kw{pow}\citealso{b:Basics.pow} & \mapsto & \text{basic value} & 2\\
+\kw{*},\ \kw{/},\ \kw{//} & \kw{mul}\citealso{b:Basics.mul},\ \kw{fdiv}\citealso{b:Basics.fdiv},\ \kw{idiv}\citealso{b:Basics.idiv} & \mapsto & \text{basic value} & 2\\
+\kw{+},\ \kw{-} & \kw{add}\citealso{b:Basics.add},\ \kw{sub}\citealso{b:Basics.sub} & \mapsto & \text{basic value} & 2\\
+\kw{++} & \kw{append}\citealso{b:Basics.append} & \mapsto & \text{basic value} & 2\\
+\kw{::} & \kw{::}\citealso{b:List} & \mapsto & \kw{::} & 2\\
+\kw{==},\ \kw{/=} & \kw{eq}\citealso{b:Basics.eq},\ \kw{neq}\citealso{b:Basics.neq} & \mapsto & \text{basic value} & 2\\
+\kw{<},\ \kw{>},\ \kw{<=},\ \kw{>=} & \kw{lt}\citealso{b:Basics.lt},\ \kw{gt}\citealso{b:Basics.gt},\ \kw{le}\citealso{b:Basics.le},\ \kw{ge}\citealso{b:Basics.ge} & \mapsto & \text{basic value} & 2\\
+\kw{\&\&},\ \kw{||} & \kw{and}\citealso{b:Basics.and},\ \kw{or}\citealso{b:Basics.or} & \mapsto & \text{basic value} & 2\\
+\kw{|>},\ \kw{<|} & \kw{apR}\citealso{b:Basics.apR},\ \kw{apL}\citealso{b:Basics.apL} & \mapsto & \text{Elm} & \\
+\hline
+\end{array}
+\]
+\caption{The Dynamic Operator Table, $\OTdyn$}\label{fig:dynamic-basis-operators}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{|r@{\ }c@{\ }l@{\qquad}c|}
+\hline
+\var\ \text{or}\ \con & \mapsto & v & \arity\\
+\hline
+\multicolumn{4}{|l|}{\kw{Maybe}}\\
+\hline
+\kw{Just}\citealso{b:Maybe.Maybe} & \mapsto & \kw{Just} & 1\\
+\kw{Nothing}\citealso{b:Maybe.Maybe} & \mapsto & \kw{Nothing} & 0\\
+\hline
+\multicolumn{4}{|l|}{\kw{Result}}\\
+\hline
+\kw{Ok}\citealso{b:Result.Result},\ \kw{Err}\citealso{b:Result.Result} & \mapsto & \kw{Ok},\ \kw{Err} & 1\\
+\hline
+\multicolumn{4}{|l|}{\kw{Debug}}\\
+\hline
+\kw{log}\citealso{b:Debug.log} & \mapsto & \text{basic value} & 2\\
+\kw{todo}\citealso{b:Debug.todo},\ \kw{toString}\citealso{b:Debug.toString} & \mapsto & \text{basic value} & 1\\
+\hline
+\multicolumn{4}{|l|}{\kw{Platform}}\\
+\hline
+\kw{worker}\citealso{b:Platform.worker} & \mapsto & \text{basic value} & 1\\
+\hline
+\multicolumn{4}{|l|}{\kw{Platform.Cmd}\ \text{and}\ \kw{Platform.Sub}}\\
+\hline
+\kw{none}\citealso{b:Platform.Cmd.none}\citealso{b:Platform.Sub.none} & \mapsto & \text{Elm} & \\
+\kw{batch}\citealso{b:Platform.Cmd.batch}\citealso{b:Platform.Sub.batch} & \mapsto & \text{basic value} & 1\\
+\kw{map}\citealso{b:Platform.Cmd.map}\citealso{b:Platform.Sub.map} & \mapsto & \text{basic value} & 2\\
+\hline
+\multicolumn{4}{|l|}{\kw{Task}}\\
+\hline
+\kw{succeed}\citealso{b:Task.succeed},\ \kw{fail}\citealso{b:Task.fail} & \mapsto & \text{basic value} & 1\\
+\kw{andThen}\citealso{b:Task.andThen},\ \kw{onError}\citealso{b:Task.onError} & \mapsto & \text{basic value} & 2\\
+\kw{map}\citealso{b:Task.map},\ \kw{map2}\citealso{b:Task.map2},\ \kw{map3}\citealso{b:Task.map3},\ \kw{map4}\citealso{b:Task.map4},\ \kw{map5}\citealso{b:Task.map5} & \mapsto & \text{Elm} & \\
+\kw{sequence}\citealso{b:Task.sequence},\ \kw{mapError}\citealso{b:Task.mapError},\ \kw{perform}\citealso{b:Task.perform},\ \kw{attempt}\citealso{b:Task.attempt} & \mapsto & \text{Elm} & \\
+\hline
+\multicolumn{4}{|l|}{\kw{Process}}\\
+\hline
+\kw{spawn}\citealso{b:Process.spawn},\ \kw{sleep}\citealso{b:Process.sleep},\ \kw{kill}\citealso{b:Process.kill} & \mapsto & \text{basic value} & 1\\
+\hline
+\end{array}
+\]
+\caption{Dynamic $\VE$ of the Other Modules of $\ME_0$}\label{fig:dynamic-basis-others}
+\end{figure}
+
+The interfaces of the modules \kw{List}, \kw{Tuple}, \kw{String}, \kw{Char},
+\kw{Array}, \kw{Bytes}, \kw{Json.\allowbreak Encode}, \kw{Json.\allowbreak Decode},
+\kw{VirtualDom} and \kw{Html} are $(\emptyset,\emptymap,\emptymap)$: these
+modules are in $\ME_0$ for their types, which have no dynamic counterpart
+(the values of \kw{Array} and \kw{Bytes} being given in
+Sections~\ref{sec:appendix-dynamic-basis-arrays}
+and~\ref{sec:appendix-dynamic-basis-bytes}). The interfaces of \kw{Platform},
+\kw{Platform.Cmd}, \kw{Platform.Sub}, \kw{Task}, \kw{Process} and \kw{Debug}
+are $(\emptyset,\emptymap,\VE)$, with $\VE$ as in
+Figure~\ref{fig:dynamic-basis-others}. These interfaces have the property of
+Section~\ref{sec:dynamic-modules-compound}. The basic values
+\kw{Platform.\allowbreak Cmd.\allowbreak batch} and
+\kw{Platform.\allowbreak Cmd.\allowbreak map}, and their counterparts in \kw{Platform.Sub}, are written
+\kw{Cmd.batch}, \kw{Cmd.map}, \kw{Sub.batch} and \kw{Sub.map} in
+Chapter~\ref{ch:effects}, after the qualifiers of the default imports.
+
+Besides those of the figures, the class BasVal contains the following basic
+values, which are bound to no identifier of the basis: the basic value
+\kw{Elm.\allowbreak Kernel.\allowbreak Basics.\allowbreak log} of arity $1$
+(Section~\ref{sec:appendix-dynamic-basis-elm}); the basic value
+\kw{Task.command} of arity $1$, to which the environment of the texts of
+\kw{Task} binds the hidden variable \kw{command}
+(Section~\ref{sec:appendix-dynamic-basis-elm}), and whose $\APPLY$ is given in
+Section~\ref{sec:effects-apply}; the basic values
+\kw{Array.fromList} and \kw{Array.toList} of arity $1$, which
+Chapter~\ref{ch:effects} applies to encode and decode arrays at ports
+(Section~\ref{sec:appendix-dynamic-basis-arrays}); and the values of ports,
+$\effoutport(\effp,\tau)$ and $\effinport(\effp,\tau)$, of arity $1$
+(Section~\ref{sec:effects-ports}).
+
+% ===========================================================================
+\section{Values Written in Elm}\label{sec:appendix-dynamic-basis-elm}
+
+A value of the basis whose definition in elm/core 1.0.5 is written in Elm is
+defined by that text, except \kw{min}, \kw{max}, \kw{clamp} and
+\kw{negate}, which are basic values (below); the other basic values are
+those whose definition is a reference to the kernel. % A60, A48, A49
+The texts of the values of \kw{Basics} marked ``Elm'' in
+Figures~\ref{fig:dynamic-basis-basics} and~\ref{fig:dynamic-basis-operators}
+are shown in Figure~\ref{fig:dynamic-basis-elm}, as they stand in the file
+\kw{Basics.elm} of elm/core 1.0.5.
+
+\begin{figure}[htbp]
+\centering
+\small
+\begin{minipage}[t]{0.48\textwidth}
+\footnotesize
+\begin{verbatim}
+abs n =
+  if lt n 0 then -n else n
+
+logBase base number =
+  fdiv
+    (Elm.Kernel.Basics.log number)
+    (Elm.Kernel.Basics.log base)
+
+radians angleInRadians =
+  angleInRadians
+
+degrees angleInDegrees =
+  fdiv (mul angleInDegrees pi) 180
+
+turns angleInTurns =
+  mul (mul 2 pi) angleInTurns
+\end{verbatim}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\footnotesize
+\begin{verbatim}
+fromPolar (radius, theta) =
+  ( mul radius (cos theta)
+  , mul radius (sin theta)
+  )
+
+toPolar ( x, y ) =
+  ( sqrt (add (mul x x) (mul y y))
+  , atan2 y x
+  )
+
+composeL g f x =
+  g (f x)
+
+composeR f g x =
+  g (f x)
+
+apR x f =
+  f x
+
+apL f x =
+  f x
+
+identity x =
+  x
+
+always a _ =
+  a
+
+never (JustOneMore nvr) =
+  never nvr
+\end{verbatim}
+\end{minipage}
+\caption{The Values of \kw{Basics} Written in Elm}\label{fig:dynamic-basis-elm}
+\end{figure}
+
+Each text of Figure~\ref{fig:dynamic-basis-elm} is a declaration $\dec$ that,
+by the derived forms of Appendix~\ref{ch:appendix-derived-forms}, has the
+form $\var\ \kw{=}\ \kw{\textbackslash}\,\atpat\ \kw{->}\ \expm$. Let
+\[
+  \begin{array}{@{}l@{}}
+  E_{\mathrm{K}}=E_0+(\QE_{\mathrm{K}},\VE_{\mathrm{K}}),\quad\text{where}\\[0.5ex]
+  \QE_{\mathrm{K}}=\{\kw{Elm.Kernel.Basics}\mapsto(\emptymap,\{\kw{log}\mapsto\kw{Elm.Kernel.Basics.log}\}),\\
+  \phantom{\QE_{\mathrm{K}}=\{}\kw{Basics}\mapsto(\emptymap,\VE_{\mathrm{K}})\},
+  \end{array}
+\]
+and $\VE_{\mathrm{K}}$ binds every identifier of \kw{Basics} that
+Figures~\ref{fig:dynamic-basis-basics} and~\ref{fig:dynamic-basis-operators}
+do not mark ``Elm'' to the value shown there, the hidden variables of the
+operators included, and binds the hidden constructor \kw{JustOneMore} of the
+closed type \kw{Never} to the constructor value \kw{JustOneMore} of arity
+$1$. The qualifier \kw{Basics} is bound in $E_{\mathrm{K}}$ to the
+environment of the identifiers of \kw{Basics} that $\VE_{\mathrm{K}}$ binds,
+so that the long identifiers \kw{Basics.True}, \kw{Basics.False} and
+\kw{Basics.negate} that the derived forms of
+Appendix~\ref{ch:appendix-derived-forms} introduce into these texts (by
+\kw{if} and by prefix minus) denote the values \kw{True}, \kw{False} and
+\kw{negate} of Figure~\ref{fig:dynamic-basis-basics}; the texts are part of
+the definition, not of a program, so the rule that a module cannot qualify
+its own names (A38) does not apply to them.
+% audit X18, V3; A38 governs programs only
+No text refers
+to a value that another text defines. The value bound to $\var$ in
+$\ME_0(\kw{Basics})$ is $\VE(\var)$, where
+\[
+  \jdg{E_{\mathrm{K}}}{\dec}{\VE}
+\]
+by rule~\ruleref{r:d-dec-nonrec}, or, for \kw{never}, whose declaration is
+recursive, by rule~\ruleref{r:d-dec-rec}. In each case $\VE$ is unique: it
+binds $\var$ to a closure. % DECIDED: the kernel reference
+% Elm.Kernel.Basics.log in the text of logBase denotes a basic value; kernel
+% references are outside Standard Elm (A16), so the environment of the text
+% supplies it. JustOneMore is bound only in that environment.
+In the text of \kw{abs}, \kw{-n} is the derived form \kw{Basics.negate n};
+the text of \kw{negate} itself is \kw{-n}, which by that derived form would
+apply \kw{negate} to its own argument, so \kw{negate} is a basic value.
+% DECIDED: negate is a basic value; its elm/core text is circular under the
+% derived form of prefix minus.
+\kw{min} and \kw{max} are basic values at every comparable type: at floats
+their $\APPLY$ is the minimum and maximum of IEEE 754-2019, which their
+elm/core texts do not give, and at every other comparable type it is the
+result of those texts (Section~\ref{sec:appendix-dynamic-basis-order}). % A48
+\kw{clamp} is a basic value likewise: at floats its $\APPLY$ is built on the
+minimum and maximum of IEEE 754-2019, which its elm/core text does not
+give, and at Int values it is the result of that text
+(Sections~\ref{sec:appendix-dynamic-basis-floatarith}
+and~\ref{sec:appendix-dynamic-basis-order}). % A48, A49
+\kw{Debug.log}, \kw{Debug.todo} and \kw{Debug.toString} are kernel
+references in elm/core, and are basic values.
+
+The values of \kw{Platform.Cmd}, \kw{Platform.Sub} and \kw{Task} marked
+``Elm'' in Figure~\ref{fig:dynamic-basis-others} are defined in the same way
+by their texts in the files \kw{Platform/\allowbreak Cmd.elm},
+\kw{Platform/\allowbreak Sub.elm} and \kw{Task.elm} of elm/core 1.0.5. The
+text of a value of the module $\modid$ is evaluated in the environment
+\[
+  E_{\modid}=E_0+(\QE_{\modid},\VE_{\modid}),
+\]
+where $\QE_{\modid}$ binds each qualifier that the texts of $\modid$ use to
+an environment binding the identifiers they write under it, to their values
+in $\ME_0$ or, for a further function of elm/core, to the value of its text
+(below), and $\VE_{\modid}$ binds the identifiers of the interfaces
+of $\modid$ and of the modules it imports unqualified (among them the
+constructors \kw{Ok} and \kw{Err}) to their values in $\ME_0$. The values
+marked ``Elm'' are taken in an order in which each text refers only to values
+already defined: \kw{Task.map} before \kw{Task.perform}, and \kw{Task.map2}
+before \kw{Task.sequence}. For $\modid=\kw{Task}$, $\VE_{\kw{Task}}$ also binds
+the two hidden identifiers of \kw{Task}
+(Section~\ref{sec:appendix-static-basis-modenv}): the variable \kw{command}
+to the basic value \kw{Task.command}, whose $\APPLY$ is that of
+Figure~\ref{fig:effects-apply}, and the constructor \kw{Perform} of the
+custom type \kw{MyCmd} to the constructor value \kw{Perform}, of arity $1$.
+Neither is in $\ME_0(\kw{Task})$. The texts of \kw{Task.perform} and
+\kw{Task.attempt} apply \kw{command} to a value \kw{Perform}~$\tk$, which
+$\APPLY$ makes a leaf command of the task manager. % A60, A85; decision 5 (audit X9, Y3)
+Where such a text refers to a further function of elm/core
+(\kw{Task.sequence} applies \kw{List.foldr}), that function is defined by its
+text likewise, and the kernel function \kw{Elm.Kernel.List.cons} is the list
+constructor \kw{::}. Chapter~\ref{ch:effects} states what these texts give
+(Section~\ref{sec:effects-apply}). % A60, A85
+
+The texts are specialised over their \kw{number} variables with the rest of
+the program (Section~\ref{sec:dynamic-core-numbers}): the copy of \kw{abs} used
+at $\tFloat$ compares with the float $0$, and the constants \kw{180} and
+\kw{2} in the texts of \kw{degrees} and \kw{turns}, whose type is $\tFloat$,
+denote floats. % A87
+Of the values of the basis written in Elm, only \kw{abs} has a type scheme
+that quantifies a variable of class $\knum$
+(Figure~\ref{fig:static-basis-basics-ve1}); the identifier \kw{abs} of
+Figure~\ref{fig:dynamic-basis-basics} is bound to its default copy, at
+$\tInt$. Besides this, the value environment of $\ME_0(\kw{Basics})$ binds
+the new variable of the copy of the declaration of \kw{abs} at $\tFloat$
+that the specialisation makes, to the value of that copy, evaluated in
+$E_{\mathrm{K}}$ as the default copy is. An occurrence of \kw{abs} at
+$\tFloat$ thus finds its copy: qualified, through the qualifier
+\kw{Basics}; unqualified, through the default import
+\kw{import Basics exposing (..)}, whose exposing list gives the whole of
+that value environment; and through an exposing item \kw{abs} of an
+import, which stands for the variable and the new variable of its copy
+(Section~\ref{sec:dynamic-modules-reduced}).
+So \kw{abs 1.5} is the float $1.5$. % A87; audit V1
+% A49: clamp, whose type scheme also quantifies a variable of class number,
+% is a basic value, so specialisation makes no copy of it; its APPLY
+% dispatches on its arguments, as that of add does.
+
+Thus the order in which a basis function written in Elm applies the functions
+it is given, for instance \kw{List.foldr} from the last element of its list,
+is fixed by its text. % A60
+Consequences of the texts of Figure~\ref{fig:dynamic-basis-elm} that the
+definitions of Section~\ref{sec:appendix-dynamic-basis-apply} make visible
+are noted there. % A40, A60
+
+% ===========================================================================
+\section{The Function APPLY}\label{sec:appendix-dynamic-basis-apply}
+
+For a basic value $b$ of arity $n$ and values $v_1,\ldots,v_n$,
+$\APPLY(b,v_1\cdots v_n)$ is a finite set of values
+(Section~\ref{sec:dynamic-core-basic}); in this section we separate the
+arguments by commas, writing $\APPLY(b,v_1,\ldots,v_n)$. The set has exactly
+one member except where stated: it has two members when an equality test
+reaches two functions (Section~\ref{sec:appendix-dynamic-basis-eq}), and none
+for \kw{Debug.todo} (Section~\ref{sec:appendix-dynamic-basis-debug}).
+In this section $m$ and $n$ range over $\IntRange$, $x$, $y$ and $z$ over
+$\effFlt$, and $s$ and $s'$ over $\effStr$.
+The definitions cover every argument that the evaluation of a program that
+elaborates supplies to $b$.
+
+\textbf{Overloading.} The basic values \kw{add}, \kw{sub}, \kw{mul},
+\kw{pow}, \kw{negate} and \kw{clamp} act on Int values and on floats; \kw{compare},
+\kw{lt}, \kw{gt}, \kw{le}, \kw{ge}, \kw{min} and \kw{max} on all comparable
+values; \kw{append} on
+strings and on lists; \kw{eq} and \kw{neq} on all values. $\APPLY$ dispatches
+on the special values it is given: each case is defined below for each kind of
+argument. Before evaluation a program is specialised over its \kw{number}
+variables, so that every integer constant has the type $\tInt$ or $\tFloat$,
+and an integer constant of type $\tFloat$ denotes the nearest float
+(Section~\ref{sec:dynamic-core-numbers}). % A87
+Hence both arguments of a number operation are Int values or both are floats,
+the three arguments of \kw{clamp} are all Int values or all floats, every
+argument of a basic value of floats is a float, and an Int value never
+meets a float in equality or order. % A49
+
+% ===========================================================================
+\subsection{Int Arithmetic}\label{sec:appendix-dynamic-basis-intarith}
+
+For real $r$, $\lfloor r\rfloor$ is the greatest integer at most $r$,
+$\lceil r\rceil$ the least integer at least $r$, and $\dbtrunc(r)$ is
+$\lfloor r\rfloor$ when $r\geq 0$ and $\lceil r\rceil$ when $r<0$. On Int
+values, $\APPLY$ is given in Figure~\ref{fig:dynamic-basis-int}. An exact
+result is normalised into $\IntRange$; where an operation has no
+mathematically correct result, the result is $0$. % D3, A40, A41, A42, A43
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+\APPLY(\kw{add},m,n) & = & \{\norm(m+n)\} & \\
+\APPLY(\kw{sub},m,n) & = & \{\norm(m-n)\} & \\
+\APPLY(\kw{mul},m,n) & = & \{\norm(m\cdot n)\} & \\
+\APPLY(\kw{negate},n) & = & \{\norm(-n)\} & \\[1ex]
+\APPLY(\kw{idiv},m,n) & = & \{\norm(\dbtrunc(m/n))\} & \text{if}\ n\neq 0\\
+                      & = & \{0\} & \text{if}\ n=0\\[1ex]
+\APPLY(\kw{modBy},n,m) & = & \{m-n\cdot\lfloor m/n\rfloor\} & \text{if}\ n\neq 0\\
+                       & = & \{0\} & \text{if}\ n=0\\[1ex]
+\APPLY(\kw{remainderBy},n,m) & = & \{m-n\cdot\dbtrunc(m/n)\} & \text{if}\ n\neq 0\\
+                             & = & \{0\} & \text{if}\ n=0\\[1ex]
+\APPLY(\kw{pow},m,n) & = & \{\norm(m^{n})\} & \text{if}\ n\geq 0\\
+                     & = & \{1\} & \text{if}\ n<0\ \text{and}\ m=1\\
+                     & = & \{(-1)^{n}\} & \text{if}\ n<0\ \text{and}\ m=-1\\
+                     & = & \{0\} & \text{if}\ n<0\ \text{and}\ m\notin\{1,-1\}
+\end{array}
+\]
+\caption{$\APPLY$ on Int Values}\label{fig:dynamic-basis-int}
+\end{figure}
+
+In the figure, $m^{0}=1$ for every $m$, including $0$. The first argument of
+\kw{modBy} and \kw{remainderBy} is the divisor: \kw{modBy 4 -5} is $3$ and
+\kw{remainderBy 4 -5} is $-1$. The following property, which may easily be
+demonstrated, shows that \kw{modBy} and \kw{remainderBy} need no
+normalisation.
+\begin{property}
+For $n\neq 0$, $m-n\cdot\lfloor m/n\rfloor$ is $0$ or has the sign of $n$,
+$m-n\cdot\dbtrunc(m/n)$ is $0$ or has the sign of $m$, and both are less than
+$|n|$ in absolute value; hence both are members of $\IntRange$.
+\end{property}
+Thus \kw{3 // 0}, \kw{modBy 0 3} and \kw{remainderBy 0 3} are all $0$, and
+\kw{1 \textasciicircum{} -1} is $1$, \kw{(-1) \textasciicircum{} -3} is $-1$
+and \kw{2 \textasciicircum{} -1} is $0$. % D3, A42, A43
+The quotient \kw{($\min\IntRange$) // -1} is $\norm(-\min\IntRange)$. % A41
+By the text of \kw{abs} (Figure~\ref{fig:dynamic-basis-elm}), \kw{abs n} is
+$\norm(|n|)$. % A40
+
+% ===========================================================================
+\subsection{Floating-Point Arithmetic}\label{sec:appendix-dynamic-basis-floatarith}
+
+On floats, \kw{add}, \kw{sub}, \kw{mul}, \kw{fdiv}, \kw{negate} and
+\kw{sqrt} are the operations of IEEE 754-2019 on binary64 numbers, rounding
+to nearest with ties to even; Figure~\ref{fig:dynamic-basis-float} gives them
+case by case, the first applicable line giving the result.
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+\APPLY(\kw{negate},x) & = & \{\dbNaN\} & \text{if}\ x\ \text{is}\ \dbNaN\\
+                      & = & \{(-1)\cdot x\} & \text{otherwise}\\[1ex]
+\APPLY(\kw{add},x,y) & = & \{\dbNaN\} & \text{if}\ x\ \text{or}\ y\ \text{is}\ \dbNaN,\\
+                     &   &             & \text{or}\ \{x,y\}=\{+\infty,-\infty\}\\
+                     & = & \{x\} & \text{if}\ x\in\{+\infty,-\infty\}\\
+                     & = & \{y\} & \text{if}\ y\in\{+\infty,-\infty\}\\
+                     & = & \{-0\} & \text{if}\ x\ \text{and}\ y\ \text{are both}\ -0\\
+                     & = & \{\dbfl(x+y)\} & \text{otherwise}\\[1ex]
+\APPLY(\kw{sub},x,y) & = & \APPLY(\kw{add},x,z) & \text{where}\ \APPLY(\kw{negate},y)=\{z\}\\[1ex]
+\APPLY(\kw{mul},x,y) & = & \{\dbNaN\} & \text{if}\ x\ \text{or}\ y\ \text{is}\ \dbNaN,\\
+                     &   &             & \text{or one is a zero and one an infinity}\\
+                     & = & \{\dbsgn(x)\dbsgn(y)\cdot\infty\} & \text{if}\ x\ \text{or}\ y\ \text{is an infinity}\\
+                     & = & \{\dbsgn(x)\dbsgn(y)\cdot 0\} & \text{if}\ x\ \text{or}\ y\ \text{is a zero}\\
+                     & = & \{\dbfl(x\cdot y)\} & \text{otherwise}\\[1ex]
+\APPLY(\kw{fdiv},x,y) & = & \{\dbNaN\} & \text{if}\ x\ \text{or}\ y\ \text{is}\ \dbNaN,\\
+                      &   &             & \text{or both are zeros, or both infinities}\\
+                      & = & \{\dbsgn(x)\dbsgn(y)\cdot\infty\} & \text{if}\ x\ \text{is an infinity,}\ \text{or}\ y\ \text{a zero}\\
+                      & = & \{\dbsgn(x)\dbsgn(y)\cdot 0\} & \text{if}\ x\ \text{is a zero,}\ \text{or}\ y\ \text{an infinity}\\
+                      & = & \{\dbfl(x/y)\} & \text{otherwise}\\[1ex]
+\APPLY(\kw{sqrt},x) & = & \{\dbNaN\} & \text{if}\ x\ \text{is}\ \dbNaN,\ \text{or}\ x<0\\
+                    & = & \{x\} & \text{if}\ x\in\{+0,-0,+\infty\}\\
+                    & = & \{\dbfl(\sqrt{x})\} & \text{otherwise}
+\end{array}
+\]
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+\APPLY(\kw{isNaN},x) & = & \{\kw{True}\} & \text{if}\ x\ \text{is}\ \dbNaN\\
+                     & = & \{\kw{False}\} & \text{otherwise}\\[1ex]
+\APPLY(\kw{isInfinite},x) & = & \{\kw{True}\} & \text{if}\ x\in\{+\infty,-\infty\}\\
+                          & = & \{\kw{False}\} & \text{otherwise}
+\end{array}
+\]
+\caption{$\APPLY$ on Floats: Arithmetic}\label{fig:dynamic-basis-float}
+\end{figure}
+
+Thus \kw{1 / 0} is $+\infty$, \kw{1 / -0} is $-\infty$, \kw{0 / 0} is NaN,
+and \kw{x - x} is $+0$ for every finite \kw{x}. In the case $x<0$ of
+\kw{sqrt}, $x$ is not a zero, so \kw{sqrt -0} is $-0$. By the text of
+\kw{abs}, \kw{abs -0} is $-0$ and \kw{abs} of NaN is NaN, since
+\kw{lt} is false for both (Section~\ref{sec:appendix-dynamic-basis-order}).
+
+At floats, \kw{min} and \kw{max} are the operations \emph{minimum} and
+\emph{maximum} of IEEE 754-2019, the first applicable line giving the
+result: % A48
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+\APPLY(\kw{min},x,y) & = & \{\dbNaN\} & \text{if}\ x\ \text{or}\ y\ \text{is}\ \dbNaN\\
+                     & = & \{-0\} & \text{if}\ x\ \text{and}\ y\ \text{are zeros and one of them is}\ {-0}\\
+                     & = & \{x\} & \text{if}\ x\leq y\\
+                     & = & \{y\} & \text{otherwise}\\[1ex]
+\APPLY(\kw{max},x,y) & = & \{\dbNaN\} & \text{if}\ x\ \text{or}\ y\ \text{is}\ \dbNaN\\
+                     & = & \{+0\} & \text{if}\ x\ \text{and}\ y\ \text{are zeros and one of them is}\ {+0}\\
+                     & = & \{x\} & \text{if}\ x\geq y\\
+                     & = & \{y\} & \text{otherwise}.
+\end{array}
+\]
+These lines apply when both arguments are floats; at the other comparable
+values $\APPLY$ takes the cases of
+Section~\ref{sec:appendix-dynamic-basis-order}. The case is selected by the
+arguments, as for \kw{lt}: the type schemes of \kw{min} and \kw{max}
+quantify a variable of class $\kcomp$, not $\knum$, so number
+specialisation makes no copy of them
+(Section~\ref{sec:dynamic-core-numbers}). The result does not depend
+on the order of the arguments: with \kw{nan} for \kw{0/0}, \kw{max nan 1}
+and \kw{max 1 nan} are both NaN, \kw{max 0 -0} and \kw{max -0 0} are $+0$,
+and \kw{min -0 0} and \kw{min 0 -0} are $-0$. % A48
+
+At floats, \kw{clamp} is built on these operations: % A48, A49
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+\APPLY(\kw{clamp},x,y,z) & = & \APPLY(\kw{min},z',y) &\\
+ & & \multicolumn{2}{@{}l@{}}{\quad\text{where}\ \APPLY(\kw{max},z,x)=\{z'\},}
+\end{array}
+\]
+when $x$, $y$ and $z$ are floats; the first argument is the lower bound,
+the second the upper bound, and \kw{clamp lo hi x} is
+\kw{min (max x lo) hi}. At Int values $\APPLY$ takes the cases of
+Section~\ref{sec:appendix-dynamic-basis-order}; the case is selected by the
+arguments, as for \kw{add}. When \kw{lo} is greater than \kw{hi}, the
+result is \kw{hi} unless an argument is NaN: \kw{clamp 10 0 5} is $+0$.
+A NaN in any argument gives NaN: \kw{clamp 0 1 nan}, \kw{clamp nan 1 0.5}
+and \kw{clamp 0 nan 0.5} are all NaN. Zeros are ordered as by
+\kw{max} and \kw{min}: \kw{clamp 0 1 -0} is $+0$, the maximum of $-0$ and
+$+0$ being $+0$, and \kw{clamp -1 -0 0} is $-0$.
+% A48, A49
+
+% ===========================================================================
+\subsection{Powers and Elementary Functions}\label{sec:appendix-dynamic-basis-elementary}
+
+The power at floats, the trigonometric functions, and the logarithm
+\kw{Elm.\allowbreak Kernel.\allowbreak Basics.\allowbreak log} on which \kw{logBase} is built, denote the real
+functions $x^{y}$, $\sin$, $\cos$, $\tan$, $\arcsin$, $\arccos$, $\arctan$,
+the natural logarithm $\ln$, and the two-argument arctangent, rounded to a
+float, with the special values that IEEE 754-2019 (Section 9.2) recommends.
+% A65
+The two-argument arctangent of a point $(x,y)\neq(0,0)$ is the angle
+$\theta$ with $-\dbpinum<\theta\leq\dbpinum$ such that
+$(x,y)=\rho\cdot(\cos\theta,\sin\theta)$ for some $\rho>0$; the first argument
+of \kw{atan2} is $y$. The power is given in
+Figure~\ref{fig:dynamic-basis-pow} and the other functions in
+Figure~\ref{fig:dynamic-basis-elem}; in each, the first applicable line gives
+the result. An integer $k$ is \emph{odd} when $k=2j+1$ for an integer $j$.
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+\APPLY(\kw{pow},x,y) & = & \{1\} & \text{if}\ y\ \text{is a zero}\\
+  & = & \{1\} & \text{if}\ x\ \text{is}\ 1\\
+  & = & \{\dbNaN\} & \text{if}\ x\ \text{or}\ y\ \text{is}\ \dbNaN\\
+  & = & \{\dbsgn(x)\cdot\infty\} & \text{if}\ x\ \text{is a zero and}\ y<0\ \text{an odd integer}\\
+  & = & \{+\infty\} & \text{if}\ x\ \text{is a zero and}\ y<0\\
+  & = & \{x\} & \text{if}\ x\ \text{is a zero and}\ y>0\ \text{an odd integer}\\
+  & = & \{+0\} & \text{if}\ x\ \text{is a zero and}\ y>0\\
+  & = & \{1\} & \text{if}\ x=-1\ \text{and}\ y\in\{+\infty,-\infty\}\\
+  & = & \{+0\} & \text{if}\ |x|<1\ \text{and}\ y=+\infty\\
+  & = & \{+0\} & \text{if}\ |x|>1\ \text{and}\ y=-\infty\\
+  & = & \{+\infty\} & \text{if}\ |x|>1\ \text{and}\ y=+\infty\\
+  & = & \{+\infty\} & \text{if}\ |x|<1\ \text{and}\ y=-\infty\\
+  & = & \{+0\} & \text{if}\ x=+\infty\ \text{and}\ y<0\\
+  & = & \{+\infty\} & \text{if}\ x=+\infty\ \text{and}\ y>0\\
+  & = & \{-0\} & \text{if}\ x=-\infty\ \text{and}\ y<0\ \text{an odd integer}\\
+  & = & \{-\infty\} & \text{if}\ x=-\infty\ \text{and}\ y>0\ \text{an odd integer}\\
+  & = & \{+0\} & \text{if}\ x=-\infty\ \text{and}\ y<0\\
+  & = & \{+\infty\} & \text{if}\ x=-\infty\ \text{and}\ y>0\\
+  & = & \{\dbNaN\} & \text{if}\ x<0\ \text{and}\ y\ \text{is not an integer}\\
+  & = & \{\dbfl(x^{y})\} & \text{otherwise}
+\end{array}
+\]
+\caption{$\APPLY$ on Floats: Power}\label{fig:dynamic-basis-pow}
+\end{figure}
+
+The first two lines apply even when the other argument is NaN. In the last
+line of Figure~\ref{fig:dynamic-basis-pow}, $x$ and $y$ are finite
+and $x$ is not a zero; when $x<0$, $y$ is an integer and
+$x^{y}=(-1)^{y}|x|^{y}$. Thus \kw{1 \textasciicircum{} (1/0)} is $1$, and
+\kw{(-8) \textasciicircum{} (1/3)} is NaN. % A65
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+\APPLY(b,\dbNaN) & = & \{\dbNaN\} & \text{for each}\ b\ \text{of the figure}\\[1ex]
+\APPLY(b,x) & = & \{x\} & \text{if}\ x\ \text{is a zero, for}\ b\in\{\kw{sin},\kw{tan},\kw{asin},\kw{atan}\}\\
+\APPLY(b,x) & = & \{\dbNaN\} & \text{if}\ x\in\{+\infty,-\infty\},\ \text{for}\ b\in\{\kw{sin},\kw{cos},\kw{tan}\}\\
+\APPLY(b,x) & = & \{\dbNaN\} & \text{if}\ |x|>1,\ \text{for}\ b\in\{\kw{asin},\kw{acos}\}\\
+\APPLY(\kw{atan},x) & = & \{\dbsgn(x)\cdot\dbfl(\dbpinum/2)\} & \text{if}\ x\in\{+\infty,-\infty\}
+\end{array}
+\]
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+\APPLY(\kw{Elm.Kernel.Basics.log},x) & = & \{-\infty\} & \text{if}\ x\ \text{is a zero}\\
+  & = & \{\dbNaN\} & \text{if}\ x<0\\
+  & = & \{+\infty\} & \text{if}\ x=+\infty\\[1ex]
+\APPLY(b,x) & = & \{\dbfl(f(x))\} & \text{otherwise, for each}\ b
+\end{array}
+\]
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+\APPLY(\kw{atan2},y,x) & = & \{\dbNaN\} & \text{if}\ x\ \text{or}\ y\ \text{is}\ \dbNaN\\
+  & = & \{y\} & \text{if}\ y\ \text{is a zero, and}\ x\ \text{is}\ +0\ \text{or}\ x>0\\
+  & = & \{\dbsgn(y)\cdot\dbfl(\dbpinum)\} & \text{if}\ y\ \text{is a zero, and}\ x\ \text{is}\ -0\ \text{or}\ x<0\\
+  & = & \{\dbsgn(y)\cdot\dbfl(\dbpinum/2)\} & \text{if}\ x\ \text{is a zero}\\
+  & = & \{\dbsgn(y)\cdot\dbfl(\dbpinum/2)\} & \text{if}\ y\ \text{is an infinity and}\ x\ \text{is finite}\\
+  & = & \{\dbsgn(y)\cdot\dbfl(3\dbpinum/4)\} & \text{if}\ y\ \text{is an infinity and}\ x=-\infty\\
+  & = & \{\dbsgn(y)\cdot\dbfl(\dbpinum/4)\} & \text{if}\ y\ \text{is an infinity and}\ x=+\infty\\
+  & = & \{\dbsgn(y)\cdot\dbfl(\dbpinum)\} & \text{if}\ x=-\infty\\
+  & = & \{\dbsgn(y)\cdot 0\} & \text{if}\ x=+\infty\\
+  & = & \{\dbfl(\theta)\} & \text{otherwise}
+\end{array}
+\]
+\caption{$\APPLY$ on Floats: Elementary Functions}\label{fig:dynamic-basis-elem}
+\end{figure}
+
+In the first part of Figure~\ref{fig:dynamic-basis-elem}, $b$ ranges over
+\kw{sin}, \kw{cos}, \kw{tan}, \kw{asin}, \kw{acos}, \kw{atan} and
+\kw{Elm.\allowbreak Kernel.\allowbreak Basics.\allowbreak log}, and $f$ is the
+real function of $b$: $\sin$, $\cos$, $\tan$, $\arcsin$, $\arccos$, $\arctan$
+or $\ln$; on the arguments of the line $\{\dbfl(f(x))\}$, $f(x)$ is a real
+number. In the last line for \kw{atan2}, $\theta$ is the two-argument
+arctangent of $(x,y)$. The values \kw{e} and \kw{pi} are $\dbfl(\dbeuler)$
+and $\dbfl(\dbpinum)$, and \kw{logBase}, \kw{degrees}, \kw{radians},
+\kw{turns}, \kw{fromPolar} and \kw{toPolar} are given by their texts
+(Figure~\ref{fig:dynamic-basis-elm}), so that \kw{logBase 10 1000} is the
+quotient of two rounded logarithms, rounded again.
+
+The lines $\{\dbfl(x^{y})\}$, $\{\dbfl(f(x))\}$ and $\{\dbfl(\theta)\}$ of
+Figures~\ref{fig:dynamic-basis-pow} and~\ref{fig:dynamic-basis-elem} give the
+correctly rounded result. On those arguments, and only there, the accuracy
+with which an implementation computes the result is implementation-dependent,
+and an implementation may give a float near the real result in its place
+(Section~\ref{sec:appendix-implementation-float}). The operations of
+Figure~\ref{fig:dynamic-basis-float} allow no such latitude. % A65, D8
+
+% ===========================================================================
+\subsection{Conversions}\label{sec:appendix-dynamic-basis-conv}
+
+An Int value becomes a float by rounding, and a float becomes an Int value by
+\emph{saturation} into $\IntRange$:
+\[
+  \dbsat(k)=\left\{
+  \begin{array}{@{}ll@{}}
+  k & \text{if}\ k\in\IntRange\\
+  \max\IntRange & \text{if}\ k=+\infty\ \text{or}\ k>\max\IntRange\\
+  \min\IntRange & \text{if}\ k=-\infty\ \text{or}\ k<\min\IntRange
+  \end{array}\right.
+\]
+for $k\in\mathbb{Z}\cup\{+\infty,-\infty\}$. The conversions are given in Figure~\ref{fig:dynamic-basis-conv}. % A44, A45
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+\APPLY(\kw{toFloat},n) & = & \{\dbfl(n)\} & \\[1ex]
+\APPLY(\kw{round},x) & = & \{\dbsat(\lfloor x+\tfrac{1}{2}\rfloor)\} & \text{if}\ x\in\effFltFin\\
+\APPLY(\kw{floor},x) & = & \{\dbsat(\lfloor x\rfloor)\} & \text{if}\ x\in\effFltFin\\
+\APPLY(\kw{ceiling},x) & = & \{\dbsat(\lceil x\rceil)\} & \text{if}\ x\in\effFltFin\\
+\APPLY(\kw{truncate},x) & = & \{\dbsat(\dbtrunc(x))\} & \text{if}\ x\in\effFltFin\\[1ex]
+\APPLY(b,x) & = & \{\dbsat(x)\} & \text{if}\ x\in\{+\infty,-\infty\}\\
+\APPLY(b,\dbNaN) & = & \{0\} &
+\end{array}
+\]
+\caption{$\APPLY$ on Conversions}\label{fig:dynamic-basis-conv}
+\end{figure}
+
+In the last two lines $b$ is any of \kw{round}, \kw{floor}, \kw{ceiling} and
+\kw{truncate}. The sum $x+\frac{1}{2}$ is exact, not rounded to a float, so
+\kw{round} rounds a half upward: \kw{round 2.5} is $3$ and \kw{round -2.5} is
+$-2$. A float zero of either sign converts to the one Int zero, and
+\kw{toFloat 0} is $+0$, so \kw{1 / toFloat (negate 0)} is $+\infty$. % A45
+
+% ===========================================================================
+\subsection{Equality}\label{sec:appendix-dynamic-basis-eq}
+
+The \emph{function values} are the closures, the basic values with their
+partial applications, and the constructor values awaiting arguments:
+\[
+  \dbFun=\Closure\cup\BasApp\cup\{\con\ v_1\cdots v_k\in\ConVal\mid k<\arity(\con)\}.
+\]
+Equality is structural on all values, and is defined by a set
+$\dbEq(v,v')\subseteq\{\kw{True},\kw{False}\}$ in
+Figure~\ref{fig:dynamic-basis-eq}, by recursion on the structure of $v$ and
+$v'$ (values are finite, and the recursion does not enter a function value).
+Then
+\[
+  \begin{array}{rcl}
+  \APPLY(\kw{eq},v,v') &=& \dbEq(v,v'),\\
+  \APPLY(\kw{neq},v,v') &=& \{\kw{True}\mid\kw{False}\in\dbEq(v,v')\}\\
+  &&{}\cup\{\kw{False}\mid\kw{True}\in\dbEq(v,v')\}.
+  \end{array}
+\]
+% A35, A50, A51
+
+\begin{figure}[htbp]
+\centering
+\small
+\begin{enumerate}
+\item If $v,v'\in\dbFun$, then $\dbEq(v,v')=\{\kw{True},\kw{False}\}$.
+\item If $v$ and $v'$ are floats: $\dbEq(v,v')=\{\kw{True}\}$ if neither is
+  NaN and $v=v'$ (so that $+0$ equals $-0$), and $\{\kw{False}\}$ otherwise.
+\item If $v$ and $v'$ are both Int values, both characters, both strings,
+  both the unit value, both process identifiers, or both boundary values
+  (Chapter~\ref{ch:effects}) that are $\effnull$, $\efftrue$, $\efffalse$,
+  numbers, strings or byte sequences:
+  $\dbEq(v,v')=\{\kw{True}\}$ if $v$ and $v'$ are the same, and
+  $\{\kw{False}\}$ otherwise.
+\item If $v$ and $v'$ have the same form, with components $v_1,\ldots,v_k$ and
+  $v'_1,\ldots,v'_k$ ($k\geq 0$), as listed below, then
+  $\kw{True}\in\dbEq(v,v')$ if $\kw{True}\in\dbEq(v_i,v'_i)$ for every $i$, and
+  $\kw{False}\in\dbEq(v,v')$ if $\kw{False}\in\dbEq(v_i,v'_i)$ for some $i$.
+  The forms are:
+  \begin{itemize}
+  \item tuples with the same number of components;
+  \item constructor values $\con\ v_1\cdots v_k$ and $\con\ v'_1\cdots v'_k$
+    with the same constructor name and $k=\arity(\con)$;
+  \item records $r$ and $r'$ with $\Dom r=\Dom r'$, the components being
+    $r(\lab)$ and $r'(\lab)$ for each $\lab\in\Dom r$;
+  \item arrays of boundary values (JSON arrays among them) with the same
+    number of elements, and objects of boundary values with the same set of
+    keys, the components being the values at each key; % A92
+  \item effect values (Chapter~\ref{ch:effects}) of the same form, with the
+    same primitives, managers and port names, the components being the values,
+    boundary values, tasks, commands and subscriptions they contain.
+  \end{itemize}
+\item Otherwise $\dbEq(v,v')=\{\kw{False}\}$.
+\end{enumerate}
+\caption{Equality of Values}\label{fig:dynamic-basis-eq}
+\end{figure}
+
+The clauses are tried in order. Lists, \kw{Maybe} and \kw{Result} values,
+\kw{Bool} and \kw{Order} values, arrays and the values of type \kw{Bytes}
+are constructor values, so they are compared by the fourth clause: two lists
+are equal when they have the same length and equal elements. A record type gives all its records the same
+domain, so the condition $\Dom r=\Dom r'$ always holds in a program that
+elaborates. The following property may easily be demonstrated.
+\begin{property}
+$\dbEq(v,v')$ is non-empty. It is $\{\kw{True},\kw{False}\}$ only if, at some
+depth, corresponding components of $v$ and $v'$ are both function values, and
+it is $\{\kw{False}\}$ whenever some pair of corresponding components that are
+not function values is unequal.
+\end{property}
+Equality is thus deterministic except when the comparison reaches two
+function values, where it may give either \kw{True} or \kw{False}:
+\kw{(\textbackslash x -> x) == (\textbackslash x -> x)} may evaluate to
+either. This is the only non-determinism in the dynamic semantics of the
+Core (rule~\ruleref{r:d-app-basic-apply}). % A51, R9
+Because equality looks only at structure, the identity of values plays no
+part. NaN is unequal to every float, itself included, so a value with a NaN
+component is not equal to itself: if \kw{t} is \kw{(0/0, 1)}, then
+\kw{t == t} is \kw{False}. % A50
+The two zeros of the floats are equal. Implementations whose equality
+consults identity are recorded in
+Section~\ref{sec:appendix-implementation-equality}.
+
+% ===========================================================================
+\subsection{Order}\label{sec:appendix-dynamic-basis-order}
+
+The \emph{comparable values} are the Int values, the floats, the characters,
+the strings, and the lists and tuples whose elements or components are
+comparable values; they are the values of the types admissible for the class
+$\kcomp$ (Section~\ref{sec:static-core-classes}). For comparable values $v$ and
+$v'$ of one type, $\dbcmp(v,v')\in\{\kw{LT},\kw{EQ},\kw{GT}\}$ is defined in
+Figure~\ref{fig:dynamic-basis-order}. Then
+\[
+  \APPLY(\kw{compare},v,v')=\{\dbcmp(v,v')\}.
+\]
+% A46, A52, A53
+
+\begin{figure}[htbp]
+\centering
+\small
+\begin{enumerate}
+\item Int values $m$, $n$: $\dbcmp(m,n)$ is \kw{LT} if $m<n$, \kw{EQ} if
+  $m=n$, and \kw{GT} if $m>n$.
+\item Floats $x$, $y$: $\dbcmp(x,y)$ is \kw{EQ} if both are NaN, \kw{GT} if only $x$ is
+  NaN, \kw{LT} if only $y$ is NaN, and otherwise \kw{LT}, \kw{EQ} or \kw{GT}
+  as $x<y$, $x=y$ or $x>y$.
+\item Characters: $\dbcmp(\dbch,\dbch')=\dbcmp(\dbcode(\dbch),\dbcode(\dbch'))$.
+\item Strings $s=\dbch_1\cdots\dbch_k$ and $s'=\dbch'_1\cdots\dbch'_l$: if
+  $\dbch_i\neq\dbch'_i$ for some $i\leq\min(k,l)$, and $i$ is the least such,
+  then $\dbcmp(s,s')=\dbcmp(\dbch_i,\dbch'_i)$; otherwise
+  $\dbcmp(s,s')=\dbcmp(k,l)$.
+\item Lists: $\dbcmp(\kw{[]},\kw{[]})=\kw{EQ}$,
+  $\dbcmp(\kw{[]},v_1\mathbin{\kw{::}}v_2)=\kw{LT}$,
+  $\dbcmp(v_1\mathbin{\kw{::}}v_2,\kw{[]})=\kw{GT}$, and
+  $\dbcmp(v_1\mathbin{\kw{::}}v_2,\,v'_1\mathbin{\kw{::}}v'_2)$ is
+  $\dbcmp(v_1,v'_1)$ if that is not \kw{EQ}, and $\dbcmp(v_2,v'_2)$ otherwise.
+\item Tuples $(v_1,\ldots,v_k)$ and $(v'_1,\ldots,v'_k)$: $\dbcmp(v_i,v'_i)$
+  for the least $i$ with $\dbcmp(v_i,v'_i)\neq\kw{EQ}$, and \kw{EQ} if there is
+  none.
+\end{enumerate}
+\caption{Order of Comparable Values}\label{fig:dynamic-basis-order}
+\end{figure}
+
+\begin{property}
+For comparable values $v$, $v'$ and $v''$ of one type,
+$\dbcmp(v,v')=\kw{LT}$ if and only if $\dbcmp(v',v)=\kw{GT}$,
+$\dbcmp(v,v)=\kw{EQ}$, and if $\dbcmp(v,v')\neq\kw{GT}$ and
+$\dbcmp(v',v'')\neq\kw{GT}$ then $\dbcmp(v,v'')\neq\kw{GT}$.
+\end{property}
+Thus \kw{compare} is a total order on each comparable type, up to the values
+it makes \kw{EQ}, and sorting by it has a defined result. It is
+\kw{EQ} for the two zeros and for two NaNs, and puts NaN above every other
+float; it therefore disagrees with equality at NaN, which is unequal to
+itself. % A46
+Characters are ordered by $\dbcode$, and strings by their sequences of
+characters, so the order of one-character strings is that of their
+characters. % A53
+
+The order operators are the IEEE 754 predicates at floats and are derived
+from $\dbcmp$ at every other comparable type: % A47
+\[
+  \begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+  \APPLY(\kw{lt},x,y) & = & \{\kw{True}\} & \text{if neither is NaN and}\ x<y\\
+                      & = & \{\kw{False}\} & \text{otherwise}\\
+  \APPLY(\kw{le},x,y) & = & \{\kw{True}\} & \text{if neither is NaN and}\ x\leq y\\
+                      & = & \{\kw{False}\} & \text{otherwise}\\
+  \APPLY(\kw{gt},x,y) & = & \APPLY(\kw{lt},y,x) & \\
+  \APPLY(\kw{ge},x,y) & = & \APPLY(\kw{le},y,x) & \\[1ex]
+  \APPLY(\kw{lt},v,v') & = & \{\kw{True}\} & \text{if}\ \dbcmp(v,v')=\kw{LT}\\
+                       & = & \{\kw{False}\} & \text{otherwise}\\
+  \APPLY(\kw{le},v,v') & = & \{\kw{True}\} & \text{if}\ \dbcmp(v,v')\neq\kw{GT}\\
+                       & = & \{\kw{False}\} & \text{otherwise}\\
+  \APPLY(\kw{gt},v,v') & = & \APPLY(\kw{lt},v',v) & \\
+  \APPLY(\kw{ge},v,v') & = & \APPLY(\kw{le},v',v) &
+  \end{array}
+\]
+where in the first six lines $x$ and $y$ are floats, and in the last six $v$ and
+$v'$ are comparable values of any other kind. Hence \kw{nan < 1},
+\kw{nan > 1} and \kw{nan >= nan} are \kw{False}, where \kw{nan} is
+\kw{0/0}, while \kw{[ nan ] > [ 1 ]} is \kw{True}, the list being compared by
+$\dbcmp$. % A47
+
+At comparable values other than floats, \kw{min} and \kw{max} give the
+results of their elm/core texts, \kw{min x y = if lt x y then x else y} and
+\kw{max x y = if gt x y then x else y}: % A48
+\[
+  \begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+  \APPLY(\kw{min},v,v') & = & \{v\} & \text{if}\ \dbcmp(v,v')=\kw{LT}\\
+                        & = & \{v'\} & \text{otherwise}\\
+  \APPLY(\kw{max},v,v') & = & \{v\} & \text{if}\ \dbcmp(v,v')=\kw{GT}\\
+                        & = & \{v'\} & \text{otherwise},
+  \end{array}
+\]
+where $v$ and $v'$ are comparable values that are not floats; the cases at
+floats are those of Section~\ref{sec:appendix-dynamic-basis-floatarith}.
+Thus \kw{max [ nan ] [ 1 ]} and \kw{max [ 1 ] [ nan ]} are both
+\kw{[ nan ]}, the lists being compared by $\dbcmp$, which puts NaN above
+every other float. % A48
+
+At Int values, \kw{clamp} gives the result of its elm/core text,
+\[
+\begin{array}{@{}l@{}}
+\kw{clamp low high number =}\\
+\quad\kw{if lt number low then low}\\
+\quad\kw{else if gt number high then high else number},
+\end{array}
+\]
+the first applicable line giving the result: % A49
+\[
+  \begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+  \APPLY(\kw{clamp},v,v',v'') & = & \{v\} & \text{if}\ \APPLY(\kw{lt},v'',v)=\{\kw{True}\}\\
+                              & = & \{v'\} & \text{if}\ \APPLY(\kw{gt},v'',v')=\{\kw{True}\}\\
+                              & = & \{v''\} & \text{otherwise},
+  \end{array}
+\]
+where $v$, $v'$ and $v''$ are not floats, and are therefore Int values, the
+type scheme of \kw{clamp} quantifying a variable of class $\knum$; the case
+at floats is that of Section~\ref{sec:appendix-dynamic-basis-floatarith}.
+When \kw{lo} is greater than \kw{hi}, \kw{clamp lo hi x} at Int values is
+\kw{lo} if \kw{x < lo}, else \kw{hi} if \kw{x > hi}, else \kw{x}:
+\kw{clamp 10 0 5} is $10$, where at floats it is $+0$. % A49
+
+% ===========================================================================
+\subsection{Booleans, Appending and Functions}\label{sec:appendix-dynamic-basis-bool}
+
+The Boolean values are the constructor values \kw{True} and \kw{False}.
+\[
+  \begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
+  \APPLY(\kw{not},v) & = & \{\kw{False}\} & \text{if}\ v=\kw{True}\\
+                     & = & \{\kw{True}\} & \text{otherwise}\\
+  \APPLY(\kw{and},v,v') & = & \{\kw{True}\} & \text{if}\ v=v'=\kw{True}\\
+                        & = & \{\kw{False}\} & \text{otherwise}\\
+  \APPLY(\kw{or},v,v') & = & \{\kw{False}\} & \text{if}\ v=v'=\kw{False}\\
+                       & = & \{\kw{True}\} & \text{otherwise}\\
+  \APPLY(\kw{xor},v,v') & = & \{\kw{True}\} & \text{if}\ v\neq v'\\
+                        & = & \{\kw{False}\} & \text{otherwise}
+  \end{array}
+\]
+The basic values \kw{and} and \kw{or} receive both arguments as values, so the
+operator values \kw{(\&\&)} and \kw{(||)} are strict; only the infixed forms
+\kw{e1 \&\& e2} and \kw{e1 || e2}, which are derived forms, evaluate their
+second operand conditionally. % A56
+
+The basic value \kw{append} concatenates strings and lists; for strings,
+$s\,s'$ is the sequence of the characters of $s$ followed by those of $s'$:
+\[
+  \begin{array}{@{}r@{\ }c@{\ }l@{}}
+  \APPLY(\kw{append},s,s') & = & \{s\,s'\}\\
+  \APPLY(\kw{append},\kw{[]},v) & = & \{v\}\\
+  \APPLY(\kw{append},v_1\mathbin{\kw{::}}v_2,v) & = & \{v_1\mathbin{\kw{::}}v'\}
+  \end{array}
+\]
+where, in the last line, $\APPLY(\kw{append},v_2,v)=\{v'\}$.
+The composition and application operators and \kw{identity}, \kw{always} and
+\kw{never} are given by their texts (Figure~\ref{fig:dynamic-basis-elm}). No
+value has the type \kw{Never}, so \kw{never} is never applied.
+
+% ===========================================================================
+\subsection{Debugging}\label{sec:appendix-dynamic-basis-debug}
+
+\[
+  \begin{array}{@{}r@{\ }c@{\ }l@{}}
+  \APPLY(\kw{Debug.log},s,v) & = & \{v\}\\
+  \APPLY(\kw{Debug.todo},s) & = & \emptyset\\
+  \APPLY(\kw{Debug.toString},v) & = & \{s_v\}
+  \end{array}
+\]
+where $s_v$ is the string that the implementation gives for $v$.
+Thus \kw{Debug.log} returns its second argument; any output it makes lies outside
+the definition. \kw{Debug.todo} has no result, so an application of it has no
+value (Section~\ref{sec:dynamic-core-basic}). The string of
+\kw{Debug.toString} is determined by its argument, in a way that is
+implementation-dependent (Section~\ref{sec:appendix-implementation-order}).
+% A62, D8
+
+% ===========================================================================
+\subsection{Arrays}\label{sec:appendix-dynamic-basis-arrays}
+
+We take the class Con to contain, besides \kw{[]} and \kw{::}, a third
+constructor name $\dbarr$ that no identifier spells, with
+$\arity(\dbarr)=1$. The values of the type \kw{Array} are the constructor
+values $\dbarr\ v$ with $v$ a list: the array of the elements of $v$, in
+order. The two basic values that Chapter~\ref{ch:effects} applies to arrays
+are
+\[
+  \begin{array}{@{}r@{\ }c@{\ }l@{}}
+  \APPLY(\kw{Array.fromList},v) & = & \{\dbarr\ v\},\\
+  \APPLY(\kw{Array.toList},\dbarr\ v) & = & \{v\}.
+  \end{array}
+\]
+Two arrays are equal when their lists are, by the fourth clause of
+Figure~\ref{fig:dynamic-basis-eq}. The other functions of the library module
+\kw{Array} lie outside the definition (Appendix~\ref{ch:appendix-static-basis}).
+% DECIDED: elm/core writes Array.fromList and Array.toList in Elm over the
+% kernel type JsArray; kernel code being outside the definition, the values
+% of Array are given abstractly here, and these two functions agree with that
+% text: toList (fromList l) is l.
+
+\subsection{Bytes}\label{sec:appendix-dynamic-basis-bytes}
+
+We take the class Con to contain also a fourth constructor name $\dbbin$ that
+no identifier spells, with $\arity(\dbbin)=1$. The values of the type
+\kw{Bytes} are the constructor values $\dbbin\ v$ with $v$ a list of Int
+values each from $0$ to $255$; the value $\dbbin\,[o_1,\ldots,o_k]$ is the
+finite sequence of the bytes $o_1,\ldots,o_k$, in order. % A92
+Two values of type \kw{Bytes} are equal exactly when their sequences are, by
+the fourth clause of Figure~\ref{fig:dynamic-basis-eq}: equality on them is
+structural, like that on lists. % A50
+The values of \kw{Bytes} meet the definition only at ports and in flags,
+where Chapter~\ref{ch:effects} relates them to the byte sequences of the
+boundary (Section~\ref{sec:effects-ports}); the functions of the library
+\kw{elm/bytes} lie outside the definition
+(Appendix~\ref{ch:appendix-static-basis}).
+% DECIDED (A92): elm/bytes represents Bytes by a kernel DataView; kernel code
+% being outside the definition, the values are given abstractly here, as for
+% Array, and the interface of Bytes in ME0 is empty.
+
+% ===========================================================================
+\subsection{Effect Values}\label{sec:appendix-dynamic-basis-effects}
+
+For the basic values of \kw{Task}, \kw{Process}, \kw{Platform.Cmd},
+\kw{Platform.Sub} and \kw{Platform}, and for \kw{Task.command}, $\APPLY$ and
+the arities are given in Figure~\ref{fig:effects-apply}
+(Section~\ref{sec:effects-apply}); for the values of ports,
+$\effoutport(\effp,\tau)$ and $\effinport(\effp,\tau)$, in
+Section~\ref{sec:effects-ports}. % D10, D11

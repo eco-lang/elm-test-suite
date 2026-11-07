@@ -4,4 +4,6 @@ dist/
 .elm-pages/
 functions/
 data/
+data-standard/
+public/downloads/
 gen/

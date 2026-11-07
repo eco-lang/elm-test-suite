@@ -1,0 +1,498 @@
+% Values: PRECISE, FAITHFUL, ILLUMINATING, ECONOMICAL
+% Evidence planned:
+% - PRECISE: a rule for every production of the reduced module grammar
+%   (Module, Header in both forms, Imports, ExpList, ExpItem, TopDec in its six
+%   forms, DatBind, ConBind, TypBind); every object and operation (ConEnv,
+%   Interface, ModEnv, Basis, the merge of environments, the record
+%   constructors, the translation of value groups) defined before its first
+%   use; one property stated for the interfaces the rules produce.
+% - FAITHFUL: imports as elaborated (one qualifier per import, shared
+%   qualifiers merge, later imports replace earlier ones, A28, A38); a
+%   module's own names replace imported ones; record alias constructors take
+%   their fields in the order written; ports bound to outport and inport
+%   (D11); each top-level value evaluated once when its module is evaluated,
+%   in the dependency order of Appendix A (A59); a delayed self-reference
+%   forced during its own evaluation has no result (A25); main need not be
+%   exposed (A82); flat modules (D6).
+% - ILLUMINATING: comments on the reading of value groups, on why a closed
+%   type and an operator item expose nothing, on where a port's payload type
+%   comes from, and on the order of imports.
+% - ECONOMICAL: options merge the two headers, exposing parts and binding
+%   sequences; one rule for a value group, recursive or not; no rule for
+%   type-variable sequences or types, which the reduced syntax removes.
+\chapter{Dynamic Semantics for Modules}\label{ch:dynamic-modules}
+
+The dynamic semantics of Modules defines the dynamic interfaces that modules
+evaluate to, and the environments that imports and top-level declarations
+produce. Its sentences infer that a module evaluates to an interface in a
+basis, that a sequence of imports evaluates to an environment, that an
+exposing list cuts an interface down to the part it exposes, and that a
+top-level declaration evaluates to an interface in an environment. Modules
+are flat: a module makes its top-level values and constructors available by
+name, and there are no signatures or functors. % D6
+Every module evaluated here is assumed to have elaborated in the static
+semantics of Chapter~\ref{ch:static-modules}. % S4
+The order in which the modules of a program are evaluated, and the meaning of
+\kw{main}, are given in Chapter~\ref{ch:programs}.
+
+\section{Reduced Syntax}\label{sec:dynamic-modules-reduced}
+
+Types play no part in evaluation, except that a port must know what it sends
+or receives. For the dynamic semantics the syntax of Modules is reduced as
+follows, in addition to the reduction of the Core
+(Section~\ref{sec:dynamic-core-reduced}):
+% D1 (definition-style)
+\begin{itemize}
+\item The type annotations of top-level values are omitted, as in the Core.
+  Since a module has no pattern bindings at the top level
+  (Section~\ref{sec:syntax-modules-restrictions}), every top-level value
+  declaration has the form
+  \[
+    \var_1\ \kw{=}\ \expm_1\ \kw{and}\ \cdots\ \kw{and}\ \var_n\ \kw{=}\
+    \expm_n\qquad(n\geq 1).
+  \]
+\item The type-variable sequence is omitted from every custom-type binding and
+  every type-alias binding; the class TyVarSeq is omitted.
+\item Each constructor binding $\con\ \ty_1\cdots\ty_n$ is replaced by $\con$,
+  whose arity $\arity(\con)$ is $n$ (Section~\ref{sec:dynamic-core-simple}).
+  Thus a constructor binding has the form $\con\ \opt{\kw{|}\ \conbind}$.
+\item A type-alias binding $\tycon\ \kw{=}\ \ty$ is replaced by
+  $\tycon\ \kw{=}\ \kw{\kwlb}\lab_1\kw{,}\ \cdots\kw{,}\ \lab_n\kw{\kwrb}$
+  $(n\geq 0)$ if it is a record alias
+  (Section~\ref{sec:syntax-modules-restrictions}) whose record type has the
+  labels $\lab_1,\ldots,\lab_n$, in the order written; every other type-alias
+  binding is replaced by $\tycon$ alone.
+\item A port declaration $\kw{port}\ \var\ \kw{:}\ \ty$ is replaced by
+  $\kw{port}\ \var\ \kw{:}\ (\smdirout,\tau)$ for an outgoing port and by
+  $\kw{port}\ \var\ \kw{:}\ (\smdirin,\tau)$ for an incoming one, where
+  $\tau$ is the payload type of the port; the direction and the payload type
+  are those that elaboration records in the port environment (Chapter~\ref{ch:static-modules},
+  Section~\ref{sec:static-modules-ports}).
+  % DECIDED: the reduced syntax keeps the direction and the payload type
+  % tau of a port as elaboration determines them, since encoding and
+  % decoding (Chapter 8) are defined by the type, not by the phrase ty.
+\item After number specialisation (Section~\ref{sec:dynamic-core-numbers}),
+  an exposing item $\var$ naming a top-level variable whose declaration has
+  been copied stands for the items naming $\var$ and each of the new
+  variables that the copies bind, so that a module that uses $\var$ at an
+  instance other than the default one finds the copy for that instance.
+  % audit X6, X7: copies other than the default copy bind new variables.
+\item An import $\kw{import}\ \modid$ without \kw{as} is read as
+  $\kw{import}\ \modid\ \kw{as}\ \modid$: it provides its own \modid{} as
+  qualifier (Section~\ref{sec:syntax-modules-identifiers}).
+\end{itemize}
+As everywhere in the semantics, the derived forms of
+Appendix~\ref{ch:appendix-derived-forms} have been applied, so the
+top-level declarations of a module stand in the order of
+Section~\ref{sec:appendix-derived-forms-modules}; and the imports of a module
+are the default imports of Figure~\ref{fig:default-imports} followed by the
+imports written in it.
+
+\section{Compound Objects}\label{sec:dynamic-modules-compound}
+
+There are no simple objects beyond those of the Core. The compound objects
+for the dynamic semantics of Modules, extra to those of the Core
+(Figure~\ref{fig:dynamic-core-compound}), are shown in
+Figure~\ref{fig:dynamic-modules-compound}.
+
+\begin{figure}[htbp]
+\centering
+\begin{objtable}
+\objdef{\dmCE}{\dmConEnv}{\cls{TyCon}\finmap\ValEnv}
+\objdef{(\dmRA,\dmCE,\VE)\ \text{or}\ I}{\Interface}{\Fin\cls{TyCon}\times\dmConEnv\times\ValEnv}
+\objdef{\ME}{\ModEnv}{\cls{ModId}\finmap\Interface}
+\objdef{\ME\ \text{or}\ B}{\Basis}{\ModEnv}
+\end{objtable}
+\caption{Compound Semantic Objects for Modules}
+\label{fig:dynamic-modules-compound}
+\end{figure}
+
+A \emph{constructor environment} $\dmCE$ maps the type constructor
+$\tycon$ of each custom type to a value environment of its constructors. A
+dynamic \emph{interface} $(\dmRA,\dmCE,\VE)$ records what a module makes
+available to other modules: $\VE$ binds every value it exposes, namely its
+exposed values and ports, the constructors of each custom type whose
+constructors it exposes, and the constructor of each record alias it
+exposes; $\dmCE$ maps every custom type that it exposes to the constructors
+of that type that it exposes, which is the empty map for a type exposed
+closed; and $\dmRA$ is the set of the type constructors $\tycon$ of the
+record aliases whose constructors it exposes. % audit X3, X13
+For a type constructor $\tycon$ we write $\con=\tycon$ when $\con$ is spelt
+as $\tycon$, as in Chapter~\ref{ch:static-modules}: the constructor of a
+record alias $\tycon$ is bound in $\VE$ to the constructor $\con$ with
+$\con=\tycon$. A module
+environment maps each module identifier to the interface of that module, and
+a dynamic basis is a module environment. Interface, ModEnv and Basis are the
+dynamic objects of the names that Chapter~\ref{ch:static-modules} uses for
+static objects; Chapter~\ref{ch:programs} distinguishes them where both are in
+play.
+
+Projection, injection and modification are as for the Core. In particular
+``$\dmCE\of I$'' is the second component of $I$; $B(\modid)$ means
+$\ME(\modid)$; ``$\VE$ in $\Interface$'' means $(\emptyset,\emptymap,\VE)$;
+and interfaces are modified component by component, the set components by
+union. The interfaces inferred by the rules of this chapter have the
+following property, on which rule~\ruleref{r:dm-expitem-alias} relies.
+\begin{property}
+If $(\dmRA,\dmCE,\VE)$ is an interface inferred by the rules, then
+$\con\in\Dom\VE$ for every $\tycon\in\dmRA$ and $\con=\tycon$, and
+$\VE(\con)=v$ whenever $(\dmCE(\tycon))(\con)=v$.
+\end{property}
+
+\section{Merging Environments}\label{sec:dynamic-modules-merge}
+
+Several imports of one module may provide the same qualifier, and the names
+they provide under it are then all available under that qualifier. Imports
+are therefore combined by the following modification, which merges, rather
+than replaces, the environment of a qualifier common to both of its
+arguments. For environments $E_1=(\QE_1,\VE_1)$ and $E_2=(\QE_2,\VE_2)$,
+\[
+  E_1\dmmerge E_2 \;=\; (\QE,\ \VE_1+\VE_2),
+\]
+where $\Dom\QE=\Dom\QE_1\cup\Dom\QE_2$, and $\QE(\modid)$ is
+$\QE_1(\modid)+\QE_2(\modid)$ if $\modid\in\Dom\QE_1\cap\Dom\QE_2$, and
+otherwise whichever of $\QE_1(\modid)$ and $\QE_2(\modid)$ is defined.
+Where both arguments bind a name, the binding of $E_2$ is kept.
+
+\section{Record Constructors}\label{sec:dynamic-modules-record}
+
+The constructor of a record alias is a function of the fields of the record,
+taken in the order in which the alias writes them. For $n\geq 1$ and distinct
+labels $\lab_1,\ldots,\lab_n$ we extend BasVal with the basic value
+$\dmrecord(\lab_1\cdots\lab_n)$, of arity $n$, and extend $\APPLY$ to it by
+\[
+  \APPLY(\dmrecord(\lab_1\cdots\lab_n),\,v_1\cdots v_n)
+  \;=\; \{\{\lab_1\mapsto v_1,\ldots,\lab_n\mapsto v_n\}\}.
+\]
+For $n=0$ we let $\dmrecord()$ stand for the empty record $\emptymap$, which
+is a value but not a basic value, since every basic value has arity at least
+1. These values are not bound in the initial basis
+(Appendix~\ref{ch:appendix-dynamic-basis}); they are bound only by the
+record aliases of modules.
+
+BasVal includes also the values of ports, the basic values
+$\effoutport(\var,\tau)$ and $\effinport(\var,\tau)$ for a port name $\var$
+and a payload type $\tau$. They are defined in Chapter~\ref{ch:effects}
+(Section~\ref{sec:effects-ports}); this chapter uses only the fact that they
+are basic values. % D11, audit X11
+
+\section{Top-level Value Groups}\label{sec:dynamic-modules-groups}
+
+A recursive group of top-level values need not consist of functions: the
+restrictions of Section~\ref{sec:syntax-modules-restrictions} admit any group
+in which every cycle passes through an occurrence within a lambda expression.
+% A26
+The operation $\Rec$ (Section~\ref{sec:dynamic-core-closures}) gives the
+bindings of a group only to the closures that the group binds, not to a
+closure held within a record, a tuple or a constructor value. We have
+therefore adopted the following translation, under which every member of a
+group is reached through a function of the unit value.
+
+Let $\valbind=\var_1\ \kw{=}\ \expm_1\ \kw{and}\ \cdots\ \kw{and}\ \var_n\
+\kw{=}\ \expm_n$ be a top-level value declaration, and let
+$\var'_1,\ldots,\var'_n$ be distinct variables that occur nowhere in the
+program. For a phrase of the Core, $\dmthunk{\mathit{phrase}}$ is the phrase
+obtained from it by replacing simultaneously, for $1\leq i\leq n$,
+\begin{itemize}
+\item each free occurrence of the atomic expression $\var_i$ by the atomic
+  expression $\kw{(}\var'_i\ \kw{()}\kw{)}$, and
+\item each atomic expression $\kw{\kwlb}\ \var_i\ \kw{|}\ \exprow\
+  \kw{\kwrb}$ in which $\var_i$ is free by
+  $\kw{let}\ \var_i\ \kw{=}\ \var'_i\ \kw{()}\ \kw{in}\
+  \kw{\kwlb}\ \var_i\ \kw{|}\ \dmthunk{\exprow}\ \kw{\kwrb}$,
+\end{itemize}
+where ``free'' is as in Section~\ref{sec:appendix-derived-forms-let}. These are
+the only positions at which a variable occurs free in an expression. Then
+\[
+  \dmthunk{\valbind}\;=\;
+  \var'_1\ \kw{=}\ \kw{\textbackslash}\,\kw{\_}\ \kw{->}\ \dmthunk{\expm_1}\
+  \kw{and}\ \cdots\ \kw{and}\
+  \var'_n\ \kw{=}\ \kw{\textbackslash}\,\kw{\_}\ \kw{->}\ \dmthunk{\expm_n}.
+\]
+Every binding of $\dmthunk{\valbind}$ is a lambda expression, so $\Rec$ ties
+the knot for it exactly as for a recursive declaration of the Core, and
+$\var'_i\ \kw{()}$ then evaluates $\dmthunk{\expm_i}$. When no $\var_i$ is
+free in any $\expm_j$, the declaration is not recursive and
+$\dmthunk{\expm_i}=\expm_i$.
+% DECIDED: a top-level value group is evaluated through this translation.
+% Chapter 6's Declarations rules suffice only for groups of lambdas; a
+% top-level group may also hold a value that refers to the group within a
+% lambda (ones = { head = 1, tail = \_ -> ones }), or a direct reference to
+% a member that is a function. The translation keeps every object finite and
+% reuses Rec.
+
+\section{Inference Rules}\label{sec:dynamic-modules-rules}
+
+The rules infer sentences of the forms
+\[
+  \jdg{B}{\mathit{phrase}}{A},\quad
+  \jdg{E}{\mathit{phrase}}{A},\quad
+  \jdg{I}{\mathit{phrase}}{A},\quad
+  \jdg{}{\mathit{phrase}}{A},
+\]
+where $B$ is a basis, $E$ an environment, $I$ an interface, and $A$ is the
+result: a basis with a value environment, a module identifier with an
+interface, an environment, an interface, a constructor environment with a
+value environment, or a value environment. Each is pronounced ``$\mathit{phrase}$
+evaluates to $A$'', followed by ``in $B$'', ``in $E$'' or ``in $I$''. The
+hypotheses of a rule that are not sentences are its side conditions; some
+premises are sentences of the Core (Chapter~\ref{ch:dynamic-core}). The
+convention for options is the same as for the Core static semantics.
+
+As in the Core, sentences have no states and there are no exception packets,
+so every rule is given in full, and the order of the premises of a rule
+carries no meaning (Section~\ref{sec:dynamic-core-rules}). % D2, A58
+
+\rulegroup{Modules}{\jdg{B}{\modm}{B',\VE}}
+
+\defnrule[r:dm-module]
+  {\jdg{B}{\imports}{E}\premsep\jdg{E_0+E}{\topdec}{I}\premsep
+   \jdg{I}{\header}{(\modid,I')}}
+  {\jdg{B}{\header\ \imports\ \topdec}{\{\modid\mapsto I'\},\ \VE\of I}}
+
+\begin{rulecomments}
+\rcomment{r:dm-module} Here $E_0$ is the environment of
+Appendix~\ref{ch:appendix-dynamic-basis} that binds the list constructor
+names \kw{[]} and \kw{::}; every module starts from it, as its elaboration
+starts from $\pi_0$ (rule~\ruleref{r:sm-module}). % audit X4
+The top-level declarations are evaluated in
+$E_0$ modified by the environment that the imports give, so a name that a module declares replaces,
+within it, an imported name spelt alike (rule~\ruleref{r:dm-topdec-seq}). The
+basis $\{\modid\mapsto I'\}$ holds only what the header exposes; the value
+environment $\VE\of I$ of all the module's own values is the second result,
+as in the static semantics, because Chapter~\ref{ch:programs} takes the value
+of \kw{main} from it, and \kw{main} need not be exposed. % A82
+A module is evaluated once, after the modules it imports, and its top-level
+values are evaluated then (Chapter~\ref{ch:programs}). % A59
+\end{rulecomments}
+
+\rulegroup{Headers}{\jdg{I}{\header}{(\modid,I')}}
+
+\defnrule[r:dm-header]
+  {\jdg{I}{\explist}{I'}}
+  {\jdg{I}{\opt{\kw{port}}\ \kw{module}\ \modid\ \kw{exposing}\ \explist}{(\modid,I')}}
+
+\begin{rulecomments}
+\rcomment{r:dm-header} The word \kw{port} has no dynamic content: a port
+module and a plain module evaluate alike.
+\end{rulecomments}
+
+\rulegroup{Imports}{\jdg{B}{\imports}{E}}
+
+\defnrule[r:dm-imports-import]
+  {B(\modid)=I\premsep\opt{\jdg{I}{\explist}{I'}}\premsep
+   \jdg{B}{\imports}{E}}
+  {B\vdash\kw{import}\ \modid\ \kw{as}\ \modid'\
+     \opt{\kw{exposing}\ \explist}\ \imports\\
+   \Rightarrow(\{\modid'\mapsto(\emptymap,\VE\of I)\},\ \emptymap\opt{+\,\VE\of I'})\dmmerge E}
+
+\defnrule[r:dm-imports-empty]
+  {}
+  {\jdg{B}{\ }{(\emptymap,\emptymap)}}
+
+\begin{rulecomments}
+\rcomment{r:dm-imports-import} $B(\modid)$ is defined, since a module is
+evaluated only after every module it imports (Chapter~\ref{ch:programs}). The
+qualifier $\modid'$ gives access to every value that the imported module
+exposes, its constructors included; the exposing list makes a part of them
+available unqualified. The environment of later imports stands on the right of
+$\dmmerge$, so a name exposed by a later import replaces the same name exposed
+by an earlier one, and in particular a written import replaces a default
+import. Where elaboration has found an unqualified name ambiguous, the name is
+not used, so which binding is kept is immaterial. % A28, A38
+\end{rulecomments}
+
+\rulegroup{Exposing Lists}{\jdg{I}{\explist}{I'}}
+
+\defnrule[r:dm-explist-all]
+  {}
+  {\jdg{I}{\kw{(..)}}{I}}
+
+\defnrule[r:dm-explist-items]
+  {\jdg{I}{\expitem_1}{I_1}\ \ \cdots\ \ \jdg{I}{\expitem_n}{I_n}}
+  {\jdg{I}{\kw{(}\expitem_1\ \kw{,}\ \cdots\ \kw{,}\ \expitem_n\kw{)}}
+     {I_1+\cdots+I_n}}
+
+\begin{rulecomments}
+\rcomment{r:dm-explist-all} The sentence $\jdg{I}{\explist}{I'}$ is the
+dynamic counterpart of the interface $\Expose$ of
+Chapter~\ref{ch:static-modules}: the values of $I'$ are exactly those whose
+names elaboration admits through $\explist$.
+\end{rulecomments}
+
+\rulegroup{Exposing Items}{\jdg{I}{\expitem}{I'}}
+
+\defnrule[r:dm-expitem-var]
+  {(\VE\of I)(\var)=v}
+  {\jdg{I}{\var}{\{\var\mapsto v\}\ \text{in}\ \Interface}}
+
+\defnrule[r:dm-expitem-op]
+  {}
+  {\jdg{I}{\kw{(}\opv\kw{)}}{(\emptyset,\emptymap,\emptymap)}}
+
+\defnrule[r:dm-expitem-alias]
+  {\tycon\in\dmRA\of I\premsep\con=\tycon\premsep(\VE\of I)(\con)=v}
+  {\jdg{I}{\tycon}{(\{\tycon\},\emptymap,\{\con\mapsto v\})}}
+
+\defnrule[r:dm-expitem-type]
+  {\tycon\notin\dmRA\of I\premsep
+   \dmCE=\{\tycon\mapsto\emptymap\,;\,\tycon\in\Dom(\dmCE\of I)\}}
+  {\jdg{I}{\tycon}{(\emptyset,\dmCE,\emptymap)}}
+
+\defnrule[r:dm-expitem-open]
+  {(\dmCE\of I)(\tycon)=\VE}
+  {\jdg{I}{\tycon\,\kw{(..)}}{(\emptyset,\{\tycon\mapsto\VE\},\VE)}}
+
+\begin{rulecomments}
+\rcomment{r:dm-expitem-var} The variable is a value or a port.
+\rcomment{r:dm-expitem-op} An operator is not in the domain of a value
+environment: its value is given by the operator table $\OTdyn$, and is the
+same in every module (rule~\ruleref{r:d-atexp-op}). Exposing or importing an
+operator therefore binds nothing. % audit X1
+\rcomment{r:dm-expitem-alias} Rules~\ruleref{r:dm-expitem-alias}
+and~\ruleref{r:dm-expitem-type} cover the one item $\tycon$, distinguished by
+whether $\tycon$ is a record alias whose constructor $I$ exposes. The
+property of Section~\ref{sec:dynamic-modules-compound} ensures that
+$(\VE\of I)(\con)$ is then defined. A record alias exposed by name exposes
+its constructor, so \kw{import Geometry exposing (Point)} makes \kw{Point 1 2}
+available.
+\rcomment{r:dm-expitem-type} A custom type exposed without \kw{(..)}
+exposes no value, even when one of its constructors is spelt as the type: in
+a module with \kw{type Id = Id Int} and header \kw{exposing (Id)}, the
+constructor \kw{Id} is not exposed. The type is still exposed, closed: the
+constructor environment maps it to the empty map, so that an import of
+\kw{Id(..)} has a meaning (rule~\ruleref{r:dm-expitem-open}). An alias of a
+type other than a closed record is in neither $\dmRA\of I$ nor
+$\Dom(\dmCE\of I)$, and exposes nothing. % audit X3
+\rcomment{r:dm-expitem-open} By elaboration, $\tycon$ names a custom type
+that $I$ exposes, so $(\dmCE\of I)(\tycon)$ is defined; an item
+$\tycon\,\kw{(..)}$ for an alias is rejected
+(Chapters~\ref{ch:syntax-modules} and~\ref{ch:static-modules}). In a header,
+$I$ is the module's own interface, which holds every constructor of
+$\tycon$. In an import, $\VE$ holds the constructors that the imported
+module exposes, and is the empty map when it exposes $\tycon$ closed: with
+\kw{module A exposing (T)}, \kw{type T = T Int} and
+\kw{import A exposing (T(..))}, the import makes no constructor available.
+% audit X3, decision 3
+\end{rulecomments}
+
+\rulegroup{Top-level Declarations}{\jdg{E}{\topdec}{I}}
+
+\defnrule[r:dm-topdec-val]
+  {\jdg{E}{\dmthunk{\valbind}}{\VE}\\
+   \jdg{E+\Rec\VE}{\var'_1\ \kw{()}}{v_1}\ \ \cdots\ \
+   \jdg{E+\Rec\VE}{\var'_n\ \kw{()}}{v_n}}
+  {\jdg{E}{\valbind}
+     {\{\var_1\mapsto v_1,\ldots,\var_n\mapsto v_n\}\ \text{in}\ \Interface}}
+
+\defnrule[r:dm-topdec-type]
+  {\jdg{}{\datbind}{(\dmCE,\VE)}}
+  {\jdg{E}{\kw{type}\ \datbind}{(\emptyset,\dmCE,\VE)}}
+
+\defnrule[r:dm-topdec-alias]
+  {\jdg{}{\typbind}{(\dmRA,\VE)}}
+  {\jdg{E}{\kw{type alias}\ \typbind}{(\dmRA,\emptymap,\VE)}}
+
+\defnrule[r:dm-topdec-port-out]
+  {}
+  {\jdg{E}{\kw{port}\ \var\ \kw{:}\ (\smdirout,\tau)}
+     {\{\var\mapsto\effoutport(\var,\tau)\}\ \text{in}\ \Interface}}
+
+\defnrule[r:dm-topdec-port-in]
+  {}
+  {\jdg{E}{\kw{port}\ \var\ \kw{:}\ (\smdirin,\tau)}
+     {\{\var\mapsto\effinport(\var,\tau)\}\ \text{in}\ \Interface}}
+
+\defnrule[r:dm-topdec-seq]
+  {\jdg{E}{\topdec_1}{(\dmRA_1,\dmCE_1,\VE_1)}\premsep
+   \jdg{E+\VE_1}{\topdec_2}{I_2}}
+  {\jdg{E}{\topdec_1\ \kw{;}\ \topdec_2}{(\dmRA_1,\dmCE_1,\VE_1)+I_2}}
+
+\begin{rulecomments}
+\rcomment{r:dm-topdec-val} Here $\valbind$ is
+$\var_1\ \kw{=}\ \expm_1\ \kw{and}\ \cdots\ \kw{and}\ \var_n\ \kw{=}\ \expm_n$,
+and $\dmthunk{\valbind}$ and $\var'_1,\ldots,\var'_n$ are as in
+Section~\ref{sec:dynamic-modules-groups}; the first premise is a sentence of
+the Core (Value Bindings), and the choice of the new variables does not affect
+the result. Each $\var_i$ is bound to a value obtained once, when its module
+is evaluated. % A59
+A reference to $\var_i$ within the group evaluates $\dmthunk{\expm_i}$ again
+in the same environment, which gives $v_i$ again, there being no state,
+unless $\expm_i$ relies on the unspecified result of an equality of functions
+(Section~\ref{sec:dynamic-core-basic}). A top-level value is thus evaluated
+once only up to that non-determinism: where $\expm_i$ compares functions, a
+reference to $\var_i$ within its group may give another of the values that
+the equality of functions allows, and so differ from $v_i$. % A59 (note), A51, audit X15
+Thus with
+\kw{ones = \{ head = 1, tail = \textbackslash\_ -> ones \}}, the expression
+\kw{(ones.tail ()).head} evaluates to \kw{1}.
+% DECIDED: a reference within a group re-evaluates the member; A59 allows
+% repeated evaluation where results agree, and only function equality (A51)
+% can make them differ.
+In \kw{x = let f \_ = x in f ()} the occurrence of \kw{x} is delayed, so the
+restrictions of Section~\ref{sec:syntax-modules-restrictions} admit it, but
+evaluating $\var'_1\ \kw{()}$ needs $\var'_1\ \kw{()}$ again, without end: no
+sentence about the declaration can be inferred, and the module has no
+meaning. % A25
+\rcomment{r:dm-topdec-port-out} Rules~\ruleref{r:dm-topdec-port-out}
+and~\ruleref{r:dm-topdec-port-in}: the payload type $\tau$ comes from
+elaboration through the reduced syntax; it has no type variables, so the
+value of a port is the same at every use. Applied to a value, the value of an
+outgoing port gives a command that sends its encoding at $\tau$; applied to a
+function, the value of an incoming port gives a subscription
+(Section~\ref{sec:effects-ports}). Port names are unique in a program, so the
+name identifies the port. % A84, D11
+\rcomment{r:dm-topdec-seq} By the derived forms of
+Section~\ref{sec:appendix-derived-forms-modules}, $\topdec$ consists of the
+custom-type group, then the aliases, then the ports and value groups in
+dependency order, so every declaration is evaluated after each declaration
+it refers to. Where that order leaves two declarations unordered, either
+order gives the same result.
+\end{rulecomments}
+
+\rulegroup{Custom-type Bindings}{\jdg{}{\datbind}{(\dmCE,\VE)}}
+
+\defnrule[r:dm-datbind]
+  {\jdg{}{\conbind}{\VE}\premsep\opt{\jdg{}{\datbind}{(\dmCE,\VE')}}}
+  {\jdg{}{\tycon\ \kw{=}\ \conbind\ \opt{\kw{and}\ \datbind}}
+     {(\{\tycon\mapsto\VE\}\opt{+\,\dmCE},\ \VE\opt{+\,\VE'})}}
+
+\begin{rulecomments}
+\rcomment{r:dm-datbind} No type names are generated: a custom type has no
+dynamic content beyond its constructors. The constructors of a module are
+distinct (Section~\ref{sec:syntax-modules-restrictions}), so the
+modification of $\VE$ replaces no binding.
+\end{rulecomments}
+
+\rulegroup{Constructor Bindings}{\jdg{}{\conbind}{\VE}}
+
+\defnrule[r:dm-conbind]
+  {\opt{\jdg{}{\conbind}{\VE}}}
+  {\jdg{}{\con\ \opt{\kw{|}\ \conbind}}{\{\con\mapsto\con\}\opt{+\,\VE}}}
+
+\begin{rulecomments}
+\rcomment{r:dm-conbind} The constructor value $\con$ awaits all
+$\arity(\con)$ of its arguments; a constructor of arity 0 is thus a complete
+value. Constructors spelt alike in different modules give equal constructor
+values, which never meet in one rule, since they have different types
+(Section~\ref{sec:dynamic-core-simple}).
+\end{rulecomments}
+
+\rulegroup{Alias Bindings}{\jdg{}{\typbind}{(\dmRA,\VE)}}
+
+\defnrule[r:dm-typbind]
+  {\opt{\con=\tycon}}
+  {\vdash\tycon\ \opt{\kw{=}\ \kw{\kwlb}\lab_1\kw{,}\ \cdots\kw{,}\ \lab_n\kw{\kwrb}}\\
+     \Rightarrow(\emptyset\opt{\cup\,\{\tycon\}},\ \emptymap\opt{+\,\{\con\mapsto\dmrecord(\lab_1\cdots\lab_n)\}})}
+
+\begin{rulecomments}
+\rcomment{r:dm-typbind} Here $n\geq 0$, and by the syntactic restrictions
+the labels are distinct. The constructor takes the fields in the order in
+which the alias writes them: with \kw{type alias P = \{ y : Int, x : Int \}},
+\kw{P 1 2} evaluates to \kw{\{ y = 1, x = 2 \}}. An alias of the empty record
+binds its name to the empty record itself
+(Section~\ref{sec:dynamic-modules-record}). An alias of any other type binds
+nothing, and its type constructor is not in $\dmRA$; so rule
+\ruleref{r:dm-topdec-alias} records in $\dmRA$ exactly the record aliases.
+% audit X13
+\end{rulecomments}

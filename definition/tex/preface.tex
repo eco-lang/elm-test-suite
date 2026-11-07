@@ -1,0 +1,220 @@
+% Values: ILLUMINATING
+% Evidence planned:
+% - ILLUMINATING: the case for a formal definition of Elm (implementers, a
+%   second implementation in eco, programmers who reason about programs); the
+%   character of the language as it shapes the definition (D2 to D7, D10,
+%   D11); the method, with the keystone sentence B |- P => M stated and
+%   explained in words, rules from constituent phrases, and the factoring
+%   into static and dynamic semantics; the debt to the Definition of
+%   Standard ML (D1) and the two conventions that the absence of state and
+%   exceptions removes; what is left to implementations and where rulings
+%   declare existing behaviour non-conforming (Appendix E).
+
+\chapter*{Preface}\addcontentsline{toc}{chapter}{Preface}
+
+Until now the meaning of an Elm program has been settled in practice by what
+one implementation does with it: the Elm compiler for JavaScript, together
+with the JavaScript kernel of its core library. The language is described in
+prose, in a guide and in the documentation of its libraries, and that
+description serves a programmer learning the language well. It serves less
+well three other readers. An implementer must decide, for every construction,
+what the program means, and cannot always tell from the existing
+implementation whether a behaviour is the language's or the accident of a
+host. A programmer who wants to show that two programs are equivalent, or
+that a function never fails, needs a meaning precise enough to argue from.
+And two parties who must agree on what a given program does need a text that
+both accept as the authority.
+
+This book is a formal definition of both the grammar and the meaning of Elm,
+version 0.19.1. The occasion for it is a second implementation, eco, which
+compiles Elm to native code and has its own runtime. Two implementations on
+different hosts give different answers wherever an answer was a consequence
+of the host rather than of the language: the range of integers, what a
+character is, what happens when an integer is divided by zero. Once there
+are two, each such question must be answered once, independently of both,
+and precisely enough that either implementation can be checked against the
+answer. We call the language so defined \emph{Standard Elm}.
+
+\section*{Standard Elm}
+
+Elm is a functional language for writing interactive programs that run
+under the control of a host, first of all a web browser. It is pure: a
+phrase denotes a value, and evaluating it changes nothing, since the
+language has no assignable variables, no mutable data and no input or
+output. It is strict: the argument of a function is evaluated before the
+function is applied. It is statically typed, with types inferred and
+polymorphism introduced at definitions. In its semantics it is extremely
+close to ML: values, closures, custom types with constructors, pattern
+matching and polymorphic type inference behave as they do there, and where
+the two languages agree this definition gives Elm the meaning ML has. % D7
+
+Five features distinguish Elm from ML and shape the definition. First, Elm
+has no exceptions and pursues the aim that a program which has been accepted
+does not fail when it runs. No phrase raises or handles an exception, and
+the definition gives every phrase that has elaborated either a value or
+none. A phrase has no value only when its evaluation does not terminate,
+when it needs a top-level value while that value is itself being evaluated,
+or when it reaches \kw{Debug.todo}, the one escape the language provides.
+% D2, A25, A62
+Arithmetic is accordingly total: where an operation has no mathematically
+correct result, the definition gives a defined answer in its place, so that
+\kw{3 // 0} is \kw{0}. % D3, A42
+The basic arithmetic and comparison operations are defined in this book
+rather than left to a library. % D4
+Second, records are row-polymorphic: a function may demand some fields of a
+record and accept any record that has them, and a record type may end in a
+row variable standing for the fields not named. % D5
+Third, a type variable may be constrained to a class (\kw{number},
+\kw{comparable}, \kw{appendable} or \kw{compappend}) and then stands only for
+the few predefined types on which arithmetic, ordering or appending is
+defined. The classes are fixed: a program cannot add types to them. They
+take the place of ML's overloaded identifiers and equality types, and
+equality itself is defined at every type. % A35
+Fourth, the module system is deliberately simple. A module is a sequence of
+top-level declarations and makes some of them available to other modules by
+name; there are no signatures, functors or sharing. % D6
+Fifth, effects are managed. A program never performs an effect. It computes
+values that describe effects (\emph{commands}, \emph{subscriptions} and
+\emph{tasks}) and hands them to the platform that runs it; the platform
+performs them and returns their outcomes to the program as messages, one
+at a time. Commands, subscriptions and tasks are defined as types of the
+basis rather than as syntax, but they are integral to the language and have
+a chapter of their own. % D10
+A program communicates with its host through \emph{ports}, which it
+declares; \kw{port} is a reserved word, port declarations belong to the
+language, and the definition states exactly which values can and cannot be
+sent over a port. % D11
+
+Standard Elm leaves out what Elm reserves to its own core packages: effect
+modules, declarations of new infix operators and references to kernel code.
+It also leaves out embedded shader blocks, which belong to a graphics
+extension rather than to the language.
+
+\section*{Language Definition}
+
+The words of a programming language (\kw{type}, \kw{case}, \kw{port},
+\kw{module}) name things that are not phrases: types, values, functions,
+interfaces, commands. These things are the \emph{semantic objects} of the
+language, and they, not its syntax, carry its character; when programmers
+think about an Elm program they think in terms of them. For Standard Elm the
+semantic objects include types with rows and classes, type schemes,
+environments and module interfaces on the one hand, and values, closures,
+records, tasks, commands and the boundary values (JSON values, with byte
+sequences) that cross a port on the other. % A92
+A definition of the language must therefore be a definition in terms of
+these objects. They must be described in a notation independent of Elm,
+since to describe them in another programming language would only move the
+question to that language; ordinary mathematics serves. And they must be
+given enough theory (substitution, instantiation, closure, the properties on
+which the rules rely) for the rules to make sense, as a mathematician
+develops the theory of the objects a subject is about.
+
+With the objects in hand, the definition must say what meaning each phrase
+of the language has. Here the keystone of our method is that a phrase never
+has a meaning in isolation. It always has a meaning against a background,
+which is itself a semantic object: a distillation of what earlier phrases
+have contributed, such as the types and values of the names in scope and the
+interfaces of the modules imported. The meaning of a phrase depends on its
+background as much as on the phrase. The basic assertion of the definition
+is therefore a sentence of the form
+\[
+  \jdg{B}{P}{M},
+\]
+read ``against the background $B$, the phrase $P$ has the meaning $M$''. The
+formal purpose of this definition is exactly to decree which sentences of
+this form hold, and no more. It does so by rules, each of which allows a
+sentence about a compound phrase to be inferred from sentences about its
+constituent phrases, so that the meaning of a phrase is determined by the
+meanings of its parts. The rules are numbered through the whole book, and
+each group of them is followed by Comments on the points that are not
+obvious.
+
+The meaning of an Elm phrase has two parts: what can be known of it before it
+is evaluated, namely whether it is well formed and what its type is, and the
+value it evaluates to. We give the two separately. The \emph{static
+semantics} infers types and interfaces, and the \emph{dynamic semantics}
+infers values; each is an instance of the keystone, with its own backgrounds
+and its own meanings. The factoring is genuine. A value never has to be
+presented together with its type, and the dynamic semantics consults no type
+except where a port must know the type of what it sends or receives. A
+phrase that does not elaborate has no meaning at all, and the dynamic
+semantics need not consider it.
+
+\section*{This Definition}
+
+This book follows \emph{The Definition of Standard ML (Revised)} closely, in
+its structure, its notation and its style: a grid of phases against levels,
+a bare language with derived forms, semantic objects defined in figures,
+numbered inference rules with Comments, and an initial basis in appendices.
+% D1
+Where Elm agrees with ML we have followed the treatment of that book, so
+that a reader who knows it will find most of the static semantics of the
+Core, and much of its dynamic semantics, in familiar form. % D7
+The additions are the row variables and classes of the static semantics,
+the much smaller static semantics of modules, a chapter on tasks, commands,
+subscriptions and ports, and a chapter on programs which defines how the
+platform runs a program as a labelled transition system whose observable
+behaviour is its traffic on ports. Appendix~\ref{ch:appendix-standard-ml}
+compares the two definitions construct by construct.
+
+Two conventions of the Definition of Standard ML are absent here. There,
+every sentence of the dynamic semantics carries a state, for references, and
+the state is threaded through the premises of every rule, so that the order
+of the premises is the order of evaluation; and for every rule there are
+further implicit rules by which an exception packet raised in a premise
+becomes the result of the conclusion. Standard Elm has neither state nor
+exceptions, so neither convention is needed. Its dynamic sentences carry no
+state, the order of premises carries no meaning, and no rule produces a
+packet. % D2, A58
+
+The body of the definition does not settle everything. Where implementations
+legitimately differ (the range of integers, what a character is, the
+treatment of floating-point special values, the order in which the commands
+of a batch are performed), the body states only what every implementation
+must satisfy, through abstract parameters, and
+Appendix~\ref{ch:appendix-implementation} records the choices of Elm on
+JavaScript and of eco, with their consequences for programs. % D8
+Elsewhere the two implementations disagreed, or agreed on a behaviour that
+followed from their hosts rather than from the language, and the definition
+had to decide. Each such decision is a ruling, taken in the spirit of the
+language: no run-time errors, total arithmetic, and a meaning that does not
+depend on how a program is optimised. Some rulings declare existing
+behaviour non-conforming. On Elm on JavaScript, \kw{modBy 0 x} stops the
+program and comparing two functions with \kw{==} stops it too, where the
+definition gives \kw{0} and a Boolean; on eco, a negative power of
+\kw{-1} or \kw{1} is \kw{0} where the definition gives \kw{1} or \kw{-1};
+on both, a value containing a NaN may be equal to itself, where the
+definition says that it is not. % A42, A43, A50, A51
+Appendix~\ref{ch:appendix-implementation} lists every such point with the
+ruling that settles it.
+
+\section*{How this Definition was Produced}
+
+This definition was written with the assistance of an AI system, Claude
+(model Claude Opus 5.5, made by Anthropic), working within a staged,
+documented workflow. Under the author's direction it surveyed the sources
+and test suites of the two implementations, Elm 0.19.1 and eco, recording
+each fact with a citation to the code or test that establishes it; it
+proposed a ruling, with its reasons, wherever the implementations disagree
+or are silent; it drafted the chapters and appendices; it audited the
+drafts, in independent passes, for consistency between chapters; and it
+encoded the dynamic semantics of the Core in the proof assistant Lean~4,
+with an evaluator proved to agree with the rules and checked against the
+expected results in eco's test programs. The author set the directions the
+definition follows, reviewed every ruling, and is responsible for the
+whole; the AI system is not an author. The survey, the record of rulings,
+the audit reports and the mechanisation are kept with the sources of this
+book.
+
+\section*{Acknowledgements}
+
+Elm was designed by Evan Czaplicki, and the language defined here is his.
+The form of this book is that of \emph{The Definition of Standard ML} by
+Robin Milner, Mads Tofte, Robert Harper and David MacQueen; we are indebted
+to them for a method which has served a second language with little change.
+
+\bigskip
+\begin{flushright}
+Rupert Smith\\[2ex]
+November 2026
+\end{flushright}

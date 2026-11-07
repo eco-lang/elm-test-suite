@@ -1,0 +1,576 @@
+% Values: PRECISE, FAITHFUL
+% Evidence planned:
+% - PRECISE: B0 = (T0, ME0, PE0) given component by component; every type name
+%   with its arity; every interface in ME0 as a type environment and a value
+%   environment in the object notation of Chapter 4 (fig:static-core-compound);
+%   the static operator table OT_STAT, every operator with the type scheme and
+%   status of the hidden identifier it stands for; tynames ME0 contained in T0.
+% - FAITHFUL: type schemes exactly as the annotations of elm/core 1.0.5,
+%   elm/json 1.1.4 and elm/virtual-dom 1.0.5 (Bytes from elm/bytes for its
+%   type only, A92), class-attributed variables
+%   written by their spelling (A19); all of Basics (D4); equality at every type
+%   (A35); Debug as ruled in A62; the default imports (fig:default-imports)
+%   elaborate against ME0; List in scope before any import; the library beyond
+%   these entries is outside the definition (I1; plan "Out of Scope"); the
+%   values of Task, Cmd, Sub, Process and Platform are exactly those that the
+%   effects chapter gives a meaning (fig:effects-apply and the Elm-written
+%   functions listed after it), so that the basis is paired (I2).
+
+\chapter{The Initial Static Basis}\label{ch:appendix-static-basis}
+
+In this appendix and the next we define a minimal initial basis: the type
+names, modules, types and values that the definition itself mentions, together
+with all of the module \kw{Basics}. % D4, I1
+Libraries may provide richer bases, extending the module environment with
+further modules and the interfaces below with further values; such libraries
+are not described here. Components of the initial basis are indicated by the
+subscript 0. The initial static basis is
+\[
+  B_0 = T_0, \ME_0, \PE_0, \qquad\text{where}\ \PE_0 = \emptymap,
+\]
+$T_0$ is given in Section~\ref{sec:appendix-static-basis-tynames} and $\ME_0$
+in Sections~\ref{sec:appendix-static-basis-modenv}
+to~\ref{sec:appendix-static-basis-platform}. The basis declares no port.
+
+In the type schemes of this appendix a type variable is written as the type
+variable of the syntax that names it (Section~\ref{sec:static-core-simple}), so
+that its spelling gives its class: \mv{number} has class $\knum$,
+\mv{comparable} has class $\kcomp$, \mv{appendable} has class $\kapp$, and
+every other variable written here (\mv{a}, \mv{b}, \mv{c}, \mv{d}, \mv{e},
+\mv{r}, \mv{x}, \mv{y}, \mv{msg}, \mv{flags}, \mv{model}) has class $\kany$. % A19
+No variable of class $\kcapp$ occurs in the initial basis. A type is written as
+in Chapter~\ref{ch:static-core}, with type names after their arguments: the
+type that a program writes \kw{Maybe a} is $\mv{a}\,\tMaybe$, and \kw{Task x
+a} is $(\mv{x}, \mv{a})\sbtTask$.
+
+\section{Type Names}\label{sec:appendix-static-basis-tynames}
+
+The set of type names of the initial basis is
+\[
+\begin{array}{@{}r@{\ }c@{\ }l@{}}
+  T_0 & = & \{\tInt, \tFloat, \tChar, \tString, \tunit, \tList, \tTuple{2},
+            \tTuple{3},\\
+      &   & \phantom{\{}\tBool, \sbtOrder, \sbtNever, \tMaybe, \sbtResult,
+            \tArray, \tBytes, \tValue,\\
+      &   & \phantom{\{}\sbtCmd, \sbtSub, \sbtTask, \sbtProcessId,
+            \sbtProgram, \sbtNode\}.
+\end{array}
+\]
+The members of $T_0$ are type names, not type constructors; we have spelt each
+as a type constructor bound to it in $\ME_0$, or, for $\tunit$ and
+$\tTuple{k}$, after the syntax of the types that denote them. Their arities,
+and the type constructors bound to them, are shown in
+Figure~\ref{fig:static-basis-tynames}. The first eight are the type names of
+Figure~\ref{fig:static-core-builtin}, which the rules of
+Chapter~\ref{ch:static-core} mention directly. The type names $\tunit$,
+$\tTuple{2}$ and $\tTuple{3}$ are bound to no type constructor: the type
+expressions \kw{()} and \kw{(}$\,\ty_1\kw{,}\,\ty_2\opt{\kw{,}\,\ty_3}\,$\kw{)}
+denote them. Which of the type names are admissible for each class is given by
+Figure~\ref{fig:static-core-admissible}: a type built from any type name of
+$T_0$ other than $\tInt$, $\tFloat$, $\tChar$, $\tString$, $\tList$,
+$\tTuple{2}$ and $\tTuple{3}$ is admissible for no class but $\kany$.
+
+\begin{figure}[htbp]
+\centering
+\small
+\begin{tabular}{@{}>{$}l<{$}c>{$}l<{$}@{}}
+\hline
+t & arity & \text{bound to}\\
+\hline
+\tInt & 0 & \kw{Basics.Int}\\
+\tFloat & 0 & \kw{Basics.Float}\\
+\tChar & 0 & \kw{Char.Char}\\
+\tString & 0 & \kw{String.String}\\
+\tunit & 0 & \text{(none)}\\
+\tList & 1 & \kw{List}\ \text{(Section~\ref{sec:appendix-static-basis-modenv})}\\
+\tTuple{2} & 2 & \text{(none)}\\
+\tTuple{3} & 3 & \text{(none)}\\
+\tBool & 0 & \kw{Basics.Bool}\\
+\sbtOrder & 0 & \kw{Basics.Order}\\
+\sbtNever & 0 & \kw{Basics.Never}\\
+\tMaybe & 1 & \kw{Maybe.Maybe}\\
+\sbtResult & 2 & \kw{Result.Result}\\
+\tArray & 1 & \kw{Array.Array}\\
+\tBytes & 0 & \kw{Bytes.Bytes}\\
+\tValue & 0 & \kw{Json.Encode.Value},\ \kw{Json.Decode.Value}\\
+\sbtCmd & 1 & \kw{Platform.Cmd.Cmd}\\
+\sbtSub & 1 & \kw{Platform.Sub.Sub}\\
+\sbtTask & 2 & \kw{Platform.Task},\ \kw{Task.Task}\\
+\sbtProcessId & 0 & \kw{Platform.ProcessId},\ \kw{Process.Id}\\
+\sbtProgram & 3 & \kw{Platform.Program}\\
+\sbtNode & 1 & \kw{VirtualDom.Node},\ \kw{Html.Html}\\
+\hline
+\end{tabular}
+\caption{Type Names of the Initial Basis, $T_0$}\label{fig:static-basis-tynames}
+\end{figure}
+
+The type names $\tBool$, $\sbtOrder$, $\tMaybe$ and $\sbtResult$ are those of
+custom types whose constructors $\ME_0$ exposes; $\sbtNever$ is that of a
+custom type that \kw{Basics} exposes closed
+(Section~\ref{sec:static-modules-objects}): its one constructor
+\kw{JustOneMore} is in its type structure but not in the value environment of
+the interface, so that no phrase of a program has a value of type
+$\sbtNever$. The others are \emph{abstract}: $\ME_0$ binds them with no
+constructors, and their values are given by the dynamic basis
+(Appendix~\ref{ch:appendix-dynamic-basis}) and Chapter~\ref{ch:effects}.
+% X2/X3 (decision 3): Never is a closed custom type, as Chapter 5 defines
+% closed (constructors in the type structure, none in VE of I).
+
+\section{The Module Environment}\label{sec:appendix-static-basis-modenv}
+
+The module environment $\ME_0$ has the domain
+\[
+\begin{array}{@{}l@{}}
+  \{\kw{Basics}, \kw{List}, \kw{Maybe}, \kw{Result}, \kw{String}, \kw{Char},
+    \kw{Tuple}, \kw{Array}, \kw{Bytes}, \kw{Debug},\\
+  \phantom{\{}\kw{Platform}, \kw{Platform.Cmd}, \kw{Platform.Sub}, \kw{Task},
+    \kw{Process},\\
+  \phantom{\{}\kw{Json.Encode}, \kw{Json.Decode}, \kw{VirtualDom}, \kw{Html}\}.
+\end{array}
+\]
+The interface $\ME_0(\modid)$ of each module is an environment
+$(\emptymap, \TE, \VE)$ whose qualified environment is empty; its type
+environment and value environment are shown in
+Figures~\ref{fig:static-basis-basics-te} to~\ref{fig:static-basis-effects}.
+In Figures~\ref{fig:static-basis-data} to~\ref{fig:static-basis-effects} the
+entries of each interface are headed by the name of its module; the bindings
+of the type environment come first and, below a rule, those of the value
+environment. An interface with no binding shown in a component has the empty
+map there; the interfaces of \kw{List} and \kw{Tuple} are $(\emptymap,
+\emptymap, \emptymap)$. As in Chapter~\ref{ch:static-core}, every
+variable has status $\isv$ and every constructor status $\isc$, and a
+constructor of a custom type is bound in the value environment of the
+type's structure and, unless the type is closed, in the value environment of
+the interface. The type names
+occurring in $\ME_0$ are those of $T_0$:
+\[
+  \tynames \ME_0 \subseteq T_0 .
+\]
+
+Every module of $\ME_0$ belongs to the library \kw{elm/core}, except five:
+\kw{Bytes} belongs to \kw{elm/bytes}, \kw{Json.Encode} and \kw{Json.Decode}
+to \kw{elm/json}, \kw{VirtualDom} to \kw{elm/\allowbreak virtual-dom}, and
+\kw{Html} to \kw{elm/html}.
+These five are in $\ME_0$ only for their types, which the definition of ports
+(Section~\ref{sec:static-modules-ports}) and of the type of \kw{main}
+(Chapter~\ref{ch:programs}) mention. % A82, A92, D11
+
+Before any import is read, every module has in scope, unqualified, the type
+constructor \kw{List} and the two list constructor names \kw{[]} and \kw{::}
+of Section~\ref{sec:static-core-compound}, which no identifier spells. They
+form the environment
+\[
+  E_0 = (\emptymap, \TE_0, \VE_0), \qquad
+  \TE_0 = \{\kw{List}\citelabel{b:List} \mapsto (\tList, \VE_0)\},
+\]
+where
+\[
+  \VE_0 = \{\kw{[]}\citealso{b:List} \mapsto (\forall\mv{a}.\,\mv{a}\,\tList, \isc),\
+           \kw{::}\citealso{b:List} \mapsto (\forall\mv{a}.\,\mv{a} \rightarrow \mv{a}\,\tList
+           \rightarrow \mv{a}\,\tList, \isc)\}.
+\]
+% DECIDED: the List type constructor is in scope in every module before the
+% default imports (eco Compiler/Canonicalize/Environment/Foreign.elm:109-121;
+% Parse/DefaultImports.elm), and is not exposed by the module List, so it is
+% given as E0 rather than in ME0(List). TE_0 and VE_0 are defined here only;
+% Chapter 5 starts each module from E0 through pi_0, citing TE_0 and VE_0 for
+% the List entries of its provider map (audit X10; decision 2).
+The module \kw{List} declares neither the type constructor \kw{List} nor any
+constructor, so that \kw{List.List} is not a long type constructor of the
+initial basis.
+
+The imports of every module begin with the default imports of
+Figure~\ref{fig:default-imports}, which are elaborated
+(Chapter~\ref{ch:static-modules}) against $\ME_0$. Every module they name is
+in $\Dom\ME_0$, and every type and value they expose is in that module's
+interface; an operator they expose is one that the module declares, and
+binds nothing. Thus the default imports put in scope, unqualified, every
+type, constructor and value of \kw{Basics}; the types \kw{Maybe},
+\kw{Result}, \kw{String}, \kw{Char}, \kw{Program}, \kw{Cmd} and \kw{Sub}; and
+the constructors of \kw{Maybe} and \kw{Result}. They make every value of
+\kw{Debug}, \kw{Platform}, \kw{Maybe} and \kw{Result} available qualified, and
+those of \kw{Platform.Cmd} and \kw{Platform.Sub} under the qualifiers \kw{Cmd}
+and \kw{Sub}. The modules \kw{Array}, \kw{Bytes}, \kw{Task}, \kw{Process},
+\kw{Json.Encode}, \kw{Json.Decode}, \kw{VirtualDom} and \kw{Html} are in scope
+only where a module imports them.
+
+\textbf{Operators.} No program declares an operator, so the operators are
+those of the initial basis, the same in every program; their fixities are
+those of Figure~\ref{fig:core-fixities}. Each is declared, by \kw{Basics} or
+\kw{List}, to stand for an identifier. The \emph{static operator table}
+\[
+  \OTstat : \cls{Op} \finmap \TypeScheme \times \IdStatus
+\]
+maps each operator of Figure~\ref{fig:core-fixities} to the type scheme and
+status of the identifier it stands for, and is given in
+Figure~\ref{fig:static-basis-operators}. The meaning of an operator is
+$\OTstat(\opv)$, whatever the context (Section~\ref{sec:static-core-projection}):
+it is looked up in no environment and reached through no interface, so a
+program's own top-level \kw{add} does not capture \kw{+}. The operators of
+library modules outside the initial basis are outside the definition.
+% A16, A56; audit X1 (decision 1)
+The operator \kw{::} stands for the list constructor \kw{::} of $\VE_0$, with
+status $\isc$, and is declared by \kw{List}; every other operator is declared
+by \kw{Basics}, as the figure records, so that the set of operators that
+\kw{List} declares is $\{\kw{::}\}$ and that of \kw{Basics} is
+$\Dom\OTstat\setminus\{\kw{::}\}$ (no other module of $\ME_0$ declares an
+operator). Every operator other than \kw{::} stands for a variable of \kw{Basics}
+(\kw{add}, \kw{eq}, \kw{apR} and the others of the figure) that \kw{Basics}
+declares but does not expose. These variables are \emph{hidden}: they are
+bound in no interface of $\ME_0$, so that no program can write
+\kw{Basics.add} or \kw{add} for \kw{(+)}.
+
+\textbf{Hidden identifiers.} Besides the variables that the operators stand
+for, the modules of $\ME_0$ declare the following identifiers, which no
+interface binds and no program can name: the constructor \kw{JustOneMore} of
+the closed type \kw{Never} of \kw{Basics}; and, in \kw{Task}, the function
+\kw{command} and the constructor \kw{Perform} of the custom type \kw{MyCmd},
+which \kw{Task} does not expose. In elm/core 1.0.5 that type is declared as
+\kw{type MyCmd msg = Perform (Task Never msg)}, so the task that \kw{Perform}
+carries cannot fail. These hidden identifiers are mentioned only by the texts of
+values of the basis written in Elm, and their values are given in
+Section~\ref{sec:appendix-dynamic-basis-elm}. % I2, A60, A85
+
+\textbf{Library functions.} The modules of $\ME_0$ declare, in their
+libraries, many values that are absent from the figures, among them every
+function of \kw{List}, \kw{String}, \kw{Char}, \kw{Tuple}, \kw{Array},
+\kw{Maybe} and \kw{Result}, the functions of \kw{Bytes}, and the encoders,
+decoders and views of \kw{elm/json} and \kw{elm/html}. Like the modules not in
+$\Dom\ME_0$ (\kw{Dict}, \kw{Set}, \kw{Bitwise}, \kw{Bytes.Encode},
+\kw{Bytes.Decode} and the rest), they are library, not language, and lie outside
+the definition. The module \kw{Tuple} is in $\ME_0$ only because a default
+import names it; its interface is empty. The type \kw{Router} and the values
+\kw{sendToApp} and \kw{sendToSelf} of \kw{Platform}, which serve managers,
+are omitted with them, effect modules being kernel-only. % A16, A37, I1
+
+\section{Basics}\label{sec:appendix-static-basis-basics}
+
+The interface $\ME_0(\kw{Basics})$ contains every type and value that
+\kw{Basics} exposes. Its type environment is shown in
+Figure~\ref{fig:static-basis-basics-te}, and its value environment in
+Figures~\ref{fig:static-basis-basics-ve1} and~\ref{fig:static-basis-basics-ve2}.
+The equality operators have a type scheme whose variable has class $\kany$, so
+that equality elaborates at every type. % A35
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{|r@{\ }c@{\ }l|}
+\hline
+\tycon & \mapsto & (\theta,\ \{\con_1 \mapsto (\sigma_1, \is_1), \cdots, \con_n \mapsto (\sigma_n, \is_n)\})\quad (n \ge 0)\\
+\hline
+\kw{Int}\citelabel{b:Basics.Int} & \mapsto & (\tInt,\ \emptymap)\\
+\kw{Float}\citelabel{b:Basics.Float} & \mapsto & (\tFloat,\ \emptymap)\\
+\kw{Bool}\citelabel{b:Basics.Bool} & \mapsto & (\tBool,\ \{\kw{True} \mapsto (\tBool, \isc),\ \kw{False} \mapsto (\tBool, \isc)\})\\
+\kw{Order}\citelabel{b:Basics.Order} & \mapsto & (\sbtOrder,\ \{\kw{LT} \mapsto (\sbtOrder, \isc),\ \kw{EQ} \mapsto (\sbtOrder, \isc),\\
+ & & \phantom{(\sbtOrder,\ \{}\kw{GT} \mapsto (\sbtOrder, \isc)\})\\
+\kw{Never}\citelabel{b:Basics.Never} & \mapsto & (\sbtNever,\ \{\kw{JustOneMore} \mapsto (\sbtNever \rightarrow \sbtNever, \isc)\})\\
+\hline
+\end{array}
+\]
+\caption{Static $\TE$ of $\ME_0(\kw{Basics})$}\label{fig:static-basis-basics-te}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{|r@{\ }c@{\ }l|}
+\hline
+\var\ \text{or}\ \con & \mapsto & (\sigma, \is)\\
+\hline
+\kw{True}\citealso{b:Basics.Bool},\ \kw{False}\citealso{b:Basics.Bool} & \mapsto & (\tBool, \isc)\\
+\kw{LT}\citealso{b:Basics.Order},\ \kw{EQ}\citealso{b:Basics.Order},\ \kw{GT}\citealso{b:Basics.Order} & \mapsto & (\sbtOrder, \isc)\\
+\hline
+\kw{toFloat}\citelabel{b:Basics.toFloat} & \mapsto & (\tInt \rightarrow \tFloat, \isv)\\
+\kw{round}\citelabel{b:Basics.round},\ \kw{floor}\citelabel{b:Basics.floor} & \mapsto & (\tFloat \rightarrow \tInt, \isv)\\
+\kw{ceiling}\citelabel{b:Basics.ceiling},\ \kw{truncate}\citelabel{b:Basics.truncate} & \mapsto & (\tFloat \rightarrow \tInt, \isv)\\
+\hline
+\kw{max}\citelabel{b:Basics.max},\ \kw{min}\citelabel{b:Basics.min} & \mapsto & (\forall\mv{comparable}.\,\mv{comparable} \rightarrow \mv{comparable}\\
+ & & \phantom{(\forall\mv{comparable}.\,}{} \rightarrow \mv{comparable}, \isv)\\
+\kw{compare}\citelabel{b:Basics.compare} & \mapsto & (\forall\mv{comparable}.\,\mv{comparable} \rightarrow \mv{comparable} \rightarrow \sbtOrder, \isv)\\
+\hline
+\kw{not}\citelabel{b:Basics.not} & \mapsto & (\tBool \rightarrow \tBool, \isv)\\
+\kw{xor}\citelabel{b:Basics.xor} & \mapsto & (\tBool \rightarrow \tBool \rightarrow \tBool, \isv)\\
+\hline
+\kw{modBy}\citelabel{b:Basics.modBy},\ \kw{remainderBy}\citelabel{b:Basics.remainderBy} & \mapsto & (\tInt \rightarrow \tInt \rightarrow \tInt, \isv)\\
+\kw{negate}\citelabel{b:Basics.negate},\ \kw{abs}\citelabel{b:Basics.abs} & \mapsto & (\forall\mv{number}.\,\mv{number} \rightarrow \mv{number}, \isv)\\
+\kw{clamp}\citelabel{b:Basics.clamp} & \mapsto & (\forall\mv{number}.\,\mv{number} \rightarrow \mv{number} \rightarrow \mv{number}\\
+ & & \phantom{(\forall\mv{number}.\,}{} \rightarrow \mv{number}, \isv)\\
+\hline
+\end{array}
+\]
+\caption{Static $\VE$ of $\ME_0(\kw{Basics})$: Constructors, Conversions,
+Comparison, Booleans and Integer Functions}\label{fig:static-basis-basics-ve1}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{|r@{\ }c@{\ }l|}
+\hline
+\var & \mapsto & (\sigma, \is)\\
+\hline
+\kw{sqrt}\citelabel{b:Basics.sqrt} & \mapsto & (\tFloat \rightarrow \tFloat, \isv)\\
+\kw{logBase}\citelabel{b:Basics.logBase} & \mapsto & (\tFloat \rightarrow \tFloat \rightarrow \tFloat, \isv)\\
+\kw{e}\citelabel{b:Basics.e},\ \kw{pi}\citelabel{b:Basics.pi} & \mapsto & (\tFloat, \isv)\\
+\kw{degrees}\citelabel{b:Basics.degrees},\ \kw{radians}\citelabel{b:Basics.radians} & \mapsto & (\tFloat \rightarrow \tFloat, \isv)\\
+\kw{turns}\citelabel{b:Basics.turns} & \mapsto & (\tFloat \rightarrow \tFloat, \isv)\\
+\kw{cos}\citelabel{b:Basics.cos},\ \kw{sin}\citelabel{b:Basics.sin},\ \kw{tan}\citelabel{b:Basics.tan} & \mapsto & (\tFloat \rightarrow \tFloat, \isv)\\
+\kw{acos}\citelabel{b:Basics.acos},\ \kw{asin}\citelabel{b:Basics.asin},\ \kw{atan}\citelabel{b:Basics.atan} & \mapsto & (\tFloat \rightarrow \tFloat, \isv)\\
+\kw{atan2}\citelabel{b:Basics.atan2} & \mapsto & (\tFloat \rightarrow \tFloat \rightarrow \tFloat, \isv)\\
+\kw{toPolar}\citelabel{b:Basics.toPolar} & \mapsto & ((\tFloat, \tFloat)\tTuple{2} \rightarrow (\tFloat, \tFloat)\tTuple{2}, \isv)\\
+\kw{fromPolar}\citelabel{b:Basics.fromPolar} & \mapsto & ((\tFloat, \tFloat)\tTuple{2} \rightarrow (\tFloat, \tFloat)\tTuple{2}, \isv)\\
+\kw{isNaN}\citelabel{b:Basics.isNaN},\ \kw{isInfinite}\citelabel{b:Basics.isInfinite} & \mapsto & (\tFloat \rightarrow \tBool, \isv)\\
+\hline
+\kw{identity}\citelabel{b:Basics.identity} & \mapsto & (\forall\mv{a}.\,\mv{a} \rightarrow \mv{a}, \isv)\\
+\kw{always}\citelabel{b:Basics.always} & \mapsto & (\forall\mv{a}\,\mv{b}.\,\mv{a} \rightarrow \mv{b} \rightarrow \mv{a}, \isv)\\
+\kw{never}\citelabel{b:Basics.never} & \mapsto & (\forall\mv{a}.\,\sbtNever \rightarrow \mv{a}, \isv)\\
+\hline
+\end{array}
+\]
+\caption{Static $\VE$ of $\ME_0(\kw{Basics})$: Floating-point Functions and
+Function Helpers}\label{fig:static-basis-basics-ve2}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\small
+\setlength{\arraycolsep}{3pt}
+\[
+\begin{array}{|c@{\ }l@{\ }c@{\ }l|}
+\hline
+\opv & \text{stands for} & \mapsto & \OTstat(\opv)\\
+\hline
+\kw{<{}<} & \kw{composeL}\citelabel{b:Basics.composeL} & \mapsto & (\forall\mv{a}\,\mv{b}\,\mv{c}.\,(\mv{b} \rightarrow \mv{c}) \rightarrow (\mv{a} \rightarrow \mv{b}) \rightarrow \mv{a} \rightarrow \mv{c}, \isv)\\
+\kw{>{}>} & \kw{composeR}\citelabel{b:Basics.composeR} & \mapsto & (\forall\mv{a}\,\mv{b}\,\mv{c}.\,(\mv{a} \rightarrow \mv{b}) \rightarrow (\mv{b} \rightarrow \mv{c}) \rightarrow \mv{a} \rightarrow \mv{c}, \isv)\\
+\kw{\textasciicircum} & \kw{pow}\citelabel{b:Basics.pow} & \mapsto & (\forall\mv{number}.\,\mv{number} \rightarrow \mv{number} \rightarrow \mv{number}, \isv)\\
+\kw{*} & \kw{mul}\citelabel{b:Basics.mul} & \mapsto & (\forall\mv{number}.\,\mv{number} \rightarrow \mv{number} \rightarrow \mv{number}, \isv)\\
+\kw{/} & \kw{fdiv}\citelabel{b:Basics.fdiv} & \mapsto & (\tFloat \rightarrow \tFloat \rightarrow \tFloat, \isv)\\
+\kw{//} & \kw{idiv}\citelabel{b:Basics.idiv} & \mapsto & (\tInt \rightarrow \tInt \rightarrow \tInt, \isv)\\
+\kw{+},\ \kw{-} & \kw{add}\citelabel{b:Basics.add},\ \kw{sub}\citelabel{b:Basics.sub} & \mapsto & (\forall\mv{number}.\,\mv{number} \rightarrow \mv{number} \rightarrow \mv{number}, \isv)\\
+\kw{++} & \kw{append}\citelabel{b:Basics.append} & \mapsto & (\forall\mv{appendable}.\,\mv{appendable} \rightarrow \mv{appendable}\\
+ & & & \phantom{(\forall\mv{appendable}.\,}{} \rightarrow \mv{appendable}, \isv)\\
+\kw{::}^{*} & \kw{::}\citealso{b:List} & \mapsto & (\forall\mv{a}.\,\mv{a} \rightarrow \mv{a}\,\tList \rightarrow \mv{a}\,\tList, \isc)\\
+\kw{==},\ \kw{/=} & \kw{eq}\citelabel{b:Basics.eq},\ \kw{neq}\citelabel{b:Basics.neq} & \mapsto & (\forall\mv{a}.\,\mv{a} \rightarrow \mv{a} \rightarrow \tBool, \isv)\\
+\kw{<},\ \kw{>} & \kw{lt}\citelabel{b:Basics.lt},\ \kw{gt}\citelabel{b:Basics.gt} & \mapsto & (\forall\mv{comparable}.\,\mv{comparable} \rightarrow \mv{comparable} \rightarrow \tBool, \isv)\\
+\kw{<=},\ \kw{>=} & \kw{le}\citelabel{b:Basics.le},\ \kw{ge}\citelabel{b:Basics.ge} & \mapsto & (\forall\mv{comparable}.\,\mv{comparable} \rightarrow \mv{comparable} \rightarrow \tBool, \isv)\\
+\kw{\&\&},\ \kw{||} & \kw{and}\citelabel{b:Basics.and},\ \kw{or}\citelabel{b:Basics.or} & \mapsto & (\tBool \rightarrow \tBool \rightarrow \tBool, \isv)\\
+\kw{|>} & \kw{apR}\citelabel{b:Basics.apR} & \mapsto & (\forall\mv{a}\,\mv{b}.\,\mv{a} \rightarrow (\mv{a} \rightarrow \mv{b}) \rightarrow \mv{b}, \isv)\\
+\kw{<|} & \kw{apL}\citelabel{b:Basics.apL} & \mapsto & (\forall\mv{a}\,\mv{b}.\,(\mv{a} \rightarrow \mv{b}) \rightarrow \mv{a} \rightarrow \mv{b}, \isv)\\
+\hline
+\end{array}
+\]
+\par\smallskip
+\begin{minipage}{0.8\textwidth}\small
+${}^{*}$\,Declared by \kw{List} to stand for the list constructor \kw{::}
+of $\VE_0$. Every other operator is declared by \kw{Basics} to stand for the
+hidden variable shown.
+\end{minipage}
+\caption{The Static Operator Table, $\OTstat$}\label{fig:static-basis-operators}
+\end{figure}
+
+The operators of Figure~\ref{fig:static-basis-operators} are listed in
+decreasing order of precedence. The infixed forms of \kw{\&\&} and \kw{||} are
+derived forms (Appendix~\ref{ch:appendix-derived-forms}), which elaborate as
+conditional expressions; the type schemes of \kw{and} and \kw{or} are those of
+the operator values \kw{(\&\&)} and \kw{(||)}. % A56
+
+\section{Further Data Types}\label{sec:appendix-static-basis-data}
+
+The interfaces of \kw{Maybe}, \kw{Result}, \kw{String}, \kw{Char},
+\kw{Array} and \kw{Bytes} are shown in Figure~\ref{fig:static-basis-data}. The interfaces of
+\kw{List} and \kw{Tuple} bind no type constructor and no value; the list type
+and the list constructors are those of $E_0$
+(Section~\ref{sec:appendix-static-basis-modenv}), and the meaning of the
+operator \kw{::} that \kw{List} declares is $\OTstat(\kw{::})$
+(Figure~\ref{fig:static-basis-operators}).
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{|r@{\ }c@{\ }l|}
+\hline
+\multicolumn{3}{|l|}{\kw{Maybe}}\\
+\hline
+\kw{Maybe}\citelabel{b:Maybe.Maybe} & \mapsto & (\tMaybe,\ \{\kw{Just} \mapsto (\forall\mv{a}.\,\mv{a} \rightarrow \mv{a}\,\tMaybe, \isc),\\
+ & & \phantom{(\tMaybe,\ \{}\kw{Nothing} \mapsto (\forall\mv{a}.\,\mv{a}\,\tMaybe, \isc)\})\\
+\hline
+\kw{Just}\citealso{b:Maybe.Maybe} & \mapsto & (\forall\mv{a}.\,\mv{a} \rightarrow \mv{a}\,\tMaybe, \isc)\\
+\kw{Nothing}\citealso{b:Maybe.Maybe} & \mapsto & (\forall\mv{a}.\,\mv{a}\,\tMaybe, \isc)\\
+\hline
+\multicolumn{3}{|l|}{\kw{Result}}\\
+\hline
+\kw{Result}\citelabel{b:Result.Result} & \mapsto & (\sbtResult,\ \{\kw{Ok} \mapsto (\forall\mv{x}\,\mv{a}.\,\mv{a} \rightarrow (\mv{x}, \mv{a})\sbtResult, \isc),\\
+ & & \phantom{(\sbtResult,\ \{}\kw{Err} \mapsto (\forall\mv{x}\,\mv{a}.\,\mv{x} \rightarrow (\mv{x}, \mv{a})\sbtResult, \isc)\})\\
+\hline
+\kw{Ok}\citealso{b:Result.Result} & \mapsto & (\forall\mv{x}\,\mv{a}.\,\mv{a} \rightarrow (\mv{x}, \mv{a})\sbtResult, \isc)\\
+\kw{Err}\citealso{b:Result.Result} & \mapsto & (\forall\mv{x}\,\mv{a}.\,\mv{x} \rightarrow (\mv{x}, \mv{a})\sbtResult, \isc)\\
+\hline
+\multicolumn{3}{|l|}{\kw{String}}\\
+\hline
+\kw{String}\citelabel{b:String.String} & \mapsto & (\tString,\ \emptymap)\\
+\hline
+\multicolumn{3}{|l|}{\kw{Char}}\\
+\hline
+\kw{Char}\citelabel{b:Char.Char} & \mapsto & (\tChar,\ \emptymap)\\
+\hline
+\multicolumn{3}{|l|}{\kw{Array}}\\
+\hline
+\kw{Array}\citelabel{b:Array.Array} & \mapsto & (\tArray,\ \emptymap)\\
+\hline
+\multicolumn{3}{|l|}{\kw{Bytes}}\\
+\hline
+\kw{Bytes}\citelabel{b:Bytes.Bytes} & \mapsto & (\tBytes,\ \emptymap)\\
+\hline
+\end{array}
+\]
+\caption{Static Interfaces of \kw{Maybe}, \kw{Result}, \kw{String},
+\kw{Char}, \kw{Array} and \kw{Bytes}}\label{fig:static-basis-data}
+\end{figure}
+
+\section{Debugging, Programs and Effects}\label{sec:appendix-static-basis-platform}
+
+The interfaces of the remaining modules are shown in
+Figures~\ref{fig:static-basis-platform}, \ref{fig:static-basis-task}
+and~\ref{fig:static-basis-effects}.
+The meanings of the values of \kw{Debug} are given in
+Appendix~\ref{ch:appendix-dynamic-basis}. Since the result type of
+\kw{Debug.todo} is a bound variable of its type scheme, an application of
+\kw{Debug.todo} elaborates to every type. % A62
+Chapter~\ref{ch:effects} builds task, command and subscription values from
+the values of \kw{Platform.Cmd}, \kw{Platform.Sub}, \kw{Task} and
+\kw{Process}, and \kw{Platform.worker} makes a program
+(Chapter~\ref{ch:programs}). % D10
+The function \kw{command} of \kw{Task} and the constructor \kw{Perform} of its
+custom type \kw{MyCmd} are hidden
+(Section~\ref{sec:appendix-static-basis-modenv}): they are absent from the
+interface of \kw{Task}, and are reached only through the texts of
+\kw{perform} and \kw{attempt}, whose environment
+(Section~\ref{sec:appendix-dynamic-basis-elm}) binds them. The
+values of ports are not in $\ME_0$: a port is declared by a module of a
+program (Section~\ref{sec:static-modules-ports}).
+The type constructors \kw{Task.Task} and \kw{Process.Id} are type aliases in
+their libraries; the type functions they are bound to are the type names
+$\sbtTask$ and $\sbtProcessId$ themselves (Section~\ref{sec:static-core-types}),
+and likewise \kw{Json.Decode.Value} is bound to $\tValue$ and \kw{Html.Html}
+to $\sbtNode$.
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{|r@{\ }c@{\ }l|}
+\hline
+\multicolumn{3}{|l|}{\kw{Debug}}\\
+\hline
+\kw{log}\citelabel{b:Debug.log} & \mapsto & (\forall\mv{a}.\,\tString \rightarrow \mv{a} \rightarrow \mv{a}, \isv)\\
+\kw{todo}\citelabel{b:Debug.todo} & \mapsto & (\forall\mv{a}.\,\tString \rightarrow \mv{a}, \isv)\\
+\kw{toString}\citelabel{b:Debug.toString} & \mapsto & (\forall\mv{a}.\,\mv{a} \rightarrow \tString, \isv)\\
+\hline
+\multicolumn{3}{|l|}{\kw{Platform}}\\
+\hline
+\kw{Program}\citelabel{b:Platform.Program} & \mapsto & (\sbtProgram,\ \emptymap)\\
+\kw{Task}\citelabel{b:Platform.Task} & \mapsto & (\sbtTask,\ \emptymap)\\
+\kw{ProcessId}\citelabel{b:Platform.ProcessId} & \mapsto & (\sbtProcessId,\ \emptymap)\\
+\hline
+\kw{worker}\citelabel{b:Platform.worker} & \mapsto & (\forall\mv{flags}\,\mv{model}\,\mv{msg}.\\
+ & & \quad\{\kw{init} \mapsto \mv{flags} \rightarrow (\mv{model}, \mv{msg}\,\sbtCmd)\tTuple{2},\\
+ & & \quad\phantom{\{}\kw{update} \mapsto \mv{msg} \rightarrow \mv{model} \rightarrow (\mv{model}, \mv{msg}\,\sbtCmd)\tTuple{2},\\
+ & & \quad\phantom{\{}\kw{subscriptions} \mapsto \mv{model} \rightarrow \mv{msg}\,\sbtSub\}\\
+ & & \quad{} \rightarrow (\mv{flags}, \mv{model}, \mv{msg})\sbtProgram,\ \isv)\\
+\hline
+\multicolumn{3}{|l|}{\kw{Platform.Cmd}}\\
+\hline
+\kw{Cmd}\citelabel{b:Platform.Cmd.Cmd} & \mapsto & (\sbtCmd,\ \emptymap)\\
+\hline
+\kw{none}\citelabel{b:Platform.Cmd.none} & \mapsto & (\forall\mv{msg}.\,\mv{msg}\,\sbtCmd, \isv)\\
+\kw{batch}\citelabel{b:Platform.Cmd.batch} & \mapsto & (\forall\mv{msg}.\,(\mv{msg}\,\sbtCmd)\tList \rightarrow \mv{msg}\,\sbtCmd, \isv)\\
+\kw{map}\citelabel{b:Platform.Cmd.map} & \mapsto & (\forall\mv{a}\,\mv{msg}.\,(\mv{a} \rightarrow \mv{msg}) \rightarrow \mv{a}\,\sbtCmd \rightarrow \mv{msg}\,\sbtCmd, \isv)\\
+\hline
+\multicolumn{3}{|l|}{\kw{Platform.Sub}}\\
+\hline
+\kw{Sub}\citelabel{b:Platform.Sub.Sub} & \mapsto & (\sbtSub,\ \emptymap)\\
+\hline
+\kw{none}\citelabel{b:Platform.Sub.none} & \mapsto & (\forall\mv{msg}.\,\mv{msg}\,\sbtSub, \isv)\\
+\kw{batch}\citelabel{b:Platform.Sub.batch} & \mapsto & (\forall\mv{msg}.\,(\mv{msg}\,\sbtSub)\tList \rightarrow \mv{msg}\,\sbtSub, \isv)\\
+\kw{map}\citelabel{b:Platform.Sub.map} & \mapsto & (\forall\mv{a}\,\mv{msg}.\,(\mv{a} \rightarrow \mv{msg}) \rightarrow \mv{a}\,\sbtSub \rightarrow \mv{msg}\,\sbtSub, \isv)\\
+\hline
+\end{array}
+\]
+\caption{Static Interfaces of \kw{Debug} and the \kw{Platform} Modules}\label{fig:static-basis-platform}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{|r@{\ }c@{\ }l|}
+\hline
+\multicolumn{3}{|l|}{\kw{Task}}\\
+\hline
+\kw{Task}\citelabel{b:Task.Task} & \mapsto & (\sbtTask,\ \emptymap)\\
+\hline
+\kw{succeed}\citelabel{b:Task.succeed} & \mapsto & (\forall\mv{x}\,\mv{a}.\,\mv{a} \rightarrow (\mv{x}, \mv{a})\sbtTask, \isv)\\
+\kw{fail}\citelabel{b:Task.fail} & \mapsto & (\forall\mv{x}\,\mv{a}.\,\mv{x} \rightarrow (\mv{x}, \mv{a})\sbtTask, \isv)\\
+\kw{map}\citelabel{b:Task.map} & \mapsto & (\forall\mv{x}\,\mv{a}\,\mv{b}.\,(\mv{a} \rightarrow \mv{b}) \rightarrow (\mv{x}, \mv{a})\sbtTask \rightarrow (\mv{x}, \mv{b})\sbtTask, \isv)\\
+\kw{map2}\citelabel{b:Task.map2} & \mapsto & (\forall\mv{x}\,\mv{a}\,\mv{b}\,\mv{r}.\,(\mv{a} \rightarrow \mv{b} \rightarrow \mv{r}) \rightarrow (\mv{x}, \mv{a})\sbtTask \rightarrow (\mv{x}, \mv{b})\sbtTask\\
+ & & \phantom{(\forall\mv{x}\,\mv{a}\,\mv{b}\,\mv{r}.\,}{} \rightarrow (\mv{x}, \mv{r})\sbtTask, \isv)\\
+\kw{map3}\citelabel{b:Task.map3} & \mapsto & (\forall\mv{x}\,\mv{a}\,\mv{b}\,\mv{c}\,\mv{r}.\,(\mv{a} \rightarrow \mv{b} \rightarrow \mv{c} \rightarrow \mv{r}) \rightarrow (\mv{x}, \mv{a})\sbtTask \rightarrow (\mv{x}, \mv{b})\sbtTask\\
+ & & \phantom{(\forall\mv{x}\,\mv{a}\,\mv{b}\,\mv{c}\,\mv{r}.\,}{} \rightarrow (\mv{x}, \mv{c})\sbtTask \rightarrow (\mv{x}, \mv{r})\sbtTask, \isv)\\
+\kw{map4}\citelabel{b:Task.map4} & \mapsto & (\forall\mv{x}\,\mv{a}\,\mv{b}\,\mv{c}\,\mv{d}\,\mv{r}.\,(\mv{a} \rightarrow \mv{b} \rightarrow \mv{c} \rightarrow \mv{d} \rightarrow \mv{r}) \rightarrow (\mv{x}, \mv{a})\sbtTask\\
+ & & \phantom{(\forall\mv{x}\,\mv{a}\,\mv{b}\,\mv{c}\,\mv{d}\,\mv{r}.\,}{} \rightarrow (\mv{x}, \mv{b})\sbtTask \rightarrow (\mv{x}, \mv{c})\sbtTask \rightarrow (\mv{x}, \mv{d})\sbtTask\\
+ & & \phantom{(\forall\mv{x}\,\mv{a}\,\mv{b}\,\mv{c}\,\mv{d}\,\mv{r}.\,}{} \rightarrow (\mv{x}, \mv{r})\sbtTask, \isv)\\
+\kw{map5}\citelabel{b:Task.map5} & \mapsto & (\forall\mv{x}\,\mv{a}\,\mv{b}\,\mv{c}\,\mv{d}\,\mv{e}\,\mv{r}.\,(\mv{a} \rightarrow \mv{b} \rightarrow \mv{c} \rightarrow \mv{d} \rightarrow \mv{e} \rightarrow \mv{r}) \rightarrow (\mv{x}, \mv{a})\sbtTask\\
+ & & \phantom{(\forall\mv{x}\,\mv{a}\,\mv{b}\,\mv{c}\,\mv{d}\,\mv{e}\,\mv{r}.\,}{} \rightarrow (\mv{x}, \mv{b})\sbtTask \rightarrow (\mv{x}, \mv{c})\sbtTask \rightarrow (\mv{x}, \mv{d})\sbtTask\\
+ & & \phantom{(\forall\mv{x}\,\mv{a}\,\mv{b}\,\mv{c}\,\mv{d}\,\mv{e}\,\mv{r}.\,}{} \rightarrow (\mv{x}, \mv{e})\sbtTask \rightarrow (\mv{x}, \mv{r})\sbtTask, \isv)\\
+\kw{sequence}\citelabel{b:Task.sequence} & \mapsto & (\forall\mv{x}\,\mv{a}.\,((\mv{x}, \mv{a})\sbtTask)\tList \rightarrow (\mv{x}, \mv{a}\,\tList)\sbtTask, \isv)\\
+\kw{andThen}\citelabel{b:Task.andThen} & \mapsto & (\forall\mv{x}\,\mv{a}\,\mv{b}.\,(\mv{a} \rightarrow (\mv{x}, \mv{b})\sbtTask) \rightarrow (\mv{x}, \mv{a})\sbtTask\\
+ & & \phantom{(\forall\mv{x}\,\mv{a}\,\mv{b}.\,}{} \rightarrow (\mv{x}, \mv{b})\sbtTask, \isv)\\
+\kw{onError}\citelabel{b:Task.onError} & \mapsto & (\forall\mv{x}\,\mv{y}\,\mv{a}.\,(\mv{x} \rightarrow (\mv{y}, \mv{a})\sbtTask) \rightarrow (\mv{x}, \mv{a})\sbtTask\\
+ & & \phantom{(\forall\mv{x}\,\mv{y}\,\mv{a}.\,}{} \rightarrow (\mv{y}, \mv{a})\sbtTask, \isv)\\
+\kw{mapError}\citelabel{b:Task.mapError} & \mapsto & (\forall\mv{x}\,\mv{y}\,\mv{a}.\,(\mv{x} \rightarrow \mv{y}) \rightarrow (\mv{x}, \mv{a})\sbtTask \rightarrow (\mv{y}, \mv{a})\sbtTask, \isv)\\
+\kw{perform}\citelabel{b:Task.perform} & \mapsto & (\forall\mv{a}\,\mv{msg}.\,(\mv{a} \rightarrow \mv{msg}) \rightarrow (\sbtNever, \mv{a})\sbtTask \rightarrow \mv{msg}\,\sbtCmd, \isv)\\
+\kw{attempt}\citelabel{b:Task.attempt} & \mapsto & (\forall\mv{x}\,\mv{a}\,\mv{msg}.\,((\mv{x}, \mv{a})\sbtResult \rightarrow \mv{msg}) \rightarrow (\mv{x}, \mv{a})\sbtTask\\
+ & & \phantom{(\forall\mv{x}\,\mv{a}\,\mv{msg}.\,}{} \rightarrow \mv{msg}\,\sbtCmd, \isv)\\
+\hline
+\end{array}
+\]
+\caption{Static Interface of \kw{Task}}\label{fig:static-basis-task}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\small
+\[
+\begin{array}{|r@{\ }c@{\ }l|}
+\hline
+\multicolumn{3}{|l|}{\kw{Process}}\\
+\hline
+\kw{Id}\citelabel{b:Process.Id} & \mapsto & (\sbtProcessId,\ \emptymap)\\
+\hline
+\kw{spawn}\citelabel{b:Process.spawn} & \mapsto & (\forall\mv{x}\,\mv{y}\,\mv{a}.\,(\mv{x}, \mv{a})\sbtTask \rightarrow (\mv{y}, \sbtProcessId)\sbtTask, \isv)\\
+\kw{sleep}\citelabel{b:Process.sleep} & \mapsto & (\forall\mv{x}.\,\tFloat \rightarrow (\mv{x}, \tunit)\sbtTask, \isv)\\
+\kw{kill}\citelabel{b:Process.kill} & \mapsto & (\forall\mv{x}.\,\sbtProcessId \rightarrow (\mv{x}, \tunit)\sbtTask, \isv)\\
+\hline
+\multicolumn{3}{|l|}{\kw{Json.Encode}\ \text{and}\ \kw{Json.Decode}}\\
+\hline
+\kw{Value}\citelabel{b:Json.Encode.Value}\citelabel{b:Json.Decode.Value} & \mapsto & (\tValue,\ \emptymap)\\
+\hline
+\multicolumn{3}{|l|}{\kw{VirtualDom}}\\
+\hline
+\kw{Node}\citelabel{b:VirtualDom.Node} & \mapsto & (\sbtNode,\ \emptymap)\\
+\hline
+\multicolumn{3}{|l|}{\kw{Html}}\\
+\hline
+\kw{Html}\citelabel{b:Html.Html} & \mapsto & (\sbtNode,\ \emptymap)\\
+\hline
+\end{array}
+\]
+\caption{Static Interfaces of \kw{Process}, \kw{Json} and View Modules}\label{fig:static-basis-effects}
+\end{figure}
+
+

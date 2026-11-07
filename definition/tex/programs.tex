@@ -1,0 +1,689 @@
+% Values: PRECISE, FAITHFUL, ILLUMINATING, TRACTABLE, ECONOMICAL
+% Evidence planned:
+% - PRECISE: the syntax of programs with its restrictions; one rule for each
+%   production of Program in elaboration and in evaluation, and one rule
+%   combining them over Basis = StaticBasis x DynamicBasis; configurations,
+%   events and every component of a configuration defined by set
+%   constructions; dispatch, the start of a program and every transition
+%   (update, process steps and their actions, ends of processes, incoming and
+%   outgoing port values, the passing of time, platform steps) given by rules;
+%   the meaning of a program as a set of traces, and conformance.
+% - FAITHFUL: A32 and A82 (only the main module's main is constrained; it
+%   need not be exposed; Program or a view); A27 (Dflt); A84 (port names
+%   global, static); A72 and A77 (flags); A66, A67 (dispatch in any
+%   enumeration); A68 (incoming values are events, handled after the step in
+%   progress); A69, A70 (outgoing order per port, host outside); A71 (bad
+%   incoming value rejected); A78 (suspension at any andThen); A79, A80, A81
+%   (process primitives); A83, A85 (platform parameter, no effect modules);
+%   A92 (Bytes flags, boundary values);
+%   A86 (the three guarantees and no more); D2, D10, D11.
+% - ILLUMINATING: comments on the absence of a rule for failing
+%   elaboration, the choice of E over the interface for main, the defaulting
+%   of number, self-kill, the stuck message queue when update has no result,
+%   input-enabledness, and a program that does not start.
+% - TRACTABLE: stated properties: the meaning does not depend on the order
+%   chosen among independent modules; the ordering guarantees of A86 follow
+%   from the transitions.
+% - ECONOMICAL: options merge the silent and platform process steps; one
+%   rule ends a process without a message; one rule admits all platform
+%   steps.
+\chapter{Programs}\label{ch:programs}
+
+This chapter defines what a program is and what it means. A program is a
+main module together with the modules it imports. It is elaborated and
+evaluated module by module, in a basis that pairs a static basis
+(Chapter~\ref{ch:static-modules}) with a dynamic basis
+(Chapter~\ref{ch:dynamic-modules}); elaboration finds the type of \kw{main} in
+the main module and the ports of the program, and evaluation finds the value
+of \kw{main}. That value is a program value (Chapter~\ref{ch:effects}), and the
+program runs on the platform (Chapter~\ref{ch:introduction}), which supplies
+the primitives and managers beyond those of tasks and ports. % A83
+The running of a program is defined as a labelled transition system, whose
+configurations hold the current model, the messages awaiting \kw{update}, the
+processes, the current subscriptions and the values awaiting delivery on
+outgoing ports. The sentences of the chapter infer that a program elaborates
+to a type and a port environment, that it evaluates to a value, that a program
+value started with flags begins in a configuration, and that a configuration
+moves to another, with or without an event. The meaning of a program is the
+set of sequences of events at its boundary that it can produce. % D10, D11
+
+\section{Syntax of Programs}\label{sec:programs-syntax}
+
+The phrase class Program of programs is defined as follows:
+\begin{center}
+\begin{grammar}
+\gprod{\program}{\modm\ \opt{\program}}{}
+\end{grammar}
+\end{center}
+A program is thus a non-empty sequence of modules; its last module is its
+\emph{main module}. A module $\modm$ \emph{imports} a module $\modid$ if an
+import of $\modm$, written or default (Figure~\ref{fig:default-imports}),
+names $\modid$. Programs are subject to the following restrictions, in
+addition to the restrictions of Section~\ref{sec:syntax-modules-restrictions}
+on each module.
+\begin{itemize}
+\item\citelabel{res:program-modules-distinct} No two modules of a program have the same module identifier, and no
+  module of a program has the identifier of a module of the initial basis
+  (Appendix~\ref{ch:appendix-static-basis}). % A89
+  % Rule r:sm-module's side condition modid notin Dom(ME of B) then holds for
+  % every module of a program.
+\item\citelabel{res:program-import-order} Each module of a program imports only modules of the initial basis and
+  modules that stand before it in the program.
+\item\citelabel{res:program-modules-reachable} Every module of a program other than the main module is imported,
+  directly or through other modules, by the main module.
+  % A16, A30 (amended): every module, the main module included, has a header
+  % (Section sec:syntax-modules-restrictions), so no restriction here
+  % concerns a module without one.
+\item\citelabel{res:program-main} The main module has a top-level value declaration that binds
+  \kw{main}. That declaration has the form
+  $\kw{main}\ \opt{\kw{:}\ \ty}\ \kw{=}\ \expm$, binding \kw{main} alone,
+  and \kw{main} does not occur free in $\expm$, so that \kw{main} does not
+  refer to itself, directly or through a delayed occurrence. % A89
+\end{itemize}
+Thus the modules of a program are the main module and every module it
+imports directly or indirectly; the import relation among them has no cycle;
+and every module stands after the modules it imports. A program as written is
+the finite set of these modules. Any sequence of that set that meets the
+restrictions is a program in the sense of the grammar; the main module comes
+last in every such sequence, and all such sequences have the same meaning
+(Section~\ref{sec:programs-evaluation}).
+
+\section{Elaboration of Programs}\label{sec:programs-elaboration}
+
+Until now, the name Basis and the metavariable $B$ have stood for a static
+basis in Chapter~\ref{ch:static-modules} and for a dynamic basis in
+Chapter~\ref{ch:dynamic-modules}; those chapters never needed both at once.
+In this chapter the class Basis of Chapter~\ref{ch:static-modules} is called
+$\pgStaticBasis$, with metavariable $\pgBstat$, and that of
+Chapter~\ref{ch:dynamic-modules} is called $\pgDynamicBasis$, with
+metavariable $\pgBdyn$; a basis is a pair of the two:
+\[
+  B\ \text{or}\ (\pgBstat,\pgBdyn)\in\Basis=\pgStaticBasis\times\pgDynamicBasis .
+\]
+The \emph{initial basis} $B_0$ is the pair of the initial static basis of
+Appendix~\ref{ch:appendix-static-basis} and the initial dynamic basis of
+Appendix~\ref{ch:appendix-dynamic-basis}. Modification of static bases is
+component by component, the set component by union, as for contexts
+(Section~\ref{sec:static-core-projection}):
+\[
+  (T,\ME,\PE)+(T',\ME',\PE')=(T\cup T',\ \ME+\ME',\ \PE+\PE') ;
+\]
+a dynamic basis is a module environment, modified as a finite map.
+
+The rules of this section and the next allow sentences of the forms
+\[
+  \begin{array}{c}
+  \jstat{\pgBstat}{\program}{(\tau,\PE)},\qquad
+  \jdyn{\pgBdyn}{\program}{v},\\[0.5ex]
+  \jdg{B}{\program}{(\tau,\PE,v)}
+  \end{array}
+\]
+to be inferred, where $\pgBstat$ is a static basis, $\pgBdyn$ a dynamic basis,
+$B$ a basis, $\tau$ a type, $\PE$ a port environment
+(Section~\ref{sec:static-modules-objects}) and $v$ a value. We write
+$\vdash_{\mathrm{STAT}}$ for the elaboration of programs, $\vdash_{\mathrm{DYN}}$
+for their evaluation, and $\vdash$ alone for the sentence that combines the
+two. The first sentence is pronounced ``$\program$ elaborates to $\tau$ and
+$\PE$ in $\pgBstat$'': $\tau$ is the type of \kw{main} in the main module, and
+$\PE$ holds the ports of the program. The second is pronounced ``$\program$
+evaluates to $v$ in $\pgBdyn$'': $v$ is the value of \kw{main}. The third is
+pronounced ``$\program$ elaborates to $\tau$ and $\PE$, and evaluates to $v$,
+in $B$''. Premises also use the sentences about modules of
+Chapters~\ref{ch:static-modules} and~\ref{ch:dynamic-modules}, in their forms
+there; other hypotheses are side conditions.
+
+The type of \kw{main} is the instance of its type scheme that takes $\tInt$
+for each bound type variable of class $\knum$. It is the type of the default
+copy of the declaration of \kw{main}, the copy that number specialisation
+makes of every top-level declaration, taking $\tInt$ for each of its variables
+of class $\knum$ (Section~\ref{sec:dynamic-core-numbers}). % A27, A87
+For a type scheme $\sigma=\forall\tyrowvar^{(k)}.\tau$, let
+$\alpha_1,\ldots,\alpha_l$ be those of the bound variables
+$\tyrowvar_1,\ldots,\tyrowvar_k$ that are type variables of class $\knum$; then
+\[
+  \pgDflt\sigma=\tau\{\tInt,\ldots,\tInt/\alpha_1,\ldots,\alpha_l\} .
+\]
+The substitution respects classes, since $\tInt\in\Adm{\knum}$. In the rules
+below, $\sbtProgram$ is the type name of \kw{Platform.Program}, of arity 3,
+and $\sbtNode$ that of \kw{VirtualDom.Node}, of arity 1, of which \kw{Html} is
+an alias (Appendix~\ref{ch:appendix-static-basis}); $\effMgrPlat$ is the set
+of the names of the managers of the platform
+(Section~\ref{sec:effects-simple}).
+
+\rulegroup{Elaboration of Programs}{\jstat{\pgBstat}{\program}{(\tau,\PE)}}
+
+\defnrule[r:p-stat-module]
+  {\jdg{\pgBstat}{\modm}{\pgBstat',E}\\
+   \Dom(\PE\of\pgBstat')\cap\big(\Dom(\PE\of\pgBstat)\cup\effMgrPlat\big)=\emptyset\\
+   \jstat{\pgBstat+\pgBstat'}{\program}{(\tau,\PE)}}
+  {\jstat{\pgBstat}{\modm\ \program}{(\tau,\PE)}}
+
+\defnrule[r:p-stat-main-program]
+  {\jdg{\pgBstat}{\modm}{\pgBstat',E}\\
+   \Dom(\PE\of\pgBstat')\cap\big(\Dom(\PE\of\pgBstat)\cup\effMgrPlat\big)=\emptyset\\
+   E(\kw{main})=(\sigma,\isv)\premsep
+   \pgDflt\sigma=(\tau_1,\tau_2,\tau_3)\sbtProgram\premsep
+   \Port(\tau_1)}
+  {\jstat{\pgBstat}{\modm}{\big((\tau_1,\tau_2,\tau_3)\sbtProgram,\ \PE\of(\pgBstat+\pgBstat')\big)}}
+
+\defnrule[r:p-stat-main-view]
+  {\jdg{\pgBstat}{\modm}{\pgBstat',E}\\
+   \Dom(\PE\of\pgBstat')\cap\big(\Dom(\PE\of\pgBstat)\cup\effMgrPlat\big)=\emptyset\\
+   E(\kw{main})=(\sigma,\isv)\premsep
+   \pgDflt\sigma=\tau\,\sbtNode}
+  {\jstat{\pgBstat}{\modm}{\big(\tau\,\sbtNode,\ \PE\of(\pgBstat+\pgBstat')\big)}}
+
+\begin{rulecomments}
+\rcomment{r:p-stat-module} Each module is elaborated in the static basis that
+the modules before it have built, so it finds there the interface of every
+module it imports, and the type names it generates are new
+(rule~\ruleref{r:sm-module}). The side condition makes port names global to
+the program: no two ports of a program share a name, even in different
+modules, and no port has the name of a manager of the platform; a program
+with such a clash does not elaborate. % A84, D2
+\rcomment{r:p-stat-main-program} Rules~\ruleref{r:p-stat-main-program}
+and~\ruleref{r:p-stat-main-view} cover the one production, since \kw{main}
+may have either of two forms of type. Only the \kw{main} of the main module
+is constrained; a \kw{main} in another module is an ordinary value. % A32
+The scheme of \kw{main} is taken from $E$, the environment of all the
+declarations of the module, not from its interface, so \kw{main} need not be
+exposed. % A82
+A bound variable of class $\knum$ in the scheme of \kw{main} is $\tInt$ in
+its type: with \kw{init = \textbackslash\_ -> (0, Cmd.none)} and no other
+constraint on the model, the model type is $\tInt$, and the value of
+\kw{main} is that of its default copy, at $\tInt$
+(rule~\ruleref{r:p-dyn-main}). % A27, A87
+The flags type $\tau_1$ is a port type, so \kw{main : Program (Int -> Int)
+Model Msg} and \kw{main : Program flags Model Msg}, with \kw{flags} a type
+variable, do not elaborate; the unit type is a port type, and as flags it is
+treated specially (Section~\ref{sec:programs-execution}). Since \kw{Bytes}
+is a port type, flags may be, or contain, values of type \kw{Bytes}. % A92
+The model type $\tau_2$ and the message type $\tau_3$ are unconstrained. Some
+implementations admit further types of flags, which are not port types
+(Appendix~\ref{ch:appendix-implementation}).
+% A33, A77
+\rcomment{r:p-stat-main-view} A \kw{main} of type \kw{Html msg} or
+\kw{Svg msg} has a type $\tau\,\sbtNode$, since both are aliases. No function
+type is of either form, so a \kw{main} with parameters does not elaborate. % A82
+\end{rulecomments}
+
+There is no rule for a program one of whose modules does not elaborate. Such
+a program has no meaning, and no part of it is evaluated
+(Section~\ref{sec:programs-evaluation}).
+
+\section{Evaluation of Programs}\label{sec:programs-evaluation}
+
+The modules of a program are evaluated in the order in which they are
+elaborated, each in the dynamic basis that the modules before it have built.
+The syntax evaluated is the reduced syntax of
+Section~\ref{sec:dynamic-modules-reduced}, which records the direction and
+payload type that elaboration finds for each port, after number
+specialisation (Section~\ref{sec:dynamic-core-numbers}), which makes the
+default copy of every top-level declaration besides the copies its uses
+need; when the declaration quantifies no variable of class $\knum$, the
+default copy is the declaration itself. In rule~\ruleref{r:p-dyn-main},
+$\VE(\kw{main})$ is the value bound by the default copy of the declaration of
+\kw{main}, whose type is $\pgDflt\sigma$ for the scheme $\sigma$ of \kw{main},
+the type found by rule~\ruleref{r:p-stat-main-program}
+or~\ruleref{r:p-stat-main-view}. % A27, A87
+
+\rulegroup{Evaluation of Programs}{\jdyn{\pgBdyn}{\program}{v}}
+
+\defnrule[r:p-dyn-module]
+  {\jdg{\pgBdyn}{\modm}{\pgBdyn',\VE}\premsep
+   \jdyn{\pgBdyn+\pgBdyn'}{\program}{v}}
+  {\jdyn{\pgBdyn}{\modm\ \program}{v}}
+
+\defnrule[r:p-dyn-main]
+  {\jdg{\pgBdyn}{\modm}{\pgBdyn',\VE}\premsep v=\VE(\kw{main})}
+  {\jdyn{\pgBdyn}{\modm}{v}}
+
+\begin{rulecomments}
+\rcomment{r:p-dyn-module} A module is evaluated once, after every module it
+imports, and its top-level values are evaluated then, whether or not they are
+used: every top-level declaration has its default copy, even when nothing
+uses it. A \kw{main} in a module other than the main module is evaluated in the
+same way, once, as an ordinary value. % A59, A32, A87
+\rcomment{r:p-dyn-main} The value of \kw{main} is taken from $\VE$, the value
+environment of all the top-level declarations of the module
+(rule~\ruleref{r:dm-module}), not from the basis $\pgBdyn'$, which holds only
+what the module exposes; so \kw{main} need not be exposed. No module imports
+the main module, and $\pgBdyn'$ is not used. % A82
+If a top-level value of any module has no value (it reaches
+\kw{Debug.todo}, or forces a delayed reference to itself), no sentence about
+the program can be inferred, and the program has no meaning. % A25, A62
+\end{rulecomments}
+
+\rulegroup{Programs}{\jdg{B}{\program}{(\tau,\PE,v)}}
+
+\defnrule[r:p-program]
+  {\jstat{\pgBstat\of B}{\program}{(\tau,\PE)}\premsep
+   \jdyn{\pgBdyn\of B}{\program}{v}}
+  {\jdg{B}{\program}{(\tau,\PE,v)}}
+
+\begin{rulecomments}
+\rcomment{r:p-program} A program is elaborated as a whole before any part of
+it is evaluated: if one module fails to elaborate, the static premise fails,
+and nothing is evaluated, not even the modules before it. Elaboration may
+choose the new type names of a module freely (rule~\ruleref{r:sm-module}), but
+neither $\PE$, whose types are built from type names of the initial basis
+alone, nor $v$ depends on the choice.
+\end{rulecomments}
+
+A program $\program$ \emph{has a meaning} when
+$\jdg{B_0}{\program}{(\tau,\PE,v)}$ for some $\tau$, $\PE$ and $v$. Since a
+program is a set of modules, the following property, which may easily be
+demonstrated, is needed for this to make sense.
+\begin{property}
+Let $\program$ and $\program'$ be sequences of the same modules, both meeting
+the restrictions of Section~\ref{sec:programs-syntax}. Then the sentence
+$\jdg{B_0}{\program}{(\tau,\PE,v)}$ can be inferred if and only if the
+sentence $\jdg{B_0}{\program'}{(\tau',\PE,v)}$ can, where $\tau'$ is $\tau$
+with the type names that the modules generate renamed.
+\end{property}
+
+\section{Execution}\label{sec:programs-execution}
+
+Let $\jdg{B_0}{\program}{(\tau,\PE,v)}$. When $\tau$ is $\tau'\,\sbtNode$, the
+program is a view, whose meaning is given in
+Section~\ref{sec:programs-views}. Otherwise
+$\tau=(\tau_1,\tau_2,\tau_3)\sbtProgram$, where $\tau_1$ is the \emph{flags
+type}, and $v$ is a program value $\effprog\,r$
+(Section~\ref{sec:effects-commands}). This section defines how a program
+value runs. Throughout, $\PE$ is the port environment of the program, and the
+record $r$ is fixed: the rules apply its fields \kw{init}, \kw{update} and
+\kw{subscriptions}, written $r(\kw{init})$ and so on.
+
+A program runs on a platform. Besides the primitives $\effPrimPlat$, their
+outcomes and the managers $\effMgrPlat$ (Chapter~\ref{ch:effects}), the
+platform provides a set $\pgEventPlat$ of \emph{platform events}, and its
+\emph{platform steps}, defined in Section~\ref{sec:programs-transitions}. All
+of these are parameters of the platform; the definition fixes the manager of
+tasks, the ports, and the program loop. % A83, A85
+
+\subsection{Configurations and Events}\label{sec:programs-configurations}
+
+For a set $A$, $A^{*}=\bigcup_{n\geq 0}A^n$ is the set of finite sequences of
+members of $A$. The empty sequence is $\pgnil$, and $x\cdot y$ is the
+concatenation of the sequences $x$ and $y$; a member of $A$ is also a
+sequence of length one, and $x_1\cdots x_n$ is $x_1\cdot\ldots\cdot x_n$.
+A finite multiset of members of $A$ is a finite map from $A$ to the positive
+integers, giving the multiplicity of each member; multisets are written as in
+Section~\ref{sec:effects-compound}. The objects of execution are shown in
+Figure~\ref{fig:programs-objects}.
+
+\begin{figure}[htbp]
+\centering
+\begin{objtable}
+\objdef{s\ \text{or}\ d}{\pgTime}{\{x\in\mathbb{R}\mid x\geq 0\}}
+\objdef{K}{\Config}{\pgTime\times\Val\times\Val^{*}\times\pgProcMap}
+& & & \phantom{{}={}}\times\SubVal\times\pgOutQueue\times\pgPending & \\
+\objdef{P}{\pgProcMap}{\ProcId\finmap\pgProc}
+\objdef{}{\pgProc}{\big(\TaskVal\times\pgTime\times(\CmdVal\cup\{\pgspawned\})\big)}
+& & & \phantom{{}={}}\cup\{\pgended\} & \\
+\objdef{Q}{\pgOutQueue}{\cls{Var}\finmap\BVal^{*}}
+\objdef{H}{\pgPending}{\CmdVal\finmap\{1,2,\ldots\}}
+\objdef{\ell}{\Event}{(\{\pgEvIn\}\times\cls{Var}\times\BVal)}
+& & & \phantom{{}={}}\cup(\{\pgEvOut\}\times\cls{Var}\times\BVal)\cup\effAction & \\
+& & & \phantom{{}={}}\cup(\{\pgwait\}\times\pgTime)\cup\pgEventPlat & \\
+\end{objtable}
+\caption{Semantic Objects of Execution}
+\label{fig:programs-objects}
+\end{figure}
+
+A configuration $K=(s,v,M,P,\sbv,Q,H)$ has the following components.
+\begin{itemize}
+\item $s$ is the present time, in milliseconds since the program started.
+\item $v$ is the \emph{model}, the value that the latest \kw{update}, or
+  \kw{init}, produced.
+\item $M$ is the \emph{message queue}, the messages awaiting \kw{update}.
+\item $P$ holds every process started so far. If
+  $P(\pid)=(\tk,s',\pgorig)$, the process named by $\pid$ is \emph{live}, is
+  reducing $\tk$, and took its latest step (or started) at time $s'$; its
+  \emph{origin} $\pgorig$ is the leaf command whose task it performs, or
+  $\pgspawned$ if it was started by $\effspawn$. If $P(\pid)=\pgended$, the
+  process has ended or been killed.
+\item $\sbv$ is the current subscription value, the value of
+  \kw{subscriptions} applied to the model.
+\item $Q(\effp)$ is the sequence of boundary values awaiting delivery on the
+  outgoing port $\effp$.
+\item $H$ holds the leaf commands handed to the managers of the platform and
+  not yet acted on.
+\end{itemize}
+The event $\pgEvIn(\effp,j)$ is the host's sending of $j$ on the incoming port
+$\effp$; $\pgEvOut(\effp,j)$ is the program's delivery of $j$ on the outgoing
+port $\effp$; an action $\effa$ (Section~\ref{sec:effects-tasks}) is a
+primitive performed by a process; $\pgwait\,d$, with $d>0$, is the passing of
+$d$ milliseconds; and a platform event is whatever the platform makes
+observable of its managers.
+
+For a manager $\effm$ and a value $v$, the leaf commands (and leaf
+subscriptions) of $\effm$ with argument $v$ are
+\[
+  \pgLeaf(\effm,v)=\{\effmap(v_n,\cdots\effmap(v_1,\effleaf(\effm,v))\cdots)
+    \mid n\geq 0\} .
+\]
+The outgoing queues at the start of a program are
+\[
+  \pgQinit=\{\effp\mapsto\pgnil\,;\,\PE(\effp)=(\smdirout,\tau)\ \text{for some}\ \tau\} .
+\]
+For a type $\tau$ with $\Port(\tau)$ and a boundary value $j$, the \emph{flags
+value} of $j$ at $\tau$ is
+\[
+  \pgFlags{\tau}(j)=\begin{cases}
+    () & \text{if}\ \tau=\tunit,\\
+    \Dec{\tau}(j) & \text{otherwise},
+  \end{cases}
+\]
+which is undefined when $\Dec{\tau}(j)$ is. % A77
+
+\subsection{Dispatch and Start}\label{sec:programs-dispatch}
+
+The rules of this section and the next allow sentences of the forms
+\[
+  \jdg{s,P,Q,H}{D}{(P',Q',H')},\qquad
+  \jdg{\PE,\tau_1,j}{\effprog\,r}{K},\qquad
+  K\step{\opt{\ell}}K'
+\]
+to be inferred. In the first, $D$ is a sequence of leaf commands, and the
+sentence is pronounced ``dispatching $D$ at time $s$ turns $P$, $Q$, $H$ into
+$P'$, $Q'$, $H'$''. The second is pronounced ``$\effprog\,r$, started with
+the flags $j$, begins in $K$''. The third is pronounced ``$K$ moves to $K'$'',
+and, when the event $\ell$ is present, ``with $\ell$''; a transition without
+an event is \emph{silent}. Premises also use the sentences of
+Chapter~\ref{ch:effects} and the sentence $\japp{v_1}{v_2}{v}$ of the
+application of values (Section~\ref{sec:dynamic-core-apply}); other
+hypotheses are side conditions. The convention for options is the same as for
+the Core static semantics. There are no states and no exception packets: the
+configuration is the whole of what changes, and every rule is given in full.
+% D2
+
+A command is \emph{dispatched} by dispatching a sequence that holds its leaf
+commands, each as many times as $\effFlat$ gives it, in any order. Which
+order is no part of the meaning, by the effect order convention of
+Section~\ref{sec:effects-commands}. % A66, A67
+
+\rulegroup{Dispatch}{\jdg{s,P,Q,H}{D}{(P',Q',H')}}
+
+\defnrule[r:p-disp-empty]
+  {}
+  {\jdg{s,P,Q,H}{\pgnil}{(P,Q,H)}}
+
+\defnrule[r:p-disp-task]
+  {\effc\in\pgLeaf(\effmtask,\tk)\premsep\pid\notin\Dom P\\
+   \jdg{s,\ P+\{\pid\mapsto(\tk,s,\effc)\},\ Q,H}{D}{(P',Q',H')}}
+  {\jdg{s,P,Q,H}{\effc\cdot D}{(P',Q',H')}}
+
+\defnrule[r:p-disp-out]
+  {\effc\in\pgLeaf(\effmout\,\effp,j)\\
+   \jdg{s,P,\ Q+\{\effp\mapsto Q(\effp)\cdot j\},\ H}{D}{(P',Q',H')}}
+  {\jdg{s,P,Q,H}{\effc\cdot D}{(P',Q',H')}}
+
+\defnrule[r:p-disp-plat]
+  {\effc\in\pgLeaf(\effm,v)\premsep\effm\in\effMgrPlat\\
+   \jdg{s,P,Q,\ H\uplus\effmset{\effc}}{D}{(P',Q',H')}}
+  {\jdg{s,P,Q,H}{\effc\cdot D}{(P',Q',H')}}
+
+\begin{rulecomments}
+\rcomment{r:p-disp-task} Each task leaf starts a process of its own, with an
+identifier that names no process started before, live or ended; a leaf that
+occurs twice in a command starts two processes, and performs its task twice.
+% D10
+The process keeps the leaf as its origin, since the message it gives, when
+its task succeeds, comes from the leaf (rule~\ruleref{r:p-proc-message}).
+\rcomment{r:p-disp-out} The boundary value was computed when the command was made
+(Section~\ref{sec:effects-ports}); dispatch only appends it to the queue of
+its port. Since $Q(\effp)$ is defined only for the outgoing ports of the
+program, $\effp$ is one of them. The values of one command for one port
+join the queue in the order of $D$, which is unspecified: with
+\kw{Cmd.batch [send 1, send 2]}, either value may be delivered first. % A66
+\rcomment{r:p-disp-plat} What the managers of the platform do with the leaves
+handed to them is given by the platform steps
+(Section~\ref{sec:programs-transitions}). No rule dispatches a leaf of any
+other manager: a leaf of an incoming port is a subscription, never a
+command, and there are no effect modules in Standard Elm. % A83, A85
+\end{rulecomments}
+
+\rulegroup{Starting a Program}{\jdg{\PE,\tau_1,j}{\effprog\,r}{K}}
+
+\defnrule[r:p-init]
+  {\pgFlags{\tau_1}(j)=v_1\premsep\japp{r(\kw{init})}{v_1}{(v,\cm)}\\
+   \effFlat(\cm)=\effmset{\effc_1,\ldots,\effc_n}\premsep
+   \jdg{0,\ \emptymap,\ \pgQinit,\ \emptymap}{\effc_1\cdots\effc_n}{(P,Q,H)}\\
+   \japp{r(\kw{subscriptions})}{v}{\sbv}}
+  {\jdg{\PE,\tau_1,j}{\effprog\,r}{(0,v,\pgnil,P,\sbv,Q,H)}}
+
+\begin{rulecomments}
+\rcomment{r:p-init} The host starts a program with a boundary value $j$ as
+its flags; when the host gives no flags, $j$ is $\effnull$. % A72, A92
+With flags of the unit type every boundary value is accepted, whereas a port of
+the unit type accepts only $\effnull$. % A77
+When $\pgFlags{\tau_1}(j)$ is undefined, as for $j=1.5$ with flags type
+\kw{Int}, no rule applies, there is no configuration in which the program
+begins, and the program does not start; how an implementation reports this
+is outside the definition (Appendix~\ref{ch:appendix-implementation}). % D2
+The commands of \kw{init} are dispatched, and the subscriptions computed from
+the initial model, before any message is handled. The empty map
+$\emptymap$ serves here as the empty process map and the empty multiset.
+\end{rulecomments}
+
+\subsection{Transitions}\label{sec:programs-transitions}
+
+A \emph{platform step} $K\pgplatstep{\opt{\ell}}K'$ is given by the platform.
+Its event $\ell$, if present, is a platform event. A platform step changes
+nothing but the components $M$ and $H$ of $K$: it removes leaf commands from
+$H$, and it appends to $M$ messages that, as the platform defines, are given
+by the leaf commands it removes or by the members of $\effFlat(\sbv)$ whose
+manager is in $\effMgrPlat$ (Section~\ref{sec:effects-messages}). Whether a
+platform step exists may depend on the present time $s$. % A83
+
+\rulegroup{Transitions}{K\step{\opt{\ell}}K'}
+
+\defnrule[r:p-update]
+  {\japp{r(\kw{update})}{v_1}{v_2}\premsep\japp{v_2}{v}{(v',\cm)}\\
+   \effFlat(\cm)=\effmset{\effc_1,\ldots,\effc_n}\premsep
+   \jdg{s,P,Q,H}{\effc_1\cdots\effc_n}{(P',Q',H')}\\
+   \japp{r(\kw{subscriptions})}{v'}{\sbv'}}
+  {(s,v,v_1\cdot M,P,\sbv,Q,H)\step{}(s,v',M,P',\sbv',Q',H')}
+
+\defnrule[r:p-proc-step]
+  {P(\pid)=(\tk,s',\pgorig)\premsep\tk\effred{\opt{\effa}}\tk'\\
+   \opt{\effa=\effdone{\pi(v_1\cdots v_k)}{\tk''}\premsep\pi\in\effPrimPlat}}
+  {(s,v,M,P,\sbv,Q,H)\step{\opt{\effa}}
+   (s,v,M,P+\{\pid\mapsto(\tk',s,\pgorig)\},\sbv,Q,H)}
+
+\defnrule[r:p-proc-sleep]
+  {P(\pid)=(\tk,s',\pgorig)\premsep\tk\effred{\effa}\tk'\premsep
+   \effa=\effdone{\effsleep(v')}{\tk''}\\
+   \text{if}\ v'\in\effFltFin\ \text{then}\ s\geq s'+\max(0,v')}
+  {(s,v,M,P,\sbv,Q,H)\step{\effa}
+   (s,v,M,P+\{\pid\mapsto(\tk',s,\pgorig)\},\sbv,Q,H)}
+
+\defnrule[r:p-proc-spawn]
+  {P(\pid)=(\tk,s',\pgorig)\premsep\tk\effred{\effa}\tk'\premsep
+   \effa=\effdone{\effspawn(\tk_0)}{\effsucceed\,\pid'}\\
+   \pid'\notin\Dom P\premsep
+   P'=P+\{\pid\mapsto(\tk',s,\pgorig),\ \pid'\mapsto(\tk_0,s,\pgspawned)\}}
+  {(s,v,M,P,\sbv,Q,H)\step{\effa}(s,v,M,P',\sbv,Q,H)}
+
+\defnrule[r:p-proc-kill]
+  {P(\pid)=(\tk,s',\pgorig)\premsep\tk\effred{\effa}\tk'\premsep
+   \effa=\effdone{\effkill(\pid')}{\tk''}\\
+   P'=(P+\{\pid'\mapsto\pgended\})+\{\pid\mapsto(\tk',s,\pgorig)\}}
+  {(s,v,M,P,\sbv,Q,H)\step{\effa}(s,v,M,P',\sbv,Q,H)}
+
+\defnrule[r:p-proc-message]
+  {P(\pid)=(\effsucceed\,v',s',\effc)\premsep\effrecv{\effc}{v'}{v''}}
+  {(s,v,M,P,\sbv,Q,H)\step{}(s,v,M\cdot v'',P+\{\pid\mapsto\pgended\},\sbv,Q,H)}
+
+\defnrule[r:p-proc-end]
+  {P(\pid)=(\tk,s',\pgorig)\\
+   \tk=\efffail\,v'\ \text{or}\ (\tk=\effsucceed\,v'\ \text{and}\ \pgorig=\pgspawned)}
+  {(s,v,M,P,\sbv,Q,H)\step{}(s,v,M,P+\{\pid\mapsto\pgended\},\sbv,Q,H)}
+
+\defnrule[r:p-in-accept]
+  {\PE(\effp)=(\smdirin,\tau)\premsep\Dec{\tau}(j)=v'\premsep
+   \effFlat(\sbv)=\effmset{\effc_1,\ldots,\effc_n}\\
+   \text{for}\ 1\leq i\leq n:\ \ \effrecv{\effc_i}{(\effp,j)}{M_i},\\
+   \text{or}\ M_i=\pgnil\ \text{and}\
+   \effrecv{\effc_i}{(\effp,j)}{v''}\ \text{for no}\ v''}
+  {(s,v,M,P,\sbv,Q,H)\step{\pgEvIn(\effp,j)}
+   (s,v,M\cdot M_1\cdots M_n,P,\sbv,Q,H)}
+
+\defnrule[r:p-in-reject]
+  {\PE(\effp)=(\smdirin,\tau)\premsep\Dec{\tau}(j)\ \text{is undefined}}
+  {K\step{\pgEvIn(\effp,j)}K}
+
+\defnrule[r:p-out]
+  {Q(\effp)=j\cdot J}
+  {(s,v,M,P,\sbv,Q,H)\step{\pgEvOut(\effp,j)}(s,v,M,P,\sbv,Q+\{\effp\mapsto J\},H)}
+
+\defnrule[r:p-wait]
+  {d>0}
+  {(s,v,M,P,\sbv,Q,H)\step{\pgwait\,d}(s+d,v,M,P,\sbv,Q,H)}
+
+\defnrule[r:p-platform]
+  {K\pgplatstep{\opt{\ell}}K'}
+  {K\step{\opt{\ell}}K'}
+
+\begin{rulecomments}
+\rcomment{r:p-update} This is the only rule that takes a message from the
+queue or changes the model. The message at the head of the queue is applied,
+with the model, to \kw{update}; the commands of the result are dispatched,
+and the subscriptions recomputed from the new model, whether or not it has
+changed, all in the one step. If the application of \kw{update} has no
+result (it reaches \kw{Debug.todo}), the rule never applies again, and no
+further message is handled, though processes, ports and the platform go on
+taking steps. % A62
+\rcomment{r:p-proc-step} A process takes one reduction of its task at a time,
+and the steps of different processes, and every other transition, may come
+between any two of them. A process may thus be suspended at any
+$\effandThen$; a program may rely on nothing more. % A78
+Rules~\ruleref{r:p-proc-step} to~\ruleref{r:p-proc-kill} record the present
+time as the time of the process's latest step. An action of a primitive of
+the platform acts on the world as the platform defines.
+\rcomment{r:p-proc-sleep} The process reached $\effprim(\effsleep,v')$ by its
+step at time $s'$, so the action takes place no sooner than $\max(0,v')$
+milliseconds later; for an infinite or NaN delay, no condition is imposed.
+The definition sets no time by which the action must take place. % A81
+\rcomment{r:p-proc-spawn} The new process names a process never started
+before, and its origin is $\pgspawned$: its outcome goes to no other process,
+and it gives no message (rule~\ruleref{r:p-proc-end}). % A79
+\rcomment{r:p-proc-kill} The killed process takes no further step, and if it
+was performing the task of a leaf it gives no message. Killing a process
+that has ended changes nothing. When a process kills itself, the second
+modification overrides the first, so it is not ended and goes on with
+$\tk'$. % A80
+\rcomment{r:p-proc-message} A process whose origin is a leaf command ends,
+when its task succeeds, by adding the message of its leaf
+(rule~\ruleref{r:e-msg-task}) to the end of the queue. When the functions of
+the $\effmap$s around the leaf give no result, the process never ends.
+\rcomment{r:p-proc-end} A process whose task fails ends, whatever its origin,
+and nothing else happens: there is no error, and no message. % A79, D2
+\rcomment{r:p-in-accept} An incoming value is an event of its own, so it is
+never handled in the middle of another step; its messages join the end of the
+queue, and are handled by later updates. % A68
+Each leaf subscription on $\effp$ gives one message, through the functions of
+the $\effmap$s around it; a leaf on another port, or of another manager,
+gives none, and so does a leaf whose functions give no result. The order of
+the messages of one value follows the enumeration of $\effFlat(\sbv)$, and
+is unspecified. A value accepted while no subscription is current gives no
+message. % A66
+\rcomment{r:p-in-reject} A boundary value that does not decode at the type of the
+port is rejected: the program never sees it, and is unchanged. % A71, D2
+Thus with \kw{port recv : (String -> msg) -> Sub msg}, the value 1337 is
+rejected. For every incoming port and every boundary value one of
+rules~\ruleref{r:p-in-accept} and~\ruleref{r:p-in-reject} applies, so the host
+may send at any time. A name that is not an incoming port of the program has
+no transition: sending on it is outside the definition.
+\rcomment{r:p-out} The values of each port are delivered in the order in
+which they joined its queue, so a value sent by one update is delivered
+before a value that a later update sends on the same port. Delivery happens
+after the step that queued the value, at a time the definition does not fix,
+and in no fixed order across ports. The event records only that the program
+has delivered $j$; whether the host has a subscriber, and what it does with
+$j$, are outside the definition. % A69, A70
+\rcomment{r:p-wait} Time passes only in this rule, and every other transition
+takes no time. Since this rule applies to every configuration, the definition
+requires no step to happen by any time: only the lower bound of
+rule~\ruleref{r:p-proc-sleep}, and what the platform imposes on its own
+steps, relate the steps of a program to time.
+\rcomment{r:p-platform} The managers of the platform, such as those of
+\kw{Time} or \kw{Http}, act through these steps, within the limits stated
+above. A platform with no managers has no platform steps. % A83
+\end{rulecomments}
+
+The rules give the following guarantees, and no others. % A86
+\begin{property}
+Messages are handled one at a time, by rule~\ruleref{r:p-update}, in the
+order in which they joined the message queue. Each update applies
+\kw{update} to the model that the previous update produced, or to the model
+of \kw{init} for the first. The commands of an update are dispatched in the
+step of that update, so the effects of an earlier update are dispatched
+before those of a later one. Apart from these, and from the order of the
+values of each outgoing port, the steps of distinct processes, the arrival
+of incoming values and platform steps, the delivery of outgoing values, and
+the update steps interleave in every way the rules allow.
+\end{property}
+
+\section{Observable Behaviour}\label{sec:programs-behaviour}
+
+Let $\jdg{B_0}{\program}{(\tau,\PE,\effprog\,r)}$ with
+$\tau=(\tau_1,\tau_2,\tau_3)\sbtProgram$, and let $j$ be a boundary value. An
+\emph{execution} of $\program$ with flags $j$ is a finite sequence of
+transitions
+\[
+  K_0\step{\opt{\ell_1}}K_1\step{\opt{\ell_2}}\cdots\step{\opt{\ell_n}}K_n
+  \qquad(n\geq 0),
+\]
+where $\jdg{\PE,\tau_1,j}{\effprog\,r}{K_0}$. The \emph{observable} events
+are those of the forms $\pgEvIn(\effp,j')$, $\pgEvOut(\effp,j')$ and
+$\pgwait\,d$, the platform events, and the actions
+$\effdone{\pi(v_1\cdots v_k)}{\tk}$ with $\pi\in\effPrimPlat$. The
+\emph{trace} of an execution is the sequence of its observable events, in
+order; silent transitions and the actions of $\effsleep$, $\effspawn$ and
+$\effkill$, whose whole effect lies within the configuration, are omitted.
+The set of traces
+\[
+  \pgTr(\program,j)
+\]
+is the set of the traces of the executions of $\program$ with flags $j$, and
+the \emph{meaning} of $\program$ is the function that maps each $j$ to
+$\pgTr(\program,j)$. When $\pgTr(\program,j)$ is empty, the program does not
+start with flags $j$; otherwise it holds the empty trace and every prefix of
+each of its traces.
+
+An implementation \emph{conforms} to the definition if, for every program
+that has a meaning and every boundary value $j$, every trace that the
+implementation can produce when it runs the program with flags $j$ is a
+member of $\pgTr(\program,j)$, and the implementation does not start the
+program when $\pgTr(\program,j)$ is empty. Two conforming implementations may
+produce different traces of one program, as where the order of the commands
+of a batch, or the interleaving of processes, is left open, and both conform.
+Conformance concerns what is produced, not that anything is: the definition
+does not require a program to make progress. % A86
+
+\section{Views and Other Programs}\label{sec:programs-views}
+
+Let $\jdg{B_0}{\program}{(\tau'\,\sbtNode,\PE,v)}$. The program is a
+\emph{view}: its meaning is the value $v$ of type \kw{Html}, which the host
+renders. % A82
+It has no configuration and no transitions: it handles no message, and has no
+traffic on its ports, whatever ports its modules declare. How the host
+renders $v$ is outside the definition; an implementation that only evaluates
+the program conforms. Every top-level value of every module is evaluated, so
+a \kw{Debug.log} in the definition of \kw{main} is evaluated once.
+
+A platform may provide functions other than \kw{Platform.worker} that make
+program values, such as the functions \kw{sandbox}, \kw{element},
+\kw{document} and \kw{application} of the module \kw{Browser}. They are not part of the
+initial basis, and their records have further fields, such as \kw{view}
+(Section~\ref{sec:effects-commands}). A program whose \kw{main} is made by one
+of them runs as in Section~\ref{sec:programs-execution}, except that the
+platform defines how \kw{init} is applied (for \kw{application}, to
+the flags, a URL and a navigation key), and that among its platform steps are
+steps that render the value of \kw{view} applied to the present model, as a
+platform event, after each update, and steps that append to the message
+queue the messages that the host sends from the rendered view. % A83
+A platform that does not provide these functions, or does not run the
+programs they make, is recorded in Appendix~\ref{ch:appendix-implementation}.

@@ -72,6 +72,10 @@ jobs:
       - name: Write the site data
         run: node runner/site-data.js
 
+      # The Definition of Standard Elm, from its LaTeX sources under definition/.
+      - name: Write the site data for the Definition
+        run: node runner/definition-data.js
+
       - name: Build the site
         working-directory: site
         run: |

@@ -297,6 +297,22 @@ The site is built for the root of its domain: the elm-pages it uses does not rou
 base path, so it cannot be served from a GitHub project page (`<owner>.github.io/<repo>/`).
 Styling is elm-css global snippets in `site/src/Style.elm`, used through `ts-` classes.
 
+## The Definition of Standard Elm
+
+The site also carries *The Definition of Standard Elm*, a formal definition of the language, under
+`/standard`: its chapters, a page for every rule at an address made from the rule's name
+(`/standard/rules/d-atexp-var`), pages likewise for every restriction, derived form and entry of
+the initial basis (`/standard/basis/Basics/modBy`), and the PDF. Its LaTeX sources are in `definition/`;
+`runner/definition-data.js` turns them into the site's data, rendering the mathematics with KaTeX at
+build time, so the pages need no KaTeX JavaScript. See [definition/README.md](definition/README.md).
+
+```sh
+node runner/definition-data.js    # writes site/data-standard/ from definition/tex/
+```
+
+The book's pages put their content in `View.freeze`, so elm-pages renders it at build time and does
+not send the book's data to the browser. The styles are the `sd-` classes in `site/src/Style.elm`.
+
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs on Linux for each push to `master` and each pull request:
@@ -317,6 +333,8 @@ runner/run-all.js     runs it with several and writes the comparison report
 runner/directives.js  reads a test's directives and checks its output
 runner/dom.js         the minimal DOM that lets Html programs start on Node
 runner/site-data.js   writes the results website's data from the last results
+runner/definition-data.js  writes the website's data for The Definition of Standard Elm
+definition/           the LaTeX sources and PDF of The Definition of Standard Elm
 runner/check-baseline.js  fails when Elm 0.19.1 fails a test it should pass (CI)
 site/                 the results website (elm-pages)
 .github/workflows/    CI: run the suite, build and publish the website
@@ -326,4 +344,5 @@ tests/<project>/      the test projects (elm.json and src/)
 
 ## License
 
-BSD 3-Clause; see [LICENSE](LICENSE).
+The code is BSD 3-Clause; see [LICENSE](LICENSE). The text of *The Definition of Standard Elm* in
+`definition/` is CC BY 4.0; see [definition/LICENSE](definition/LICENSE).

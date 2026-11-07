@@ -1,0 +1,143 @@
+% defn.sty -- environments for a formal language definition.
+% Implements the layout rules in shared/definition-style.md. Notation for a
+% particular language does NOT live here: it lives in the book's macros.sty,
+% generated from the notation registry.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{defn}[2026/11/07 Formal definition layout]
+
+\RequirePackage{iftex}
+\ifPDFTeX\RequirePackage[T1]{fontenc}\fi   % braces and < > in \texttt
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{array}
+
+% ---------------------------------------------------------------------------
+% Numbering (definition-style S7): figures and rules run through the whole
+% book and never restart per chapter.
+% ---------------------------------------------------------------------------
+\@ifundefined{c@chapter}{}{\counterwithout{figure}{chapter}}
+\newcounter{defnrule}
+
+% ---------------------------------------------------------------------------
+% Typefaces for the three kinds of name (definition-style G7).
+% ---------------------------------------------------------------------------
+\newcommand{\kw}[1]{\textnormal{\texttt{#1}}}   % terminal: \kw{let}
+\newcommand{\mv}[1]{\ensuremath{\mathit{#1}}}   % metavariable: \mv{exp}
+\newcommand{\cls}[1]{\ensuremath{\mathrm{#1}}}  % class or domain: \cls{TyVar}
+% Typewriter braces that work under every engine: \kw{\kwlb} and \kw{\kwrb}.
+\newcommand{\kwlb}{\char`\{}
+\newcommand{\kwrb}{\char`\}}
+
+% ---------------------------------------------------------------------------
+% Options (definition-style R6).
+% ---------------------------------------------------------------------------
+\newcommand{\opt}[1]{\langle #1\rangle}
+\newcommand{\optt}[1]{\langle\!\langle #1\rangle\!\rangle}
+
+% ---------------------------------------------------------------------------
+% Rule groups (R2): plural class name, boxed judgment form at the right.
+%   \rulegroup{Atomic Expressions}{C \vdash \mv{atexp} \Rightarrow \tau}
+% ---------------------------------------------------------------------------
+\newcommand{\rulegroup}[2]{%
+  \par\addvspace{\bigskipamount}%
+  \noindent{\large\bfseries #1}\hfill\fbox{$#2$}%
+  \par\nopagebreak\smallskip}
+
+% ---------------------------------------------------------------------------
+% Rules (R4, R5): premises over conclusion, number at the right.
+%   \defnrule[label]{premise \premsep side condition}{conclusion}
+% Separate premises with \premsep; break premise lines with \\.
+% An axiom has empty premises: \defnrule[l]{}{conclusion}.
+% Refer to a rule with \ruleref{label}, which prints "(n)".
+% ---------------------------------------------------------------------------
+\newcommand{\premsep}{\qquad}
+\newcommand{\defnrule}[3][]{%
+  \stepcounter{defnrule}%
+  \begin{equation*}
+    \frac{\begin{array}{@{}c@{}}#2\end{array}}
+         {\begin{array}{@{}c@{}}#3\end{array}}
+    \tag{\arabic{defnrule}}%
+    \if\relax\detokenize{#1}\relax\else\label{#1}\fi
+  \end{equation*}}
+\newcommand{\ruleref}[1]{\eqref{#1}}
+
+% ---------------------------------------------------------------------------
+% Comments after a rule group (C1).
+%   \begin{rulecomments}
+%     \rcomment{rule-label} Text of the comment.
+%   \end{rulecomments}
+% ---------------------------------------------------------------------------
+\newenvironment{rulecomments}{%
+  \par\smallskip\noindent\textit{Comments:}%
+  \begin{list}{}{%
+    \setlength{\leftmargin}{2.2em}%
+    \setlength{\labelwidth}{2em}%
+    \setlength{\labelsep}{0.2em}%
+    \setlength{\itemindent}{0pt}%
+    \setlength{\itemsep}{0.5\baselineskip}}}%
+  {\end{list}}
+\newcommand{\rcomment}[1]{\item[\ruleref{#1}\hfill]}
+
+% ---------------------------------------------------------------------------
+% Grammar figures (G4): lhs ::= rhs, one alternative per line, roman label.
+%   \begin{grammar}
+%     \gprod{\mv{exp}}{\mv{exp}\ \mv{atexp}}{application}
+%     \galt{\mv{exp}\ \kw{handle}\ \mv{match}}{handle exception}
+%   \end{grammar}
+% ---------------------------------------------------------------------------
+\newenvironment{grammar}{%
+  \par\noindent\begin{tabular}{@{}>{$}l<{$}@{\quad}c@{\quad}>{$}l<{$}@{\qquad}l@{}}}%
+  {\end{tabular}\par}
+\newcommand{\gprod}[3]{#1 & ::= & #2 & #3\\}
+\newcommand{\galt}[2]{ & & #1 & #2\\}
+\newcommand{\gnote}[1]{ & & & #1\\}
+
+% ---------------------------------------------------------------------------
+% Semantic object figures (O2, O3).
+%   \begin{objtable}
+%     \objrow{\alpha\ \text{or}\ \mv{tyvar}}{\cls{TyVar}}{type variables}
+%     \objdef{\sigma}{\cls{TypeScheme}}{\bigcup_{k\ge 0}\cls{TyVar}^k\times\cls{Type}}
+%   \end{objtable}
+% ---------------------------------------------------------------------------
+\newenvironment{objtable}{%
+  \par\noindent\begin{tabular}{@{}>{$}r<{$}@{\ }>{$}c<{$}@{\ }>{$}l<{$}@{\ }>{$}l<{$}@{\qquad}l@{}}}%
+  {\end{tabular}\par}
+\newcommand{\objrow}[3]{#1 & \in & #2 & & #3\\}
+\newcommand{\objdef}[3]{#1 & \in & #2 & = #3 & \\}
+
+% ---------------------------------------------------------------------------
+% Derived forms tables (B3).
+%   \begin{derivedforms}
+%     \dform{\kw{()}}{\kw{\{\ \}}}
+%   \end{derivedforms}
+% ---------------------------------------------------------------------------
+\newenvironment{derivedforms}{%
+  \par\noindent\begin{tabular}{@{}>{$}l<{$}@{\qquad}>{$}l<{$}@{}}
+  \hline
+  \textnormal{Derived Form} & \textnormal{Equivalent Form}\\
+  \hline}%
+  {\hline\end{tabular}\par}
+\newcommand{\dform}[2]{#1 & #2\\}
+
+% ---------------------------------------------------------------------------
+% Citable items other than rules: a restriction (res:), a derived form (df:)
+% and an entry of the initial basis (b:). Neither command prints anything.
+% \citelabel{label} defines the item's label where the item is stated, as a
+% hyperlink target; it works in text and in mathematics:
+%   \item\citelabel{res:core-no-float-pattern} No float constant ...
+%   \dform{\citelabel{df:if}\kw{if}\ ...}{...}
+%   \kw{modBy}\citelabel{b:Basics.modBy},\ \kw{remainderBy}\citelabel{...}
+% \citealso{label} marks a further place that belongs to the same item, such
+% as the dynamic basis row of a value whose label is in the static basis; the
+% web edition collects these places on the item's page.
+% ---------------------------------------------------------------------------
+\newcommand{\citelabel}[1]{%
+  \ifmmode\text{\phantomsection\ltx@label{#1}}\else\phantomsection\label{#1}\fi}
+\newcommand{\citealso}[1]{}
+
+% ---------------------------------------------------------------------------
+% Displayed properties (O7): indented, unnumbered.
+% ---------------------------------------------------------------------------
+\newenvironment{property}{\begin{quote}}{\end{quote}}
+
+\endinput

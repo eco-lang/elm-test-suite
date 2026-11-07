@@ -8,12 +8,12 @@ import SiteConfig exposing (SiteConfig)
 
 title : String
 title =
-    "Elm test suite"
+    "Elm Exactly"
 
 
 canonicalUrl : String
 canonicalUrl =
-    "https://eco-lang.github.io/elm-test-suite"
+    "https://elm-test-suite.netlify.app"
 
 
 config : SiteConfig
