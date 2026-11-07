@@ -35,11 +35,14 @@ type alias RouteParams =
 
 
 {-| `index` and `item` are used only inside `View.freeze`, so elm-pages leaves them out of the data
-sent to the browser; the page title and description are kept apart for that reason.
+sent to the browser; the page title and description are kept apart for that reason. `slug` is the item's
+name as the book writes it, for the key of its discussions: the address in the browser may not
+keep its case (Netlify serves a mixed-case path at its lower-case form).
 -}
 type alias Data =
     { title : String
     , description : String
+    , slug : String
     , index : Index
     , item : Item
     }
@@ -75,6 +78,7 @@ data params =
         (\idx it ->
             { title = Render.itemKindName it.kind ++ " " ++ it.slug ++ " · " ++ idx.title
             , description = ItemView.description idx it
+            , slug = it.slug
             , index = idx
             , item = it
             }
@@ -105,7 +109,7 @@ view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
 view app shared =
     let
         slug =
-            app.routeParams.restriction
+            app.data.slug
 
         key =
             ItemView.itemKey Restriction slug
