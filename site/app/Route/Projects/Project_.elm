@@ -11,7 +11,6 @@ import Head.Seo as Seo
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
-import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import Route
 import RouteBuilder exposing (App, StatefulRoute)
@@ -92,15 +91,10 @@ update _ _ msg model =
 
 head : App Data ActionData RouteParams -> List Head.Tag
 head app =
-    Seo.summary
+    Seo.summaryLarge
         { canonicalUrlOverride = Nothing
         , siteName = Site.title
-        , image =
-            { url = Pages.Url.external ""
-            , alt = Site.title
-            , dimensions = Nothing
-            , mimeType = Nothing
-            }
+        , image = Site.socialImage
         , description = app.data.project.description
         , locale = Nothing
         , title = app.data.project.name ++ " · " ++ Site.title

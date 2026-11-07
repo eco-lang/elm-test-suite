@@ -7,7 +7,6 @@ import BackendTask exposing (BackendTask)
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
-import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import RouteBuilder exposing (App, StatelessRoute)
 import Shared
@@ -61,15 +60,10 @@ route =
 
 head : App Data ActionData RouteParams -> List Head.Tag
 head app =
-    Seo.summary
+    Seo.summaryLarge
         { canonicalUrlOverride = Nothing
         , siteName = Site.title
-        , image =
-            { url = Pages.Url.external ""
-            , alt = app.data.title
-            , dimensions = Nothing
-            , mimeType = Nothing
-            }
+        , image = Site.socialImage
         , description = app.data.description
         , locale = Nothing
         , title = app.data.title

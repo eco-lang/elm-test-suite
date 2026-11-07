@@ -12,7 +12,6 @@ import Head
 import Head.Seo as Seo
 import Html
 import Html.Attributes as Attr
-import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import Route
 import RouteBuilder exposing (App, StatelessRoute)
@@ -52,15 +51,10 @@ route =
 
 head : App Data ActionData RouteParams -> List Head.Tag
 head _ =
-    Seo.summary
+    Seo.summaryLarge
         { canonicalUrlOverride = Nothing
         , siteName = Site.title
-        , image =
-            { url = Pages.Url.external ""
-            , alt = Site.title
-            , dimensions = Nothing
-            , mimeType = Nothing
-            }
+        , image = Site.socialImage
         , description = "The discussions of the tests of " ++ Site.title ++ ", by the test or project they are about"
         , locale = Nothing
         , title = "Discussions · " ++ Site.title
