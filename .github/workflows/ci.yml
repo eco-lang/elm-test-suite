@@ -2,7 +2,8 @@
 # publishes it to Netlify. Runs on master deploy to production; a pull request gets a draft deploy
 # when the Netlify secrets are available (not for pull requests from forks). Runs on the staging
 # branch, standard-elm-suite, deploy to a separate staging site. The site is also kept as a workflow
-# artifact either way.
+# artifact either way. Test results whose inputs have not changed come from a result cache kept
+# between runs; a weekly scheduled run (and a manual run with "fresh") runs every test again.
 #
 # Netlify setup: create a site (no build settings needed: CI uploads the built files), then add the
 # repository secrets NETLIFY_AUTH_TOKEN (a personal access token) and NETLIFY_SITE_ID (the site's
@@ -16,6 +17,14 @@ on:
     branches: [master, standard-elm-suite]
   pull_request:
   workflow_dispatch:
+    inputs:
+      fresh:
+        description: 'Run every test, ignoring the result cache, and report results that differ from it'
+        type: boolean
+        default: false
+  # Weekly, every test runs afresh: the result cache is renewed and checked (see below).
+  schedule:
+    - cron: '17 4 * * 1'
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -33,6 +42,10 @@ jobs:
       # the production site's. A missing staging secret leaves the value empty, so the deploy is
       # skipped rather than going to the production site.
       STAGING: ${{ github.ref == 'refs/heads/standard-elm-suite' }}
+      # The site's address, for its link previews and the links back to it (site/scripts/site-url.mjs):
+      # the staging site's on the staging branch. The repository variables SITE_URL and
+      # SITE_URL_STAGING override the defaults.
+      SITE_URL: ${{ github.ref == 'refs/heads/standard-elm-suite' && (vars.SITE_URL_STAGING || 'https://effortless-quokka-462d98.netlify.app') || (vars.SITE_URL || 'https://elm-test-suite.netlify.app') }}
       NETLIFY_AUTH_TOKEN: ${{ github.ref == 'refs/heads/standard-elm-suite' && secrets.NETLIFY_AUTH_TOKEN_STAGING || (github.ref != 'refs/heads/standard-elm-suite' && secrets.NETLIFY_AUTH_TOKEN || '') }}
       NETLIFY_SITE_ID: ${{ github.ref == 'refs/heads/standard-elm-suite' && secrets.NETLIFY_SITE_ID_STAGING || (github.ref != 'refs/heads/standard-elm-suite' && secrets.NETLIFY_SITE_ID || '') }}
     steps:
@@ -57,9 +70,31 @@ jobs:
       - name: Install the compilers
         run: pnpm install --frozen-lockfile
 
-      # run-all.js exits 0 whatever the tests' outcomes; the baseline check at the end decides.
+      # The result cache (runner/run.js, plans/test-result-cache.md): each test's result under a hash
+      # of everything it depends on, so a test whose inputs have not changed is neither compiled nor
+      # run again. The newest cache is restored (this branch's, else master's); a lost cache only
+      # makes the run a full one.
+      - name: Restore the result cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .work/result-cache
+          key: results-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: results-
+
+      # run-all.js exits 0 whatever the tests' outcomes; the baseline check at the end decides. The
+      # weekly run, and a manual run with "fresh", run every test (--refresh): the cache is renewed,
+      # and any result that differs from the cached one is listed in the report.
       - name: Run the suite under every compiler
-        run: pnpm test:all 2>&1 | tee test-output.txt
+        env:
+          REFRESH: ${{ (github.event_name == 'schedule' || inputs.fresh) && '--refresh' || '' }}
+        run: pnpm test:all -- $REFRESH 2>&1 | tee test-output.txt
+
+      - name: Save the result cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .work/result-cache
+          key: results-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Write the comparison report to the job summary
         if: always()

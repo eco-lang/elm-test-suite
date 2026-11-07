@@ -243,6 +243,29 @@ function extractSkip(content) {
     return null;
 }
 
+// Why a test's result is never taken from the result cache (run.js), or null: its outcome may
+// differ between two runs of the same program, so each run must be a real one.
+//   `-- NO-CACHE: <why>`        any test, for a reason the harness cannot see
+//   `-- STDIN-DELAY-MS:`        its input arrives after a delay
+//   Time.now, Time.every, Process.sleep, Random.generate in its source, qualified or exposed by
+//   its import: it depends on the clock or on a seed taken from it
+const TIMING = /\b(Time\.now|Time\.every|Process\.sleep|Random\.generate)\b/;
+const TIMING_IMPORT = /^import\s+(Time|Process|Random)\b[^\n]*\bexposing\s*\(([^)]*)\)/gm;
+const TIMING_NAMES = { Time: ['now', 'every'], Process: ['sleep'], Random: ['generate'] };
+function uncacheable(content) {
+    const no = directiveLines(content, '-- NO-CACHE:');
+    if (no.length) return 'NO-CACHE: ' + (no[0].trim() || '(no reason given)');
+    if (directiveLines(content, '-- STDIN-DELAY-MS:').length) return 'STDIN-DELAY-MS';
+    const m = TIMING.exec(content);
+    if (m) return 'uses ' + m[1];
+    for (const im of content.matchAll(TIMING_IMPORT)) {
+        const exposed = im[2].split(',').map((x) => x.trim());
+        const hit = TIMING_NAMES[im[1]].find((n) => exposed.includes(n) || exposed.includes('..'));
+        if (hit) return 'uses ' + im[1] + '.' + hit;
+    }
+    return null;
+}
+
 // --- Files ---------------------------------------------------------------------------------------
 
 function writeIfChanged(file, content) {
@@ -260,5 +283,5 @@ function mtimeMs(file) {
 
 module.exports = {
     extractCheckPatterns, verifyPatterns, directiveLines, extractExit, extractStdin, extractEnv,
-    extractUnsetenv, extractCount, childEnv, findPrlimit, extractSkip, writeIfChanged, mtimeMs,
+    extractUnsetenv, extractCount, childEnv, findPrlimit, extractSkip, uncacheable, writeIfChanged, mtimeMs,
 };

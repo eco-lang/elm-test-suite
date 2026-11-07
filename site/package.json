@@ -5,7 +5,9 @@
   "description": "The elm-test-suite results website, built with elm-pages from the data runner/site-data.js writes",
   "scripts": {
     "postinstall": "elm-tooling install",
+    "prestart": "node scripts/site-url.mjs",
     "start": "elm-pages dev",
+    "prebuild": "node scripts/site-url.mjs",
     "build": "elm-pages build",
     "test": "elm-test --compiler ./node_modules/.bin/elm"
   },

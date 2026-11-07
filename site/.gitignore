@@ -7,3 +7,4 @@ data/
 data-standard/
 public/downloads/
 gen/
+src/SiteUrl.elm

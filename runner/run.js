@@ -5,7 +5,7 @@
 //   node runner/run.js [--compiler <name>] [--project <name>[,<name>...]]
 //        [--filter <substr>[,<substr>...]] [--jobs <n>] [--compile-jobs <n>] [--timeout <seconds>]
 //        [--compile-timeout <seconds>] [--compile-memory <MB>]
-//        [--json <file>] [--list-compilers]
+//        [--json <file>] [--no-cache] [--refresh] [--list-compilers]
 //   node runner/run.js --compiler <name> --project <name> --record <TestName>
 //
 // --compiler names an entry of compilers.json (default: its "default"). Each entry gives:
@@ -42,6 +42,17 @@
 //      (default 60 s) with the `-- EXIT:` status (default 0) and its stdout+stderr satisfy the
 //      CHECK lines.
 //   `-- LINUX-ONLY:` skips the test on other hosts.
+// The result cache: a test's result is kept in .work/result-cache/<compiler>/<key>.json, the key a
+// hash of everything the result depends on (the compiler's executable, this runner, Node, the
+// project's elm.json, the test's source and the modules it imports, ...), and a later run takes it
+// from there instead of compiling and running the test again. A result that may be an accident of
+// the moment (a compile that crashed, timed out or ran out of memory, a program that timed out or
+// was killed) is kept only once two runs in a row have given it: the first is a pending entry,
+// never used. Every result of a test that directives.uncacheable names (`-- NO-CACHE:`,
+// `-- STDIN-DELAY-MS:`, the clock) is never kept. A missing or unreadable entry is a miss. --no-cache neither reads
+// nor writes it; --refresh runs every test, rewrites the entries and reports each result that
+// differs from the one it replaces. A run of every test of a compiler removes that compiler's
+// entries it did not use. See plans/test-result-cache.md.
 // --record <TestName> runs one test without checking it and prints each non-empty output line as
 // `-- CHECK: <line>`. Each test's output is kept in .work/<compiler>/<project>/out/<Name>.log.
 // --json writes every test's outcome, its failure message and up to 4000 characters of its output
@@ -73,6 +84,8 @@ function parseArgs(argv) {
         record: null,
         json: null,
         listCompilers: false,
+        noCache: false,
+        refresh: false,
     };
     for (let i = 0; i < argv.length; i++) {
         const a = argv[i];
@@ -96,8 +109,10 @@ function parseArgs(argv) {
             case '--record': opts.record = val(); break;
             case '--json': opts.json = path.resolve(val()); break;
             case '--list-compilers': opts.listCompilers = true; break;
+            case '--no-cache': opts.noCache = true; break;
+            case '--refresh': opts.refresh = true; break;
             case '--help': case '-h':
-                console.log(fs.readFileSync(__filename, 'utf8').split('\n').slice(1, 48)
+                console.log(fs.readFileSync(__filename, 'utf8').split('\n').slice(1, 60)
                     .map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
                 process.exit(0);
                 break;
@@ -294,9 +309,118 @@ function seedPackages(elmJsonData, compiler, elmHome) {
     }
 }
 
+// --- Result cache --------------------------------------------------------------------------------
+
+const crypto = require('crypto');
+const CACHE_FORMAT = 1;
+const sha256 = (data) => crypto.createHash('sha256').update(data).digest('hex');
+
+// The executable a command runs: its path, or the first match on PATH; null if not found.
+function executable(command) {
+    if (command.includes('/') || command.includes(path.sep)) return fs.existsSync(command) ? command : null;
+    for (const dir of (process.env.PATH || '').split(path.delimiter)) {
+        if (!dir) continue;
+        const p = path.join(dir, command);
+        try { fs.accessSync(p, fs.constants.X_OK); return p; } catch (e) { /* next */ }
+    }
+    return null;
+}
+
+// The cache of one run of this runner for one compiler: what every key of it shares (the compiler,
+// the judge, the environment, the limits), and the entries used, written and found to differ.
+function openCache(opts, compiler) {
+    const enabled = !opts.noCache && !opts.record;
+    const exe = executable(compiler.command);
+    const judge = ['run.js', 'directives.js', 'dom.js'].map((f) => [f, sha256(fs.readFileSync(path.join(__dirname, f)))]);
+    const common = {
+        format: CACHE_FORMAT,
+        compiler: {
+            name: compiler.name, target: compiler.target, args: compiler.args, env: compiler.env,
+            elmVersion: compiler.elmVersion || null, version: compiler.version,
+            executable: exe ? sha256(fs.readFileSync(exe)) : compiler.command,
+        },
+        judge,
+        environment: {
+            node: process.version, platform: process.platform, arch: process.arch,
+            image: [process.env.ImageOS || null, process.env.ImageVersion || null],
+        },
+        limits: { run: opts.timeoutSec, compile: opts.compileTimeoutSec, memory: opts.compileMemoryMB },
+    };
+    return {
+        enabled,
+        refresh: opts.refresh,
+        dir: path.join(ROOT, '.work', 'result-cache', compiler.name),
+        common,
+        used: new Set(),
+        hits: 0,
+        written: 0,
+        pending: 0,
+        mismatches: [],
+    };
+}
+
+// The module names a source imports.
+function importsOf(content) {
+    return [...content.matchAll(/^import\s+([A-Z][A-Za-z0-9_.]*)/gm)].map((m) => m[1]);
+}
+
+// A test's key: the cache's shared inputs, the project, and the source of the test and of every
+// module of the project it imports, directly or not.
+function cacheKey(cache, project, modules, name) {
+    const closure = new Set();
+    const visit = (m) => {
+        if (closure.has(m) || !modules.has(m)) return;
+        closure.add(m);
+        importsOf(modules.get(m)).forEach(visit);
+    };
+    visit(name);
+    const sources = [...closure].sort().map((m) => [m, sha256(modules.get(m))]);
+    return { key: sha256(JSON.stringify({ ...cache.common, project, test: name, sources })), closure };
+}
+
+// The entry under `key`, or null: one that is missing, unreadable, of another format or for
+// another key is a miss.
+function readEntry(cache, key) {
+    try {
+        const e = JSON.parse(fs.readFileSync(path.join(cache.dir, key + '.json'), 'utf8'));
+        if (e && e.format === CACHE_FORMAT && e.key === key && e.result && typeof e.result.status === 'string') return e;
+    } catch (e) { /* a miss */ }
+    return null;
+}
+
+// Writes an entry whole or not at all: to a temporary file, then renamed over the entry. A pending
+// entry records a result seen once that is used only when the next run gives it again.
+function writeEntry(cache, key, project, test, result, pending) {
+    fs.mkdirSync(cache.dir, { recursive: true });
+    const file = path.join(cache.dir, key + '.json');
+    const tmp = file + '.' + process.pid + '-' + crypto.randomBytes(4).toString('hex') + '.tmp';
+    const entry = { format: CACHE_FORMAT, key, project, test, ranAt: new Date().toISOString(), pending,
+        result: { status: result.status, message: result.message || '', output: result.output || '',
+            ms: result.ms, compileError: result.compileError } };
+    fs.writeFileSync(tmp, JSON.stringify(entry));
+    fs.renameSync(tmp, file);
+    cache.used.add(key);
+    cache.written++;
+    if (pending) cache.pending++;
+}
+
+// After a run of every test: removes the compiler's entries this run did not use, and any
+// temporary file an interrupted run left.
+function pruneCache(cache) {
+    if (!fs.existsSync(cache.dir)) return 0;
+    let removed = 0;
+    for (const f of fs.readdirSync(cache.dir)) {
+        const key = f.endsWith('.json') ? f.slice(0, -5) : null;
+        if (key !== null && cache.used.has(key)) continue;
+        fs.rmSync(path.join(cache.dir, f), { force: true });
+        removed++;
+    }
+    return removed;
+}
+
 // --- One project -------------------------------------------------------------------------------
 
-async function runProject(spec, opts, compiler) {
+async function runProject(spec, opts, compiler, cache) {
     const work = path.join(ROOT, '.work', compiler.name, spec.name);
     const projects = Array.from({ length: opts.compileJobs }, (_, k) => path.join(work, 'project-' + k));
     const outDir = path.join(work, 'out');
@@ -373,6 +497,27 @@ async function runProject(spec, opts, compiler) {
         else toRun.push(t);
     }
 
+    // The result cache: a test whose result is cached is neither compiled nor run.
+    const modules = new Map(sources.map((f) => [f.slice(0, -4), fs.readFileSync(path.join(srcDir, f), 'utf8')]));
+    const project = { name: spec.name, elmJson, modeGuard: spec.modeGuard, allowSkip: spec.allowSkip, unicode: spec.unicode };
+    const keys = new Map();   // test name -> its key, for a test whose result may be cached
+    if (cache.enabled) {
+        for (const t of toRun) {
+            const { key, closure } = cacheKey(cache, project, modules, t.name);
+            if ([...closure].some((m) => D.uncacheable(modules.get(m)) !== null)) continue;
+            keys.set(t.name, key);
+            if (cache.refresh) continue;
+            const e = readEntry(cache, key);
+            if (!e || e.pending) continue;
+            cache.used.add(key);
+            cache.hits++;
+            results.set(t.name, Object.assign({}, e.result, { cached: e.ranAt }));
+        }
+        const fromCache = toRun.filter((t) => results.has(t.name)).length;
+        if (fromCache) console.log('  ' + fromCache + ' from the cache');
+        for (let i = toRun.length - 1; i >= 0; i--) if (results.has(toRun[i].name)) toRun.splice(i, 1);
+    }
+
     // 2. Compile.
     const ext = compiler.target === 'js' ? '.js' : '';
     const outFile = (t) => path.join(outDir, t.name + ext);
@@ -415,7 +560,8 @@ async function runProject(spec, opts, compiler) {
             : r.signal ? 'compiler killed by ' + r.signal : null;
         if (died) {
             try { fs.unlinkSync(out); } catch (e) { /* none */ }
-            results.set(t.name, { status: 'fail', message: died + '\n' + r.output.slice(0, 4000), compileError: t.compileError });
+            results.set(t.name, { status: 'fail', message: died + '\n' + r.output.slice(0, 4000), compileError: t.compileError,
+                volatile: true });
         } else if (t.compileError) {
             try { fs.unlinkSync(out); } catch (e) { /* none */ }
             let message = r.code === 0 || produced ? 'compiled, but a compile error was expected'
@@ -488,8 +634,31 @@ async function runProject(spec, opts, compiler) {
         if (!message && !opts.record) message = D.verifyPatterns(r.output, t.patterns);
         if (message) message += '\n--- output ---\n' + r.output.slice(0, 4000);
         results.set(t.name, { status: message ? 'fail' : 'pass', message, ms: Date.now() - started,
-            output: r.output.slice(0, 4000) });
+            output: r.output.slice(0, 4000), volatile: r.timedOut || r.signal !== null });
     });
+
+    // Keep the results: one that may be an accident of the moment (r.volatile) is kept pending until
+    // the next run gives it again. With --refresh, note each result that differs from the confirmed
+    // entry it replaces.
+    const firstLine = (m) => (m || '').split('\n')[0];
+    for (const t of toRun) {
+        const key = keys.get(t.name);
+        const r = results.get(t.name);
+        if (key === undefined || !r || r.status === 'skip') continue;
+        const old = readEntry(cache, key);
+        const pending = Boolean(r.volatile) &&
+            !(old && old.result.status === r.status && firstLine(old.result.message) === firstLine(r.message));
+        if (cache.refresh && old && !old.pending) {
+            if (old.result.status !== r.status || (r.volatile ? firstLine(old.result.message) !== firstLine(r.message)
+                : (old.result.message || '') !== (r.message || ''))) {
+                cache.mismatches.push({ test: spec.name + '/' + t.name, was: old.result.status, now: r.status,
+                    ranAt: old.ranAt });
+                console.log('  DIFFERS FROM THE CACHE ' + spec.name + '/' + t.name + ': cached ' + old.result.status +
+                    ' (ran ' + old.ranAt + '), now ' + r.status);
+            }
+        }
+        writeEntry(cache, key, spec.name, t.name, r, pending);
+    }
 
     // --record: print the run's output as CHECK lines.
     if (opts.record) {
@@ -513,7 +682,8 @@ async function runProject(spec, opts, compiler) {
         const r = results.get(t.name);
         json[t.name] = { status: r.status, reason: r.status === 'pass' ? '' : (r.message || '').split('\n')[0],
             message: r.status === 'pass' ? '' : (r.message || ''), output: r.output || '' };
-        if (r.ms !== undefined) json[t.name].ms = r.ms;
+        if (r.ms !== undefined && r.ms !== null) json[t.name].ms = r.ms;
+        if (r.cached) json[t.name].cached = r.cached;
         if (r.status === 'pass') passed++;
         else if (r.status === 'skip') { skipped++; console.log('  SKIP ' + spec.name + '/' + t.name + ': ' + r.message); }
         else {
@@ -547,17 +717,26 @@ async function main() {
     const chosen = specs.filter((s) => !opts.projects.length || opts.projects.includes(s.name));
     console.log('Compiler ' + compiler.name + ': ' + compiler.command + ' (' + compiler.version + '), target ' + compiler.target);
 
+    const cache = openCache(opts, compiler);
     let passed = 0, failed = 0, skipped = 0;
     const failures = [];
     const report = { compiler: compiler.name, version: compiler.version, description: compiler.description || '',
         target: compiler.target, node: process.version, projects: {} };
     for (const spec of chosen) {
-        const r = await runProject(spec, opts, compiler);
+        const r = await runProject(spec, opts, compiler, cache);
         passed += r.passed; failed += r.failed; skipped += r.skipped;
         failures.push(...r.failures);
         report.projects[spec.name] = r.results;
     }
     if (opts.record) return failed ? 1 : 0;
+    if (cache.enabled) {
+        const complete = !opts.projects.length && !opts.filters.length;
+        const pruned = complete ? pruneCache(cache) : 0;
+        console.log(compiler.name + ': ' + cache.hits + ' result(s) from the cache, ' + cache.written + ' written' +
+            (cache.pending ? ' (' + cache.pending + ' pending a second run)' : '') +
+            (pruned ? ', ' + pruned + ' unused entr' + (pruned === 1 ? 'y' : 'ies') + ' removed' : ''));
+        report.cache = { hits: cache.hits, written: cache.written, pending: cache.pending, mismatches: cache.mismatches };
+    }
     if (opts.json) {
         fs.mkdirSync(path.dirname(opts.json), { recursive: true });
         fs.writeFileSync(opts.json, JSON.stringify(report, null, 1));

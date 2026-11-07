@@ -11,7 +11,9 @@
 //   - per compiler: version, and tests passed, failed and skipped;
 //   - per project: the same, one column per compiler;
 //   - every test whose outcome is not the same under all compilers, with each compiler's outcome
-//     and, for a failure, the first line of its reason.
+//     and, for a failure, the first line of its reason;
+//   - how many results came from the result cache, and (after --refresh) every result that differs
+//     from the cached one. --no-cache and --refresh are passed on to run.js.
 // The exit status is 0 when every compiler ran (whatever its results), 2 on a usage error.
 'use strict';
 
@@ -32,7 +34,7 @@ function parseArgs(argv) {
         } else if (a === '--report-only') {
             opts.reportOnly = true;
         } else if (a === '--help' || a === '-h') {
-            console.log(fs.readFileSync(__filename, 'utf8').split('\n').slice(1, 16)
+            console.log(fs.readFileSync(__filename, 'utf8').split('\n').slice(1, 17)
                 .map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
             process.exit(0);
         } else if (a === '--compiler' || a.startsWith('--compiler=') || a === '--json' || a.startsWith('--json=')) {
@@ -89,6 +91,18 @@ function report(names) {
         }
     } else {
         out.push('None: every test has the same outcome under every compiler.');
+    }
+    // The result cache (run.js): how many results it gave, and with --refresh, every result that
+    // differs from the one the cache held (a flaky test, or an input missing from the cache's key).
+    if (runs.some((r) => r.cache)) {
+        out.push('', '## The result cache', '');
+        out.push(runs.map((r) => r.compiler + ': ' + (r.cache ? r.cache.hits + ' from the cache, ' + r.cache.written + ' run and kept' : 'not used')).join('; ') + '.');
+        const mismatches = runs.flatMap((r) => ((r.cache || {}).mismatches || []).map((m) => Object.assign({ compiler: r.compiler }, m)));
+        if (mismatches.length) {
+            out.push('', '### Results that differ from the cache (' + mismatches.length + ')', '');
+            out.push('| Compiler | Test | Cached | Now |', '|---|---|---|---|');
+            for (const m of mismatches) out.push(`| ${m.compiler} | ${m.test} | ${m.was} (${m.ranAt.slice(0, 10)}) | ${m.now} |`);
+        }
     }
     const text = out.join('\n') + '\n';
     fs.mkdirSync(path.join(ROOT, '.work'), { recursive: true });

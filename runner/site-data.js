@@ -133,6 +133,8 @@ function main() {
                     message: terminalText(o.message || o.reason),
                     output: terminalText(o.output),
                     ms: typeof o.ms === 'number' ? o.ms : null,
+                    // When the result came from the result cache (run.js): the time it was produced.
+                    cached: typeof o.cached === 'string' ? o.cached : null,
                 })),
             });
             if (new Set(outcomes.map((o) => o.status)).size > 1) {

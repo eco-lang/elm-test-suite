@@ -7,6 +7,7 @@ import Head.Seo as Seo
 import MimeType
 import Pages.Url
 import SiteConfig exposing (SiteConfig)
+import SiteUrl
 
 
 title : String
@@ -14,9 +15,12 @@ title =
     "Elm Exactly"
 
 
+{-| The site's address, from SITE_URL at build time (scripts/site-url.mjs): the production site,
+or the staging site on a staging build.
+-}
 canonicalUrl : String
 canonicalUrl =
-    "https://elm-test-suite.netlify.app"
+    SiteUrl.siteUrl
 
 
 {-| The image of every page's link preview (Open Graph and Twitter card): the Elm tangram's pieces

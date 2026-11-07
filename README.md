@@ -68,6 +68,8 @@ pnpm test:all -- --compilers elm-0.19.1,elm-0.19.3         # compare two compile
 | `--compile-memory <MB>` | memory a compile may use (default 4096; Linux only); a compiler that exceeds it is killed and fails the test |
 | `--record <Name>` | run one test (with exactly one `--project`) and print its output as CHECK lines |
 | `--json <file>` | also write every test's outcome to a file |
+| `--no-cache` | neither read nor write the result cache |
+| `--refresh` | run every test, renew the result cache, and report each result that differs from the cached one |
 
 A compiler that crashes can leave `elm-stuff` corrupt, and the next compile in it then reports a
 CORRUPT CACHE (Elm 0.19.2, Lamdera) or hangs (Elm 0.19.3). So the runner clears `elm-stuff`
@@ -76,6 +78,29 @@ a corrupt cache once more with an empty `elm-stuff`; the test fails only if the 
 
 `run-all.js` (`pnpm test:all`) takes the same options except `--compiler` and `--json`, plus
 `--compilers <a,b>`. The exit status of `run.js` is 1 when a test failed.
+
+### The result cache
+
+A released compiler does not change, nor does a test nobody edits, so the runner keeps each test's
+result in `.work/result-cache/<compiler>/<key>.json` and takes it from there on the next run, without
+compiling or running the test. The key is a hash of everything the result depends on: the
+compiler's executable, the runner (`run.js`, `directives.js`, `dom.js`), Node's version, the
+platform and runner image, the time and memory limits, the project's `elm.json`, and the source of
+the test and of every module of its project it imports. Edit one test and only it runs again;
+edit a helper module and only the tests that import it do.
+
+Every result of a test with `-- NO-CACHE:` or `-- STDIN-DELAY-MS:`, or whose source (or a module it
+imports) uses `Time.now`, `Time.every`, `Process.sleep` or `Random.generate`, is never kept. A result
+that may be an accident of the moment (a compile that crashed, timed out or ran out of memory, a
+program that timed out or was killed) is kept only once two runs in a row give it: the first is
+written as a pending entry, which is never used. An entry that is missing, unreadable, of another
+format or under the wrong key is a miss: the test runs and the entry is written again, so losing
+the cache only makes a run slower. A run of every test of a compiler removes that compiler's
+entries it did not use. A result from the cache is marked `cached` (with the time it was produced)
+in `.work/results/<compiler>.json`, and its test page says so; the program's `.log` is written only
+by a real run. `--refresh` runs everything and lists, in the report, each result that differs
+from the cached one: a flaky test, or an input missing from the key. The design is in
+[plans/test-result-cache.md](plans/test-result-cache.md).
 
 ## What a run does
 
@@ -87,7 +112,8 @@ For each test, the runner:
    (`.work/<compiler>/elm-home`), so compilers never share a package cache. A package missing from
    it is first copied, source only, from another compiler's cache or from `~/.elm` if one has it,
    and the compiler builds its own artifacts; only packages nobody has are downloaded. Outputs are
-   kept and reused until the test, its project or the compiler changes.
+   kept and reused until the test, its project or the compiler changes. (A test whose result is
+   in the result cache, below, is not compiled or run at all.)
 2. Runs the program in its own process: on Node for a compiler that writes JavaScript, directly for
    one that writes an executable. Most tests are `main = Html.text ...` programs that print with
    `Debug.log` while `main` is evaluated; a minimal DOM (`runner/dom.js`) lets them start on Node.
@@ -189,6 +215,7 @@ main =
 | `-- FLAGS: <json>` | the flags passed to `init` |
 | `-- COMPILE-ERROR: <what>` | the compiler must reject the program; the CHECK lines (the report title, such as `-- CHECK: -- TYPE MISMATCH -`) are matched against its output |
 | `-- LINUX-ONLY: <reason>` | skipped on other hosts |
+| `-- NO-CACHE: <reason>` | always compiled and run: its result is never taken from the result cache |
 
 CHECK patterns are matched in any order, each against the whole output. Other lines that look
 like directives (`CHECK-MLIR`, `TEXT-MLIR`, `SKIP-AOT`) belong to eco's own harness and are ignored.
@@ -295,7 +322,10 @@ cd site && npm install && npm start      # dev server; or `npm run build` for si
 
 The site is built for the root of its domain: the elm-pages it uses does not route pages under a
 base path, so it cannot be served from a GitHub project page (`<owner>.github.io/<repo>/`).
-Its address, which links back to it use, is `Site.canonicalUrl` in `site/app/Site.elm`.
+Its address, which link previews and the links back to it use, is `Site.canonicalUrl`: the
+environment variable `SITE_URL` at build time (default `https://elm-test-suite.netlify.app`), which
+`site/scripts/site-url.mjs` writes into `site/src/SiteUrl.elm` before `npm run build` and
+`npm start`. CI sets it to the staging site's address on the staging branch.
 Styling is elm-css global snippets in `site/src/Style.elm`, used through `ts-` classes. The site's
 own Elm unit tests are in `site/tests/` (`cd site && npm test`).
 
@@ -350,6 +380,13 @@ the repository secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` set, a push to
 the site to Netlify, and a pull request gets a draft deploy linked in a comment. A push to
 `standard-elm-suite` publishes to a separate staging site, with the secrets
 `NETLIFY_AUTH_TOKEN_STAGING` and `NETLIFY_SITE_ID_STAGING`.
+
+The result cache is kept between runs with `actions/cache` (the newest one, this branch's or else
+`master`'s, is restored before the suite and saved after it even when a later step fails), so a
+push that changes no test runs only the tests that never use the cache. GitHub drops a cache
+unused for 7 days; the next run is then a full one. Every Monday a scheduled run, and any manual
+run with the option *fresh*, runs every test with `--refresh`: the cache is renewed, and a result
+that differs from the cached one is listed in the job summary.
 
 ## Layout
 

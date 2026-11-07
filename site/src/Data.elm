@@ -118,6 +118,7 @@ type alias TestResult =
     , message : String
     , output : String
     , ms : Maybe Int
+    , cached : Maybe String
     }
 
 
@@ -262,12 +263,14 @@ testDecoder =
         (Decode.field "source" Decode.string)
         (Decode.field "results"
             (Decode.list
-                (Decode.map5 TestResult
+                (Decode.map6 TestResult
                     (Decode.field "compiler" Decode.string)
                     (Decode.field "status" statusDecoder)
                     (Decode.field "message" Decode.string)
                     (Decode.field "output" Decode.string)
                     (Decode.field "ms" (Decode.nullable Decode.int))
+                    -- The time a result from the result cache was produced (absent in older data).
+                    (Decode.oneOf [ Decode.field "cached" (Decode.nullable Decode.string), Decode.succeed Nothing ])
                 )
             )
         )

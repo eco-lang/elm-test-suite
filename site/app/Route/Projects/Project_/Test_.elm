@@ -187,6 +187,16 @@ resultCard r =
 
                 Nothing ->
                     Html.text ""
+            , case r.cached of
+                Just ranAt ->
+                    Html.span
+                        [ Attr.class "ts-muted ts-small"
+                        , Attr.title "Nothing this result depends on has changed since, so this build reused it"
+                        ]
+                        [ Html.text ("from the cache: ran " ++ String.replace "T" " " (String.left 16 ranAt) ++ " UTC") ]
+
+                Nothing ->
+                    Html.text ""
             ]
         , case r.status of
             Pass ->
