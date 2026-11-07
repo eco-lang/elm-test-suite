@@ -676,6 +676,42 @@ standardStyles =
     , Css.Global.class "sd-item-place" [ p "margin-bottom" "18px" ]
     , Css.Global.class "sd-item-source" [ p "margin-top" "-4px" ]
     , Css.Global.class "sd-also" [ p "color" colors.muted, p "font-size" "15px" ]
+
+    -- Discussions (DiscussionsView)
+    , Css.Global.class "dz-section"
+        [ p "margin-top" "32px"
+        , p "padding" "16px 20px"
+        , p "border" ("1px solid " ++ colors.border)
+        , p "border-radius" "8px"
+        , p "background-color" colors.bgWhite
+        ]
+    , Css.Global.class "dz-head" [ p "font-size" "18px", p "margin" "0 0 10px", p "color" colors.heading ]
+    , Css.Global.class "dz-status" [ p "color" colors.muted, p "margin" "6px 0" ]
+    , Css.Global.class "dz-failed" [ p "color" colors.fail ]
+    , Css.Global.class "dz-list" [ p "list-style" "none", p "padding" "0", p "margin" "6px 0" ]
+    , Css.Global.class "dz-entry" [ p "padding" "8px 0", p "border-bottom" ("1px solid " ++ colors.bgSubtle) ]
+    , Css.Global.selector ".dz-entry:last-child" [ p "border-bottom" "none" ]
+    , Css.Global.class "dz-meta" [ p "font-size" "13px", p "color" colors.muted, p "margin-top" "2px" ]
+    , Css.Global.class "dz-answered" [ p "color" colors.pass, p "font-weight" "600" ]
+    , Css.Global.class "dz-key" [ p "font-family" fontCode, p "font-size" "12px" ]
+    , Css.Global.class "dz-actions" [ p "margin" "12px 0 4px", p "font-size" "15px", p "font-weight" "600" ]
+    , Css.Global.class "dz-sep" [ p "color" colors.muted, p "margin" "0 8px", p "font-weight" "400" ]
+    , Css.Global.class "dz-note" [ p "font-size" "13px", p "color" colors.muted, p "margin" "4px 0 0" ]
+    , Css.Global.class "dz-group" [ p "margin" "20px 0" ]
+    , Css.Global.class "dz-group-head"
+        [ p "font-size" "15px"
+        , p "margin" "0 0 4px"
+        , p "display" "flex"
+        , p "align-items" "baseline"
+        , p "gap" "8px"
+        ]
+    , Css.Global.class "dz-count"
+        [ p "font-size" "12px"
+        , p "color" colors.muted
+        , p "background-color" colors.bgSubtle
+        , p "border-radius" "999px"
+        , p "padding" "0 7px"
+        ]
     , Css.Global.class "sd-nowrap" [ p "white-space" "nowrap", p "vertical-align" "top" ]
     , Css.Global.class "sd-basis-row" [ p "display" "flex", p "gap" "12px", p "margin" "6px 0", p "align-items" "baseline" ]
     , Css.Global.class "sd-basis-label" [ p "flex" "0 0 56px", p "color" colors.muted, p "font-size" "14px" ]

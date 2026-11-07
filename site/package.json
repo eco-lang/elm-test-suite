@@ -6,12 +6,14 @@
   "scripts": {
     "postinstall": "elm-tooling install",
     "start": "elm-pages dev",
-    "build": "elm-pages build"
+    "build": "elm-pages build",
+    "test": "elm-test --compiler ./node_modules/.bin/elm"
   },
   "devDependencies": {
     "elm-optimize-level-2": "^0.3.5",
     "elm-pages": "3.5.1",
     "elm-review": "^2.13.5",
+    "elm-test": "0.19.1-revision12",
     "elm-tooling": "^1.21.0",
     "katex": "0.19.1",
     "lamdera": "^0.19.1-1.4.0",

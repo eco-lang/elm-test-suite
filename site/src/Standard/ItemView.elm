@@ -1,4 +1,4 @@
-module Standard.ItemView exposing (description, itemPage, listPage, listTitle)
+module Standard.ItemView exposing (description, itemFoot, itemKey, itemNoun, itemPage, listPage, listTitle)
 
 {-| The pages of the citable items other than rules (restrictions, derived forms and entries of the
 initial basis): one list page per kind, and a page for each item. Like the rest of the book, these
@@ -305,12 +305,50 @@ itemPage idx it =
                 [ Html.h2 [ Attr.class "sd-h sd-h1" ] [ Html.text "Referred to from" ]
                 , Html.ul [ Attr.class "sd-list" ] (List.map Render.place it.referencedFrom)
                 ]
-        , Html.nav [ Attr.class "sd-pager" ]
+        ]
+
+
+{-| The foot of an item's page, after its Discussions section.
+-}
+itemFoot : Index -> Item -> Html msg
+itemFoot idx it =
+    Html.div [ Attr.class "sd-book" ]
+        [ Html.nav [ Attr.class "sd-pager" ]
             [ pagerLink it.kind "Previous" it.prev
             , pagerLink it.kind "Next" it.next
             ]
         , Render.licence idx
         ]
+
+
+{-| The key of an item in the titles of discussions about it: its label, `res:core-no-float-pattern`.
+-}
+itemKey : ItemKind -> String -> String
+itemKey kind slug =
+    (case kind of
+        Restriction ->
+            "res:"
+
+        DerivedForm ->
+            "df:"
+
+        BasisEntry ->
+            "b:"
+    )
+        ++ slug
+
+
+itemNoun : ItemKind -> String
+itemNoun kind =
+    case kind of
+        Restriction ->
+            "restriction"
+
+        DerivedForm ->
+            "derived form"
+
+        BasisEntry ->
+            "basis entry"
 
 
 meta : Item -> List (Html msg)

@@ -4,6 +4,8 @@ module Route.Standard.Chapter_ exposing (ActionData, Data, Model, Msg, RoutePara
 -}
 
 import BackendTask exposing (BackendTask)
+import Discuss
+import DiscussionsView
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
@@ -123,9 +125,27 @@ head app =
 
 
 view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
-view app _ =
+view app shared =
+    let
+        key =
+            "ch:" ++ app.routeParams.chapter
+    in
     { title = app.data.title
-    , body = [ View.freeze (chapterView app.data.index app.data.chapter) ]
+    , body =
+        [ View.freeze (chapterView app.data.index app.data.chapter)
+        , Html.div [ Attr.class "sd-book" ]
+            [ DiscussionsView.section
+                { category = Discuss.Standard
+                , key = key
+                , noun = "chapter"
+                , url = Site.canonicalUrl ++ Render.chapterHref app.routeParams.chapter ""
+                , context = app.data.description ++ "."
+                }
+                ((==) key)
+                shared.discussions
+            ]
+        , View.freeze (chapterFoot app.data.index app.data.chapter)
+        ]
     }
 
 
@@ -166,9 +186,12 @@ chapterView idx ch =
                     )
                 ]
         , Html.article [ Attr.class "sd-text" ] (Render.blocks ch.blocks)
-        , pager ch
-        , Render.licence idx
         ]
+
+
+chapterFoot : Index -> Chapter -> Html msg
+chapterFoot idx ch =
+    Html.div [ Attr.class "sd-book" ] [ pager ch, Render.licence idx ]
 
 
 crumbs : Index -> ChapterSummary -> Html msg

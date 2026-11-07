@@ -2,6 +2,7 @@ module Shared exposing (Data, Model, Msg(..), SharedMsg(..), template)
 
 import BackendTask exposing (BackendTask)
 import Data exposing (Report)
+import Discussions
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Html exposing (Html)
@@ -13,6 +14,7 @@ import Route exposing (Route)
 import SharedTemplate exposing (SharedTemplate)
 import Site
 import Style
+import Task
 import UrlPath exposing (UrlPath)
 import View exposing (View)
 
@@ -24,12 +26,14 @@ template =
     , view = view
     , data = data
     , subscriptions = subscriptions
-    , onPageChange = Nothing
+    , onPageChange = Just (\page -> PageChanged page.path)
     }
 
 
 type Msg
-    = NoOp
+    = StartDiscussions
+    | PageChanged UrlPath
+    | DiscussionsMsg Discussions.Msg
 
 
 {-| The run's report: the header and footer show where it came from.
@@ -42,8 +46,11 @@ type SharedMsg
     = NoOpShared
 
 
+{-| The discussions of the site's categories on GitHub, fetched once per visit by the browser
+(see `Discussions`).
+-}
 type alias Model =
-    {}
+    { discussions : Discussions.State }
 
 
 init :
@@ -59,13 +66,62 @@ init :
             , pageUrl : Maybe PageUrl
             }
     -> ( Model, Effect Msg )
-init _ _ =
-    ( {}, Effect.none )
+init _ page =
+    let
+        model =
+            { discussions = Discussions.init }
+    in
+    -- The fetch starts from a message, not here: init also runs when the pages are pre-rendered,
+    -- whose HTML should not say the discussions are loading.
+    case page of
+        Just p ->
+            if Discussions.wanted p.path.path then
+                ( model, Effect.fromCmd (Task.perform (\_ -> StartDiscussions) (Task.succeed ())) )
+
+            else
+                ( model, Effect.none )
+
+        Nothing ->
+            ( model, Effect.none )
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
-update _ model =
-    ( model, Effect.none )
+update msg model =
+    case msg of
+        StartDiscussions ->
+            fetchDiscussions model
+
+        PageChanged path ->
+            startDiscussions path model
+
+        DiscussionsMsg m ->
+            let
+                ( discussions, cmd ) =
+                    Discussions.update m model.discussions
+            in
+            ( { model | discussions = discussions }, Effect.fromCmd (Cmd.map DiscussionsMsg cmd) )
+
+
+{-| Starts fetching the discussions on the first page that shows them.
+-}
+startDiscussions : UrlPath -> Model -> ( Model, Effect Msg )
+startDiscussions path model =
+    if Discussions.wanted path then
+        fetchDiscussions model
+
+    else
+        ( model, Effect.none )
+
+
+{-| Fetches the discussions, unless they are fetched or being fetched already.
+-}
+fetchDiscussions : Model -> ( Model, Effect Msg )
+fetchDiscussions model =
+    let
+        ( discussions, cmd ) =
+            Discussions.start model.discussions
+    in
+    ( { model | discussions = discussions }, Effect.fromCmd (Cmd.map DiscussionsMsg cmd) )
 
 
 subscriptions : UrlPath -> Model -> Sub Msg

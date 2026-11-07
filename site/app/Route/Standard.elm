@@ -4,6 +4,7 @@ module Route.Standard exposing (ActionData, Data, Model, Msg, RouteParams, route
 -}
 
 import BackendTask exposing (BackendTask)
+import Discuss
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
@@ -129,6 +130,14 @@ front idx =
             , Html.text " and "
             , Html.a [ Attr.href (Route.toString Route.Standard__Basis) ] [ Html.text (count BasisEntry ++ " entries of the initial basis") ]
             , Html.text "."
+            ]
+        , Html.p [ Attr.class "sd-also" ]
+            [ Html.strong [] [ Html.text "Take part. " ]
+            , Html.text "Each of those pages, and each chapter, has a Discussions section: start a discussion of the item on GitHub with its Discuss link, and the discussion is shown on the page. See "
+            , Html.a [ Attr.href (Route.toString Route.Standard__Discussions) ] [ Html.text "all the discussions" ]
+            , Html.text ", or the "
+            , Html.a [ Attr.href (Discuss.categoryUrl Discuss.Standard), Attr.target "_blank", Attr.rel "noopener noreferrer" ] [ Html.text "Standard category" ]
+            , Html.text " of the repository's GitHub Discussions."
             ]
         , Html.h2 [ Attr.class "sd-contents-head" ] [ Html.text "Contents" ]
         , Html.ol [ Attr.class "sd-contents" ] (List.map contentsEntry (part "front" ++ part "main"))

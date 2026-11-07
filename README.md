@@ -295,7 +295,34 @@ cd site && npm install && npm start      # dev server; or `npm run build` for si
 
 The site is built for the root of its domain: the elm-pages it uses does not route pages under a
 base path, so it cannot be served from a GitHub project page (`<owner>.github.io/<repo>/`).
-Styling is elm-css global snippets in `site/src/Style.elm`, used through `ts-` classes.
+Its address, which links back to it use, is `Site.canonicalUrl` in `site/app/Site.elm`.
+Styling is elm-css global snippets in `site/src/Style.elm`, used through `ts-` classes. The site's
+own Elm unit tests are in `site/tests/` (`cd site && npm test`).
+
+### Discussions
+
+Each test, project, rule, restriction, derived form, entry of the basis and chapter of the
+Definition has a Discussions section, linked to the repository's
+[GitHub Discussions](https://github.com/eco-lang/elm-test-suite/discussions): the *Tests*
+category for the tests, the *Standard* category for the Definition. A discussion is about an item
+when its title holds the item's key in square brackets:
+
+| Key | Item |
+|-----|------|
+| `[t:elm-bugs/CompilerIssue2281LongLineListTest]` | a test |
+| `[p:elm-bugs]` | a test project |
+| `[r:d-atexp-var]` | a rule (its label in `definition/tex/`) |
+| `[res:...]`, `[df:...]`, `[b:...]` | a restriction, derived form or entry of the basis |
+| `[ch:static-core]` | a chapter |
+
+The Discuss link of an item opens GitHub's form for a new discussion with the key in its title and
+a link back to the item. The browser reads the discussions from GitHub's REST API, which needs no
+token for reading (60 requests an hour for each address): `Shared` fetches the two categories once
+per visit, when the first page that shows discussions opens, and each page shows its own. Nothing
+is rebuilt when a discussion is posted. `/discussions` and `/standard/discussions` list every
+discussion of each category. The code is `site/src/Discuss.elm` (the links), `Discussions.elm`
+(fetching, the keys) and `DiscussionsView.elm`; the design is in
+[plans/github-discussions.md](plans/github-discussions.md).
 
 ## The Definition of Standard Elm
 
@@ -315,12 +342,14 @@ not send the book's data to the browser. The styles are the `sd-` classes in `si
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs on Linux for each push to `master` and each pull request:
-`pnpm test:all`, the comparison report into the job summary, the website, then
-`runner/check-baseline.js`, which fails the job when Elm 0.19.1 fails a test outside `elm-bugs`
-and `elm-bug-fixes`. The results and the built site are kept as workflow artifacts. With the
-repository secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` set, a push to `master` publishes the
-site to Netlify, and a pull request gets a draft deploy linked in a comment.
+`.github/workflows/ci.yml` runs on Linux for each push to `master` or `standard-elm-suite` and each
+pull request: `pnpm test:all`, the comparison report into the job summary, the website and its unit
+tests, then `runner/check-baseline.js`, which fails the job when Elm 0.19.1 fails a test outside
+`elm-bugs` and `elm-bug-fixes`. The results and the built site are kept as workflow artifacts. With
+the repository secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` set, a push to `master` publishes
+the site to Netlify, and a pull request gets a draft deploy linked in a comment. A push to
+`standard-elm-suite` publishes to a separate staging site, with the secrets
+`NETLIFY_AUTH_TOKEN_STAGING` and `NETLIFY_SITE_ID_STAGING`.
 
 ## Layout
 
@@ -337,6 +366,7 @@ runner/definition-data.js  writes the website's data for The Definition of Stand
 definition/           the LaTeX sources and PDF of The Definition of Standard Elm
 runner/check-baseline.js  fails when Elm 0.19.1 fails a test it should pass (CI)
 site/                 the results website (elm-pages)
+plans/                plans for work on the site
 .github/workflows/    CI: run the suite, build and publish the website
 tests/<project>/      the test projects (elm.json and src/)
 .work/                compiled programs, logs, package caches and results (not tracked)

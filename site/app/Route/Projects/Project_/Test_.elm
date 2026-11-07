@@ -2,6 +2,8 @@ module Route.Projects.Project_.Test_ exposing (ActionData, Data, Model, Msg, Rou
 
 import BackendTask exposing (BackendTask)
 import Data exposing (Status(..), Test, TestResult)
+import Discuss
+import DiscussionsView
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
@@ -90,10 +92,13 @@ head app =
 
 
 view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
-view app _ =
+view app shared =
     let
         test =
             app.data
+
+        key =
+            "t:" ++ test.project ++ "/" ++ test.name
     in
     { title = test.name ++ " · " ++ Site.title
     , body =
@@ -132,6 +137,18 @@ view app _ =
             [ Html.h2 [ Attr.class "ts-h2" ] [ Html.text "Results" ]
             , Html.div [ Attr.class "ts-results" ] (List.map resultCard test.results)
             ]
+        , DiscussionsView.section
+            { category = Discuss.Tests
+            , key = key
+            , noun = "test"
+            , url = Site.canonicalUrl ++ Route.toString (Route.Projects__Project___Test_ { project = test.project, test = test.name })
+            , context =
+                "Outcomes when the site was built: "
+                    ++ String.join ", " (List.map (\r -> r.compiler ++ " " ++ Data.statusLabel r.status) test.results)
+                    ++ "."
+            }
+            ((==) key)
+            shared.discussions
         , Html.section [ Attr.class "ts-section" ]
             [ Html.h2 [ Attr.class "ts-h2" ] [ Html.text "Source" ]
             , Html.p [ Attr.class "ts-muted ts-small" ]

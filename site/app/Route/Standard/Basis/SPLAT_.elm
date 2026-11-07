@@ -5,9 +5,13 @@ module Route.Standard.Basis.SPLAT_ exposing (ActionData, Data, Model, Msg, Route
 -}
 
 import BackendTask exposing (BackendTask)
+import Discuss
+import DiscussionsView
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
+import Html
+import Html.Attributes as Attr
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import RouteBuilder exposing (App, StatelessRoute)
@@ -104,7 +108,28 @@ head app =
 
 
 view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
-view app _ =
+view app shared =
+    let
+        slug =
+            String.join "." (Tuple.first app.routeParams.splat :: Tuple.second app.routeParams.splat)
+
+        key =
+            ItemView.itemKey BasisEntry slug
+    in
     { title = app.data.title
-    , body = [ View.freeze (ItemView.itemPage app.data.index app.data.item) ]
+    , body =
+        [ View.freeze (ItemView.itemPage app.data.index app.data.item)
+        , Html.div [ Attr.class "sd-book" ]
+            [ DiscussionsView.section
+                { category = Discuss.Standard
+                , key = key
+                , noun = ItemView.itemNoun BasisEntry
+                , url = Site.canonicalUrl ++ Render.itemHref BasisEntry slug
+                , context = app.data.description ++ "."
+                }
+                ((==) key)
+                shared.discussions
+            ]
+        , View.freeze (ItemView.itemFoot app.data.index app.data.item)
+        ]
     }

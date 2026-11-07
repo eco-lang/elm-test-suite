@@ -2,6 +2,8 @@ module Route.Projects.Project_ exposing (ActionData, Data, Model, Msg, RoutePara
 
 import BackendTask exposing (BackendTask)
 import Data exposing (Compiler, Project, Report, Status(..), TestRow)
+import Discuss
+import DiscussionsView
 import Effect exposing (Effect)
 import FatalError exposing (FatalError)
 import Head
@@ -142,10 +144,13 @@ keep model row =
 
 
 view : App Data ActionData RouteParams -> Shared.Model -> Model -> View (PagesMsg Msg)
-view app _ model =
+view app shared model =
     let
         project =
             app.data.project
+
+        key =
+            "p:" ++ project.name
 
         compilers =
             app.data.report.compilers
@@ -171,6 +176,7 @@ view app _ model =
         [ Html.div [ Attr.class "ts-crumbs" ] [ Route.link [] [ Html.text "Results" ] Route.Index, Html.text " / " ]
         , Html.h1 [ Attr.class "ts-h1" ] [ Html.text project.name ]
         , Html.p [ Attr.class "ts-lede" ] [ Html.text project.description ]
+        , Html.p [ Attr.class "ts-small" ] [ Html.a [ Attr.href "#discussions" ] [ Html.text "Discussions of this project and its tests ↓" ] ]
         , Html.div [ Attr.class "ts-filters" ]
             ([ chip All ("All " ++ String.fromInt (List.length project.tests))
              , chip FailingSomewhere "Failing anywhere"
@@ -200,6 +206,15 @@ view app _ model =
                 , Html.tbody [] (List.map (testRow project.name) shown)
                 ]
             ]
+        , DiscussionsView.section
+            { category = Discuss.Tests
+            , key = key
+            , noun = "project"
+            , url = Site.canonicalUrl ++ Route.toString (Route.Projects__Project_ { project = project.name })
+            , context = "The project " ++ project.name ++ ": " ++ project.description
+            }
+            (\k -> k == key || String.startsWith ("t:" ++ project.name ++ "/") k)
+            shared.discussions
         ]
     }
 

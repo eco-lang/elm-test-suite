@@ -49,6 +49,12 @@ where the item is stated:
 | A derived form | `df:if` | `/standard/derived-forms/if` |
 | An entry of the initial basis: a type with its constructors, or a value (an operator under the hidden variable it stands for) | `b:Platform.Cmd.none` | `/standard/basis/Platform/Cmd/none` |
 
+Each of these items, every rule and every chapter also has a Discussions section on the site: a
+discussion in the *Standard* category of the repository's GitHub Discussions is shown on an item's
+page when its title holds the item's label in square brackets, `[r:d-atexp-var]` (for a chapter,
+`[ch:static-core]`). This is another reason a published label does not change: the discussions
+about an item are attached to it by its label.
+
 An entry of the basis is labelled at its row in the static basis (Appendix C); `\citealso` marks
 its row in the dynamic basis (Appendix D). Its page collects those rows, the definition of its
 `APPLY` and its text in Elm. In the chapters, each item has an anchor (the label with `:` and `.` as

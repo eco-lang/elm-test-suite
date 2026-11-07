@@ -1,5 +1,8 @@
 # Plan: link the site with GitHub Discussions
 
+**Status (2026-11-07): phases 1 and 2 are implemented**; phase 3 is not started. See Implementation
+notes at the end for where the code differs in detail from this plan.
+
 ## Goal
 
 Every citable part of *The Definition of Standard Elm* on the site (a rule, restriction, derived
@@ -80,7 +83,7 @@ No JavaScript; works for every reader and for search engines.
 - Test pages (`Route/Projects/Project_/Test_.elm`): "Discuss this test", keyed
   `[t:<project>/<Test>]`, in the Tests category. Project pages: "Discuss this project", keyed
   `[p:<project>]`.
-- On the book pages these links are static and go inside `View.freeze` with the rest of the page.
+- The links are plain links in the page's pre-rendered HTML, so they work without JavaScript.
 - The front page of the book and the results page each get a short paragraph on how to take part,
   linking to their category.
 
@@ -195,3 +198,38 @@ within a minute or two of being posted. Nothing is rebuilt.
 2. Tests get their own category, *Tests*, in the same phases as the Definition.
 3. The site's address is `https://elm-test-suite.netlify.app` (`Site.canonicalUrl`, corrected
    from `https://eco-lang.github.io/elm-test-suite`). It may change; it is set in one place.
+
+## Implementation notes
+
+What was built, where it differs in detail from the plan above:
+
+- **Modules.** `site/src/Discuss.elm` (the categories, `Target`, the new-discussion, search and
+  category URLs), `site/src/Discussions.elm` (the state, fetching and paging, the reply reader,
+  the decoder, `keysOf`, `displayTitle`, selecting and grouping) and `site/src/DiscussionsView.elm`
+  (the Discussions section and the lists). The views are apart from `Discussions` so that its unit
+  tests do not need the routes elm-pages generates.
+- **One section per page.** The Discuss and search links are in the page's Discussions section,
+  with the live list, rather than in the frozen part beside "Read it in its chapter". The section is
+  outside `View.freeze` but still in the pre-rendered HTML, so the links work without JavaScript; the
+  frozen part of a book page is split in two (the item, then the pager and licence) with the section
+  between them. Only the item's key and description, already in the page's data, are added to what
+  the browser receives.
+- **Pages.** The section is on rule, restriction, derived form, basis entry, chapter, test and
+  project pages. A project page lists the discussions of the project and of its tests, and has a
+  link near its top down to the section, below the table of tests. `/standard/discussions` and
+  `/discussions` list each category by key, a discussion under each of its keys and those without a
+  key under General.
+- **Fetching.** `Shared` starts the fetch on the first page under `/standard`, `/projects` or
+  `/discussions` (on `init`, or through `onPageChange`), only from its initial state, so client-side
+  navigation makes no further requests. It reads at most 10 pages of 100. Discussions of other
+  categories, and replies GitHub sends for them, are dropped by the decoder.
+- **Failures.** The section shows "Loading the discussions from GitHub…", the list, "No
+  discussions of this ... yet", GitHub's rate limit with the UTC time it resets, or why the
+  discussions could not be loaded; the links are shown in every case.
+- **Tests.** `site/tests/DiscussionsTest.elm`, 34 elm-test tests (keys, titles, URLs, paging, the
+  decoder against a reply of the API, the reply reader including the rate limit, selecting and
+  grouping), run by `npm test` in `site/` and in CI after the site is built. In the browser, checked
+  against the live API (no discussions yet), with `api.github.com` unreachable, and against a local
+  stand-in for the API serving made-up discussions in both categories.
+- **Not done.** The live list is not checked against real discussions yet (there are none), and the
+  prefilled `body` has not been checked against a discussion form (there is none yet).

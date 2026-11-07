@@ -91,6 +91,11 @@ view app _ =
             , Route.link [] [ Html.em [] [ Html.text "The Definition of Standard Elm" ] ] Route.Standard
             , Html.text ", a formal definition of the language with a page for every rule."
             ]
+        , Html.p [ Attr.class "ts-lede" ]
+            [ Html.text "Each test and project has a Discussions section: start a discussion of a test on GitHub from its page, and it is shown there. See "
+            , Route.link [] [ Html.text "all the discussions of the tests" ] Route.Discussions
+            , Html.text "."
+            ]
         , Html.section [ Attr.class "ts-section" ]
             [ Html.h2 [ Attr.class "ts-h2" ] [ Html.text "Compilers" ]
             , Html.div [ Attr.class "ts-cards" ] (List.map compilerCard report.compilers)

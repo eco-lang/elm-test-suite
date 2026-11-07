@@ -4,6 +4,8 @@ module Route.Standard.Rules.Rule_ exposing (ActionData, Data, Model, Msg, RouteP
 -}
 
 import BackendTask exposing (BackendTask)
+import Discuss
+import DiscussionsView
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
@@ -96,9 +98,27 @@ head app =
 
 
 view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
-view app _ =
+view app shared =
+    let
+        key =
+            "r:" ++ app.routeParams.rule
+    in
     { title = app.data.title
-    , body = [ View.freeze (ruleView app.data.index app.data.rule) ]
+    , body =
+        [ View.freeze (ruleView app.data.index app.data.rule)
+        , Html.div [ Attr.class "sd-book" ]
+            [ DiscussionsView.section
+                { category = Discuss.Standard
+                , key = key
+                , noun = "rule"
+                , url = Site.canonicalUrl ++ Render.ruleHref app.routeParams.rule
+                , context = app.data.description ++ "."
+                }
+                ((==) key)
+                shared.discussions
+            ]
+        , View.freeze (ruleFoot app.data.index app.data.rule)
+        ]
     }
 
 
@@ -178,7 +198,13 @@ ruleView idx r =
                     ]
                 ]
             ]
-        , Html.nav [ Attr.class "sd-pager" ] [ ruleLink "Previous rule" r.prev, ruleLink "Next rule" r.next ]
+        ]
+
+
+ruleFoot : Index -> Rule -> Html msg
+ruleFoot idx r =
+    Html.div [ Attr.class "sd-book" ]
+        [ Html.nav [ Attr.class "sd-pager" ] [ ruleLink "Previous rule" r.prev, ruleLink "Next rule" r.next ]
         , Render.licence idx
         ]
 
