@@ -1,16 +1,19 @@
 # Runs the suite under every compiler on Linux, builds the results website (site/, elm-pages) and
 # publishes it to Netlify. Runs on master deploy to production; a pull request gets a draft deploy
-# when the Netlify secrets are available (not for pull requests from forks). The site is also kept
-# as a workflow artifact either way.
+# when the Netlify secrets are available (not for pull requests from forks). Runs on the staging
+# branch, standard-elm-suite, deploy to a separate staging site. The site is also kept as a workflow
+# artifact either way.
 #
 # Netlify setup: create a site (no build settings needed: CI uploads the built files), then add the
 # repository secrets NETLIFY_AUTH_TOKEN (a personal access token) and NETLIFY_SITE_ID (the site's
-# API ID). Without them every step but the deploy runs.
+# API ID). For the staging site, create another site and add NETLIFY_AUTH_TOKEN_STAGING and
+# NETLIFY_SITE_ID_STAGING. Without a site's secrets every step but its deploy runs; the staging
+# branch never falls back to the production site's secrets.
 name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, standard-elm-suite]
   pull_request:
   workflow_dispatch:
 
@@ -26,8 +29,12 @@ jobs:
       contents: read
       pull-requests: write
     env:
-      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      # The staging branch deploys to the staging site with its own secrets; everything else uses
+      # the production site's. A missing staging secret leaves the value empty, so the deploy is
+      # skipped rather than going to the production site.
+      STAGING: ${{ github.ref == 'refs/heads/standard-elm-suite' }}
+      NETLIFY_AUTH_TOKEN: ${{ github.ref == 'refs/heads/standard-elm-suite' && secrets.NETLIFY_AUTH_TOKEN_STAGING || (github.ref != 'refs/heads/standard-elm-suite' && secrets.NETLIFY_AUTH_TOKEN || '') }}
+      NETLIFY_SITE_ID: ${{ github.ref == 'refs/heads/standard-elm-suite' && secrets.NETLIFY_SITE_ID_STAGING || (github.ref != 'refs/heads/standard-elm-suite' && secrets.NETLIFY_SITE_ID || '') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -82,21 +89,27 @@ jobs:
           npm ci --no-audit --no-fund
           npm run build
 
+      # The site's own Elm unit tests (site/tests/): the keys and links of its GitHub Discussions.
+      - name: Test the site
+        working-directory: site
+        run: npm test
+
       - name: Keep the site
         uses: actions/upload-artifact@v4
         with:
           name: site
           path: site/dist/
 
-      # A run on master (a push or a manual run) deploys to production; a pull request gets a draft
-      # deploy at its own URL.
+      # A run on master (a push or a manual run) deploys to production; a run on the staging branch
+      # deploys to the staging site's production URL; a pull request gets a draft deploy at its own
+      # URL.
       - name: Deploy to Netlify
         if: env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
         uses: nwtgck/actions-netlify@v3
         with:
           publish-dir: site/dist
           production-branch: master
-          production-deploy: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
+          production-deploy: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || env.STAGING == 'true') }}
           alias: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || '' }}
           deploy-message: ${{ github.event.head_commit.message || github.event.pull_request.title || github.sha }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
