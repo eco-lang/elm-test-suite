@@ -243,6 +243,22 @@ function extractSkip(content) {
     return null;
 }
 
+// A test's `-- TAGS: a, b` labels (README.md, "Tags"), in the order written: one or more lines, each a
+// comma-separated list of lower-case names (letters, digits, `.` and `-`). The runner adds the
+// test's project in front; naming a project here is an error, as is a malformed name.
+function extractTags(content, projects = []) {
+    const tags = [];
+    for (const rest of directiveLines(content, '-- TAGS:')) {
+        const names = rest.split(',').map((s) => s.trim());
+        if (names.some((n) => !/^[a-z0-9][a-z0-9.-]*$/.test(n))) throw new Error("malformed TAGS directive: '" + rest + "'");
+        for (const n of names) {
+            if (projects.includes(n)) throw new Error('TAGS names the project ' + n + ': a test is tagged with its own project already');
+            if (!tags.includes(n)) tags.push(n);
+        }
+    }
+    return tags;
+}
+
 // Why a test's result is never taken from the result cache (run.js), or null: its outcome may
 // differ between two runs of the same program, so each run must be a real one.
 //   `-- NO-CACHE: <why>`        any test, for a reason the harness cannot see
@@ -283,5 +299,5 @@ function mtimeMs(file) {
 
 module.exports = {
     extractCheckPatterns, verifyPatterns, directiveLines, extractExit, extractStdin, extractEnv,
-    extractUnsetenv, extractCount, childEnv, findPrlimit, extractSkip, uncacheable, writeIfChanged, mtimeMs,
+    extractUnsetenv, extractCount, childEnv, findPrlimit, extractSkip, extractTags, uncacheable, writeIfChanged, mtimeMs,
 };

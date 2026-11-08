@@ -73,9 +73,11 @@ view _ shared =
             , Html.a [ Attr.href (Discuss.categoryUrl Discuss.Tests), Attr.target "_blank", Attr.rel "noopener noreferrer" ]
                 [ Html.text "Tests category of the repository's GitHub Discussions" ]
             , Html.text ". A discussion is about a test when its title holds the test's key in brackets, "
-            , Html.code [] [ Html.text "[t:elm-bugs/CompilerIssue2281LongLineListTest]" ]
-            , Html.text ", or about a whole project with "
-            , Html.code [] [ Html.text "[p:elm-bugs]" ]
+            , Html.code [] [ Html.text "[t:elm/CompilerIssue2281LongLineListTest]" ]
+            , Html.text ", about a whole project with "
+            , Html.code [] [ Html.text "[p:elm]" ]
+            , Html.text ", or about a tag with "
+            , Html.code [] [ Html.text "[tag:elm19-bug]" ]
             , Html.text "; the Discuss link on each test's page starts one with the key in place, and the discussion is then shown on that page."
             ]
         , DiscussionsView.overview Discuss.Tests shared.discussions

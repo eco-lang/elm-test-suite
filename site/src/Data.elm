@@ -13,6 +13,7 @@ module Data exposing
     , project
     , report
     , statusLabel
+    , tag
     , test
     )
 
@@ -87,6 +88,7 @@ type alias Report =
     , node : String
     , compilers : List Compiler
     , projects : List ProjectSummary
+    , tags : List ProjectSummary
     , differing : List Differing
     }
 
@@ -97,14 +99,20 @@ type alias Outcome =
     }
 
 
+{-| A test in the table of a project or a tag. `tags` are its tags but its project.
+-}
 type alias TestRow =
-    { name : String
+    { project : String
+    , name : String
     , summary : String
     , compileError : Bool
+    , tags : List String
     , outcomes : List Outcome
     }
 
 
+{-| A project, or a tag: its name, description and tests.
+-}
 type alias Project =
     { name : String
     , description : String
@@ -127,6 +135,7 @@ type alias Test =
     , name : String
     , doc : String
     , issues : List String
+    , tags : List String
     , source : String
     , results : List TestResult
     }
@@ -150,6 +159,13 @@ report =
 project : String -> BackendTask FatalError Project
 project name =
     load projectDecoder ("data/projects/" ++ name ++ ".json")
+
+
+{-| The tests with a tag (`-- TAGS:`), as a `Project`.
+-}
+tag : String -> BackendTask FatalError Project
+tag name =
+    load projectDecoder ("data/tags/" ++ name ++ ".json")
 
 
 test : String -> String -> BackendTask FatalError Test
@@ -199,34 +215,41 @@ compilerDecoder =
         countsDecoder
 
 
+andMap : Decoder a -> Decoder (a -> b) -> Decoder b
+andMap =
+    Decode.map2 (|>)
+
+
+summaryDecoder : Decoder ProjectSummary
+summaryDecoder =
+    Decode.map4 ProjectSummary
+        (Decode.field "name" Decode.string)
+        (Decode.field "description" Decode.string)
+        (Decode.field "total" Decode.int)
+        (Decode.field "counts" (Decode.list countsDecoder))
+
+
 reportDecoder : Decoder Report
 reportDecoder =
-    Decode.map8 Report
-        (Decode.field "generated" Decode.string)
-        (Decode.field "commit" Decode.string)
-        (Decode.field "repository" Decode.string)
-        (Decode.field "runUrl" Decode.string)
-        (Decode.field "node" Decode.string)
-        (Decode.field "compilers" (Decode.list compilerDecoder))
-        (Decode.field "projects"
-            (Decode.list
-                (Decode.map4 ProjectSummary
-                    (Decode.field "name" Decode.string)
-                    (Decode.field "description" Decode.string)
-                    (Decode.field "total" Decode.int)
-                    (Decode.field "counts" (Decode.list countsDecoder))
+    Decode.succeed Report
+        |> andMap (Decode.field "generated" Decode.string)
+        |> andMap (Decode.field "commit" Decode.string)
+        |> andMap (Decode.field "repository" Decode.string)
+        |> andMap (Decode.field "runUrl" Decode.string)
+        |> andMap (Decode.field "node" Decode.string)
+        |> andMap (Decode.field "compilers" (Decode.list compilerDecoder))
+        |> andMap (Decode.field "projects" (Decode.list summaryDecoder))
+        |> andMap (Decode.field "tags" (Decode.list summaryDecoder))
+        |> andMap
+            (Decode.field "differing"
+                (Decode.list
+                    (Decode.map3 Differing
+                        (Decode.field "project" Decode.string)
+                        (Decode.field "test" Decode.string)
+                        (Decode.field "outcomes" (Decode.list statusDecoder))
+                    )
                 )
             )
-        )
-        (Decode.field "differing"
-            (Decode.list
-                (Decode.map3 Differing
-                    (Decode.field "project" Decode.string)
-                    (Decode.field "test" Decode.string)
-                    (Decode.field "outcomes" (Decode.list statusDecoder))
-                )
-            )
-        )
 
 
 projectDecoder : Decoder Project
@@ -236,10 +259,12 @@ projectDecoder =
         (Decode.field "description" Decode.string)
         (Decode.field "tests"
             (Decode.list
-                (Decode.map4 TestRow
+                (Decode.map6 TestRow
+                    (Decode.field "project" Decode.string)
                     (Decode.field "name" Decode.string)
                     (Decode.field "summary" Decode.string)
                     (Decode.field "compileError" Decode.bool)
+                    (Decode.field "tags" (Decode.list Decode.string))
                     (Decode.field "outcomes"
                         (Decode.list
                             (Decode.map2 Outcome
@@ -255,11 +280,12 @@ projectDecoder =
 
 testDecoder : Decoder Test
 testDecoder =
-    Decode.map6 Test
+    Decode.map7 Test
         (Decode.field "project" Decode.string)
         (Decode.field "name" Decode.string)
         (Decode.field "doc" Decode.string)
         (Decode.field "issues" (Decode.list Decode.string))
+        (Decode.field "tags" (Decode.list Decode.string))
         (Decode.field "source" Decode.string)
         (Decode.field "results"
             (Decode.list

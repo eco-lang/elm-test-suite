@@ -155,8 +155,9 @@ jobs:
           enable-commit-comment: false
           enable-github-deployment: false
 
-      # The tests Elm 0.19.1 fails outside elm-bugs and elm-bug-fixes, into the job summary. A
-      # report, not a gate: it never fails the job. It runs even when a step above failed (a deploy).
-      - name: Report the tests Elm 0.19.1 fails outside elm-bugs and elm-bug-fixes
+      # The tests Elm 0.19.1 fails that are not tagged elm19-bug or elm19-bug-fix, into the job
+      # summary. A report, not a gate: it never fails the job. It runs even when a step above failed
+      # (a deploy).
+      - name: Report the tests Elm 0.19.1 fails that are not tagged elm19-bug or elm19-bug-fix
         if: always()
         run: node runner/check-baseline.js | tee -a "$GITHUB_STEP_SUMMARY"

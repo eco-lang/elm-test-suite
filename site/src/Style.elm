@@ -423,6 +423,18 @@ filterStyles =
         , p "border-color" colors.text
         , p "color" colors.bgWhite
         ]
+    , Css.Global.class "ts-tag"
+        [ p "display" "inline-block"
+        , p "border" ("1px solid " ++ colors.border)
+        , p "border-radius" "999px"
+        , p "padding" "0 8px"
+        , p "margin-left" "6px"
+        , p "font-size" "12px"
+        , p "line-height" "18px"
+        , p "color" colors.heading
+        , p "text-decoration" "none"
+        , p "white-space" "nowrap"
+        ]
     , Css.Global.class "ts-input"
         [ p "border" ("1px solid " ++ colors.border)
         , p "border-radius" "6px"

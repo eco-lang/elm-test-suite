@@ -10,6 +10,8 @@ ordinary program.
 
 -}
 
+-- HELPER: imported by NonEntryMainEvaluatedOnceTest; its `main` is not a program
+
 import Html exposing (Html)
 
 

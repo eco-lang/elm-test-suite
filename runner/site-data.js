@@ -7,17 +7,21 @@
 // Reads the results of the last run of each compiler in compilers.json (.work/results/<compiler>.json,
 // written by run-all.js), the test sources under tests/ and the project descriptions in README.md,
 // and writes, under --out (default site/data):
-//   report.json               the compilers and their totals, each project's totals per compiler,
-//                             and every test whose outcome is not the same under all compilers
-//   projects/<project>.json   each test of the project, its summary and its outcome per compiler
+//   report.json               the compilers and their totals, each project's and each tag's totals
+//                             per compiler, and every test whose outcome is not the same under all
+//                             compilers
+//   projects/<project>.json   each test of the project, its summary, its tags and its outcome per
+//                             compiler
+//   tags/<tag>.json           the same for each tag (`-- TAGS:`) but the projects
 //   tests/<project>/<Test>.json
-//                             one test: its doc comment, issue links, source, and per compiler its
-//                             outcome, failure message and output
+//                             one test: its doc comment, issue links, tags, source, and per compiler
+//                             its outcome, failure message and output
 // A compiler with no results is left out. The exit status is 2 when no compiler has results.
 'use strict';
 
 const fs = require('fs');
 const path = require('path');
+const D = require('./directives');
 
 const ROOT = path.resolve(__dirname, '..');
 const RESULTS = path.join(ROOT, '.work', 'results');
@@ -31,11 +35,11 @@ function parseArgs(argv) {
     return opts;
 }
 
-// The `| \`project\` | count | description |` rows of README.md's table of projects.
+// The `| \`name\` | count | description |` rows of README.md's tables of projects and of tags.
 function projectDescriptions() {
     const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
     const out = {};
-    for (const m of readme.matchAll(/^\| `([a-z-]+)` \| \d+ \| (.+) \|$/gm)) out[m[1]] = m[2];
+    for (const m of readme.matchAll(/^\| `([a-z0-9.-]+)` \| \d+ \| (.+) \|$/gm)) out[m[1]] = m[2];
     return out;
 }
 
@@ -105,6 +109,7 @@ function main() {
         differing: [],
     };
 
+    const tagged = new Map();   // tag -> the rows of its tests
     for (const p of projects) {
         const srcDir = path.join(ROOT, 'tests', p, 'src');
         const names = [...new Set(runs.flatMap((r) => Object.keys(r.projects[p] || {})))].sort();
@@ -115,17 +120,27 @@ function main() {
             const doc = docComment(source);
             const outcomes = runs.map((r) => (r.projects[p] || {})[name] || missing);
             const issues = [...new Set(doc.match(/https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/(?:issues|pull)\/\d+/g) || [])];
-            rows.push({
+            let tags = [];   // its tags but its project; a malformed TAGS line fails the test in run.js
+            try { tags = D.extractTags(source, projects); } catch (e) { /* none */ }
+            const row = {
+                project: p,
                 name,
                 summary: summary(doc),
                 compileError: /^-- COMPILE-ERROR:/m.test(source),
+                tags,
                 outcomes: outcomes.map((o) => ({ status: o.status, reason: o.reason || '' })),
-            });
+            };
+            rows.push(row);
+            for (const g of tags) {
+                if (!tagged.has(g)) tagged.set(g, []);
+                tagged.get(g).push(row);
+            }
             writeJson(path.join(opts.out, 'tests', p, name + '.json'), {
                 project: p,
                 name,
                 doc,
                 issues,
+                tags,
                 source,
                 results: outcomes.map((o, i) => ({
                     compiler: runs[i].compiler,
@@ -149,8 +164,20 @@ function main() {
             counts: runs.map((r) => count(r.projects[p])),
         });
     }
+    report.tags = [];
+    for (const g of [...tagged.keys()].sort()) {
+        const rows = tagged.get(g);
+        writeJson(path.join(opts.out, 'tags', g + '.json'), { name: g, description: descriptions[g] || '', tests: rows });
+        const counts = runs.map((_, i) => {
+            const c = { pass: 0, fail: 0, skip: 0 };
+            for (const row of rows) if (row.outcomes[i].status in c) c[row.outcomes[i].status]++;
+            return c;
+        });
+        report.tags.push({ name: g, description: descriptions[g] || '', total: rows.length, counts });
+    }
     writeJson(path.join(opts.out, 'report.json'), report);
-    console.log('site data for ' + runs.length + ' compiler(s), ' + projects.length + ' projects, written to ' +
+    console.log('site data for ' + runs.length + ' compiler(s), ' + projects.length + ' projects and ' +
+        report.tags.length + ' tags, written to ' +
         path.relative(ROOT, opts.out));
     return 0;
 }

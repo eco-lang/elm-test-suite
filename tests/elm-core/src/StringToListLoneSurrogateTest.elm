@@ -2,7 +2,7 @@ module StringToListLoneSurrogateTest exposing (main)
 
 {-| `String.toList` of a string holding a lone low surrogate returns one `Char`.
 
-The bug of <https://github.com/elm/core/issues/1060>, with a program that follows A Standard Definition of Elm? The issue, and `elm-bugs`'s `CoreIssue1060StringToListLoneSurrogateTest`, write the
+The bug of <https://github.com/elm/core/issues/1060>, with a program that follows A Standard Definition of Elm? The issue, and `CoreIssue1060StringToListLoneSurrogateTest` (tagged `elm19-bug`), write the
 lone surrogate as the escape `"\u{dd56}"`, which ruling A8 makes invalid: an escape must denote a
 Unicode scalar value. <https://elm-test-suite.netlify.app/standard/syntax-core#fig-core-escapes>
 

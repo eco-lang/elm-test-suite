@@ -30,16 +30,16 @@ keys =
             \_ -> Discussions.keysOf "[r:d-atexp-var] Why a variable?" |> Expect.equal [ "r:d-atexp-var" ]
         , test "several keys, anywhere in the title" <|
             \_ ->
-                Discussions.keysOf "[r:d-atexp-var] and [t:elm-bugs/SomeTest] disagree"
-                    |> Expect.equal [ "r:d-atexp-var", "t:elm-bugs/SomeTest" ]
+                Discussions.keysOf "[r:d-atexp-var] and [t:elm/SomeTest] disagree"
+                    |> Expect.equal [ "r:d-atexp-var", "t:elm/SomeTest" ]
         , test "keys with dots and slashes" <|
             \_ ->
-                Discussions.keysOf "[b:Platform.Cmd.none] [t:elm-bugs/CompilerIssue2281LongLineListTest]"
-                    |> Expect.equal [ "b:Platform.Cmd.none", "t:elm-bugs/CompilerIssue2281LongLineListTest" ]
+                Discussions.keysOf "[b:Platform.Cmd.none] [t:elm/CompilerIssue2281LongLineListTest]"
+                    |> Expect.equal [ "b:Platform.Cmd.none", "t:elm/CompilerIssue2281LongLineListTest" ]
         , test "every prefix" <|
             \_ ->
-                Discussions.keysOf "[r:a] [res:b] [df:c] [b:D.e] [ch:f] [t:g/H] [p:i]"
-                    |> Expect.equal [ "r:a", "res:b", "df:c", "b:D.e", "ch:f", "t:g/H", "p:i" ]
+                Discussions.keysOf "[r:a] [res:b] [df:c] [b:D.e] [ch:f] [t:g/H] [p:i] [tag:j]"
+                    |> Expect.equal [ "r:a", "res:b", "df:c", "b:D.e", "ch:f", "t:g/H", "p:i", "tag:j" ]
         , test "space inside the brackets" <|
             \_ -> Discussions.keysOf "[ r:d-atexp-var ] x" |> Expect.equal [ "r:d-atexp-var" ]
         , test "an unknown prefix is not a key" <|
@@ -112,7 +112,7 @@ urls =
                     |> Expect.equal (Just True)
         , test "a test's discussion is in the Tests category" <|
             \_ ->
-                param "category" (Discuss.newDiscussionUrl { target | category = Discuss.Tests, key = "t:elm-bugs/X" })
+                param "category" (Discuss.newDiscussionUrl { target | category = Discuss.Tests, key = "t:elm/X" })
                     |> Expect.equal (Just "tests")
         , test "the address is the repository's" <|
             \_ ->
@@ -196,7 +196,7 @@ selecting =
             \_ -> Discussions.about ((==) "res:core-no-shadowing") all |> List.map .number |> Expect.equal [ 3 ]
         , test "about a project or its tests" <|
             \_ ->
-                Discussions.about (\k -> k == "p:elm-bugs" || String.startsWith "t:elm-bugs/" k) all
+                Discussions.about (\k -> k == "p:elm-bytes" || String.startsWith "t:elm-bytes/" k) all
                     |> List.map .number
                     |> Expect.equal [ 5 ]
         , test "the most recently active first" <|
@@ -211,7 +211,7 @@ selecting =
             \_ ->
                 Discussions.grouped (Discussions.inCategory Discuss.Tests all)
                     |> List.map Tuple.first
-                    |> Expect.equal [ "t:elm-bugs/BytesIssue15BytesEqualityTest", "" ]
+                    |> Expect.equal [ "t:elm-bytes/BytesIssue15BytesEqualityTest", "" ]
         ]
 
 
@@ -234,7 +234,7 @@ fixture =
     "category": { "name": "Tests", "slug": "tests" },
     "user": null, "comments": 1, "answer_chosen_at": null, "state": "closed",
     "updated_at": "2026-11-08T11:00:00Z", "html_url": "https://github.com/eco-lang/elm-test-suite/discussions/4" },
-  { "number": 5, "title": "[t:elm-bugs/BytesIssue15BytesEqualityTest] Why does this fail everywhere?",
+  { "number": 5, "title": "[t:elm-bytes/BytesIssue15BytesEqualityTest] Why does this fail everywhere?",
     "category": { "name": "Tests", "slug": "tests" },
     "user": { "login": "someone" }, "comments": 0, "answer_chosen_at": null, "state": "open",
     "updated_at": "2026-11-08T12:00:00Z", "html_url": "https://github.com/eco-lang/elm-test-suite/discussions/5" }

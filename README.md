@@ -18,17 +18,17 @@ Adding another compiler (a new Elm release, a release candidate, a fork) is one 
 `compilers.json`; see [Adding a compiler](#adding-a-compiler).
 
 Most of the tests come from the end-to-end suite of eco, an Elm compiler with a native back end,
-and pass under Elm 0.19.1. Two projects expect the correct behaviour where Elm 0.19.1 has a bug,
-so they fail under 0.19.1 by design: `elm-bug-fixes` (bugs fixed in a later release; each test
-passes from that release) and `elm-bugs` (bugs reported in open issues of the github.com/elm
-repositories). eco's tests of the places where it deliberately behaves differently from Elm (64-bit `Int`, IEEE
+and pass under Elm 0.19.1. The tests tagged `elm19-bug-fix` (bugs fixed in a later release; each
+test passes from that release) and `elm19-bug` (bugs reported in open issues of the github.com/elm
+repositories) expect the correct behaviour where Elm 0.19.1 has a bug, so they fail under 0.19.1 by
+design; see [Tags](#tags). eco's tests of the places where it deliberately behaves differently from Elm (64-bit `Int`, IEEE
 `Float` comparisons, and so on) are not part of this suite.
 
 ## Requirements
 
-- Node.js 20 or later. The case-mapping tests in `elm-conformance` were recorded with Unicode 17.0
-  (Node 22.x and later); with an older Node the runner warns, and those tests may fail for that
-  reason alone.
+- Node.js 20 or later. The case-mapping tests (those with `-- UNICODE: 17.0`) were recorded with
+  Unicode 17.0 (Node 22.x and later); with another Node the runner warns, and those tests may fail
+  for that reason alone.
 - pnpm. With Corepack (`corepack enable`), the version pinned in `package.json` is used.
 - Linux (tested) or macOS (untested), on x64 or arm64: the platforms the compiler packages ship
   binaries for.
@@ -130,33 +130,55 @@ Each program's output is kept in `.work/<compiler>/<project>/out/<Name>.log`.
 report and writes it to `.work/report.md`:
 
 - each compiler's version and totals;
-- each project's totals, one column per compiler;
+- each project's totals, one column per compiler, and each tag's;
 - every test whose outcome is not the same under every compiler, with each compiler's outcome and
   the first line of the reason for each failure.
 
 ## The tests
 
-`tests/` holds 13 Elm projects, each with its own `elm.json`:
+`tests/` holds 11 Elm projects, each with its own `elm.json`. A test of the language itself is in
+`elm`; a test of elm/core, the basis library (the operators of `Basics` included), is in `elm-core`;
+any other test of a package is in that package's project. `&&`, `||`, `::` and list literals count as
+language, since the book defines them as derived forms or as part of the initial environment. Every
+project depends on the latest release of each package it uses.
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 605 | the language and elm/core: every construct, closures, recursion, pattern matching, records, custom types, numbers, strings |
-| `elm-core` | 108 | the elm/core modules, function by function |
-| `elm-bytes` | 84 | elm/bytes encoders and decoders |
-| `elm-json` | 32 | elm/json |
-| `elm-parser` | 39 | elm/parser |
-| `elm-regex` | 5 | elm/regex |
-| `elm-time` | 4 | elm/time |
-| `elm-url` | 4 | elm/url |
-| `elm-html` | 3 | elm/html |
-| `elm-conformance` | 33 | edge cases recorded from Elm on Node: Unicode and case mapping, JSON number and string formats, Float edge values, regex and URL encoding details |
-| `elm-compile-errors` | 216 | programs the compiler must reject, checked by the title of the error report |
-| `elm-bug-fixes` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
-| `elm-bugs` | 151 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
+| `elm` | 735 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
+| `elm-core` | 362 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
+| `elm-bytes` | 88 | elm/bytes encoders and decoders |
+| `elm-parser` | 51 | elm/parser |
+| `elm-json` | 42 | elm/json |
+| `elm-regex` | 12 | elm/regex |
+| `elm-url` | 9 | elm/url |
+| `elm-time` | 8 | elm/time |
+| `elm-html` | 5 | elm/html |
+| `elm-virtual-dom` | 2 | elm/virtual-dom |
+| `elm-random` | 1 | elm/random |
 
-### elm-bugs and its issue triage
+### Tags
 
-`tests/elm-bugs/issues.tsv` records a triage of every open issue (883, in November 2026) of the
+A test may carry tags, `-- TAGS: a, b`, which group tests across projects; each test is also tagged
+with its own project. The results website shows the tests by project and by tag.
+
+| Tag | Tests | What they are |
+|---|---|---|
+| `elm19-compile-error` | 222 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
+| `elm19-bug` | 151 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
+| `elm19-bug-fix` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
+| `elm19-quirks` | 2 | edge cases where the test records what Elm 0.19.1 does, and that differs from A Standard Definition of Elm? or from what another test expects |
+
+The 34 tests of edge cases recorded from Elm on Node (Unicode and case mapping, JSON number and string
+formats, Float edge values, regex and URL encoding details) carry `-- MODE-GUARD:` and
+`-- NO-SKIP:`, and the case-mapping ones `-- UNICODE: 17.0`; they share the helper module
+`ConformanceHelp`, of which each project that has them holds a copy. Two of them are tagged
+`elm19-quirks`: `ParserLoneLowSurrogateTest` expects a Char made of two lone surrogates, which ruling
+A52 rules out, and `StringWordsUnicodeSpaceTest` expects `String.words` to give `[""]`, which
+the `elm19-bug` test `CoreIssue1019StringWordsEmptyTest` treats as a bug.
+
+### Bugs and the issue triage
+
+`tests/issues.tsv` records a triage of every open issue (883, in November 2026) of the
 github.com/elm repositories but `elm-lang.org` and `package.elm-lang.org`, one line each:
 
 | Column | Meaning |
@@ -164,29 +186,29 @@ github.com/elm repositories but `elm-lang.org` and `package.elm-lang.org`, one l
 | `likelihood` | that the issue is a real bug in Elm 0.19.1 or its packages: `CERTAIN`, `LIKELY`, `WEAK`, `NOT_BUG` |
 | `impact` | `HIGH`, `MEDIUM`, `LOW` |
 | `e2e` | whether a test of this suite could show it: `yes`, `maybe`, `no` (needs a browser, network, the REPL, ...) |
-| `outcome` | `REPRODUCED` (a test of `elm-bugs`), `FIXED` (a test of `elm-bug-fixes`), `NOT_REPRODUCED` (Elm 0.19.1 behaves correctly), `NOT_E2E`, `NOT_ATTEMPTED` (not a bug, or the correct behaviour is debatable) |
+| `outcome` | `REPRODUCED` (a test tagged `elm19-bug`), `FIXED` (a test tagged `elm19-bug-fix`), `NOT_REPRODUCED` (Elm 0.19.1 behaves correctly), `NOT_E2E`, `NOT_ATTEMPTED` (not a bug, or the correct behaviour is debatable) |
 | `test` | the test (or tests, space-separated), for `REPRODUCED` and `FIXED` |
 | `fixed_in` | the compilers under which that test passes |
 | `note` | why |
 
-`elm-bugs` also holds a test, named `Standard<ruling>...Test`, for each point on which Elm 0.19.1
+The tag `elm19-bug` also marks a test, named `Standard<ruling>...Test`, for each point on which Elm 0.19.1
 diverges from *A Standard Definition of Elm?* (Appendix E, Known Divergences, of the book), where no
 other test covered it. Each links the book's page for its ruling (and the GitHub issue, where there
 is one) and expects what the book defines. A test of an Int beyond 32 bits holds for every Int range
 the book allows.
 
 A test whose issue's program is invalid under the book is kept as the issue wrote it, with a comment
-that says so and names a test in another project that follows the book. Three `elm-bugs` tests use
+that says so and names a test that follows the book. Three tests tagged `elm19-bug` use
 surrogate escapes such as `"\u{D800}"`, which ruling A8 makes invalid: their counterparts are
-`elm-core`'s `CharLiteralSurrogateEscapeTest` (compiler#2366) and `StringToListLoneSurrogateTest`
-(core#1060), and `elm-url`'s `UrlPercentEncodeLoneSurrogateTest` (url#54), which compute their lone
+`elm`'s `CharLiteralSurrogateEscapeTest` (compiler#2366), `elm-core`'s
+`StringToListLoneSurrogateTest` (core#1060) and `elm-url`'s `UrlPercentEncodeLoneSurrogateTest` (url#54), which compute their lone
 surrogates with `Char.fromCode`.
 
 A bug counts as fixed once a later official Elm release (not a fork such as Lamdera) fixes it: its
-test then moves from `elm-bugs` to `elm-bug-fixes`, its comment says which release fixed it, and
-its outcome becomes `FIXED`. A bug fixed only in a fork stays in `elm-bugs`.
+test's tag then changes from `elm19-bug` to `elm19-bug-fix`, its comment says which release fixed
+it, and its outcome becomes `FIXED`. A bug fixed only in a fork stays `elm19-bug`.
 
-Some compiler bugs in `elm-bugs` make the compiler loop while its memory grows: the runner kills a
+Some compiler bugs tagged `elm19-bug` make the compiler loop while its memory grows: the runner kills a
 compile at `--compile-memory` (4096 MB), so they fail within seconds.
 
 A test is a module in `src/` with a top-level `main` (or a `-- COMPILE-ERROR:` line). Modules
@@ -228,6 +250,10 @@ main =
 | `-- FLAGS: <json>` | the flags passed to `init` |
 | `-- COMPILE-ERROR: <what>` | the compiler must reject the program; the CHECK lines (the report title, such as `-- CHECK: -- TYPE MISMATCH -`) are matched against its output |
 | `-- LINUX-ONLY: <reason>` | skipped on other hosts |
+| `-- NO-SKIP: <reason>` | a skip (on another host, or on a compiler with no JavaScript host for flags and ports) is a failure instead |
+| `-- TAGS: <tag>, <tag>` | the test's tags (lower-case letters, digits, `.` and `-`), besides its project; see [Tags](#tags) |
+| `-- MODE-GUARD: <reason>` | a Char equality whose answer in debug mode (where `==` on Chars is a prefix test) differs from its answer under `--optimize` throws, so the program fails |
+| `-- UNICODE: <version>` | the Unicode version the expected output was recorded with; under a Node with another, the runner warns |
 | `-- NO-CACHE: <reason>` | always compiled and run: its result is never taken from the result cache |
 | `-- HELPER: <reason>` | not a test, even with a top-level `main`: a module that tests import |
 
@@ -325,9 +351,9 @@ skipped.
 ## The results website
 
 `site/` is an [elm-pages](https://elm-pages.com) site built from a run's results: each compiler's
-totals, each project's totals per compiler, the tests whose outcome differs between compilers, and
-a page per test with its description, issue link, source, and per compiler its outcome, failure
-message and output. To build it after `pnpm test:all`:
+totals, each project's and each tag's totals per compiler with a page listing its tests, the tests
+whose outcome differs between compilers, and a page per test with its description, issue link,
+tags, source, and per compiler its outcome, failure message and output. To build it after `pnpm test:all`:
 
 ```sh
 node runner/site-data.js          # writes site/data/ from .work/results/ and tests/
@@ -353,8 +379,9 @@ when its title holds the item's key in square brackets:
 
 | Key | Item |
 |-----|------|
-| `[t:elm-bugs/CompilerIssue2281LongLineListTest]` | a test |
-| `[p:elm-bugs]` | a test project |
+| `[t:elm/CompilerIssue2281LongLineListTest]` | a test |
+| `[p:elm]` | a test project |
+| `[tag:elm19-bug]` | a tag |
 | `[r:d-atexp-var]` | a rule (its label in `definition/tex/`) |
 | `[res:...]`, `[df:...]`, `[b:...]` | a restriction, derived form or entry of the basis |
 | `[ch:static-core]` | a chapter |
@@ -389,7 +416,7 @@ not send the book's data to the browser. The styles are the `sd-` classes in `si
 `.github/workflows/ci.yml` runs on Linux for each push to `master` or `standard-elm-suite` and each
 pull request: `pnpm test:all`, the comparison report into the job summary, the website and its unit
 tests, then `runner/check-baseline.js`, which adds to the job summary every test Elm 0.19.1 fails
-outside `elm-bugs` and `elm-bug-fixes`. The suite reports on compilers already released, so no test
+that is not tagged `elm19-bug` or `elm19-bug-fix`. The suite reports on compilers already released, so no test
 result, of the suite or of the website's unit tests, ever fails the job. The results and the built site are kept as workflow artifacts. With
 the repository secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` set, a push to `master` publishes
 the site to Netlify, and a pull request gets a draft deploy linked in a comment. A push to
@@ -416,11 +443,12 @@ runner/dom.js         the minimal DOM that lets Html programs start on Node
 runner/site-data.js   writes the results website's data from the last results
 runner/definition-data.js  writes the website's data for A Standard Definition of Elm?
 definition/           the LaTeX sources and PDF of A Standard Definition of Elm?
-runner/check-baseline.js  lists the tests Elm 0.19.1 fails outside elm-bugs, elm-bug-fixes (CI)
+runner/check-baseline.js  lists the tests Elm 0.19.1 fails that are not tagged elm19-bug, elm19-bug-fix (CI)
 site/                 the results website (elm-pages)
 plans/                plans for work on the site
 .github/workflows/    CI: run the suite, build and publish the website
 tests/<project>/      the test projects (elm.json and src/)
+tests/issues.tsv      the triage of the open issues of the github.com/elm repositories
 .work/                compiled programs, logs, package caches and results (not tracked)
 ```
 

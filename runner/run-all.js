@@ -9,7 +9,7 @@
 // runner/run.js, its results in .work/results/<compiler>.json). --report-only skips the runs and
 // reports on the stored results. The report goes to the console and to .work/report.md:
 //   - per compiler: version, and tests passed, failed and skipped;
-//   - per project: the same, one column per compiler;
+//   - per project: the same, one column per compiler; and likewise per tag (`-- TAGS:`);
 //   - every test whose outcome is not the same under all compilers, with each compiler's outcome
 //     and, for a failure, the first line of its reason;
 //   - how many results came from the result cache, and (after --refresh) every result that differs
@@ -72,6 +72,19 @@ function report(names) {
             const t = r.projects[p];
             return t ? `${count(t, 'pass')} / ${count(t, 'fail')} / ${count(t, 'skip')}` : '–';
         }).join(' | ') + ' |');
+    }
+    // Every tag but the projects' (each test is tagged with its project): the same totals.
+    const tags = [...new Set(runs.flatMap((r) => Object.values(r.projects).flatMap((ts) =>
+        Object.values(ts).flatMap((t) => t.tags || []))))].filter((g) => !projects.includes(g)).sort();
+    if (tags.length) {
+        out.push('', '## By tag (passed / failed / skipped)', '');
+        out.push('| Tag | ' + names.join(' | ') + ' |', '|---|' + names.map(() => '---|').join(''));
+        for (const g of tags) {
+            out.push('| ' + g + ' | ' + runs.map((r) => {
+                const t = Object.values(r.projects).flatMap((ts) => Object.values(ts)).filter((x) => (x.tags || []).includes(g));
+                return `${count(t, 'pass')} / ${count(t, 'fail')} / ${count(t, 'skip')}`;
+            }).join(' | ') + ' |');
+        }
     }
     const diffs = [];
     for (const p of projects) {

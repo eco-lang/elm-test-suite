@@ -42,7 +42,11 @@
 //      `-- ENV:` lines, and the test passes iff the program exits on its own within the timeout
 //      (default 60 s) with the `-- EXIT:` status (default 0) and its stdout+stderr satisfy the
 //      CHECK lines.
-//   `-- LINUX-ONLY:` skips the test on other hosts.
+//   `-- LINUX-ONLY:` skips the test on other hosts; with `-- NO-SKIP:` a skip is a failure instead.
+//   `-- MODE-GUARD:` makes a Char equality whose debug-mode answer differs from --optimize's throw
+//   (patchModeGuard). `-- UNICODE: <version>` names the Unicode version the expectations were
+//   recorded with; under a node with another, the runner warns.
+//   `-- TAGS: a, b` labels the test; its project is always its first tag.
 // The result cache: a test's result is kept in .work/result-cache/<compiler>/<key>.json, the key a
 // hash of everything the result depends on (the compiler's executable, this runner, Node, the
 // project's elm.json, the test's source and the modules it imports, ...), and a later run takes it
@@ -56,8 +60,8 @@
 // entries it did not use. See plans/test-result-cache.md.
 // --record <TestName> runs one test without checking it and prints each non-empty output line as
 // `-- CHECK: <line>`. Each test's output is kept in .work/<compiler>/<project>/out/<Name>.log.
-// --json writes every test's outcome, its failure message and up to 4000 characters of its output
-// (the program's, or the compiler's for a COMPILE-ERROR test) to a file (run-all.js and
+// --json writes every test's outcome, its failure message, its tags and up to 4000 characters of its
+// output (the program's, or the compiler's for a COMPILE-ERROR test) to a file (run-all.js and
 // runner/site-data.js read it). The exit status is 1 if any test failed, 2 on a usage or setup
 // error, else 0.
 'use strict';
@@ -238,23 +242,20 @@ function launcher(name, flags) {
 
 // --- Projects ----------------------------------------------------------------------------------
 
-// The test projects: every directory of tests/ with an elm.json. `modeGuard` patches the compiled
-// program so that a Char equality whose debug-mode answer differs from --optimize throws
-// (patchModeGuard); `allowSkip: false` makes a skip a failure.
+// The test projects: every directory of tests/ with an elm.json.
 function projectSpecs() {
     const dir = path.join(ROOT, 'tests');
     return fs.readdirSync(dir).sort()
         .filter((n) => fs.existsSync(path.join(dir, n, 'elm.json')))
-        .map((name) => ({ name, dir: path.join(dir, name), modeGuard: name === 'elm-conformance',
-            allowSkip: name !== 'elm-conformance', unicode: name === 'elm-conformance' ? '17.0' : null }));
+        .map((name) => ({ name, dir: path.join(dir, name) }));
 }
 
 // --- Mode guard --------------------------------------------------------------------------------
 
-// The conformance tests are compiled in debug mode (Debug.log is rejected under --optimize), where
-// a Char is a `String` object and Elm's _Utils_eqHelp walks it with `for (var key in x)`, which makes
-// `x == y` a prefix test. Their reference semantics is --optimize (string equality), so a Char
-// equality whose two answers differ is made to throw. A compiler whose output has no
+// The tests are compiled in debug mode (Debug.log is rejected under --optimize), where a Char is a
+// `String` object and Elm's _Utils_eqHelp walks it with `for (var key in x)`, which makes `x == y` a
+// prefix test. A test with `-- MODE-GUARD:` takes --optimize (string equality) as its reference, so
+// in it a Char equality whose two answers differ is made to throw. A compiler whose output has no
 // _Utils_eqHelp is left unpatched.
 const GUARD_MARKER = '/* elm-test-suite mode guard */';
 const EQ_DEF = 'function _Utils_eqHelp(x, y, depth, stack)';
@@ -421,17 +422,12 @@ function pruneCache(cache) {
 
 // --- One project -------------------------------------------------------------------------------
 
-async function runProject(spec, opts, compiler, cache) {
+async function runProject(spec, opts, compiler, cache, projectNames) {
     const work = path.join(ROOT, '.work', compiler.name, spec.name);
     const projects = Array.from({ length: opts.compileJobs }, (_, k) => path.join(work, 'project-' + k));
     const outDir = path.join(work, 'out');
     const srcDir = path.join(spec.dir, 'src');
     fs.mkdirSync(outDir, { recursive: true });
-    if (spec.unicode && process.versions.unicode !== spec.unicode) {
-        console.log('WARNING: ' + spec.name + "'s case-mapping expectations were recorded with Unicode " +
-            spec.unicode + '; this node (' + process.version + ') has Unicode ' + process.versions.unicode +
-            ', so tests of Char.toUpper/toLower may fail for that reason alone');
-    }
 
     // 1. Mirror the project; discover the tests.
     // An application's elm.json names the exact compiler version it needs: write the compiler's.
@@ -466,9 +462,16 @@ async function runProject(spec, opts, compiler, cache) {
 
     const results = new Map();   // name -> { status: 'pass'|'fail'|'skip', message }
     const toRun = [];
+    const otherUnicode = [];
     for (const t of selected) {
         let skip;
+        t.tags = [spec.name];
         try {
+            t.tags.push(...D.extractTags(t.content, projectNames));
+            t.modeGuard = D.directiveLines(t.content, '-- MODE-GUARD:').length > 0;
+            t.noSkip = D.directiveLines(t.content, '-- NO-SKIP:').length > 0;
+            const unicode = D.directiveLines(t.content, '-- UNICODE:').map((l) => l.trim());
+            if (unicode.length && unicode[0] !== process.versions.unicode) otherUnicode.push(t.name);
             skip = D.extractSkip(t.content);
             t.patterns = D.extractCheckPatterns(t.content);
             t.exit = D.extractExit(t.content);
@@ -494,15 +497,19 @@ async function runProject(spec, opts, compiler, cache) {
             results.set(t.name, { status: 'fail', message: String(e.message || e) });
             continue;
         }
-        if (skip !== null && !spec.allowSkip) {
-            results.set(t.name, { status: 'fail', message: skip + ': skips are not allowed in ' + spec.name });
+        if (skip !== null && t.noSkip) {
+            results.set(t.name, { status: 'fail', message: skip + ': the test has NO-SKIP' });
         } else if (skip !== null) results.set(t.name, { status: 'skip', message: skip });
         else toRun.push(t);
+    }
+    if (otherUnicode.length) {
+        console.log('  WARNING: ' + otherUnicode.join(', ') + ' recorded expectations under another Unicode version ' +
+            'than this node (' + process.version + ', Unicode ' + process.versions.unicode + '), and may fail for that reason alone');
     }
 
     // The result cache: a test whose result is cached is neither compiled nor run.
     const modules = new Map(sources.map((f) => [f.slice(0, -4), fs.readFileSync(path.join(srcDir, f), 'utf8')]));
-    const project = { name: spec.name, elmJson, modeGuard: spec.modeGuard, allowSkip: spec.allowSkip, unicode: spec.unicode };
+    const project = { name: spec.name, elmJson };
     const keys = new Map();   // test name -> its key, for a test whose result may be cached
     if (cache.enabled) {
         for (const t of toRun) {
@@ -575,7 +582,7 @@ async function runProject(spec, opts, compiler, cache) {
         } else if (r.code !== 0 || !produced) {
             try { fs.unlinkSync(out); } catch (e) { /* none */ }
             results.set(t.name, { status: 'fail', message: 'compile failed (exit ' + r.code + '):\n' + r.output.slice(0, 4000) });
-        } else if (spec.modeGuard && compiler.target === 'js') {
+        } else if (t.modeGuard && compiler.target === 'js') {
             patchModeGuard(out);
         }
     };
@@ -684,7 +691,7 @@ async function runProject(spec, opts, compiler, cache) {
     for (const t of selected) {
         const r = results.get(t.name);
         json[t.name] = { status: r.status, reason: r.status === 'pass' ? '' : (r.message || '').split('\n')[0],
-            message: r.status === 'pass' ? '' : (r.message || ''), output: r.output || '' };
+            message: r.status === 'pass' ? '' : (r.message || ''), output: r.output || '', tags: t.tags };
         if (r.ms !== undefined && r.ms !== null) json[t.name].ms = r.ms;
         if (r.cached) json[t.name].cached = r.cached;
         if (r.status === 'pass') passed++;
@@ -726,7 +733,7 @@ async function main() {
     const report = { compiler: compiler.name, version: compiler.version, description: compiler.description || '',
         target: compiler.target, node: process.version, projects: {} };
     for (const spec of chosen) {
-        const r = await runProject(spec, opts, compiler, cache);
+        const r = await runProject(spec, opts, compiler, cache, specs.map((s) => s.name));
         passed += r.passed; failed += r.failed; skipped += r.skipped;
         failures.push(...r.failures);
         report.projects[spec.name] = r.results;

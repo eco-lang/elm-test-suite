@@ -74,11 +74,11 @@ view app _ =
         [ Html.h1 [ Attr.class "ts-h1" ] [ Html.text "Results" ]
         , Html.p [ Attr.class "ts-lede" ]
             [ Html.text "Each test is a real Elm program: the suite compiles it with each compiler, runs it, and checks its output against the expected output in its comments. "
-            , Html.text "Two projects, "
-            , Html.code [] [ Html.text "elm-bugs" ]
+            , Html.text "The tests tagged "
+            , Route.link [] [ Html.code [] [ Html.text "elm19-bug" ] ] (Route.Tags__Tag_ { tag = "elm19-bug" })
             , Html.text " and "
-            , Html.code [] [ Html.text "elm-bug-fixes" ]
-            , Html.text ", expect the correct behaviour where Elm 0.19.1 has a bug, so they fail under 0.19.1 by design."
+            , Route.link [] [ Html.code [] [ Html.text "elm19-bug-fix" ] ] (Route.Tags__Tag_ { tag = "elm19-bug-fix" })
+            , Html.text " expect the correct behaviour where Elm 0.19.1 has a bug, so they fail under 0.19.1 by design."
             ]
         , Html.p [ Attr.class "ts-lede" ]
             [ Html.text "The site also carries "
@@ -86,7 +86,7 @@ view app _ =
             , Html.text ", a formal definition of the language with a page for every rule."
             ]
         , Html.p [ Attr.class "ts-lede" ]
-            [ Html.text "Each test and project has a Discussions section: start a discussion of a test on GitHub from its page, and it is shown there. See "
+            [ Html.text "Each test, project and tag has a Discussions section: start a discussion of a test on GitHub from its page, and it is shown there. See "
             , Route.link [] [ Html.text "all the discussions of the tests" ] Route.Discussions
             , Html.text "."
             ]
@@ -97,7 +97,12 @@ view app _ =
         , Html.section [ Attr.class "ts-section" ]
             [ Html.h2 [ Attr.class "ts-h2" ] [ Html.text "By project" ]
             , Html.p [ Attr.class "ts-muted ts-small" ] [ Html.text "Passed / failed (/ skipped). Choose a project to see its tests." ]
-            , Html.div [ Attr.class "ts-scroll" ] [ projectsTable report ]
+            , Html.div [ Attr.class "ts-scroll" ] [ summaryTable "Project" (\name -> Route.Projects__Project_ { project = name }) report report.projects ]
+            ]
+        , Html.section [ Attr.class "ts-section", Attr.id "tags" ]
+            [ Html.h2 [ Attr.class "ts-h2" ] [ Html.text "By tag" ]
+            , Html.p [ Attr.class "ts-muted ts-small" ] [ Html.text "Passed / failed (/ skipped). A tag gathers tests across projects; choose one to see its tests." ]
+            , Html.div [ Attr.class "ts-scroll" ] [ summaryTable "Tag" (\name -> Route.Tags__Tag_ { tag = name }) report report.tags ]
             ]
         , Html.section [ Attr.class "ts-section", Attr.id "differing" ]
             [ Html.h2 [ Attr.class "ts-h2" ]
@@ -133,25 +138,27 @@ compilerCard compiler =
         ]
 
 
-projectsTable : Report -> Html msg
-projectsTable report =
+{-| The totals of each project, or of each tag, with a link to its page.
+-}
+summaryTable : String -> (String -> Route.Route) -> Report -> List ProjectSummary -> Html msg
+summaryTable heading toRoute report rows =
     Html.table [ Attr.class "ts-table" ]
         [ Html.thead []
             [ Html.tr []
-                (Html.th [] [ Html.text "Project" ]
+                (Html.th [] [ Html.text heading ]
                     :: Html.th [ Attr.class "ts-num" ] [ Html.text "Tests" ]
                     :: List.map (\c -> Html.th [] [ Html.text c.name ]) report.compilers
                 )
             ]
-        , Html.tbody [] (List.map projectRow report.projects)
+        , Html.tbody [] (List.map (summaryRow toRoute) rows)
         ]
 
 
-projectRow : ProjectSummary -> Html msg
-projectRow project =
+summaryRow : (String -> Route.Route) -> ProjectSummary -> Html msg
+summaryRow toRoute project =
     Html.tr []
         (Html.td []
-            [ Route.link [] [ Html.strong [] [ Html.text project.name ] ] (Route.Projects__Project_ { project = project.name })
+            [ Route.link [] [ Html.strong [] [ Html.text project.name ] ] (toRoute project.name)
             , Html.div [ Attr.class "ts-summary" ] [ Html.text project.description ]
             ]
             :: Html.td [ Attr.class "ts-num" ] [ Html.text (String.fromInt project.total) ]

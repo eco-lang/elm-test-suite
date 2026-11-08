@@ -50,7 +50,7 @@ default categories.
    | `r:<label>` | a rule | Standard |
    | `res:`, `df:`, `b:` | a restriction, derived form, entry of the basis | Standard |
    | `ch:<chapter>` | a chapter, for what is not about one item | Standard |
-   | `t:<project>/<Test>` | a test, as in its address: `t:elm-bugs/CompilerIssue2281LongLineListTest` | Tests |
+   | `t:<project>/<Test>` | a test, as in its address: `t:elm/CompilerIssue2281LongLineListTest` | Tests |
    | `p:<project>` | a test project as a whole | Tests |
 
    The labels of the Definition are stable by design (`definition/README.md`), so a discussion
@@ -170,7 +170,7 @@ within a minute or two of being posted. Nothing is rebuilt.
 
 - `keysOf` and the URL builders: unit tests (elm-test in `site/`, or checks in a small script),
   including several keys in a title, keys with dots (`b:Platform.Cmd.none`) and slashes
-  (`t:elm-bugs/CompilerIssue2281LongLineListTest`), and titles without keys.
+  (`t:elm/CompilerIssue2281LongLineListTest`), and titles without keys.
 - The decoder against a saved reply of the API (a fixture under `site/`), including a discussion in
   another category and one with no keys.
 - In the browser: a page with discussions, one without, a failed fetch (block `api.github.com`),

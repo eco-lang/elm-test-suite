@@ -2,7 +2,7 @@ module UrlPercentEncodeLoneSurrogateTest exposing (main)
 
 {-| `Url.percentEncode` returns a string for a string holding a lone surrogate.
 
-The bug of <https://github.com/elm/url/issues/54>, with a program that follows A Standard Definition of Elm? The issue, and `elm-bugs`'s `UrlIssue54PercentEncodeLoneSurrogateTest`, write the
+The bug of <https://github.com/elm/url/issues/54>, with a program that follows A Standard Definition of Elm? The issue, and `UrlIssue54PercentEncodeLoneSurrogateTest` (tagged `elm19-bug`), write the
 lone surrogate as the escape `"\u{d800}"`, which ruling A8 makes invalid: an escape must denote a
 Unicode scalar value. <https://elm-test-suite.netlify.app/standard/syntax-core#fig-core-escapes>
 

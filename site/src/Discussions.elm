@@ -266,11 +266,11 @@ discussion category =
 
 keyPattern : Regex
 keyPattern =
-    Regex.fromString "\\[\\s*((?:r|res|df|b|ch|t|p):[^\\]\\s]+)\\s*\\]"
+    Regex.fromString "\\[\\s*((?:r|res|df|b|ch|t|p|tag):[^\\]\\s]+)\\s*\\]"
         |> Maybe.withDefault Regex.never
 
 
-{-| The keys in a title: `[r:d-atexp-var] [t:elm-bugs/SomeTest] Why ...` has two.
+{-| The keys in a title: `[r:d-atexp-var] [t:elm/SomeTest] Why ...` has two.
 -}
 keysOf : String -> List String
 keysOf title =

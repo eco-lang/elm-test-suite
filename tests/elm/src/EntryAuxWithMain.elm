@@ -9,6 +9,8 @@ this module is an ordinary program.
 
 -}
 
+-- HELPER: imported by EntryMainOfRootModuleTest; its `main` is not the program's
+
 import Html exposing (text)
 
 

@@ -15,6 +15,7 @@ import RouteBuilder exposing (App, StatelessRoute)
 import Shared
 import Site
 import SyntaxHighlight
+import TestList
 import Ui
 import View exposing (View)
 
@@ -103,6 +104,11 @@ view app shared =
             , Html.text " / "
             ]
         , Html.h1 [ Attr.class "ts-h1" ] [ Html.text test.name ]
+        , if List.isEmpty test.tags then
+            Html.text ""
+
+          else
+            Html.p [ Attr.class "ts-small" ] (Html.text "Tags:" :: List.map TestList.tagLink test.tags)
         , Html.div [ Attr.class "ts-filters" ]
             (List.map
                 (\r ->
