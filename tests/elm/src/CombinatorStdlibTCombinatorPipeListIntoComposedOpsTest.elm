@@ -9,6 +9,7 @@ Every combinator is a local definition in `testValue`: `b = s (k s) k`,
 
 -}
 
+-- TAGS: elm-spec, s-atexp-let, s-dec-group, d-app-closure
 -- CHECK: testValue: 12
 
 import Basics exposing (..)

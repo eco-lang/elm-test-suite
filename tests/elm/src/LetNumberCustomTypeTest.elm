@@ -10,6 +10,7 @@ result is 45.
 
 -}
 
+-- TAGS: elm-spec, sm-datbind, s-dec-group, d-atexp-scon
 -- CHECK: ctor: 45
 
 import Html exposing (text)

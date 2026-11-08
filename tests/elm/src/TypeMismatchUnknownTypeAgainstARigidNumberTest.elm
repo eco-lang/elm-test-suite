@@ -11,6 +11,7 @@ The test checks only that a TYPE MISMATCH is reported.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app, s-match, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, unknown type against a rigid number
 -- CHECK: -- TYPE MISMATCH -
 

@@ -3,6 +3,7 @@ module CombinatorSpCombineTest exposing (main)
 {-| The SP combinator, which applies two functions to the same argument and combines the results: `sp mul inc double 6` is `inc 6 * double 6`, which is 84.
 -}
 
+-- TAGS: elm-spec, d-app-closure
 -- CHECK: result: 84
 
 import Html exposing (text)

@@ -9,6 +9,7 @@ The helper is applied once to `( 0, outer )` rather than passed to `List.foldl`,
 so the result is the single `LambdaId 999` unwrapped plus the initial 0.
 -}
 
+-- TAGS: elm-spec, s-atpat-record, d-atpat-record, d-patrow-field
 -- CHECK: uid: 999
 
 import Html exposing (text)

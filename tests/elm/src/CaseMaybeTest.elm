@@ -4,6 +4,7 @@ module CaseMaybeTest exposing (main)
 and a default of -1 for `Nothing`.
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-atpat-con
 -- CHECK: case1: 42
 -- CHECK: case2: -1
 

@@ -9,6 +9,7 @@ The type variable `a` in the annotation is rigid: the function must work for any
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-longcon
 -- COMPILE-ERROR: TYPE MISMATCH, Maybe of a number against a rigid var
 -- CHECK: -- TYPE MISMATCH -
 

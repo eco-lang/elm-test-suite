@@ -7,6 +7,7 @@ right operand would reach a branch that recurses without end, so a past-end
 peek must print `"none"`, and an in-bounds peek prints the character.
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-mrule-fail
 -- CHECK: peek at past-end: "none"
 -- CHECK: peek at first: "H"
 

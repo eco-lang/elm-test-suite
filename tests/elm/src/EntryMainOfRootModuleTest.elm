@@ -10,6 +10,7 @@ that the import still works.
 
 -}
 
+-- TAGS: elm-spec, p-stat-main-view, p-dyn-main, p-dyn-module
 -- CHECK: which: "root"
 -- CHECK: greeting: "hello"
 

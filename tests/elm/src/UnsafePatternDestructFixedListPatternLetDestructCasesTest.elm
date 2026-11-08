@@ -9,6 +9,7 @@ of exactly two elements.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-exhaustiveness
 -- COMPILE-ERROR: UNSAFE PATTERN, Destruct fixed list pattern (LetDestructCases)
 -- CHECK: -- UNSAFE PATTERN -
 

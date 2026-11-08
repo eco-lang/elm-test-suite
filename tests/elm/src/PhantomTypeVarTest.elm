@@ -10,6 +10,7 @@ type. `main` applies an identity function wrapped in `ROk` three times to
 
 -}
 
+-- TAGS: elm-spec, sm-datbind, sm-conbind, s-valbind-var
 -- CHECK: result: 42
 
 import Html exposing (text)

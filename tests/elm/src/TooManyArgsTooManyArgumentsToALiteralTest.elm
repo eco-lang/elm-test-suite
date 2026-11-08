@@ -7,6 +7,7 @@ module TooManyArgsTooManyArgumentsToALiteralTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-scon
 -- COMPILE-ERROR: TOO MANY ARGS, too many arguments to a literal
 -- CHECK: -- TOO MANY ARGS -
 

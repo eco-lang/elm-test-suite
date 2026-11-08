@@ -9,6 +9,7 @@ Elm 0.19.1 crashes ("index out of bounds") on this program. It should report a t
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-atpat-record
 -- COMPILE-ERROR: field iDontExist does not exist
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: out of bounds

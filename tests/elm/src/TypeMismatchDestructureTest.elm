@@ -5,6 +5,7 @@ module TypeMismatchDestructureTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-pat, s-atpat-tuple
 -- COMPILE-ERROR: TYPE MISMATCH, destructure
 -- CHECK: -- TYPE MISMATCH -
 

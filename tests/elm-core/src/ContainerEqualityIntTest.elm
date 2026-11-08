@@ -11,6 +11,7 @@ module ContainerEqualityIntTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: pairEqual: True
 -- CHECK: pairFirstDiff: False
 -- CHECK: pairSecondDiff: False

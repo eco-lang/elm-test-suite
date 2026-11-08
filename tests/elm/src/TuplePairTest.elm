@@ -3,6 +3,7 @@ module TuplePairTest exposing (main)
 {-| Tuple literals of `Int`, `String` and `Bool` components are built and printed correctly.
 -}
 
+-- TAGS: elm-spec, s-atexp-tuple, d-atexp-tuple
 -- CHECK: pair1: (1,2)
 -- CHECK: pair2: ("a","b")
 -- CHECK: pair3: (True,False)

@@ -5,6 +5,7 @@ module EqualityStringChainCaseTest exposing (main)
 `classify` matches `( "foo", True )` and `( "bar", False )`, and falls through to `"other"` for `( "baz", True )`. `"hello" == "hello"` is `True` and `"hello" == "world"` is `False`.
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-atpat-tuple, d-match-next
 -- CHECK: case1: "matched foo+True"
 -- CHECK: case2: "matched bar+False"
 -- CHECK: case3: "other"

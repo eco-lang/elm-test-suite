@@ -5,6 +5,7 @@ module EqualityOtherConstantsTest exposing (main)
 Each empty value (`""`, `[]`, `Nothing`) is held in an annotated local and compared with an equal literal, which is `True`, and with a non-empty value on either side, which is `False`. `() == ()` is `True`.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: emptyEmpty: True
 -- CHECK: emptyNonEmpty: False
 -- CHECK: nonEmptyEmpty: False

@@ -10,6 +10,7 @@ it fails on the empty list.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-exhaustiveness
 -- COMPILE-ERROR: UNSAFE PATTERN, All destruct patterns (EdgeCaseCases)
 -- CHECK: -- UNSAFE PATTERN -
 

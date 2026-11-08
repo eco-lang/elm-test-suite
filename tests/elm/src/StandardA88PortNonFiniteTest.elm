@@ -12,6 +12,7 @@ come back as `Just NaN` and `Just Infinity`.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, e-enc-float-null, e-dec-nothing
 -- CHECK: got: Nothing
 -- CHECK-NEXT: got: Nothing
 -- CHECK-NOT: Just

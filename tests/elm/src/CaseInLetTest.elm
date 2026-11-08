@@ -8,6 +8,7 @@ called with 5, 0 and -3.
 
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-atpat-con, d-atexp-let
 -- CHECK: let1: "positive"
 -- CHECK: let2: "zero"
 -- CHECK: let3: "negative"

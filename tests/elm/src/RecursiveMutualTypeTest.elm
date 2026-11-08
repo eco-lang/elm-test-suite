@@ -6,6 +6,7 @@ module RecursiveMutualTypeTest exposing (main)
 over each node's `Forest` of children.
 -}
 
+-- TAGS: elm-spec, sm-topdec-types, sm-datbind, d-pat-con
 -- CHECK: nodes: 4
 
 import Html exposing (text)

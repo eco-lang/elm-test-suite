@@ -8,6 +8,7 @@ otherwise. `opClosure 1 10` is therefore 20.
 
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-exp-lambda, d-app-closure
 -- CHECK: testValue: 20
 
 import Basics exposing (..)

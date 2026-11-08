@@ -11,6 +11,7 @@ the lambda passed to `mapAccuml`. Elm 0.19.1 crashes instead ("x [rank = 2]", Ty
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, not a compiler crash
 -- CHECK-NOT: HasCallStack
 -- CHECK: -- TYPE MISMATCH -

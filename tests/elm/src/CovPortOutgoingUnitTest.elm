@@ -7,6 +7,7 @@ program runs and logs `1`.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-portout, modules-ports
 -- CHECK: testValue: 1
 
 import Array

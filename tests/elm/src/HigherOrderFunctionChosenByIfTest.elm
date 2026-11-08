@@ -7,6 +7,7 @@ module HigherOrderFunctionChosenByIfTest exposing (..)
 
 -}
 
+-- TAGS: elm-spec, d-app-closure, d-exp-lambda
 -- CHECK: testValue: 2
 
 import Basics exposing (..)

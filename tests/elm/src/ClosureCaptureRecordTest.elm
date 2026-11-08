@@ -8,6 +8,7 @@ return a function adding 3 to its argument, so applied to 3 each logs 6.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure, d-atpat-tuple
 -- CHECK: rec: 6
 -- CHECK: tup: 6
 

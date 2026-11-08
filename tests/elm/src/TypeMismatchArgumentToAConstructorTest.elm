@@ -7,6 +7,7 @@ module TypeMismatchArgumentToAConstructorTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-longcon, sm-conbind
 -- COMPILE-ERROR: TYPE MISMATCH, argument to a constructor
 -- CHECK: -- TYPE MISMATCH -
 

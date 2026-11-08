@@ -4,6 +4,7 @@ module EmbeddedNothingInRecordTest exposing (main)
 `Nothing` pattern.
 -}
 
+-- TAGS: elm-spec, d-atexp-record, core-field-selection, d-atpat-con
 -- CHECK: result: "nothing"
 
 import Html exposing (text)

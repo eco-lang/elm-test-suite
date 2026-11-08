@@ -5,6 +5,7 @@ is applied to.
 `useCtor` takes an `Int -> Wrap` and pattern matches on its result;
 `useCtor Wrap 7` prints 7.
 -}
+-- TAGS: elm-spec, s-atexp-longcon, d-atexp-con, d-app-con
 -- CHECK: ctorAsValue: 7
 import Html exposing (text)
 type Wrap = Wrap Int

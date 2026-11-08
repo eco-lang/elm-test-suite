@@ -8,6 +8,7 @@ is never called.
 
 -}
 
+-- TAGS: elm-spec, modules-value-recursion, sm-topdec-value, dm-topdec-val
 -- CHECK: ok: ()
 
 import Html exposing (text)

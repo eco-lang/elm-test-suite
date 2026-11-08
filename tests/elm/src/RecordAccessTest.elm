@@ -5,6 +5,7 @@ module RecordAccessTest exposing (main)
 `main` logs `point.x`, `point.y` and `person.name`.
 -}
 
+-- TAGS: elm-spec, d-atexp-record, s-atpat-record, d-atpat-record, d-patrow-field
 -- CHECK: x: 1
 -- CHECK: y: 2
 -- CHECK: name: "Alice"

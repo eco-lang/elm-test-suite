@@ -8,6 +8,7 @@ to `sqrt` is used as a `Float`: `round (sqrt (negate (negate n)))` with
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: neg: 12
 
 import Html exposing (text)

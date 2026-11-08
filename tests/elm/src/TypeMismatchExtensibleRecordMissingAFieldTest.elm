@@ -5,6 +5,7 @@ module TypeMismatchExtensibleRecordMissingAFieldTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-record
 -- COMPILE-ERROR: TYPE MISMATCH, extensible record missing a field
 -- CHECK: -- TYPE MISMATCH -
 

@@ -7,6 +7,7 @@ The string `"hello"` matches none of them and reaches the wildcard.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-atpat-wild
 -- CHECK: esc1: "newline"
 -- CHECK: esc2: "tab"
 -- CHECK: esc3: "quote"

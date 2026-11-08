@@ -8,6 +8,7 @@ multiplication, are `Float`s.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: listrec: [45,60]
 
 import Html exposing (text)

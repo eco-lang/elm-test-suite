@@ -5,6 +5,7 @@ module NameClashTwoLetBindingsOfOneNameTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-binding-site-distinct
 -- COMPILE-ERROR: NAME CLASH, two let bindings of one name
 -- CHECK: -- NAME CLASH -
 

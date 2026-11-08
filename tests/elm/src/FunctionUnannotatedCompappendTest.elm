@@ -7,6 +7,7 @@ What is tested is that the definition type-checks and the program runs.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, s-atexp-op
 -- CHECK: testValue: 0
 
 import Basics exposing (..)

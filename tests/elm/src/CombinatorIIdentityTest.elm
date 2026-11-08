@@ -6,6 +6,7 @@ module CombinatorIIdentityTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, d-app-closure
 -- CHECK: result: 42
 
 import Html exposing (text)

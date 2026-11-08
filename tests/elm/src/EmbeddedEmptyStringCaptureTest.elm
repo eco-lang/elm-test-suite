@@ -4,6 +4,7 @@ module EmbeddedEmptyStringCaptureTest exposing (main)
 `let` sees it as empty, with length 0.
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure, d-valbind-pat
 -- CHECK: isEmpty: True
 -- CHECK: len: 0
 

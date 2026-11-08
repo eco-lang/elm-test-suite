@@ -3,6 +3,7 @@ module RecordUpdateTest exposing (main)
 {-| Record update syntax produces a new record with one field changed and leaves the original unchanged.
 -}
 
+-- TAGS: elm-spec, s-atexp-update, d-atexp-update
 -- CHECK: updated: { x = 10, y = 2 }
 -- CHECK: original: { x = 1, y = 2 }
 

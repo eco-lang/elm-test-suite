@@ -10,6 +10,7 @@ its memory grows without bound, or crashes.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-exp-app, s-ty-openrecord
 -- COMPILE-ERROR: a type error, not a hang
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: HasCallStack

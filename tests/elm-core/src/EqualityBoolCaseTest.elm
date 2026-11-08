@@ -9,6 +9,7 @@ unequal ones log `"no"`.
 
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-atpat-con, d-atpat-con-fail
 -- CHECK: cTT: "yes"
 -- CHECK: cTF: "no"
 -- CHECK: cFT: "no"

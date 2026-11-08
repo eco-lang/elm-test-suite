@@ -7,6 +7,7 @@ module TypeMismatchTwoRigidVarsTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, two rigid vars
 -- CHECK: -- TYPE MISMATCH -
 

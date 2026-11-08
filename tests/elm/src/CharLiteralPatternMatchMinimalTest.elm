@@ -8,6 +8,7 @@ pattern and once by binding the Char and comparing it with `==`. Every case shou
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-tuple, d-pat-con
 -- CHECK: m1_bareChar: "y"
 -- CHECK: m2_charInTuple: "y"
 -- CHECK: m3_charInMaybe: "y"

@@ -6,6 +6,7 @@ module TailRecNestedCaseTest exposing (main)
 the last element, using a `x :: []` pattern before the general `_ :: rest` one.
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-atpat-nil, d-atpat-nil-fail, d-match-first
 -- CHECK: find: True
 -- CHECK: nofind: False
 -- CHECK: last: 4

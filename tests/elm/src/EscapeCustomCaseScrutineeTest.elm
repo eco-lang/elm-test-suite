@@ -5,6 +5,7 @@ module EscapeCustomCaseScrutineeTest exposing (main)
 `unwrap (Just2 7)` returns 7 and `unwrap Nothing2` returns 0.
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-con
 -- CHECK: just: 7
 -- CHECK: nothing: 0
 

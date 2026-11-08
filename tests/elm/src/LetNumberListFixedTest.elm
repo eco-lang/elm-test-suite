@@ -8,6 +8,7 @@ so the test logs 105.
 
 -}
 
+-- TAGS: elm-spec, s-atexp-scon, d-atexp-scon, d-pat-cons
 -- CHECK: listfixed: 105
 
 import Html exposing (text)

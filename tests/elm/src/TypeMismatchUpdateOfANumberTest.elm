@@ -8,6 +8,7 @@ Only a record can be updated, and `n` is a number.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-update
 -- COMPILE-ERROR: TYPE MISMATCH, update of a number
 -- CHECK: -- TYPE MISMATCH -
 

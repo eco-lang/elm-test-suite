@@ -7,6 +7,7 @@ module TooManyArgsTooManyArgumentsToANullaryConstructorTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-longcon, sm-conbind
 -- COMPILE-ERROR: TOO MANY ARGS, too many arguments to a nullary constructor
 -- CHECK: -- TOO MANY ARGS -
 

@@ -3,6 +3,7 @@ module FloatMathTanTest exposing (..)
 {-| `tan 0` is 0.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: testValue: 0
 
 import Basics exposing (..)

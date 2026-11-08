@@ -4,6 +4,7 @@ module LocalTailRecSimpleTest exposing (main)
 the sum 1 + 2 + ... + 10 = 55.
 -}
 
+-- TAGS: elm-spec, s-valbind-var, s-dec-group, d-dec-rec
 -- CHECK: result: 55
 
 import Html exposing (text)

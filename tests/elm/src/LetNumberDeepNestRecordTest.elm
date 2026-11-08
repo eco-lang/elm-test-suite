@@ -7,6 +7,7 @@ is read through two field accesses and used as a `Float`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: deeprec: 45
 
 import Html exposing (text)

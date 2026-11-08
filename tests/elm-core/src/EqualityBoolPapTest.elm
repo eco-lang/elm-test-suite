@@ -10,6 +10,7 @@ contains each value.
 
 -}
 
+-- TAGS: elm-spec, d-atexp-op, d-app-basic-partial
 -- CHECK: isTrueList: [True,False,True,False]
 -- CHECK: isFalseList: [False,True,False,True]
 -- CHECK: filterTrue: [True,True]

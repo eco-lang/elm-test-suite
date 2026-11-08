@@ -6,6 +6,7 @@ module CombinatorCConsTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, d-atexp-op, d-app-closure
 -- CHECK: result: [1,2,3]
 
 import Html exposing (text)

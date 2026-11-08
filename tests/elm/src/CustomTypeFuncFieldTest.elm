@@ -8,6 +8,7 @@ an argument pattern and the function called.
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-pat-con, d-app-con
 -- CHECK: op1: 11
 -- CHECK: op2: 20
 

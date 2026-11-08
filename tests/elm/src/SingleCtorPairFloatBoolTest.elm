@@ -9,6 +9,7 @@ for 100.0.
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-con, d-atpat-con-fail
 -- CHECK: unwrap_float: 9.81
 -- CHECK: match_true: "yes"
 -- CHECK: match_false: "no"

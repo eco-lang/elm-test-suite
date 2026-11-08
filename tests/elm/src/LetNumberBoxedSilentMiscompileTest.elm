@@ -10,6 +10,7 @@ list held in a record field (`[45]`).
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: tuple: 45
 -- CHECK: record: 45
 -- CHECK: list: [45,60]

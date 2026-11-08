@@ -3,6 +3,7 @@ module FloatNegateTest exposing (main)
 {-| `negate` flips the sign of a positive and a negative Float, and `negate 0.0` prints as 0.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: neg1: -3.14
 -- CHECK: neg2: 3.14
 -- CHECK: neg3: 0

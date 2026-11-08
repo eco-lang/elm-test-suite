@@ -7,6 +7,7 @@ The annotated type's argument is itself a function type, `Int -> Int`.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-ty-con, s-ty-fun
 -- COMPILE-ERROR: TYPE MISMATCH, function in a type argument
 -- CHECK: -- TYPE MISMATCH -
 

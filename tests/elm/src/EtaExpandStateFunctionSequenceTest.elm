@@ -5,6 +5,7 @@ module EtaExpandStateFunctionSequenceTest exposing (..)
 `andThen` and `pure` are annotated against `St`, so each one's definition names the state as an extra parameter. `sequence []` falls to the wildcard branch, which runs `tick` and then returns `pure []`, so `List.length (sequence [] 0)` is 0.
 -}
 
+-- TAGS: elm-spec, sm-typbind, s-ty-con, s-valbind-var, d-pat-cons-fail
 -- CHECK: testValue: 0
 
 import Basics exposing (..)

@@ -12,6 +12,7 @@ Preview` extends the custom type `Preview`, and `id` then reads `p.id` from it. 
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-con
 -- COMPILE-ERROR: extending a non-record
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: not well-formed

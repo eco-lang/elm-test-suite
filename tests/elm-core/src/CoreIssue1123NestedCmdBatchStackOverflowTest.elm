@@ -11,6 +11,7 @@ is a valid command, so the program must run it and receive the inner task's resu
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, p-init, p-disp-task, e-msg-task, p-proc-message
 -- CHECK: got: 1
 
 import Task

@@ -7,6 +7,7 @@ module TooManyArgsTooManyArgumentsToAnOperatorTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-op
 -- COMPILE-ERROR: TOO MANY ARGS, too many arguments to an operator
 -- CHECK: -- TOO MANY ARGS -
 

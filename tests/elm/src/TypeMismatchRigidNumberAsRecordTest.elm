@@ -7,6 +7,7 @@ module TypeMismatchRigidNumberAsRecordTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-record
 -- COMPILE-ERROR: TYPE MISMATCH, rigid number as record
 -- CHECK: -- TYPE MISMATCH -
 

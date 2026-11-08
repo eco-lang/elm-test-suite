@@ -8,6 +8,7 @@ pattern `[]`.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-case, s-atpat-nil, s-atexp-scon
 -- COMPILE-ERROR: TYPE MISMATCH, list pattern
 -- CHECK: -- TYPE MISMATCH -
 

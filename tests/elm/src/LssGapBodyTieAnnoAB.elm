@@ -8,6 +8,7 @@ have identical bodies, `\y -> x + y`. Each is partially applied to 3 and
 passed to `apply`, which calls it with 4, printing 7 for both.
 -}
 
+-- TAGS: elm-spec, s-valbind-var, d-exp-lambda, d-app-closure
 -- CHECK: bodyTieAnn: 7
 -- CHECK: bodyTieInf: 7
 

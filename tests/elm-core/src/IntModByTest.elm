@@ -10,6 +10,7 @@ Among what is not tested: a negative modulus, and `modBy 0`.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: mod1: 3
 -- CHECK: mod2: 1
 -- CHECK: mod3: 3

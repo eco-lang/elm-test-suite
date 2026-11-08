@@ -11,6 +11,7 @@ everywhere else.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-con, s-ty-openrecord
 -- COMPILE-ERROR: duplicate field x through record extension
 -- CHECK: {{-- [A-Z ]+ -}}
 

@@ -6,6 +6,7 @@ the outer one stays an `Int`: matching `( ( 30, 40 ), 50 )` against
 logs 155.
 -}
 
+-- TAGS: elm-spec, s-atexp-scon, d-atexp-scon, d-atpat-tuple
 -- CHECK: nesttup: 155
 
 import Html exposing (text)

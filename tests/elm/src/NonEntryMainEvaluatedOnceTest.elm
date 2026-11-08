@@ -10,6 +10,7 @@ rejects a second `auxMain` line, which the CHECK-NEXT pair alone would accept.
 
 -}
 
+-- TAGS: elm-spec, p-dyn-module, dm-topdec-val
 -- CHECK: auxMain: "abab"
 -- CHECK-NEXT: uses: 2
 -- CHECK-NOT: {{auxMain[^\n]*\n[^\n]*auxMain}}

@@ -14,6 +14,7 @@ Fixed in Elm 0.19.2.
 -}
 
 -- TAGS: elm19-bug-fix
+-- TAGS: elm-spec, core-binding-site-distinct
 -- COMPILE-ERROR: NAME CLASH with a readable code excerpt
 -- CHECK: -- NAME CLASH -
 -- CHECK-NOT: {{ {200}[ ]}}

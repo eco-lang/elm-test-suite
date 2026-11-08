@@ -8,6 +8,7 @@ so `testValue` is 22.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, d-dec-rec, core-let-recursion
 -- CHECK: testValue: 22
 
 import Basics exposing (..)

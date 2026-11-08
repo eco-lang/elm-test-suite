@@ -7,6 +7,7 @@ builds the record, taking the fields in the order the alias declares them.
 
 -}
 
+-- TAGS: elm-spec, sm-typbind-record, dm-typbind
 -- CHECK: result: { bold = True, count = 42 }
 
 import Html exposing (text)

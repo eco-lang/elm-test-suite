@@ -4,6 +4,7 @@ module EmbeddedNothingMapTest exposing (main)
 each `Just` to its payload.
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-atpat-con
 -- CHECK: results: [-1,1,-1,2]
 
 import Html exposing (text)

@@ -6,6 +6,7 @@ The right operand calls a function that recurses without end, so the program
 only prints its two lines if that operand is skipped.
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-mrule-fail
 -- CHECK: shortAnd: False
 -- CHECK: shortOr: True
 

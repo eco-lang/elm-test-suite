@@ -16,6 +16,7 @@ are written directly. The tests:
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, d-app-closure, dm-topdec-seq
 -- CHECK: b_compose: 25
 -- CHECK: c_flip: -7
 -- CHECK: s_feed: 15

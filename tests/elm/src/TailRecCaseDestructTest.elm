@@ -8,6 +8,7 @@ destructures a list with `x :: xs` give the right results.
   - `myCountHelper 0 [10, 20, 30]`, which ignores each element with `_ :: rest`, counts 3.
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-atpat-nil, d-atpat-wild, d-atexp-op
 -- CHECK: foldl: 15
 -- CHECK: sum: 10
 -- CHECK: count: 3

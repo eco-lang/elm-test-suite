@@ -5,6 +5,7 @@ are each used as a `Float`: `round (r.lo * 1.5) + round (r.hi * 1.5)` with
 `r = { lo = 30, hi = 40 }` logs 105.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: multi: 105
 
 import Html exposing (text)

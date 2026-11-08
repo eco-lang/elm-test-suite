@@ -5,6 +5,7 @@ record's fields (`{ p, r }` from a record that also has `q`), and a record patte
 nested inside a tuple pattern.
 -}
 
+-- TAGS: elm-spec, s-atpat-record, d-atpat-record, d-patrow-field, d-valbind-pat
 -- CHECK: single: 42
 -- CHECK: multi: 3
 -- CHECK: partial: 4

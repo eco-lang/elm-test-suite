@@ -8,6 +8,7 @@ Elm generalises the binding `t = ( 30, 40 )`, so `Tuple.first t + 1` uses it at
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-longvar, core-number-default, d-atexp-scon
 -- CHECK: dual-int: 31
 -- CHECK: dual-float: 45
 

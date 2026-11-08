@@ -5,6 +5,7 @@ module MutualRecursionTest exposing (main)
 `isEven 0` is `True`, `isEven 5` is `False` and `isOdd 5` is `True`.
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, dm-topdec-val
 -- CHECK: isEven0: True
 -- CHECK: isEven5: False
 -- CHECK: isOdd5: True

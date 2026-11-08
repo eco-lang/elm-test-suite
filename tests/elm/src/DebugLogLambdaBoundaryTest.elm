@@ -9,6 +9,7 @@ the label `DebugLogLambdaBoundaryTest` and returns it, so `result` is `"hi"`.
 
 -}
 
+-- TAGS: elm-spec, s-atexp-longvar, d-atexp-var, d-exp-case
 -- CHECK: DebugLogLambdaBoundaryTest: "hi"
 -- CHECK: result: "hi"
 

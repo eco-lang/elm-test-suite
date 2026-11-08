@@ -8,6 +8,7 @@ to the number literal `1`, which cannot be a tuple.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-exp-lambda, s-atpat-tuple
 -- COMPILE-ERROR: TYPE MISMATCH, lambda argument pattern
 -- CHECK: -- TYPE MISMATCH -
 

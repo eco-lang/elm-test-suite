@@ -3,6 +3,7 @@ module CaseFanOutShadowTest exposing (main)
 {-| A function that destructures a custom type in its parameter and then cases on a `Result` combines the bound field with the `Ok` value, or returns -1 for `Err`.
 -}
 
+-- TAGS: elm-spec, s-pat-con, d-pat-con, d-pat-cons
 -- CHECK: r1: 5
 -- CHECK: r2: -1
 -- CHECK: r3: 0

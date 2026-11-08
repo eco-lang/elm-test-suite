@@ -8,6 +8,7 @@ A compiler that uses text of this kind as a marker in its own output must still 
 these literals as plain string data.
 -}
 
+-- TAGS: elm-spec, d-atexp-scon
 -- CHECK: s1: "__mlir_unknown_loc__"
 -- CHECK: s2: "__mlir_loc__:foo:1:2"
 -- CHECK: s3: "__mlir_loc__:"

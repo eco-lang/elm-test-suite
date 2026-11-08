@@ -7,6 +7,7 @@ The annotation fixes which fields `r` is known to have, so accessing a field not
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atpat-record, s-valbind-var, s-ty-openrecord
 -- COMPILE-ERROR: TYPE MISMATCH
 -- CHECK: -- TYPE MISMATCH -
 

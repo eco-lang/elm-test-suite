@@ -3,6 +3,7 @@ module MaybeJustTest exposing (main)
 {-| `Just` wraps an Int, a String and a Bool, and `Debug.log` prints each as `Just <value>`.
 -}
 
+-- TAGS: elm-spec, d-app-con
 -- CHECK: just1: Just 42
 -- CHECK: just2: Just "hello"
 -- CHECK: just3: Just True

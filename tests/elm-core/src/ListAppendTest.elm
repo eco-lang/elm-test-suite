@@ -3,6 +3,7 @@ module ListAppendTest exposing (main)
 {-| `List.append` and the `++` operator join two lists in order, and appending `[]` on the right leaves a list unchanged.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: append1: [1,2,3,4]
 -- CHECK: append_empty: [1,2]
 -- CHECK: concat_op: [1,2,3]

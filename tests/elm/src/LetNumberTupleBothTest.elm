@@ -5,6 +5,7 @@ module LetNumberTupleBothTest exposing (main)
 `p = ( 30, 40 )` logs 105.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: tupboth: 105
 
 import Html exposing (text)

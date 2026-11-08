@@ -7,6 +7,7 @@ The ASCII character `'x'` matches none of them and reaches the wildcard.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-atpat-wild
 -- CHECK: char1: "greek alpha"
 -- CHECK: char2: "greek beta"
 -- CHECK: char3: "cjk"

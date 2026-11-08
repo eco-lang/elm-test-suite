@@ -8,6 +8,7 @@ returns `a + d` = 1 + 4 = 5.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon-fail, d-match-next, d-atpat-tuple, d-atpat-wild
 -- CHECK: testValue: 5
 
 import Basics exposing (..)

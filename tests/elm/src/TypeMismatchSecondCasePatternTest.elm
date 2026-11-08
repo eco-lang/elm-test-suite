@@ -7,6 +7,7 @@ The patterns are `"a"`, `'c'` and `_`; the second does not match the type of the
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-match, s-atpat-scon
 -- COMPILE-ERROR: TYPE MISMATCH, second case pattern
 -- CHECK: -- TYPE MISMATCH -
 

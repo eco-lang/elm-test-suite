@@ -12,6 +12,7 @@ reassigns `item`, every lambda sees its last value, and the `tco` line prints `[
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: plain: [3,2,1]
 -- CHECK: tco: [3,2,1]
 

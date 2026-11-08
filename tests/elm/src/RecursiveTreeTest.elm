@@ -6,6 +6,7 @@ The tree `Branch (Branch (Leaf 1) (Leaf 2)) (Leaf 3)` sums to 6 and has depth 3,
 counting a `Leaf` as depth 1.
 -}
 
+-- TAGS: elm-spec, sm-datbind, d-pat-con, sm-topdec-value
 -- CHECK: sum: 6
 -- CHECK: depth: 3
 

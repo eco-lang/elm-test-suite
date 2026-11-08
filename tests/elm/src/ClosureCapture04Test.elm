@@ -7,6 +7,7 @@ used only as the subject of a `case`, and adds the extracted values.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: both: 30
 -- CHECK: first: 10
 -- CHECK: neither: 0

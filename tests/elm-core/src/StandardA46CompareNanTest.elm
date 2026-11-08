@@ -11,6 +11,7 @@ nan` are `GT`, and sorting with `compare` has no defined result.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: compare 1 nan: LT
 -- CHECK: compare nan nan: EQ
 -- CHECK: compare nan 1: GT

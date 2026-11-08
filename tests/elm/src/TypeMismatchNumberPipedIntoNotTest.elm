@@ -5,6 +5,7 @@ module TypeMismatchNumberPipedIntoNotTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, number piped into not
 -- CHECK: -- TYPE MISMATCH -
 

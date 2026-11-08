@@ -10,6 +10,7 @@ must say that `List` needs 1 argument and got 0, and must not mention a "type at
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-ty-con
 -- COMPILE-ERROR: TOO FEW ARGS, List without its argument
 -- CHECK: -- TOO FEW ARGS -
 -- CHECK: The `List` type needs 1 argument, but I see 0 instead

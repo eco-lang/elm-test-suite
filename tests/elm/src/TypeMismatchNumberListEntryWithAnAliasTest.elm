@@ -7,6 +7,7 @@ All entries of a list share one type, and the record `{ y : Int }` that `N` name
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app, s-atexp-scon
 -- COMPILE-ERROR: TYPE MISMATCH, number list entry with an alias
 -- CHECK: -- TYPE MISMATCH -
 

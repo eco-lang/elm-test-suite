@@ -8,6 +8,7 @@ In `Just 1 :: [ "a" ]` the tail is a `List String`, so the head must be a
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, Maybe consed onto a list of strings
 -- CHECK: -- TYPE MISMATCH -
 

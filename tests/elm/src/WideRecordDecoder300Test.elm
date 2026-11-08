@@ -9,6 +9,7 @@ reads back fields 0, 19, 20, 31, 32, 63, 64, 95, 96, 255, 256 and 299.
 
 -}
 
+-- TAGS: elm-spec, sm-typbind-record, dm-typbind, d-app-basic-partial, d-app-basic-apply
 -- CHECK: f0000: Just 1000
 -- CHECK: f0019: Just False
 -- CHECK: f0020: Just 1020

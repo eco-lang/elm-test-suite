@@ -17,6 +17,7 @@ other. Custom types are not `comparable`, so only `==` is used.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: ptEqual: True
 -- CHECK: ptXDiff: False
 -- CHECK: ptYDiff: False

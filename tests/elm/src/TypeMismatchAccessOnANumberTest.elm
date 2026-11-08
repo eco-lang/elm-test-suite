@@ -7,6 +7,7 @@ module TypeMismatchAccessOnANumberTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atpat-record, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, access on a number
 -- CHECK: -- TYPE MISMATCH -
 

@@ -4,6 +4,7 @@ module ListConcatTest exposing (main)
 gives the other list.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: append: [1,2,3,4]
 -- CHECK: concat: [1,2,3,4,5,6]
 -- CHECK: empty: [1,2,3]

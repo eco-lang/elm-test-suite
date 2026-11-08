@@ -8,6 +8,7 @@ and the other constructor, `Fixed`.
 
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-atpat-scon, d-atpat-scon-fail
 -- CHECK: r1: "greeting"
 -- CHECK: r2: "farewell"
 -- CHECK: r3: "unknown cmd"

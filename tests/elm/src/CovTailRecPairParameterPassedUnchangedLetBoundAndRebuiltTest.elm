@@ -8,6 +8,7 @@ test checks that these definitions compile and the program runs.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-pat, s-atpat-tuple, sm-topdec-value
 -- CHECK: testValue: <function>
 
 import Basics exposing (..)

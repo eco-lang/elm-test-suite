@@ -10,6 +10,7 @@ character, so the length must be 1, whichever character it is.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: length: 1
 
 import Html exposing (text)

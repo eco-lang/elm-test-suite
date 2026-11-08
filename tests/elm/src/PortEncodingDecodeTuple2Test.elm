@@ -8,6 +8,7 @@ and shows a text node, so the expected output is `testValue: 0`.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-portin
 -- CHECK: testValue: 0
 
 import Array exposing (..)

@@ -12,6 +12,7 @@ Each step decrements `k` and increments `counter`; `evenP` returns `True` and
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, d-dec-rec, core-let-recursion
 -- CHECK: evenResult: True
 -- CHECK: oddResult: False
 -- CHECK: callsEven: 4

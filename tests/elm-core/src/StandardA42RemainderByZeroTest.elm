@@ -13,6 +13,7 @@ In Elm 0.19.1 `remainderBy 0 7` is NaN, typed as an `Int`, and the NaN spreads: 
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: remainderBy 0 7 + 1 == 1: True
 -- CHECK: String.fromInt (remainderBy 0 7): "0"
 

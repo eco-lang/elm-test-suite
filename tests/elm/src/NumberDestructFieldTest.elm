@@ -12,6 +12,7 @@ used as `Float`s, while the third has its own parameter and is not, so
 
 -}
 
+-- TAGS: elm-spec, s-valbind-pat, s-dec-group, d-atexp-scon, core-number-default
 -- CHECK: tuple field: 2.5
 -- CHECK: list field: 1.25
 -- CHECK: record field: 4.5

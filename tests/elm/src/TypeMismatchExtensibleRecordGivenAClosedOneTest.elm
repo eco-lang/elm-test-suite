@@ -8,6 +8,7 @@ must be built from the argument; a literal with only `name` does not have that t
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-ty-openrecord, s-atexp-record
 -- COMPILE-ERROR: TYPE MISMATCH, extensible record given a closed one
 -- CHECK: -- TYPE MISMATCH -
 

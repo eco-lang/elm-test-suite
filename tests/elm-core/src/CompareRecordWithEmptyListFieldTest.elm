@@ -10,6 +10,7 @@ non-empty one.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: cmp_ee: EQ
 -- CHECK: cmp_eA: LT
 -- CHECK: cmp_Ae: GT

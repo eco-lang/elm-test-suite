@@ -7,6 +7,7 @@ The annotation is a closed record type, so a record with the extra field `age` d
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-record
 -- COMPILE-ERROR: TYPE MISMATCH, record field extra
 -- CHECK: -- TYPE MISMATCH -
 

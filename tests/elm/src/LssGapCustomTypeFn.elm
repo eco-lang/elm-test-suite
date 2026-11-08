@@ -2,6 +2,7 @@ module LssGapCustomTypeFn exposing (main)
 {-| A function stored in a custom type constructor can be pattern matched out
 and applied: `useBox (Box double) 7` prints 14.
 -}
+-- TAGS: elm-spec, sm-conbind, d-app-con, d-pat-con
 -- CHECK: customTypeFn: 14
 import Html exposing (text)
 type Box = Box (Int -> Int)

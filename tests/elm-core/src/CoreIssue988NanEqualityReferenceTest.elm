@@ -11,6 +11,7 @@ the same object, so both comparisons must give the same answer.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: same answer: True
 
 import Html exposing (text)

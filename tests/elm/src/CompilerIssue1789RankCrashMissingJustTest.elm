@@ -10,6 +10,7 @@ bug"); it should report a type mismatch.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-match, s-valbind-var
 -- COMPILE-ERROR: missing Just in a case branch
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: compiler bug

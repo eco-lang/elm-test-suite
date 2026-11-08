@@ -12,6 +12,7 @@ report an error.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-con
 -- COMPILE-ERROR: extending a non-record
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: CallStack

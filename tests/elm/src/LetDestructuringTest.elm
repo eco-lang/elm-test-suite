@@ -4,6 +4,7 @@ module LetDestructuringTest exposing (main)
 `head` logs the first element of the triple `(10, 20, 30)`.
 -}
 
+-- TAGS: elm-spec, d-valbind-pat, d-atpat-tuple
 -- CHECK: first: 1
 -- CHECK: second: 2
 -- CHECK: head: 10

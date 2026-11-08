@@ -11,6 +11,7 @@ infinity itself, typed as an `Int`, so each line below is `False`.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: round nan + 1 == 1: True
 -- CHECK: floor nan + 1 == 1: True
 -- CHECK: ceiling nan + 1 == 1: True

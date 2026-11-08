@@ -9,6 +9,7 @@ next counter with a partially applied `add3`.
 
 -}
 
+-- TAGS: elm-spec, s-atpat-record, d-patrow-field, d-dec-rec
 -- CHECK: testValue: 8
 
 import Basics exposing (..)

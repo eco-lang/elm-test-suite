@@ -12,6 +12,7 @@ module LambdaCaseBoundaryTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-atpat-con, d-exp-lambda, d-app-closure
 -- CHECK: add: 7
 -- CHECK: sub: 3
 -- CHECK: mul: 20

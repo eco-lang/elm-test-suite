@@ -9,6 +9,7 @@ TYPE MISMATCH error.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, sm-typbind, s-ty-con, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, type where an alias
 -- CHECK: -- TYPE MISMATCH -
 

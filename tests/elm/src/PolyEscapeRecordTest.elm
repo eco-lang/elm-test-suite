@@ -8,6 +8,7 @@ field calls the new function.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-update, d-atexp-update
 -- CHECK: result: 42
 -- CHECK: narrowed: 6
 

@@ -10,6 +10,7 @@ integer.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: {{code: [0-9]+(\n|$)}}
 
 import Html exposing (text)

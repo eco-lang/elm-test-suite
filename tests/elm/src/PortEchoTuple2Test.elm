@@ -9,6 +9,7 @@ value it logs `done` and `subscriptions` returns `Sub.none` so the program can f
 
 -}
 
+-- TAGS: elm-spec, e-enc-tuple, e-dec-tuple
 -- CHECK: PortEchoTuple2Test got: (1,"one")
 -- CHECK: PortEchoTuple2Test got: (-2,"")
 -- CHECK: PortEchoTuple2Test: "done"

@@ -8,6 +8,7 @@ sleep ends.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-portout, p-disp-out, p-disp-task, p-proc-sleep, p-proc-message
 -- MODE-GUARD: a Char equality must give the same answer as under --optimize
 -- NO-SKIP: an edge case every compiler must run
 -- CHECK: OutgoingPortTuple3Test: "sent"

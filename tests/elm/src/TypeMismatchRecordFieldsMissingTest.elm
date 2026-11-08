@@ -5,6 +5,7 @@ module TypeMismatchRecordFieldsMissingTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-record
 -- COMPILE-ERROR: TYPE MISMATCH, record fields missing
 -- CHECK: -- TYPE MISMATCH -
 

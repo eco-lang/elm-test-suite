@@ -12,6 +12,7 @@ through a record pattern, and after a record update.
 
 -}
 
+-- TAGS: elm-spec, d-atexp-record, d-atexp-update, d-atpat-record, d-patrow-field
 -- CHECK: access f27: 1027
 -- CHECK: access f25: 1025
 -- CHECK: pattern: 1028025

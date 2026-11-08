@@ -9,6 +9,7 @@ less than any other list.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: pairLt: LT
 -- CHECK: pairGt: GT
 -- CHECK: pairEq: EQ

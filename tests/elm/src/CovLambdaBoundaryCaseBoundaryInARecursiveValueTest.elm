@@ -7,6 +7,7 @@ one of which calls the function recursively.
 
 -}
 
+-- TAGS: elm-spec, modules-value-recursion, sm-topdec-value, dm-topdec-val, d-exp-case
 -- CHECK: testValue: 4
 
 import Basics exposing (..)

@@ -7,6 +7,7 @@ The pattern `a :: "s"` puts a string where the tail of the scrutinee `[ 1 ]` mus
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-pat-cons, s-atpat-scon
 -- COMPILE-ERROR: TYPE MISMATCH, tail pattern
 -- CHECK: -- TYPE MISMATCH -
 

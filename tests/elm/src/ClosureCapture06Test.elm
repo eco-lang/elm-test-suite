@@ -10,6 +10,7 @@ calls log `"ab"`, `"a"` and `""`.
 
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-pat-con
 -- CHECK: both: "ab"
 -- CHECK: one: "a"
 -- CHECK: none: ""

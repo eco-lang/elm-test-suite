@@ -10,6 +10,7 @@ Fields 0 to 24 are `Int`s; fields 25 to 29 are a `Float`, a `Char`, an `Int`, a
 
 -}
 
+-- TAGS: elm-spec, sm-typbind-record, dm-typbind, d-app-basic-partial, d-app-basic-apply
 -- CHECK: f0000: Just 1000
 -- CHECK: f0024: Just 1024
 -- CHECK: f0025: Just 25.5

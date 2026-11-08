@@ -7,6 +7,7 @@ Each case logs `"y"` when the pattern matches. The local `check` function is nev
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon
 -- CHECK: dquote: "y"
 -- CHECK: lbrace: "y"
 -- CHECK: lowerA: "y"

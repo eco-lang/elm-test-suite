@@ -9,6 +9,7 @@ number `1` and the `String` `"a"`.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-tuple, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, units on both sides
 -- CHECK: -- TYPE MISMATCH -
 

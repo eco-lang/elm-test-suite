@@ -16,6 +16,7 @@ pair `(4,3)` directly.
 
 -}
 
+-- TAGS: elm-spec, dm-topdec-val, d-exp-lambda, d-valbind-pat, d-app-closure
 -- CHECK: chooseIf called: 12
 -- CHECK: chooseIf folded: 6
 -- CHECK: chooseElse called: -1

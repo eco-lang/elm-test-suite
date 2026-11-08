@@ -15,6 +15,7 @@ logs three results:
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon
 -- CHECK: Creation.eq: True
 -- CHECK: Creation.dict: True
 -- CHECK: Creation.case: True

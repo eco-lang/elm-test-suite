@@ -3,6 +3,7 @@ module IntAddTest exposing (main)
 {-| Int addition gives the right sum for two positives, a positive and its negation, and two negatives.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: add1: 13
 -- CHECK: add2: 0
 -- CHECK: add3: -5

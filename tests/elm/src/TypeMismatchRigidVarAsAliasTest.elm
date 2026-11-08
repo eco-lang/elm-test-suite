@@ -7,6 +7,7 @@ module TypeMismatchRigidVarAsAliasTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, rigid var as alias
 -- CHECK: -- TYPE MISMATCH -
 

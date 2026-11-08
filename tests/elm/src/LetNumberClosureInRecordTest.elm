@@ -5,6 +5,7 @@ record field and then called with a Float: `rec.f 1.5` computes `1.5 * 30`, logg
 rounded as 45.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: closrec: 45
 
 import Html exposing (text)

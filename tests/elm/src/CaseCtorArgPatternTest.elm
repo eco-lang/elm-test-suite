@@ -3,6 +3,7 @@ module CaseCtorArgPatternTest exposing (main)
 {-| A single-constructor custom type can be destructured by a pattern in a function parameter, as in `getId (Person id _)`.
 -}
 
+-- TAGS: elm-spec, s-pat-con, d-pat-con
 -- CHECK: id: 30
 -- CHECK: age: 25
 

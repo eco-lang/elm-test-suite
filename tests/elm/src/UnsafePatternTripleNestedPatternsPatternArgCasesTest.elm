@@ -10,6 +10,7 @@ on the empty list.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-exhaustiveness
 -- COMPILE-ERROR: UNSAFE PATTERN, Triple nested patterns (PatternArgCases)
 -- CHECK: -- UNSAFE PATTERN -
 

@@ -7,6 +7,7 @@ module TypeMismatchTwoComparableVarsTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, sm-datbind, s-atexp-tuple, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, two comparable vars
 -- CHECK: -- TYPE MISMATCH -
 

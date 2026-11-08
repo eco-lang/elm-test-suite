@@ -13,6 +13,7 @@ The values are `True` and `False`.
 
 -}
 
+-- TAGS: elm-spec, e-enc-true, e-enc-false, e-dec-true, e-dec-false
 -- CHECK: PortEchoBoolTest got: True
 -- CHECK: PortEchoBoolTest got: False
 -- CHECK: PortEchoBoolTest: "done"

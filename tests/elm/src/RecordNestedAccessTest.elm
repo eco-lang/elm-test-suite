@@ -5,6 +5,7 @@ module RecordNestedAccessTest exposing (main)
 `r.nested.value` gives 42 and `s.a.b.c` gives 99.
 -}
 
+-- TAGS: elm-spec, core-field-selection, d-atpat-record, d-patrow-field
 -- CHECK: deep: 42
 -- CHECK: chain: 99
 

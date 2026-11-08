@@ -10,6 +10,7 @@ both processes have finished.
 
 -}
 
+-- TAGS: elm-spec, p-proc-spawn, p-proc-sleep, p-proc-step
 -- CHECK: yield: "A 1"
 -- CHECK: yield: "A 2"
 -- CHECK: yield: "A 3"

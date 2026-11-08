@@ -11,6 +11,7 @@ ran into a compiler bug"); it should report a type mismatch.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-valbind-var, s-exp-app
 -- COMPILE-ERROR: String vs a
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: compiler bug

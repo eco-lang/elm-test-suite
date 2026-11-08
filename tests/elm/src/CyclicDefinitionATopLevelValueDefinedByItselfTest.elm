@@ -7,6 +7,7 @@ module CyclicDefinitionATopLevelValueDefinedByItselfTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, modules-value-recursion
 -- COMPILE-ERROR: CYCLIC DEFINITION, a top-level value defined by itself
 -- CHECK: -- CYCLIC DEFINITION -
 

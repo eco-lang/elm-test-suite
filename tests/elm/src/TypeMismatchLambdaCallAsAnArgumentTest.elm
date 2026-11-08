@@ -8,6 +8,7 @@ is a call of a lambda rather than a named function.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-exp-lambda
 -- COMPILE-ERROR: TYPE MISMATCH, lambda call as an argument
 -- CHECK: -- TYPE MISMATCH -
 

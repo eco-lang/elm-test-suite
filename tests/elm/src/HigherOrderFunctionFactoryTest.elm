@@ -7,6 +7,7 @@ module HigherOrderFunctionFactoryTest exposing (..)
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure, d-atexp-tuple
 -- CHECK: testValue: (5,2)
 
 import Basics exposing (..)

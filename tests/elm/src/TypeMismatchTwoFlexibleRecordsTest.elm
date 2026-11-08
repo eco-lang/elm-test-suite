@@ -7,6 +7,7 @@ In `k c`, `c.name + 1` needs `name` to be a number, while passing `c` to `h`, wh
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atpat-record, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, two flexible records
 -- CHECK: -- TYPE MISMATCH -
 

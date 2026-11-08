@@ -7,6 +7,7 @@ module RecordChainedUpdatesTest exposing (..)
 
 -}
 
+-- TAGS: elm-spec, s-atexp-update, d-atexp-update
 -- CHECK: testValue: { x = 10, y = 20 }
 
 import Basics exposing (..)

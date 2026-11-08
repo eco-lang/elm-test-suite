@@ -9,6 +9,7 @@ first `Var "LE"` or `Var "BE"`; every other element is skipped by a tail call. I
 `[ Lit 1, Call "foo" [], Var "LE", Var "other" ]` that is position 2.
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-pat-con, d-pat-con-fail, d-atpat-scon
 -- CHECK: result: "found LE at 2"
 
 import Html exposing (text)

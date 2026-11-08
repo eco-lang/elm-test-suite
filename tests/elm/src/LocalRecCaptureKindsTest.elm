@@ -11,6 +11,7 @@ steps i by 2 until `i >= 4` and returns
 Starting from 2 also stops at 4, so the mapped list is `[110,110]`.
 -}
 
+-- TAGS: elm-spec, d-dec-rec, d-exp-lambda, d-app-closure
 -- CHECK: direct: 110
 -- CHECK: via_hof: [110,110]
 

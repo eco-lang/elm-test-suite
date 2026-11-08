@@ -9,6 +9,7 @@ unqualified.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-longcon
 -- COMPILE-ERROR: TYPE MISMATCH, type under an exposing list
 -- CHECK: -- TYPE MISMATCH -
 

@@ -9,6 +9,7 @@ program that confused `b` with the lambda's parameter `a` would print 200.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: result: 105
 
 import Html exposing (text)

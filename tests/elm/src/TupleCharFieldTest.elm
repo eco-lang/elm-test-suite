@@ -3,6 +3,7 @@ module TupleCharFieldTest exposing (main)
 {-| A tuple holding a `Char` and an `Int` (`( 'A', Char.toCode 'A' )`) is built and printed with both components intact.
 -}
 
+-- TAGS: elm-spec, s-atexp-tuple, d-atexp-tuple
 -- CHECK: pair: ('A',65)
 
 import Html exposing (text)

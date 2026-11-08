@@ -9,6 +9,7 @@ alone could, since each use of an annotated top-level function gets fresh type v
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, sm-datbind, s-atexp-tuple, s-exp-app, s-atexp-longvar
 -- COMPILE-ERROR: TYPE MISMATCH, differently named flex vars
 -- CHECK: -- TYPE MISMATCH -
 

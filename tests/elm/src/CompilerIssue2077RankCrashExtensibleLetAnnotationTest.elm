@@ -12,6 +12,7 @@ plain argument of `test` and is not polymorphic. Elm 0.19.1 crashes
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: let annotation is too general
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: compiler bug

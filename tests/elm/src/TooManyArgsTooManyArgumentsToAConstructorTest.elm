@@ -5,6 +5,7 @@ module TooManyArgsTooManyArgumentsToAConstructorTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-longcon
 -- COMPILE-ERROR: TOO MANY ARGS, too many arguments to a constructor
 -- CHECK: -- TOO MANY ARGS -
 

@@ -10,6 +10,7 @@ the error.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-con
 -- COMPILE-ERROR: a kind error, not a crash or a hang
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: HasCallStack

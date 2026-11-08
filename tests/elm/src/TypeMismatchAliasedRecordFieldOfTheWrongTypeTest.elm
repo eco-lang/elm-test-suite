@@ -7,6 +7,7 @@ module TypeMismatchAliasedRecordFieldOfTheWrongTypeTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-ty-con, s-atexp-record
 -- COMPILE-ERROR: TYPE MISMATCH, aliased record field of the wrong type
 -- CHECK: -- TYPE MISMATCH -
 

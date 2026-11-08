@@ -7,6 +7,7 @@ Prefix minus is `negate`, which takes a `number`, and a `String` is not one.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, negate
 -- CHECK: -- TYPE MISMATCH -
 

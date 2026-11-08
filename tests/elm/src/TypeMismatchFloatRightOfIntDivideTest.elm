@@ -4,6 +4,7 @@ module TypeMismatchFloatRightOfIntDivideTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app, s-atexp-scon
 -- COMPILE-ERROR: TYPE MISMATCH, Float right of //
 -- CHECK: -- TYPE MISMATCH -
 

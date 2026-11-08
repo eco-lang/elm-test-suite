@@ -8,6 +8,7 @@ text itself is not checked.
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-app-con
 -- CHECK: person
 
 import Html exposing (text)

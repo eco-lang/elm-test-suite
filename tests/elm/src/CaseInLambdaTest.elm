@@ -9,6 +9,7 @@ passed straight to another function.
 
 -}
 
+-- TAGS: elm-spec, s-exp-lambda, d-exp-case, d-app-closure
 -- CHECK: lambda1: "yes"
 -- CHECK: lambda2: "no"
 -- CHECK: lambda3: "yes"

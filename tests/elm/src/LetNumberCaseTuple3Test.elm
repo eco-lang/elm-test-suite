@@ -8,6 +8,7 @@ in the second sum makes them Floats, giving 61.0, which is logged rounded as 61.
 
 -}
 
+-- TAGS: elm-spec, s-atexp-scon, core-number-default, d-atexp-scon
 -- CHECK: case-tuple3-int: 60
 -- CHECK: case-tuple3-float: 61
 

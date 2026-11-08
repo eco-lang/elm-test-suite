@@ -3,6 +3,7 @@ module CaseDeeplyNestedTest exposing (main)
 {-| Case expressions on `Maybe` nested three levels deep reach the right innermost branch.
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-pat-con, d-atpat-con
 -- CHECK: deep1: "all"
 -- CHECK: deep2: "two"
 

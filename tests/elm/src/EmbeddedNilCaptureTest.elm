@@ -4,6 +4,7 @@ module EmbeddedNilCaptureTest exposing (main)
 matches it against the `[]` pattern.
 -}
 
+-- TAGS: elm-spec, s-atexp-nil, d-exp-lambda, d-atpat-nil
 -- CHECK: result: "empty"
 
 import Html exposing (text)

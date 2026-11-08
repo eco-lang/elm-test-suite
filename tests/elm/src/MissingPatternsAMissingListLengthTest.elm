@@ -8,6 +8,7 @@ elements, so the match is not exhaustive.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-exhaustiveness
 -- COMPILE-ERROR: MISSING PATTERNS, a missing list length
 -- CHECK: -- MISSING PATTERNS -
 

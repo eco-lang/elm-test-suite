@@ -5,6 +5,7 @@ module NameClashARecordFieldGivenTwiceTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-row-labels-distinct
 -- COMPILE-ERROR: NAME CLASH, a record field given twice
 -- CHECK: -- NAME CLASH -
 

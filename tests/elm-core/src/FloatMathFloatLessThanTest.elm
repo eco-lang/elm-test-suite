@@ -3,6 +3,7 @@ module FloatMathFloatLessThanTest exposing (..)
 {-| `<` on two Float literals, `1.5 < 2.5`, is True.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: testValue: True
 
 import Basics exposing (..)

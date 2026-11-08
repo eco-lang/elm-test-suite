@@ -7,6 +7,7 @@ Both have type `Int -> Int`. `f` is `addN 10`, so `f 3` is 13. `g` is
 
 -}
 
+-- TAGS: elm-spec, d-app-closure, d-exp-lambda
 -- CHECK: hetero_true: 13
 -- CHECK: hetero_false: 10
 

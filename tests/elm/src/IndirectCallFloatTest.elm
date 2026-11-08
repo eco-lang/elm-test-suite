@@ -8,6 +8,7 @@ shadows the one from `Basics`.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-seq, s-atexp-op, d-app-closure
 -- CHECK: apply_double: 10
 -- CHECK: apply_negate: -3
 -- CHECK: apply_addTen: 15

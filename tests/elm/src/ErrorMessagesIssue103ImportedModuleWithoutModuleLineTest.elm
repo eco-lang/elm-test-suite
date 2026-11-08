@@ -11,6 +11,7 @@ It must not assume the module is called `Main` and report a name mismatch ("shou
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, modules-header
 -- COMPILE-ERROR: MODULE NAME MISSING, an imported module has no module line
 -- CHECK: -- MODULE NAME MISSING -
 -- CHECK: module ErrorMessagesIssue103NoModuleLineHelper exposing (..)

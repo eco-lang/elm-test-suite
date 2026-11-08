@@ -4,6 +4,7 @@ module ArrayEqAfterPushTest exposing (main)
 same elements, for lengths 96, 128 and 160.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: push96: True
 -- CHECK: push128: True
 -- CHECK: push160: True

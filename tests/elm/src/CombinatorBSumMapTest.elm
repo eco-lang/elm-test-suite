@@ -7,6 +7,7 @@ rather than to functions defined in the module.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, d-app-closure, d-app-basic-partial
 -- CHECK: result: 9
 
 import Html exposing (text)

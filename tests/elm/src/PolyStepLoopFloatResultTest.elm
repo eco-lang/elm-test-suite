@@ -11,6 +11,7 @@ finishes with `Done 3.14`, so the result is 3.14 and the state 0 + 3 + 2 + 1 + 0
 
 -}
 
+-- TAGS: elm-spec, sm-typbind, s-ty-con, s-valbind-var, s-valbind-pat
 -- CHECK: result: 3.14
 -- CHECK: state: 6
 

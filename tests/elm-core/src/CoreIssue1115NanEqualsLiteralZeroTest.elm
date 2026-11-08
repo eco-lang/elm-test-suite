@@ -11,6 +11,7 @@ right.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: nan == 0: False
 -- CHECK: 0 == nan: False
 -- CHECK: nan == zero: False

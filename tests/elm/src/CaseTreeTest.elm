@@ -8,6 +8,7 @@ two children (3).
 
 -}
 
+-- TAGS: elm-spec, sm-datbind, d-pat-con, d-atpat-con
 -- CHECK: tree1: 0
 -- CHECK: tree2: 1
 -- CHECK: tree3: 3

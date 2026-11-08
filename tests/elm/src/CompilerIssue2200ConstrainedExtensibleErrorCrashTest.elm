@@ -12,6 +12,7 @@ MISMATCH report and then crashes with "Used toErrorType on a type that is not we
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-openrecord
 -- COMPILE-ERROR: TYPE MISMATCH, printed completely
 -- CHECK-NOT: HasCallStack
 -- CHECK: -- TYPE MISMATCH -

@@ -7,6 +7,7 @@ Inside `g : { r | name : Int } -> Int`, a local `h a` uses `a.name ++ "s"` and b
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-tuple, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, rigid extension where flexible after a mismatch
 -- CHECK: -- TYPE MISMATCH -
 

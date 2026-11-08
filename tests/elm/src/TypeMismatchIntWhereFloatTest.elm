@@ -8,6 +8,7 @@ conversion from `Int` to `Float`; `toFloat` must be called explicitly.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, Int where Float
 -- CHECK: -- TYPE MISMATCH -
 

@@ -8,6 +8,7 @@ The module defines `type alias Bool = Int`, so `b : Bool` is an `Int`. The list
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, sm-typbind, sm-topdec-seq, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, alias named like an imported type
 -- CHECK: -- TYPE MISMATCH -
 

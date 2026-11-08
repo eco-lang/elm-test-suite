@@ -8,6 +8,7 @@ evaluating it would never finish.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-let-recursion
 -- COMPILE-ERROR: CYCLIC VALUE, a let value defined by itself
 -- CHECK: -- CYCLIC VALUE -
 

@@ -13,6 +13,7 @@ import Html exposing (text)
 
 
 
+-- TAGS: elm-spec, sm-topdec-value, d-app-closure
 -- CHECK: b_compose: 25
 -- CHECK: s_feed: 15
 

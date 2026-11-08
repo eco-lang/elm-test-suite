@@ -9,6 +9,7 @@ fields 0, 24 and 25 read back as `Just 1000`, `Just 1024` and `Just 1025`.
 
 -}
 
+-- TAGS: elm-spec, sm-typbind-record, dm-typbind, d-app-basic-partial, d-app-basic-apply
 -- CHECK: f0000: Just 1000
 -- CHECK: f0024: Just 1024
 -- CHECK: f0025: Just 1025

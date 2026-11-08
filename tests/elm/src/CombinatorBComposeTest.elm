@@ -7,6 +7,7 @@ point-free definition `s (k s) k`.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, d-app-closure
 -- CHECK: result: 25
 
 import Html exposing (text)

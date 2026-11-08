@@ -5,6 +5,7 @@ point, next to an `Int` field and after a record update, and a record holding
 one is equal to a record literal with the same fields.
 -}
 
+-- TAGS: elm-spec, d-atexp-update, d-atexp-record
 -- CHECK: rec_c: 128512
 -- CHECK: rec_n: 7
 -- CHECK: rec_updated: 119070

@@ -8,6 +8,7 @@ to 26 and adds field 24 of two separately built values (2048).
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, dm-conbind, d-app-con, d-pat-con
 -- CHECK: field23: 1023
 -- CHECK: field24: 1024
 -- CHECK: field25: 2.5

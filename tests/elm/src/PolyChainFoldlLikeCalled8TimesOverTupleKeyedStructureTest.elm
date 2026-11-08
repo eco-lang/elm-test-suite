@@ -9,6 +9,7 @@ every call returns 0.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-var, s-atexp-longvar, s-dec-group, s-atexp-nil
 -- CHECK: testValue: 0
 
 import Basics exposing (..)

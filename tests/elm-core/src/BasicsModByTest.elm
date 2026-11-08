@@ -4,6 +4,7 @@ module BasicsModByTest exposing (main)
 not of the dividend.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: mod_pos: 1
 -- CHECK: mod_neg: 2
 -- CHECK: mod_zero: 0

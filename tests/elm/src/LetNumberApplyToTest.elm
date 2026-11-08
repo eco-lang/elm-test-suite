@@ -5,6 +5,7 @@ through a generic higher-order function: `round (applyTo (\x -> x * 1.5) n)` wit
 `n = 30` gives 45.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: applyTo: 45
 
 import Html exposing (text)

@@ -4,6 +4,7 @@ module EmbeddedNothingInTupleTest exposing (main)
 and each matches the right pattern.
 -}
 
+-- TAGS: elm-spec, d-valbind-pat, d-atpat-tuple, d-atpat-con, d-pat-con
 -- CHECK: first: "nothing"
 -- CHECK: second: 42
 

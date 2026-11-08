@@ -7,6 +7,7 @@ module TypeMismatchAccessOnAnEmptyRecordTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atpat-record, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, access on an empty record
 -- CHECK: -- TYPE MISMATCH -
 

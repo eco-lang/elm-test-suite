@@ -14,6 +14,7 @@ The test checks:
 
 -}
 
+-- TAGS: elm-spec, d-atexp-record, d-exprow-field, d-atpat-record, d-patrow-field, d-atexp-update
 -- CHECK: f0000: 1000
 -- CHECK: f0031: 31.5
 -- CHECK: f0032: 'g'

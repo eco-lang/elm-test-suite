@@ -13,6 +13,7 @@ Elm 0.19.1 does not crash but compiles the program, accepting the ill-formed typ
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-con, sm-typbind
 -- COMPILE-ERROR: extensible record alias applied to the unit type
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: bypassed the normal error reporting

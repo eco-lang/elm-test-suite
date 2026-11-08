@@ -5,6 +5,7 @@ that uses each element as a Float: `x * 1.5` then `round` turns `[30, 40]` into
 `[45,60]`.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: array: [45,60]
 
 import Array

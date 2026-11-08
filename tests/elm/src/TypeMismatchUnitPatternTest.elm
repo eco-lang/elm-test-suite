@@ -9,6 +9,7 @@ argument.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atpat-unit
 -- COMPILE-ERROR: TYPE MISMATCH, unit pattern
 -- CHECK: -- TYPE MISMATCH -
 

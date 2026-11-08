@@ -7,6 +7,7 @@ Folding `[ (+1), (*2), (-3) ]` over `5` gives `6`, `12`, then `9`.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-pat, d-valbind-pat, d-atpat-tuple, d-atpat-record
 -- CHECK: testValue: 9
 
 import Basics exposing (..)

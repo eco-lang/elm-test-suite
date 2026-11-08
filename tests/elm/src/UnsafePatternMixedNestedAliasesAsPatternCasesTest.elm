@@ -10,6 +10,7 @@ list.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-exhaustiveness
 -- COMPILE-ERROR: UNSAFE PATTERN, Mixed nested aliases (AsPatternCases)
 -- CHECK: -- UNSAFE PATTERN -
 

@@ -8,6 +8,7 @@ The test logs `add 2 3` (5), `double 5` (10) and `identity 42` (42), where
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-seq, dm-topdec-seq, d-app-closure
 -- CHECK: add1: 5
 -- CHECK: double1: 10
 -- CHECK: identity1: 42

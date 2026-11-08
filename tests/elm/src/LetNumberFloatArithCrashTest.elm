@@ -12,6 +12,7 @@ Each top-level value binds `n` in its own `let` and returns a `Float`:
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: sqrt: 12
 -- CHECK: add: 31
 -- CHECK: div: 6

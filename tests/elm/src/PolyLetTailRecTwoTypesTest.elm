@@ -8,6 +8,7 @@ One use sums a `List Int` (6); the other counts the elements of a `List String`
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-let, d-dec-rec
 -- CHECK: r: (6,2)
 
 import Html exposing (text)

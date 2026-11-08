@@ -4,6 +4,7 @@ module BasicsClampTest exposing (main)
 15, and `clamp 1.0 5.0` leaves 3.5 unchanged.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: clamp_low: 5
 -- CHECK: clamp_mid: 7
 -- CHECK: clamp_high: 10

@@ -5,6 +5,7 @@ module TypeMismatchCompappendListEntryWithABoolTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, compappend list entry with a Bool
 -- CHECK: -- TYPE MISMATCH -
 

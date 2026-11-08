@@ -11,6 +11,7 @@ three are expected to wake first, in any order, and the reference last.
 
 -}
 
+-- TAGS: elm19-quirks
 -- CHECK-DAG: sleep: "inf: woke first"
 -- CHECK-DAG: sleep: "nan: woke first"
 -- CHECK-DAG: sleep: "huge: woke first"

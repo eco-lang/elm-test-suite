@@ -3,6 +3,7 @@ module CombinatorSpMulTest exposing (main)
 {-| The SP combinator with operator sections as its functions: `sp (*) ((+) 1) ((*) 2) 6` is `7 * 12`, which is 84.
 -}
 
+-- TAGS: elm-spec, d-atexp-op, d-app-basic-partial, d-app-closure
 -- CHECK: result: 84
 
 import Html exposing (text)

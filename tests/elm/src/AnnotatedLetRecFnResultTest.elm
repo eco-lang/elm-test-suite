@@ -8,6 +8,7 @@ steps, doubling the number of applications each time, so `twice 4` applies
 
 -}
 
+-- TAGS: elm-spec, s-valbind-var, s-dec-group, d-dec-rec
 -- CHECK: AnnotatedLetRecFnResultTest: 16
 
 import Html exposing (text)

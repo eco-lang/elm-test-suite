@@ -5,6 +5,7 @@ module LetNumberMixedTupleSlotTest exposing (main)
 `( a, _, c )` and adding `round (a * 1.5)` to `round (c * 1.5)` logs 105.
 -}
 
+-- TAGS: elm-spec, s-atexp-scon, d-atexp-scon, d-atpat-tuple
 -- CHECK: mixedslot: 105
 
 import Html exposing (text)

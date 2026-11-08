@@ -8,6 +8,7 @@ With `n = 30`, the pair `( n + 1, round (1.5 * n) )` logs `(31,45)`. The
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, core-number-default, d-atexp-scon
 -- CHECK: dual: (31,45)
 
 import Html exposing (text)

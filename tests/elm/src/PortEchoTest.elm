@@ -9,6 +9,7 @@ program can finish.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-portout, sm-topdec-portin, e-enc-int, e-dec-int, p-in-accept, e-msg-port
 -- CHECK: PortEchoTest got: 42
 -- CHECK: PortEchoTest done: "ok"
 

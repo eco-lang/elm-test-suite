@@ -13,6 +13,7 @@ The values are an empty array and a three-element array.
 
 -}
 
+-- TAGS: elm-spec, e-enc-array, e-dec-array, e-enc-string, e-dec-string
 -- CHECK: PortEchoArrayStringTest got: Array.fromList []
 -- CHECK: PortEchoArrayStringTest got: Array.fromList ["a","b","c"]
 -- CHECK: PortEchoArrayStringTest: "done"

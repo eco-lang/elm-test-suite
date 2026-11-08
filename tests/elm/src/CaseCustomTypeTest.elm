@@ -3,6 +3,7 @@ module CaseCustomTypeTest exposing (main)
 {-| A case on a custom type whose constructors carry different numbers of arguments binds those arguments in each branch.
 -}
 
+-- TAGS: elm-spec, s-pat-con, d-pat-con, d-pat-con-fail
 -- CHECK: shape1: 100
 -- CHECK: shape2: 50
 

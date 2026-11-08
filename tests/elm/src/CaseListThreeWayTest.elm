@@ -8,6 +8,7 @@ The three-element list `[1, 2, 3]` reaches `x :: xs`, and its result shows that
 
 -}
 
+-- TAGS: elm-spec, d-match-first, d-pat-cons, d-atpat-nil-fail
 -- CHECK: desc1: "empty"
 -- CHECK: desc2: "single: 42"
 -- CHECK: desc3: "multiple: 1"

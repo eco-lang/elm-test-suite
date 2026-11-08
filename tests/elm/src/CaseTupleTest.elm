@@ -8,6 +8,7 @@ four inputs reaches a different one.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-tuple, d-atpat-scon-fail, d-match-first
 -- CHECK: pair1: "both zero"
 -- CHECK: pair2: "x is zero"
 -- CHECK: pair3: "y is zero"

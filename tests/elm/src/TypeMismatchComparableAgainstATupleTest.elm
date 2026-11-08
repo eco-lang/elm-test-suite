@@ -9,6 +9,7 @@ components are a number and a `String`, which cannot agree. Their second compone
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-tuple, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, comparable against a tuple
 -- CHECK: -- TYPE MISMATCH -
 

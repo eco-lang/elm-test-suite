@@ -6,6 +6,7 @@ module RecordChainedUpdateTest exposing (main)
 of that result.
 -}
 
+-- TAGS: elm-spec, s-atexp-update, d-atexp-update
 -- CHECK: multi: { x = 100, y = 20, z = 300 }
 -- CHECK: chain: { x = 10, y = 20 }
 

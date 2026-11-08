@@ -14,6 +14,7 @@ Fixed in Elm 0.19.2.
 -}
 
 -- TAGS: elm19-bug-fix
+-- TAGS: elm-spec, core-record-update-form
 -- COMPILE-ERROR: record update without fields
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: -- EXTRA COMMA

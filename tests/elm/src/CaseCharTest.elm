@@ -3,6 +3,7 @@ module CaseCharTest exposing (main)
 {-| A case on Char with literal vowel branches and a wildcard picks the matching literal, falling back to the wildcard for other characters.
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-atpat-wild
 -- CHECK: char1: "vowel a"
 -- CHECK: char2: "vowel e"
 -- CHECK: char3: "other"

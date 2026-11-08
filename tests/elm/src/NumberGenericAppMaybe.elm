@@ -5,6 +5,7 @@ module NumberGenericAppMaybe exposing (main)
 can be used in `Float` arithmetic: `round (1.5 * n)` logs 45.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: numgenapp: 45
 
 import Html exposing (text)

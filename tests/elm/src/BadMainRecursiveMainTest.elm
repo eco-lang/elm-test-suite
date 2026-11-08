@@ -7,6 +7,7 @@ module BadMainRecursiveMainTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, program-main, p-stat-main-program, p-stat-main-view
 -- COMPILE-ERROR: BAD MAIN, recursive main
 -- CHECK: -- BAD MAIN -
 

@@ -3,6 +3,7 @@ module TaskSucceedAsArgTest exposing (main)
 {-| `Task.succeed`, passed as a function value to a polymorphic `apply : (a -> b) -> a -> b` with `a` instantiated to `Int`, produces a task that `Task.perform` delivers to `update` with the value 7.
 -}
 
+-- TAGS: elm-spec, d-app-basic-apply, e-msg-task
 -- CHECK: got: 7
 
 import Platform

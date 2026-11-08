@@ -8,6 +8,7 @@ to get `b`, matches that, and logs `ok: ()`.
 
 -}
 
+-- TAGS: elm-spec, modules-value-recursion, sm-topdec-value, dm-topdec-val
 -- CHECK: ok: ()
 
 import Html exposing (text)

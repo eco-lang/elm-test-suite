@@ -4,6 +4,7 @@ module EmbeddedMixedConstantsTest exposing (main)
 unchanged when its field is read.
 -}
 
+-- TAGS: elm-spec, d-atexp-record, d-exprow-field, core-field-selection
 -- CHECK: m: Nothing
 -- CHECK: l: []
 -- CHECK: b: True

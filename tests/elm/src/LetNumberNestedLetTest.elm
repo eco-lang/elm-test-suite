@@ -4,6 +4,7 @@ module LetNumberNestedLetTest exposing (main)
 a `Float`: `n = 30`, then `m = n`, then `round (m * 1.5)` logs 45.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: nestedlet: 45
 
 import Html exposing (text)

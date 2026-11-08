@@ -8,6 +8,7 @@ extra term in `innerBig` is multiplied by `0`, so every `n` from `3` down to
 `0` logs `42`.
 -}
 
+-- TAGS: elm-spec, s-dec-group, d-dec-rec, d-exp-lambda
 -- CHECK: go 3: 42
 -- CHECK: go 2: 42
 -- CHECK: go 1: 42

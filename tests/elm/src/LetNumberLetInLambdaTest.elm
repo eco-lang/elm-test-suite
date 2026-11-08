@@ -7,6 +7,7 @@ multiplied by a `Float` is a `Float`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: lamlet: 45
 
 import Html exposing (text)

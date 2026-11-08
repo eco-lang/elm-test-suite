@@ -10,6 +10,7 @@ module CompilerIssue2019AliasOfTypeVariableTest exposing (..)
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, sm-typbind, s-ty-con
 -- CHECK: test: 1
 
 import Html exposing (text)

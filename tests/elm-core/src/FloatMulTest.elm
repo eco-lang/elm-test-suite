@@ -6,6 +6,7 @@ Whole-number results print without a decimal point, so `10.0 * 3.0` prints as 30
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: mul1: 30
 -- CHECK: mul2: -15
 -- CHECK: mul3: 6

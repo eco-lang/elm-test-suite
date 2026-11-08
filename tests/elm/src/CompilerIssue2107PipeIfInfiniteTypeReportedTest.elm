@@ -12,6 +12,7 @@ infinite, so `∞` must not appear.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-match
 -- COMPILE-ERROR: TYPE MISMATCH without an infinite type
 -- CHECK: -- TYPE MISMATCH -
 -- CHECK-NOT: ∞

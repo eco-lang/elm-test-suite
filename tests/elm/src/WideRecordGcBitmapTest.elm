@@ -9,6 +9,7 @@ that the two counts add to 200000 and that `w1.p ++ w2.a` has length 2.
 
 -}
 
+-- TAGS: elm-spec, d-atexp-record, d-atpat-record, d-patrow-field
 -- CHECK: WideRecordGcBitmap: 200000
 -- CHECK: WideRecordGcBitmapTag: 2
 

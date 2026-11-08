@@ -10,6 +10,7 @@ variable.
 
 -}
 
+-- TAGS: elm-spec, sm-datbind, s-dec-group, d-pat-con, d-atexp-scon
 -- CHECK: nestcustom: 45
 
 import Html exposing (text)

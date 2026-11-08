@@ -8,6 +8,7 @@ A record update keeps the record's type, so the new value of `x` must still be a
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-update
 -- COMPILE-ERROR: TYPE MISMATCH, update value
 -- CHECK: -- TYPE MISMATCH -
 

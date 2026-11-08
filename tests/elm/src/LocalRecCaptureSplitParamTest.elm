@@ -11,6 +11,7 @@ From `( 0, 0 )` with n = 2 the pair becomes `( 2, 4 )`, so each prints
 3 + 2 + 4 = 9.
 -}
 
+-- TAGS: elm-spec, d-dec-rec, d-exp-lambda, d-app-closure
 -- CHECK: o2: 9
 -- CHECK: o3: 9
 

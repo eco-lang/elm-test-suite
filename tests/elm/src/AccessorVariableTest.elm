@@ -3,6 +3,7 @@ module AccessorVariableTest exposing (main)
 {-| A record accessor works when bound to a variable, and `.name` works on lists of two different record types.
 -}
 
+-- TAGS: elm-spec, s-atpat-record, d-patrow-field
 -- CHECK: via_var: 42
 -- CHECK: mapped: [10,20,30]
 -- CHECK: person_name: "Alice"

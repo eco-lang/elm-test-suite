@@ -8,6 +8,7 @@ module TypeMismatchFlexibleRecordWhereClosedAfterAMismatchTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-tuple, s-atpat-record
 -- COMPILE-ERROR: TYPE MISMATCH, flexible record where closed after a mismatch
 -- CHECK: -- TYPE MISMATCH -
 

@@ -12,6 +12,7 @@ failed unification with the second branch `takesString ""`.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-match, s-exp-case
 -- COMPILE-ERROR: TYPE MISMATCH that shows the first branch's real type
 -- CHECK: -- TYPE MISMATCH -
 -- CHECK-NOT: Thing a (Thing a b)

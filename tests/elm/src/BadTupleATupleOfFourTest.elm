@@ -7,6 +7,7 @@ Elm tuples have at most three elements; `testValue` is `( 1, 2, 3, 4 )`.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-tuple
 -- COMPILE-ERROR: BAD TUPLE, a tuple of four
 -- CHECK: -- BAD TUPLE -
 

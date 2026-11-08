@@ -9,6 +9,7 @@ value has.
 
 -}
 
+-- TAGS: elm-spec, sm-datbind, sm-conbind, d-pat-con, d-pat-con-fail
 -- CHECK: left: 42
 -- CHECK: right: 0
 -- CHECK: mapLeft: 84

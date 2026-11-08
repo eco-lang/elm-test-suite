@@ -7,6 +7,7 @@ module TypeMismatchRigidExtensionWhereClosedTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-ty-openrecord
 -- COMPILE-ERROR: TYPE MISMATCH, rigid extension where closed
 -- CHECK: -- TYPE MISMATCH -
 

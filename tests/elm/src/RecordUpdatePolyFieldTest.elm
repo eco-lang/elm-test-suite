@@ -7,6 +7,7 @@ module RecordUpdatePolyFieldTest exposing (main)
 so it uses `r` with `f : Int -> Int`. `r2.f 5` gives 6 and `r2.g` keeps 0.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-update, d-atexp-update
 -- CHECK: f: 6
 -- CHECK: g: 0
 

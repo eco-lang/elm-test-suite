@@ -12,6 +12,7 @@ In this module the unqualified names `True` and `False` refer to the local type
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-seq, sm-conbind, dm-conbind, d-atpat-con, d-atpat-con-fail
 -- CHECK: pickTrue: 1
 -- CHECK: pickFalse: 2
 -- CHECK: pickUnknown: 3

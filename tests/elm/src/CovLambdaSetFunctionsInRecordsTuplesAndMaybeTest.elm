@@ -7,6 +7,7 @@ to `14`.
 
 -}
 
+-- TAGS: elm-spec, d-atexp-record, d-atexp-tuple, d-pat-con, d-app-closure
 -- CHECK: testValue: 14
 
 import Basics exposing (..)

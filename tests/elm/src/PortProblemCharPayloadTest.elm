@@ -9,6 +9,7 @@ outgoing port `charOut : Char -> Cmd msg` is declared.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, sm-topdec-portout
 -- COMPILE-ERROR: PORT ERROR
 -- CHECK: -- PORT ERROR -
 -- CHECK: The `charOut` port is trying to transmit a `Char` value:

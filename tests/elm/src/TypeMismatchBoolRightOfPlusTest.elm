@@ -5,6 +5,7 @@ module TypeMismatchBoolRightOfPlusTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, Bool right of +
 -- CHECK: -- TYPE MISMATCH -
 

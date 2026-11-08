@@ -6,6 +6,7 @@ module MultiLocalTailRecTest exposing (main)
 `5 + 4 + 3 + 2 + 1` into `15`. The logged sum is `15`.
 -}
 
+-- TAGS: elm-spec, s-dec-group, d-dec-rec, d-atexp-let
 -- CHECK: result: 15
 
 import Html exposing (text)

@@ -7,6 +7,7 @@ module TooFewArgsAConstructorPatternWithTooFewArgumentsTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-pat-con
 -- COMPILE-ERROR: TOO FEW ARGS, a constructor pattern with too few arguments
 -- CHECK: -- TOO FEW ARGS -
 

@@ -12,6 +12,7 @@ through these choices, including a `chooseA` result passed into `chooseB`:
 
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-atpat-scon, d-valbind-pat, d-app-closure
 -- CHECK: testValue: 38
 
 import Basics exposing (..)

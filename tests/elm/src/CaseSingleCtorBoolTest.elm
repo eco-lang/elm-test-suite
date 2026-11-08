@@ -10,6 +10,7 @@ unwrapped value.
 
 -}
 
+-- TAGS: elm-spec, s-pat-con, d-pat-con, d-atpat-con-fail
 -- CHECK: nested_true: "split"
 -- CHECK: nested_false: "join"
 -- CHECK: extract_true: True

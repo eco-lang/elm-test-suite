@@ -6,6 +6,7 @@ record nested in a pair, are both used as `Float`s: matching
 `round (r.lo * 1.5) + round (c * 1.5)` logs 105.
 -}
 
+-- TAGS: elm-spec, s-atexp-scon, d-atexp-scon, d-atpat-tuple
 -- CHECK: tuprec: 105
 
 import Html exposing (text)

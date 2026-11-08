@@ -11,6 +11,7 @@ the `n` of its own call: `[1,2,3]`.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: results: [1,2,3]
 
 import Html exposing (text)

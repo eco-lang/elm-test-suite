@@ -13,6 +13,7 @@ new subscription is in place and the reply is dropped.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, p-update, p-out, p-in-accept, e-msg-port
 -- CHECK: got: "hello"
 
 import Process

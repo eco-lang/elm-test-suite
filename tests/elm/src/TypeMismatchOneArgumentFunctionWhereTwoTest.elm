@@ -7,6 +7,7 @@ module TypeMismatchOneArgumentFunctionWhereTwoTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-ty-fun
 -- COMPILE-ERROR: TYPE MISMATCH, one-argument function where two
 -- CHECK: -- TYPE MISMATCH -
 

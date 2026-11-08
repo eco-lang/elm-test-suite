@@ -8,6 +8,7 @@ use site. With `n = 30`, `floatFn n` is 45.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: topfn: 45
 
 import Html exposing (text)

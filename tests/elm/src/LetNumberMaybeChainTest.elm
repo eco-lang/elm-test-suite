@@ -8,6 +8,7 @@ the second uses `(/)` and `round`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: chain: 15
 
 import Html exposing (text)

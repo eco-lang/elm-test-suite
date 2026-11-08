@@ -11,6 +11,7 @@ an argument of `asRow` whose `msg` is fixed by the caller. Elm 0.19.1 crashes in
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: a type error, not a compiler crash
 -- CHECK-NOT: HasCallStack
 -- CHECK: {{-- [A-Z ]+ -}}

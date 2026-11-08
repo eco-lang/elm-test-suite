@@ -6,6 +6,7 @@ module ImportResolutionQualifiedImportedFunctionTest exposing (..)
 
 -}
 
+-- TAGS: elm-spec, sm-imports-import, sm-explist-all, s-atexp-longvar
 -- CHECK: testValue: [-1,-2]
 
 import Basics exposing (..)

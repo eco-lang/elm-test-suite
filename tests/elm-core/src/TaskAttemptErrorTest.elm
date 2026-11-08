@@ -7,6 +7,7 @@ module TaskAttemptErrorTest exposing (main)
 `Err` it receives.
 -}
 
+-- TAGS: elm-spec, e-msg-task, e-task-onerror-fail, p-disp-task, p-proc-message
 -- CHECK: ok: 42
 -- CHECK: err: "boom"
 

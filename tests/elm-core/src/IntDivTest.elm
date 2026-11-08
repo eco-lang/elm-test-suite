@@ -7,6 +7,7 @@ flooring division would give -4.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: div1: 3
 -- CHECK: div2: -3
 -- CHECK: div3: -3

@@ -6,6 +6,7 @@ Both infinities are made by dividing 1.0 and -1.0 by 0.0; the finite value is 3.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: isInf1: True
 -- CHECK: isInf2: True
 -- CHECK: isInf3: False

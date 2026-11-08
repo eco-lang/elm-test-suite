@@ -7,6 +7,7 @@ module TypeMismatchArgumentOfAFixedConstructorPatternTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-pat-con, s-atpat-scon
 -- COMPILE-ERROR: TYPE MISMATCH, argument of a fixed constructor pattern
 -- CHECK: -- TYPE MISMATCH -
 

@@ -10,6 +10,7 @@ Elm 0.19.1 crashes ("index out of bounds") instead of reporting it.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-exp-app, s-exp-lambda
 -- COMPILE-ERROR: record lacks field tool
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: out of bounds

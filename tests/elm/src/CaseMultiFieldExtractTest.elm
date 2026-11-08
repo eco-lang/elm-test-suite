@@ -8,6 +8,7 @@ and a four-argument constructor to the right variable.
 
 -}
 
+-- TAGS: elm-spec, s-pat-con, d-pat-con
 -- CHECK: point1: 3
 -- CHECK: point2: 6
 -- CHECK: rect1: 50

@@ -11,6 +11,7 @@ and the annotation on `eraseType` is too general: a TYPE MISMATCH. Elm 0.19.1 in
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, sm-topdec-value, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, eraseType's annotation is more general than f allows
 -- CHECK-NOT: HasCallStack
 -- CHECK: -- TYPE MISMATCH -

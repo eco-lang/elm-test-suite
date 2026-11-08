@@ -6,6 +6,7 @@ module HigherOrderReturnLambdaBasedOnConditionTest exposing (..)
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure, d-atpat-wild
 -- CHECK: testValue: 42
 
 import Basics exposing (..)

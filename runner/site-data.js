@@ -12,16 +12,20 @@
 //                             compilers
 //   projects/<project>.json   each test of the project, its summary, its tags and its outcome per
 //                             compiler
-//   tags/<tag>.json           the same for each tag (`-- TAGS:`) but the projects
+//   tags/<tag>.json           the same for each tag (`-- TAGS:`) but the projects and the checks
+//   checks.json               for each rule and restriction of A Standard Definition of Elm?, the
+//                             tests that check it: those with a tag that is its name (spec-items.js)
 //   tests/<project>/<Test>.json
-//                             one test: its doc comment, issue links, tags, source, and per compiler
-//                             its outcome, failure message and output
+//                             one test: its doc comment, issue links, tags, the rules and
+//                             restrictions it checks, source, and per compiler its outcome, failure
+//                             message and output
 // A compiler with no results is left out. The exit status is 2 when no compiler has results.
 'use strict';
 
 const fs = require('fs');
 const path = require('path');
 const D = require('./directives');
+const { specItems } = require('./spec-items');
 
 const ROOT = path.resolve(__dirname, '..');
 const RESULTS = path.join(ROOT, '.work', 'results');
@@ -110,6 +114,8 @@ function main() {
     };
 
     const tagged = new Map();   // tag -> the rows of its tests
+    const items = specItems();
+    const checks = { rules: {}, restrictions: {} };   // name -> the tests that check it
     for (const p of projects) {
         const srcDir = path.join(ROOT, 'tests', p, 'src');
         const names = [...new Set(runs.flatMap((r) => Object.keys(r.projects[p] || {})))].sort();
@@ -120,8 +126,15 @@ function main() {
             const doc = docComment(source);
             const outcomes = runs.map((r) => (r.projects[p] || {})[name] || missing);
             const issues = [...new Set(doc.match(/https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/(?:issues|pull)\/\d+/g) || [])];
-            let tags = [];   // its tags but its project; a malformed TAGS line fails the test in run.js
-            try { tags = D.extractTags(source, projects); } catch (e) { /* none */ }
+            let all = [];   // its tags but its project; a malformed TAGS line fails the test in run.js
+            try { all = D.extractTags(source, projects); } catch (e) { /* none */ }
+            // A tag that names a rule or restriction of the book is a check of it, not a tag.
+            const tags = all.filter((g) => !items.has(g));
+            const checked = all.filter((g) => items.has(g)).map((g) => ({ kind: items.get(g), name: g }));
+            for (const c of checked) {
+                const k = c.kind === 'rule' ? 'rules' : 'restrictions';
+                (checks[k][c.name] = checks[k][c.name] || []).push({ project: p, test: name, summary: summary(doc) });
+            }
             const row = {
                 project: p,
                 name,
@@ -141,6 +154,7 @@ function main() {
                 doc,
                 issues,
                 tags,
+                checks: checked,
                 source,
                 results: outcomes.map((o, i) => ({
                     compiler: runs[i].compiler,
@@ -176,6 +190,7 @@ function main() {
         report.tags.push({ name: g, description: descriptions[g] || '', total: rows.length, counts });
     }
     writeJson(path.join(opts.out, 'report.json'), report);
+    writeJson(path.join(opts.out, 'checks.json'), checks);
     console.log('site data for ' + runs.length + ' compiler(s), ' + projects.length + ' projects and ' +
         report.tags.length + ' tags, written to ' +
         path.relative(ROOT, opts.out));

@@ -12,6 +12,7 @@ needs a List on the right." `ListOfInts` is a List, so that claim is false.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-atexp-op, s-exp-app, sm-typbind
 -- COMPILE-ERROR: String consed onto an alias of List Int
 -- CHECK: -- TYPE MISMATCH -
 -- CHECK-NOT: needs a List on the right

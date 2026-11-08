@@ -17,6 +17,7 @@ character.
 
 -}
 
+-- TAGS: elm-spec, e-enc-string, e-dec-string
 -- CHECK: PortEchoStringTest got: []
 -- CHECK: PortEchoStringTest got: [104,101,108,108,111]
 -- CHECK: PortEchoStringTest got: [113,117,111,116,101,32,34,32,98,97,99,107,92,115,108,97,115,104]

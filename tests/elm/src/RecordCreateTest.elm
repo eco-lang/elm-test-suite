@@ -6,6 +6,7 @@ module RecordCreateTest exposing (main)
 before `name` although the literal gives `name` first.
 -}
 
+-- TAGS: elm-spec, d-atexp-record, d-exprow-field
 -- CHECK: record1: { x = 1, y = 2 }
 -- CHECK: record2: { age = 30, name = "Alice" }
 

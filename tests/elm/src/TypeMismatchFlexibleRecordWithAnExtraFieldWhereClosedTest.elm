@@ -8,6 +8,7 @@ record `{ name : Int }`, which has no such field.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atpat-record, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, flexible record with an extra field where closed
 -- CHECK: -- TYPE MISMATCH -
 

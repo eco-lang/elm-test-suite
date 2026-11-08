@@ -12,6 +12,7 @@ MVar operation").
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-exp-app, s-valbind-var
 -- COMPILE-ERROR: a type error, not a compiler crash
 -- CHECK-NOT: HasCallStack
 -- CHECK: {{-- [A-Z ]+ -}}

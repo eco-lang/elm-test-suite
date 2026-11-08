@@ -7,6 +7,7 @@ module TypeMismatchRigidVarAsMaybeTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-longcon
 -- COMPILE-ERROR: TYPE MISMATCH, rigid var as Maybe
 -- CHECK: -- TYPE MISMATCH -
 

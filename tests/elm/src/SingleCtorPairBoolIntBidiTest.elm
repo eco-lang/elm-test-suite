@@ -9,6 +9,7 @@ giving `"positive"` for 7 and `"non-positive"` for -3. `extractBool` and
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-con, d-atpat-con-fail
 -- CHECK: match_true: "yes"
 -- CHECK: match_false: "no"
 -- CHECK: match_pos: "positive"

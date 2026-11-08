@@ -8,6 +8,7 @@ implicitly, so `2 / n` with `n : Int` must not compile.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, Int right of /
 -- CHECK: -- TYPE MISMATCH -
 

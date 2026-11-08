@@ -15,6 +15,7 @@ notation (`3.0e10`, `-1.0e-7`).
 
 -}
 
+-- TAGS: elm-spec, e-enc-float, e-dec-float
 -- CHECK: PortEchoFloatTest got: 0
 -- CHECK: PortEchoFloatTest got: 1.5
 -- CHECK: PortEchoFloatTest got: -0.25

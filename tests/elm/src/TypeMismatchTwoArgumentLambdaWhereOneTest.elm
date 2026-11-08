@@ -7,6 +7,7 @@ module TypeMismatchTwoArgumentLambdaWhereOneTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-exp-lambda
 -- COMPILE-ERROR: TYPE MISMATCH, two-argument lambda where one
 -- CHECK: -- TYPE MISMATCH -
 

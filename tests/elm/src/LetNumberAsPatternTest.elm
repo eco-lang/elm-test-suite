@@ -9,6 +9,7 @@ In `case ( 30, 40 ) of (( a, _ ) as whole)`, `a * 1.5` makes the elements Floats
 
 -}
 
+-- TAGS: elm-spec, s-atexp-scon, d-atexp-scon, d-pat-as
 -- CHECK: aspat: 115
 
 import Html exposing (text)

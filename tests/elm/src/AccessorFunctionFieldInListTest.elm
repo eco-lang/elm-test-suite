@@ -8,6 +8,7 @@ type `List (Ops -> Int -> Int)`, and each is applied to one record and then to
 
 -}
 
+-- TAGS: elm-spec, s-atpat-record, d-patrow-field
 -- CHECK: results: [11,20]
 
 import Html exposing (text)

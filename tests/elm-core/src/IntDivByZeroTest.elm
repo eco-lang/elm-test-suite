@@ -3,6 +3,7 @@ module IntDivByZeroTest exposing (main)
 {-| Checks that integer division `//` by zero gives 0, for a positive and for a negative dividend.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: divZero1: 0
 -- CHECK: divZero2: 0
 

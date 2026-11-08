@@ -3,6 +3,7 @@ module IntMulTest exposing (main)
 {-| Checks integer multiplication `*` with positive, mixed-sign, two negative and zero operands.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: mul1: 30
 -- CHECK: mul2: -15
 -- CHECK: mul3: 6

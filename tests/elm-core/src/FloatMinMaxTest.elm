@@ -6,6 +6,7 @@ The pairs are 10.0 and 3.14, and -5.0 and 5.0. Whole-number results print withou
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: min1: 3.14
 -- CHECK: min2: -5
 -- CHECK: max1: 10

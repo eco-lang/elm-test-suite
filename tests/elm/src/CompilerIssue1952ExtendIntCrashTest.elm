@@ -10,6 +10,7 @@ crashes ("Used toErrorType on a type that is not well-formed"); it should report
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-con
 -- COMPILE-ERROR: extending a non-record
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: not well-formed

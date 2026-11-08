@@ -15,6 +15,7 @@ eleven-constructor `info.node`.
 
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-atpat-con, d-atpat-con-fail, d-patrow-field
 -- CHECK: test1: True
 -- CHECK: test2: False
 -- CHECK: test3: True

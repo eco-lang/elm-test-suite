@@ -5,6 +5,7 @@ than, greater than and equal to one another, comparing character codes from the
 first character.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: cmp1: LT
 -- CHECK: cmp2: GT
 -- CHECK: cmp3: EQ

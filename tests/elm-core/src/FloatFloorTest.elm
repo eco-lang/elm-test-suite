@@ -5,6 +5,7 @@ module FloatFloorTest exposing (main)
 `floor -2.3` and `floor -2.7` are both -3.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: floor1: 2
 -- CHECK: floor2: 2
 -- CHECK: floor3: -3

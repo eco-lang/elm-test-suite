@@ -8,6 +8,7 @@ extracts the `Char` from `WrapChar 'x'`.
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-con, d-atpat-con-fail
 -- CHECK: match_true: "yes"
 -- CHECK: match_false: "no"
 -- CHECK: unwrap_char: 'x'

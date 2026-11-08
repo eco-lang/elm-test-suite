@@ -8,6 +8,7 @@ of `{ a = 10, b = 20 }` (10), and sets it to 99 (99).
 
 -}
 
+-- TAGS: elm-spec, d-valbind-pat, s-atexp-update, d-atexp-update
 -- CHECK: get: 10
 -- CHECK: set: 99
 

@@ -15,6 +15,7 @@ back.
 
 -}
 
+-- TAGS: elm-spec, p-init, p-disp-out, p-disp-task
 -- CHECK: CmdBatchOrderTest tasks: [3,2,1]
 -- CHECK: CmdBatchOrderTest port: [5,4,3,2,1]
 

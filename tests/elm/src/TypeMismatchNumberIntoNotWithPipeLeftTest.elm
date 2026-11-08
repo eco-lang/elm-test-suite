@@ -5,6 +5,7 @@ module TypeMismatchNumberIntoNotWithPipeLeftTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, number into not with <|
 -- CHECK: -- TYPE MISMATCH -
 

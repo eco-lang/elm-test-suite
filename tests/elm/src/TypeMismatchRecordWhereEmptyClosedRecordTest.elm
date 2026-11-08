@@ -7,6 +7,7 @@ module TypeMismatchRecordWhereEmptyClosedRecordTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-ty-record, s-atexp-record
 -- COMPILE-ERROR: TYPE MISMATCH, record where empty closed record
 -- CHECK: -- TYPE MISMATCH -
 

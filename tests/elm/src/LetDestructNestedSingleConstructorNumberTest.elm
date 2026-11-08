@@ -9,6 +9,7 @@ type `Outer` is declared but not used.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-pat, d-pat-con, s-atexp-scon, d-atexp-scon
 -- CHECK: testValue: 1.5
 
 import Basics exposing (..)

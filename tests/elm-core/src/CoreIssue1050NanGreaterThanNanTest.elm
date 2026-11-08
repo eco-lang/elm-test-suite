@@ -10,6 +10,7 @@ Elm 0.19.1 returns True for both.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: nan > nan: False
 -- CHECK: nan >= nan: False
 

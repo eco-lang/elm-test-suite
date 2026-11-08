@@ -9,6 +9,7 @@ second branch is dead code. The correct behaviour is a REDUNDANT PATTERN error. 
 -}
 
 -- TAGS: elm19-bug-fix
+-- TAGS: elm-spec, core-irredundancy
 -- COMPILE-ERROR: REDUNDANT PATTERN, the same Char written two ways
 -- CHECK: -- REDUNDANT PATTERN -
 

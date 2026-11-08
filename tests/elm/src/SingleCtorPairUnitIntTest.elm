@@ -8,6 +8,7 @@ module SingleCtorPairUnitIntTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-var, d-atpat-wild
 -- CHECK: unwrap_unit: ()
 -- CHECK: unwrap_int: 77
 -- CHECK: match_unit: "got_unit"

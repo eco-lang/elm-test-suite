@@ -5,6 +5,7 @@ module TypeMismatchFieldAccessUnderIntTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atpat-record
 -- COMPILE-ERROR: TYPE MISMATCH, field access under Int
 -- CHECK: -- TYPE MISMATCH -
 

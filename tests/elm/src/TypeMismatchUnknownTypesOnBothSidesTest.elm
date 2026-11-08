@@ -10,6 +10,7 @@ The test checks only that a TYPE MISMATCH is reported.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app, s-atexp-tuple
 -- COMPILE-ERROR: TYPE MISMATCH, unknown types on both sides
 -- CHECK: -- TYPE MISMATCH -
 

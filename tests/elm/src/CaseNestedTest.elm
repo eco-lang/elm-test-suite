@@ -4,6 +4,7 @@ module CaseNestedTest exposing (main)
 inside each branch reaches all four combinations correctly.
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-pat-con, d-atpat-con
 -- CHECK: nested1: "both"
 -- CHECK: nested2: "first"
 -- CHECK: nested3: "second"

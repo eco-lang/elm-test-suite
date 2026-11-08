@@ -11,6 +11,7 @@ import Html exposing (text)
 
 
 
+-- TAGS: elm-spec, sm-typbind, s-ty-con, s-valbind-var, d-app-closure, d-valbind-pat
 -- CHECK: r: [30,42,54]
 
 

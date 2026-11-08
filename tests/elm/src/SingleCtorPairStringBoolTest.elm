@@ -7,6 +7,7 @@ patterns `WrapBool True` and `WrapBool False`, giving `"yes"` and `"no"`.
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-con, d-atpat-con-fail
 -- CHECK: unwrap_str: "world"
 -- CHECK: match_true: "yes"
 -- CHECK: match_false: "no"

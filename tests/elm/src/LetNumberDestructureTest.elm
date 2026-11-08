@@ -8,6 +8,7 @@ module LetNumberDestructureTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, s-valbind-pat, s-atexp-scon, d-atexp-scon
 -- CHECK: destructure: 105
 
 import Html exposing (text)

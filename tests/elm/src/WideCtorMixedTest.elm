@@ -12,6 +12,7 @@ The test checks:
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, dm-conbind, d-app-con, d-pat-con
 -- CHECK: field23: "23s"
 -- CHECK: field24: True
 -- CHECK: field55: 1055

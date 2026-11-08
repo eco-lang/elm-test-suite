@@ -9,6 +9,7 @@ cannot be recursive, so the compiler must report the self-reference.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, modules-alias-not-recursive
 -- COMPILE-ERROR: ALIAS PROBLEM, extensible record, unit, tuple and function
 -- CHECK: -- ALIAS PROBLEM -
 

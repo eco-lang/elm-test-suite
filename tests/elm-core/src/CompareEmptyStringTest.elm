@@ -7,6 +7,7 @@ string that is a prefix of another (`"a"` and `"ab"`) is less than it.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: ee: EQ
 -- CHECK: ea: LT
 -- CHECK: ae: GT

@@ -7,6 +7,7 @@ module TypeMismatchRigidCompappendAsIntTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, rigid compappend as Int
 -- CHECK: -- TYPE MISMATCH -
 

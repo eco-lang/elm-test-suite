@@ -10,6 +10,7 @@ passed in have four outer and five inner fields. Both members hold `LambdaId 999
 The `RecordNarrow` tests are variations of this program.
 -}
 
+-- TAGS: elm-spec, s-atpat-record, d-atpat-record, d-patrow-field
 -- CHECK: uid: 1998
 
 import Html exposing (text)

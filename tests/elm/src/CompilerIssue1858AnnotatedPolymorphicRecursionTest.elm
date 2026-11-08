@@ -11,6 +11,7 @@ Elm 0.19.1 reports a type mismatch saying it needs `Silly a b`.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, sm-topdec-value, s-valbind-var
 -- CHECK: bVals: Just "b"
 
 import Html exposing (text)

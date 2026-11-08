@@ -4,6 +4,7 @@ module Route.Standard.Rules.Rule_ exposing (ActionData, Data, Model, Msg, RouteP
 -}
 
 import BackendTask exposing (BackendTask)
+import Data exposing (TestRef)
 import Discuss
 import DiscussionsView
 import FatalError exposing (FatalError)
@@ -18,6 +19,7 @@ import Shared
 import Site
 import Standard exposing (Index, Rule, RuleLink)
 import Standard.Render as Render
+import Standard.TestsView as TestsView
 import View exposing (View)
 
 
@@ -33,7 +35,7 @@ type alias RouteParams =
     { rule : String }
 
 
-{-| `index` and `rule` are used only inside `View.freeze`, so elm-pages leaves them out of the data
+{-| `index`, `rule` and `tests` are used only inside `View.freeze`, so elm-pages leaves them out of the data
 sent to the browser; the page title and description are kept apart for that reason. `slug` is the item's
 name as the book writes it, for the key of its discussions: the address in the browser may not
 keep its case (Netlify serves a mixed-case path at its lower-case form).
@@ -44,6 +46,7 @@ type alias Data =
     , slug : String
     , index : Index
     , rule : Rule
+    , tests : List TestRef
     }
 
 
@@ -69,17 +72,19 @@ pages =
 
 data : RouteParams -> BackendTask FatalError Data
 data params =
-    BackendTask.map2
-        (\idx r ->
+    BackendTask.map3
+        (\idx r tests ->
             { title = "Rule " ++ String.fromInt r.number ++ " (" ++ r.slug ++ ") · " ++ idx.title
             , description = "Rule " ++ String.fromInt r.number ++ ", " ++ r.slug ++ ", of " ++ idx.title ++ " (" ++ idx.edition ++ ")"
             , slug = r.slug
             , index = idx
             , rule = r
+            , tests = tests
             }
         )
         Standard.index
         (Standard.rule params.rule)
+        (Data.testsChecking Data.Rule params.rule)
 
 
 head : App Data ActionData RouteParams -> List Head.Tag
@@ -104,6 +109,7 @@ view app shared =
     { title = app.data.title
     , body =
         [ View.freeze (ruleView app.data.index app.data.rule)
+        , View.freeze (TestsView.section "rule" app.data.tests)
         , Html.div [ Attr.class "sd-book" ]
             [ DiscussionsView.section
                 { category = Discuss.Standard

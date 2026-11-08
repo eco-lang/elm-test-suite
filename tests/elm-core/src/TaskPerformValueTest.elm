@@ -6,6 +6,7 @@ module TaskPerformValueTest exposing (main)
 payload of each message.
 -}
 
+-- TAGS: elm-spec, e-msg-task, p-disp-task, p-proc-message
 -- CHECK: a: 42
 -- CHECK: b: "nullary ok"
 -- CHECK: c: -7

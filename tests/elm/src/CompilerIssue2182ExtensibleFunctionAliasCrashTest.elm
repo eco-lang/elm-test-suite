@@ -13,6 +13,7 @@ Both must be accepted alike.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-con, sm-typbind, s-valbind-var
 -- CHECK: done
 
 import Html exposing (text)

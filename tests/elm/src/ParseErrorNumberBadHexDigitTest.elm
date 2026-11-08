@@ -7,6 +7,7 @@ The expected heading keeps the spelling "HEXIDECIMAL" used in Elm's own error me
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec
 -- COMPILE-ERROR: WEIRD HEXIDECIMAL
 -- CHECK: -- WEIRD HEXIDECIMAL -
 x =

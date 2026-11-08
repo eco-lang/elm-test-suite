@@ -10,6 +10,7 @@ Whatever the result, a value of type `Int` must be a whole number.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: {{pow: "-?[0-9]+"(\n|$)}}
 
 import Html exposing (text)

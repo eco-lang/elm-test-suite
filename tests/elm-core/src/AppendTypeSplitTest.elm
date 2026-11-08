@@ -9,6 +9,7 @@ the long string. The list cases also append a list produced by `List.map`.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: strs: "foobar"
 -- CHECK: strEmptyR: "foo"
 -- CHECK: strEmptyL: "foo"

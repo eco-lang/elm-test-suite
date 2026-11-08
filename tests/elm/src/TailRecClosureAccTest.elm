@@ -5,6 +5,7 @@ right result: `go` adds `m` to `acc` while counting `m` down to 0, so `recursive
 5 + 4 + 3 + 2 + 1 = 15.
 -}
 
+-- TAGS: elm-spec, d-dec-rec, d-atexp-let
 -- CHECK: result: 15
 
 import Html exposing (text)

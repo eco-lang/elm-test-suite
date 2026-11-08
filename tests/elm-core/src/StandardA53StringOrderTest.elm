@@ -11,6 +11,7 @@ first, and sorts the list the other way round.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: compare "😀" "ﬀ": GT
 -- CHECK: "😀" > "ﬀ": True
 -- CHECK: sorted: ["ﬀ","😀"]

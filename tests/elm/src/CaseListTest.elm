@@ -4,6 +4,7 @@ module CaseListTest exposing (main)
 exactly one element (`[_]`) and any longer list (`_`).
 -}
 
+-- TAGS: elm-spec, d-atpat-nil, d-pat-cons, d-atpat-nil-fail
 -- CHECK: case1: "empty"
 -- CHECK: case2: "one"
 -- CHECK: case3: "many"

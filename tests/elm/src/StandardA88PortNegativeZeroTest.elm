@@ -12,6 +12,7 @@ through, so `1 / v` is `-Infinity`.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, e-enc-float, e-dec-float
 -- CHECK: 1 / received > 0: True
 
 import Process

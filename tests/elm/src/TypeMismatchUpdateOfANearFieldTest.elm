@@ -9,6 +9,7 @@ them.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-update
 -- COMPILE-ERROR: TYPE MISMATCH, update of a near field
 -- CHECK: -- TYPE MISMATCH -
 

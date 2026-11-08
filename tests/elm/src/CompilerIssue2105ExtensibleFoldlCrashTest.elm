@@ -12,6 +12,7 @@ with "Used toErrorType on a type that is not well-formed" (Type/Type.hs:541).
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-exp-app, s-valbind-var
 -- COMPILE-ERROR: a type error, not a compiler crash
 -- CHECK-NOT: HasCallStack
 -- CHECK-NOT: not well-formed

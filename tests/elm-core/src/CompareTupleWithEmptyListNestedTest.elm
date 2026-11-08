@@ -8,6 +8,7 @@ to another empty list.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: ee: EQ
 -- CHECK: eA: LT
 -- CHECK: Ae: GT

@@ -9,6 +9,7 @@ position inside a string concatenation. The four checks cover a primitive, an al
 primitive, a list of a primitive, and a `TCustom`.
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-atpat-scon, d-atpat-scon-fail
 -- CHECK: r1: "decode_int"
 -- CHECK: r2: "decode_string"
 -- CHECK: r3: "decode_list(decode_int)"

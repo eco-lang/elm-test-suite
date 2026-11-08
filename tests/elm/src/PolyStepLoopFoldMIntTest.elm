@@ -11,6 +11,7 @@ sum of 15 and a final state of 104.
 
 -}
 
+-- TAGS: elm-spec, sm-typbind, s-ty-con, s-valbind-var, d-exp-lambda
 -- CHECK: sum: 15
 -- CHECK: final: 104
 

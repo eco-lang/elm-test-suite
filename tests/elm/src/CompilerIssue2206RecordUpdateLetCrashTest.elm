@@ -15,6 +15,7 @@ Fixed in Elm 0.19.3.
 -}
 
 -- TAGS: elm19-bug-fix
+-- TAGS: elm-spec, s-atexp-update
 -- COMPILE-ERROR: TYPE MISMATCH, not a compiler crash
 -- CHECK-NOT: HasCallStack
 -- CHECK: -- TYPE MISMATCH -

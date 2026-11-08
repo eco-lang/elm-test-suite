@@ -4,6 +4,7 @@ module BasicsIdentityTest exposing (main)
 99 whatever its second argument.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: identity_int: 42
 -- CHECK: identity_string: "hello"
 -- CHECK: always_result: 99

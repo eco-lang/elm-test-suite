@@ -3,6 +3,7 @@ module ToFloatTest exposing (main)
 {-| `toFloat` converts a positive, a negative and a zero `Int` to the equal `Float`.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: toFloat1: 42
 -- CHECK: toFloat2: -10
 -- CHECK: toFloat3: 0

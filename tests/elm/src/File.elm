@@ -15,6 +15,7 @@ Because of this module, a test of this project cannot `import File`.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, program-modules-distinct, sm-module
 -- CHECK: compiled: True
 
 import Html exposing (text)

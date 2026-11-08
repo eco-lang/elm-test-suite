@@ -6,6 +6,7 @@ expose, and a field of `config`, read through the module name as
 `CovForeignTypesHelper.config.x`. Their sum, 42, is logged.
 -}
 
+-- TAGS: elm-spec, sm-imports-import, sm-typbind, core-field-selection, dm-imports-import
 -- CHECK: CovForeignTypesTest: 42
 
 import CovForeignTypesHelper

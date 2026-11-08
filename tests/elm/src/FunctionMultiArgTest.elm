@@ -7,6 +7,7 @@ The test logs `addThree 1 2 3` (6), `addFour 1 2 3 4` (10) and
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: three: 6
 -- CHECK: four: 10
 -- CHECK: five: 15

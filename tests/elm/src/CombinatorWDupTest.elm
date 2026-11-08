@@ -3,6 +3,7 @@ module CombinatorWDupTest exposing (main)
 {-| The W combinator, which passes one argument twice: `w mul 9` is `mul 9 9`, which is 81.
 -}
 
+-- TAGS: elm-spec, d-app-closure
 -- CHECK: result: 81
 
 import Html exposing (text)

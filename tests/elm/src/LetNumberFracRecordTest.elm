@@ -10,6 +10,7 @@ an `Int` and `0.1 * r.fracPart` makes `fracPart` a `Float`, so the result is
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-record, d-atexp-scon
 -- CHECK: frac: 34
 
 import Html exposing (text)

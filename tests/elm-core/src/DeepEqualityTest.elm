@@ -14,6 +14,7 @@ The fixtures are built by folding: `nat n` is `n` applications of `S` to `Z`, `n
   - `dict nest 150`: two Dicts whose values under key 1 differ 150 levels down are not equal.
 -}
 
+-- TAGS: elm-spec
 -- MODE-GUARD: a Char equality must give the same answer as under --optimize
 -- NO-SKIP: an edge case every compiler must run
 -- CHECK: nat 150 vs 200: "False"

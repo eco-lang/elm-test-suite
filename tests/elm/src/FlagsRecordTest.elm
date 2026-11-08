@@ -5,6 +5,7 @@ module FlagsRecordTest exposing (main)
 The `FLAGS` directive supplies the JSON `{"count":42,"label":"native-flags","enabled":true}`. `init` logs `label`, `count + 1` and `enabled`.
 -}
 
+-- TAGS: elm-spec, p-init, p-stat-main-program, e-dec-record, e-dec-true
 -- SKIP-AOT: needs `-- FLAGS:` JSON, which only the JIT harness can inject (eco_entry.cpp reads no flags)
 -- FLAGS: {"count":42,"label":"native-flags","enabled":true}
 -- CHECK: FlagsRecordTest label: "native-flags"

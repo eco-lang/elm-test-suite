@@ -8,6 +8,7 @@ operands are equal. The two `/=` cases choose `"yes"` only for `True /= False`.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: ifTT: "yes"
 -- CHECK: ifTF: "no"
 -- CHECK: ifFT: "no"

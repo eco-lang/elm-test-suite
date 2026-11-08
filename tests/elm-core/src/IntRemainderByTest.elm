@@ -8,6 +8,7 @@ division.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: rem1: 3
 -- CHECK: rem2: -3
 -- CHECK: rem3: 3

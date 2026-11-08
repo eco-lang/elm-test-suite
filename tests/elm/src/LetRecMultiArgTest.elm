@@ -4,6 +4,7 @@ module LetRecMultiArgTest exposing (main)
 both arguments changed; `f 1 1` logs `result: 2`.
 -}
 
+-- TAGS: elm-spec, s-dec-group, d-dec-rec
 -- CHECK: result: 2
 
 import Html exposing (text)

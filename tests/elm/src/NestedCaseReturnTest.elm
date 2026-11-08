@@ -8,6 +8,7 @@ module NestedCaseReturnTest exposing (main)
 `"List"` branch, an unknown primitive (`"Bytes"`) and `Unit`.
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-pat-con, d-atpat-scon, d-match-next
 -- CHECK: r1: "integer"
 -- CHECK: r2: "text"
 -- CHECK: r3: "custom List"

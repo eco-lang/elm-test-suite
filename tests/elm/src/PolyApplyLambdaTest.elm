@@ -4,6 +4,7 @@ module PolyApplyLambdaTest exposing (main)
 `String` function and an anonymous lambda.
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, s-atexp-longvar
 -- CHECK: applyIntId: 1
 -- CHECK: applyStrId: "hi"
 -- CHECK: applyLambda: 42

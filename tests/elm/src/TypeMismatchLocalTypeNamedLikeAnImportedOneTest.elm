@@ -10,6 +10,7 @@ are unrelated.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, sm-datbind, sm-topdec-seq, s-ty-con, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, local type named like an imported one
 -- CHECK: -- TYPE MISMATCH -
 

@@ -9,6 +9,7 @@ captures an `Int` alongside the tuple, and `mixedCapture 1 ( 2, 3 ) 3` gives 9.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-pat, d-valbind-pat, d-exp-lambda
 -- CHECK: add: 6
 -- CHECK: nested: 10
 -- CHECK: mixed: 9

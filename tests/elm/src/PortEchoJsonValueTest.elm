@@ -14,6 +14,7 @@ JSON string, a JSON number (2.5), and `null`.
 
 -}
 
+-- TAGS: elm-spec, e-enc-value, e-dec-value
 -- CHECK: PortEchoJsonValueTest got: "{\"a\":[1,true,null],\"b\":\"x\"}"
 -- CHECK: PortEchoJsonValueTest got: "\"plain\""
 -- CHECK: PortEchoJsonValueTest got: "2.5"

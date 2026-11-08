@@ -12,6 +12,7 @@ memory grows without bound, or crashes.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-match
 -- COMPILE-ERROR: a type error, not a hang
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: HasCallStack

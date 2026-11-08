@@ -6,6 +6,7 @@ module TailRecNestedStringCaseTest exposing (main)
 maps the leaf name `"answer"` to 42.
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-atpat-scon, d-atpat-scon-fail
 -- CHECK: result: 42
 
 import Html exposing (text)

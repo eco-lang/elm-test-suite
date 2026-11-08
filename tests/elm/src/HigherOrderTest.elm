@@ -7,6 +7,7 @@ The test logs `apply double 5` (10), `apply square 5` (25) and
 
 -}
 
+-- TAGS: elm-spec, d-app-closure
 -- CHECK: apply1: 10
 -- CHECK: apply2: 25
 -- CHECK: twice1: 20

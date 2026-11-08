@@ -5,6 +5,7 @@ module TypeMismatchConstructorPatternTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-case, s-pat-con, s-atexp-scon
 -- COMPILE-ERROR: TYPE MISMATCH, constructor pattern
 -- CHECK: -- TYPE MISMATCH -
 

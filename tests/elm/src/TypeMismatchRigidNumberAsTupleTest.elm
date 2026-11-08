@@ -7,6 +7,7 @@ module TypeMismatchRigidNumberAsTupleTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-tuple
 -- COMPILE-ERROR: TYPE MISMATCH, rigid number as tuple
 -- CHECK: -- TYPE MISMATCH -
 

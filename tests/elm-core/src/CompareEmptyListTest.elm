@@ -8,6 +8,7 @@ shorter list is less.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: ee: EQ
 -- CHECK: ea: LT
 -- CHECK: ae: GT

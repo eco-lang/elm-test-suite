@@ -5,6 +5,7 @@ module RecordAccessorFunctionTest exposing (main)
 `main` maps `.name` over two people records and `.x` over two point records.
 -}
 
+-- TAGS: elm-spec, s-atpat-record, d-atpat-record, d-patrow-field
 -- CHECK: names: ["Alice","Bob"]
 -- CHECK: xs: [1,4]
 

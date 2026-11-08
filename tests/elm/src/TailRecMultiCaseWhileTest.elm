@@ -7,6 +7,7 @@ module TailRecMultiCaseWhileTest exposing (main)
 as special, so the total is 3 + 4 - 1 + 2 = 8 and the special count is 2.
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-pat-con, d-atpat-con, d-atpat-scon
 -- CHECK: total: 8
 -- CHECK: special: 2
 

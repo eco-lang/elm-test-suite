@@ -3,6 +3,7 @@ module LssGapTupleFn exposing (main)
 
 `pair` is `( double, 7 )`, and `useTuple` binds `( f, x )` in a `let` and computes `f x`,
 logging 14. -}
+-- TAGS: elm-spec, s-valbind-pat, d-valbind-pat, d-atpat-tuple
 -- CHECK: tupleFn: 14
 import Html exposing (text)
 double : Int -> Int

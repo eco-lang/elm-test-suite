@@ -6,6 +6,7 @@ module HigherOrderTripleNestedFunctionTest exposing (..)
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: testValue: [1,2,3]
 
 import Basics exposing (..)

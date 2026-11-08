@@ -7,6 +7,7 @@ Only the inputs 1, 5 and 7 are tried; the wildcard branch is not reached.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-match-next
 -- CHECK: day1: "Monday"
 -- CHECK: day5: "Friday"
 -- CHECK: day7: "Sunday"

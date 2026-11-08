@@ -4,6 +4,7 @@ module StringLiteralTest exposing (main)
 printed unchanged by `Debug.log`.
 -}
 
+-- TAGS: elm-spec, d-atexp-scon
 -- CHECK: str1: "Hello"
 -- CHECK: str2: "Hello, World!"
 -- CHECK: str3: "abc123"

@@ -4,6 +4,7 @@ module TypeMismatchIfConditionIntTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-case, s-atpat-con, s-atexp-scon
 -- COMPILE-ERROR: TYPE MISMATCH, if condition int
 -- CHECK: -- TYPE MISMATCH -
 

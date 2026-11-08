@@ -5,6 +5,7 @@ module LetNumberRecordDestructureTest exposing (main)
 `round (lo * 1.5) + round (hi * 1.5)` logs 105.
 -}
 
+-- TAGS: elm-spec, s-valbind-pat, s-atpat-record, s-atexp-scon, d-atexp-scon
 -- CHECK: recdestr: 105
 
 import Html exposing (text)

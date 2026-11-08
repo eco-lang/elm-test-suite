@@ -11,6 +11,7 @@ reported; Elm 0.19.1 crashes ("You ran into a compiler bug") instead.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: let annotation is too general
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: compiler bug

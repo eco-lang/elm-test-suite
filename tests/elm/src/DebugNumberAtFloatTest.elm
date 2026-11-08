@@ -11,6 +11,7 @@ The test calls `showAll 1.25`, `bump 2.5` and `showAll 2`, and checks that the
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, s-atexp-scon, d-atexp-scon
 -- CHECK: showAll: ["1.25","2.5"]
 -- CHECK: bump: 3.5
 -- CHECK: bumpResult: 3.5

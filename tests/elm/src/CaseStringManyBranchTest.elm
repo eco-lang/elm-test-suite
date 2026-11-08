@@ -8,6 +8,7 @@ none of them.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-atpat-wild
 -- CHECK: d1: "Monday"
 -- CHECK: d4: "Thursday"
 -- CHECK: d7: "Sunday"

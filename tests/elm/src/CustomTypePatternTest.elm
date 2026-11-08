@@ -8,6 +8,7 @@ with `_`; on `Person "Alice" 30` they return `"Alice"` and 30.
 
 -}
 
+-- TAGS: elm-spec, s-pat-con, d-pat-con, d-atpat-wild
 -- CHECK: name: "Alice"
 -- CHECK: age: 30
 

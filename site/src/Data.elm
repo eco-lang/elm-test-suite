@@ -1,5 +1,7 @@
 module Data exposing
-    ( Compiler
+    ( Check
+    , CheckKind(..)
+    , Compiler
     , Counts
     , Differing
     , Outcome
@@ -8,6 +10,7 @@ module Data exposing
     , Report
     , Status(..)
     , Test
+    , TestRef
     , TestResult
     , TestRow
     , project
@@ -15,6 +18,7 @@ module Data exposing
     , statusLabel
     , tag
     , test
+    , testsChecking
     )
 
 {-| The results data `runner/site-data.js` writes under `data/`, and the backend tasks that read it.
@@ -22,6 +26,7 @@ module Data exposing
 
 import BackendTask exposing (BackendTask)
 import BackendTask.File
+import Dict
 import FatalError exposing (FatalError)
 import Json.Decode as Decode exposing (Decoder)
 
@@ -136,8 +141,32 @@ type alias Test =
     , doc : String
     , issues : List String
     , tags : List String
+    , checks : List Check
     , source : String
     , results : List TestResult
+    }
+
+
+type CheckKind
+    = Rule
+    | Restriction
+
+
+{-| A rule or restriction of A Standard Definition of Elm? that a test checks: the test has a tag
+that is its name.
+-}
+type alias Check =
+    { kind : CheckKind
+    , name : String
+    }
+
+
+{-| A test that checks a rule or restriction, as the rule's or restriction's page lists it.
+-}
+type alias TestRef =
+    { project : String
+    , test : String
+    , summary : String
     }
 
 
@@ -166,6 +195,49 @@ project name =
 tag : String -> BackendTask FatalError Project
 tag name =
     load projectDecoder ("data/tags/" ++ name ++ ".json")
+
+
+{-| The tests that check a rule or restriction, by its name.
+-}
+testsChecking : CheckKind -> String -> BackendTask FatalError (List TestRef)
+testsChecking kind name =
+    load
+        (Decode.field
+            (case kind of
+                Rule ->
+                    "rules"
+
+                Restriction ->
+                    "restrictions"
+            )
+            (Decode.dict (Decode.list testRefDecoder))
+        )
+        "data/checks.json"
+        |> BackendTask.map (Dict.get name >> Maybe.withDefault [])
+
+
+testRefDecoder : Decoder TestRef
+testRefDecoder =
+    Decode.map3 TestRef
+        (Decode.field "project" Decode.string)
+        (Decode.field "test" Decode.string)
+        (Decode.field "summary" Decode.string)
+
+
+checkDecoder : Decoder Check
+checkDecoder =
+    Decode.map2 Check
+        (Decode.field "kind" Decode.string
+            |> Decode.map
+                (\k ->
+                    if k == "rule" then
+                        Rule
+
+                    else
+                        Restriction
+                )
+        )
+        (Decode.field "name" Decode.string)
 
 
 test : String -> String -> BackendTask FatalError Test
@@ -280,12 +352,13 @@ projectDecoder =
 
 testDecoder : Decoder Test
 testDecoder =
-    Decode.map7 Test
+    Decode.map8 Test
         (Decode.field "project" Decode.string)
         (Decode.field "name" Decode.string)
         (Decode.field "doc" Decode.string)
         (Decode.field "issues" (Decode.list Decode.string))
         (Decode.field "tags" (Decode.list Decode.string))
+        (Decode.field "checks" (Decode.list checkDecoder))
         (Decode.field "source" Decode.string)
         (Decode.field "results"
             (Decode.list

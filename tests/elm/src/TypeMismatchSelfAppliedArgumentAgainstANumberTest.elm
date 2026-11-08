@@ -7,6 +7,7 @@ In `k x`, a `let` computes `x x`, and the body puts `x` in a list beside `\v -> 
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-exp-lambda
 -- COMPILE-ERROR: TYPE MISMATCH, self-applied argument against a number
 -- CHECK: -- TYPE MISMATCH -
 

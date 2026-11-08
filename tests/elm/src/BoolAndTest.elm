@@ -3,6 +3,7 @@ module BoolAndTest exposing (main)
 {-| The `&&` operator gives `True` only when both operands are `True`, checked over all four combinations.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: and1: True
 -- CHECK: and2: False
 -- CHECK: and3: False

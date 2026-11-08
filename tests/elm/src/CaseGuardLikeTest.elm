@@ -9,6 +9,7 @@ four results `"A"`, `"B"`, `"C"` and `"F"` once.
 
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-atpat-con, d-atpat-con-fail
 -- CHECK: grade1: "A"
 -- CHECK: grade2: "B"
 -- CHECK: grade3: "C"

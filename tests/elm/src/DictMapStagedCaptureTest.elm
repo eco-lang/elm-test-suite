@@ -11,6 +11,7 @@ and 20 become 15 and 25.
 
 -}
 
+-- TAGS: elm-spec, d-app-closure, d-exp-lambda, d-atpat-tuple
 -- CHECK: result: [("a",("hello",15)),("b",("world",25))]
 
 import Dict

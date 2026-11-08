@@ -8,6 +8,7 @@ pattern in `one` must not be confused with the separate patterns of `two`:
 and `"b"`, and `two "a,s:b"` falls to the wildcard.
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-match-next
 -- CHECK: one_comma: "comma"
 -- CHECK: one_a: "other"
 -- CHECK: two_a: "a"

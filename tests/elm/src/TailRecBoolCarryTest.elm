@@ -8,6 +8,7 @@ next, and sets it from a branch inside a `case`, returns the right result.
 otherwise. So `[1, 2, 3, 10]` gives 10, `[1, 2, 3]` gives 0, and `[1, 42]` gives 42.
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-atpat-nil, d-match-next
 -- CHECK: result1: 10
 -- CHECK: result2: 0
 -- CHECK: result3: 42

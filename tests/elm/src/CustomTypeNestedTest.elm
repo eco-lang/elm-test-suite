@@ -8,6 +8,7 @@ text itself is not checked.
 
 -}
 
+-- TAGS: elm-spec, sm-datbind, sm-conbind, d-app-con
 -- CHECK: nested
 
 import Html exposing (text)

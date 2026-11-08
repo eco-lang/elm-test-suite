@@ -4,6 +4,7 @@ module LetNumberResultMapTest exposing (main)
 `Result.map (\x -> round (x * 1.5)) (Ok 30)`, unwrapped by a `case`, logs 45.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: result: 45
 
 import Html exposing (text)

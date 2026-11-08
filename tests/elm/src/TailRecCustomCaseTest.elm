@@ -5,6 +5,7 @@ destructures its `Cons` constructor gives the right result: summing
 `Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil)))` is 10.
 -}
 
+-- TAGS: elm-spec, sm-datbind, d-pat-con, d-atpat-con
 -- CHECK: total: 10
 
 import Html exposing (text)

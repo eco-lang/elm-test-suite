@@ -10,6 +10,7 @@ Elm 0.19.1 rejects this program, saying `SearchResult state` does not match
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-dec-group, d-dec-rec
 -- CHECK: result: Goal
 
 import Html exposing (text)

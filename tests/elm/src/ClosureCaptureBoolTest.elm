@@ -7,6 +7,7 @@ function that remembers that `Bool`.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: when_true: 1
 -- CHECK: when_false: 0
 

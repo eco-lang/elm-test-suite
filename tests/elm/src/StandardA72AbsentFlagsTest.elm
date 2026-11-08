@@ -12,6 +12,7 @@ initialization."
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, p-init, e-dec-nothing
 -- CHECK: flags: Nothing
 
 

@@ -6,6 +6,7 @@ The test prints the list, its `List.head`, and the list with `0.0` consed onto t
 
 -}
 
+-- TAGS: elm-spec, s-atexp-op, d-app-con
 -- CHECK: list: [1,2.5,3.75]
 -- CHECK: head: Just 1
 -- CHECK: prepend: [0,1,2.5,3.75]

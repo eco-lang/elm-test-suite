@@ -5,6 +5,7 @@ function arguments take apart again.
 `A 1`, `B 1 1`, `C 1 1 1` and `D 1 1 1 1` are each unwrapped and their fields
 summed, giving 1 + 2 + 3 + 4 = 10.
 -}
+-- TAGS: elm-spec, sm-conbind, d-app-con, s-pat-con, d-pat-con
 -- CHECK: ctorScale: 10
 import Html exposing (text)
 type A = A Int

@@ -10,6 +10,7 @@ threshold 0 the result is `[1,2,3]`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, d-dec-rec, d-atexp-let
 -- CHECK: LetRecClosureTest: [1,2,3]
 
 import Html exposing (text)

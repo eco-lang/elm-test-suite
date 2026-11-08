@@ -4,6 +4,7 @@ module TypeMismatchFloatUnderIntTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-scon
 -- COMPILE-ERROR: TYPE MISMATCH, float under Int
 -- CHECK: -- TYPE MISMATCH -
 

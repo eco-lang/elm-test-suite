@@ -9,6 +9,7 @@ counts 2 nodes.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-var, s-atexp-longvar, sm-datbind
 -- CHECK: size: 2
 
 import Html exposing (text)

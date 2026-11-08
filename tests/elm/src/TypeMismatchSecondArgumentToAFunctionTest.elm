@@ -7,6 +7,7 @@ module TypeMismatchSecondArgumentToAFunctionTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, second argument to a function
 -- CHECK: -- TYPE MISMATCH -
 

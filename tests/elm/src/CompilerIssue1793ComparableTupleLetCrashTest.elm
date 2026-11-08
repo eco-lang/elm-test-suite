@@ -9,6 +9,7 @@ Elm 0.19.1 crashes ("index out of bounds") on this valid program; it should comp
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-atexp-op, s-dec-group, d-app-basic-apply
 -- CHECK: f 1: True
 
 import Html exposing (text)

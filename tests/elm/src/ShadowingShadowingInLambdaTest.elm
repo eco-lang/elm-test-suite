@@ -7,6 +7,7 @@ In `test y = \y -> y`, the lambda's `y` shadows the function's `y`.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-no-shadowing
 -- COMPILE-ERROR: SHADOWING, shadowing in lambda
 -- CHECK: -- SHADOWING -
 

@@ -7,6 +7,7 @@ module InlineDupLetNamesTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, d-atpat-tuple, d-atpat-scon-fail, d-match-next
 -- CHECK: InlineDupLetNamesTest: 6
 
 import Html exposing (text)

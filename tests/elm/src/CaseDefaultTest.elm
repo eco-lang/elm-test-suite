@@ -3,6 +3,7 @@ module CaseDefaultTest exposing (main)
 {-| A case on Int with one literal branch and a wildcard sends every other value to the wildcard.
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-atpat-wild
 -- CHECK: default1: "special"
 -- CHECK: default2: "normal"
 -- CHECK: default3: "normal"

@@ -4,6 +4,7 @@ module CaseListConsTest exposing (main)
 sums the empty list, a one-element list and a three-element list correctly.
 -}
 
+-- TAGS: elm-spec, s-pat-cons, d-pat-cons, d-atpat-nil
 -- CHECK: sum1: 0
 -- CHECK: sum2: 1
 -- CHECK: sum3: 6

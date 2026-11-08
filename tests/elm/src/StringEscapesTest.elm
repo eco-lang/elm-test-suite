@@ -6,6 +6,7 @@ module StringEscapesTest exposing (main)
 The newline and tab strings are logged too, but only their labels are checked.
 -}
 
+-- TAGS: elm-spec, d-atexp-scon
 -- CHECK: newline
 -- CHECK: tab
 -- CHECK: quote: "\""

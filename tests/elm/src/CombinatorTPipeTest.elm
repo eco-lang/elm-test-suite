@@ -6,6 +6,7 @@ module CombinatorTPipeTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, d-app-closure, d-app-basic-partial
 -- CHECK: result: 12
 
 import Html exposing (text)

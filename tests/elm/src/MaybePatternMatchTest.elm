@@ -6,6 +6,7 @@ module MaybePatternMatchTest exposing (main)
 `unwrap Nothing` is `0`.
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-pat-con-fail, d-atpat-con, d-match-next
 -- CHECK: match1: 42
 -- CHECK: match2: 0
 

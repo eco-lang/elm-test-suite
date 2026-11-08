@@ -7,6 +7,7 @@ module TypeMismatchRigidVarAgainstItsMaybeTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-ty-con
 -- COMPILE-ERROR: TYPE MISMATCH, rigid var against its Maybe
 -- CHECK: -- TYPE MISMATCH -
 

@@ -7,6 +7,7 @@ over a list of `Float`s is a `Float`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: foldl: 4
 
 import Html exposing (text)

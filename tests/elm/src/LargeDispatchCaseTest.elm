@@ -10,6 +10,7 @@ constructors are not used.
 
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-pat-con, d-atpat-scon, d-match-next
 -- CHECK: r1: 3
 -- CHECK: r2: -1
 -- CHECK: r3: -5

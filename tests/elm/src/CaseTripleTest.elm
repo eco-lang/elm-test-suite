@@ -8,6 +8,7 @@ of the four inputs reaches a different one.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-tuple, d-atpat-scon-fail, d-match-first
 -- CHECK: triple1: "all zero"
 -- CHECK: triple2: "x zero"
 -- CHECK: triple3: "z zero"

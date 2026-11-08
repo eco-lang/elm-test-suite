@@ -4,6 +4,7 @@ module CaseResultTest exposing (main)
 `Err`.
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-pat-con-fail
 -- CHECK: res1: 42
 -- CHECK: res2: -1
 -- CHECK: res3: 100

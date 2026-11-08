@@ -10,6 +10,7 @@ destructuring it, and returns a count. It runs once per member, so `lambdaId`
 is logged twice; the CHECK line matches the first.
 -}
 
+-- TAGS: elm-spec, s-atpat-record, d-atpat-record, d-patrow-field
 -- CHECK: lambdaId: LambdaId 999
 
 import Html exposing (text)

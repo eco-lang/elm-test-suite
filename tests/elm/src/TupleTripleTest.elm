@@ -4,6 +4,7 @@ module TupleTripleTest exposing (main)
 by `Debug.log` as `(1,2,3)` and `("a","b","c")`.
 -}
 
+-- TAGS: elm-spec, s-atexp-tuple, d-atexp-tuple
 -- CHECK: triple1: (1,2,3)
 -- CHECK: triple2: ("a","b","c")
 

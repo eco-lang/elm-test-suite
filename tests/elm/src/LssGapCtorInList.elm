@@ -4,6 +4,7 @@ module LssGapCtorInList exposing (main)
 `makers` is `[ Wrap ]`; `runFirst` applies the first function in the list
 and unwraps the result, printing 7.
 -}
+-- TAGS: elm-spec, s-atexp-longcon, d-atexp-con, d-app-con
 -- CHECK: ctorInList: 7
 import Html exposing (text)
 type Wrap = Wrap Int

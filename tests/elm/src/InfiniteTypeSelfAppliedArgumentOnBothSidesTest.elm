@@ -9,6 +9,7 @@ be a function taking its own type. `y` is never used, and the body returns
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-exp-lambda
 -- COMPILE-ERROR: INFINITE TYPE, self-applied argument on both sides
 -- CHECK: -- INFINITE TYPE -
 

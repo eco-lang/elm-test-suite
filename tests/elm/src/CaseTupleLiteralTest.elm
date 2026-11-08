@@ -9,6 +9,7 @@ branches once.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-tuple, d-atpat-scon-fail, d-match-first
 -- CHECK: origin: "origin"
 -- CHECK: xaxis: "x-axis"
 -- CHECK: yaxis: "y-axis"

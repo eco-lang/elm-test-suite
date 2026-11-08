@@ -9,6 +9,7 @@ which multiplies the field by `1.5`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: rec2fn: 45
 
 import Html exposing (text)

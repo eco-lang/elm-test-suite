@@ -3,6 +3,7 @@ module TailRecursiveSumTest exposing (main)
 {-| A tail-recursive accumulator function sums the integers from 1 to n correctly for n = 5, 10 and 100.
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, dm-topdec-val
 -- CHECK: sum1: 15
 -- CHECK: sum2: 55
 -- CHECK: sum3: 5050

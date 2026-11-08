@@ -10,6 +10,7 @@ call, so its result (142) comes from the lambda it starts with rather than from
 
 -}
 
+-- TAGS: elm-spec, s-atpat-record, d-patrow-field, d-dec-rec
 -- CHECK: results: [2,11,142,42]
 
 import Html exposing (text)

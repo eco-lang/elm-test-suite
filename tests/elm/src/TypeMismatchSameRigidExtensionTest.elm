@@ -7,6 +7,7 @@ module TypeMismatchSameRigidExtensionTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-ty-openrecord
 -- COMPILE-ERROR: TYPE MISMATCH, same rigid extension
 -- CHECK: -- TYPE MISMATCH -
 

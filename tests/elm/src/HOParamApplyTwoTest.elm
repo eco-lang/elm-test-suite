@@ -6,6 +6,7 @@ module HOParamApplyTwoTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: result: 1
 
 import Html exposing (text)

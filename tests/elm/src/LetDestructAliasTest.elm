@@ -4,6 +4,7 @@ module LetDestructAliasTest exposing (main)
 `((a, b)) as pair = (1, 2)`, `pair` is `(1,2)` and `a` is 1.
 -}
 
+-- TAGS: elm-spec, s-valbind-pat, d-valbind-pat, d-pat-as
 -- CHECK: pair: (1,2)
 -- CHECK: first: 1
 

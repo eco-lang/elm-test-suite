@@ -14,6 +14,7 @@ empty inner list, and an empty list.
 
 -}
 
+-- TAGS: elm-spec, e-enc-list, e-enc-just, e-enc-nothing, e-enc-tuple, e-dec-list, e-dec-just, e-dec-nothing, e-dec-tuple
 -- CHECK: PortEchoNestedTest got: [Just (1,["x","y"]),Nothing,Just (2,[])]
 -- CHECK: PortEchoNestedTest got: []
 -- CHECK: PortEchoNestedTest: "done"

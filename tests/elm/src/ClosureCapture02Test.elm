@@ -8,6 +8,7 @@ gives `"hello"` and `Nothing` gives `"none"`.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure, d-pat-con
 -- CHECK: just: "hello"
 -- CHECK: nothing: "none"
 

@@ -10,6 +10,7 @@ that annotation fixes the fields to `Float`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: scale: 105
 
 import Html exposing (text)

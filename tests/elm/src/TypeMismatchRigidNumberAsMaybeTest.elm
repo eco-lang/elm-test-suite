@@ -7,6 +7,7 @@ module TypeMismatchRigidNumberAsMaybeTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-longcon
 -- COMPILE-ERROR: TYPE MISMATCH, rigid number as Maybe
 -- CHECK: -- TYPE MISMATCH -
 

@@ -6,6 +6,7 @@ module LetNumberWildcardSlotTest exposing (main)
 `round (c * 1.5)` logs 120.
 -}
 
+-- TAGS: elm-spec, s-atexp-scon, d-atexp-scon, d-atpat-wild
 -- CHECK: wildslot: 120
 
 import Html exposing (text)

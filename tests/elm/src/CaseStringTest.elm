@@ -4,6 +4,7 @@ module CaseStringTest exposing (main)
 returns the `Int` of the matching branch.
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-atpat-wild
 -- CHECK: case1: 1
 -- CHECK: case2: 2
 -- CHECK: case3: 0

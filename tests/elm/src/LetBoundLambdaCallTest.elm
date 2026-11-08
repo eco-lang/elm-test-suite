@@ -4,6 +4,7 @@ module LetBoundLambdaCallTest exposing (main)
 arguments: `(\x y -> x) 1 2` returns the first, 1.
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: result: 1
 
 import Html exposing (text)

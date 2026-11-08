@@ -8,6 +8,7 @@ naming only the fields it reads, while the records passed in have four outer and
 five inner fields. Both members hold `LambdaId 999`, so the sum is 1998.
 -}
 
+-- TAGS: elm-spec, s-ty-openrecord, s-valbind-var, d-patrow-field
 -- CHECK: uid: 1998
 
 import Html exposing (text)

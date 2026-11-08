@@ -9,6 +9,7 @@ logs `done` after a 300 ms sleep, by which time every level has run.
 
 -}
 
+-- TAGS: elm-spec, p-proc-spawn, p-proc-sleep
 -- CHECK: recurse: "spawned 1"
 -- CHECK: recurse: "spawned 2"
 -- CHECK: recurse: "spawned 3"

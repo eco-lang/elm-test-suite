@@ -10,6 +10,7 @@ operands give `True`.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: vTT: True
 -- CHECK: vTF: False
 -- CHECK: vFT: False

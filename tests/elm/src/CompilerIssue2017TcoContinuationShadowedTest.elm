@@ -11,6 +11,7 @@ stack. `windDown 1 identity` should call `identity 1` and return 1.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: windDown: 1
 
 import Html exposing (text)

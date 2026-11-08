@@ -7,6 +7,7 @@ module TypeMismatchAccessorUnderIntTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-exp-lambda
 -- COMPILE-ERROR: TYPE MISMATCH, accessor under Int
 -- CHECK: -- TYPE MISMATCH -
 

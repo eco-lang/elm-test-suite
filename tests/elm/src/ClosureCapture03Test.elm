@@ -9,6 +9,7 @@ gives 42 and `Err "bad"` gives -1.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure, sm-topdec-seq
 -- CHECK: ok: 42
 -- CHECK: err: -1
 

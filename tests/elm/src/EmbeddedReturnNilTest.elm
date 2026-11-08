@@ -9,6 +9,7 @@ caller receives it like any other list.
 
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-atpat-nil
 -- CHECK: r1: [2,4]
 -- CHECK: r2: []
 

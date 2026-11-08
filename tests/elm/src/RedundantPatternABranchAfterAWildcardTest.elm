@@ -8,6 +8,7 @@ branch can never be reached.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-irredundancy
 -- COMPILE-ERROR: REDUNDANT PATTERN, a branch after a wildcard
 -- CHECK: -- REDUNDANT PATTERN -
 

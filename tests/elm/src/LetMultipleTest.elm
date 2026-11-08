@@ -4,6 +4,7 @@ module LetMultipleTest exposing (main)
 their product (120).
 -}
 
+-- TAGS: elm-spec, d-atexp-let, d-dec-nonrec
 -- CHECK: sum: 15
 -- CHECK: product: 120
 

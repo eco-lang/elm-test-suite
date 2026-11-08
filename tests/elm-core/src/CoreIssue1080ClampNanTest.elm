@@ -11,6 +11,7 @@ returns 100.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: clamp nan: NaN
 
 import Html exposing (text)

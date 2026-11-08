@@ -7,6 +7,7 @@ module TooManyArgsAConstructorPatternWithTooManyArgumentsTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-pat-con
 -- COMPILE-ERROR: TOO MANY ARGS, a constructor pattern with too many arguments
 -- CHECK: -- TOO MANY ARGS -
 

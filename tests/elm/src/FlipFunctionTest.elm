@@ -5,6 +5,7 @@ module FlipFunctionTest exposing (main)
 `flip (\a b -> 3.14) "world" 7` calls the lambda with 7 and `"world"`, which ignores both and returns 3.14.
 -}
 
+-- TAGS: elm-spec, s-valbind-var, d-app-closure
 -- CHECK: result: 3.14
 
 import Html exposing (text)

@@ -5,6 +5,7 @@ module LetNumberTupleSecondTest exposing (main)
 `round (Tuple.second p * 1.5)` with `p = ( 99, 30 )` logs 45.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: tup2: 45
 
 import Html exposing (text)

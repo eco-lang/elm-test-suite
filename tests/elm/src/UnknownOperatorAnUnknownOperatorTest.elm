@@ -6,6 +6,7 @@ error.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op
 -- COMPILE-ERROR: UNKNOWN OPERATOR, an unknown operator
 -- CHECK: -- UNKNOWN OPERATOR -
 

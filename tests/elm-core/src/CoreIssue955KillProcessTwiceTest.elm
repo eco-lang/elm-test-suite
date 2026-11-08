@@ -10,6 +10,7 @@ dead process should be a no-op, and the task should complete.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, p-proc-spawn, p-proc-kill, e-task-andthen-succeed
 -- CHECK: killed twice: ()
 
 import Process

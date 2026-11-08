@@ -3,6 +3,7 @@ module CaseCustomType4Test exposing (main)
 {-| A case on a custom type with four constructors and no arguments, with one branch per constructor, selects the right branch for each.
 -}
 
+-- TAGS: elm-spec, d-atpat-con, d-atpat-con-fail
 -- CHECK: dir1: "up"
 -- CHECK: dir2: "down"
 -- CHECK: dir3: "left"

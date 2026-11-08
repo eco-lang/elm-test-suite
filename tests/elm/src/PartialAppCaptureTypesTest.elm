@@ -9,6 +9,7 @@ logs the value it was given. A last case partially applies `addFloat` to
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure, s-atexp-longvar
 -- CHECK: float_cap: 1.5
 -- CHECK: char_cap: 'x'
 -- CHECK: bool_cap: True

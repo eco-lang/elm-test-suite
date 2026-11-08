@@ -4,6 +4,7 @@ module CompareIntTest exposing (main)
 operands.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: cmp1: LT
 -- CHECK: cmp2: GT
 -- CHECK: cmp3: EQ

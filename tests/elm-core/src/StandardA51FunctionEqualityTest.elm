@@ -13,6 +13,7 @@ Elm 0.19.1 stops the program: "Trying to use `(==)` on functions."
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, d-app-basic-apply
 -- CHECK: compared: True
 
 import Html

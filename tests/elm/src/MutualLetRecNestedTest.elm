@@ -8,6 +8,7 @@ gives the parameter sum `42`; ending in `innerBig` gives twice that, `84`. So
 odd `n` logs `42` and even `n` logs `84`.
 -}
 
+-- TAGS: elm-spec, d-dec-rec, d-exp-lambda, d-app-closure
 -- CHECK: run 3: 42
 -- CHECK: run 2: 84
 -- CHECK: run 1: 42

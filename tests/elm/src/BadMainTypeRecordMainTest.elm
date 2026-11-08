@@ -5,6 +5,7 @@ module BadMainTypeRecordMainTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, p-stat-main-program, p-stat-main-view
 -- COMPILE-ERROR: BAD MAIN TYPE, record main
 -- CHECK: -- BAD MAIN TYPE -
 

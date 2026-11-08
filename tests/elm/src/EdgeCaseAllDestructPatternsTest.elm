@@ -8,6 +8,7 @@ and `(v as w)` binds 6, so the result `[ a, x, h, v ]` is `[1,3,4,6]`.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-pat, d-valbind-pat, d-atpat-tuple, d-atpat-record, d-pat-as
 -- CHECK: testValue: [1,3,4,6]
 
 import Basics exposing (..)

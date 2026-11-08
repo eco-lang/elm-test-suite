@@ -12,6 +12,7 @@ then `"ok"`, and drops its subscription.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-portout, s-ty-con, e-enc-record, e-dec-record
 -- CHECK: PortAliasEchoTest got: { n = 42, s = "hi" }
 -- CHECK: PortAliasEchoTest done: "ok"
 

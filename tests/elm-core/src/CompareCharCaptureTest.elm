@@ -7,6 +7,7 @@ module CompareCharCaptureTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, d-app-basic-partial, d-app-basic-apply
 -- CHECK: sorted: ['a','b','c','d','e']
 -- CHECK: reverse_sorted: ['e','d','c','b','a']
 

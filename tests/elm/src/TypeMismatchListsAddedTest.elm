@@ -8,6 +8,7 @@ Lists are joined with `++`, not `+`.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, lists added
 -- CHECK: -- TYPE MISMATCH -
 

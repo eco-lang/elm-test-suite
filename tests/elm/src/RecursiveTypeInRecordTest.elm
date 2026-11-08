@@ -7,6 +7,7 @@ evaluates `Add { left = Lit 1, right = Add { left = Lit 2, right = Lit 3 } }` by
 matching and field access, and expects `6`.
 -}
 
+-- TAGS: elm-spec, sm-topdec-types, sm-conbind, s-ty-record, d-patrow-field
 -- CHECK: eval: 6
 
 import Html exposing (text)

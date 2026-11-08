@@ -8,6 +8,7 @@ give `False` is checked.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: lt: True
 -- CHECK: gt: True
 -- CHECK: le1: True

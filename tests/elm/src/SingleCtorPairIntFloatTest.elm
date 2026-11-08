@@ -8,6 +8,7 @@ above its threshold of 100.0.
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-var
 -- CHECK: unwrap_int: 42
 -- CHECK: unwrap_float: 2.718
 -- CHECK: match_int_pos: "positive"

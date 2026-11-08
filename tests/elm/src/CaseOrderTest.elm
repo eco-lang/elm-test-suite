@@ -4,6 +4,7 @@ module CaseOrderTest exposing (main)
 string, using the results of `compare` on `Int` values.
 -}
 
+-- TAGS: elm-spec, d-atpat-con, d-atpat-con-fail
 -- CHECK: ord1: "less"
 -- CHECK: ord2: "equal"
 -- CHECK: ord3: "greater"

@@ -10,6 +10,7 @@ rejects the definition with a TYPE MISMATCH between `a -> b` and `Identity a -> 
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, sm-typbind, s-ty-con
 -- CHECK: map: 3
 
 import Html exposing (text)

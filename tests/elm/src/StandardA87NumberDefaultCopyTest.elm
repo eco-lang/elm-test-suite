@@ -14,6 +14,7 @@ kind of number, so the first branch never runs.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, p-dyn-module, d-atexp-scon
 -- CHECK: the Int copy of x is evaluated: 1
 -- CHECK: x + 0.5: 1.5
 

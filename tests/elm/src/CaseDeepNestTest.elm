@@ -3,6 +3,7 @@ module CaseDeepNestTest exposing (main)
 {-| Case expressions on Int nested two and three levels deep, each with literal branches and a wildcard, reach the right innermost branch.
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-atpat-scon, d-atpat-scon-fail
 -- CHECK: r1: "x=0,y=0"
 -- CHECK: r2: "x=0,y=other"
 -- CHECK: r3: "x=1,y=0"

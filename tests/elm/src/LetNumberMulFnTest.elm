@@ -9,6 +9,7 @@ parameter type of `mulF` fixes `n` to `Float`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: mulFn: 45
 
 import Html exposing (text)

@@ -13,6 +13,7 @@ also stops Elm 0.19.1, elm/core #955.)
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, p-proc-sleep, p-proc-kill
 -- CHECK: checked after 200 ms: ()
 -- CHECK-NOT: the long sleep ended
 

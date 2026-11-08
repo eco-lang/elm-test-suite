@@ -12,6 +12,7 @@ this is a TYPE MISMATCH.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, not a compiler crash
 -- CHECK-NOT: HasCallStack
 -- CHECK: -- TYPE MISMATCH -

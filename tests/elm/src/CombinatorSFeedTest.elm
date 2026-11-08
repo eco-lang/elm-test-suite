@@ -3,6 +3,7 @@ module CombinatorSFeedTest exposing (main)
 {-| The S combinator, which gives its argument to a function together with a second function's result on that argument: `s (+) double 5` is `5 + double 5`, which is 15.
 -}
 
+-- TAGS: elm-spec, d-atexp-op, d-app-closure
 -- CHECK: result: 15
 
 import Html exposing (text)

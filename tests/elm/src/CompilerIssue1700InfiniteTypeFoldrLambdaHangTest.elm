@@ -9,6 +9,7 @@ Elm 0.19.1 hangs on it, its memory growing without bound, instead of reporting t
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-exp-app, s-atexp-op
 -- COMPILE-ERROR: a type error, not a hang
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: HasCallStack

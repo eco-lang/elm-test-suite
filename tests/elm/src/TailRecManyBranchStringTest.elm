@@ -7,6 +7,7 @@ matches the name `"beta"` in a `case` on string literals and returns
 `"found-beta"`.
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-atpat-scon, d-atpat-scon-fail
 -- CHECK: result: "found-beta"
 
 import Html exposing (text)

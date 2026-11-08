@@ -7,6 +7,7 @@ module NotEqualBoolCaseTest exposing (main)
 exactly when the operands differ.
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-atpat-con, d-atpat-con-fail
 -- CHECK: cTT: "no"
 -- CHECK: cTF: "yes"
 -- CHECK: cFT: "yes"

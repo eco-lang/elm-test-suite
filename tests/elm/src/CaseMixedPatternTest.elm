@@ -15,6 +15,7 @@ Among what is not tested: the `Nested (Just [])` and `Nested Nothing` branches.
 
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-pat-cons, d-atpat-nil
 -- CHECK: head: 42
 -- CHECK: empty: 0
 -- CHECK: pair_head: 10

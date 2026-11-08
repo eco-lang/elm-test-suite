@@ -14,6 +14,7 @@ Subscriptions returned together with a command must be active when the command r
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, p-update, p-out, p-in-accept, e-msg-port
 -- CHECK: got: "hello"
 
 import Process

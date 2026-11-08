@@ -9,6 +9,7 @@ reads `captures`, `params` and `lambdaId` of `inner`; both members hold
 `LambdaId 999`, so the sum is 1998.
 -}
 
+-- TAGS: elm-spec, s-valbind-var, s-ty-con, d-patrow-field
 -- CHECK: uid: 1998
 
 import Html exposing (text)

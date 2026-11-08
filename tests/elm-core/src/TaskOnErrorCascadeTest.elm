@@ -15,6 +15,7 @@ Among what is not tested: a handler that fails again, and a failure that reaches
 
 -}
 
+-- TAGS: elm-spec, e-task-andthen-succeed, e-task-andthen-fail, e-task-onerror-fail, e-task-andthen-inner
 -- CHECK: onerr: "recovered 1"
 -- CHECK: onerr: "recovered 2"
 -- CHECK: onerr: "recovered 3"

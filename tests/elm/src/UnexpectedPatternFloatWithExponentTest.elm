@@ -9,6 +9,7 @@ written with an exponent is a float.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-no-float-pattern
 -- COMPILE-ERROR: UNEXPECTED PATTERN
 -- CHECK: -- UNEXPECTED PATTERN -
 

@@ -3,6 +3,7 @@ module FloatAbsTest exposing (main)
 {-| `abs` on a positive, a negative and a zero `Float`.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: abs1: 3.14
 -- CHECK: abs2: 3.14
 -- CHECK: abs3: 0

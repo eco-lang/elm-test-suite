@@ -6,6 +6,7 @@ The test prints the list, its `List.head`, and the list with `'z'` consed onto t
 
 -}
 
+-- TAGS: elm-spec, s-atexp-op, d-app-con
 -- CHECK: list: ['a','b','c']
 -- CHECK: head: Just 'a'
 -- CHECK: prepend: ['z','a','b','c']

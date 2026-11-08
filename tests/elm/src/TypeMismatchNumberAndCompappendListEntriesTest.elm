@@ -7,6 +7,7 @@ All entries of a list share one type. `c` must be a `compappend` (appendable and
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, number and compappend list entries
 -- CHECK: -- TYPE MISMATCH -
 

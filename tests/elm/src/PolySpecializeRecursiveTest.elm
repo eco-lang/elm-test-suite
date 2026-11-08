@@ -9,6 +9,7 @@ list and self-concatenation over the `String` list.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, s-valbind-var, s-atexp-longvar
 -- CHECK: intLen: 3
 -- CHECK: strLen: 2
 -- CHECK: intMap: [2,4,6]

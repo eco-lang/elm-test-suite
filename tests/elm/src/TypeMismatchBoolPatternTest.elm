@@ -7,6 +7,7 @@ module TypeMismatchBoolPatternTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-case, s-atpat-con, s-atexp-scon
 -- COMPILE-ERROR: TYPE MISMATCH, bool pattern
 -- CHECK: -- TYPE MISMATCH -
 

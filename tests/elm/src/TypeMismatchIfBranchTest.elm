@@ -4,6 +4,7 @@ module TypeMismatchIfBranchTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-match
 -- COMPILE-ERROR: TYPE MISMATCH, if branch
 -- CHECK: -- TYPE MISMATCH -
 

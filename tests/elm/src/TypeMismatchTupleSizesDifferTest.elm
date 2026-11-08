@@ -7,6 +7,7 @@ module TypeMismatchTupleSizesDifferTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-tuple, s-ty-tuple
 -- COMPILE-ERROR: TYPE MISMATCH, tuple sizes differ
 -- CHECK: -- TYPE MISMATCH -
 

@@ -12,6 +12,7 @@ evaluated only when needed and its `Debug.log` never runs.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, d-atexp-op, d-exp-app
 -- CHECK: second argument of (&&): True
 -- CHECK: (&&) False _: False
 -- CHECK: second argument of (||): False

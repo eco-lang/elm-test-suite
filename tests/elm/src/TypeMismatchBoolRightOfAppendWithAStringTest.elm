@@ -7,6 +7,7 @@ module TypeMismatchBoolRightOfAppendWithAStringTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, Bool right of ++ with a string
 -- CHECK: -- TYPE MISMATCH -
 

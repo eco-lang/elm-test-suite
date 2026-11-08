@@ -9,6 +9,7 @@ and dividing 10 by 0 logs -1.
 
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-pat-con, d-atpat-con
 -- CHECK: r1: 5
 -- CHECK: r2: -1
 

@@ -7,6 +7,7 @@ reads `captures`, `params` and `lambdaId`. Both members hold `LambdaId 999`, so
 the sum is 1998.
 -}
 
+-- TAGS: elm-spec, s-atpat-record, d-atpat-record, d-patrow-field
 -- CHECK: uid: 1998
 
 import Html exposing (text)

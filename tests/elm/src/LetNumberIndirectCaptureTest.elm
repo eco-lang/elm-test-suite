@@ -7,6 +7,7 @@ With `k = 30`, `(\x -> x * k) 2.5` is 75.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: capture: 75
 
 import Html exposing (text)

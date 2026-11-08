@@ -12,6 +12,7 @@ must call the one it wraps. Elm 0.19.1 turns the tail call into a loop that reas
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: g 5: 120
 
 import Html exposing (text)

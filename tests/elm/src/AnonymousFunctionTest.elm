@@ -3,6 +3,7 @@ module AnonymousFunctionTest exposing (main)
 {-| Anonymous functions work as the function argument of `List.map`, `List.foldl` and `List.filter`.
 -}
 
+-- TAGS: elm-spec, s-exp-lambda, d-exp-lambda, d-app-closure
 -- CHECK: lambda1: [2,4,6]
 -- CHECK: lambda2: 15
 -- CHECK: lambda3: [2,4]

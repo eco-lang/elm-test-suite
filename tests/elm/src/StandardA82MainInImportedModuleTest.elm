@@ -12,6 +12,7 @@ program type; a `main` in any other module is an ordinary value.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, p-stat-main-program, p-dyn-module
 -- CHECK: helper main + 1: 43
 
 import Html

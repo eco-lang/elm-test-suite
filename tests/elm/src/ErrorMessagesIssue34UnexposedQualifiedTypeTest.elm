@@ -10,6 +10,7 @@ module ErrorMessagesIssue34UnexposedQualifiedTypeTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-ty-con
 -- COMPILE-ERROR: NAMING ERROR, a qualified type that the module does not expose
 -- CHECK: -- NAMING ERROR -
 -- CHECK: The `List` module does not expose a `Bar` type.

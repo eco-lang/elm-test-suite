@@ -8,6 +8,7 @@ Destructuring `f ()` gives `first` as `()` and `second` as 42.
 
 -}
 
+-- TAGS: elm-spec, d-atexp-unit, d-atpat-unit, d-valbind-pat
 -- CHECK: first: ()
 -- CHECK: second: 42
 

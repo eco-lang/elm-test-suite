@@ -14,6 +14,7 @@ Folding `step` over `[ 1, 2, 3, 4, 9 ]` applies `bumpB`, `bumpA`, `bumpB`,
 
 import Html exposing (text)
 
+-- TAGS: elm-spec, d-app-closure, d-app-con, d-pat-con, d-atexp-update
 -- CHECK: final: { depth = 9, stats = { a = 2, b = 2, shape = 4 } }
 
 

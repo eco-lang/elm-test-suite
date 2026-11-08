@@ -12,6 +12,7 @@ Fixed in Elm 0.19.3.
 -}
 
 -- TAGS: elm19-bug-fix
+-- TAGS: elm-spec, sm-topdec-value, s-atexp-update
 -- CHECK: result: { x = (), y = () }
 
 import Html exposing (text)

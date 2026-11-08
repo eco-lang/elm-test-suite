@@ -4,6 +4,7 @@ module LetMultiFuncTest exposing (main)
 `identity` returns its argument (1) and a local `const` returns the first of two (2).
 -}
 
+-- TAGS: elm-spec, s-atexp-let, d-atexp-let, d-app-closure
 -- CHECK: r1: 1
 -- CHECK: r2: 2
 

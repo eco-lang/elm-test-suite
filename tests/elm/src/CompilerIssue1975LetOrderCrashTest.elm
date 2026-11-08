@@ -11,6 +11,7 @@ the normal report).
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-exp-app, s-exp-lambda
 -- COMPILE-ERROR: record is not a Type
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: out of bounds

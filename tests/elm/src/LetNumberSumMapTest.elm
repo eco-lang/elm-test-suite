@@ -4,6 +4,7 @@ module LetNumberSumMapTest exposing (main)
 `Float`: `round (List.sum (List.map (\x -> x * 1.5) [ 30, 40 ]))` logs 105.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: summap: 105
 
 import Html exposing (text)

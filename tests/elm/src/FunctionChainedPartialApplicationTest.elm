@@ -7,6 +7,7 @@ waiting for its third argument.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: testValue: <function>
 
 import Basics exposing (..)

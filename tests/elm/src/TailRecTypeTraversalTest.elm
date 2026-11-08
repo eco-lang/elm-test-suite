@@ -7,6 +7,7 @@ to `"integer"`. The `TList` branch, whose recursive call is not in tail
 position, is not exercised.
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-atpat-scon
 -- CHECK: result: "integer"
 
 import Html exposing (text)

@@ -7,6 +7,7 @@ escaped literal `'\\'`, selects the branch matching the scrutinee.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail
 -- CHECK: result: "comma"
 
 import Html exposing (text)

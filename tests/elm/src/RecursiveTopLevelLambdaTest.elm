@@ -6,6 +6,7 @@ module RecursiveTopLevelLambdaTest exposing (..)
 `count (n + 1)` until `n > 3`, so `count 0` gives 4.
 -}
 
+-- TAGS: elm-spec, modules-value-recursion, sm-topdec-value, dm-topdec-val
 -- CHECK: testValue: 4
 
 import Basics exposing (..)

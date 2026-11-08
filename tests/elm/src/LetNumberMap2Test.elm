@@ -9,6 +9,7 @@ which makes it a `Float`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: map2: [45,60]
 
 import Html exposing (text)

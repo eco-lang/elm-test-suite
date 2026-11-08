@@ -3,6 +3,7 @@ module CaseCharManyBranchTest exposing (main)
 {-| A case on Char with ten literal branches (`'0'` to `'9'`) and a wildcard maps digit characters to their values and anything else to -1.
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-atpat-wild
 -- CHECK: d0: 0
 -- CHECK: d5: 5
 -- CHECK: d9: 9

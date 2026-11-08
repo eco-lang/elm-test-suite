@@ -4,6 +4,7 @@ module LetNestedTest exposing (main)
 inner binding 10 is multiplied by 3, giving 30.
 -}
 
+-- TAGS: elm-spec, d-atexp-let
 -- CHECK: nested: 30
 
 import Html exposing (text)

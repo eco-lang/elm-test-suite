@@ -7,6 +7,7 @@ returns more than one element.
 
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-match-next, s-atexp-longcon
 -- CHECK: testValue: [1]
 
 import Basics exposing (..)

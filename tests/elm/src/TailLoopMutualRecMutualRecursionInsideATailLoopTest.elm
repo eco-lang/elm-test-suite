@@ -10,6 +10,7 @@ holds, so `loop 4 0` counts the even numbers 4 and 2 and returns 2.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, d-dec-rec, core-let-recursion
 -- CHECK: testValue: 2
 
 import Basics exposing (..)

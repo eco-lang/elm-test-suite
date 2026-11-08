@@ -9,6 +9,7 @@ are multiples of 32 that are not powers of two.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: append32: True
 -- CHECK: append64: True
 -- CHECK: append96: True

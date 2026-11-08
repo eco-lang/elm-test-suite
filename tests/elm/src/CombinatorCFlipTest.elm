@@ -6,6 +6,7 @@ module CombinatorCFlipTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, d-app-closure
 -- CHECK: result: -7
 
 import Html exposing (text)

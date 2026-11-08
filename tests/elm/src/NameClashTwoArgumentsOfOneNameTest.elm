@@ -5,6 +5,7 @@ module NameClashTwoArgumentsOfOneNameTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-binding-site-distinct
 -- COMPILE-ERROR: NAME CLASH, two arguments of one name
 -- CHECK: -- NAME CLASH -
 

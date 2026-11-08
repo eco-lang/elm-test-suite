@@ -7,6 +7,7 @@ log shows `testValue: 1`.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, s-atpat-record, d-atpat-record, d-patrow-field
 -- CHECK: testValue: 1
 
 import Basics exposing (..)

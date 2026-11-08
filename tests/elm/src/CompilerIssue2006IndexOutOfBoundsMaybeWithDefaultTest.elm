@@ -10,6 +10,7 @@ bounds") instead of reporting the type mismatch.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-exp-app
 -- COMPILE-ERROR: Model is not Subtype
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: out of bounds

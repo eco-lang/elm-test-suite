@@ -10,6 +10,7 @@ when `flag` is True and by 2 otherwise. Both values of the flag are covered:
   - `count 5`: flag False, i = 0, 2, 4, result 4
 -}
 
+-- TAGS: elm-spec, d-dec-rec, d-atexp-let, d-exp-lambda
 -- CHECK: count_true: 3
 -- CHECK: count_false: 4
 

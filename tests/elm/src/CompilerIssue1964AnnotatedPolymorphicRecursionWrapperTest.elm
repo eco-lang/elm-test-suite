@@ -12,6 +12,7 @@ is 2.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, sm-topdec-value, s-valbind-var
 -- CHECK: depth: 2
 
 import Html exposing (text)

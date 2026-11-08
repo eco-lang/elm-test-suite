@@ -5,6 +5,7 @@ module EtaExpandSeventeenArgumentAliasTest exposing (..)
 `wide` and `wider` are defined with one parameter against the `Big` alias, and `unused` passes a lambda to `useBig`, which takes a `Big`. None of them is called at run time; the program only logs `testValue`, which is 1.
 -}
 
+-- TAGS: elm-spec, sm-typbind, s-ty-con, s-valbind-var
 -- CHECK: testValue: 1
 
 import Basics exposing (..)

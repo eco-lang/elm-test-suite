@@ -9,6 +9,7 @@ cannot be appended.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-tuple, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, compappend against a tuple
 -- CHECK: -- TYPE MISMATCH -
 

@@ -22,6 +22,7 @@ and the `x * k` use, with `k` a `Float` literal, makes it a `Float`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-longvar, s-atexp-scon, d-atexp-scon
 -- CHECK: scalar: 9
 -- CHECK: listSum: 15
 -- CHECK: tupleFirst: 3

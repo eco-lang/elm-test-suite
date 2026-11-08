@@ -4,6 +4,7 @@ module TypeMismatchFieldTypoTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atpat-record, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, field typo
 -- CHECK: -- TYPE MISMATCH -
 

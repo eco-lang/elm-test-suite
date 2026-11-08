@@ -9,6 +9,7 @@ parameter type fixes the pair's elements to `Float`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: tup2fn: 105
 
 import Html exposing (text)

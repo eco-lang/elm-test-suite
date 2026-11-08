@@ -4,6 +4,7 @@ module PartialApplicationTest exposing (main)
 and passed to `List.map`.
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: partial1: 7
 -- CHECK: partial2: 15
 -- CHECK: partial3: [2,3,4]

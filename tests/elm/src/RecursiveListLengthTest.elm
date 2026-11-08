@@ -3,6 +3,7 @@ module RecursiveListLengthTest exposing (main)
 {-| A self-recursive function that pattern matches on `[]` and `_ :: rest` counts the elements of lists of length 0, 3 and 5.
 -}
 
+-- TAGS: elm-spec, d-atpat-nil, d-atpat-nil-fail, d-pat-cons, sm-topdec-value
 -- CHECK: len0: 0
 -- CHECK: len3: 3
 -- CHECK: len5: 5

@@ -8,6 +8,7 @@ gives `[30,31]`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: listclos: [30,31]
 
 import Html exposing (text)

@@ -3,6 +3,7 @@ module IntAbsTest exposing (main)
 {-| `abs` on an Int returns its magnitude for a positive, a negative and a zero argument.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: abs1: 5
 -- CHECK: abs2: 5
 -- CHECK: abs3: 0

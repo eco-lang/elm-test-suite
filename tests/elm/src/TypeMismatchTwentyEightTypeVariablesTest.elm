@@ -7,6 +7,7 @@ module TypeMismatchTwentyEightTypeVariablesTest exposing (main)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH
 -- CHECK: -- TYPE MISMATCH -
 

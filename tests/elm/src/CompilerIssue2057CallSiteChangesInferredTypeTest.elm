@@ -12,6 +12,7 @@ should be: List x"), unifying the rigid variables of different functions. It sho
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-dec-group, s-valbind-var, sm-topdec-value
 -- CHECK: sort: []
 
 import Html exposing (text)

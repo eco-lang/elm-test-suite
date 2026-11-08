@@ -11,6 +11,7 @@ reported.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app, s-match
 -- COMPILE-ERROR: TYPE MISMATCH, unknown type against a number
 -- CHECK: -- TYPE MISMATCH -
 

@@ -3,6 +3,7 @@ module FloatMathIsNaNTest exposing (..)
 {-| `isNaN (0 / 0)` is True.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: testValue: True
 
 import Basics exposing (..)

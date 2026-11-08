@@ -5,6 +5,7 @@ module TypeMismatchNumberRightOfOrTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-case, s-match
 -- COMPILE-ERROR: TYPE MISMATCH, number right of ||
 -- CHECK: -- TYPE MISMATCH -
 

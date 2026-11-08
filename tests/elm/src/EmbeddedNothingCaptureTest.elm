@@ -4,6 +4,7 @@ module EmbeddedNothingCaptureTest exposing (main)
 matches it against the `Nothing` pattern.
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-atpat-con, d-pat-con-fail
 -- CHECK: result: -1
 
 import Html exposing (text)

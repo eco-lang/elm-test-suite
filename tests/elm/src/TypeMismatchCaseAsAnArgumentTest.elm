@@ -5,6 +5,7 @@ module TypeMismatchCaseAsAnArgumentTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-exp-case
 -- COMPILE-ERROR: TYPE MISMATCH, case as an argument
 -- CHECK: -- TYPE MISMATCH -
 

@@ -5,6 +5,7 @@ module TypeMismatchConsHeadAgainstAConsTailTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-pat-cons, s-atpat-scon
 -- COMPILE-ERROR: TYPE MISMATCH, cons head against a cons tail
 -- CHECK: -- TYPE MISMATCH -
 

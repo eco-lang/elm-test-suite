@@ -7,6 +7,7 @@ module TypeMismatchSelfAppliedArgumentAgainstARigidNumberTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-exp-lambda, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, self-applied argument against a rigid number
 -- CHECK: -- TYPE MISMATCH -
 

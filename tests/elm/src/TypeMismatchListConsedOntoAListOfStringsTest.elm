@@ -8,6 +8,7 @@ but it is a list of numbers.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, list consed onto a list of strings
 -- CHECK: -- TYPE MISMATCH -
 

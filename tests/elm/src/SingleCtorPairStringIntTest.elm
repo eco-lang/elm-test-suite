@@ -7,6 +7,7 @@ module SingleCtorPairStringIntTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-var
 -- CHECK: unwrap_str: "hello"
 -- CHECK: unwrap_int: 99
 -- CHECK: match_str: "found_hello"

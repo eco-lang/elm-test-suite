@@ -11,6 +11,7 @@ should be reported.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: let annotation claims a type variable for a monomorphic value
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: compiler bug

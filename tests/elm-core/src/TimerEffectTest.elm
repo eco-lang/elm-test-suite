@@ -7,6 +7,7 @@ starts another, until the fifth, when it logs `"done"` and returns `Cmd.none`.
 The message is built by a function that ignores the sleep's `()` result.
 -}
 
+-- TAGS: elm-spec, p-proc-sleep, e-msg-task, p-update
 -- CHECK: TimerEffectTest: "fired 1"
 -- CHECK: TimerEffectTest: "fired 2"
 -- CHECK: TimerEffectTest: "fired 3"

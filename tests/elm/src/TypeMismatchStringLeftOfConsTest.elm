@@ -7,6 +7,7 @@ In `"a" :: [ 1 ]` the element on the left must have the type of the list's eleme
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, string left of ::
 -- CHECK: -- TYPE MISMATCH -
 

@@ -3,6 +3,7 @@ module FloatNegativeZeroTest exposing (main)
 {-| Negative zero (`-0.0`) equals 0.0, and dividing 1.0 by it gives -Infinity while dividing by 0.0 gives Infinity.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: eq: True
 -- CHECK: div1: Infinity
 -- CHECK: div2: -Infinity

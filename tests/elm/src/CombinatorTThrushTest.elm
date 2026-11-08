@@ -6,6 +6,7 @@ module CombinatorTThrushTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, d-app-closure
 -- CHECK: result: 21
 
 import Html exposing (text)

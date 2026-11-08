@@ -8,6 +8,7 @@ The payload is reached by matching `Just n` directly, not through `Maybe.map`.
 
 -}
 
+-- TAGS: elm-spec, s-atexp-scon, d-atexp-scon, d-pat-con
 -- CHECK: maybedirect: 45
 
 import Html exposing (text)

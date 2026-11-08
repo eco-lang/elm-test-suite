@@ -5,6 +5,7 @@ module BadMainTypeFunctionMainTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, p-stat-main-program, p-stat-main-view
 -- COMPILE-ERROR: BAD MAIN TYPE, function main
 -- CHECK: -- BAD MAIN TYPE -
 

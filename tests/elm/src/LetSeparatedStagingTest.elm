@@ -11,6 +11,8 @@ is not compared.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-var, d-exp-case, d-exp-lambda, d-atexp-let
+
 import Html exposing (text)
 
 caseFunc : Int -> Int -> Int -> Int -> Int

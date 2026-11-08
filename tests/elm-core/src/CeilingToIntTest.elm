@@ -4,6 +4,7 @@ module CeilingToIntTest exposing (main)
 `ceiling -2.7` is -2.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: ceil1: 3
 -- CHECK: ceil2: -2
 

@@ -7,6 +7,7 @@ module BadMainTypeThreeArgumentTypeMainTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, p-stat-main-program, p-stat-main-view
 -- COMPILE-ERROR: BAD MAIN TYPE, three-argument type main
 -- CHECK: -- BAD MAIN TYPE -
 

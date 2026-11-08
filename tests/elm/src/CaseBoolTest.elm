@@ -3,6 +3,7 @@ module CaseBoolTest exposing (main)
 {-| A case expression on a Bool with `True` and `False` branches selects the matching branch.
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-atpat-con, d-atpat-con-fail
 -- CHECK: case1: "yes"
 -- CHECK: case2: "no"
 

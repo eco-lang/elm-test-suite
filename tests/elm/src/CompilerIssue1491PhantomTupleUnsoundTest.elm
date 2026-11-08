@@ -10,6 +10,7 @@ unify (`m` would have to equal `OnePlus m`). It should report a type error.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-exp-app
 -- COMPILE-ERROR: (m, m) does not unify with (OnePlus m, m)
 -- CHECK: {{-- [A-Z ]+ -}}
 

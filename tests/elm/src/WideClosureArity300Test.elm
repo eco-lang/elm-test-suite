@@ -10,6 +10,7 @@ last holds a partially applied function; the last holds the result, `[1882518]`.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: res: [1882518]
 
 import Html exposing (text)

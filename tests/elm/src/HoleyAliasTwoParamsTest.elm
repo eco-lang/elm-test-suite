@@ -13,6 +13,7 @@ to `recInt`.
 import Html exposing (text)
 
 
+-- TAGS: elm-spec, sm-typbind, s-ty-con, sm-conbind, d-pat-con
 -- CHECK: pairInt: 42
 -- CHECK: pairStr: "hi"
 -- CHECK: recFloat: 2.5

@@ -11,6 +11,7 @@ whose type holds `Bytes`.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, sm-topdec-portout, sm-topdec-portin, e-enc-bytes, e-dec-bytes
 -- CHECK: received: [1,2,255]
 
 import Bytes exposing (Bytes)

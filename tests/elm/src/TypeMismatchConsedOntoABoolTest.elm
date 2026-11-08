@@ -5,6 +5,7 @@ module TypeMismatchConsedOntoABoolTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, consed onto a Bool
 -- CHECK: -- TYPE MISMATCH -
 

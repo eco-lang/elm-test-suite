@@ -13,6 +13,7 @@ The values are `Just 3`, `Nothing` and `Just -7`.
 
 -}
 
+-- TAGS: elm-spec, e-enc-just, e-enc-nothing, e-dec-just, e-dec-nothing
 -- CHECK: PortEchoMaybeIntTest got: Just 3
 -- CHECK: PortEchoMaybeIntTest got: Nothing
 -- CHECK: PortEchoMaybeIntTest got: Just -7

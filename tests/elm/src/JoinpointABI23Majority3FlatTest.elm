@@ -9,6 +9,7 @@ and gives `5 + 3 + 2`, which is 10; the other branches are not run.
 
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-atpat-scon, d-exp-lambda, d-app-closure
 -- CHECK: testValue: 10
 
 import Basics exposing (..)

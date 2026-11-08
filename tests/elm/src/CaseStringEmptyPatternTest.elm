@@ -9,6 +9,7 @@ other string to `"retry"`. The test calls it with each literal and with
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-atpat-wild
 -- CHECK: empty: "yes"
 -- CHECK: Y: "yes"
 -- CHECK: y: "yes"

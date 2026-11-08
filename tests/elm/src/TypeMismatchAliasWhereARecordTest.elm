@@ -7,6 +7,7 @@ module TypeMismatchAliasWhereARecordTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-ty-con, sm-typbind-record
 -- COMPILE-ERROR: TYPE MISMATCH, alias where a record
 -- CHECK: -- TYPE MISMATCH -
 

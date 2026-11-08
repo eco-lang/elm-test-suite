@@ -8,6 +8,7 @@ The four calls cover all four combinations; `(Just 3, Just 4)` gives their sum.
 
 -}
 
+-- TAGS: elm-spec, s-atpat-tuple, d-atpat-tuple, d-pat-con
 -- CHECK: both: 7
 -- CHECK: first: 3
 -- CHECK: second: 4

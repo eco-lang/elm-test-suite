@@ -7,6 +7,7 @@ wraps a `Char`, matches it back out and builds the string `"got_Z"`.
 
 -}
 
+-- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-var
 -- CHECK: unwrap_char: 'Z'
 -- CHECK: unwrap_float: 1.5
 -- CHECK: match_char: "got_Z"

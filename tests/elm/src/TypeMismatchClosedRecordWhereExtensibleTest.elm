@@ -9,6 +9,7 @@ argument to have an `age` field, which the record literal `{ name = 1 }` does no
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-record, s-exp-app, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, closed record where extensible
 -- CHECK: -- TYPE MISMATCH -
 

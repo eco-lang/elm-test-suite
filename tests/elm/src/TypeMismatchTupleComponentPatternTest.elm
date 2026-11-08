@@ -7,6 +7,7 @@ The pattern `( "a", b )` is used in a `case` on `( 1, 2 )`.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-case, s-atpat-tuple, s-atpat-scon
 -- COMPILE-ERROR: TYPE MISMATCH, tuple component pattern
 -- CHECK: -- TYPE MISMATCH -
 

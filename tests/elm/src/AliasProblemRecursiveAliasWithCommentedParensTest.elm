@@ -8,6 +8,7 @@ parentheses. A type alias cannot be recursive, so the compiler must report it.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, modules-alias-not-recursive
 -- COMPILE-ERROR: ALIAS PROBLEM
 -- CHECK: -- ALIAS PROBLEM -
 

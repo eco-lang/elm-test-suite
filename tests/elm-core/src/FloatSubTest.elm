@@ -6,6 +6,7 @@ The cases are `10.0 - 3.0`, `5.0 - -5.0` and `-2.0 - -3.0`.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: sub1: 7
 -- CHECK: sub2: 10
 -- CHECK: sub3: 1

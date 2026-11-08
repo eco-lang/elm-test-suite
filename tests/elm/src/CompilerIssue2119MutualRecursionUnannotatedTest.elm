@@ -12,6 +12,7 @@ program is valid and should compile and run.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, sm-topdec-value, sm-imports-import, dm-topdec-val
 -- CHECK: depth: 1
 
 import CompilerIssue2119View as View

@@ -9,6 +9,7 @@ value it logs `done` and `subscriptions` returns `Sub.none` so the program can f
 
 -}
 
+-- TAGS: elm-spec, e-enc-unit, e-dec-unit
 -- CHECK: PortEchoUnitTest got: ()
 -- CHECK: PortEchoUnitTest got: ()
 -- CHECK: PortEchoUnitTest: "done"

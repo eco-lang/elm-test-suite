@@ -8,6 +8,7 @@ rounds to 45.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: ifbr: 45
 
 import Html exposing (text)

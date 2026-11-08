@@ -5,6 +5,7 @@ module FromArrayCharListRoundtripTest exposing (main)
 The test logs the reconstructed list as well as the result of comparing it with the original.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: result: ['a','b','c']
 -- CHECK: match: True
 

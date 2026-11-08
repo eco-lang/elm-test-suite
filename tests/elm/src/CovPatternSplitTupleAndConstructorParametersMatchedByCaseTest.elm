@@ -8,6 +8,7 @@ test checks that these definitions compile and the program runs.
 
 -}
 
+-- TAGS: elm-spec, s-atpat-tuple, s-atpat-scon, s-pat-con, core-exhaustiveness
 -- CHECK: testValue: <function>
 
 import Basics exposing (..)

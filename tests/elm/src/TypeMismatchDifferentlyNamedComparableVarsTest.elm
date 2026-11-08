@@ -10,6 +10,7 @@ function gets fresh type variables.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, sm-datbind, s-atexp-tuple, s-exp-app, s-atexp-longvar
 -- COMPILE-ERROR: TYPE MISMATCH, differently named comparable vars
 -- CHECK: -- TYPE MISMATCH -
 

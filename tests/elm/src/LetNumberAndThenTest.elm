@@ -4,6 +4,7 @@ module LetNumberAndThenTest exposing (main)
 `number`, is used at `Float` inside `Maybe.andThen`: `round (30 * 1.5)` gives 45.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: andthen: 45
 
 import Html exposing (text)

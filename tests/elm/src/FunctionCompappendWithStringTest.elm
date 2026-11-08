@@ -7,6 +7,7 @@ first, so `zsortConcat "hello" "world"` is `"helloworld"`.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-var, s-ty-tyvar, s-atexp-op
 -- CHECK: testValue: "helloworld"
 
 import Basics exposing (..)

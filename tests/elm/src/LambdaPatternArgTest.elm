@@ -8,6 +8,7 @@ first element.
 
 -}
 
+-- TAGS: elm-spec, d-app-closure, d-atpat-tuple, d-atpat-record, d-atpat-wild
 -- CHECK: swap: (2,1)
 -- CHECK: getX: 42
 -- CHECK: mixed: "b"

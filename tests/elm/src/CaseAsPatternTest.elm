@@ -3,6 +3,7 @@ module CaseAsPatternTest exposing (main)
 {-| An as-pattern in a case branch, `((x :: _) as whole)`, binds both the list head and the whole list.
 -}
 
+-- TAGS: elm-spec, s-pat-as, d-pat-as, d-pat-cons
 -- CHECK: as1: 0
 -- CHECK: as2: 3
 -- CHECK: as3: 6

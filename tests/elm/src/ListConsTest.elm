@@ -3,6 +3,7 @@ module ListConsTest exposing (main)
 {-| The cons operator `::` builds one-, two- and three-element lists onto `[]`.
 -}
 
+-- TAGS: elm-spec, s-atexp-op, d-app-con, d-atexp-nil
 -- CHECK: cons1: [1]
 -- CHECK: cons2: [1,2]
 -- CHECK: cons3: [1,2,3]

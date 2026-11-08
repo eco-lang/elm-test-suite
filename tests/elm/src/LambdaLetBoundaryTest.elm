@@ -14,6 +14,7 @@ module LambdaLetBoundaryTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, d-atexp-let, d-exp-lambda, d-app-closure
 -- CHECK: basic: 15
 -- CHECK: capturing: 19
 -- CHECK: multi_let: 20

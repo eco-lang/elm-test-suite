@@ -5,6 +5,7 @@ components are equal, so the result is decided by comparing `[]` with
 `[ 1 ]` in the second component.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: lt_ee: False
 -- CHECK: lt_eA: True
 -- CHECK: lt_Ae: False

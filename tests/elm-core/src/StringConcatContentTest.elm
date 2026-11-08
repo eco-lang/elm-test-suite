@@ -9,6 +9,7 @@ characters.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: concat20: "abcdefghijABCDEFGHIJ"
 -- CHECK: concat_len: 200
 -- CHECK: concat_head: "xyxy"

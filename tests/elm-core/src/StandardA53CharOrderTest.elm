@@ -11,6 +11,7 @@ code units, where `'😀'` starts with the surrogate 0xD83D, below 0xFB00, so it
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- CHECK: compare '😀' 'ﬀ': GT
 -- CHECK: '😀' > 'ﬀ': True
 -- CHECK: toCode order agrees: True

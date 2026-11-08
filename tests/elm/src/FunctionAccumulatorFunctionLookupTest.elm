@@ -11,6 +11,7 @@ lambdas and the partial application `max 4`. The test logs
 
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-atpat-tuple, d-exp-case, d-app-basic-partial
 -- CHECK: testValue: 15
 
 import Basics exposing (..)

@@ -12,6 +12,7 @@ rejected with an ordinary error report.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-con
 -- COMPILE-ERROR: an ordinary error report, not a compiler crash
 -- CHECK-NOT: HasCallStack
 -- CHECK-NOT: not well-formed

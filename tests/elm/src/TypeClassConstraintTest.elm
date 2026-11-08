@@ -11,6 +11,7 @@ lists.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-var, s-ty-tyvar, s-atexp-longvar, d-atexp-scon
 -- CHECK: absInt: 5
 -- CHECK: absFloat: 3.14
 -- CHECK: minInt: 3

@@ -7,6 +7,7 @@ module TypeMismatchRigidComparableAsNumberTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, rigid comparable as number
 -- CHECK: -- TYPE MISMATCH -
 

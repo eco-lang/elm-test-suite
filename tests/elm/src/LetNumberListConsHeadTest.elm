@@ -7,6 +7,7 @@ module LetNumberListConsHeadTest exposing (main)
 
 -}
 
+-- TAGS: elm-spec, s-atexp-scon, d-atexp-scon, d-pat-cons
 -- CHECK: listcons: 45
 
 import Html exposing (text)

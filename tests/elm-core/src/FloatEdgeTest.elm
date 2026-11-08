@@ -17,6 +17,7 @@ Most rows log `Debug.toString` of the result.
   - `3 ^ 33` is 5559060566555523, exact as an Int.
 -}
 
+-- TAGS: elm-spec
 -- MODE-GUARD: a Char equality must give the same answer as under --optimize
 -- NO-SKIP: an edge case every compiler must run
 -- CHECK: round 2.5: "3"

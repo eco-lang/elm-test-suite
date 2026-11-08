@@ -12,6 +12,7 @@ operation" instead of reporting an error.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-con
 -- COMPILE-ERROR: a type error, not a compiler crash
 -- CHECK-NOT: HasCallStack
 -- CHECK-NOT: not well-formed

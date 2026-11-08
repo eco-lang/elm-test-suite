@@ -5,6 +5,7 @@ forward pipe into a partially applied `List.map`, and a chain of backward
 pipes.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: pipe1: 12
 -- CHECK: pipe2: [2,4,6]
 -- CHECK: backpipe: 10

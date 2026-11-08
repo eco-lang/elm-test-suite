@@ -9,6 +9,7 @@ the U+1F600 pattern.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail
 -- CHECK: a: "other"
 -- CHECK: euro: "euro"
 -- CHECK: lowSurrogate: "other"

@@ -4,6 +4,7 @@ module EmbeddedNothingCallbackTest exposing (main)
 and applies its function argument to a `Just` payload.
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-atpat-con, d-app-con
 -- CHECK: applied1: Nothing
 -- CHECK: applied2: Just 11
 

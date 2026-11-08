@@ -4,6 +4,7 @@ module LetBasicTest exposing (main)
 Int literals gives 5, and `"hello" ++ " " ++ "world"` gives `"hello world"`.
 -}
 
+-- TAGS: elm-spec, d-atexp-let, d-dec-nonrec
 -- CHECK: result1: 5
 -- CHECK: result2: "hello world"
 

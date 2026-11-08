@@ -7,6 +7,7 @@ module TypeMismatchTriplesDifferTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-tuple, s-ty-tuple
 -- COMPILE-ERROR: TYPE MISMATCH, triples differ
 -- CHECK: -- TYPE MISMATCH -
 

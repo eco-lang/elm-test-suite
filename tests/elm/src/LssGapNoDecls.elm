@@ -2,6 +2,7 @@ module LssGapNoDecls exposing (main)
 {-| A program with no type declarations calls one annotated top-level function.
 
 `double 7` logs 14. -}
+-- TAGS: elm-spec, sm-topdec-value, dm-topdec-val
 -- CHECK: noDecls: 14
 import Html exposing (text)
 double : Int -> Int

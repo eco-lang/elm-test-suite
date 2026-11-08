@@ -8,6 +8,7 @@ The literal `100` has the type `number`, and the only thing that fixes it to
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: logbase: 2
 
 import Html exposing (text)

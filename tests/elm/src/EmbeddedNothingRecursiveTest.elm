@@ -10,6 +10,7 @@ the tail. The test logs a search of `[1, 2, 3, 4]` for an element greater than
 
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-atpat-nil, d-app-con
 -- CHECK: find1: Just 3
 -- CHECK: find2: Nothing
 

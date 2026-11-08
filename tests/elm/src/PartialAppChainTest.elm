@@ -4,6 +4,7 @@ module PartialAppChainTest exposing (main)
 `addThree 3`, then `4`, then `3`, against a direct full call.
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: chain1: 10
 -- CHECK: chain2: 6
 

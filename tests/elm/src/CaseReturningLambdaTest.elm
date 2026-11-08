@@ -11,6 +11,7 @@ Among what is not tested: the wildcard `String` branch, `\a _ -> a`.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-exp-lambda, d-app-closure
 -- CHECK: r1: 6
 -- CHECK: r2: 5
 -- CHECK: r3: 0

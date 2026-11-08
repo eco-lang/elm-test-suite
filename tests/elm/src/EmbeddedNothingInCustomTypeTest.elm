@@ -4,6 +4,7 @@ module EmbeddedNothingInCustomTypeTest exposing (main)
 `case` still matches the `Nothing` pattern.
 -}
 
+-- TAGS: elm-spec, d-pat-con, d-atpat-con
 -- CHECK: result: -1
 
 import Html exposing (text)

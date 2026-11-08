@@ -10,6 +10,7 @@ should compile.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-ty-con, sm-typbind, s-atpat-con
 -- CHECK: bug: ()
 
 import Html exposing (text)

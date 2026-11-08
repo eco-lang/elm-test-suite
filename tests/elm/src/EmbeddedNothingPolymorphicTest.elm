@@ -4,6 +4,7 @@ module EmbeddedNothingPolymorphicTest exposing (main)
 the first two then also through a function with a concrete type.
 -}
 
+-- TAGS: elm-spec, s-atexp-longvar, s-atexp-nil, s-atexp-op
 -- CHECK: r1: Nothing
 -- CHECK: r2: []
 -- CHECK: r3: ""

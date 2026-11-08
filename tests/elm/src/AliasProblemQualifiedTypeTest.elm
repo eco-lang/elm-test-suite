@@ -8,6 +8,7 @@ module AliasProblemQualifiedTypeTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, modules-alias-not-recursive
 -- COMPILE-ERROR: ALIAS PROBLEM, qualified type
 -- CHECK: -- ALIAS PROBLEM -
 

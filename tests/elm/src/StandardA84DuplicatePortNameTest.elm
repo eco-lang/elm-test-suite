@@ -12,6 +12,7 @@ it stops when it starts, as the two ports collide at run time.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, p-stat-module, modules-program
 -- COMPILE-ERROR: two ports named send in one program
 -- CHECK: {{-- [A-Z ]+ -}}
 

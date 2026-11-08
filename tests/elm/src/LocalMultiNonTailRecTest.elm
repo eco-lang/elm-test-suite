@@ -11,6 +11,7 @@ It is applied to `[ 1, 2, 3 ]` (Int, sum 6) and to `[ 0.5, 1.5, 2.0 ]`
 import Html exposing (text)
 
 
+-- TAGS: elm-spec, s-dec-group, d-dec-rec, d-atexp-scon
 -- CHECK: sumInt: 6
 -- CHECK: sumFloat: 4
 

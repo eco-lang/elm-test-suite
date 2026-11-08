@@ -5,6 +5,7 @@ works as a function value passed to `List.map`, `List.filter` and `List.any`
 over `[ True, False, True, False ]`.
 -}
 
+-- TAGS: elm-spec, d-atexp-op, d-app-basic-partial
 -- CHECK: isNotTrueList: [False,True,False,True]
 -- CHECK: isNotFalseList: [True,False,True,False]
 -- CHECK: filterNotTrue: [False,False]

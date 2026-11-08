@@ -10,6 +10,7 @@ element. Elm 0.19.1 crashes ("You ran into a compiler bug"); it should report a 
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, s-valbind-var, s-atexp-op
 -- COMPILE-ERROR: number vs Float
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: compiler bug

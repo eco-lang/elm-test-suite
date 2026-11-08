@@ -8,6 +8,7 @@ different types.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, sm-typbind, sm-topdec-seq, s-ty-con, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, imported type named like an alias
 -- CHECK: -- TYPE MISMATCH -
 

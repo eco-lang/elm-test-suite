@@ -9,6 +9,7 @@ so the logged value is 1 rather than the number of entries.
 
 -}
 
+-- TAGS: elm-spec, s-valbind-var, s-atexp-longvar, d-pat-con
 -- CHECK: testValue: 1
 
 import Basics exposing (..)

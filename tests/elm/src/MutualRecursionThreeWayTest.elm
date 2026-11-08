@@ -7,6 +7,7 @@ Each call decrements `n`, and the function reached at `0` decides the result:
 `n` = 10 ends in `funcB` (`1`); `n` = 9, 3 and 0 end in `funcA` (`0`).
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, dm-topdec-val
 -- CHECK: a10: 1
 -- CHECK: a9: 0
 -- CHECK: a3: 0

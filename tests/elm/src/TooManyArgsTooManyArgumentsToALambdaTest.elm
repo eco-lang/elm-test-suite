@@ -5,6 +5,7 @@ module TooManyArgsTooManyArgumentsToALambdaTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-exp-lambda
 -- COMPILE-ERROR: TOO MANY ARGS, too many arguments to a lambda
 -- CHECK: -- TOO MANY ARGS -
 

@@ -9,6 +9,7 @@ and returns a `let`-bound function whose body calls `Debug.log`.
 
 -}
 
+-- TAGS: elm-spec, sm-typbind, s-ty-con, d-app-closure
 -- CHECK: eta body: 7
 
 import Html exposing (text)

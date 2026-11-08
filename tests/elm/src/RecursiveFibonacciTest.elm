@@ -3,6 +3,7 @@ module RecursiveFibonacciTest exposing (main)
 {-| A top-level `fib` that calls itself twice per step returns 0, 1 and 55 for 0, 1 and 10.
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, dm-topdec-val
 -- CHECK: fib0: 0
 -- CHECK: fib1: 1
 -- CHECK: fib10: 55

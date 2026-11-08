@@ -14,6 +14,7 @@ says so, and names a test that follows A8.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- COMPILE-ERROR: a surrogate escape
 -- CHECK: {{-- [A-Z ]+ -}}
 

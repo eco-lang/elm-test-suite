@@ -12,6 +12,7 @@ The annotation means `a -> a`, and `make 7` should print 7. Elm 0.19.1 rejects t
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, sm-typbind, s-ty-con, s-valbind-var
 -- CHECK: make: 7
 
 import Html exposing (text)

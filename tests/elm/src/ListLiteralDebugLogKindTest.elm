@@ -9,6 +9,7 @@ argument, a list literal and a `::` cons.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-atexp-tuple, d-app-con
 -- MODE-GUARD: a Char equality must give the same answer as under --optimize
 -- NO-SKIP: an edge case every compiler must run
 -- CHECK-DAG: fl: 1.5

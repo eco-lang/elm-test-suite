@@ -3,6 +3,7 @@ module CaseCustomType4WildcardTest exposing (main)
 {-| A case on a four-constructor custom type with two explicit branches and a wildcard sends the other two constructors to the wildcard.
 -}
 
+-- TAGS: elm-spec, d-atpat-con, d-atpat-con-fail, d-atpat-wild
 -- CHECK: card1: "hearts"
 -- CHECK: card2: "spades"
 -- CHECK: card3: "other"

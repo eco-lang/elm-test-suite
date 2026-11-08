@@ -8,6 +8,7 @@ left uncovered.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, core-exhaustiveness
 -- COMPILE-ERROR: MISSING PATTERNS, a missing tuple shape
 -- CHECK: -- MISSING PATTERNS -
 

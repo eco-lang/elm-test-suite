@@ -7,6 +7,7 @@ module TypeMismatchRigidNumberAsFunctionTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-exp-lambda
 -- COMPILE-ERROR: TYPE MISMATCH, rigid number as function
 -- CHECK: -- TYPE MISMATCH -
 

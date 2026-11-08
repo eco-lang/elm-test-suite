@@ -3,6 +3,7 @@ module FloatCompareTest exposing (main)
 {-| `<`, `>`, `<=`, `>=`, `==` and `/=` on `Float` literals, each in a case where the comparison is `True`.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: lt: True
 -- CHECK: gt: True
 -- CHECK: le: True

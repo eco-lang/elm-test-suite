@@ -10,6 +10,7 @@ Elm 0.19.1 rejects `( )` as an expression or type but accepts it as a pattern.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec
 -- COMPILE-ERROR: a unit pattern with a gap
 -- CHECK: {{-- [A-Z ]+ -}}
 

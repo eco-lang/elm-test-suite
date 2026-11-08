@@ -8,6 +8,7 @@ by `Maybe.map`, with 0 as the default for `Nothing`. The test logs `[45,60]`.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: listmaybe: [45,60]
 
 import Html exposing (text)

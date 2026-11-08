@@ -7,6 +7,7 @@ returns a different lambda per branch.
 
 -}
 
+-- TAGS: elm-spec, sm-typbind, s-ty-con, d-exp-case, d-exp-lambda
 -- CHECK: testValue: 4
 
 import Basics exposing (..)

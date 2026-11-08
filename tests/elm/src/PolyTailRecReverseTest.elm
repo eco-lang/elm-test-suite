@@ -8,6 +8,7 @@ in tail position.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, s-atexp-longvar
 -- CHECK: intRev: [3,2,1]
 -- CHECK: strRev: ["c","b","a"]
 

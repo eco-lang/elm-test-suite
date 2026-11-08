@@ -7,6 +7,7 @@ custom type, and a nested `case` reads the payload of that field.
 
 -}
 
+-- TAGS: elm-spec, d-app-con, d-pat-con, d-match-next
 -- CHECK: result: 7
 
 import Html exposing (text)

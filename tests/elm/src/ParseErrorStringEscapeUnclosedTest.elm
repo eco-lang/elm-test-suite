@@ -5,6 +5,7 @@ module ParseErrorStringEscapeUnclosedTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec
 -- COMPILE-ERROR: BAD UNICODE ESCAPE
 -- CHECK: -- BAD UNICODE ESCAPE -
 x =

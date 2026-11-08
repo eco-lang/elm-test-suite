@@ -3,6 +3,7 @@ module LssGapRecordFnNoAlias exposing (main)
 
 `useIt` takes `{ transform : Int -> Int }` written inline in its annotation, and calling it with
 `{ transform = double }` and 7 logs 14. -}
+-- TAGS: elm-spec, s-ty-record, s-atpat-record, d-atpat-record, d-patrow-field
 -- CHECK: recordFnNoAlias: 14
 import Html exposing (text)
 double : Int -> Int

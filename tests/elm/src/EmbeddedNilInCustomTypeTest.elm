@@ -4,6 +4,7 @@ module EmbeddedNilInCustomTypeTest exposing (main)
 `case` is still empty, with length 0.
 -}
 
+-- TAGS: elm-spec, s-atexp-nil, d-app-con, d-pat-con
 -- CHECK: isEmpty: True
 -- CHECK: len: 0
 

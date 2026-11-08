@@ -7,6 +7,7 @@ swaps its arguments, which sorts it in descending order.
 
 -}
 
+-- TAGS: elm-spec, d-app-basic-partial, d-app-basic-apply
 -- CHECK: sorted: [1,2,3,4,5]
 -- CHECK: reverse_sorted: [5,4,3,2,1]
 

@@ -7,6 +7,7 @@ module TypeMismatchRigidVarAppendedTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-op
 -- COMPILE-ERROR: TYPE MISMATCH, rigid var appended
 -- CHECK: -- TYPE MISMATCH -
 

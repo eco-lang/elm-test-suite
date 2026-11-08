@@ -8,6 +8,7 @@ appendable `a ++ a`, and the second pairs a `String` with a tuple of numbers.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-op, s-atexp-tuple
 -- COMPILE-ERROR: TYPE MISMATCH, appendable against a tuple
 -- CHECK: -- TYPE MISMATCH -
 

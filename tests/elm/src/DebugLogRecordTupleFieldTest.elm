@@ -11,6 +11,7 @@ depend on how `Debug.toString` formats a record.
 
 -}
 
+-- TAGS: elm-spec, d-atexp-tuple, d-exprow-field
 -- CHECK: first: 1
 -- CHECK: second: 2.5
 -- CHECK: pair: (1,2.5)

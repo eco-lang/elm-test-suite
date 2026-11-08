@@ -5,6 +5,7 @@ variables, and inside a top-level helper `neqBool` that receives both
 operands as arguments, for all four combinations of operands.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: vTT: False
 -- CHECK: vTF: True
 -- CHECK: vFT: True

@@ -10,6 +10,7 @@ return 42 and 99.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure, d-pat-con
 -- CHECK: unwrap1: 42
 -- CHECK: unwrap2: 99
 

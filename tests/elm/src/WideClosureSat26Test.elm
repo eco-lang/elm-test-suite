@@ -9,6 +9,7 @@ function that still sees all 26 of them.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure
 -- CHECK: res: [6208,6215]
 
 import Html exposing (text)

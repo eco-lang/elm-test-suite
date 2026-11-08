@@ -3,6 +3,7 @@ module CombinatorWConcatTest exposing (main)
 {-| The W combinator, which passes one argument twice, applied to string append: `w (++) "hi"` is `"hihi"`.
 -}
 
+-- TAGS: elm-spec, d-atexp-op, d-app-closure
 -- CHECK: result: "hihi"
 
 import Html exposing (text)

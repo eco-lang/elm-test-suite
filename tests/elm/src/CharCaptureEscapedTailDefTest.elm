@@ -13,6 +13,7 @@ function built for `'z'` to `[ 'z' ]`.
 
 import Html exposing (text)
 
+-- TAGS: elm-spec, d-dec-rec, d-exp-lambda, d-app-closure
 -- CHECK: hit: True
 -- CHECK: miss: False
 -- CHECK: both: True

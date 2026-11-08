@@ -8,6 +8,7 @@ so the three calls log `"ab"`, `"a"` and `""`.
 
 -}
 
+-- TAGS: elm-spec, d-exp-lambda, d-app-closure, d-pat-con
 -- CHECK: both: "ab"
 -- CHECK: one: "a"
 -- CHECK: none: ""

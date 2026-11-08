@@ -9,6 +9,7 @@ is sent is not observed.
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-portout, p-init
 -- CHECK: OutgoingPortTuple3Test: "sent"
 
 import Platform

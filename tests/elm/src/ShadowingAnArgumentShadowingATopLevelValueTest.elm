@@ -8,6 +8,7 @@ module; Elm does not allow a local name to shadow one already in scope.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, modules-no-shadowing
 -- COMPILE-ERROR: SHADOWING, an argument shadowing a top-level value
 -- CHECK: -- SHADOWING -
 

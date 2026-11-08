@@ -14,6 +14,7 @@ such as `'\u{03BB}'` and `'\u{20AC}'`.
 
 -}
 
+-- TAGS: elm-spec
 -- CHECK: pairEqual: True
 -- CHECK: pairFirstDiff: False
 -- CHECK: pairSecondDiff: False

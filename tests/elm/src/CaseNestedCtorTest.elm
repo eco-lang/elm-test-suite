@@ -5,6 +5,7 @@ another (`Container (Wrap n)`), and a tuple pattern inside a constructor
 (`Box ( a, x )`).
 -}
 
+-- TAGS: elm-spec, s-pat-con, d-pat-con, d-atpat-tuple
 -- CHECK: single: 42
 -- CHECK: double: 3
 

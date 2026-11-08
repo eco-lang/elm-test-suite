@@ -4,6 +4,7 @@ module TailRecFoldlCaseTest exposing (main)
 `let` and matching on the list with `case`, sums `[ 1, 2, 3 ]` to 6.
 -}
 
+-- TAGS: elm-spec, d-dec-rec, d-pat-cons, d-atpat-nil
 -- CHECK: result: 6
 
 import Html exposing (text)

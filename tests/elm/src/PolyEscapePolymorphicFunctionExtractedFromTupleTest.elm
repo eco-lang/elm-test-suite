@@ -8,6 +8,7 @@ component of a pair, here the function `id`, which is then applied to 42.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atpat-tuple, d-atpat-tuple, d-app-closure
 -- CHECK: testValue: 42
 
 import Basics exposing (..)

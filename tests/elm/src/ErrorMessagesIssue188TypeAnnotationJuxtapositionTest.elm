@@ -11,6 +11,7 @@ test accepts any error heading except TYPE MISMATCH, which would compare the bod
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec
 -- COMPILE-ERROR: a type annotation that does not parse
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: TYPE MISMATCH

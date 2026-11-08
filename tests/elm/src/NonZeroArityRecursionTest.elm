@@ -5,6 +5,7 @@ itself in tail position from 100 down to 0 and returns 0; the program logs
 `countDown: 0`.
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, dm-topdec-val
 -- CHECK: countDown: 0
 
 import Html exposing (text)

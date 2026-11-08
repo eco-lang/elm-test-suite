@@ -12,6 +12,7 @@ so `swap` gives `( 6, 5 )` and `f` returns `6 + 50 = 56`. The pair comes from
 
 import Html exposing (text)
 
+-- TAGS: elm-spec, d-valbind-pat, d-app-closure
 -- CHECK: captured: 56
 
 

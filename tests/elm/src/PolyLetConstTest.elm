@@ -7,6 +7,7 @@ the same scope, and each use returns its first argument.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-let, s-atexp-longvar
 -- CHECK: r1: 1
 -- CHECK: r2: "hi"
 

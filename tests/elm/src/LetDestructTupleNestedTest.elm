@@ -8,6 +8,7 @@ The nested sum is `3 + 4 + 5 - 6 + 2 = 8`; the chained one is `1 + 2 + 3 = 6`.
 
 -}
 
+-- TAGS: elm-spec, d-valbind-pat, d-atpat-tuple
 -- CHECK: basic: 3
 -- CHECK: nested: 8
 -- CHECK: chain: 6

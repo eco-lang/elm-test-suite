@@ -7,6 +7,7 @@ All entries of a list share one type. The first entry must be a `number` and the
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, number and appendable list entries
 -- CHECK: -- TYPE MISMATCH -
 

@@ -8,6 +8,7 @@ first components disagree.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-tuple, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, Int against number after a mismatch
 -- CHECK: -- TYPE MISMATCH -
 

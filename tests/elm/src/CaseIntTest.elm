@@ -8,6 +8,7 @@ branch matches.
 
 -}
 
+-- TAGS: elm-spec, d-atpat-scon, d-atpat-scon-fail, d-atpat-wild
 -- CHECK: case1: "one"
 -- CHECK: case2: "two"
 -- CHECK: case3: "other"

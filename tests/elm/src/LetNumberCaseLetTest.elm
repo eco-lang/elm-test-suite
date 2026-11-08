@@ -4,6 +4,7 @@ module LetNumberCaseLetTest exposing (main)
 a Float: `round (30 * 1.5)` gives 45.
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: caselet: 45
 
 import Html exposing (text)

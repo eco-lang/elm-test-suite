@@ -6,6 +6,7 @@ module RecordWithFunctionsTest exposing (main)
 `ops2` replaces `add` with `\x -> x + 2`, so `ops2.add 5` gives 7.
 -}
 
+-- TAGS: elm-spec, d-atexp-record, d-patrow-field, d-atexp-update
 -- CHECK: apply1: 11
 -- CHECK: apply2: 20
 -- CHECK: composed: 22

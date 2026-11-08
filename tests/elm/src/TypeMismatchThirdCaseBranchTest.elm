@@ -7,6 +7,7 @@ Every branch of a `case` must produce the same type; the branches return `"a"`, 
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-match
 -- COMPILE-ERROR: TYPE MISMATCH, third case branch
 -- CHECK: -- TYPE MISMATCH -
 

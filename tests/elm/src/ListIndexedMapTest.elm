@@ -8,6 +8,7 @@ The local versions are stubs (`map2` and `range` return `[]`, `length` returns
 
 -}
 
+-- TAGS: elm-spec, sm-topdec-seq, dm-topdec-seq, sm-explist-all
 -- CHECK: testValue: []
 
 import Basics exposing (..)

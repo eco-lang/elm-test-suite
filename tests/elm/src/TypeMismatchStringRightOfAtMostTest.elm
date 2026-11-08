@@ -7,6 +7,7 @@ In `1 <= "a"` both operands of `<=` must have the same `comparable` type.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, string right of <=
 -- CHECK: -- TYPE MISMATCH -
 

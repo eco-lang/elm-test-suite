@@ -8,6 +8,7 @@ test logs 105.
 
 -}
 
+-- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: foldr: 105
 
 import Html exposing (text)

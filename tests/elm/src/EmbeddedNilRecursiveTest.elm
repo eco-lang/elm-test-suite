@@ -4,6 +4,7 @@ module EmbeddedNilRecursiveTest exposing (main)
 positive elements of its input, skipping the rest.
 -}
 
+-- TAGS: elm-spec, d-atpat-nil, d-pat-cons, d-match-next
 -- CHECK: result: [2,4,6]
 
 import Html exposing (text)

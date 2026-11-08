@@ -9,6 +9,7 @@ both appendable and comparable. Putting `x` and `b` in one list forces `b` to ha
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-valbind-var, s-atexp-op
 -- COMPILE-ERROR: TYPE MISMATCH, compappend against a rigid var
 -- CHECK: -- TYPE MISMATCH -
 

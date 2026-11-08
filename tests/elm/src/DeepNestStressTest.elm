@@ -11,6 +11,7 @@ taken apart.
 
 -}
 
+-- TAGS: elm-spec, d-pat-cons, d-valbind-pat, d-atpat-tuple, core-field-selection, d-atexp-let
 -- CHECK: nested_list: 1
 -- CHECK: nested_tuple: 1
 -- CHECK: nested_record: 1

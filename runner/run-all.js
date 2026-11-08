@@ -21,6 +21,8 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
+const { specItems } = require('./spec-items');
+
 const ROOT = path.resolve(__dirname, '..');
 const RESULTS = path.join(ROOT, '.work', 'results');
 
@@ -73,9 +75,11 @@ function report(names) {
             return t ? `${count(t, 'pass')} / ${count(t, 'fail')} / ${count(t, 'skip')}` : '–';
         }).join(' | ') + ' |');
     }
-    // Every tag but the projects' (each test is tagged with its project): the same totals.
+    // Every tag but the projects' (each test is tagged with its project) and the rules' and
+    // restrictions' of the book (a check of one, not a group): the same totals.
+    const items = specItems();
     const tags = [...new Set(runs.flatMap((r) => Object.values(r.projects).flatMap((ts) =>
-        Object.values(ts).flatMap((t) => t.tags || []))))].filter((g) => !projects.includes(g)).sort();
+        Object.values(ts).flatMap((t) => t.tags || []))))].filter((g) => !projects.includes(g) && !items.has(g)).sort();
     if (tags.length) {
         out.push('', '## By tag (passed / failed / skipped)', '');
         out.push('| Tag | ' + names.join(' | ') + ' |', '|---|' + names.map(() => '---|').join(''));

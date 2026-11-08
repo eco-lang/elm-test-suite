@@ -5,6 +5,7 @@ number literals in an unannotated `let` and matched by `case` with every field u
 as a Float: `round 45 + round 60 + round 75` gives 180.
 -}
 
+-- TAGS: elm-spec, sm-datbind, s-dec-group, d-atexp-scon
 -- CHECK: tri3: 180
 
 import Html exposing (text)

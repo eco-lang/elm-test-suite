@@ -11,6 +11,7 @@ leaf is the rightmost one, so both calls are taken and the result is 42.
 The module defines its own `Maybe_` type instead of using `Maybe`.
 -}
 
+-- TAGS: elm-spec, d-dec-rec, d-exp-case, d-pat-con
 -- CHECK: found: 42
 
 import Html exposing (text)

@@ -7,6 +7,7 @@ module TypeMismatchParameterisedAliasTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, sm-typbind-record, s-ty-con, s-valbind-var
 -- COMPILE-ERROR: TYPE MISMATCH, parameterised alias
 -- CHECK: -- TYPE MISMATCH -
 

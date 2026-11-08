@@ -12,6 +12,7 @@ element in the map". The program is valid and should print `g 3: 0`.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, sm-topdec-value, sm-item-var, dm-topdec-val
 -- CHECK: g 3: 0
 
 import CompilerIssue2207Mutual exposing (g)

@@ -9,6 +9,7 @@ both operands to be the same appendable type, and an `Int` is neither a list nor
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, Int right of ++ with a list
 -- CHECK: -- TYPE MISMATCH -
 

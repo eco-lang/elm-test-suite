@@ -3,6 +3,7 @@ module FloatMathAtan2Test exposing (..)
 {-| `atan2 1 1` is pi/4, printed as 0.7853981633974483.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: testValue: 0.7853981633974483
 
 import Basics exposing (..)

@@ -10,6 +10,7 @@ elements.
 
 -}
 
+-- TAGS: elm-spec, d-atexp-op
 -- CHECK: eq_count: 2
 -- CHECK: ne_count: 3
 -- CHECK: eq_filter: [1.5,1.5]

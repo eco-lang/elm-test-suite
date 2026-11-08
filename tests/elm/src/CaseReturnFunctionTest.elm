@@ -8,6 +8,7 @@ and each result is applied at once to two `Int` arguments.
 
 -}
 
+-- TAGS: elm-spec, d-exp-case, d-exp-lambda, d-app-closure
 -- CHECK: op1: 7
 -- CHECK: op2: 3
 -- CHECK: op3: 10

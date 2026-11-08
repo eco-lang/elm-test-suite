@@ -14,6 +14,8 @@ import Route
 import RouteBuilder exposing (App, StatelessRoute)
 import Shared
 import Site
+import Standard
+import Standard.Render as Render
 import SyntaxHighlight
 import TestList
 import Ui
@@ -109,6 +111,16 @@ view app shared =
 
           else
             Html.p [ Attr.class "ts-small" ] (Html.text "Tags:" :: List.map TestList.tagLink test.tags)
+        , if List.isEmpty test.checks then
+            Html.text ""
+
+          else
+            Html.p [ Attr.class "ts-small" ]
+                (Html.text "Checks, in "
+                    :: Html.a [ Attr.href (Route.toString Route.Standard) ] [ Html.em [] [ Html.text "A Standard Definition of Elm?" ] ]
+                    :: Html.text ":"
+                    :: List.map checkLink test.checks
+                )
         , Html.div [ Attr.class "ts-filters" ]
             (List.map
                 (\r ->
@@ -232,3 +244,20 @@ source code =
 
         Err _ ->
             Html.pre [ Attr.class "ts-pre" ] [ Html.text code ]
+
+
+{-| A rule or restriction the test checks, as a link to its page in the book.
+-}
+checkLink : Data.Check -> Html msg
+checkLink check =
+    let
+        ( noun, href ) =
+            case check.kind of
+                Data.Rule ->
+                    ( "rule ", Render.ruleHref check.name )
+
+                Data.Restriction ->
+                    ( "restriction ", Render.itemHref Standard.Restriction check.name )
+    in
+    Html.a [ Attr.class "ts-tag", Attr.href href ]
+        [ Html.span [ Attr.class "ts-muted" ] [ Html.text noun ], Html.text check.name ]

@@ -8,6 +8,7 @@ function, it must receive both arguments, giving the same 15 as the direct
 call.
 -}
 
+-- TAGS: elm-spec, d-exp-app, d-exp-lambda, d-app-closure
 -- CHECK: direct: 15
 -- CHECK: viaCapture: 15
 

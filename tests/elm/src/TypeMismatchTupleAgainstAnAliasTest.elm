@@ -7,6 +7,7 @@ module TypeMismatchTupleAgainstAnAliasTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, sm-typbind, s-ty-con, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, tuple against an alias
 -- CHECK: -- TYPE MISMATCH -
 

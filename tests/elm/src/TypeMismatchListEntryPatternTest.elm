@@ -8,6 +8,7 @@ in one list, and all entries of a list must share one type.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-pat-cons, s-atpat-scon
 -- COMPILE-ERROR: TYPE MISMATCH, list entry pattern
 -- CHECK: -- TYPE MISMATCH -
 

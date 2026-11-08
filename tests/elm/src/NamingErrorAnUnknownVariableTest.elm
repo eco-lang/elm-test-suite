@@ -5,6 +5,7 @@ module NamingErrorAnUnknownVariableTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-longvar
 -- COMPILE-ERROR: NAMING ERROR, an unknown variable
 -- CHECK: -- NAMING ERROR -
 

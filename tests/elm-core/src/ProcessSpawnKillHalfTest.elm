@@ -11,6 +11,7 @@ by `done`.
 
 -}
 
+-- TAGS: elm-spec, p-proc-spawn, p-proc-kill, p-proc-sleep
 -- CHECK: spawnKill: "fired 1"
 -- CHECK: spawnKill: "fired 3"
 -- CHECK: spawnKill: "fired 5"

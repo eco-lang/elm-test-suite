@@ -163,10 +163,20 @@ with its own project. The results website shows the tests by project and by tag.
 
 | Tag | Tests | What they are |
 |---|---|---|
+| `elm-spec` | 871 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
 | `elm19-compile-error` | 222 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
 | `elm19-bug` | 151 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
 | `elm19-bug-fix` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
-| `elm19-quirks` | 2 | edge cases where the test records what Elm 0.19.1 does, and that differs from A Standard Definition of Elm? or from what another test expects |
+| `elm19-quirks` | 3 | edge cases where the test records what Elm 0.19.1 does, and that differs from A Standard Definition of Elm? or from what another test expects |
+
+A tag may also be the name of a rule or restriction of A Standard Definition of Elm?, as in
+`-- TAGS: elm-spec, s-dec-group, d-dec-rec, core-let-recursion`: the test checks that rule or
+restriction. Such a tag is not a group of its own: the test's page links to the rule's or
+restriction's page in the book, and that page lists every test that checks it. A test tagged
+`elm-spec` names the rules and restrictions that are its subject, not every rule its program
+happens to use; one that checks only the initial basis or a derived form names none. The names
+come from the LaTeX sources (`\defnrule[r:<name>]`, `\citelabel{res:<name>}`), read by
+`runner/spec-items.js`.
 
 The 34 tests of edge cases recorded from Elm on Node (Unicode and case mapping, JSON number and string
 formats, Float edge values, regex and URL encoding details) carry `-- MODE-GUARD:` and
@@ -174,7 +184,9 @@ formats, Float edge values, regex and URL encoding details) carry `-- MODE-GUARD
 `ConformanceHelp`, of which each project that has them holds a copy. Two of them are tagged
 `elm19-quirks`: `ParserLoneLowSurrogateTest` expects a Char made of two lone surrogates, which ruling
 A52 rules out, and `StringWordsUnicodeSpaceTest` expects `String.words` to give `[""]`, which
-the `elm19-bug` test `CoreIssue1019StringWordsEmptyTest` treats as a bug.
+the `elm19-bug` test `CoreIssue1019StringWordsEmptyTest` treats as a bug. The third is
+`ProcessSleepNonFiniteTest`, which expects a sleep of `1.0e300` ms to end at once, as on Node,
+where ruling A81 has it wait at least that long.
 
 ### Bugs and the issue triage
 
@@ -441,6 +453,7 @@ runner/run-all.js     runs it with several and writes the comparison report
 runner/directives.js  reads a test's directives and checks its output
 runner/dom.js         the minimal DOM that lets Html programs start on Node
 runner/site-data.js   writes the results website's data from the last results
+runner/spec-items.js  the names of the book's rules and restrictions, for tags that name them
 runner/definition-data.js  writes the website's data for A Standard Definition of Elm?
 definition/           the LaTeX sources and PDF of A Standard Definition of Elm?
 runner/check-baseline.js  lists the tests Elm 0.19.1 fails that are not tagged elm19-bug, elm19-bug-fix (CI)

@@ -3,6 +3,7 @@ module RecursiveFactorialTest exposing (main)
 {-| A self-recursive top-level `factorial` returns 1 for 0 and 120 and 3628800 for 5 and 10.
 -}
 
+-- TAGS: elm-spec, sm-topdec-value, dm-topdec-val
 -- CHECK: fact0: 1
 -- CHECK: fact5: 120
 -- CHECK: fact10: 3628800

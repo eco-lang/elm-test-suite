@@ -8,6 +8,7 @@ reads `r1.alpah`, which none of them is.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atpat-record, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH
 -- CHECK: -- TYPE MISMATCH -
 

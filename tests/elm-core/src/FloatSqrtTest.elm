@@ -3,6 +3,7 @@ module FloatSqrtTest exposing (main)
 {-| `sqrt` of 4.0, 9.0 and 0.0 is 2, 3 and 0.
 -}
 
+-- TAGS: elm-spec
 -- CHECK: sqrt1: 2
 -- CHECK: sqrt2: 3
 -- CHECK: sqrt3: 0

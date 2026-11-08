@@ -5,6 +5,7 @@ module EscapeTopLevelTupleTest exposing (main)
 `globalPair` is `( 11, 22 )`, so `a` is 11 and `b` is 22.
 -}
 
+-- TAGS: elm-spec, dm-topdec-val, d-valbind-pat, d-atpat-tuple
 -- CHECK: a: 11
 -- CHECK: b: 22
 

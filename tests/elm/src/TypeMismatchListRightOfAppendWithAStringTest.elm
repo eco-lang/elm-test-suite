@@ -8,6 +8,7 @@ both operands to be the same appendable type.
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-atexp-op, s-exp-app
 -- COMPILE-ERROR: TYPE MISMATCH, list right of ++ with a string
 -- CHECK: -- TYPE MISMATCH -
 

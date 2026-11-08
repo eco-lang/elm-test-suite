@@ -11,6 +11,7 @@ Elm 0.19.1 accepts `import Dict as Basics`.
 -}
 
 -- TAGS: elm19-bug
+-- TAGS: elm-spec, modules-basics-qualifier
 -- COMPILE-ERROR: import Dict as Basics
 -- CHECK: {{-- [A-Z ]+ -}}
 

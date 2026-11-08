@@ -5,6 +5,7 @@ module ErasedListSpecializationTest exposing (main)
 `count [ 1, 2 ] + count []` is 2 and `count [ 1, 2, 3 ] + count [] + count []` is 3.
 -}
 
+-- TAGS: elm-spec, s-valbind-var, s-atexp-nil, d-atpat-nil, d-pat-cons
 -- CHECK: n: 2
 -- CHECK: m: 3
 

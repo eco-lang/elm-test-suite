@@ -7,6 +7,7 @@ module TooManyArgsTooManyArgumentsToALocalTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
+-- TAGS: elm-spec, s-exp-app, s-atexp-longvar
 -- COMPILE-ERROR: TOO MANY ARGS, too many arguments to a local
 -- CHECK: -- TOO MANY ARGS -
 
