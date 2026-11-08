@@ -1,6 +1,6 @@
 module Route.Standard.DerivedForms exposing (ActionData, Data, Model, Msg, RouteParams, route)
 
-{-| The derived forms of The Definition of Standard Elm, each with a page of its own.
+{-| The derived forms of A Standard Definition of Elm?, each with a page of its own.
 -}
 
 import BackendTask exposing (BackendTask)

@@ -1,6 +1,6 @@
 module Route.Standard.Chapter_ exposing (ActionData, Data, Model, Msg, RouteParams, route)
 
-{-| One chapter (or the preface, or an appendix) of The Definition of Standard Elm.
+{-| One chapter (or the preface, or an appendix) of A Standard Definition of Elm?
 -}
 
 import BackendTask exposing (BackendTask)

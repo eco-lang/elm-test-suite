@@ -1,6 +1,6 @@
 module Route.Standard.Rules exposing (ActionData, Data, Model, Msg, RouteParams, route)
 
-{-| Every rule of The Definition of Standard Elm, by chapter and rule group.
+{-| Every rule of A Standard Definition of Elm?, by chapter and rule group.
 -}
 
 import BackendTask exposing (BackendTask)

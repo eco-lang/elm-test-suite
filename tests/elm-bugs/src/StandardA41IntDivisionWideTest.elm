@@ -2,7 +2,7 @@ module StandardA41IntDivisionWideTest exposing (main)
 
 {-| `a // 1` is `a`, also for an `a` beyond 32 bits.
 
-The Definition of Standard Elm, ruling A41: for `b /= 0`, `a // b` is the truncated quotient
+A Standard Definition of Elm?, ruling A41: for `b /= 0`, `a // b` is the truncated quotient
 normalised into the Int range. <https://elm-test-suite.netlify.app/standard/basis/Basics/idiv>
 
 An integer constant denotes its value normalised into the Int range, so whatever the range both

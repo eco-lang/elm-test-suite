@@ -1,6 +1,6 @@
-# The Definition of Standard Elm
+# A Standard Definition of Elm?
 
-The LaTeX sources of *The Definition of Standard Elm* (Draft version 0.3), a formal definition of the
+The LaTeX sources of *A Standard Definition of Elm?* (Draft version 0.3), a formal definition of the
 Elm language, and the PDF of that edition. The website (`site/`) shows the book with a page for every
 rule; `runner/definition-data.js` turns these sources into the site's data.
 

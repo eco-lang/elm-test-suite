@@ -1,6 +1,6 @@
 module Route.Standard.Discussions exposing (ActionData, Data, Model, Msg, RouteParams, route)
 
-{-| Every discussion of The Definition of Standard Elm, by the rule or item it is about. The list
+{-| Every discussion of A Standard Definition of Elm?, by the rule or item it is about. The list
 is fetched by the browser from GitHub (see `Discussions`); the rest of the page is frozen.
 -}
 

@@ -2,7 +2,7 @@ module StandardA81SleepBeyond32BitsTest exposing (main)
 
 {-| `Process.sleep d` waits at least `d` milliseconds, also when `d` is above 2^31 - 1.
 
-The Definition of Standard Elm, ruling A81: the action of `Process.sleep d` takes place no sooner
+A Standard Definition of Elm?, ruling A81: the action of `Process.sleep d` takes place no sooner
 than `d` milliseconds later, for every finite `d`. <https://elm-test-suite.netlify.app/standard/rules/p-proc-sleep>
 
 A process sleeps for 3e9 ms (about 35 days); 200 ms later it is still asleep, and is killed so that

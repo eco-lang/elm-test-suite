@@ -1,6 +1,6 @@
 module Route.Standard.Restrictions exposing (ActionData, Data, Model, Msg, RouteParams, route)
 
-{-| The restrictions of The Definition of Standard Elm, each with a page of its own.
+{-| The restrictions of A Standard Definition of Elm?, each with a page of its own.
 -}
 
 import BackendTask exposing (BackendTask)

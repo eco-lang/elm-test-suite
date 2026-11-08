@@ -34,7 +34,7 @@ module Standard exposing
     , rule
     )
 
-{-| The Definition of Standard Elm, as `runner/definition-data.js` writes it under `data-standard/`:
+{-| A Standard Definition of Elm?, as `runner/definition-data.js` writes it under `data-standard/`:
 the book's text as blocks and inlines, with its mathematics already rendered by KaTeX into a tree of
 elements.
 -}

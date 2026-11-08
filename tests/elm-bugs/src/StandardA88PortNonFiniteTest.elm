@@ -2,7 +2,7 @@ port module StandardA88PortNonFiniteTest exposing (main)
 
 {-| A NaN or an infinity sent out through a port arrives as JSON `null`.
 
-The Definition of Standard Elm, ruling A88: a value crosses a port as JSON, which has no NaN or
+A Standard Definition of Elm?, ruling A88: a value crosses a port as JSON, which has no NaN or
 infinity, so a non-finite float goes out as `null`. <https://elm-test-suite.netlify.app/standard/rules/e-enc-float>
 
 The test's host sends each `echoOut` value straight back on `echoIn`, decoded as a `Maybe Float`:

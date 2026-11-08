@@ -82,7 +82,7 @@ view app _ =
             ]
         , Html.p [ Attr.class "ts-lede" ]
             [ Html.text "The site also carries "
-            , Route.link [] [ Html.em [] [ Html.text "The Definition of Standard Elm" ] ] Route.Standard
+            , Route.link [] [ Html.em [] [ Html.text "A Standard Definition of Elm?" ] ] Route.Standard
             , Html.text ", a formal definition of the language with a page for every rule."
             ]
         , Html.p [ Attr.class "ts-lede" ]

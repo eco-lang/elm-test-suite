@@ -2,7 +2,7 @@ module StandardA82MainInImportedModuleTest exposing (main)
 
 {-| A `main` in a module other than the main module is an ordinary value, of any type.
 
-The Definition of Standard Elm, rulings A32 and A82: only the `main` of the main module must have a
+A Standard Definition of Elm?, rulings A32 and A82: only the `main` of the main module must have a
 program type; a `main` in any other module is an ordinary value.
 <https://elm-test-suite.netlify.app/standard/rules/p-stat-main-program>
 

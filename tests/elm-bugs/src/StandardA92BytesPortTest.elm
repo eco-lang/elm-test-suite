@@ -2,7 +2,7 @@ port module StandardA92BytesPortTest exposing (main)
 
 {-| `Bytes` may cross a port.
 
-The Definition of Standard Elm, ruling A92: `Bytes` is a payload type, crossing a port as a
+A Standard Definition of Elm?, ruling A92: `Bytes` is a payload type, crossing a port as a
 sequence of bytes. <https://elm-test-suite.netlify.app/standard/static-modules#sec-static-modules-ports>
 
 The test's host sends each `echoOut` value straight back on `echoIn`. Elm 0.19.1 rejects a port

@@ -2,7 +2,7 @@ module StandardA46CompareNanTest exposing (main)
 
 {-| `compare` is a total order on Float: NaN is above every other float and equal to NaN.
 
-The Definition of Standard Elm, ruling A46: at floats, `compare x y` is `EQ` if both are NaN, `GT`
+A Standard Definition of Elm?, ruling A46: at floats, `compare x y` is `EQ` if both are NaN, `GT`
 if only `x` is NaN, and `LT` if only `y` is NaN. <https://elm-test-suite.netlify.app/standard/basis/Basics/compare>
 
 In Elm 0.19.1 `compare` with a NaN argument is always `GT`, so `compare 1 nan` and `compare nan

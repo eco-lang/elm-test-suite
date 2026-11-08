@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// definition-data.js: writes the data the website (site/) shows The Definition of Standard Elm from.
+// definition-data.js: writes the data from which the website (site/) shows A Standard Definition of Elm?
 //
 // Usage:
 //   node runner/definition-data.js [--out <dir>] [--check-aux <dir>]

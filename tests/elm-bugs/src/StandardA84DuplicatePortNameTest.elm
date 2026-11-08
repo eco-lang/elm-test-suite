@@ -2,7 +2,7 @@ port module StandardA84DuplicatePortNameTest exposing (main)
 
 {-| Two ports of one program may not have the same name.
 
-The Definition of Standard Elm, ruling A84: the name of every port of a program is distinct from
+A Standard Definition of Elm?, ruling A84: the name of every port of a program is distinct from
 those of its other ports (and of the platform's managers); a program that breaks this does not
 elaborate. <https://elm-test-suite.netlify.app/standard/restrictions/modules-program> <https://elm-test-suite.netlify.app/standard/rules/p-stat-module>
 

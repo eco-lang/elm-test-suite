@@ -2,7 +2,7 @@ module StandardA72AbsentFlagsTest exposing (main)
 
 {-| A program given no flags starts with flags `null`: `Maybe` flags are `Nothing`.
 
-The Definition of Standard Elm, ruling A72: when the host gives no flags, the flags are the JSON
+A Standard Definition of Elm?, ruling A72: when the host gives no flags, the flags are the JSON
 value `null`. <https://elm-test-suite.netlify.app/standard/rules/p-init>
 
 This test is started without flags (no `-- FLAGS:` line). Elm 0.19.1 decodes `undefined`, which a

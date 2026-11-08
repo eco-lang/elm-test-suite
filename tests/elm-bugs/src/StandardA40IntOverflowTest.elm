@@ -2,7 +2,7 @@ module StandardA40IntOverflowTest exposing (main)
 
 {-| Int `+`, `-` and `*` give an Int, never an infinity or NaN, however large the exact result.
 
-The Definition of Standard Elm, ruling A40: Int addition, subtraction and multiplication give the
+A Standard Definition of Elm?, ruling A40: Int addition, subtraction and multiplication give the
 exact result normalised into the Int range, and an Int is always a member of that range.
 <https://elm-test-suite.netlify.app/standard/basis/Basics/mul>
 

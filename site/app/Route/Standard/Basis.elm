@@ -1,6 +1,6 @@
 module Route.Standard.Basis exposing (ActionData, Data, Model, Msg, RouteParams, route)
 
-{-| The initial basis of The Definition of Standard Elm: its types and values, each with a page of its own.
+{-| The initial basis of A Standard Definition of Elm?, its types and values, each with a page of its own.
 -}
 
 import BackendTask exposing (BackendTask)

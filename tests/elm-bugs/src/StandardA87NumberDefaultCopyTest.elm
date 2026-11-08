@@ -2,7 +2,7 @@ module StandardA87NumberDefaultCopyTest exposing (main)
 
 {-| A top-level value of type `number` has an Int copy, which is evaluated even when only the Float one is used.
 
-The Definition of Standard Elm, ruling A87: a program is specialised over its `number` variables
+A Standard Definition of Elm?, ruling A87: a program is specialised over its `number` variables
 before it runs; a value whose type scheme quantifies one has a default copy at `Int`, evaluated when
 its module is, besides a copy for each type it is used at.
 <https://elm-test-suite.netlify.app/standard/dynamic-core#sec-dynamic-core-numbers>

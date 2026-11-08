@@ -5,7 +5,7 @@ module StandardA42ModByZeroTest exposing (main)
 <https://github.com/elm/core/issues/1147>
 <https://github.com/elm/core/issues/1072>
 
-The Definition of Standard Elm, ruling A42: `x // 0`, `modBy 0 x` and `remainderBy 0 x` are `0`,
+A Standard Definition of Elm?, ruling A42: `x // 0`, `modBy 0 x` and `remainderBy 0 x` are `0`,
 so that no evaluation ends in a run-time error. <https://elm-test-suite.netlify.app/standard/basis/Basics/modBy>
 
 Elm 0.19.1 stops the program: "Cannot perform mod 0. Division by zero error." (The result is

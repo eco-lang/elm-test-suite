@@ -2,7 +2,7 @@ module StandardA56PrefixAndOrTest exposing (main)
 
 {-| `(&&)` and `(||)` used as functions evaluate both arguments, like every other function.
 
-The Definition of Standard Elm, ruling A56: only the infix forms `a && b` and `a || b` are
+A Standard Definition of Elm?, ruling A56: only the infix forms `a && b` and `a || b` are
 conditionals (derived forms); the operator values `(&&)` and `(||)` are functions of the basis,
 applied to two values. <https://elm-test-suite.netlify.app/standard/basis/Basics/and>
 

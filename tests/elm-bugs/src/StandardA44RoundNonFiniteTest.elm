@@ -2,7 +2,7 @@ module StandardA44RoundNonFiniteTest exposing (main)
 
 {-| `round`, `floor` and `ceiling` of NaN are `0`, and of an infinity an Int.
 
-The Definition of Standard Elm, ruling A44: they give `0` for NaN, and the greatest or least Int
+A Standard Definition of Elm?, ruling A44: they give `0` for NaN, and the greatest or least Int
 for an infinity. <https://elm-test-suite.netlify.app/standard/basis/Basics/round>
 
 Whatever the Int range, `round (1/0) - round (1/0) + 1` is then `1`. Elm 0.19.1 returns NaN or the

@@ -152,7 +152,7 @@ report and writes it to `.work/report.md`:
 | `elm-conformance` | 33 | edge cases recorded from Elm on Node: Unicode and case mapping, JSON number and string formats, Float edge values, regex and URL encoding details |
 | `elm-compile-errors` | 216 | programs the compiler must reject, checked by the title of the error report |
 | `elm-bug-fixes` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
-| `elm-bugs` | 151 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from The Definition of Standard Elm; each test links its issue or ruling and expects the correct behaviour |
+| `elm-bugs` | 151 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
 
 ### elm-bugs and its issue triage
 
@@ -170,7 +170,7 @@ github.com/elm repositories but `elm-lang.org` and `package.elm-lang.org`, one l
 | `note` | why |
 
 `elm-bugs` also holds a test, named `Standard<ruling>...Test`, for each point on which Elm 0.19.1
-diverges from *The Definition of Standard Elm* (Appendix E, Known Divergences, of the book), where no
+diverges from *A Standard Definition of Elm?* (Appendix E, Known Divergences, of the book), where no
 other test covered it. Each links the book's page for its ruling (and the GitHub issue, where there
 is one) and expects what the book defines. A test of an Int beyond 32 bits holds for every Int range
 the book allows.
@@ -368,9 +368,9 @@ discussion of each category. The code is `site/src/Discuss.elm` (the links), `Di
 (fetching, the keys) and `DiscussionsView.elm`; the design is in
 [plans/github-discussions.md](plans/github-discussions.md).
 
-## The Definition of Standard Elm
+## A Standard Definition of Elm?
 
-The site also carries *The Definition of Standard Elm*, a formal definition of the language, under
+The site also carries *A Standard Definition of Elm?*, a formal definition of the language, under
 `/standard`: its chapters, a page for every rule at an address made from the rule's name
 (`/standard/rules/d-atexp-var`), pages likewise for every restriction, derived form and entry of
 the initial basis (`/standard/basis/Basics/modBy`), and the PDF. Its LaTeX sources are in `definition/`;
@@ -414,8 +414,8 @@ runner/run-all.js     runs it with several and writes the comparison report
 runner/directives.js  reads a test's directives and checks its output
 runner/dom.js         the minimal DOM that lets Html programs start on Node
 runner/site-data.js   writes the results website's data from the last results
-runner/definition-data.js  writes the website's data for The Definition of Standard Elm
-definition/           the LaTeX sources and PDF of The Definition of Standard Elm
+runner/definition-data.js  writes the website's data for A Standard Definition of Elm?
+definition/           the LaTeX sources and PDF of A Standard Definition of Elm?
 runner/check-baseline.js  lists the tests Elm 0.19.1 fails outside elm-bugs, elm-bug-fixes (CI)
 site/                 the results website (elm-pages)
 plans/                plans for work on the site
@@ -426,5 +426,5 @@ tests/<project>/      the test projects (elm.json and src/)
 
 ## License
 
-The code is BSD 3-Clause; see [LICENSE](LICENSE). The text of *The Definition of Standard Elm* in
+The code is BSD 3-Clause; see [LICENSE](LICENSE). The text of *A Standard Definition of Elm?* in
 `definition/` is CC BY 4.0; see [definition/LICENSE](definition/LICENSE).

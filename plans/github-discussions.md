@@ -5,7 +5,7 @@ notes at the end for where the code differs in detail from this plan.
 
 ## Goal
 
-Every citable part of *The Definition of Standard Elm* on the site (a rule, restriction, derived
+Every citable part of *A Standard Definition of Elm?* on the site (a rule, restriction, derived
 form or entry of the basis), and every test of the suite, should be a place where people can start
 and find a debate. The debates live in the Discussions of this repository,
 [eco-lang/elm-test-suite](https://github.com/eco-lang/elm-test-suite/discussions), which are
@@ -153,7 +153,7 @@ within a minute or two of being posted. Nothing is rebuilt.
 ## Repository setup (by a maintainer, on GitHub)
 
 1. Create the categories, both in the open-ended discussion format:
-   - *Standard* (slug `standard`), described as, say, "The Definition of Standard Elm: one
+   - *Standard* (slug `standard`), described as, say, "A Standard Definition of Elm?, one
      discussion per rule or question, with the rule's key in the title, as the site's Discuss links
      write it";
    - *Tests* (slug `tests`), described as, say, "The tests and their results: one discussion per

@@ -2,7 +2,7 @@ module StandardA48MinMaxNanTest exposing (main)
 
 {-| Float `min` and `max` are IEEE 754-2019 minimum and maximum, whatever the order of the arguments.
 
-The Definition of Standard Elm, ruling A48: at floats, `min` and `max` of a NaN are NaN, and `-0`
+A Standard Definition of Elm?, ruling A48: at floats, `min` and `max` of a NaN are NaN, and `-0`
 is below `+0`. <https://elm-test-suite.netlify.app/standard/basis/Basics/min>
 
 Elm 0.19.1 uses `if lt x y then x else y`, so the answer depends on the order of the arguments:

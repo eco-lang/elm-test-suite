@@ -1,6 +1,6 @@
 module Route.Standard.Rules.Rule_ exposing (ActionData, Data, Model, Msg, RouteParams, route)
 
-{-| One rule of The Definition of Standard Elm, at an address made from its name.
+{-| One rule of A Standard Definition of Elm?, at an address made from its name.
 -}
 
 import BackendTask exposing (BackendTask)

@@ -1,4 +1,4 @@
-// KaTeX's stylesheet and fonts, for the mathematics of The Definition of Standard Elm, which is
+// KaTeX's stylesheet and fonts, for the mathematics of A Standard Definition of Elm?, which is
 // rendered at build time (runner/definition-data.js); no KaTeX JavaScript runs in the browser.
 import "katex/dist/katex.min.css";
 

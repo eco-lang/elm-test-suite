@@ -2,7 +2,7 @@ port module StandardA88PortNegativeZeroTest exposing (main)
 
 {-| `-0` sent out through a port arrives as `+0`.
 
-The Definition of Standard Elm, ruling A88: a value crosses a port as JSON, where `-0` is the number
+A Standard Definition of Elm?, ruling A88: a value crosses a port as JSON, where `-0` is the number
 `0`; at `Float` it decodes as `+0`. <https://elm-test-suite.netlify.app/standard/rules/e-enc-float>
 <https://elm-test-suite.netlify.app/standard/rules/e-dec-float>
 

@@ -2,7 +2,7 @@ module CharLiteralSurrogateEscapeTest exposing (main)
 
 {-| `'\u{D800}'` is not a Char literal: a surrogate code point is not a character.
 
-The Definition of Standard Elm, ruling A8: the escape `\u{h}` denotes a Unicode scalar value, so
+A Standard Definition of Elm?, ruling A8: the escape `\u{h}` denotes a Unicode scalar value, so
 the surrogate code points D800 to DFFF are not allowed, in Char literals as in String literals.
 <https://elm-test-suite.netlify.app/standard/syntax-core#fig-core-escapes>
 

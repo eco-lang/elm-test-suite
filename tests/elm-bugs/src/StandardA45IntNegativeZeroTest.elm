@@ -2,7 +2,7 @@ module StandardA45IntNegativeZeroTest exposing (main)
 
 {-| Int has one zero: no Int operation gives a negative zero.
 
-The Definition of Standard Elm, ruling A45: Int has one zero, so `toFloat` of any Int zero is `+0`
+A Standard Definition of Elm?, ruling A45: Int has one zero, so `toFloat` of any Int zero is `+0`
 and `1 / toFloat` of it is `+Infinity`. <https://elm-test-suite.netlify.app/standard/basis/Basics/negate>
 
 In Elm 0.19.1 `negate 0`, `0 * -1`, `modBy 4 -4`, `remainderBy 4 -4`, `round -0.4` and

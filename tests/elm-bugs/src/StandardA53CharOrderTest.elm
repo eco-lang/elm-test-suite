@@ -2,7 +2,7 @@ module StandardA53CharOrderTest exposing (main)
 
 {-| Characters are ordered by their code points.
 
-The Definition of Standard Elm, ruling A53: `compare` on characters compares their codes (`toCode`).
+A Standard Definition of Elm?, ruling A53: `compare` on characters compares their codes (`toCode`).
 <https://elm-test-suite.netlify.app/standard/appendix-dynamic-basis#sec-appendix-dynamic-basis-order>
 
 `'😀'` is U+1F600 and `'ﬀ'` is U+FB00, so `'😀'` is the greater. Elm 0.19.1 compares the UTF-16

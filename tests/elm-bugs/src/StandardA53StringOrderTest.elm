@@ -2,7 +2,7 @@ module StandardA53StringOrderTest exposing (main)
 
 {-| Strings are ordered character by character, by code point.
 
-The Definition of Standard Elm, ruling A53: `compare` on strings is lexicographic over their
+A Standard Definition of Elm?, ruling A53: `compare` on strings is lexicographic over their
 characters, ordered by `toCode`. <https://elm-test-suite.netlify.app/standard/appendix-dynamic-basis#sec-appendix-dynamic-basis-order>
 
 `"😀"` (U+1F600) is above `"ﬀ"` (U+FB00). Elm 0.19.1 compares UTF-16 code units, so it puts `"😀"`

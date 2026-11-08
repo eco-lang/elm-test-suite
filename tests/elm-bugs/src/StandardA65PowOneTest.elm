@@ -2,7 +2,7 @@ module StandardA65PowOneTest exposing (main)
 
 {-| Float `1 ^ y` is `1` for every `y`, and `(-1) ^ y` is `1` for an infinite `y`.
 
-The Definition of Standard Elm, ruling A65: Float `pow` is IEEE 754-2019 `pow`, under which `1 ^ y`
+A Standard Definition of Elm?, ruling A65: Float `pow` is IEEE 754-2019 `pow`, under which `1 ^ y`
 is `1` even when `y` is an infinity or NaN, and `-1 ^ ±Infinity` is `1`.
 <https://elm-test-suite.netlify.app/standard/basis/Basics/pow>
 

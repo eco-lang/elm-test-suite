@@ -5,7 +5,7 @@ module StandardA44TruncateWideTest exposing (main)
 <https://github.com/elm/core/issues/1003>
 <https://github.com/elm/core/issues/1079>
 
-The Definition of Standard Elm, ruling A44: `truncate` gives the integer its argument denotes when
+A Standard Definition of Elm?, ruling A44: `truncate` gives the integer its argument denotes when
 it lies in the Int range, and the greatest or least Int when it lies above or below.
 <https://elm-test-suite.netlify.app/standard/basis/Basics/truncate>
 

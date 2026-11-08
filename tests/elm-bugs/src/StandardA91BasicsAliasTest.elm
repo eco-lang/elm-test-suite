@@ -2,7 +2,7 @@ module StandardA91BasicsAliasTest exposing (..)
 
 {-| Only an import of the module Basics may provide the qualifier `Basics`.
 
-The Definition of Standard Elm, ruling A91: an import `import M as Basics` requires `M` to be
+A Standard Definition of Elm?, ruling A91: an import `import M as Basics` requires `M` to be
 `Basics`, so that `Basics.True`, `Basics.False` and `Basics.negate`, which derived forms introduce,
 always denote the initial basis. <https://elm-test-suite.netlify.app/standard/restrictions/modules-basics-qualifier>
 

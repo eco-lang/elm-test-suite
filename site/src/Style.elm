@@ -463,7 +463,7 @@ resultStyles =
 
 
 
--- THE DEFINITION OF STANDARD ELM
+-- A STANDARD DEFINITION OF ELM?
 
 
 standardStyles : List Snippet
