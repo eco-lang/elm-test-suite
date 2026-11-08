@@ -141,18 +141,18 @@ report and writes it to `.work/report.md`:
 | Project | Tests | What they cover |
 |---|---|---|
 | `elm` | 605 | the language and elm/core: every construct, closures, recursion, pattern matching, records, custom types, numbers, strings |
-| `elm-core` | 106 | the elm/core modules, function by function |
+| `elm-core` | 108 | the elm/core modules, function by function |
 | `elm-bytes` | 84 | elm/bytes encoders and decoders |
 | `elm-json` | 32 | elm/json |
 | `elm-parser` | 39 | elm/parser |
 | `elm-regex` | 5 | elm/regex |
 | `elm-time` | 4 | elm/time |
-| `elm-url` | 3 | elm/url |
+| `elm-url` | 4 | elm/url |
 | `elm-html` | 3 | elm/html |
 | `elm-conformance` | 33 | edge cases recorded from Elm on Node: Unicode and case mapping, JSON number and string formats, Float edge values, regex and URL encoding details |
 | `elm-compile-errors` | 216 | programs the compiler must reject, checked by the title of the error report |
 | `elm-bug-fixes` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
-| `elm-bugs` | 126 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues; each test links its issue and expects the correct behaviour |
+| `elm-bugs` | 151 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from The Definition of Standard Elm; each test links its issue or ruling and expects the correct behaviour |
 
 ### elm-bugs and its issue triage
 
@@ -168,6 +168,19 @@ github.com/elm repositories but `elm-lang.org` and `package.elm-lang.org`, one l
 | `test` | the test (or tests, space-separated), for `REPRODUCED` and `FIXED` |
 | `fixed_in` | the compilers under which that test passes |
 | `note` | why |
+
+`elm-bugs` also holds a test, named `Standard<ruling>...Test`, for each point on which Elm 0.19.1
+diverges from *The Definition of Standard Elm* (Appendix E, Known Divergences, of the book), where no
+other test covered it. Each links the book's page for its ruling (and the GitHub issue, where there
+is one) and expects what the book defines. A test of an Int beyond 32 bits holds for every Int range
+the book allows.
+
+A test whose issue's program is invalid under the book is kept as the issue wrote it, with a comment
+that says so and names a test in another project that follows the book. Three `elm-bugs` tests use
+surrogate escapes such as `"\u{D800}"`, which ruling A8 makes invalid: their counterparts are
+`elm-core`'s `CharLiteralSurrogateEscapeTest` (compiler#2366) and `StringToListLoneSurrogateTest`
+(core#1060), and `elm-url`'s `UrlPercentEncodeLoneSurrogateTest` (url#54), which compute their lone
+surrogates with `Char.fromCode`.
 
 A bug counts as fixed once a later official Elm release (not a fork such as Lamdera) fixes it: its
 test then moves from `elm-bugs` to `elm-bug-fixes`, its comment says which release fixed it, and
@@ -216,6 +229,7 @@ main =
 | `-- COMPILE-ERROR: <what>` | the compiler must reject the program; the CHECK lines (the report title, such as `-- CHECK: -- TYPE MISMATCH -`) are matched against its output |
 | `-- LINUX-ONLY: <reason>` | skipped on other hosts |
 | `-- NO-CACHE: <reason>` | always compiled and run: its result is never taken from the result cache |
+| `-- HELPER: <reason>` | not a test, even with a top-level `main`: a module that tests import |
 
 CHECK patterns are matched in any order, each against the whole output. Other lines that look
 like directives (`CHECK-MLIR`, `TEXT-MLIR`, `SKIP-AOT`) belong to eco's own harness and are ignored.
@@ -374,8 +388,9 @@ not send the book's data to the browser. The styles are the `sd-` classes in `si
 
 `.github/workflows/ci.yml` runs on Linux for each push to `master` or `standard-elm-suite` and each
 pull request: `pnpm test:all`, the comparison report into the job summary, the website and its unit
-tests, then `runner/check-baseline.js`, which fails the job when Elm 0.19.1 fails a test outside
-`elm-bugs` and `elm-bug-fixes`. The results and the built site are kept as workflow artifacts. With
+tests, then `runner/check-baseline.js`, which adds to the job summary every test Elm 0.19.1 fails
+outside `elm-bugs` and `elm-bug-fixes`. The suite reports on compilers already released, so no test
+result, of the suite or of the website's unit tests, ever fails the job. The results and the built site are kept as workflow artifacts. With
 the repository secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` set, a push to `master` publishes
 the site to Netlify, and a pull request gets a draft deploy linked in a comment. A push to
 `standard-elm-suite` publishes to a separate staging site, with the secrets
@@ -401,7 +416,7 @@ runner/dom.js         the minimal DOM that lets Html programs start on Node
 runner/site-data.js   writes the results website's data from the last results
 runner/definition-data.js  writes the website's data for The Definition of Standard Elm
 definition/           the LaTeX sources and PDF of The Definition of Standard Elm
-runner/check-baseline.js  fails when Elm 0.19.1 fails a test it should pass (CI)
+runner/check-baseline.js  lists the tests Elm 0.19.1 fails outside elm-bugs, elm-bug-fixes (CI)
 site/                 the results website (elm-pages)
 plans/                plans for work on the site
 .github/workflows/    CI: run the suite, build and publish the website

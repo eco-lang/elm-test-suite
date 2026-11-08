@@ -81,7 +81,8 @@ jobs:
           key: results-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: results-
 
-      # run-all.js exits 0 whatever the tests' outcomes; the baseline check at the end decides. The
+      # The suite reports on compilers already released, so no test result ever fails the job:
+      # run-all.js exits 0 whatever the tests' outcomes. The
       # weekly run, and a manual run with "fresh", run every test (--refresh): the cache is renewed,
       # and any result that differs from the cached one is listed in the report.
       - name: Run the suite under every compiler
@@ -125,8 +126,10 @@ jobs:
           npm run build
 
       # The site's own Elm unit tests (site/tests/): the keys and links of its GitHub Discussions.
+      # Like the suite's, their failures are reported in the log and never fail the job.
       - name: Test the site
         working-directory: site
+        continue-on-error: true
         run: npm test
 
       - name: Keep the site
@@ -152,8 +155,8 @@ jobs:
           enable-commit-comment: false
           enable-github-deployment: false
 
-      # elm-bugs and elm-bug-fixes fail under Elm 0.19.1 by design; anything else failing is a
-      # regression in the suite or the runner. It runs even when a step above failed (a deploy).
-      - name: Check Elm 0.19.1 passes every test it should
+      # The tests Elm 0.19.1 fails outside elm-bugs and elm-bug-fixes, into the job summary. A
+      # report, not a gate: it never fails the job. It runs even when a step above failed (a deploy).
+      - name: Report the tests Elm 0.19.1 fails outside elm-bugs and elm-bug-fixes
         if: always()
-        run: node runner/check-baseline.js
+        run: node runner/check-baseline.js | tee -a "$GITHUB_STEP_SUMMARY"

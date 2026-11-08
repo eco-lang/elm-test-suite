@@ -22,7 +22,8 @@
 // The compiler runs with its own ELM_HOME, .work/<compiler>/elm-home, so compilers never share a
 // package cache.
 //
-// For every tests/<project>/src/*.elm that has a top-level `main` or a `-- COMPILE-ERROR:` line:
+// For every tests/<project>/src/*.elm that has a top-level `main` or a `-- COMPILE-ERROR:` line, and
+// no `-- HELPER:` line:
 //   1. The project is mirrored into one directory per compile worker, .work/<compiler>/<project>/
 //      project-<k> (a compiler is not safe to run twice at once in one project). A compiler
 //      that crashes can leave elm-stuff corrupt, so elm-stuff is cleared after a compile that
@@ -441,7 +442,9 @@ async function runProject(spec, opts, compiler, cache) {
     const tests = [];
     for (const f of sources) {
         const content = fs.readFileSync(path.join(srcDir, f), 'utf8');
-        if (/^main\b/m.test(content) || /^-- COMPILE-ERROR:/m.test(content)) {
+        // A module with `-- HELPER:` is never a test, even with a top-level `main` (one that tests
+        // what a `main` outside the main module is).
+        if ((/^main\b/m.test(content) || /^-- COMPILE-ERROR:/m.test(content)) && !/^-- HELPER:/m.test(content)) {
             tests.push({ name: f.slice(0, -4), content });
         }
     }

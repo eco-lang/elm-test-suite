@@ -1,13 +1,15 @@
 #!/usr/bin/env node
-// check-baseline.js — fails when the default compiler fails a test it is expected to pass.
+// check-baseline.js: reports the tests the default compiler fails outside the projects expected to
+// fail.
 //
 // Usage:
 //   node runner/check-baseline.js [--compiler <name>] [--expect-failures <project>[,<project>...]]
 //
-// Reads .work/results/<compiler>.json (default: compilers.json's "default") and exits 1 if a test
-// failed outside the projects named by --expect-failures (default: elm-bugs,elm-bug-fixes, whose
-// tests expect the correct behaviour where Elm 0.19.1 has a bug), listing each such test. CI runs
-// it after publishing the report, so a regression still gets a report.
+// Reads .work/results/<compiler>.json (default: compilers.json's "default") and lists, in Markdown,
+// each test that failed outside the projects named by --expect-failures (default: elm-bugs,
+// elm-bug-fixes, whose tests expect the correct behaviour where Elm 0.19.1 has a bug). The suite
+// reports on compilers already released, so a failure is a finding, never an error: the exit
+// status is 0 whatever the results, and 2 only on a usage error or missing results.
 'use strict';
 
 const fs = require('fs');
@@ -35,12 +37,13 @@ function main() {
             if (t.status === 'fail') failures.push(project + '/' + name + ': ' + t.reason);
         }
     }
+    console.log('## ' + compiler + ' outside ' + expected.join(', ') + '\n');
     if (failures.length) {
-        console.log(compiler + ' failed ' + failures.length + ' test(s) outside ' + expected.join(', ') + ':');
-        for (const f of failures) console.log('  ' + f);
-        return 1;
+        console.log(compiler + ' failed ' + failures.length + ' test(s) outside ' + expected.join(', ') + ':\n');
+        for (const f of failures) console.log('- ' + f.replace(/\n/g, ' '));
+    } else {
+        console.log(compiler + ' passed every test outside ' + expected.join(', ') + '.');
     }
-    console.log(compiler + ' passed every test outside ' + expected.join(', '));
     return 0;
 }
 

@@ -1,7 +1,7 @@
 repo	number	title	likelihood	impact	e2e	outcome	test	fixed_in	note
 compiler	1008	"more flexibility for comparable types"	NOT_BUG	LOW	no	NOT_ATTEMPTED			meta issue collecting feature requests for more comparable types
 compiler	1039	type system extensions	NOT_BUG	LOW	no	NOT_ATTEMPTED			meta issue collecting type-system feature requests
-compiler	1145	Runtime error when comparing functions	NOT_BUG	MEDIUM	yes	NOT_ATTEMPTED			function equality throws at runtime by design (documented in Basics.(==)); making it a type error is a language proposal
+compiler	1145	Runtime error when comparing functions	NOT_BUG	MEDIUM	yes	REPRODUCED	StandardA51FunctionEqualityTest		function equality throws at runtime by design (documented in Basics.(==)); making it a type error is a language proposal; The Definition of Standard Elm decides it (ruling A51), and the test expects the book
 compiler	1246	Int literals over "max unsigned 32bit" produce bad JS	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue1246LargeIntLiteralTest		integer literals beyond 64 bits wrap silently (1e20 -> 7766279631452242000, 2^63 -> -2^63)
 compiler	1261	Negative numbers in pattern matches are syntax errors	LIKELY	LOW	yes	NOT_ATTEMPTED			negative literal patterns: 0.19.1 rejects them with an explicit "not possible at this time" message; deliberate limitation (same as 1773)
 compiler	1375	parser suggestions	NOT_BUG	LOW	no	NOT_ATTEMPTED			meta list of parser syntax suggestions
@@ -562,7 +562,7 @@ core	987	Elm compiler does not like '0xFFFFFFFF' hexadecimal literal (on 32-bit 
 core	988	Inconsistant equality for objects containing NaN	CERTAIN	LOW	yes	REPRODUCED	CoreIssue988NanEqualityReferenceTest CoreIssue988NanContainerSelfEqualityTest		Equality of structures containing NaN depends on reference identity; any container holding NaN equals itself
 core	989	Ports called asynchronously if inside Cmd.batch	LIKELY	MEDIUM	no	NOT_E2E			Port in Cmd.batch called asynchronously; needs DOM events and same-tick timing
 core	1001	Char.toUpper('ß') returns two characters as Char	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1001CharToUpperSharpSTest		Char.toUpper 'ß' returns the two-character Char 'SS'
-core	1003	Int operator inconsistency: some return 32bit truncated ints, some don't.	WEAK	MEDIUM	yes	NOT_ATTEMPTED			truncate wraps to 32 bits; Int is documented as well-defined only in 32-bit range, so expected behaviour is debatable
+core	1003	Int operator inconsistency: some return 32bit truncated ints, some don't.	WEAK	MEDIUM	yes	REPRODUCED	StandardA44TruncateWideTest		truncate wraps to 32 bits; Int is documented as well-defined only in 32-bit range, so expected behaviour is debatable; The Definition of Standard Elm decides it (ruling A44), and the test expects the book
 core	1005	Problem when setting "Date.prototype._nth = null;" from JS	LIKELY	LOW	no	NOT_E2E			Debugger crash when Date.prototype._nth = null; needs host JS and --debug
 core	1013	Dict.get works unreliably when keys are lists and --optimize is enabled	WEAK	HIGH	no	NOT_E2E			Dict with List keys under --optimize; no SSCCE and harness does not use --optimize
 core	1019	String.words and String.lines don't return empty list for blank string	LIKELY	MEDIUM	yes	REPRODUCED	CoreIssue1019StringWordsEmptyTest		String.words "" and of blank string return [""] instead of []
@@ -576,9 +576,9 @@ core	1052	modify String.repeat to give more predictable results for very large n
 core	1060	Infinite loop in `String.toList` for non UTF-8 encoded string like "\u{dd56}"	CERTAIN	MEDIUM	yes	REPRODUCED	CoreIssue1060StringToListLoneSurrogateTest		String.toList on a lone low surrogate loops until out of memory
 core	1061	Invalid or incomplete documentation in many String functions (characters vs UTF-16 code units)	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation (characters vs UTF-16 code units)
 core	1066	Bitwise shifts should mention that only 5 lowest bits of shift value are used	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation (shift amounts use 5 bits)
-core	1072	Non Standard behavior on division by zero	WEAK	MEDIUM	yes	NOT_ATTEMPTED			Division-by-zero semantics discussion; behaviour is a design choice (#377)
+core	1072	Non Standard behavior on division by zero	WEAK	MEDIUM	yes	REPRODUCED	StandardA42ModByZeroTest StandardA42RemainderByZeroTest		Division-by-zero semantics discussion; behaviour is a design choice (#377); The Definition of Standard Elm decides it (ruling A42), and the test expects the book
 core	1076	Documentation missing example for String.any and String.all	NOT_BUG	LOW	no	NOT_ATTEMPTED			Documentation example request
-core	1079	truncate overflows when handling times in milliseconds	WEAK	MEDIUM	yes	NOT_ATTEMPTED			truncate 32-bit overflow (duplicate of #591/#1003); Int range documented as 32-bit, debatable
+core	1079	truncate overflows when handling times in milliseconds	WEAK	MEDIUM	yes	REPRODUCED	StandardA44TruncateWideTest		truncate 32-bit overflow (duplicate of #591/#1003); Int range documented as 32-bit, debatable; The Definition of Standard Elm decides it (ruling A44), and the test expects the book
 core	1080	Basics.clamp doesn't passthrough NaN	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1080ClampNanTest		clamp -100 100 NaN returns 100 instead of NaN
 core	1082	Debug.log could be more intuitive for beginners and less misuse prone	NOT_BUG	LOW	no	NOT_ATTEMPTED			Debug.log API proposal
 core	1088	Math module	NOT_BUG	LOW	no	NOT_ATTEMPTED			Proposal: Math module
@@ -602,7 +602,7 @@ core	1128	Subscription bug in the latest core libraries	LIKELY	HIGH	no	NOT_E2E		
 core	1140	Case sensitivity when sorting strings is difficult to deal with	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: case-insensitive sorting
 core	1141	Unused port call breaks subscriptions	CERTAIN	HIGH	yes	REPRODUCED	CoreIssue1141UnusedPortCallBreaksSubscriptionTest		An unused port call in init reorders port managers and drops a port reply
 core	1142	Overflow issue when converting integers near maxint	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1142StringToIntMaxSafeTest		String.toInt off by one near 2^53
-core	1147	modBy runtime error when passing 0 as an argument	NOT_BUG	MEDIUM	yes	NOT_ATTEMPTED			modBy 0 crash is a known, deliberate design limitation (#377); not a bug report per se
+core	1147	modBy runtime error when passing 0 as an argument	NOT_BUG	MEDIUM	yes	REPRODUCED	StandardA42ModByZeroTest		modBy 0 crash is a known, deliberate design limitation (#377); not a bug report per se; The Definition of Standard Elm decides it (ruling A42), and the test expects the book
 core	1148	[String] No way to access nth character of string	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: String.get
 core	1149	Add ability to crash with a runtime exception on purpose for Platform.worker programs.	NOT_BUG	LOW	no	NOT_ATTEMPTED			Feature request: Platform.crash
 core	1150	NaN integers can be returned by `Char.toCode`	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1150CharToCodeLoneSurrogateTest		Char.toCode (Char.fromCode 0xD800) is NaN typed as Int
