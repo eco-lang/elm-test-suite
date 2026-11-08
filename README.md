@@ -144,8 +144,8 @@ project depends on the latest release of each package it uses.
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 735 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
-| `elm-core` | 362 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
+| `elm` | 774 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
+| `elm-core` | 367 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
 | `elm-bytes` | 88 | elm/bytes encoders and decoders |
 | `elm-parser` | 51 | elm/parser |
 | `elm-json` | 42 | elm/json |
@@ -163,9 +163,9 @@ with its own project. The results website shows the tests by project and by tag.
 
 | Tag | Tests | What they are |
 |---|---|---|
-| `elm-spec` | 871 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
+| `elm-spec` | 915 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
 | `elm19-compile-error` | 222 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
-| `elm19-bug` | 151 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
+| `elm19-bug` | 152 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
 | `elm19-bug-fix` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
 | `elm19-quirks` | 3 | edge cases where the test records what Elm 0.19.1 does, and that differs from A Standard Definition of Elm? or from what another test expects |
 
@@ -176,7 +176,7 @@ restriction's page in the book, and that page lists every test that checks it. A
 `elm-spec` names the rules and restrictions that are its subject, not every rule its program
 happens to use; one that checks only the initial basis or a derived form names none. The names
 come from the LaTeX sources (`\defnrule[r:<name>]`, `\citelabel{res:<name>}`), read by
-`runner/spec-items.js`.
+`runner/spec-items.js`. Every rule and restriction of the book is checked by at least one test.
 
 The 34 tests of edge cases recorded from Elm on Node (Unicode and case mapping, JSON number and string
 formats, Float edge values, regex and URL encoding details) carry `-- MODE-GUARD:` and

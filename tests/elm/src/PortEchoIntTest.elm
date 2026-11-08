@@ -15,7 +15,7 @@ exactly (9007199254740991 and -9007199254740991).
 
 -}
 
--- TAGS: elm-spec, e-enc-int, e-dec-int
+-- TAGS: elm-spec, e-enc-int, e-dec-int, dm-topdec-port-out, dm-topdec-port-in
 -- CHECK: PortEchoIntTest got: 0
 -- CHECK: PortEchoIntTest got: -1
 -- CHECK: PortEchoIntTest got: 42
