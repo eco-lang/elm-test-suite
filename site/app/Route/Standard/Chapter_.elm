@@ -4,6 +4,8 @@ module Route.Standard.Chapter_ exposing (ActionData, Data, Model, Msg, RoutePara
 -}
 
 import BackendTask exposing (BackendTask)
+import Data exposing (TestRef)
+import Dict exposing (Dict)
 import Discuss
 import DiscussionsView
 import FatalError exposing (FatalError)
@@ -33,7 +35,8 @@ type alias RouteParams =
     { chapter : String }
 
 
-{-| `index` and `chapter` are used only inside `View.freeze`, so elm-pages leaves them out of the
+{-| `index`, `chapter` and `tested` (the tests of each figure and section, by anchor) are used only
+inside `View.freeze`, so elm-pages leaves them out of the
 data sent to the browser; the page title and description are kept apart for that reason. `slug` is the item's
 name as the book writes it, for the key of its discussions: the address in the browser may not
 keep its case (Netlify serves a mixed-case path at its lower-case form).
@@ -44,6 +47,7 @@ type alias Data =
     , slug : String
     , index : Index
     , chapter : Chapter
+    , tested : Dict String (List TestRef)
     }
 
 
@@ -69,17 +73,19 @@ pages =
 
 data : RouteParams -> BackendTask FatalError Data
 data params =
-    BackendTask.map2
-        (\idx ch ->
+    BackendTask.map3
+        (\idx ch tested ->
             { title = titleText ch.summary ++ " · " ++ idx.title
             , description = titleText ch.summary ++ ", from " ++ idx.title ++ " (" ++ idx.edition ++ ")"
             , slug = ch.summary.slug
             , index = idx
             , chapter = ch
+            , tested = tested
             }
         )
         Standard.index
         (Standard.chapter params.chapter)
+        Data.testsByPlace
 
 
 titleText : ChapterSummary -> String
@@ -130,7 +136,7 @@ view app shared =
     in
     { title = app.data.title
     , body =
-        [ View.freeze (chapterView app.data.index app.data.chapter)
+        [ View.freeze (chapterView app.data.index app.data.tested app.data.chapter)
         , Html.div [ Attr.class "sd-book" ]
             [ DiscussionsView.section
                 { category = Discuss.Standard
@@ -147,8 +153,8 @@ view app shared =
     }
 
 
-chapterView : Index -> Chapter -> Html msg
-chapterView idx ch =
+chapterView : Index -> Dict String (List TestRef) -> Chapter -> Html msg
+chapterView idx tested ch =
     let
         sections =
             idx.chapters
@@ -183,7 +189,7 @@ chapterView idx ch =
                         sections
                     )
                 ]
-        , Html.article [ Attr.class "sd-text" ] (Render.blocks ch.blocks)
+        , Html.article [ Attr.class "sd-text" ] (Render.blocksTested (\id -> Dict.get id tested |> Maybe.withDefault []) ch.blocks)
         ]
 
 

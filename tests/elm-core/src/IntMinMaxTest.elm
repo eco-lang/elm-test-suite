@@ -3,7 +3,7 @@ module IntMinMaxTest exposing (main)
 {-| Checks `min` and `max` on Int arguments, including a negative one.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.min, b:Basics.max
 -- CHECK: min1: 3
 -- CHECK: min2: -5
 -- CHECK: max1: 10

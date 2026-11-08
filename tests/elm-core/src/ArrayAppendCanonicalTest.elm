@@ -9,7 +9,7 @@ are multiples of 32 that are not powers of two.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq, b:Array.Array
 -- CHECK: append32: True
 -- CHECK: append64: True
 -- CHECK: append96: True

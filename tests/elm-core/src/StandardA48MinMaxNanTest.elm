@@ -11,7 +11,7 @@ Elm 0.19.1 uses `if lt x y then x else y`, so the answer depends on the order of
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.min, b:Basics.max
 -- CHECK: min nan 1 is NaN: True
 -- CHECK: min 1 nan is NaN: True
 -- CHECK: max nan 1 is NaN: True

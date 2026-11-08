@@ -5,7 +5,7 @@ module FloatCeilingTest exposing (main)
 `ceiling -2.3` and `ceiling -2.7` are both -2.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.ceiling
 -- CHECK: ceil1: 3
 -- CHECK: ceil2: 2
 -- CHECK: ceil3: -2

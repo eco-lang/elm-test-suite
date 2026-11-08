@@ -10,7 +10,7 @@ empty `List Bool` with `[]`, which is `True`.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq
 -- CHECK: pairTT_TT: True
 -- CHECK: pairTT_TF: False
 -- CHECK: pairTF_TT: False

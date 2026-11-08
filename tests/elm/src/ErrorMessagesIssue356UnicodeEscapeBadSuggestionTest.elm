@@ -11,7 +11,7 @@ says "Try \u{001} instead?". The suggestion must have at least four digits: `\u{
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, fig:core-escapes
 -- COMPILE-ERROR: two-digit unicode escape
 -- CHECK: -- BAD UNICODE ESCAPE -
 -- CHECK-NOT: Try \u{001} instead

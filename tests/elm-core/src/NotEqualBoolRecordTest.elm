@@ -4,7 +4,7 @@ module NotEqualBoolRecordTest exposing (main)
 four combinations of a record holding `True` and one holding `False`.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.neq
 -- CHECK: tt: False
 -- CHECK: tf: True
 -- CHECK: ft: True

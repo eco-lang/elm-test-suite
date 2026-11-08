@@ -5,7 +5,7 @@ port module PortProblemDeclarationWithoutNameTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
--- TAGS: elm-spec
+-- TAGS: elm-spec, fig:grammar-top-level-declarations
 -- COMPILE-ERROR: PORT PROBLEM
 -- CHECK: -- PORT PROBLEM -
 

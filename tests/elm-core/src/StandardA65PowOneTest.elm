@@ -11,7 +11,7 @@ Elm 0.19.1 uses JavaScript's `Math.pow`, which gives NaN for all three.
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.pow
 -- CHECK: 1 ^ inf == 1: True
 -- CHECK: 1 ^ nan == 1: True
 -- CHECK: (-1) ^ inf == 1: True

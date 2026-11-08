@@ -18,6 +18,7 @@ module Data exposing
     , statusLabel
     , tag
     , test
+    , testsByPlace
     , testsChecking
     )
 
@@ -150,18 +151,26 @@ type alias Test =
 type CheckKind
     = Rule
     | Restriction
+    | DerivedForm
+    | Basis
+    | Place
 
 
-{-| A rule or restriction of A Standard Definition of Elm? that a test checks: the test has a tag
-that is its name.
+{-| A rule, restriction, derived form or entry of the initial basis of A Standard Definition of
+Elm? that a test checks: the test has a tag that names it. `name` is the item's name without the
+`df:` or `b:` of its tag. A `Place` is a figure or section of a chapter, for what the book defines
+only there (its grammar, its lexical syntax): `name` is its title, and it is found at `anchor` in
+the chapter `chapter`.
 -}
 type alias Check =
     { kind : CheckKind
     , name : String
+    , chapter : String
+    , anchor : String
     }
 
 
-{-| A test that checks a rule or restriction, as the rule's or restriction's page lists it.
+{-| A test that checks an item of the book, as the item's page lists it.
 -}
 type alias TestRef =
     { project : String
@@ -197,7 +206,7 @@ tag name =
     load projectDecoder ("data/tags/" ++ name ++ ".json")
 
 
-{-| The tests that check a rule or restriction, by its name.
+{-| The tests that check an item of the book, by its name.
 -}
 testsChecking : CheckKind -> String -> BackendTask FatalError (List TestRef)
 testsChecking kind name =
@@ -209,6 +218,15 @@ testsChecking kind name =
 
                 Restriction ->
                     "restrictions"
+
+                DerivedForm ->
+                    "derivedForms"
+
+                Basis ->
+                    "basis"
+
+                Place ->
+                    "places"
             )
             (Decode.dict (Decode.list testRefDecoder))
         )
@@ -226,18 +244,40 @@ testRefDecoder =
 
 checkDecoder : Decoder Check
 checkDecoder =
-    Decode.map2 Check
+    Decode.map4 Check
         (Decode.field "kind" Decode.string
             |> Decode.map
                 (\k ->
-                    if k == "rule" then
-                        Rule
+                    case k of
+                        "rule" ->
+                            Rule
 
-                    else
-                        Restriction
+                        "derived-form" ->
+                            DerivedForm
+
+                        "basis" ->
+                            Basis
+
+                        "figure" ->
+                            Place
+
+                        "section" ->
+                            Place
+
+                        _ ->
+                            Restriction
                 )
         )
         (Decode.field "name" Decode.string)
+        (Decode.oneOf [ Decode.field "chapter" Decode.string, Decode.succeed "" ])
+        (Decode.oneOf [ Decode.field "anchor" Decode.string, Decode.succeed "" ])
+
+
+{-| The tests that check the figures and sections of the book, by their anchors.
+-}
+testsByPlace : BackendTask FatalError (Dict.Dict String (List TestRef))
+testsByPlace =
+    load (Decode.field "places" (Decode.dict (Decode.list testRefDecoder))) "data/checks.json"
 
 
 test : String -> String -> BackendTask FatalError Test

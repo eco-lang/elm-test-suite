@@ -8,7 +8,7 @@ whether it is `==` to the original.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Array.Array, b:Basics.eq
 -- CHECK: result: [1.5,2.5,3.5]
 -- CHECK: match: True
 

@@ -3,7 +3,7 @@ module FloatTruncateTest exposing (main)
 {-| `truncate` rounds a Float toward zero: 2.7 and 2.3 give 2, and -2.3 and -2.7 give -2.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.truncate
 -- CHECK: trunc1: 2
 -- CHECK: trunc2: 2
 -- CHECK: trunc3: -2

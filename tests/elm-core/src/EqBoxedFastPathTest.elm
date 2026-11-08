@@ -17,7 +17,7 @@ the `Bool` constants with each other; `strNe` and `boolNe` check `/=`.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq, b:Basics.neq
 -- CHECK: strSame: True
 -- CHECK: strTwin: True
 -- CHECK: strDiff: False

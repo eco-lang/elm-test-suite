@@ -7,7 +7,7 @@ first, so the two compositions give `(9 + 1) * 2` and `5 * 2 + 1`.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.composeR, b:Basics.composeL, b:Basics.apR
 -- CHECK: compose1: 20
 -- CHECK: compose2: 11
 -- CHECK: pipe1: 20

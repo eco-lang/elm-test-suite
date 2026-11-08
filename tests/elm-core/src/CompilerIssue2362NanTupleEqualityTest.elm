@@ -11,7 +11,7 @@ for `p == p`, because its equality first checks whether both sides are the same 
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq
 -- CHECK: nan == nan: False
 -- CHECK: p == q: False
 -- CHECK: p == p: False

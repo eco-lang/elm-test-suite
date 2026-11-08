@@ -9,7 +9,7 @@ literal with the same fields, which is `True`.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq
 -- CHECK: recEq: True
 -- CHECK: recDiffA: False
 -- CHECK: recDiffB: False

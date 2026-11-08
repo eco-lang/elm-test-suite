@@ -12,7 +12,7 @@ sides below are the same Int. Elm 0.19.1 converts every quotient to a 32-bit int
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.idiv
 -- CHECK: 5000000000 // 1 == 5000000000: True
 -- CHECK: -5000000000 // 1 == -5000000000: True
 

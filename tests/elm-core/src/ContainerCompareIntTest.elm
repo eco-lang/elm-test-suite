@@ -9,7 +9,7 @@ less than any other list.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.compare, b:Basics.lt, b:Basics.ge, b:Basics.gt
 -- CHECK: pairLt: LT
 -- CHECK: pairGt: GT
 -- CHECK: pairEq: EQ

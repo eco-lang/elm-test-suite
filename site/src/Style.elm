@@ -423,6 +423,7 @@ filterStyles =
         , p "border-color" colors.text
         , p "color" colors.bgWhite
         ]
+    , Css.Global.class "sd-tested" [ p "margin" "-4px 0 14px" ]
     , Css.Global.class "ts-tag"
         [ p "display" "inline-block"
         , p "border" ("1px solid " ++ colors.border)

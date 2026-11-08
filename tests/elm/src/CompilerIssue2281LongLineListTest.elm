@@ -14,7 +14,7 @@ Fixed in Elm 0.19.2.
 -}
 
 -- TAGS: elm19-bug-fix
--- TAGS: elm-spec
+-- TAGS: elm-spec, df:list
 -- CHECK: length: 22000
 
 import Html exposing (text)

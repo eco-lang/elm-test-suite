@@ -6,7 +6,7 @@ itself, the two `Just`s both ways round, and `Nothing` with `Just True` on
 either side.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.neq, b:Maybe.Maybe
 -- CHECK: jt_jt: False
 -- CHECK: jt_jf: True
 -- CHECK: jf_jt: True

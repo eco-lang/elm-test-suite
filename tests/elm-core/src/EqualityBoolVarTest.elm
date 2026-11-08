@@ -10,7 +10,7 @@ operands give `True`.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq
 -- CHECK: vTT: True
 -- CHECK: vTF: False
 -- CHECK: vFT: False

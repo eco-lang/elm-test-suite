@@ -17,7 +17,7 @@ literal.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, fig:core-escapes
 -- COMPILE-ERROR: a surrogate escape in a Char literal
 -- CHECK: {{-- [A-Z ]+ -}}
 

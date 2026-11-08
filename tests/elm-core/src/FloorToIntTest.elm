@@ -3,7 +3,7 @@ module FloorToIntTest exposing (main)
 {-| `floor` rounds a Float down to an Int: 2.7 gives 2 and -2.3 gives -3.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.floor
 -- CHECK: floor1: 2
 -- CHECK: floor2: -3
 

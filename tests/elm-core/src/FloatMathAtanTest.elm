@@ -3,7 +3,7 @@ module FloatMathAtanTest exposing (..)
 {-| `atan 0` is 0.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.atan
 -- CHECK: testValue: 0
 
 import Basics exposing (..)

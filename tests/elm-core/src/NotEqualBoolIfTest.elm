@@ -5,7 +5,7 @@ module NotEqualBoolIfTest exposing (main)
 the operands differ.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.neq, df:if
 -- CHECK: ifTT: "no"
 -- CHECK: ifTF: "yes"
 -- CHECK: ifFT: "yes"

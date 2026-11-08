@@ -8,7 +8,7 @@ rather than at the missing `)`.
 -}
 
 -- TAGS: elm19-bug-fix
--- TAGS: elm-spec
+-- TAGS: elm-spec, fig:core-grammar-patterns
 -- COMPILE-ERROR: UNFINISHED PARENTHESES
 -- CHECK: -- UNFINISHED PARENTHESES -
 f n =

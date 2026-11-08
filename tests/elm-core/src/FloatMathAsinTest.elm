@@ -3,7 +3,7 @@ module FloatMathAsinTest exposing (..)
 {-| `asin 0` is 0.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.asin
 -- CHECK: testValue: 0
 
 import Basics exposing (..)

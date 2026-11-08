@@ -14,7 +14,7 @@ NaN, and NaN + 1 is not 1.
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.add, b:Basics.sub, b:Basics.mul
 -- CHECK: big * big - big * big + 1 == 1: True
 -- CHECK: huge + huge - (huge + huge) + 1 == 1: True
 

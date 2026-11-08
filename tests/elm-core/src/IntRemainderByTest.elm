@@ -8,7 +8,7 @@ division.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.remainderBy
 -- CHECK: rem1: 3
 -- CHECK: rem2: -3
 -- CHECK: rem3: 3

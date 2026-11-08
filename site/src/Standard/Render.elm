@@ -1,5 +1,6 @@
 module Standard.Render exposing
     ( blocks
+    , blocksTested
     , chapterHref
     , chapterTitle
     , inlines
@@ -18,8 +19,10 @@ inside `View.freeze`, so it is rendered at build time and none of this code runs
 
 import Html exposing (Html)
 import Html.Attributes as Attr
+import Data exposing (TestRef)
 import Route
 import Standard exposing (Block(..), ChapterSummary, Inline(..), ItemKind(..), ItemRef, Math(..), Place, Ref, RefKind(..))
+import Standard.TestsView as TestsView
 import VirtualDom
 
 
@@ -255,6 +258,37 @@ refLink ref =
 blocks : List Block -> List (Html msg)
 blocks =
     List.map block
+
+
+{-| As `blocks`, with a line under each figure and section heading that tests check: `tested`
+gives the tests of an anchor (Data.testsByPlace). Only a chapter's own blocks get these lines.
+-}
+blocksTested : (String -> List TestRef) -> List Block -> List (Html msg)
+blocksTested tested =
+    List.concatMap
+        (\b ->
+            let
+                below id =
+                    case tested id of
+                        [] ->
+                            []
+
+                        tests ->
+                            [ TestsView.line tests ]
+            in
+            case b of
+                Heading h ->
+                    block b :: below h.id
+
+                Figure f ->
+                    block b :: below f.id
+
+                Div cls c ->
+                    [ Html.div [ Attr.class ("sd-" ++ cls) ] (blocksTested tested c) ]
+
+                _ ->
+                    [ block b ]
+        )
 
 
 block : Block -> Html msg

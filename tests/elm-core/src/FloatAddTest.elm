@@ -5,7 +5,7 @@ module FloatAddTest exposing (main)
 Whole-number `Float` results print without a decimal point, as `13`, `0` and `-5`.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.add
 -- CHECK: add1: 13
 -- CHECK: add2: 0
 -- CHECK: add3: -5

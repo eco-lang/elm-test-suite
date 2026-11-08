@@ -3,7 +3,7 @@ module FloatDivTest exposing (main)
 {-| `/` on `Float` values for each combination of signs of the dividend and divisor.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.fdiv
 -- CHECK: div1: 2.5
 -- CHECK: div2: -2.5
 -- CHECK: div3: -2.5

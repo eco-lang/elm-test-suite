@@ -5,7 +5,7 @@ module FromArrayCharListEqualityTest exposing (main)
 Only the `==` comparison is logged; `FromArrayCharListRoundtripTest` also logs the list itself.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Array.Array, b:Basics.eq
 -- CHECK: match: True
 
 import Array

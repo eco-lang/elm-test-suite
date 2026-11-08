@@ -3,7 +3,7 @@ module FloatMathBasicsETest exposing (..)
 {-| `Basics.e` prints as 2.718281828459045.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.e
 -- CHECK: testValue: 2.718281828459045
 
 import Basics exposing (..)

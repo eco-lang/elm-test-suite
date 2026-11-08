@@ -4,7 +4,7 @@ module BasicsIsNaNTest exposing (main)
 false for 42.0.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.isNaN, b:Basics.isInfinite, b:Basics.fdiv
 -- CHECK: nan_check: True
 -- CHECK: not_nan: False
 -- CHECK: inf_check: True

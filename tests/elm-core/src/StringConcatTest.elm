@@ -6,7 +6,7 @@ module StringConcatTest exposing (main)
 `String.append "foo" "bar"` are each logged.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.append
 -- CHECK: concat1: "HelloWorld"
 -- CHECK: concat2: "Hello World"
 -- CHECK: append: "foobar"

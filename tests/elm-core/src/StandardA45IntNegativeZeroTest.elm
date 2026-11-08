@@ -12,7 +12,7 @@ toFloat` of it is `-Infinity`.
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.negate, b:Basics.mul, b:Basics.modBy, b:Basics.remainderBy, b:Basics.round, b:Basics.ceiling
 -- CHECK: negate 0: True
 -- CHECK: 0 * -1: True
 -- CHECK: modBy 4 -4: True

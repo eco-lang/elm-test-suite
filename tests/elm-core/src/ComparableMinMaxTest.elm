@@ -9,7 +9,7 @@ Among what is not tested: equal arguments, and `Int`, `Float`, tuples and lists.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.min, b:Basics.max
 -- CHECK: minStr: "apple"
 -- CHECK: maxStr: "zebra"
 -- CHECK: minChar: 'a'

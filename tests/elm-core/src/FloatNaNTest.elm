@@ -6,7 +6,7 @@ The last CHECK line matches only the `nanProp` label, so the value printed for `
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.isNaN
 -- CHECK: isNaN1: True
 -- CHECK: isNaN2: False
 -- CHECK: nanProp

@@ -3,7 +3,7 @@ module ControlFlowBooleanWithNotTest exposing (..)
 {-| Checks `not` applied to a comparison: `not (n > 0)` for `n = -5` is `True`.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.not, b:Basics.gt
 -- CHECK: testValue: True
 
 import Basics exposing (..)

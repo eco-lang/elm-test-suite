@@ -6,7 +6,7 @@ The test prints the round-tripped list and whether it is `==` to the original `[
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Array.Array, b:Basics.eq
 -- CHECK: result: ['a','b','c']
 -- CHECK: match: True
 

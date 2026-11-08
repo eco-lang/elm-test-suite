@@ -169,14 +169,20 @@ with its own project. The results website shows the tests by project and by tag.
 | `elm19-bug-fix` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
 | `elm19-quirks` | 3 | edge cases where the test records what Elm 0.19.1 does, and that differs from A Standard Definition of Elm? or from what another test expects |
 
-A tag may also be the name of a rule or restriction of A Standard Definition of Elm?, as in
-`-- TAGS: elm-spec, s-dec-group, d-dec-rec, core-let-recursion`: the test checks that rule or
-restriction. Such a tag is not a group of its own: the test's page links to the rule's or
-restriction's page in the book, and that page lists every test that checks it. A test tagged
-`elm-spec` names the rules and restrictions that are its subject, not every rule its program
-happens to use; one that checks only the initial basis or a derived form names none. The names
-come from the LaTeX sources (`\defnrule[r:<name>]`, `\citelabel{res:<name>}`), read by
-`runner/spec-items.js`. Every rule and restriction of the book is checked by at least one test.
+A tag may also name an item of A Standard Definition of Elm?: a rule or restriction by its name,
+as in `-- TAGS: elm-spec, s-dec-group, d-dec-rec, core-let-recursion`; a derived form by `df:` and
+its name (`df:if-chain`); an entry of the initial basis by `b:` and its qualified name
+(`b:Basics.compare`); a figure or section by its label (`fig:core-escapes`,
+`sec:syntax-core-layout`), for what the book defines only there, such as its grammar and lexical
+syntax. The test checks that item. Such a tag is not a group of its own: the test's page links to
+the item's page in the book, or for a figure or section to its place in its chapter; the item's
+page lists every test that checks it, and a chapter lists under each figure and section heading
+the tests of it. A test tagged `elm-spec` names the items that are its subject, not every rule its
+program happens to use, and names at least one: a test that cannot say what in the book it
+checks is not tagged `elm-spec`. The names come from the LaTeX sources (`\defnrule[r:<name>]`,
+`\citelabel{res:<name>}`, `\citelabel{df:<name>}`, `\citelabel{b:<name>}`, `\label{fig:<name>}`,
+`\label{sec:<name>}`), read by `runner/spec-items.js`. Every rule and restriction of the book is
+checked by at least one test.
 
 The 34 tests of edge cases recorded from Elm on Node (Unicode and case mapping, JSON number and string
 formats, Float edge values, regex and URL encoding details) carry `-- MODE-GUARD:` and
@@ -453,7 +459,7 @@ runner/run-all.js     runs it with several and writes the comparison report
 runner/directives.js  reads a test's directives and checks its output
 runner/dom.js         the minimal DOM that lets Html programs start on Node
 runner/site-data.js   writes the results website's data from the last results
-runner/spec-items.js  the names of the book's rules and restrictions, for tags that name them
+runner/spec-items.js  the names of the book's rules, restrictions, derived forms, basis entries, figures and sections
 runner/definition-data.js  writes the website's data for A Standard Definition of Elm?
 definition/           the LaTeX sources and PDF of A Standard Definition of Elm?
 runner/check-baseline.js  lists the tests Elm 0.19.1 fails that are not tagged elm19-bug, elm19-bug-fix (CI)

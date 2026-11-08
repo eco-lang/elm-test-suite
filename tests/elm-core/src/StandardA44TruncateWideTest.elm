@@ -15,7 +15,7 @@ the range. Elm 0.19.1 converts to a 32-bit integer: `truncate 3.0e10` is `-64771
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.truncate
 -- CHECK: truncate 3.0e10 >= 2147483647: True
 -- CHECK: truncate -3.0e10 <= -2147483648: True
 

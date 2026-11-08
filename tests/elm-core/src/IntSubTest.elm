@@ -3,7 +3,7 @@ module IntSubTest exposing (main)
 {-| Checks integer subtraction `-`, including subtracting a negative literal.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.sub, df:negation
 -- CHECK: sub1: 7
 -- CHECK: sub2: 10
 -- CHECK: sub3: 1

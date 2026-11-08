@@ -3,7 +3,7 @@ module IntPowTest exposing (main)
 {-| Checks integer exponentiation `^`, including a zero exponent and a negative base with an odd exponent.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.pow
 -- CHECK: pow1: 8
 -- CHECK: pow2: 1
 -- CHECK: pow3: 1024

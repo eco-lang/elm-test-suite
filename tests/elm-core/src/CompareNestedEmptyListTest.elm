@@ -9,7 +9,7 @@ equal.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.compare
 -- CHECK: ee: EQ
 -- CHECK: eA: LT
 -- CHECK: Ae: GT

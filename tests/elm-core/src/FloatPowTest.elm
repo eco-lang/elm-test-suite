@@ -6,7 +6,7 @@ module FloatPowTest exposing (main)
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.pow
 -- CHECK: pow1: 8
 -- CHECK: pow2: 1
 -- CHECK: pow3: 1024

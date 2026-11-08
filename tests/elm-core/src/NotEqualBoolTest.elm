@@ -4,7 +4,7 @@ module NotEqualBoolTest exposing (main)
 and so does `not` applied to each of those results.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.neq, b:Basics.not
 -- CHECK: ntt: False
 -- CHECK: ntf: True
 -- CHECK: nft: True

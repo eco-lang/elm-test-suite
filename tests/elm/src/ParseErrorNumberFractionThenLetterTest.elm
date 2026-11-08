@@ -5,7 +5,7 @@ module ParseErrorNumberFractionThenLetterTest exposing (..)
 -}
 
 -- TAGS: elm19-compile-error
--- TAGS: elm-spec
+-- TAGS: elm-spec, sec:syntax-core-lexical
 -- COMPILE-ERROR: WEIRD NUMBER
 -- CHECK: -- WEIRD NUMBER -
 x =

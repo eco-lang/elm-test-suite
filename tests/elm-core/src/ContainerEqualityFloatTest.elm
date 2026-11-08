@@ -17,7 +17,7 @@ False, so a container holding NaN is unequal even to an identical container;
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq
 -- CHECK: pairEqual: True
 -- CHECK: pairFirstDiff: False
 -- CHECK: pairSecondDiff: False

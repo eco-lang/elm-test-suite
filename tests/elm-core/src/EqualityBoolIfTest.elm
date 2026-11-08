@@ -8,7 +8,7 @@ operands are equal. The two `/=` cases choose `"yes"` only for `True /= False`.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq, b:Basics.neq, df:if
 -- CHECK: ifTT: "yes"
 -- CHECK: ifTF: "no"
 -- CHECK: ifFT: "no"

@@ -3,7 +3,7 @@ module BoolOrTest exposing (main)
 {-| The `||` operator gives `False` only when both operands are `False`, checked over all four combinations.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, df:or
 -- CHECK: or1: True
 -- CHECK: or2: True
 -- CHECK: or3: True

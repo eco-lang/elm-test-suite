@@ -13,8 +13,10 @@
 //   projects/<project>.json   each test of the project, its summary, its tags and its outcome per
 //                             compiler
 //   tags/<tag>.json           the same for each tag (`-- TAGS:`) but the projects and the checks
-//   checks.json               for each rule and restriction of A Standard Definition of Elm?, the
-//                             tests that check it: those with a tag that is its name (spec-items.js)
+//   checks.json               for each rule, restriction, derived form and basis entry of A Standard
+//                             Definition of Elm?, the tests that check it: those with a tag that
+//                             names it (spec-items.js); and under `places`, by the anchor of the
+//                             figure or section in its chapter, the tests tagged with its label
 //   tests/<project>/<Test>.json
 //                             one test: its doc comment, issue links, tags, the rules and
 //                             restrictions it checks, source, and per compiler its outcome, failure
@@ -25,7 +27,7 @@
 const fs = require('fs');
 const path = require('path');
 const D = require('./directives');
-const { specItems } = require('./spec-items');
+const { specItems, specPlaces, itemName } = require('./spec-items');
 
 const ROOT = path.resolve(__dirname, '..');
 const RESULTS = path.join(ROOT, '.work', 'results');
@@ -115,7 +117,10 @@ function main() {
 
     const tagged = new Map();   // tag -> the rows of its tests
     const items = specItems();
-    const checks = { rules: {}, restrictions: {} };   // name -> the tests that check it
+    const places = specPlaces();
+    const checks = { rules: {}, restrictions: {}, derivedForms: {}, basis: {}, places: {} };   // name -> the tests that check it
+    const bucket = { rule: 'rules', restriction: 'restrictions', 'derived-form': 'derivedForms', basis: 'basis',
+        figure: 'places', section: 'places' };
     for (const p of projects) {
         const srcDir = path.join(ROOT, 'tests', p, 'src');
         const names = [...new Set(runs.flatMap((r) => Object.keys(r.projects[p] || {})))].sort();
@@ -128,12 +133,17 @@ function main() {
             const issues = [...new Set(doc.match(/https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/(?:issues|pull)\/\d+/g) || [])];
             let all = [];   // its tags but its project; a malformed TAGS line fails the test in run.js
             try { all = D.extractTags(source, projects); } catch (e) { /* none */ }
-            // A tag that names a rule or restriction of the book is a check of it, not a tag.
+            // A tag that names a rule, restriction, derived form or basis entry of the book is a check
+            // of it, not a tag.
             const tags = all.filter((g) => !items.has(g));
-            const checked = all.filter((g) => items.has(g)).map((g) => ({ kind: items.get(g), name: g }));
+            // A figure or section is named by its title, and found at its anchor in its chapter.
+            const checked = all.filter((g) => items.has(g)).map((g) => (places.has(g)
+                ? { kind: items.get(g), name: places.get(g).title, chapter: places.get(g).chapter, anchor: places.get(g).anchor }
+                : { kind: items.get(g), name: itemName(g), chapter: '', anchor: '' }));
             for (const c of checked) {
-                const k = c.kind === 'rule' ? 'rules' : 'restrictions';
-                (checks[k][c.name] = checks[k][c.name] || []).push({ project: p, test: name, summary: summary(doc) });
+                const k = bucket[c.kind];
+                const key = k === 'places' ? c.anchor : c.name;
+                (checks[k][key] = checks[k][key] || []).push({ project: p, test: name, summary: summary(doc) });
             }
             const row = {
                 project: p,

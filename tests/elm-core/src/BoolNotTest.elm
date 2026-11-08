@@ -3,7 +3,7 @@ module BoolNotTest exposing (main)
 {-| `not` negates a Bool: `not True` is `False` and `not False` is `True`.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.not
 -- CHECK: not1: False
 -- CHECK: not2: True
 

@@ -14,7 +14,7 @@ compared with `1` after adding `1`: Elm 0.19.1 compiles `x == 0` as `!x`, elm/co
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.modBy
 -- CHECK: modBy 0 7 + 1 == 1: True
 -- CHECK: modBy 0 -7 + 1 == 1: True
 

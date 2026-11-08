@@ -244,13 +244,17 @@ function extractSkip(content) {
 }
 
 // A test's `-- TAGS: a, b` labels (README.md, "Tags"), in the order written: one or more lines, each a
-// comma-separated list of lower-case names (letters, digits, `.` and `-`). The runner adds the
-// test's project in front; naming a project here is an error, as is a malformed name.
+// comma-separated list of lower-case names (letters, digits, `.` and `-`), or of names of the book's
+// derived forms (`df:if-chain`), basis entries (`b:Basics.compare`), figures (`fig:core-escapes`) and
+// sections (`sec:syntax-core-layout`). The runner adds the test's
+// project in front; naming a project here is an error, as is a malformed name.
 function extractTags(content, projects = []) {
     const tags = [];
     for (const rest of directiveLines(content, '-- TAGS:')) {
         const names = rest.split(',').map((s) => s.trim());
-        if (names.some((n) => !/^[a-z0-9][a-z0-9.-]*$/.test(n))) throw new Error("malformed TAGS directive: '" + rest + "'");
+        if (names.some((n) => !/^(?:[a-z0-9][a-z0-9.-]*|(?:df|fig|sec):[a-z0-9-]+|b:[A-Za-z][A-Za-z0-9.]*)$/.test(n))) {
+            throw new Error("malformed TAGS directive: '" + rest + "'");
+        }
         for (const n of names) {
             if (projects.includes(n)) throw new Error('TAGS names the project ' + n + ': a test is tagged with its own project already');
             if (!tags.includes(n)) tags.push(n);

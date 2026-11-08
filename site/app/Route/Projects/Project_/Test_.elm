@@ -246,7 +246,8 @@ source code =
             Html.pre [ Attr.class "ts-pre" ] [ Html.text code ]
 
 
-{-| A rule or restriction the test checks, as a link to its page in the book.
+{-| A rule, restriction, derived form or basis entry the test checks, as a link to its page in the
+book; or a figure or section, as a link to its place in its chapter.
 -}
 checkLink : Data.Check -> Html msg
 checkLink check =
@@ -258,6 +259,21 @@ checkLink check =
 
                 Data.Restriction ->
                     ( "restriction ", Render.itemHref Standard.Restriction check.name )
+
+                Data.DerivedForm ->
+                    ( "derived form ", Render.itemHref Standard.DerivedForm check.name )
+
+                Data.Basis ->
+                    ( "basis ", Render.itemHref Standard.BasisEntry check.name )
+
+                Data.Place ->
+                    ( if String.startsWith "fig-" check.anchor then
+                        "figure "
+
+                      else
+                        "section "
+                    , Render.chapterHref check.chapter check.anchor
+                    )
     in
     Html.a [ Attr.class "ts-tag", Attr.href href ]
         [ Html.span [ Attr.class "ts-muted" ] [ Html.text noun ], Html.text check.name ]

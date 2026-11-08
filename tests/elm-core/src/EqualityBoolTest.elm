@@ -7,7 +7,7 @@ The test logs the full truth table of `==` and of `/=` over `True` and `False`.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq, b:Basics.neq
 -- CHECK: tt: True
 -- CHECK: tf: False
 -- CHECK: ft: False

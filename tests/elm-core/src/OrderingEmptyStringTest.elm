@@ -8,7 +8,7 @@ Each operator is applied directly to every pairing of `""` and `"a"`, plus
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.lt, b:Basics.le, b:Basics.gt, b:Basics.ge
 -- CHECK: lt_ee: False
 -- CHECK: lt_ea: True
 -- CHECK: lt_ae: False

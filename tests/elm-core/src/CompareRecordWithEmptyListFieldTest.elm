@@ -10,7 +10,7 @@ non-empty one.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.compare, b:Basics.eq
 -- CHECK: cmp_ee: EQ
 -- CHECK: cmp_eA: LT
 -- CHECK: cmp_Ae: GT

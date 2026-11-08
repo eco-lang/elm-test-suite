@@ -1,6 +1,6 @@
-module Standard.TestsView exposing (section)
+module Standard.TestsView exposing (line, section)
 
-{-| The tests that check a rule or restriction, on its page: each links to the test's page.
+{-| The tests that check an item of the book, on its page: each links to the test's page.
 -}
 
 import Data exposing (TestRef)
@@ -9,7 +9,7 @@ import Html.Attributes as Attr
 import Route
 
 
-{-| `noun` is "rule" or "restriction".
+{-| `noun` names the kind of item: "rule", "restriction", "derived form" or "entry of the basis".
 -}
 section : String -> List TestRef -> Html msg
 section noun tests =
@@ -40,3 +40,20 @@ item t =
           else
             Html.div [ Attr.class "ts-summary" ] [ Html.text t.summary ]
         ]
+
+
+{-| The tests that check a figure or section, as one line under it in its chapter.
+-}
+line : List TestRef -> Html msg
+line tests =
+    Html.p [ Attr.class "sd-tested ts-small" ]
+        (Html.span [ Attr.class "ts-muted" ] [ Html.text "Tested by: " ]
+            :: List.intersperse (Html.text ", ")
+                (List.map
+                    (\t ->
+                        Html.a [ Attr.href (Route.toString (Route.Projects__Project___Test_ { project = t.project, test = t.test })) ]
+                            [ Html.text t.test ]
+                    )
+                    tests
+                )
+        )

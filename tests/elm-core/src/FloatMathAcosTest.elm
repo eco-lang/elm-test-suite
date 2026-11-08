@@ -6,7 +6,7 @@ A Float that is a whole number is printed by `Debug.log` without a decimal point
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.acos
 -- CHECK: testValue: 0
 
 import Basics exposing (..)

@@ -15,7 +15,7 @@ list.)
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq
 -- CHECK: record: False
 -- CHECK: custom type: False
 -- CHECK: maybe: False

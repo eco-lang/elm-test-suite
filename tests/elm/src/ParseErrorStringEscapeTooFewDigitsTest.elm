@@ -7,7 +7,7 @@ Elm requires four to six hex digits between the braces of a `\u{...}` escape.
 -}
 
 -- TAGS: elm19-compile-error
--- TAGS: elm-spec
+-- TAGS: elm-spec, fig:core-escapes
 -- COMPILE-ERROR: BAD UNICODE ESCAPE
 -- CHECK: -- BAD UNICODE ESCAPE -
 x =

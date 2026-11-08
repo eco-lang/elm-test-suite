@@ -7,7 +7,7 @@ another `""`.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.compare
 -- CHECK: ee: EQ
 -- CHECK: ea: LT
 -- CHECK: ae: GT

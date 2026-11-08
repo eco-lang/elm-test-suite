@@ -5,7 +5,7 @@ module FromArrayFloatListMapTest exposing (main)
 `[1.5, 2.5]` goes through `Array.fromList` and `Array.toList`, and adding 0.5 to each element gives `[2.0, 3.0]`.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Array.Array, b:Basics.add, b:Basics.eq
 -- CHECK: result: [2,3]
 -- CHECK: match: True
 

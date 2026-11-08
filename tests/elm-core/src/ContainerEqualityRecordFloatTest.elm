@@ -16,7 +16,7 @@ Records are not `comparable`, so only `==` is used.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq
 -- CHECK: recEqual: True
 -- CHECK: recXDiff: False
 -- CHECK: recYDiff: False

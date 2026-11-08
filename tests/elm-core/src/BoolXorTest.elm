@@ -3,7 +3,7 @@ module BoolXorTest exposing (main)
 {-| The Basics `xor` function gives `True` exactly when its two Bool arguments differ, checked over all four combinations.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.xor
 -- CHECK: xor1: False
 -- CHECK: xor2: True
 -- CHECK: xor3: True

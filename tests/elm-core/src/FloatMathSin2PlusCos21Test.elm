@@ -6,7 +6,7 @@ The sum is computed by a top-level function, `pythagorean`, applied to 1.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.sin, b:Basics.cos
 -- CHECK: testValue: 1
 
 import Basics exposing (..)

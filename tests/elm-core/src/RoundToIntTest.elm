@@ -3,7 +3,7 @@ module RoundToIntTest exposing (main)
 {-| Checks that `round` converts a `Float` to the nearest `Int`: `2.7` gives `3`, `2.3` gives `2` and `-2.7` gives `-3`.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.round
 -- CHECK: round1: 3
 -- CHECK: round2: 2
 -- CHECK: round3: -3

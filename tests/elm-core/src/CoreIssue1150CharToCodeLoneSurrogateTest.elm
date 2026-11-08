@@ -10,7 +10,7 @@ integer.
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Char.Char, b:Basics.Int
 -- CHECK: {{code: [0-9]+(\n|$)}}
 
 import Html exposing (text)

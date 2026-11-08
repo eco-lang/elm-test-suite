@@ -3,7 +3,7 @@ module EqualityTest exposing (main)
 {-| `==` and `/=` give the right answer on `Int` literals, and `==` is `True` for two equal `List Int` literals.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq, b:Basics.neq
 -- CHECK: eq1: True
 -- CHECK: eq2: False
 -- CHECK: ne1: True

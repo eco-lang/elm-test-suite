@@ -3,7 +3,7 @@ module IntNegateTest exposing (main)
 {-| Checks `negate` on a positive Int, a negative Int and zero.
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.negate
 -- CHECK: neg1: -5
 -- CHECK: neg2: 5
 -- CHECK: neg3: 0

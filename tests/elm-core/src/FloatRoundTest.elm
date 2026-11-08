@@ -7,7 +7,7 @@ cases are 2.7, 2.3 and -2.7; a negative half is not tested.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.round
 -- CHECK: round1: 3
 -- CHECK: round2: 2
 -- CHECK: round3: -3

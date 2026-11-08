@@ -14,7 +14,7 @@ of another, and characters outside ASCII.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq
 -- CHECK: pairEqual: True
 -- CHECK: pairFirstDiff: False
 -- CHECK: pairSecondDiff: False

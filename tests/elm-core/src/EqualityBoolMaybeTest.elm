@@ -9,7 +9,7 @@ and differs from both `Just True` and `Just False`.
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.eq
 -- CHECK: justTT: True
 -- CHECK: justTF: False
 -- CHECK: justFF: True

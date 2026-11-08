@@ -8,7 +8,7 @@ module CompareCharTest exposing (main)
 
 -}
 
--- TAGS: elm-spec
+-- TAGS: elm-spec, b:Basics.compare
 -- CHECK: cmp1: LT
 -- CHECK: cmp2: GT
 -- CHECK: cmp3: EQ
