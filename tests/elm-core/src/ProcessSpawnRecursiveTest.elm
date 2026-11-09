@@ -44,7 +44,7 @@ recur k =
             (\_ ->
                 let
                     _ =
-                        Debug.log "recurse" ("spawned " ++ String.fromInt k)
+                        Debug.log "recurse" ("spawned " ++ Debug.toString k)
                 in
                 if k >= depth then
                     let

@@ -9,6 +9,9 @@ module CompilerIssue1691ContradictoryExtensibleRecordHangTest exposing (main)
 
 Elm 0.19.1 hangs on it, its memory growing without bound, instead of reporting the error.
 
+The issue's own program used the library function `Maybe.map` in `fullRecord`; this version
+reproduces the same bug with a `case` on the `Maybe` in its place.
+
 -}
 
 -- TAGS: elm19-bug
@@ -37,7 +40,13 @@ type alias PartialRecordB a =
 fullRecord : PartialRecordA a -> Maybe (PartialRecordB b) -> FullRecord
 fullRecord partialRecordA partialRecordB =
     { fieldA = partialRecordA.fieldA
-    , fieldB = Maybe.map .fieldB partialRecordB
+    , fieldB =
+        case partialRecordB of
+            Just r ->
+                Just r.fieldB
+
+            Nothing ->
+                Nothing
     }
 
 

@@ -1,11 +1,13 @@
 module AppendTypeSplitTest exposing (main)
 
-{-| `++` gives the right result on `String`s and `List`s, including empty operands, a long string, slices, nested appends, and a function whose type is `appendable`.
+{-| `++` gives the right result on `String`s and `List`s, including empty operands, long strings, nested appends, and a function whose type is `appendable`.
 
 Each of `String` and `List` is appended with an empty operand on the left, on
-the right, and on both sides. The string cases also append a 140,000-character
-string built by `++`, slices of a string, and a slice taken across the join of
-the long string. The list cases also append a list produced by `List.map`.
+the right, and on both sides. The string cases also compare two 131,072-character
+strings built by `++` in different ways: equal when they hold the same characters,
+and not equal when only the last one differs. The list cases also append a list
+computed element by element. Slices and the length of a long string, which only
+library functions can observe, are checked by AppendSliceLengthTest.
 
 -}
 
@@ -14,9 +16,8 @@ the long string. The list cases also append a list produced by `List.map`.
 -- CHECK: strEmptyR: "foo"
 -- CHECK: strEmptyL: "foo"
 -- CHECK: strBothEmpty: ""
--- CHECK: ropeLen: 140000
--- CHECK: sliceAppend: "llohel"
--- CHECK: ropeThenSlice: "ab"
+-- CHECK: ropeEq: True
+-- CHECK: ropeNeq: False
 -- CHECK: lists: [1,2,3,4]
 -- CHECK: listEmptyR: [1,2]
 -- CHECK: listEmptyL: [1,2]
@@ -36,25 +37,36 @@ strs =
     "foo" ++ "bar"
 
 
-{-| A 140,000-character string: 70,000 `a`s appended to 70,000 `b`s.
+{-| `s` appended to itself `n` times over: 2^n copies of `s`.
+-}
+doubled : Int -> String -> String
+doubled n s =
+    if n <= 0 then
+        s
+
+    else
+        doubled (n - 1) (s ++ s)
+
+
+{-| A 131,072-character string: 65,536 `a`s appended to 65,536 `b`s.
 -}
 ropeStr : String
 ropeStr =
-    String.repeat 70000 "a" ++ String.repeat 70000 "b"
+    doubled 16 "a" ++ doubled 16 "b"
 
 
-{-| Two slices of the same string appended.
+{-| The same characters as `ropeStr`, appended in another grouping: the `b`s in two halves.
 -}
-sliceAppend : String
-sliceAppend =
-    String.slice 2 5 "hello" ++ String.slice 0 3 "hello"
+ropeStr2 : String
+ropeStr2 =
+    doubled 16 "a" ++ (doubled 15 "b" ++ doubled 15 "b")
 
 
-{-| The two characters on either side of the join in `ropeStr`.
+{-| `ropeStr` with its last character changed: the `b`s end in a `c`.
 -}
-ropeThenSlice : String
-ropeThenSlice =
-    String.slice 69999 70001 ropeStr
+ropeStrLastC : String
+ropeStrLastC =
+    doubled 16 "a" ++ (doubled 15 "b" ++ (doubled 14 "b" ++ (doubled 13 "b" ++ (doubled 12 "b" ++ (doubled 11 "b" ++ (doubled 10 "b" ++ (doubled 9 "b" ++ (doubled 8 "b" ++ (doubled 7 "b" ++ (doubled 6 "b" ++ (doubled 5 "b" ++ (doubled 4 "b" ++ (doubled 3 "b" ++ (doubled 2 "b" ++ (doubled 1 "b" ++ ("b" ++ "c"))))))))))))))))
 
 
 {-| Two list literals appended.
@@ -64,11 +76,11 @@ lists =
     [ 1, 2 ] ++ [ 3, 4 ]
 
 
-{-| A list produced by `List.map` appended to a list literal.
+{-| A list computed element by element appended to a list literal.
 -}
 chunkAppend : List Int
 chunkAppend =
-    List.map (\x -> x * 2) [ 1, 2, 3 ] ++ [ 1 ]
+    [ 1 * 2, 2 * 2, 3 * 2 ] ++ [ 1 ]
 
 
 {-| Three strings appended, where the left operand is itself an append.
@@ -102,13 +114,10 @@ main =
             Debug.log "strBothEmpty" ("" ++ "")
 
         _ =
-            Debug.log "ropeLen" (String.length ropeStr)
+            Debug.log "ropeEq" (ropeStr == ropeStr2)
 
         _ =
-            Debug.log "sliceAppend" sliceAppend
-
-        _ =
-            Debug.log "ropeThenSlice" ropeThenSlice
+            Debug.log "ropeNeq" (ropeStr == ropeStrLastC)
 
         _ =
             Debug.log "lists" lists

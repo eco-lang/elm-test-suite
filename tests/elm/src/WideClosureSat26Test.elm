@@ -4,7 +4,7 @@ module WideClosureSat26Test exposing (main)
 function that still sees all 26 of them.
 
 `mk` returns `\x -> x * 7 + a0 * 1 + a1 * 2 + ... + a25 * 26`. With arguments
-1 to 26 the weighted sum is 6201, so mapping the result over `[ 1, 2 ]` gives
+1 to 26 the weighted sum is 6201, so with `f` the result, `[ f 1, f 2 ]` is
 `[6208,6215]`.
 
 -}
@@ -22,13 +22,13 @@ mk a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 a13 a14 a15 a16 a17 a18 a19 a20 a21
 main =
     let
         base =
-            1 + List.length [ () ] - 1
+            1 + (Char.toCode 'b' - Char.toCode 'a') - 1
 
         f =
             mk (base + 0) (base + 1) (base + 2) (base + 3) (base + 4) (base + 5) (base + 6) (base + 7) (base + 8) (base + 9) (base + 10) (base + 11) (base + 12) (base + 13) (base + 14) (base + 15) (base + 16) (base + 17) (base + 18) (base + 19) (base + 20) (base + 21) (base + 22) (base + 23) (base + 24) (base + 25)
 
         _ =
-            Debug.log "res" (List.map f [ 1, 2 ])
+            Debug.log "res" [ f 1, f 2 ]
 
     in
     text "done"

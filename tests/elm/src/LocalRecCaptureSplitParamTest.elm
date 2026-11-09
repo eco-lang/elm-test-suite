@@ -5,8 +5,8 @@ function that encloses it.
 
 `outer2` and `outer3` each call themselves with an updated pair until `n`
 reaches 0, then define a local `loop` that counts to 3 and adds both
-components of the pair. `outer2` reads them with `Tuple.first` and
-`Tuple.second`; `outer3` destructures the pair with `case` inside `loop`.
+components of the pair. `outer2` reads them with the local functions
+`first` and `second`, defined by tuple patterns; `outer3` destructures the pair with `case` inside `loop`.
 From `( 0, 0 )` with n = 2 the pair becomes `( 2, 4 )`, so each prints
 3 + 2 + 4 = 9.
 -}
@@ -18,13 +18,23 @@ From `( 0, 0 )` with n = 2 the pair becomes `( 2, 4 )`, so each prints
 import Html exposing (text)
 
 
+first : ( a, b ) -> a
+first ( x, _ ) =
+    x
+
+
+second : ( a, b ) -> b
+second ( _, y ) =
+    y
+
+
 outer2 : ( Int, Int ) -> Int -> Int
 outer2 pair n =
     if n <= 0 then
         let
             loop i =
                 if i >= 3 then
-                    i + Tuple.first pair + Tuple.second pair
+                    i + first pair + second pair
 
                 else
                     loop (i + 1)

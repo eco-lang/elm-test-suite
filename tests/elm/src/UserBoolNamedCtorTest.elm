@@ -7,8 +7,8 @@ In this module the unqualified names `True` and `False` refer to the local type
 `Tri`, not to `Bool`. The test checks:
 
   - `pick` maps `True`, `False` and `Unknown` to 1, 2 and 3.
-  - `name`, mapped over the list `[ True, False, Unknown ]`, gives
-    `["T","F","U"]`.
+  - `name`, mapped over the list `[ True, False, Unknown ]` by a local `map`,
+    gives `["T","F","U"]`.
 
 -}
 
@@ -58,6 +58,16 @@ tris =
     [ True, False, Unknown ]
 
 
+map : (a -> b) -> List a -> List b
+map f xs =
+    case xs of
+        [] ->
+            []
+
+        x :: rest ->
+            f x :: map f rest
+
+
 main =
     let
         _ =
@@ -70,6 +80,6 @@ main =
             Debug.log "pickUnknown" (pick Unknown)
 
         _ =
-            Debug.log "names" (List.map name tris)
+            Debug.log "names" (map name tris)
     in
     text "done"

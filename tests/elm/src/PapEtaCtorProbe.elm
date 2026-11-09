@@ -7,7 +7,7 @@ and applied.
 `bumpA` and `bumpB` are `bumpWith` applied to a record-update lambda; each
 increments `shape` and one of `a` or `b`. `resolve` returns `Stamp n` for
 `n > 4`, else `Decline bumpA` for even `n` and `Decline bumpB` for odd `n`.
-Folding `step` over `[ 1, 2, 3, 4, 9 ]` applies `bumpB`, `bumpA`, `bumpB`,
+Folding `step`, with a local `foldl`, over `[ 1, 2, 3, 4, 9 ]` applies `bumpB`, `bumpA`, `bumpB`,
 `bumpA`, then adds 9 to `depth`.
 
 -}
@@ -72,12 +72,22 @@ step n ctx =
             bump ctx
 
 
+foldl : (a -> b -> b) -> b -> List a -> b
+foldl f acc xs =
+    case xs of
+        [] ->
+            acc
+
+        x :: rest ->
+            foldl f (f x acc) rest
+
+
 main =
     let
         init =
             { stats = { a = 0, b = 0, shape = 0 }, depth = 0 }
 
         _ =
-            Debug.log "final" (List.foldl step init [ 1, 2, 3, 4, 9 ])
+            Debug.log "final" (foldl step init [ 1, 2, 3, 4, 9 ])
     in
     text "done"

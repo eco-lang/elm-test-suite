@@ -5,7 +5,6 @@ module FromArrayFloatListRoundtripTest exposing (main)
 The test logs the reconstructed list as well as the result of comparing it with the original.
 -}
 
--- TAGS: elm-spec, b:Array.Array, b:Basics.eq
 -- CHECK: result: [1.5,2.5,3.5]
 -- CHECK: match: True
 

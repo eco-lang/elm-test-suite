@@ -1,12 +1,12 @@
 module FunctionValueChoiceTest exposing (main)
 
-{-| Top-level values defined by an `if` that picks between two lambdas can be both called directly and passed to `List.foldl`, and a function returning a tuple from an `if` can be destructured.
+{-| Top-level values defined by an `if` that picks between two lambdas can be both called directly and passed to a local `foldl`, and a function returning a tuple from an `if` can be destructured.
 
 `chooseIf` and `chooseElse` have no parameters of their own: each is an `if`
 on `sumTo`, choosing multiplication or subtraction. `chooseIf` picks
-multiplication, so `chooseIf 3 4` is 12 and `List.foldl chooseIf 1 [ 1, 2, 3 ]`
+multiplication, so `chooseIf 3 4` is 12 and `foldl chooseIf 1 [ 1, 2, 3 ]`
 is 6. `chooseElse` picks subtraction, so `chooseElse 3 4` is -1 and
-`List.foldl chooseElse 0 [ 1, 2, 3 ]` is 2 (`foldl` passes the element first,
+`foldl chooseElse 0 [ 1, 2, 3 ]` is 2 (`foldl` passes the element first,
 then the accumulator).
 
 `chooseC` returns its last two `Int` arguments as a pair, swapped when its first
@@ -55,6 +55,16 @@ chooseElse =
         \a b -> a - b
 
 
+foldl : (a -> b -> b) -> b -> List a -> b
+foldl f acc xs =
+    case xs of
+        [] ->
+            acc
+
+        x :: rest ->
+            foldl f (f x acc) rest
+
+
 chooseC : Int -> Int -> Int -> ( Int, Int )
 chooseC n f g =
     if n > 0 then
@@ -70,13 +80,13 @@ main =
             Debug.log "chooseIf called" (chooseIf 3 4)
 
         _ =
-            Debug.log "chooseIf folded" (List.foldl chooseIf 1 [ 1, 2, 3 ])
+            Debug.log "chooseIf folded" (foldl chooseIf 1 [ 1, 2, 3 ])
 
         _ =
             Debug.log "chooseElse called" (chooseElse 3 4)
 
         _ =
-            Debug.log "chooseElse folded" (List.foldl chooseElse 0 [ 1, 2, 3 ])
+            Debug.log "chooseElse folded" (foldl chooseElse 0 [ 1, 2, 3 ])
 
         ( p, q ) =
             chooseC 1 3 4

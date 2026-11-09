@@ -23,4 +23,8 @@ f ( ) =
 
 
 main =
-    Html.text (String.fromInt (f ()))
+    let
+        _ =
+            Debug.log "f ()" (f ())
+    in
+    Html.text "done"

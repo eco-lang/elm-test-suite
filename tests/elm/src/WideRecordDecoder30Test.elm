@@ -7,6 +7,7 @@ different types near the end.
 `andMap` is defined here and applies a `Just` function to a `Just` argument.
 Fields 0 to 24 are `Int`s; fields 25 to 29 are a `Float`, a `Char`, an `Int`, a
 `String` and an `Int`. The test reads back field 0 and fields 24 to 29.
+The local `mapMaybe` reads each field inside the `Maybe`.
 
 -}
 
@@ -65,6 +66,16 @@ andMap ma mf =
             Nothing
 
 
+mapMaybe : (a -> b) -> Maybe a -> Maybe b
+mapMaybe f ma =
+    case ma of
+        Just a ->
+            Just (f a)
+
+        Nothing ->
+            Nothing
+
+
 build : Int -> Maybe R
 build b =
     Just R
@@ -96,38 +107,38 @@ build b =
         |> andMap (Just (toFloat b + 25.5 - 1))
         |> andMap (Just ((if b == 1 then 'a' else '?')))
         |> andMap (Just (b + 1026))
-        |> andMap (Just (String.fromInt (b + 27) ++ "s"))
+        |> andMap (Just ((if b == 1 then "28s" else "?")))
         |> andMap (Just (b + 1028))
 
 
 main =
     let
         base =
-            1 + List.length [ () ] - 1
+            1 + (Char.toCode 'b' - Char.toCode 'a') - 1
 
         r =
             build base
 
         _ =
-            Debug.log "f0000" (Maybe.map .f0000 r)
+            Debug.log "f0000" (mapMaybe .f0000 r)
 
         _ =
-            Debug.log "f0024" (Maybe.map .f0024 r)
+            Debug.log "f0024" (mapMaybe .f0024 r)
 
         _ =
-            Debug.log "f0025" (Maybe.map .f0025 r)
+            Debug.log "f0025" (mapMaybe .f0025 r)
 
         _ =
-            Debug.log "f0026" (Maybe.map .f0026 r)
+            Debug.log "f0026" (mapMaybe .f0026 r)
 
         _ =
-            Debug.log "f0027" (Maybe.map .f0027 r)
+            Debug.log "f0027" (mapMaybe .f0027 r)
 
         _ =
-            Debug.log "f0028" (Maybe.map .f0028 r)
+            Debug.log "f0028" (mapMaybe .f0028 r)
 
         _ =
-            Debug.log "f0029" (Maybe.map .f0029 r)
+            Debug.log "f0029" (mapMaybe .f0029 r)
 
     in
     text "done"

@@ -39,7 +39,7 @@ update : Msg -> () -> ( (), Cmd Msg )
 update msg model =
     case msg of
         Start ->
-            ( model, Cmd.batch (List.map echoOut [ -(0 / 1) ]) )
+            ( model, echoOut (-(0 / 1)) )
 
         Got v ->
             let

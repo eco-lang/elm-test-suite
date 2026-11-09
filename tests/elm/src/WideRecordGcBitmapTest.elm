@@ -5,13 +5,14 @@ values while the program builds large lists before reading them.
 
 `w1` is built with a `count` of 50000 (the length of one list), then a list of
 150000 strings is built before `w2` is made and both are read. The test checks
-that the two counts add to 200000 and that `w1.p ++ w2.a` has length 2.
+that the two counts add to 200000 and that `w1.p ++ w2.a` is `"pa"`. A local
+`length` counts the lists.
 
 -}
 
 -- TAGS: elm-spec, d-atexp-record, d-atpat-record, d-patrow-field
 -- CHECK: WideRecordGcBitmap: 200000
--- CHECK: WideRecordGcBitmapTag: 2
+-- CHECK: WideRecordGcBitmapTag: "pa"
 
 import Html exposing (text)
 
@@ -65,7 +66,17 @@ churn n acc =
         acc
 
     else
-        churn (n - 1) (String.fromInt n :: acc)
+        churn (n - 1) (("x" ++ "y") :: acc)
+
+
+length : Int -> List a -> Int
+length acc xs =
+    case xs of
+        [] ->
+            acc
+
+        _ :: rest ->
+            length (acc + 1) rest
 
 
 main =
@@ -75,13 +86,13 @@ main =
 
         -- The count comes from a list length rather than a literal.
         w1 =
-            mkWide (List.length seed)
+            mkWide (length 0 seed)
 
         more =
             churn 150000 []
 
         w2 =
-            mkWide (List.length more)
+            mkWide (length 0 more)
 
         total =
             w1.count + w2.count
@@ -93,6 +104,6 @@ main =
             Debug.log "WideRecordGcBitmap" total
 
         _ =
-            Debug.log "WideRecordGcBitmapTag" (String.length tag)
+            Debug.log "WideRecordGcBitmapTag" tag
     in
     text "done"

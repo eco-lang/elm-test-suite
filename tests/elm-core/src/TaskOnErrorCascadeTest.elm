@@ -43,7 +43,7 @@ segment step =
             (\_ ->
                 let
                     _ =
-                        Debug.log "onerr" ("recovered " ++ String.fromInt step)
+                        Debug.log "onerr" ("recovered " ++ Debug.toString step)
                 in
                 Task.succeed (step * 10)
             )
@@ -77,7 +77,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update (Done v) model =
     let
         _ =
-            Debug.log "onerr" ("final: " ++ String.fromInt v)
+            Debug.log "onerr" ("final: " ++ Debug.toString v)
     in
     ( model, Cmd.none )
 

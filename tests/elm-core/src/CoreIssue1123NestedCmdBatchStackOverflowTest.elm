@@ -8,6 +8,9 @@ Elm 0.19.1 recurses once per nesting level and throws `RangeError: Maximum call 
 exceeded`. The test nests a `Task.perform` inside `Cmd.batch [ acc, Cmd.none ]` 100000 times. That
 is a valid command, so the program must run it and receive the inner task's result, 1.
 
+The issue's own program used the library functions `List.foldl` and `List.range` to build the
+nesting; this version reproduces the same bug with a local tail-recursive loop in their place.
+
 -}
 
 -- TAGS: elm19-bug
@@ -17,9 +20,18 @@ is a valid command, so the program must run it and receive the inner task's resu
 import Task
 
 
+nest : Int -> Cmd Int -> Cmd Int
+nest depth acc =
+    if depth <= 0 then
+        acc
+
+    else
+        nest (depth - 1) (Cmd.batch [ acc, Cmd.none ])
+
+
 nested : Int -> Cmd Int
 nested depth =
-    List.foldl (\_ acc -> Cmd.batch [ acc, Cmd.none ]) (Task.perform identity (Task.succeed 1)) (List.range 1 depth)
+    nest depth (Task.perform identity (Task.succeed 1))
 
 
 main : Program () () Int

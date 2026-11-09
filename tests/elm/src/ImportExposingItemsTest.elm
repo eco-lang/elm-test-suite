@@ -52,7 +52,7 @@ main =
             Debug.log "double" (double 21)
 
         _ =
-            Debug.log "open" (List.map openValue [ One, Two 7 ])
+            Debug.log "open" [ openValue One, openValue (Two 7) ]
 
         _ =
             Debug.log "point" (pointSum (Point 1 2))

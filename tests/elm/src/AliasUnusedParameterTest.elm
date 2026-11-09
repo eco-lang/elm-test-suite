@@ -24,4 +24,4 @@ h =
 
 
 main =
-    Html.text (String.fromInt h)
+    Html.text (Debug.toString h)

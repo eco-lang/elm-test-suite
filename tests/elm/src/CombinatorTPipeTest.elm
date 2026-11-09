@@ -1,8 +1,9 @@
 module CombinatorTPipeTest exposing (main)
 
-{-| The T combinator, built from S and K, passing `[ 1, 2, 3 ]` to the composition of `List.sum` and `List.map ((*) 2)`: the result is 12.
+{-| The T combinator, built from S and K, passing `[ 1, 2, 3 ]` to the composition of `sum` and `map ((*) 2)`: the result is 12.
 
 `t` is `c i`, where `c = s (b b s) (k k)`, `b = s (k s) k` and `i = s k k`.
+`sum` and `map` are defined in the module by pattern matching on lists.
 
 -}
 
@@ -25,8 +26,20 @@ i = s k k
 t = c i
 
 
+sum list =
+    case list of
+        [] -> 0
+        x :: rest -> x + sum rest
+
+
+map f list =
+    case list of
+        [] -> []
+        x :: rest -> f x :: map f rest
+
+
 main =
     let
-        _ = Debug.log "result" (t [ 1, 2, 3 ] (b List.sum (List.map ((*) 2))))
+        _ = Debug.log "result" (t [ 1, 2, 3 ] (b sum (map ((*) 2))))
     in
     text "done"

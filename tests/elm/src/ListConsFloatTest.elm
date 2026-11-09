@@ -2,7 +2,7 @@ module ListConsFloatTest exposing (main)
 
 {-| A `List Float` literal holds its numbers in order, and `::` prepends a number to it.
 
-The test prints the list, its `List.head`, and the list with `0.0` consed onto the front. `Debug.log` prints the whole-number floats `1.0` and `0.0` as `1` and `0`.
+The test prints the list, its head (read with a `case`), and the list with `0.0` consed onto the front. `Debug.log` prints the whole-number floats `1.0` and `0.0` as `1` and `0`.
 
 -}
 
@@ -25,7 +25,14 @@ main =
             Debug.log "list" xs
 
         _ =
-            Debug.log "head" (List.head xs)
+            Debug.log "head"
+                (case xs of
+                    h :: _ ->
+                        Just h
+
+                    [] ->
+                        Nothing
+                )
 
         _ =
             Debug.log "prepend" (0.0 :: xs)

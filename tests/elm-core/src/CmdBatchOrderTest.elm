@@ -40,6 +40,16 @@ type alias Model =
     }
 
 
+length : List a -> Int
+length xs =
+    case xs of
+        [] ->
+            0
+
+        _ :: rest ->
+            1 + length rest
+
+
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { echoed = [], ran = [] }
@@ -64,7 +74,7 @@ update msg model =
                     model.echoed ++ [ n ]
 
                 _ =
-                    if List.length echoed == 5 then
+                    if length echoed == 5 then
                         Debug.log "CmdBatchOrderTest port" echoed
 
                     else
@@ -78,7 +88,7 @@ update msg model =
                     model.ran ++ [ n ]
 
                 _ =
-                    if List.length ran == 3 then
+                    if length ran == 3 then
                         Debug.log "CmdBatchOrderTest tasks" ran
 
                     else
@@ -89,7 +99,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    if List.length model.echoed >= 5 then
+    if length model.echoed >= 5 then
         Sub.none
 
     else

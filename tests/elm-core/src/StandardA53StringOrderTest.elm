@@ -6,7 +6,7 @@ A Standard Definition of Elm?, ruling A53: `compare` on strings is lexicographic
 characters, ordered by `toCode`. <https://elm-test-suite.netlify.app/standard/appendix-dynamic-basis#sec-appendix-dynamic-basis-order>
 
 `"😀"` (U+1F600) is above `"ﬀ"` (U+FB00). Elm 0.19.1 compares UTF-16 code units, so it puts `"😀"`
-first, and sorts the list the other way round.
+first, and the local two-element sort `sort2`, which uses `<`, orders the list the other way round.
 
 -}
 
@@ -19,6 +19,15 @@ first, and sorts the list the other way round.
 import Html
 
 
+sort2 : String -> String -> List String
+sort2 a b =
+    if a < b then
+        [ a, b ]
+
+    else
+        [ b, a ]
+
+
 main =
     let
         _ =
@@ -28,6 +37,6 @@ main =
             Debug.log "\"😀\" > \"ﬀ\"" ("😀" > "ﬀ")
 
         _ =
-            Debug.log "sorted" (List.sort [ "😀", "ﬀ" ])
+            Debug.log "sorted" (sort2 "😀" "ﬀ")
     in
     Html.text "done"

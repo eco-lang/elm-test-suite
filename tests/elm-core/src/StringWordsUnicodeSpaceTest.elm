@@ -6,9 +6,13 @@ string that is only whitespace.
 The inputs have whitespace around one word, between two words, around and between two words,
 and as the whole string.
 
+A Standard Definition of Elm? does not decide this test: `String.words` is library, outside the
+definition. `CoreIssue1019StringWordsEmptyTest` expects `[]`, not `[""]`, for a string that is
+only whitespace; the two record different views of the library, not of the language.
+
 -}
 
--- TAGS: elm19-quirks
+-- TAGS: elm-unspecced
 -- MODE-GUARD: a Char equality must give the same answer as under --optimize
 -- NO-SKIP: an edge case every compiler must run
 -- UNICODE: 17.0

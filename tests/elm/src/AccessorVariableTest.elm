@@ -1,6 +1,10 @@
 module AccessorVariableTest exposing (main)
 
-{-| A record accessor works when bound to a variable, and `.name` works on lists of two different record types.
+{-| A record accessor works when bound to a variable, and `.name` works on elements of lists of two different record types.
+
+The elements are taken out of the lists by pattern matching, and `.value` is applied to each
+element of a list of three records.
+
 -}
 
 -- TAGS: elm-spec, s-atpat-record, d-patrow-field
@@ -18,22 +22,29 @@ main =
         item = { value = 42, label = "test" }
         _ = Debug.log "via_var" (accessor item)
         items = [ { value = 10 }, { value = 20 }, { value = 30 } ]
-        _ = Debug.log "mapped" (List.map .value items)
+        mapped =
+            case items of
+                [ i1, i2, i3 ] ->
+                    [ .value i1, .value i2, .value i3 ]
+
+                _ ->
+                    []
+        _ = Debug.log "mapped" mapped
         persons = [ { name = "Alice", age = 30 } ]
         companies = [ { name = "ACME", employees = 100 } ]
         personName =
-            case List.head (List.map .name persons) of
-                Just n ->
-                    n
+            case persons of
+                p :: _ ->
+                    .name p
 
-                Nothing ->
+                [] ->
                     "none"
         companyName =
-            case List.head (List.map .name companies) of
-                Just n ->
-                    n
+            case companies of
+                c :: _ ->
+                    .name c
 
-                Nothing ->
+                [] ->
                     "none"
         _ = Debug.log "person_name" personName
         _ = Debug.log "company_name" companyName

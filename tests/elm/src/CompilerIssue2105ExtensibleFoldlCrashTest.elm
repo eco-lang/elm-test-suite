@@ -5,9 +5,12 @@ error report, not crash the compiler.
 
 <https://github.com/elm/compiler/issues/2105>
 
-`List.foldl withWindow room windows` needs `Room a` and `Room { a | withWindow : () }` to be the
+`foldl withWindow room windows` needs `Room a` and `Room { a | withWindow : () }` to be the
 same type, which they are not. Elm 0.19.1 starts printing the TYPE MISMATCH report, then crashes
 with "Used toErrorType on a type that is not well-formed" (Type/Type.hs:541).
+
+The issue's own program used the library function `List.foldl`; this version reproduces the same
+bug with a local `foldl` of the same type in its place.
 
 -}
 
@@ -34,6 +37,16 @@ type Window
     = Window
 
 
+foldl : (a -> b -> b) -> b -> List a -> b
+foldl f acc list =
+    case list of
+        [] ->
+            acc
+
+        x :: rest ->
+            foldl f (f x acc) rest
+
+
 withWindow : Window -> Room a -> Room { a | withWindow : () }
 withWindow window room =
     Room
@@ -41,4 +54,4 @@ withWindow window room =
 
 withWindows : List Window -> Room a -> Room { a | withWindow : () }
 withWindows windows room =
-    List.foldl withWindow room windows
+    foldl withWindow room windows

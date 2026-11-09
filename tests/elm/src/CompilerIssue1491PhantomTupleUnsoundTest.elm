@@ -7,6 +7,9 @@ module CompilerIssue1491PhantomTupleUnsoundTest exposing (..)
 Elm 0.19.1 accepts `head nil`, although `Vect ( m, m ) a` and `Vect ( OnePlus m, m ) a` do not
 unify (`m` would have to equal `OnePlus m`). It should report a type error.
 
+The issue's own program used the library function `List.head` in `head`; this version reproduces
+the same bug with a `case` on the list in its place.
+
 -}
 
 -- TAGS: elm19-bug
@@ -32,7 +35,12 @@ nil =
 
 head : Vect ( OnePlus m, m ) a -> Maybe a
 head (Vect xs) =
-    List.head xs
+    case xs of
+        x :: _ ->
+            Just x
+
+        [] ->
+            Nothing
 
 
 broken =

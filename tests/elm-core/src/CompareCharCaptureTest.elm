@@ -1,9 +1,9 @@
 module CompareCharCaptureTest exposing (main)
 
-{-| `List.sortWith` on a list of `Char`, given `compare` itself and given a lambda that calls `compare` with its arguments swapped.
+{-| A local insertion sort, `sortWith`, on a list of `Char`, given `compare` itself and given a lambda that calls `compare` with its arguments swapped.
 
-  - `sorted`: `List.sortWith compare` sorts `[ 'c', 'a', 'd', 'e', 'b' ]` into ascending order.
-  - `reverse_sorted`: `List.sortWith (\a b -> compare b a)` sorts the same list into descending order.
+  - `sorted`: `sortWith compare` sorts `[ 'c', 'a', 'd', 'e', 'b' ]` into ascending order.
+  - `reverse_sorted`: `sortWith (\a b -> compare b a)` sorts the same list into descending order.
 
 -}
 
@@ -15,6 +15,33 @@ module CompareCharCaptureTest exposing (main)
 import Html exposing (text)
 
 
+{-| Sorts a list by insertion, ordering its elements with `cmp`.
+-}
+sortWith : (a -> a -> Order) -> List a -> List a
+sortWith cmp xs =
+    case xs of
+        [] ->
+            []
+
+        x :: rest ->
+            insertWith cmp x (sortWith cmp rest)
+
+
+insertWith : (a -> a -> Order) -> a -> List a -> List a
+insertWith cmp x ys =
+    case ys of
+        [] ->
+            [ x ]
+
+        y :: rest ->
+            case cmp x y of
+                GT ->
+                    y :: insertWith cmp x rest
+
+                _ ->
+                    x :: ys
+
+
 main =
     let
         xs : List Char
@@ -22,9 +49,9 @@ main =
             [ 'c', 'a', 'd', 'e', 'b' ]
 
         _ =
-            Debug.log "sorted" (List.sortWith compare xs)
+            Debug.log "sorted" (sortWith compare xs)
 
         _ =
-            Debug.log "reverse_sorted" (List.sortWith (\a b -> compare b a) xs)
+            Debug.log "reverse_sorted" (sortWith (\a b -> compare b a) xs)
     in
     text "done"

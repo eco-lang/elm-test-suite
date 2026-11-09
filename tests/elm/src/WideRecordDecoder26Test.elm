@@ -6,6 +6,7 @@ argument at a time by an `andMap` pipeline over `Maybe`.
 `andMap` is defined here and applies a `Just` function to a `Just` argument.
 `build` starts from `Just R` and supplies the 26 `Int` fields, 1000 to 1025, so
 fields 0, 24 and 25 read back as `Just 1000`, `Just 1024` and `Just 1025`.
+The local `mapMaybe` reads each field inside the `Maybe`.
 
 -}
 
@@ -56,6 +57,16 @@ andMap ma mf =
             Nothing
 
 
+mapMaybe : (a -> b) -> Maybe a -> Maybe b
+mapMaybe f ma =
+    case ma of
+        Just a ->
+            Just (f a)
+
+        Nothing ->
+            Nothing
+
+
 build : Int -> Maybe R
 build b =
     Just R
@@ -90,19 +101,19 @@ build b =
 main =
     let
         base =
-            1 + List.length [ () ] - 1
+            1 + (Char.toCode 'b' - Char.toCode 'a') - 1
 
         r =
             build base
 
         _ =
-            Debug.log "f0000" (Maybe.map .f0000 r)
+            Debug.log "f0000" (mapMaybe .f0000 r)
 
         _ =
-            Debug.log "f0024" (Maybe.map .f0024 r)
+            Debug.log "f0024" (mapMaybe .f0024 r)
 
         _ =
-            Debug.log "f0025" (Maybe.map .f0025 r)
+            Debug.log "f0025" (mapMaybe .f0025 r)
 
     in
     text "done"

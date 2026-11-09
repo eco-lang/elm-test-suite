@@ -6,6 +6,7 @@ argument at a time by an `andMap` pipeline over `Maybe`.
 `andMap` is defined here and applies a `Just` function to a `Just` argument. The
 fields cycle through `Int`, `Float`, `Char`, `String` and `Bool`, and the test
 reads back fields 0, 19, 20, 24, 25, 31, 32, 33, 62, 63, 64 and 69.
+The local `mapMaybe` reads each field inside the `Maybe`.
 
 -}
 
@@ -109,124 +110,134 @@ andMap ma mf =
             Nothing
 
 
+mapMaybe : (a -> b) -> Maybe a -> Maybe b
+mapMaybe f ma =
+    case ma of
+        Just a ->
+            Just (f a)
+
+        Nothing ->
+            Nothing
+
+
 build : Int -> Maybe R
 build b =
     Just R
         |> andMap (Just (b + 999))
         |> andMap (Just (toFloat b + 1.5 - 1))
         |> andMap (Just ((if b == 1 then 'c' else '?')))
-        |> andMap (Just (String.fromInt (b + 2) ++ "s"))
+        |> andMap (Just ((if b == 1 then "3s" else "?")))
         |> andMap (Just (modBy 2 (b + 3) == 0))
         |> andMap (Just (b + 1004))
         |> andMap (Just (toFloat b + 6.5 - 1))
         |> andMap (Just ((if b == 1 then 'h' else '?')))
-        |> andMap (Just (String.fromInt (b + 7) ++ "s"))
+        |> andMap (Just ((if b == 1 then "8s" else "?")))
         |> andMap (Just (modBy 2 (b + 8) == 0))
         |> andMap (Just (b + 1009))
         |> andMap (Just (toFloat b + 11.5 - 1))
         |> andMap (Just ((if b == 1 then 'm' else '?')))
-        |> andMap (Just (String.fromInt (b + 12) ++ "s"))
+        |> andMap (Just ((if b == 1 then "13s" else "?")))
         |> andMap (Just (modBy 2 (b + 13) == 0))
         |> andMap (Just (b + 1014))
         |> andMap (Just (toFloat b + 16.5 - 1))
         |> andMap (Just ((if b == 1 then 'r' else '?')))
-        |> andMap (Just (String.fromInt (b + 17) ++ "s"))
+        |> andMap (Just ((if b == 1 then "18s" else "?")))
         |> andMap (Just (modBy 2 (b + 18) == 0))
         |> andMap (Just (b + 1019))
         |> andMap (Just (toFloat b + 21.5 - 1))
         |> andMap (Just ((if b == 1 then 'w' else '?')))
-        |> andMap (Just (String.fromInt (b + 22) ++ "s"))
+        |> andMap (Just ((if b == 1 then "23s" else "?")))
         |> andMap (Just (modBy 2 (b + 23) == 0))
         |> andMap (Just (b + 1024))
         |> andMap (Just (toFloat b + 26.5 - 1))
         |> andMap (Just ((if b == 1 then 'b' else '?')))
-        |> andMap (Just (String.fromInt (b + 27) ++ "s"))
+        |> andMap (Just ((if b == 1 then "28s" else "?")))
         |> andMap (Just (modBy 2 (b + 28) == 0))
         |> andMap (Just (b + 1029))
         |> andMap (Just (toFloat b + 31.5 - 1))
         |> andMap (Just ((if b == 1 then 'g' else '?')))
-        |> andMap (Just (String.fromInt (b + 32) ++ "s"))
+        |> andMap (Just ((if b == 1 then "33s" else "?")))
         |> andMap (Just (modBy 2 (b + 33) == 0))
         |> andMap (Just (b + 1034))
         |> andMap (Just (toFloat b + 36.5 - 1))
         |> andMap (Just ((if b == 1 then 'l' else '?')))
-        |> andMap (Just (String.fromInt (b + 37) ++ "s"))
+        |> andMap (Just ((if b == 1 then "38s" else "?")))
         |> andMap (Just (modBy 2 (b + 38) == 0))
         |> andMap (Just (b + 1039))
         |> andMap (Just (toFloat b + 41.5 - 1))
         |> andMap (Just ((if b == 1 then 'q' else '?')))
-        |> andMap (Just (String.fromInt (b + 42) ++ "s"))
+        |> andMap (Just ((if b == 1 then "43s" else "?")))
         |> andMap (Just (modBy 2 (b + 43) == 0))
         |> andMap (Just (b + 1044))
         |> andMap (Just (toFloat b + 46.5 - 1))
         |> andMap (Just ((if b == 1 then 'v' else '?')))
-        |> andMap (Just (String.fromInt (b + 47) ++ "s"))
+        |> andMap (Just ((if b == 1 then "48s" else "?")))
         |> andMap (Just (modBy 2 (b + 48) == 0))
         |> andMap (Just (b + 1049))
         |> andMap (Just (toFloat b + 51.5 - 1))
         |> andMap (Just ((if b == 1 then 'a' else '?')))
-        |> andMap (Just (String.fromInt (b + 52) ++ "s"))
+        |> andMap (Just ((if b == 1 then "53s" else "?")))
         |> andMap (Just (modBy 2 (b + 53) == 0))
         |> andMap (Just (b + 1054))
         |> andMap (Just (toFloat b + 56.5 - 1))
         |> andMap (Just ((if b == 1 then 'f' else '?')))
-        |> andMap (Just (String.fromInt (b + 57) ++ "s"))
+        |> andMap (Just ((if b == 1 then "58s" else "?")))
         |> andMap (Just (modBy 2 (b + 58) == 0))
         |> andMap (Just (b + 1059))
         |> andMap (Just (toFloat b + 61.5 - 1))
         |> andMap (Just ((if b == 1 then 'k' else '?')))
-        |> andMap (Just (String.fromInt (b + 62) ++ "s"))
+        |> andMap (Just ((if b == 1 then "63s" else "?")))
         |> andMap (Just (modBy 2 (b + 63) == 0))
         |> andMap (Just (b + 1064))
         |> andMap (Just (toFloat b + 66.5 - 1))
         |> andMap (Just ((if b == 1 then 'p' else '?')))
-        |> andMap (Just (String.fromInt (b + 67) ++ "s"))
+        |> andMap (Just ((if b == 1 then "68s" else "?")))
         |> andMap (Just (modBy 2 (b + 68) == 0))
 
 
 main =
     let
         base =
-            1 + List.length [ () ] - 1
+            1 + (Char.toCode 'b' - Char.toCode 'a') - 1
 
         r =
             build base
 
         _ =
-            Debug.log "f0000" (Maybe.map .f0000 r)
+            Debug.log "f0000" (mapMaybe .f0000 r)
 
         _ =
-            Debug.log "f0019" (Maybe.map .f0019 r)
+            Debug.log "f0019" (mapMaybe .f0019 r)
 
         _ =
-            Debug.log "f0020" (Maybe.map .f0020 r)
+            Debug.log "f0020" (mapMaybe .f0020 r)
 
         _ =
-            Debug.log "f0024" (Maybe.map .f0024 r)
+            Debug.log "f0024" (mapMaybe .f0024 r)
 
         _ =
-            Debug.log "f0025" (Maybe.map .f0025 r)
+            Debug.log "f0025" (mapMaybe .f0025 r)
 
         _ =
-            Debug.log "f0031" (Maybe.map .f0031 r)
+            Debug.log "f0031" (mapMaybe .f0031 r)
 
         _ =
-            Debug.log "f0032" (Maybe.map .f0032 r)
+            Debug.log "f0032" (mapMaybe .f0032 r)
 
         _ =
-            Debug.log "f0033" (Maybe.map .f0033 r)
+            Debug.log "f0033" (mapMaybe .f0033 r)
 
         _ =
-            Debug.log "f0062" (Maybe.map .f0062 r)
+            Debug.log "f0062" (mapMaybe .f0062 r)
 
         _ =
-            Debug.log "f0063" (Maybe.map .f0063 r)
+            Debug.log "f0063" (mapMaybe .f0063 r)
 
         _ =
-            Debug.log "f0064" (Maybe.map .f0064 r)
+            Debug.log "f0064" (mapMaybe .f0064 r)
 
         _ =
-            Debug.log "f0069" (Maybe.map .f0069 r)
+            Debug.log "f0069" (mapMaybe .f0069 r)
 
     in
     text "done"

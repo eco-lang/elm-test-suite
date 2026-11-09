@@ -1,20 +1,23 @@
 module ProcessSleepNonFiniteTest exposing (main)
 
-{-| `Process.sleep` given an infinite, NaN or enormous delay still wakes, and
-wakes before a 2000 ms sleep started at the same time.
+{-| `Process.sleep` given an infinite or NaN delay still wakes, and wakes before a 2000 ms sleep
+started at the same time.
 
-Four sleeps are started together from `init`: `1 / 0`, `0 / 0`, `1.0e300` and
-2000 ms. Each of the first three logs whether it woke before or after the
-2000 ms reference. The expected output follows Elm on node, where `setTimeout`
-treats a delay outside its supported range as a delay of about 1 ms, so all
-three are expected to wake first, in any order, and the reference last.
+Three sleeps are started together from `init`: `1 / 0`, `0 / 0` and 2000 ms. Each of the first
+two logs whether it woke before or after the 2000 ms reference. The expected output follows Elm on
+node, where `setTimeout` treats a delay outside its supported range as a delay of about 1 ms, so
+both are expected to wake first, in any order, and the reference last.
+
+A Standard Definition of Elm? does not decide this test: when the action of a sleep whose delay is
+an infinity or NaN takes place is not defined (ruling A81). A finite delay, however large, is
+waited for in full; `StandardA81SleepBeyond32BitsTest` checks that.
+<https://elm-test-suite.netlify.app/standard/rules/p-proc-sleep>
 
 -}
 
--- TAGS: elm19-quirks
+-- TAGS: elm-unspecced
 -- CHECK-DAG: sleep: "inf: woke first"
 -- CHECK-DAG: sleep: "nan: woke first"
--- CHECK-DAG: sleep: "huge: woke first"
 -- CHECK: sleep: "reference woke"
 
 import Platform
@@ -37,7 +40,6 @@ init _ =
     , Cmd.batch
         [ Task.perform (\_ -> Woke "inf") (Process.sleep (1 / 0))
         , Task.perform (\_ -> Woke "nan") (Process.sleep (0 / 0))
-        , Task.perform (\_ -> Woke "huge") (Process.sleep 1.0e300)
         , Task.perform (\_ -> Reference) (Process.sleep 2000)
         ]
     )

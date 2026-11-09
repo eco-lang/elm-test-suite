@@ -17,4 +17,8 @@ import ModuleExposingHelper exposing (Shape)
 
 
 main =
-    Html.text (String.fromInt (ModuleExposingHelper.unwrapShape (Shape 1)))
+    let
+        _ =
+            Debug.log "shape" (ModuleExposingHelper.unwrapShape (Shape 1))
+    in
+    Html.text "done"

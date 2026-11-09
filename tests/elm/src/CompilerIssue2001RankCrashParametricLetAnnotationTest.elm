@@ -8,6 +8,10 @@ module CompilerIssue2001RankCrashParametricLetAnnotationTest exposing (..)
 annotation claims it for any `a`. The annotation is too general, so a type error should be
 reported; Elm 0.19.1 crashes ("You ran into a compiler bug") instead.
 
+The issue's own program used the library type `Dict` and the function `Dict.empty`; this version
+reproduces the same bug with a local two-parameter type `Dict` and its constructor `Empty` in
+their place.
+
 -}
 
 -- TAGS: elm19-bug
@@ -17,7 +21,10 @@ reported; Elm 0.19.1 crashes ("You ran into a compiler bug") instead.
 -- CHECK-NOT: compiler bug
 
 import Html
-import Dict exposing (Dict)
+
+
+type Dict k v
+    = Empty
 
 
 type Foo a
@@ -26,7 +33,7 @@ type Foo a
 
 toDict : Foo a -> Dict a b
 toDict Foo =
-    Dict.empty
+    Empty
 
 
 fn value =

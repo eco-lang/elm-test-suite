@@ -9,6 +9,9 @@ In `helper`, the `InputA` branch builds lists of `Maybe (Maybe a)` and the `Inpu
 of `Maybe a`, so the branches agree only if `a` were `Maybe a`. Elm 0.19.1 instead hangs while its
 memory grows without bound, or crashes.
 
+The issue's own program used the library function `List.map`; this version reproduces the same
+bug with a local `map` of the same type in its place.
+
 -}
 
 -- TAGS: elm19-bug
@@ -25,6 +28,16 @@ type Input a
     | InputB (List (List a)) (List (List a))
 
 
+map : (a -> b) -> List a -> List b
+map f list =
+    case list of
+        [] ->
+            []
+
+        x :: rest ->
+            f x :: map f rest
+
+
 fn : List a -> List a -> Int
 fn _ _ =
     0
@@ -33,13 +46,13 @@ fn _ _ =
 helper lines =
     case lines of
         InputA source ->
-            ( List.map (\part -> [ Just part ]) source
+            ( map (\part -> [ Just part ]) source
             , []
             )
 
         InputB source target ->
-            ( List.map (List.map Just) source
-            , List.map (List.map Just) target
+            ( map (map Just) source
+            , map (map Just) target
             )
 
 

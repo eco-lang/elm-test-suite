@@ -20,4 +20,8 @@ update r =
 
 
 main =
-    Html.text (String.fromInt (update { key = 1 }).key)
+    let
+        _ =
+            Debug.log "key" (update { key = 1 }).key
+    in
+    Html.text "done"

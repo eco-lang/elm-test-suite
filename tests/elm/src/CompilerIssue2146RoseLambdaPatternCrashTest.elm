@@ -5,10 +5,13 @@ the compiler.
 
 <https://github.com/elm/compiler/issues/2146>
 
-In `tail`, the lambda's pattern `Branch _ xs` makes its argument a `Rose`, and `List.map f xs`
+In `tail`, the lambda's pattern `Branch _ xs` makes its argument a `Rose`, and `map f xs`
 then needs `f`'s argument type `a` to be a `Rose` too, but the annotation makes `a` an arbitrary
 type: a type error. Elm 0.19.1 crashes ("? [rank = 1]", Type/Solve.hs:206, "thread blocked
 indefinitely in an MVar operation").
+
+The issue's own program used the library function `List.map` in `tail`; this version reproduces
+the same bug with a local `map` of the same type in its place.
 
 -}
 
@@ -32,6 +35,16 @@ type Rose a
 
 type T a b
     = T (a -> b)
+
+
+map : (a -> b) -> List a -> List b
+map f list =
+    case list of
+        [] ->
+            []
+
+        x :: rest ->
+            f x :: map f rest
 
 
 mapT2 : (b -> c -> d) -> T a b -> T a c -> T a d
@@ -68,7 +81,7 @@ lazy thunk =
 
 tail : T a b -> T a (List b)
 tail (T f) =
-    T (\(Branch _ xs) -> List.map f xs)
+    T (\(Branch _ xs) -> map f xs)
 
 
 runT : T a b -> Rose a -> b

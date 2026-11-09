@@ -18,7 +18,7 @@ main =
             \_ ->
                 let
                     _ =
-                        Debug.log "no imports" (List.length [ 1, 2, 3 ])
+                        Debug.log "no imports" (1 + 2)
                 in
                 ( (), Cmd.none )
         , update = \_ model -> ( model, Cmd.none )

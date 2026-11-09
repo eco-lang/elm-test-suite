@@ -9,8 +9,10 @@ Each shape is compared with an equal value built separately (`strTwin`,
 the nested one, with a different value (`strDiff`, `listDiff`, `tupleDiff`,
 `recordDiff`, `customDiff`). A string and a list are also compared with
 themselves (`strSame`, `listSame`). `twinA` and `twinB` are computed at run time
-by the same expression, so they are equal strings that are not one literal;
-`List.range 1 3` is compared with the literal `[ 1, 2, 3 ]` for the same reason.
+by the same expression, `suffixed "42"`, which appends `"x"`, so they are equal strings
+that are not one literal; `upFrom 1`, where `upFrom n` builds
+`[ n, n + 1, n + 2 ]` at run time, is compared with the literal `[ 1, 2, 3 ]`
+for the same reason.
 
 The remaining cases compare `()` with `()`, `""` with `""`, `[]` with `[]`, and
 the `Bool` constants with each other; `strNe` and `boolNe` check `/=`.
@@ -47,14 +49,26 @@ type Shape
     | Rect Int Int
 
 
+{-| `s` with `"x"` appended, at run time.
+-}
+suffixed : String -> String
+suffixed s =
+    s ++ "x"
+
+
 twinA : String
 twinA =
-    String.fromInt 42 ++ "x"
+    suffixed "42"
 
 
 twinB : String
 twinB =
-    String.fromInt 42 ++ "x"
+    suffixed "42"
+
+
+upFrom : Int -> List Int
+upFrom n =
+    [ n, n + 1, n + 2 ]
 
 
 main : Html.Html msg
@@ -83,10 +97,10 @@ main =
             Debug.log "listSame" (l == l)
 
         _ =
-            Debug.log "listTwin" (List.range 1 3 == [ 1, 2, 3 ])
+            Debug.log "listTwin" (upFrom 1 == [ 1, 2, 3 ])
 
         _ =
-            Debug.log "listDiff" (List.range 1 3 == [ 1, 2 ])
+            Debug.log "listDiff" (upFrom 1 == [ 1, 2 ])
 
         _ =
             Debug.log "tupleTwin" (( 1, "a" ) == ( 1, "a" ))

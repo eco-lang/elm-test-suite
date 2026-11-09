@@ -5,7 +5,6 @@ module FromArrayFloatListEqualityTest exposing (main)
 The values are `[1.5, 2.5, 3.5]`. Only the `==` comparison is logged; `FromArrayFloatListRoundtripTest` also logs the list itself.
 -}
 
--- TAGS: elm-spec, b:Array.Array, b:Basics.eq
 -- CHECK: match: True
 
 import Array

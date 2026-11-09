@@ -3,7 +3,8 @@ module CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest exposing (..)
 {-| Lambdas taken out of a tuple and a record by destructuring `let` patterns, put in a list and
 applied in turn.
 
-Folding `[ (+1), (*2), (-3) ]` over `5` gives `6`, `12`, then `9`.
+A local `applyAll` applies `[ (+1), (*2), (-3) ]` in turn starting from `5`, giving `6`, `12`,
+then `9`.
 
 -}
 
@@ -17,7 +18,6 @@ import Maybe exposing (Maybe(..))
 import Platform.Cmd as Cmd exposing (Cmd)
 import Platform.Sub as Sub exposing (Sub)
 import String exposing (String)
-import Tuple
 import Html
 
 
@@ -33,7 +33,17 @@ testValue =
         fs =
             [ f, g, h ]
     in
-    List.foldl (\fn acc -> fn acc) 5 fs
+    applyAll fs 5
+
+
+applyAll : List (Int -> Int) -> Int -> Int
+applyAll fs acc =
+    case fs of
+        [] ->
+            acc
+
+        fn :: rest ->
+            applyAll rest (fn acc)
 
 
 main =

@@ -19,4 +19,8 @@ import Html
 
 
 main =
-    Html.text (String.fromInt (1 |> (+) <| 2))
+    let
+        _ =
+            Debug.log "piped" (1 |> (+) <| 2)
+    in
+    Html.text "done"

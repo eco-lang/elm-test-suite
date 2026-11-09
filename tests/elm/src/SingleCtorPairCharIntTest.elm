@@ -3,14 +3,14 @@ module SingleCtorPairCharIntTest exposing (main)
 {-| Values are extracted correctly from two single-constructor types in one module, one wrapping a `Char` and one wrapping an `Int`.
 
 `unwrapChar` and `unwrapInt` return the wrapped `'A'` and `256`. `matchChar`
-wraps a `Char`, matches it back out and builds the string `"got_A"`.
+wraps a `Char`, matches it back out and returns the pair `( "got", 'A' )`.
 
 -}
 
 -- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-var
 -- CHECK: unwrap_char: 'A'
 -- CHECK: unwrap_int: 256
--- CHECK: match_char: "got_A"
+-- CHECK: match_char: ("got",'A')
 
 import Html exposing (text)
 
@@ -37,7 +37,7 @@ unwrapInt w =
             n
 
 
-matchChar : Char -> String
+matchChar : Char -> ( String, Char )
 matchChar c =
     let
         w =
@@ -45,7 +45,7 @@ matchChar c =
     in
     case w of
         WrapChar x ->
-            "got_" ++ String.fromChar x
+            ( "got", x )
 
 
 main =

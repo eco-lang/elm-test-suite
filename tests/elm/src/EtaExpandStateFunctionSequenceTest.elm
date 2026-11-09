@@ -2,18 +2,15 @@ module EtaExpandStateFunctionSequenceTest exposing (..)
 
 {-| A state-passing `sequence` written with `andThen` and `pure` over a function type alias, `St a = Int -> a`, whose definitions take more parameters than their annotations show.
 
-`andThen` and `pure` are annotated against `St`, so each one's definition names the state as an extra parameter. `sequence []` falls to the wildcard branch, which runs `tick` and then returns `pure []`, so `List.length (sequence [] 0)` is 0.
+`andThen` and `pure` are annotated against `St`, so each one's definition names the state as an extra parameter. `sequence []` falls to the wildcard branch, which runs `tick` and then returns `pure []`, so `length (sequence [] 0)` is 0, where `length` is a local function written by pattern matching.
 -}
 
 -- TAGS: elm-spec, sm-typbind, s-ty-con, s-valbind-var, d-pat-cons-fail
 -- CHECK: testValue: 0
 
 import Basics exposing (..)
-import Char exposing (..)
 import Html exposing (text)
-import List exposing (..)
 import Maybe exposing (..)
-import String exposing (..)
 
 
 type alias St a =
@@ -58,9 +55,19 @@ sequence actions =
             andThen (\x -> pure []) tick
 
 
+length : List a -> Int
+length xs =
+    case xs of
+        [] ->
+            0
+
+        _ :: rest ->
+            1 + length rest
+
+
 testValue : Int
 testValue =
-    List.length (sequence [] 0)
+    length (sequence [] 0)
 
 
 main =

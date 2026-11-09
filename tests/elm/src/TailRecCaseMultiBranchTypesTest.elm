@@ -6,11 +6,12 @@ finds the right element.
 
 `findEndianness` walks a list of `Expr`, counting positions from `idx`, and stops at the
 first `Var "LE"` or `Var "BE"`; every other element is skipped by a tail call. In
-`[ Lit 1, Call "foo" [], Var "LE", Var "other" ]` that is position 2.
+`[ Lit 1, Call "foo" [], Var "LE", Var "other" ]` that is position 2, returned as
+`FoundLE 2`.
 -}
 
 -- TAGS: elm-spec, d-pat-cons, d-pat-con, d-pat-con-fail, d-atpat-scon
--- CHECK: result: "found LE at 2"
+-- CHECK: result: FoundLE 2
 
 import Html exposing (text)
 
@@ -21,19 +22,25 @@ type Expr
     | Lit Int
 
 
-findEndianness : List Expr -> Int -> String
+type Found
+    = FoundLE Int
+    | FoundBE Int
+    | NotFound
+
+
+findEndianness : List Expr -> Int -> Found
 findEndianness exprs idx =
     case exprs of
         [] ->
-            "not found"
+            NotFound
 
         (Var name) :: rest ->
             case name of
                 "LE" ->
-                    "found LE at " ++ String.fromInt idx
+                    FoundLE idx
 
                 "BE" ->
-                    "found BE at " ++ String.fromInt idx
+                    FoundBE idx
 
                 _ ->
                     findEndianness rest (idx + 1)

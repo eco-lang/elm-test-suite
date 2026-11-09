@@ -19,4 +19,8 @@ import Html
 
 
 main =
-    Html.text (String.fromInt ((identity << identity >> identity) 1))
+    let
+        _ =
+            Debug.log "composed" ((identity << identity >> identity) 1)
+    in
+    Html.text "done"

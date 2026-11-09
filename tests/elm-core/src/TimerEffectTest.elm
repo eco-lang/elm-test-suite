@@ -51,7 +51,7 @@ update msg model =
                     model.count + 1
 
                 _ =
-                    Debug.log "TimerEffectTest" ("fired " ++ String.fromInt newCount)
+                    Debug.log "TimerEffectTest" ("fired " ++ Debug.toString newCount)
             in
             if newCount >= 5 then
                 let

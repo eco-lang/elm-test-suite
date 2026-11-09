@@ -8,9 +8,16 @@ module CompilerIssue1979ImportOpaqueConstructorsTest exposing (..)
 `exposing (Opaque(..))` without complaint. Exposing constructors that the module does not expose
 should be an import error.
 
+A Standard Definition of Elm? does not accept this as a bug. For a type that its module exposes
+without its constructors, `import A exposing (T(..))` elaborates, imports the type and imports
+no constructor (the comment on rule sm-item-opentype). The program uses no constructor of
+`Opaque`, so it is valid, and Elm 0.19.1 is right to accept it.
+<https://elm-test-suite.netlify.app/standard/rules/sm-item-opentype>
+
 -}
 
--- TAGS: elm19-bug
+-- TAGS: elm19-bug, elm-spec-contradicts
+-- XFAIL: the book accepts T(..) of a type exposed without constructors, importing none, so the program is valid
 -- COMPILE-ERROR: the imported module does not expose Opaque's constructors
 -- CHECK: {{-- [A-Z ]+ -}}
 

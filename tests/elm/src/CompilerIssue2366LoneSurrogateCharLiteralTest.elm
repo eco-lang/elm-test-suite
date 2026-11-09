@@ -18,9 +18,17 @@ Under A8 the program does not compile, so a compiler that follows the book fails
 issue is resolved by rejecting the literal, and `elm`'s `CharLiteralSurrogateEscapeTest` tests
 that. The test is kept as it is because it is the issue's program.
 
+A Standard Definition of Elm? does not accept this as a bug: the program is not valid Elm. The
+escape `\u{h}` denotes a Unicode scalar value, so `'\u{D800}'` and `'\u{DFFF}'` are not
+character constants (restriction core-escape-unicode, ruling A8), and the program is rejected.
+CharLiteralSurrogateEscapeTest checks that. Elm 0.19.1 accepts it, so this test passes there
+(an XPASS).
+<https://elm-test-suite.netlify.app/standard/restrictions/core-escape-unicode>
+
 -}
 
--- TAGS: elm19-bug
+-- TAGS: elm19-bug, elm-spec-contradicts
+-- XFAIL: the book rejects the program: surrogate escapes are not escape sequences (A8)
 -- CHECK: cleaned: "ab"
 -- CHECK: length: 2
 -- CHECK: cut: 3

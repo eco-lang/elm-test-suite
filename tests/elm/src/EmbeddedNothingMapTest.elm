@@ -1,6 +1,6 @@
 module EmbeddedNothingMapTest exposing (main)
 
-{-| `List.map` with a function that matches `Maybe` maps each `Nothing` to -1 and
+{-| A local `map` with a function that matches `Maybe` maps each `Nothing` to -1 and
 each `Just` to its payload.
 -}
 
@@ -19,13 +19,22 @@ extract m =
             -1
 
 
+map f xs =
+    case xs of
+        [] ->
+            []
+
+        x :: rest ->
+            f x :: map f rest
+
+
 main =
     let
         items =
             [ Nothing, Just 1, Nothing, Just 2 ]
 
         results =
-            List.map extract items
+            map extract items
 
         _ = Debug.log "results" results
     in

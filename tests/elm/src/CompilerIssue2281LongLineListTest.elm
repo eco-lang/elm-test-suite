@@ -11,6 +11,9 @@ expects the program to run and log the length 22000.
 
 Fixed in Elm 0.19.2.
 
+The issue's own program used the library function `List.length` to count the list; this version
+reproduces the same bug with a local tail-recursive `length` in its place.
+
 -}
 
 -- TAGS: elm19-bug-fix
@@ -23,9 +26,19 @@ import Html exposing (text)
 main =
     let
         _ =
-            Debug.log "length" (List.length list)
+            Debug.log "length" (length 0 list)
     in
     text "done"
+
+
+length : Int -> List a -> Int
+length acc xs =
+    case xs of
+        [] ->
+            acc
+
+        _ :: rest ->
+            length (acc + 1) rest
 
 
 list : List Int

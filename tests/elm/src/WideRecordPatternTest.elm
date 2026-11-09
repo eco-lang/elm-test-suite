@@ -100,7 +100,7 @@ upd r =
 main =
     let
         base =
-            1 + List.length [ () ] - 1
+            1 + (Char.toCode 'b' - Char.toCode 'a') - 1
 
         r =
             make base

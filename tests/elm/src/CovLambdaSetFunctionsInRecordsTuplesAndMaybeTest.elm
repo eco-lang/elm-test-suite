@@ -17,7 +17,6 @@ import Maybe exposing (Maybe(..))
 import Platform.Cmd as Cmd exposing (Cmd)
 import Platform.Sub as Sub exposing (Sub)
 import String exposing (String)
-import Tuple
 import Html
 
 
@@ -27,7 +26,11 @@ type alias Ops =
 
 testValue : Int
 testValue =
-    run maybeF 3 + Tuple.first pairF 1 + Tuple.second pairF 2 + run (Just (Tuple.first pairF)) 4
+    let
+        ( p1, p2 ) =
+            pairF
+    in
+    run maybeF 3 + p1 1 + p2 2 + run (Just p1) 4
 
 
 run : Maybe (Int -> Int) -> Int -> Int

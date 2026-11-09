@@ -11,10 +11,16 @@ module CaseAsPatternTest exposing (main)
 import Html exposing (text)
 
 
+length list =
+    case list of
+        [] -> 0
+        _ :: rest -> 1 + length rest
+
+
 sumWithLength list =
     case list of
         [] -> 0
-        ((x :: _) as whole) -> x + List.length whole
+        ((x :: _) as whole) -> x + length whole
 
 
 main =

@@ -4,7 +4,7 @@ module DebugNumberAtFloatTest exposing (main)
 `Debug.log` give the right results when called with a `Float` and with an `Int`
 in the same program.
 
-`showAll` maps `Debug.toString` over `[ n, n + n ]`, and `bump` logs `n + 1`.
+`showAll` applies `Debug.toString` to `n` and to `n + n`, and `bump` logs `n + 1`.
 The test calls `showAll 1.25`, `bump 2.5` and `showAll 2`, and checks that the
 `Float` values print as `1.25`, `2.5` and `3.5` and the `Int` values as `2` and
 `4`.
@@ -21,7 +21,7 @@ import Html exposing (text)
 
 
 showAll n =
-    List.map Debug.toString [ n, n + n ]
+    [ Debug.toString n, Debug.toString (n + n) ]
 
 
 bump n =

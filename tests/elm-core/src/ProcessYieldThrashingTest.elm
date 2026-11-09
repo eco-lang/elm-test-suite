@@ -53,7 +53,7 @@ yielder label k =
                 (\_ ->
                     let
                         _ =
-                            Debug.log "yield" (label ++ " " ++ String.fromInt k)
+                            Debug.log "yield" (label ++ " " ++ Debug.toString k)
                     in
                     yielder label (k + 1)
                 )

@@ -19,4 +19,8 @@ import Html
 
 
 main =
-    Html.text (String.concat ("a" ++ "b" :: [ "c" ]))
+    let
+        _ =
+            Debug.log "chain" ("a" ++ "b" :: [ "c" ])
+    in
+    Html.text "done"

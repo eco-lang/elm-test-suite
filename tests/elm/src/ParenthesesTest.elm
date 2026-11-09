@@ -35,7 +35,12 @@ inner m =
 
 doubleAll : (List (Int)) -> (List Int)
 doubleAll xs =
-    List.map ((*) 2) xs
+    case xs of
+        [] ->
+            []
+
+        x :: rest ->
+            (*) 2 x :: doubleAll rest
 
 
 main =

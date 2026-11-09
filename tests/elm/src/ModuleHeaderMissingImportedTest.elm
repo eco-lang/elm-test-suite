@@ -19,4 +19,8 @@ import ModuleHeaderMissingHelper
 
 
 main =
-    Html.text (String.fromInt ModuleHeaderMissingHelper.v)
+    let
+        _ =
+            Debug.log "v" ModuleHeaderMissingHelper.v
+    in
+    Html.text "done"

@@ -8,6 +8,9 @@ module CompilerIssue2274MutualRecursionTransmuteTest exposing (main)
 and the annotation on `eraseType` is too general: a TYPE MISMATCH. Elm 0.19.1 infers
 `f : a -> b -> c` instead, accepts the program, and lets `eraseType` turn a `String` into an `Int`.
 
+The issue's own program used the library function `String.fromInt` to show the result; this
+version reproduces the same bug with `Debug.toString` in its place.
+
 -}
 
 -- TAGS: elm19-bug
@@ -37,4 +40,4 @@ eraseType x =
 
 
 main =
-    text (String.fromInt (eraseType "not an Int" + 1))
+    text (Debug.toString (eraseType "not an Int" + 1))

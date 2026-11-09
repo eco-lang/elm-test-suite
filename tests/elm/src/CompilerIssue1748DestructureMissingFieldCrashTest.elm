@@ -6,6 +6,9 @@ module CompilerIssue1748DestructureMissingFieldCrashTest exposing (..)
 
 Elm 0.19.1 crashes ("index out of bounds") on this program. It should report a type error.
 
+The issue's own program used the library function `Browser.sandbox`; this version reproduces the
+same bug with a local `sandbox` of the same type, built on `Platform.worker`, in its place.
+
 -}
 
 -- TAGS: elm19-bug
@@ -14,13 +17,26 @@ Elm 0.19.1 crashes ("index out of bounds") on this program. It should report a t
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: out of bounds
 
-import Browser
 import Html
+
+
+sandbox :
+    { init : model
+    , view : model -> Html.Html msg
+    , update : msg -> model -> model
+    }
+    -> Program () model msg
+sandbox app =
+    Platform.worker
+        { init = \_ -> ( app.init, Cmd.none )
+        , update = \msg model -> ( app.update msg model, Cmd.none )
+        , subscriptions = \_ -> Sub.none
+        }
 
 
 main : Program () { window : Int } msg
 main =
-    Browser.sandbox
+    sandbox
         { init = { window = 1 }
         , view = view
         , update = \_ model -> model

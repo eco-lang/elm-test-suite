@@ -10,14 +10,21 @@ Elm 0.19.1 reads integer literals into a 64-bit Int, so `100000000000000000000` 
 
 A Standard Definition of Elm? does not decide this test. An integer constant spelling n denotes
 norm(n), and the Int range and the normalisation norm are implementation parameters (Appendix,
-The Int Range and Normalisation): wrapping `100000000000000000000` into 64 bits, as Elm 0.19.1
-does, is one choice the book allows, and keeping it as a JavaScript number another. The test is
-marked XFAIL for that reason: it records the issue as reported, which no compiler meets.
+The Int Range and Normalisation): the range must hold every integer from -2^31 to 2^31 - 1, and may
+hold more. An implementation whose Int range holds `100000000000000000000` and 2^63 keeps both
+literals as they are written; one with a 64-bit range wraps them, as eco does, and conforms too.
+
+The test is marked XFAIL because these numbers are too large for every current implementation:
+none has an Int range that holds them, so every compiler changes them and the test fails. It is
+not a bug against the book. Review it when there is an Elm with built-in large integers, whose
+Int range would hold them and on which the test should pass.
+
+<https://elm-test-suite.netlify.app/standard/appendix-implementation#sec-appendix-implementation-int>
 
 -}
 
 -- TAGS: elm19-bug, elm-unspecced
--- XFAIL: the book leaves the value of an integer constant outside the Int range to the implementation (norm), and every compiler wraps it
+-- XFAIL: the numbers are too large for the Int range of every current implementation; review when an Elm has built-in large integers
 -- CHECK: big: 100000000000000000000
 -- CHECK: sixtyThree: 9223372036854776000
 

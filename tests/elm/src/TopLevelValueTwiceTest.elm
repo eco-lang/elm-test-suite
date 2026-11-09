@@ -23,4 +23,8 @@ x =
 
 
 main =
-    Html.text (String.fromInt x)
+    let
+        _ =
+            Debug.log "x" x
+    in
+    Html.text "done"

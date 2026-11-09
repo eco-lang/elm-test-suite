@@ -4,8 +4,8 @@ module UtilsOrderingCaptureIntTest exposing (main)
 passed as function values or applied in prefix form.
 
 On the list `[1, 2, 3, 4, 5]` with pivot `3`, each operator is applied in prefix
-form inside a `List.filter` lambda, and `(<)` and `(>=)` are also passed to the
-generic helper `countWith`, counting 2 and 3 elements.
+form inside a lambda passed to the local helper `filter`, and `(<)` and `(>=)`
+are also passed to the generic helper `countWith`, counting 2 and 3 elements.
 
 -}
 
@@ -24,16 +24,33 @@ import Html exposing (text)
 {-| Counts the elements `x` of a list for which `pred x target` holds.
 -}
 countWith : (a -> a -> Bool) -> a -> List a -> Int
-countWith pred target =
-    List.foldl
-        (\x acc ->
+countWith pred target xs =
+    case xs of
+        [] ->
+            0
+
+        x :: rest ->
             if pred x target then
-                acc + 1
+                1 + countWith pred target rest
 
             else
-                acc
-        )
-        0
+                countWith pred target rest
+
+
+{-| Keeps the elements of a list for which `keep` holds, in order.
+-}
+filter : (a -> Bool) -> List a -> List a
+filter keep xs =
+    case xs of
+        [] ->
+            []
+
+        x :: rest ->
+            if keep x then
+                x :: filter keep rest
+
+            else
+                filter keep rest
 
 
 main =
@@ -43,16 +60,16 @@ main =
             [ 1, 2, 3, 4, 5 ]
 
         _ =
-            Debug.log "lt_filter" (List.filter (\x -> (<) x 3) xs)
+            Debug.log "lt_filter" (filter (\x -> (<) x 3) xs)
 
         _ =
-            Debug.log "le_filter" (List.filter (\x -> (<=) x 3) xs)
+            Debug.log "le_filter" (filter (\x -> (<=) x 3) xs)
 
         _ =
-            Debug.log "gt_filter" (List.filter (\x -> (>) x 3) xs)
+            Debug.log "gt_filter" (filter (\x -> (>) x 3) xs)
 
         _ =
-            Debug.log "ge_filter" (List.filter (\x -> (>=) x 3) xs)
+            Debug.log "ge_filter" (filter (\x -> (>=) x 3) xs)
 
         _ =
             Debug.log "count_lt" (countWith (<) 3 xs)

@@ -18,4 +18,8 @@ import ImportCycleA
 
 
 main =
-    Html.text (String.fromInt ImportCycleA.a)
+    let
+        _ =
+            Debug.log "a" ImportCycleA.a
+    in
+    Html.text "done"

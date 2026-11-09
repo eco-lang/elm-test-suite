@@ -145,8 +145,8 @@ project depends on the latest release of each package it uses.
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 788 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
-| `elm-core` | 368 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
+| `elm` | 795 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
+| `elm-core` | 367 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
 | `elm-bytes` | 88 | elm/bytes encoders and decoders |
 | `elm-parser` | 51 | elm/parser |
 | `elm-json` | 42 | elm/json |
@@ -165,12 +165,12 @@ with its own project. The results website shows the tests by project and by tag.
 
 | Tag | Tests | What they are |
 |---|---|---|
-| `elm-spec` | 941 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
+| `elm-spec` | 934 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
 | `elm19-compile-error` | 221 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
-| `elm19-bug` | 152 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
+| `elm19-bug` | 153 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
 | `elm19-bug-fix` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
-| `elm19-quirks` | 3 | edge cases where the test records what Elm 0.19.1 does, and that differs from A Standard Definition of Elm? or from what another test expects |
-| `elm-unspecced` | 11 | tests whose expected outcome A Standard Definition of Elm? leaves open or puts outside the definition: what `Debug.log` prints, the value of an integer constant outside the Int range, the text of a crash, shader blocks; each says why in its comment |
+| `elm-unspecced` | 14 | tests whose expected outcome A Standard Definition of Elm? leaves open or puts outside the definition: what `Debug.log` prints, the value of an integer constant outside the Int range, the text of a crash, shader blocks; each says why in its comment |
+| `elm-spec-contradicts` | 6 | reported bugs whose expected outcome A Standard Definition of Elm? contradicts: the book decides the program the other way, so the report is not a bug against it; each is marked XFAIL and says why in its comment |
 | `error-message` | 17 | requests for a better error report: what a compiler's report says or how it is laid out, which A Standard Definition of Elm? does not define; named `ErrorMessages…` or `ErrorMessage…` after their issue, and kept in the project `elm-error-catalogue` |
 
 A tag may also name an item of A Standard Definition of Elm?: a rule or restriction by its name,
@@ -194,12 +194,12 @@ checked by at least one test.
 The 34 tests of edge cases recorded from Elm on Node (Unicode and case mapping, JSON number and string
 formats, Float edge values, regex and URL encoding details) carry `-- MODE-GUARD:` and
 `-- NO-SKIP:`, and the case-mapping ones `-- UNICODE: 17.0`; they share the helper module
-`ConformanceHelp`, of which each project that has them holds a copy. Two of them are tagged
-`elm19-quirks`: `ParserLoneLowSurrogateTest` expects a Char made of two lone surrogates, which ruling
-A52 rules out, and `StringWordsUnicodeSpaceTest` expects `String.words` to give `[""]`, which
-the `elm19-bug` test `CoreIssue1019StringWordsEmptyTest` treats as a bug. The third is
-`ProcessSleepNonFiniteTest`, which expects a sleep of `1.0e300` ms to end at once, as on Node,
-where ruling A81 has it wait at least that long.
+`ConformanceHelp`, of which each project that has them holds a copy. Three record what Elm on
+Node does where A Standard Definition of Elm? decides nothing, and are tagged `elm-unspecced`:
+`ParserLoneLowSurrogateTest` (a parser handed a Char made from a surrogate code point),
+`StringWordsUnicodeSpaceTest` (`String.words` of a string that is only whitespace, where the
+`elm19-bug` test `CoreIssue1019StringWordsEmptyTest` expects otherwise) and
+`ProcessSleepNonFiniteTest` (a sleep of an infinite or NaN delay).
 
 ### Bugs and the issue triage
 

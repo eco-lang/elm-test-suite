@@ -40,4 +40,8 @@ factorial num =
 
 
 main =
-    Html.text (String.fromInt (factorial 5))
+    let
+        _ =
+            Debug.log "factorial" (factorial 5)
+    in
+    Html.text "done"

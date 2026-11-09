@@ -20,4 +20,8 @@ import Html
 
 
 main =
-    Html.text (String.fromInt (a + b))
+    let
+        _ =
+            Debug.log "a + b" (a + b)
+    in
+    Html.text "done"

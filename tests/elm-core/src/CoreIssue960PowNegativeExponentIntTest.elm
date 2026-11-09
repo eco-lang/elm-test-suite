@@ -4,14 +4,17 @@ module CoreIssue960PowNegativeExponentIntTest exposing (main)
 
 <https://github.com/elm/core/issues/960>
 
-Elm 0.19.1 evaluates `(2 : Int) ^ -1` to `0.5`, so `String.fromInt` of an `Int` prints `"0.5"`.
+Elm 0.19.1 evaluates `(2 : Int) ^ -1` to `0.5`, so logging that `Int` prints `0.5`.
 Whatever the result, a value of type `Int` must be a whole number.
+
+The issue's own program used the library function `String.fromInt` to show the result; this
+version reproduces the same bug by logging the `Int` directly with `Debug.log`.
 
 -}
 
 -- TAGS: elm19-bug
 -- TAGS: elm-spec, b:Basics.pow, b:Basics.Int
--- CHECK: {{pow: "-?[0-9]+"(\n|$)}}
+-- CHECK: {{pow: -?[0-9]+(\n|$)}}
 
 import Html exposing (text)
 
@@ -24,6 +27,6 @@ two =
 main =
     let
         _ =
-            Debug.log "pow" (String.fromInt (two ^ -1))
+            Debug.log "pow" (two ^ -1)
     in
     text "done"

@@ -3,8 +3,8 @@ module AccessorFunctionFieldInListTest exposing (main)
 {-| Record accessors for function-typed fields can be used as list elements.
 
 `.op` and `.op2` read fields of type `Int -> Int`. They are placed in a list of
-type `List (Ops -> Int -> Int)`, and each is applied to one record and then to
-10, giving `10 + 1` and `10 * 2`.
+type `List (Ops -> Int -> Int)`. A `case` on the list takes the two elements out,
+and each is applied to one record and then to 10, giving `10 + 1` and `10 * 2`.
 
 -}
 
@@ -28,7 +28,16 @@ main =
         getters =
             [ .op, .op2 ]
 
+        results : List Int
+        results =
+            case getters of
+                [ g1, g2 ] ->
+                    [ g1 ops 10, g2 ops 10 ]
+
+                _ ->
+                    []
+
         _ =
-            Debug.log "results" (List.map (\g -> g ops 10) getters)
+            Debug.log "results" results
     in
     text "done"

@@ -15,7 +15,7 @@ In Elm 0.19.1 `remainderBy 0 7` is NaN, typed as an `Int`, and the NaN spreads: 
 -- TAGS: elm19-bug
 -- TAGS: elm-spec, b:Basics.remainderBy
 -- CHECK: remainderBy 0 7 + 1 == 1: True
--- CHECK: String.fromInt (remainderBy 0 7): "0"
+-- CHECK: remainderBy 0 7: 0
 
 import Html
 
@@ -26,6 +26,6 @@ main =
             Debug.log "remainderBy 0 7 + 1 == 1" (remainderBy 0 7 + 1 == 1)
 
         _ =
-            Debug.log "String.fromInt (remainderBy 0 7)" (String.fromInt (remainderBy 0 7))
+            Debug.log "remainderBy 0 7" (remainderBy 0 7)
     in
     Html.text "done"

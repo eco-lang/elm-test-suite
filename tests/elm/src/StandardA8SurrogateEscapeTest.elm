@@ -27,4 +27,4 @@ loneSurrogate =
 
 
 main =
-    Html.text (String.fromInt (String.length loneSurrogate))
+    Html.text loneSurrogate

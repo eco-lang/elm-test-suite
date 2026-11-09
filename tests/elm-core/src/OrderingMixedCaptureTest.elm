@@ -22,16 +22,17 @@ import Html exposing (text)
 
 
 countWith : (a -> a -> Bool) -> a -> List a -> Int
-countWith pred target =
-    List.foldl
-        (\x acc ->
+countWith pred target xs =
+    case xs of
+        [] ->
+            0
+
+        x :: rest ->
             if pred x target then
-                acc + 1
+                1 + countWith pred target rest
 
             else
-                acc
-        )
-        0
+                countWith pred target rest
 
 
 main =

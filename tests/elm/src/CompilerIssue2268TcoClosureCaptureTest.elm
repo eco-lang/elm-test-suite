@@ -9,6 +9,9 @@ result gives `[3,2,1]`. `makeLazy` is the same function with its recursive call 
 `<|`; both must print `[3,2,1]`. Elm 0.19.1 turns the tail call in `tcoMakeLazy` into a loop that
 reassigns `item`, every lambda sees its last value, and the `tco` line prints `[3,3,3]`.
 
+The issue's own program used the library function `List.map` to force the lambdas; this version
+reproduces the same bug with a local `map` in its place.
+
 -}
 
 -- TAGS: elm19-bug
@@ -39,12 +42,22 @@ tcoMakeLazy list accum =
             accum
 
 
+map : (a -> b) -> List a -> List b
+map f list =
+    case list of
+        [] ->
+            []
+
+        x :: rest ->
+            f x :: map f rest
+
+
 main =
     let
         _ =
-            Debug.log "plain" (makeLazy [ 1, 2, 3 ] [] |> List.map (\f -> f ()))
+            Debug.log "plain" (makeLazy [ 1, 2, 3 ] [] |> map (\f -> f ()))
 
         _ =
-            Debug.log "tco" (tcoMakeLazy [ 1, 2, 3 ] [] |> List.map (\f -> f ()))
+            Debug.log "tco" (tcoMakeLazy [ 1, 2, 3 ] [] |> map (\f -> f ()))
     in
     text "done"

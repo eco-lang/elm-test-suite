@@ -15,10 +15,17 @@ call.
 import Html exposing (text)
 
 
-{-| Takes one argument and returns a function adding the key's length to its input. -}
+{-| Takes one argument and returns a function adding 5 to its input when the key is `"hello"`, and 0 otherwise. -}
 makeAdder : String -> (Int -> Int)
 makeAdder key =
-    \value -> String.length key + value
+    \value ->
+        (if key == "hello" then
+            5
+
+         else
+            0
+        )
+            + value
 
 
 {-| Applies `f` to `a` and `b` from inside a local function.

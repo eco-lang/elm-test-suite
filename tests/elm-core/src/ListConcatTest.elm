@@ -1,7 +1,7 @@
 module ListConcatTest exposing (main)
 
-{-| `++` and `List.concat` join lists in order, and appending to the empty list `[]`
-gives the other list.
+{-| `++` joins lists in order, alone and in a chain of three, and appending to
+the empty list `[]` gives the other list.
 -}
 
 -- TAGS: elm-spec, b:Basics.append
@@ -15,7 +15,7 @@ import Html exposing (text)
 main =
     let
         _ = Debug.log "append" ([1, 2] ++ [3, 4])
-        _ = Debug.log "concat" (List.concat [[1, 2], [3, 4], [5, 6]])
+        _ = Debug.log "concat" ([1, 2] ++ [3, 4] ++ [5, 6])
         _ = Debug.log "empty" ([] ++ [1, 2, 3])
     in
     text "done"

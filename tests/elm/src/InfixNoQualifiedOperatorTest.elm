@@ -16,4 +16,8 @@ import Html
 
 
 main =
-    Html.text (String.fromInt (1 Basics.+ 2))
+    let
+        _ =
+            Debug.log "sum" (1 Basics.+ 2)
+    in
+    Html.text "done"

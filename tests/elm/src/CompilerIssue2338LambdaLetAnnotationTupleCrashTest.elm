@@ -8,6 +8,10 @@ module CompilerIssue2338LambdaLetAnnotationTupleCrashTest exposing (main)
 the lambda passed to `mapAccuml`. Elm 0.19.1 crashes instead ("x [rank = 2]", Type/Solve.hs:206,
 "thread blocked indefinitely in an MVar operation").
 
+The issue's own program used the library functions `List.foldl` and `List.reverse` to define
+`mapAccuml`; this version reproduces the same bug with `mapAccuml` defined by direct recursion on
+the list instead.
+
 -}
 
 -- TAGS: elm19-bug
@@ -25,20 +29,19 @@ main =
 
 mapAccuml : (a -> b -> ( a, c )) -> a -> List b -> ( a, List c )
 mapAccuml f acc0 list =
-    let
-        ( accFinal, generatedL ) =
-            List.foldl
-                (\x ( acc1, ys ) ->
-                    let
-                        ( acc2, y ) =
-                            f acc1 x
-                    in
-                    ( acc2, y :: ys )
-                )
-                ( acc0, [] )
-                list
-    in
-    ( accFinal, List.reverse generatedL )
+    case list of
+        [] ->
+            ( acc0, [] )
+
+        x :: rest ->
+            let
+                ( acc1, y ) =
+                    f acc0 x
+
+                ( accFinal, ys ) =
+                    mapAccuml f acc1 rest
+            in
+            ( accFinal, y :: ys )
 
 
 func =

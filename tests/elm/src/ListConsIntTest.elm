@@ -2,7 +2,7 @@ module ListConsIntTest exposing (main)
 
 {-| A `List Int` literal holds its numbers in order, and `::` prepends a number to it.
 
-The test prints the list, its `List.head`, and the list with `0` consed onto the front.
+The test prints the list, its head (read with a `case`), and the list with `0` consed onto the front.
 
 -}
 
@@ -25,7 +25,14 @@ main =
             Debug.log "list" xs
 
         _ =
-            Debug.log "head" (List.head xs)
+            Debug.log "head"
+                (case xs of
+                    h :: _ ->
+                        Just h
+
+                    [] ->
+                        Nothing
+                )
 
         _ =
             Debug.log "prepend" (0 :: xs)

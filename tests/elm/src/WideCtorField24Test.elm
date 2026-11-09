@@ -58,7 +58,7 @@ field26 w =
 main =
     let
         base =
-            1000 + List.length [ () ] - 1
+            1000 + (Char.toCode 'b' - Char.toCode 'a') - 1
 
         w =
             make base

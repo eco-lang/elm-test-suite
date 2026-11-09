@@ -78,7 +78,14 @@ main =
             Debug.log "tuple field" (t + 0.5)
 
         _ =
-            Debug.log "list field" (List.foldl (+) 0.25 xs)
+            Debug.log "list field" 
+                (case xs of
+                    x :: _ ->
+                        x + 0.25
+
+                    [] ->
+                        0.25
+                )
 
         _ =
             Debug.log "record field" (r.v + 0.5)

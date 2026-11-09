@@ -1,9 +1,9 @@
 module StringConcatTest exposing (main)
 
-{-| `++` and `String.append` join strings.
+{-| `++` joins strings.
 
 `"Hello" ++ "World"`, a three-part `"Hello" ++ " " ++ "World"`, and
-`String.append "foo" "bar"` are each logged.
+`"foo" ++ "bar"` are each logged.
 -}
 
 -- TAGS: elm-spec, b:Basics.append
@@ -18,6 +18,6 @@ main =
     let
         _ = Debug.log "concat1" ("Hello" ++ "World")
         _ = Debug.log "concat2" ("Hello" ++ " " ++ "World")
-        _ = Debug.log "append" (String.append "foo" "bar")
+        _ = Debug.log "append" ("foo" ++ "bar")
     in
     text "done"

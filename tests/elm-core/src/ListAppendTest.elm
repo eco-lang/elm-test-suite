@@ -1,6 +1,6 @@
 module ListAppendTest exposing (main)
 
-{-| `List.append` and the `++` operator join two lists in order, and appending `[]` on the right leaves a list unchanged.
+{-| The `++` operator joins two lists in order, and appending `[]` on the right leaves a list unchanged.
 -}
 
 -- TAGS: elm-spec, b:Basics.append
@@ -12,8 +12,8 @@ import Html exposing (text)
 
 main =
     let
-        _ = Debug.log "append1" (List.append [1, 2] [3, 4])
-        _ = Debug.log "append_empty" (List.append [1, 2] [])
+        _ = Debug.log "append1" ([1, 2] ++ [3, 4])
+        _ = Debug.log "append_empty" ([1, 2] ++ [])
         _ = Debug.log "concat_op" ([1] ++ [2, 3])
     in
     text "done"

@@ -3,14 +3,14 @@ module SingleCtorPairCharFloatTest exposing (main)
 {-| Values are extracted correctly from two single-constructor types in one module, one wrapping a `Char` and one wrapping a `Float`.
 
 `unwrapChar` and `unwrapFloat` return the wrapped `'Z'` and `1.5`. `matchChar`
-wraps a `Char`, matches it back out and builds the string `"got_Z"`.
+wraps a `Char`, matches it back out and returns the pair `( "got", 'Z' )`.
 
 -}
 
 -- TAGS: elm-spec, sm-conbind, d-pat-con, d-atpat-var
 -- CHECK: unwrap_char: 'Z'
 -- CHECK: unwrap_float: 1.5
--- CHECK: match_char: "got_Z"
+-- CHECK: match_char: ("got",'Z')
 
 import Html exposing (text)
 
@@ -37,7 +37,7 @@ unwrapFloat w =
             f
 
 
-matchChar : Char -> String
+matchChar : Char -> ( String, Char )
 matchChar c =
     let
         w =
@@ -45,7 +45,7 @@ matchChar c =
     in
     case w of
         WrapChar x ->
-            "got_" ++ String.fromChar x
+            ( "got", x )
 
 
 main =

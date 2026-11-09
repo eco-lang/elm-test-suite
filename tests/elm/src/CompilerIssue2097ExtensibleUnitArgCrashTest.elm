@@ -9,6 +9,9 @@ Elm 0.19.1 crashes with "Used toAnnotation on a type that is not well-formed" (T
 "thread blocked indefinitely in an MVar operation". `()` is not a record, so the program must be
 rejected with an ordinary error report.
 
+The issue's own program used the library function `List.map` in `f`; this version reproduces the
+same bug with a local `map` of the same type in its place.
+
 -}
 
 -- TAGS: elm19-bug
@@ -34,6 +37,16 @@ type alias T =
     Extensible String ()
 
 
+map : (a -> b) -> List a -> List b
+map g list =
+    case list of
+        [] ->
+            []
+
+        x :: rest ->
+            g x :: map g rest
+
+
 f : List T -> List String
 f list =
-    List.map .id list
+    map .id list

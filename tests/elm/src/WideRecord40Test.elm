@@ -76,42 +76,42 @@ make base =
     { f0000 = (base + 999)
         , f0001 = (toFloat base + 1.5 - 1)
         , f0002 = ((if base == 1 then 'c' else '?'))
-        , f0003 = (String.fromInt (base + 2) ++ "s")
+        , f0003 = ((if base == 1 then "3s" else "?"))
         , f0004 = (modBy 2 (base + 3) == 0)
         , f0005 = (base + 1004)
         , f0006 = (toFloat base + 6.5 - 1)
         , f0007 = ((if base == 1 then 'h' else '?'))
-        , f0008 = (String.fromInt (base + 7) ++ "s")
+        , f0008 = ((if base == 1 then "8s" else "?"))
         , f0009 = (modBy 2 (base + 8) == 0)
         , f0010 = (base + 1009)
         , f0011 = (toFloat base + 11.5 - 1)
         , f0012 = ((if base == 1 then 'm' else '?'))
-        , f0013 = (String.fromInt (base + 12) ++ "s")
+        , f0013 = ((if base == 1 then "13s" else "?"))
         , f0014 = (modBy 2 (base + 13) == 0)
         , f0015 = (base + 1014)
         , f0016 = (toFloat base + 16.5 - 1)
         , f0017 = ((if base == 1 then 'r' else '?'))
-        , f0018 = (String.fromInt (base + 17) ++ "s")
+        , f0018 = ((if base == 1 then "18s" else "?"))
         , f0019 = (modBy 2 (base + 18) == 0)
         , f0020 = (base + 1019)
         , f0021 = (toFloat base + 21.5 - 1)
         , f0022 = ((if base == 1 then 'w' else '?'))
-        , f0023 = (String.fromInt (base + 22) ++ "s")
+        , f0023 = ((if base == 1 then "23s" else "?"))
         , f0024 = (modBy 2 (base + 23) == 0)
         , f0025 = (base + 1024)
         , f0026 = (toFloat base + 26.5 - 1)
         , f0027 = ((if base == 1 then 'b' else '?'))
-        , f0028 = (String.fromInt (base + 27) ++ "s")
+        , f0028 = ((if base == 1 then "28s" else "?"))
         , f0029 = (modBy 2 (base + 28) == 0)
         , f0030 = (base + 1029)
         , f0031 = (toFloat base + 31.5 - 1)
         , f0032 = ((if base == 1 then 'g' else '?'))
-        , f0033 = (String.fromInt (base + 32) ++ "s")
+        , f0033 = ((if base == 1 then "33s" else "?"))
         , f0034 = (modBy 2 (base + 33) == 0)
         , f0035 = (base + 1034)
         , f0036 = (toFloat base + 36.5 - 1)
         , f0037 = ((if base == 1 then 'l' else '?'))
-        , f0038 = (String.fromInt (base + 37) ++ "s")
+        , f0038 = ((if base == 1 then "38s" else "?"))
         , f0039 = (modBy 2 (base + 38) == 0)
     }
 
@@ -129,7 +129,7 @@ upd r =
 main =
     let
         base =
-            1 + List.length [ () ] - 1
+            1 + (Char.toCode 'b' - Char.toCode 'a') - 1
 
         r =
             make base

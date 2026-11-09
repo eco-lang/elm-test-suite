@@ -10,7 +10,7 @@ after the previous one has come back, logs each value received, logs
 `"done"` after the last one, and then drops its subscription.
 
 The values are an empty list, a three-element list and the twenty-element
-list `List.range 1 20`.
+list of the numbers 1 to 20.
 
 -}
 
@@ -33,7 +33,7 @@ values : List (List Int)
 values =
     [ []
     , [ 1, 2, 3 ]
-    , List.range 1 20
+    , [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ]
     ]
 
 

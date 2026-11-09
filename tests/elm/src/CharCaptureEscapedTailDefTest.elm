@@ -7,7 +7,8 @@ later.
 `pickers c` defines `go`, which reports whether a `List Char` contains `c`, and
 returns `[ go ]`. The test applies the first function from that list to a list
 containing `'x'`, the same function built for `'q'` to the same list, and every
-function built for `'z'` to `[ 'z' ]`.
+function built for `'z'` to `[ 'z' ]`, using a local `runAll` that is `True` when
+every function in a list gives `True`.
 
 -}
 
@@ -47,6 +48,16 @@ runFirst fs xs =
             False
 
 
+runAll : List (List Char -> Bool) -> List Char -> Bool
+runAll fs xs =
+    case fs of
+        [] ->
+            True
+
+        f :: rest ->
+            f xs && runAll rest xs
+
+
 main =
     let
         _ =
@@ -56,6 +67,6 @@ main =
             Debug.log "miss" (runFirst (pickers 'q') [ 'a', 'b', 'x' ])
 
         _ =
-            Debug.log "both" (List.all (\f -> f [ 'z' ]) (pickers 'z'))
+            Debug.log "both" (runAll (pickers 'z') [ 'z' ])
     in
     text "done"

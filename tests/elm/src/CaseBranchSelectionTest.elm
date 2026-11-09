@@ -34,12 +34,12 @@ classify s =
             "one"
 
         Pair a b ->
-            "pair " ++ String.fromInt a ++ " " ++ String.fromInt b
+            "pair " ++ Debug.toString a ++ " " ++ Debug.toString b
 
         other ->
             case other of
                 Other n ->
-                    "other " ++ String.fromInt n
+                    "other " ++ Debug.toString n
 
                 _ ->
                     "unreachable"
@@ -58,7 +58,7 @@ overlap n =
 main =
     let
         _ =
-            Debug.log "classify" (List.map classify [ Zero, One, Pair 2 3, Other 9 ])
+            Debug.log "classify" [ classify Zero, classify One, classify (Pair 2 3), classify (Other 9) ]
 
         _ =
             Debug.log "first match wins" (overlap 1)

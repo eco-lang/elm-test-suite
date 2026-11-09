@@ -8,6 +8,9 @@ Elm 0.19.1 compiles the tail call into a `while` loop that reassigns `n`, and th
 `\() -> n` all capture that one variable, so they all return 0. Each closure should return
 the `n` of its own call: `[1,2,3]`.
 
+The issue's own program used the library function `List.map` to call the closures; this version
+reproduces the same bug with a local `map` in its place.
+
 -}
 
 -- TAGS: elm19-bug
@@ -26,9 +29,19 @@ loop n list =
         loop (n - 1) ((\() -> n) :: list)
 
 
+map : (a -> b) -> List a -> List b
+map f list =
+    case list of
+        [] ->
+            []
+
+        x :: rest ->
+            f x :: map f rest
+
+
 main =
     let
         _ =
-            Debug.log "results" (List.map (\f -> f ()) (loop 3 []))
+            Debug.log "results" (map (\f -> f ()) (loop 3 []))
     in
     text "done"

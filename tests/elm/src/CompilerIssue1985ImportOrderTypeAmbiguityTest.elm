@@ -9,9 +9,17 @@ module CompilerIssue1985ImportOrderTypeAmbiguityTest exposing (..)
 this compiles and the reordered program does not. An unqualified `TheType` is ambiguous and should
 be reported as such, whatever the import order.
 
+A Standard Definition of Elm? does not accept this as a bug. The imports are read from left to
+right, and a type listed by name replaces any type of that name that an earlier import provides
+(rules sm-imports-import and sm-item-type): `TheType` is not ambiguous but the alias of the
+second import. `Boxed 5`, of the first import's constructor, has the type `TheType Int` that the
+alias stands for, so the program is valid, and Elm 0.19.1 is right to accept it.
+<https://elm-test-suite.netlify.app/standard/rules/sm-item-type>
+
 -}
 
--- TAGS: elm19-bug
+-- TAGS: elm19-bug, elm-spec-contradicts
+-- XFAIL: the book has a type imported by name replace one of an earlier import, so TheType is not ambiguous and the program is valid
 -- COMPILE-ERROR: ambiguous type name TheType
 -- CHECK: {{-- [A-Z ]+ -}}
 

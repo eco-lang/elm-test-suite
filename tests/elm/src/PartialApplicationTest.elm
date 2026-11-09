@@ -1,7 +1,7 @@
 module PartialApplicationTest exposing (main)
 
 {-| Tests partial application of two-argument functions, both called directly
-and passed to `List.map`.
+and passed to a local `map`.
 -}
 
 -- TAGS: elm-spec, d-exp-lambda, d-app-closure
@@ -16,6 +16,15 @@ add a b = a + b
 multiply a b = a * b
 
 
+map f xs =
+    case xs of
+        [] ->
+            []
+
+        x :: rest ->
+            f x :: map f rest
+
+
 main =
     let
         add5 = add 5
@@ -23,6 +32,6 @@ main =
         addOne = add 1
         _ = Debug.log "partial1" (add5 2)
         _ = Debug.log "partial2" (triple 5)
-        _ = Debug.log "partial3" (List.map addOne [1, 2, 3])
+        _ = Debug.log "partial3" (map addOne [1, 2, 3])
     in
     text "done"

@@ -3,8 +3,8 @@ module CharLiteralPatternMatchMinimalTest exposing (main)
 {-| A Char literal pattern for the double quote `'"'` matches at increasing depths of nesting:
 bare, inside a tuple, inside a `Maybe`, and inside a `Maybe ( Char, String )`.
 
-The last two cases match on the result of `String.uncons "\"x"`, once with the literal
-pattern and once by binding the Char and comparing it with `==`. Every case should log `"y"`.
+Every case should log `"y"`. The same pattern matched against a Char taken from a String by the
+library function `String.uncons` is checked by elm-core's CharUnconsPatternTest.
 
 -}
 
@@ -13,8 +13,6 @@ pattern and once by binding the Char and comparing it with `==`. Every case shou
 -- CHECK: m2_charInTuple: "y"
 -- CHECK: m3_charInMaybe: "y"
 -- CHECK: m4_charInMaybeTuple: "y"
--- CHECK: m5_uncons_pat: "y"
--- CHECK: m6_uncons_eq: "y"
 
 import Html exposing (text)
 
@@ -48,35 +46,13 @@ main =
                 _ ->
                     "n"
 
-        -- m4: Char inside a Maybe (Char, X) — the shape from String.uncons
+        -- m4: Char inside a Maybe (Char, X), the shape String.uncons gives
         m4 =
             case Just ( '"', "x" ) of
                 Just ( '"', _ ) ->
                     "y"
 
                 _ ->
-                    "n"
-
-        -- m5: actual String.uncons with literal pattern
-        m5 =
-            case String.uncons "\"x" of
-                Just ( '"', _ ) ->
-                    "y"
-
-                _ ->
-                    "n"
-
-        -- m6: actual String.uncons with == comparison
-        m6 =
-            case String.uncons "\"x" of
-                Just ( c, _ ) ->
-                    if c == '"' then
-                        "y"
-
-                    else
-                        "n"
-
-                Nothing ->
                     "n"
 
         _ =
@@ -90,11 +66,5 @@ main =
 
         _ =
             Debug.log "m4_charInMaybeTuple" m4
-
-        _ =
-            Debug.log "m5_uncons_pat" m5
-
-        _ =
-            Debug.log "m6_uncons_eq" m6
     in
     text "done"

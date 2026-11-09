@@ -2,10 +2,10 @@ module AliasForwardTest exposing (main)
 
 {-| Top-level values defined as another function, `dup = twice` and `plus = (+)`, behave like the function they name.
 
-`dup` is called at `Int` and at `String` and is passed as a value to
-`List.map`. `plus` is called fully applied through `inc`, passed to
-`List.foldl` at `Int` and at `Float`, and partially applied in `List.map`.
-Results are reduced to `Int`s before they are logged.
+`dup` is called at `Int` and at `String` and is passed as a value to a
+local `map`. `plus` is called fully applied through `inc`, passed to a local
+`foldl` at `Int` and at `Float`, and partially applied in `map`. The `Float`
+result is reduced to an `Int` before it is logged.
 
 -}
 
@@ -15,7 +15,7 @@ import Html exposing (text)
 
 -- TAGS: elm-spec, sm-topdec-value, s-valbind-var, s-atexp-op, d-atexp-op, d-app-basic-partial, d-app-basic-apply
 -- CHECK: dupInt: 3
--- CHECK: dupStr: 3
+-- CHECK: dupStr: "a!!"
 -- CHECK: foldInt: 6
 -- CHECK: foldFloat: 45
 -- CHECK: mapPartial: 5
@@ -47,24 +47,49 @@ bang s =
     s ++ "!"
 
 
+foldl : (a -> b -> b) -> b -> List a -> b
+foldl f acc xs =
+    case xs of
+        [] ->
+            acc
+
+        x :: rest ->
+            foldl f (f x acc) rest
+
+
+map : (a -> b) -> List a -> List b
+map f xs =
+    case xs of
+        [] ->
+            []
+
+        x :: rest ->
+            f x :: map f rest
+
+
+sum : List number -> number
+sum xs =
+    foldl (+) 0 xs
+
+
 main =
     let
         _ =
             Debug.log "dupInt" (dup inc 1)
 
         _ =
-            Debug.log "dupStr" (String.length (dup bang "a"))
+            Debug.log "dupStr" (dup bang "a")
 
         _ =
-            Debug.log "foldInt" (List.foldl plus 0 [ 1, 2, 3 ])
+            Debug.log "foldInt" (foldl plus 0 [ 1, 2, 3 ])
 
         _ =
-            Debug.log "foldFloat" (round (List.foldl plus 0.5 [ 1.5, 2.5 ] * 10))
+            Debug.log "foldFloat" (round (foldl plus 0.5 [ 1.5, 2.5 ] * 10))
 
         _ =
-            Debug.log "mapPartial" (List.sum (List.map (plus 1) [ 1, 2 ]))
+            Debug.log "mapPartial" (sum (map (plus 1) [ 1, 2 ]))
 
         _ =
-            Debug.log "value" (List.sum (List.map dup [ inc ] |> List.map (\g -> g 2)))
+            Debug.log "value" (sum (map dup [ inc ] |> map (\g -> g 2)))
     in
     text "done"

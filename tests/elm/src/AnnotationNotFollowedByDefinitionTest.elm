@@ -25,4 +25,4 @@ f =
 
 
 main =
-    Html.text (String.fromInt (f + g))
+    Html.text (Debug.toString (f + g))

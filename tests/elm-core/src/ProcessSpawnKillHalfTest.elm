@@ -45,7 +45,7 @@ worker i =
             (\_ ->
                 let
                     _ =
-                        Debug.log "spawnKill" ("fired " ++ String.fromInt i)
+                        Debug.log "spawnKill" ("fired " ++ Debug.toString i)
                 in
                 Task.succeed ()
             )
@@ -56,11 +56,11 @@ spawnAll =
     let
         go k acc =
             if k > fiberCount then
-                Task.succeed (List.reverse acc)
+                Task.succeed acc
 
             else
                 Process.spawn (worker k)
-                    |> Task.andThen (\id -> go (k + 1) (id :: acc))
+                    |> Task.andThen (\id -> go (k + 1) (acc ++ [ id ]))
     in
     go 1 []
 

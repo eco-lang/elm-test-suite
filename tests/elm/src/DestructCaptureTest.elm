@@ -45,8 +45,11 @@ f a =
 
         swapped =
             swap (mk a)
+
+        ( s1, _ ) =
+            swapped
     in
-    Tuple.first swapped + x
+    s1 + x
 
 
 main =

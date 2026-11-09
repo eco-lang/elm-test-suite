@@ -1,4 +1,4 @@
-module StringCreationMatrixTest exposing (main)
+module StringCreationLibraryMatrixTest exposing (main)
 
 {-| The same string produced in different ways is `==`, finds the same `Dict`
 entry, and matches the same string pattern in a `case`.
@@ -13,9 +13,11 @@ logs three results:
   - `case`: the concatenated, sliced and reversed ones each match the
     `"abc123"` pattern.
 
+The strings are made by library functions; StringCreationMatrixTest makes the same string in
+several ways with `++` alone.
+
 -}
 
--- TAGS: elm-spec, d-atpat-scon
 -- CHECK: Creation.eq: True
 -- CHECK: Creation.dict: True
 -- CHECK: Creation.case: True

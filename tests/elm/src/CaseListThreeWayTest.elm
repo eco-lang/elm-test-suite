@@ -19,8 +19,8 @@ import Html exposing (text)
 describeList list =
     case list of
         [] -> "empty"
-        [x] -> "single: " ++ String.fromInt x
-        x :: xs -> "multiple: " ++ String.fromInt x
+        [x] -> "single: " ++ Debug.toString x
+        x :: xs -> "multiple: " ++ Debug.toString x
 
 
 main =

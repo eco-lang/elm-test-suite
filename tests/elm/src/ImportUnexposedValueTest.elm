@@ -16,4 +16,8 @@ import ModuleExposingHelper
 
 
 main =
-    Html.text (String.fromInt ModuleExposingHelper.hidden)
+    let
+        _ =
+            Debug.log "hidden" ModuleExposingHelper.hidden
+    in
+    Html.text "done"

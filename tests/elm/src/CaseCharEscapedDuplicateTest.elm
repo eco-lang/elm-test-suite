@@ -25,4 +25,4 @@ classify c =
 
 
 main =
-    text (String.fromInt (classify 'a'))
+    text (Debug.toString (classify 'a'))

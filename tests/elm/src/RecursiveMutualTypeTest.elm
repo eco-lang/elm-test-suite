@@ -2,8 +2,9 @@ module RecursiveMutualTypeTest exposing (main)
 
 {-| A pair of mutually recursive custom types, `Forest` and `RoseTree`, can be built and traversed.
 
-`countNodes` counts a tree of four `RoseNode`s nested up to three levels, folding
-over each node's `Forest` of children.
+`countNodes` counts a tree of four `RoseNode`s nested up to three levels, with
+`countForest`, defined with it by mutual recursion, counting each node's list of
+children.
 -}
 
 -- TAGS: elm-spec, sm-topdec-types, sm-datbind, d-pat-con
@@ -22,7 +23,17 @@ type RoseTree a
 
 countNodes : RoseTree a -> Int
 countNodes (RoseNode _ (Forest children)) =
-    1 + List.foldl (\child acc -> acc + countNodes child) 0 children
+    1 + countForest children
+
+
+countForest : List (RoseTree a) -> Int
+countForest trees =
+    case trees of
+        [] ->
+            0
+
+        tree :: rest ->
+            countNodes tree + countForest rest
 
 
 main =

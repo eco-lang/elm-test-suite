@@ -4,8 +4,8 @@ module CombinatorStdlibTCombinatorPipeListIntoComposedOpsTest exposing (..)
 
 Every combinator is a local definition in `testValue`: `b = s (k s) k`,
 `c = s (b b s) (k k)`, `i = s k k` and `t = c i`. The composed function is
-`b mySum mapDouble`, where `mySum` is a `List.foldl` and `mapDouble` a
-`List.map`, so `t [ 1, 2, 3 ] composed` is `mySum (mapDouble [ 1, 2, 3 ])`.
+`b mySum mapDouble`, where `mySum` and `mapDouble` are local recursive
+functions defined by pattern matching on the list, so `t [ 1, 2, 3 ] composed` is `mySum (mapDouble [ 1, 2, 3 ])`.
 
 -}
 
@@ -13,7 +13,6 @@ Every combinator is a local definition in `testValue`: `b = s (k s) k`,
 -- CHECK: testValue: 12
 
 import Basics exposing (..)
-import List exposing (..)
 import Html
 
 
@@ -38,10 +37,20 @@ testValue =
             c i
 
         mySum xs =
-            List.foldl (\a acc -> a + acc) 0 xs
+            case xs of
+                [] ->
+                    0
+
+                a :: rest ->
+                    a + mySum rest
 
         mapDouble xs =
-            List.map (\x -> x * 2) xs
+            case xs of
+                [] ->
+                    []
+
+                x :: rest ->
+                    x * 2 :: mapDouble rest
 
         composed =
             b mySum mapDouble

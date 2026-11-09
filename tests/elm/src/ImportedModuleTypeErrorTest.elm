@@ -20,5 +20,8 @@ main =
     let
         _ =
             Debug.log "ran" True
+
+        _ =
+            Debug.log "value" ImportedModuleTypeErrorHelper.value
     in
-    Html.text (String.fromInt ImportedModuleTypeErrorHelper.value)
+    Html.text "done"

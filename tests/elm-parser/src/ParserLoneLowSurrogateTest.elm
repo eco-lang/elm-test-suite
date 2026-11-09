@@ -7,9 +7,14 @@ The string is built with `Char.fromCode`. One predicate checks for the code 0xDC
 code above 0x10FFFF, which must never be seen, and the third test logs the length of the chomped
 text.
 
+A Standard Definition of Elm? does not decide this test: `Char.fromCode` of a surrogate gives a
+character of the implementation's choosing (the basis entry Char.fromCode), and `elm/parser` and
+`String.length` are library, outside the definition.
+<https://elm-test-suite.netlify.app/standard/basis/Char/fromCode>
+
 -}
 
--- TAGS: elm19-quirks
+-- TAGS: elm-unspecced
 -- MODE-GUARD: a Char equality must give the same answer as under --optimize
 -- NO-SKIP: an edge case every compiler must run
 -- CHECK: code is DC00: "Ok"

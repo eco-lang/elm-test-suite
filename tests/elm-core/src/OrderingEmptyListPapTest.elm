@@ -2,7 +2,7 @@ module OrderingEmptyListPapTest exposing (main)
 
 {-| The operators `<`, `<=`, `>` and `>=` and the function `compare`,
 partially applied to the empty list, work as function values passed to
-`List.map` over `[ [], [ 1 ], [ 1, 2 ] ]`.
+a local `map`, written with patterns, over `[ [], [ 1 ], [ 1, 2 ] ]`.
 
 The empty list is equal to itself and less than any non-empty list.
 
@@ -18,6 +18,18 @@ The empty list is equal to itself and less than any non-empty list.
 import Html exposing (text)
 
 
+{-| Applies `f` to each element of a list.
+-}
+map : (a -> b) -> List a -> List b
+map f xs =
+    case xs of
+        [] ->
+            []
+
+        x :: rest ->
+            f x :: map f rest
+
+
 main =
     let
         emptyL : List Int
@@ -26,10 +38,10 @@ main =
         xs : List (List Int)
         xs = [ emptyL, [ 1 ], [ 1, 2 ] ]
 
-        _ = Debug.log "ltEmpty" (List.map ((<) emptyL) xs)
-        _ = Debug.log "leEmpty" (List.map ((<=) emptyL) xs)
-        _ = Debug.log "gtEmpty" (List.map ((>) emptyL) xs)
-        _ = Debug.log "geEmpty" (List.map ((>=) emptyL) xs)
-        _ = Debug.log "cmpEmpty" (List.map (compare emptyL) xs)
+        _ = Debug.log "ltEmpty" (map ((<) emptyL) xs)
+        _ = Debug.log "leEmpty" (map ((<=) emptyL) xs)
+        _ = Debug.log "gtEmpty" (map ((>) emptyL) xs)
+        _ = Debug.log "geEmpty" (map ((>=) emptyL) xs)
+        _ = Debug.log "cmpEmpty" (map (compare emptyL) xs)
     in
     text "done"
