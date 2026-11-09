@@ -13,7 +13,7 @@ import Html exposing (text)
 
 
 
--- TAGS: elm-spec, sm-topdec-value, s-valbind-var, s-atexp-op, d-atexp-op
+-- TAGS: elm-spec, sm-topdec-value, s-valbind-var, s-atexp-op, d-atexp-op, d-app-basic-partial, d-app-basic-apply
 -- CHECK: dupInt: 3
 -- CHECK: dupStr: 3
 -- CHECK: foldInt: 6

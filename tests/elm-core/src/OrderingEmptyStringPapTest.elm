@@ -9,7 +9,7 @@ strings.
 
 -}
 
--- TAGS: elm-spec, d-atexp-op, d-app-basic-partial
+-- TAGS: elm-spec, d-atexp-op, d-app-basic-partial, d-app-basic-apply
 -- CHECK: ltEmpty: [False,True,True]
 -- CHECK: leEmpty: [True,True,True]
 -- CHECK: gtEmpty: [False,False,False]

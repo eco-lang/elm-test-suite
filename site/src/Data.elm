@@ -105,7 +105,8 @@ type alias Outcome =
     }
 
 
-{-| A test in the table of a project or a tag. `tags` are its tags but its project.
+{-| A test in the table of a project or a tag. `tags` are its tags but its project; `xfail` is the
+reason, when the test is expected to fail (`-- XFAIL:`).
 -}
 type alias TestRow =
     { project : String
@@ -114,6 +115,7 @@ type alias TestRow =
     , compileError : Bool
     , tags : List String
     , outcomes : List Outcome
+    , xfail : Maybe String
     }
 
 
@@ -145,6 +147,7 @@ type alias Test =
     , checks : List Check
     , source : String
     , results : List TestResult
+    , xfail : Maybe String
     }
 
 
@@ -153,14 +156,15 @@ type CheckKind
     | Restriction
     | DerivedForm
     | Basis
+    | Figure
     | Place
 
 
 {-| A rule, restriction, derived form or entry of the initial basis of A Standard Definition of
 Elm? that a test checks: the test has a tag that names it. `name` is the item's name without the
-`df:` or `b:` of its tag. A `Place` is a figure or section of a chapter, for what the book defines
-only there (its grammar, its lexical syntax): `name` is its title, and it is found at `anchor` in
-the chapter `chapter`.
+`df:`, `b:` or `fig:` of its tag; a figure is also found at `anchor` in the chapter `chapter`. A
+`Place` is a section of a chapter: `name` is its title, and it is found at `anchor` in the chapter
+`chapter`.
 -}
 type alias Check =
     { kind : CheckKind
@@ -225,6 +229,9 @@ testsChecking kind name =
                 Basis ->
                     "basis"
 
+                Figure ->
+                    "figures"
+
                 Place ->
                     "places"
             )
@@ -259,7 +266,7 @@ checkDecoder =
                             Basis
 
                         "figure" ->
-                            Place
+                            Figure
 
                         "section" ->
                             Place
@@ -273,7 +280,7 @@ checkDecoder =
         (Decode.oneOf [ Decode.field "anchor" Decode.string, Decode.succeed "" ])
 
 
-{-| The tests that check the figures and sections of the book, by their anchors.
+{-| The tests that check the figures and sections of the book, by their anchors in their chapters.
 -}
 testsByPlace : BackendTask FatalError (Dict.Dict String (List TestRef))
 testsByPlace =
@@ -371,7 +378,7 @@ projectDecoder =
         (Decode.field "description" Decode.string)
         (Decode.field "tests"
             (Decode.list
-                (Decode.map6 TestRow
+                (Decode.map7 TestRow
                     (Decode.field "project" Decode.string)
                     (Decode.field "name" Decode.string)
                     (Decode.field "summary" Decode.string)
@@ -385,9 +392,17 @@ projectDecoder =
                             )
                         )
                     )
+                    xfailDecoder
                 )
             )
         )
+
+
+{-| The reason a test is expected to fail, if it is.
+-}
+xfailDecoder : Decoder (Maybe String)
+xfailDecoder =
+    Decode.oneOf [ Decode.field "xfail" (Decode.nullable Decode.string), Decode.succeed Nothing ]
 
 
 testDecoder : Decoder Test
@@ -413,3 +428,4 @@ testDecoder =
                 )
             )
         )
+        |> andMap xfailDecoder

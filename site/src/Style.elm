@@ -436,6 +436,18 @@ filterStyles =
         , p "text-decoration" "none"
         , p "white-space" "nowrap"
         ]
+    , Css.Global.class "ts-xfail"
+        [ p "display" "inline-block"
+        , p "border" ("1px dashed " ++ colors.fail)
+        , p "border-radius" "999px"
+        , p "padding" "0 8px"
+        , p "margin-left" "6px"
+        , p "font-size" "12px"
+        , p "line-height" "18px"
+        , p "color" colors.fail
+        , p "white-space" "nowrap"
+        , p "cursor" "help"
+        ]
     , Css.Global.class "ts-input"
         [ p "border" ("1px solid " ++ colors.border)
         , p "border-radius" "6px"

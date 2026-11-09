@@ -6,9 +6,10 @@
 // `b:<name>` (`b:Basics.compare`). The names are the stable addresses of their pages
 // (/standard/rules/<name>, /standard/restrictions/<name>, /standard/derived-forms/<name>,
 // /standard/basis/Basics/compare). A figure or section, `\label{fig:<name>}` or
-// `\label{sec:<name>}`, is tagged by its label (`fig:core-escapes`, `sec:syntax-core-layout`): it has
-// no page of its own, so it is a place in its chapter (/standard/syntax-core#fig-core-escapes), used
-// for what the book defines only by a figure or in prose, such as its grammar and lexical syntax.
+// `\label{sec:<name>}`, is tagged by its label (`fig:core-grammar-patterns`, `sec:syntax-core-layout`).
+// A figure has a page (/standard/figures/core-grammar-patterns); a section has none, so it is a place
+// in its chapter (/standard/syntax-core#sec-syntax-core-layout). Figures are for what the book
+// defines only by a figure, such as its grammar.
 'use strict';
 
 const fs = require('fs');
@@ -57,7 +58,7 @@ function specPlaces() {
     return all;
 }
 
-// The name of an item's page: its tag without the `df:` or `b:` in front.
-const itemName = (tag) => tag.replace(/^(df|b):/, '');
+// The name of an item's page: its tag without the `df:`, `b:` or `fig:` in front.
+const itemName = (tag) => tag.replace(/^(df|b|fig):/, '');
 
 module.exports = { specItems, specPlaces, itemName };

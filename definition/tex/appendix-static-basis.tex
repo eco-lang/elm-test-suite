@@ -233,8 +233,9 @@ Section~\ref{sec:appendix-dynamic-basis-elm}. % I2, A60, A85
 
 \textbf{Library functions.} The modules of $\ME_0$ declare, in their
 libraries, many values that are absent from the figures, among them every
-function of \kw{List}, \kw{String}, \kw{Char}, \kw{Tuple}, \kw{Array},
-\kw{Maybe} and \kw{Result}, the functions of \kw{Bytes}, and the encoders,
+function of \kw{List}, \kw{String}, \kw{Tuple}, \kw{Array},
+\kw{Maybe} and \kw{Result}, every function of \kw{Char} but \kw{toCode} and \kw{fromCode}, the
+functions of \kw{Bytes}, and the encoders,
 decoders and views of \kw{elm/json} and \kw{elm/html}. Like the modules not in
 $\Dom\ME_0$ (\kw{Dict}, \kw{Set}, \kw{Bitwise}, \kw{Bytes.Encode},
 \kw{Bytes.Decode} and the rest), they are library, not language, and lie outside
@@ -417,6 +418,9 @@ operator \kw{::} that \kw{List} declares is $\OTstat(\kw{::})$
 \multicolumn{3}{|l|}{\kw{Char}}\\
 \hline
 \kw{Char}\citelabel{b:Char.Char} & \mapsto & (\tChar,\ \emptymap)\\
+\hline
+\kw{toCode}\citelabel{b:Char.toCode} & \mapsto & (\tChar \rightarrow \tInt, \isv)\\
+\kw{fromCode}\citelabel{b:Char.fromCode} & \mapsto & (\tInt \rightarrow \tChar, \isv)\\
 \hline
 \multicolumn{3}{|l|}{\kw{Array}}\\
 \hline

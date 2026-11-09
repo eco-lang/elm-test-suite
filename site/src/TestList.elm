@@ -1,4 +1,4 @@
-module TestList exposing (Model, Msg, init, tagLink, update, view)
+module TestList exposing (Model, Msg, init, tagLink, update, view, xfailChip)
 
 {-| The filterable table of tests on a project's page and on a tag's page: the filter chips, the
 search box and one row per test, with its outcome under each compiler.
@@ -156,6 +156,7 @@ testRow config row =
 
               else
                 Html.text ""
+            , xfailChip row.xfail
             , if List.isEmpty tags then
                 Html.text ""
 
@@ -167,6 +168,18 @@ testRow config row =
                 (\o -> Html.td [ Attr.class "ts-center" ] [ Ui.statusBadgeWithReason o.status o.reason ])
                 row.outcomes
         )
+
+
+{-| The mark of a test that is expected to fail, with the reason as its title.
+-}
+xfailChip : Maybe String -> Html msg
+xfailChip xfail =
+    case xfail of
+        Just reason ->
+            Html.span [ Attr.class "ts-xfail", Attr.title ("Expected to fail: " ++ reason) ] [ Html.text "XFAIL" ]
+
+        Nothing ->
+            Html.text ""
 
 
 {-| A tag, as a link to its page.

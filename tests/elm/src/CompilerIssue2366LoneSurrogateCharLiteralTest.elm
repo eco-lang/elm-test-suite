@@ -13,7 +13,7 @@ output is not valid UTF-8, the literals no longer hold surrogates, and the progr
 
 This test is probably wrong under A Standard Definition of Elm? Its literals `'\u{D800}'` and
 `'\u{DFFF}'` are surrogate escapes, which ruling A8 makes invalid: an escape must denote a Unicode
-scalar value, and a surrogate is half of a UTF-16 encoding, not a character. <https://elm-test-suite.netlify.app/standard/syntax-core#fig-core-escapes>
+scalar value, and a surrogate is half of a UTF-16 encoding, not a character. <https://elm-test-suite.netlify.app/standard/restrictions/core-escape-unicode>
 Under A8 the program does not compile, so a compiler that follows the book fails this test; the
 issue is resolved by rejecting the literal, and `elm`'s `CharLiteralSurrogateEscapeTest` tests
 that. The test is kept as it is because it is the issue's program.

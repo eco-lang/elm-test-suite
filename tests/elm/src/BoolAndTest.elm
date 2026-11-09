@@ -3,7 +3,7 @@ module BoolAndTest exposing (main)
 {-| The `&&` operator gives `True` only when both operands are `True`, checked over all four combinations.
 -}
 
--- TAGS: elm-spec, df:and
+-- TAGS: elm-spec, df:and, df:if, d-exp-case, d-match-first, d-match-next, d-mrule-match, d-mrule-fail, d-pat-atpat, d-atpat-con, d-atpat-con-fail, d-atexp-paren, d-atexp-con
 -- CHECK: and1: True
 -- CHECK: and2: False
 -- CHECK: and3: False

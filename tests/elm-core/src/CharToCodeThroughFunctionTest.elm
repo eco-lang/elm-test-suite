@@ -2,8 +2,13 @@ module CharToCodeThroughFunctionTest exposing (main)
 
 {-| `Char.toCode` of a character returned from a top-level function, here an
 identity function applied to `'A'`, gives 65.
+
+A Standard Definition of Elm?, the basis entry Char.toCode: the code of the character with code
+point h is h. <https://elm-test-suite.netlify.app/standard/basis/Char/toCode>
+
 -}
 
+-- TAGS: elm-spec, b:Char.toCode, d-app-closure
 -- CHECK: code: 65
 
 

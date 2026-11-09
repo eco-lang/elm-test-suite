@@ -136,16 +136,17 @@ report and writes it to `.work/report.md`:
 
 ## The tests
 
-`tests/` holds 11 Elm projects, each with its own `elm.json`. A test of the language itself is in
+`tests/` holds 12 Elm projects, each with its own `elm.json`. A test of the language itself is in
 `elm`; a test of elm/core, the basis library (the operators of `Basics` included), is in `elm-core`;
-any other test of a package is in that package's project. `&&`, `||`, `::` and list literals count as
+any other test of a package is in that package's project. A request for a better error report,
+whatever it is about, is in `elm-error-catalogue`. `&&`, `||`, `::` and list literals count as
 language, since the book defines them as derived forms or as part of the initial environment. Every
 project depends on the latest release of each package it uses.
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 774 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
-| `elm-core` | 367 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
+| `elm` | 788 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
+| `elm-core` | 368 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
 | `elm-bytes` | 88 | elm/bytes encoders and decoders |
 | `elm-parser` | 51 | elm/parser |
 | `elm-json` | 42 | elm/json |
@@ -155,6 +156,7 @@ project depends on the latest release of each package it uses.
 | `elm-html` | 5 | elm/html |
 | `elm-virtual-dom` | 2 | elm/virtual-dom |
 | `elm-random` | 1 | elm/random |
+| `elm-error-catalogue` | 17 | requests for a better error report (tag `error-message`): what a compiler's report says or how it is laid out, which A Standard Definition of Elm? does not define. Where such a request rests on a program the book rejects, a test in `elm` checks the rejection |
 
 ### Tags
 
@@ -163,23 +165,28 @@ with its own project. The results website shows the tests by project and by tag.
 
 | Tag | Tests | What they are |
 |---|---|---|
-| `elm-spec` | 915 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
-| `elm19-compile-error` | 222 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
+| `elm-spec` | 941 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
+| `elm19-compile-error` | 221 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
 | `elm19-bug` | 152 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
 | `elm19-bug-fix` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
 | `elm19-quirks` | 3 | edge cases where the test records what Elm 0.19.1 does, and that differs from A Standard Definition of Elm? or from what another test expects |
+| `elm-unspecced` | 11 | tests whose expected outcome A Standard Definition of Elm? leaves open or puts outside the definition: what `Debug.log` prints, the value of an integer constant outside the Int range, the text of a crash, shader blocks; each says why in its comment |
+| `error-message` | 17 | requests for a better error report: what a compiler's report says or how it is laid out, which A Standard Definition of Elm? does not define; named `ErrorMessages…` or `ErrorMessage…` after their issue, and kept in the project `elm-error-catalogue` |
 
 A tag may also name an item of A Standard Definition of Elm?: a rule or restriction by its name,
 as in `-- TAGS: elm-spec, s-dec-group, d-dec-rec, core-let-recursion`; a derived form by `df:` and
 its name (`df:if-chain`); an entry of the initial basis by `b:` and its qualified name
-(`b:Basics.compare`); a figure or section by its label (`fig:core-escapes`,
-`sec:syntax-core-layout`), for what the book defines only there, such as its grammar and lexical
-syntax. The test checks that item. Such a tag is not a group of its own: the test's page links to
-the item's page in the book, or for a figure or section to its place in its chapter; the item's
-page lists every test that checks it, and a chapter lists under each figure and section heading
-the tests of it. A test tagged `elm-spec` names the items that are its subject, not every rule its
-program happens to use, and names at least one: a test that cannot say what in the book it
-checks is not tagged `elm-spec`. The names come from the LaTeX sources (`\defnrule[r:<name>]`,
+(`b:Basics.compare`); a figure by `fig:` and its name (`fig:core-grammar-patterns`), for what the
+book defines by a figure, such as its grammar; a section by its label (`sec:syntax-core-layout`).
+The test checks that item. Such a tag is not a group of its own: the test's page links to the
+item's page in the book (every rule, restriction, derived form, basis entry and figure has one),
+or for a section to its place in its chapter; the item's page lists every test that checks it,
+and a chapter lists under each figure and section heading the tests of it. A test tagged
+`elm-spec` names the items that are its subject, not every rule its program happens to use, and
+names at least one: a test that cannot say what in the book it checks is not tagged `elm-spec`. A
+test of a derived form also names the rules, and the entries of the basis, that the form's
+equivalent form goes through (a test of `&&` names `df:and`, `df:if` and the rules of `case`), for
+its outcome is theirs. The names come from the LaTeX sources (`\defnrule[r:<name>]`,
 `\citelabel{res:<name>}`, `\citelabel{df:<name>}`, `\citelabel{b:<name>}`, `\label{fig:<name>}`,
 `\label{sec:<name>}`), read by `runner/spec-items.js`. Every rule and restriction of the book is
 checked by at least one test.
@@ -271,6 +278,7 @@ main =
 | `-- NO-SKIP: <reason>` | a skip (on another host, or on a compiler with no JavaScript host for flags and ports) is a failure instead |
 | `-- TAGS: <tag>, <tag>` | the test's tags (lower-case letters, digits, `.` and `-`), besides its project; see [Tags](#tags) |
 | `-- MODE-GUARD: <reason>` | a Char equality whose answer in debug mode (where `==` on Chars is a prefix test) differs from its answer under `--optimize` throws, so the program fails |
+| `-- XFAIL: <reason>` | the test is expected to fail, for the reason given: it runs and passes or fails as any other, but its failure is reported as XFAIL and a pass as XPASS; `check-baseline.js` counts the failure as expected and lists a pass, and the site marks the test |
 | `-- UNICODE: <version>` | the Unicode version the expected output was recorded with; under a Node with another, the runner warns |
 | `-- NO-CACHE: <reason>` | always compiled and run: its result is never taken from the result cache |
 | `-- HELPER: <reason>` | not a test, even with a top-level `main`: a module that tests import |
@@ -401,7 +409,7 @@ when its title holds the item's key in square brackets:
 | `[p:elm]` | a test project |
 | `[tag:elm19-bug]` | a tag |
 | `[r:d-atexp-var]` | a rule (its label in `definition/tex/`) |
-| `[res:...]`, `[df:...]`, `[b:...]` | a restriction, derived form or entry of the basis |
+| `[res:...]`, `[df:...]`, `[b:...]`, `[fig:...]` | a restriction, derived form, entry of the basis or figure |
 | `[ch:static-core]` | a chapter |
 
 The Discuss link of an item opens GitHub's form for a new discussion with the key in its title and

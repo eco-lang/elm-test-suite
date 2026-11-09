@@ -38,7 +38,7 @@ which are kernel-only syntax (Section~\ref{sec:syntax-core-infix}). The words
 terminal only directly after \kw{type} (Chapter~\ref{ch:syntax-modules}), and
 elsewhere each of them is an identifier.
 
-\section{Special Constants}
+\section{Special Constants}\label{sec:syntax-core-constants}
 
 Source text is a sequence of Unicode characters. A \emph{decimal digit} is one
 of \kw{0}, \ldots, \kw{9}; a \emph{hexadecimal digit} is a decimal digit or one
@@ -105,13 +105,16 @@ characters of the string, and so is a line feed directly after the opening
 each escape sequence standing for the character it denotes.
 
 Each escape sequence begins with \kw{\textbackslash} and stands for one
-character. The escape sequences are shown in Figure~\ref{fig:core-escapes}.
-In \kw{\textbackslash u\kwlb}$h$\kw{\kwrb}, $h$ is a sequence of four, five or
-six hexadecimal digits whose value is a Unicode scalar value, that is, at most
-\kw{10FFFF} and outside the surrogate range \kw{D800} to \kw{DFFF}.
-% A8
-No other sequence beginning with \kw{\textbackslash} is an escape sequence. A
-tab character may occur, unescaped, in a character or string constant. How a
+character. The escape sequences are shown in Figure~\ref{fig:core-escapes},
+subject to this restriction:
+\begin{itemize}
+\item\citelabel{res:core-escape-unicode} In \kw{\textbackslash u\kwlb}$h$\kw{\kwrb}, $h$ is a sequence of four, five or
+  six hexadecimal digits whose value is a Unicode scalar value, that is, at most
+  \kw{10FFFF} and outside the surrogate range \kw{D800} to \kw{DFFF}. No other
+  sequence beginning with \kw{\textbackslash} is an escape sequence.
+  % A8
+\end{itemize}
+A tab character may occur, unescaped, in a character or string constant. How a
 character is represented as a value is an implementation parameter
 (Appendix~\ref{ch:appendix-implementation}).
 % A52, D8
@@ -165,16 +168,19 @@ Ll, Lt, Lm and Lo; the version of the Unicode standard that assigns these
 categories is an implementation parameter
 (Appendix~\ref{ch:appendix-implementation}).
 % A14
-A \emph{lower identifier} is a letter of category Ll (which includes \kw{a},
-\ldots, \kw{z}) followed by a sequence of zero or more \emph{inner characters}:
-letters, decimal digits and underbars \kw{\_}. An \emph{upper identifier} is a
-letter of category Lu or Lt (which include \kw{A}, \ldots, \kw{Z}) followed by
-a sequence of zero or more inner characters. A letter of category Lm or Lo may
-continue an identifier but not begin one, and no identifier begins with
-\kw{\_}. In either case reserved words are excluded, and no component of a
-long identifier may be a reserved word: thus \kw{List.if} is not a long
-identifier.
-% A2
+The identifiers are formed as this restriction states:
+\begin{itemize}
+\item\citelabel{res:core-identifier-characters} A \emph{lower identifier} is a letter of category Ll (which includes \kw{a},
+  \ldots, \kw{z}) followed by a sequence of zero or more \emph{inner characters}:
+  letters, decimal digits and underbars \kw{\_}. An \emph{upper identifier} is a
+  letter of category Lu or Lt (which include \kw{A}, \ldots, \kw{Z}) followed by
+  a sequence of zero or more inner characters. A letter of category Lm or Lo may
+  continue an identifier but not begin one, and no identifier begins with
+  \kw{\_}. In either case reserved words are excluded, and no component of a
+  long identifier may be a reserved word: thus \kw{List.if} is not a long
+  identifier.
+  % A2
+\end{itemize}
 An \emph{operator} is a non-empty sequence of the \emph{symbols}
 \begin{center}
 \kw{+}\quad\kw{-}\quad\kw{*}\quad\kw{/}\quad\kw{=}\quad\kw{.}\quad\kw{<}\quad%
@@ -243,28 +249,31 @@ item is taken.
 Thus \kw{types} is an identifier, not \kw{type} followed by \kw{s}; within a
 run of symbols \kw{-{}-} is part of an operator and begins no comment, so
 \kw{a*-b} contains the single operator \kw{*-}, and \kw{2\textasciicircum-1}
-the operator \kw{\textasciicircum-}. A special constant, and the reserved word \kw{\_}, may not be followed
-immediately by an inner character, and the digits of an integer constant may
-be followed immediately by \kw{.} only as part of a fraction; so \kw{12abc},
-\kw{1.x} and \kw{\_x} are not sequences of items.
-
-The following constructs require two items to be \emph{adjacent}, that is, to
-have no whitespace or comment between them:
+the operator \kw{\textasciicircum-}. Items are also subject to these
+restrictions:
 \begin{itemize}
-\item the parentheses of the unit \kw{()}, and the operator and parentheses of
-  an operator value \kw{(}\opv\kw{)};
-  % A1
-\item the \kw{.} of a long identifier and the items on either side of it;
-\item the \kw{.} of a field selection \atexp\kw{.}\lab{} and the items on
-  either side of it, and the \kw{.} of a field accessor \kw{.}\lab{} and the
-  label after it. A \kw{.} adjacent to a following label is the \kw{.} of a
-  field selection only if it is adjacent to the item before it and that item
-  ends an atomic expression that may precede a field selection
-  (Section~\ref{sec:syntax-core-restrictions}); otherwise it begins a field
-  accessor (Appendix~\ref{ch:appendix-derived-forms}). In particular a \kw{.}
-  directly after a field accessor begins a field accessor;
-  % A4
-\item the negation symbol and the atomic expression it negates.
+\item\citelabel{res:core-constant-separated} A special constant, and the reserved word \kw{\_}, may not be followed
+  immediately by an inner character, and the digits of an integer constant may
+  be followed immediately by \kw{.} only as part of a fraction; so \kw{12abc},
+  \kw{1.x} and \kw{\_x} are not sequences of items.
+\item\citelabel{res:core-adjacent-items} The following constructs require two items to be \emph{adjacent}, that is, to
+  have no whitespace or comment between them:
+  \begin{itemize}
+  \item the parentheses of the unit \kw{()}, and the operator and parentheses of
+    an operator value \kw{(}\opv\kw{)};
+    % A1
+  \item the \kw{.} of a long identifier and the items on either side of it;
+  \item the \kw{.} of a field selection \atexp\kw{.}\lab{} and the items on
+    either side of it, and the \kw{.} of a field accessor \kw{.}\lab{} and the
+    label after it. A \kw{.} adjacent to a following label is the \kw{.} of a
+    field selection only if it is adjacent to the item before it and that item
+    ends an atomic expression that may precede a field selection
+    (Section~\ref{sec:syntax-core-restrictions}); otherwise it begins a field
+    accessor (Appendix~\ref{ch:appendix-derived-forms}). In particular a \kw{.}
+    directly after a field accessor begins a field accessor;
+    % A4
+  \item the negation symbol and the atomic expression it negates.
+  \end{itemize}
 \end{itemize}
 An item \kw{-} is a \emph{negation symbol} when it is adjacent to a following
 atomic expression and either it begins an operand of an expression, or it
@@ -294,9 +303,12 @@ whose column is $c$ is
 These tests concern only the column at which an item begins: where the item
 before it ended, for instance on a later line than it began, is irrelevant.
 % A5
-The \emph{layout rule} is that every item of a phrase is indented, except the
-items that the constructs below require to be aligned or at the margin. Only
-these constructs change the indentation; elsewhere an item is read under the
+The \emph{layout rule} is this restriction:
+\begin{itemize}
+\item\citelabel{res:core-layout-rule} Every item of a phrase is indented, except the
+  items that the constructs below require to be aligned or at the margin.
+\end{itemize}
+Only these constructs change the indentation; elsewhere an item is read under the
 indentation of the phrase that contains it.
 \begin{enumerate}
 \item \emph{Top-level declarations} (Chapter~\ref{ch:syntax-modules}). The
@@ -368,11 +380,15 @@ An expression of the form $\expm_0\ \opv_1\ \expm_1\ \cdots\ \opv_n\ \expm_n$
 is an application or an atomic expression, possibly negated, except that the
 last operand may be any expression, is an \emph{operator chain}. Application
 binds more tightly than any operator. A chain is grouped so that an operator
-of higher precedence binds more tightly than one of lower precedence. If
-$\opv_j$ and $\opv_l$ ($j < l$) have equal precedence and no operator of lower
-precedence stands between them, then either both associate to the left and
-the chain groups to the left, or both associate to the right and it groups to
-the right; otherwise the chain is not a phrase of the language. Precisely, a
+of higher precedence binds more tightly than one of lower precedence, subject
+to this restriction:
+\begin{itemize}
+\item\citelabel{res:core-operator-chain} If $\opv_j$ and $\opv_l$ ($j < l$) of a chain have equal precedence and no operator of lower
+  precedence stands between them, then either both associate to the left and
+  the chain groups to the left, or both associate to the right and it groups to
+  the right; otherwise the chain is not a phrase of the language.
+\end{itemize}
+Precisely, a
 chain is the infixed application $\expm'\ \opv_j\ \expm''$ in which
 $\opv_j$ has the least precedence in the chain and is, among the operators of
 that precedence, the rightmost if they associate to the left and the leftmost

@@ -100,7 +100,7 @@ compiler	1998	Lowercase file name a detectable discrepancy going from 0.19.0 to 
 compiler	2001	Rank compiler bug with parametric types	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2001RankCrashParametricLetAnnotationTest		compiler crash ([rank = 2]) on a parametric let annotation
 compiler	2006	Crashing while performing type inference in function	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2006IndexOutOfBoundsMaybeWithDefaultTest		compiler crash (index out of bounds) on a type error through Maybe.withDefault
 compiler	2007	What are use-cases for more binaries? (32-bit, ARM, BSD, etc.)	NOT_BUG	LOW	no	NOT_ATTEMPTED			meta: binaries for more platforms
-compiler	2012	Name Clash output unreadable due to extra spaces	CERTAIN	LOW	yes	FIXED	CompilerIssue2012NameClashCaretSpacesTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	NAME CLASH report: single caret at the wrong column followed by ~65k spaces
+compiler	2012	Name Clash output unreadable due to extra spaces	CERTAIN	LOW	yes	FIXED	ErrorMessage2012NameClashCaretSpacesTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	NAME CLASH report: single caret at the wrong column followed by ~65k spaces
 compiler	2013	Compiler bug [rank = 1]	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2013RankCrashLambdaLetAnnotationTest		compiler crash ([rank = 1]) on let annotation b : h in a piped lambda
 compiler	2014	Compiler bug [ rank = 2 ] and [ rank = 3 ]	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2014RankCrashIdentityLetAnnotationTest		compiler crash ([rank = 2]) on let annotation b : h in a lambda
 compiler	2017	Closures in recursive calls get shadowed, causing stack overflows	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2017TcoContinuationShadowedTest		wrong JS: continuation passed through a TCO call calls itself, stack overflow
@@ -148,10 +148,10 @@ compiler	2098	error with bump/diff when docs.json line is longer than 65535 (in 
 compiler	2099	Allow package authors to request major versions if API is the same, but behavior is not	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: allow larger version bumps
 compiler	2100	Thread blocked indefinitely in an MVar operation with incorrect function signature within let	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2100LetAnnotationRank2CrashTest		crash (rank = 2) on wrong let annotation; 0.19.3 hangs instead
 compiler	2102	elm reactor documentation specifies listener is on localhost, it's on 0.0.0.0	NOT_BUG	LOW	no	NOT_ATTEMPTED			elm reactor bind address; tooling/docs
-compiler	2104	Incorrect reported type in type mismatch	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2104IfBranchWrongTypeReportedTest		TYPE MISMATCH shows polluted type Thing a (Thing a b) for if-branch
+compiler	2104	Incorrect reported type in type mismatch	CERTAIN	MEDIUM	yes	REPRODUCED	ErrorMessage2104IfBranchWrongTypeReportedTest		TYPE MISMATCH shows polluted type Thing a (Thing a b) for if-branch
 compiler	2105	Compiler crashes when attempting to give type for extensible record	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2105ExtensibleFoldlCrashTest		type error report crashes (toErrorType not well-formed); needs withWindows exposed
 compiler	2106	Compiler hangs when compiling code with extensible records in type signature	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2106FoldlExtensibleRecordHangTest		reproduced manually under 0.19.1: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
-compiler	2107	Type mismatch gives wrong and confusing error	CERTAIN	MEDIUM	yes	REPRODUCED	CompilerIssue2107PipeIfInfiniteTypeReportedTest		TYPE MISMATCH report shows bogus infinite type Thing ∞
+compiler	2107	Type mismatch gives wrong and confusing error	CERTAIN	MEDIUM	yes	REPRODUCED	ErrorMessage2107PipeIfInfiniteTypeReportedTest		TYPE MISMATCH report shows bogus infinite type Thing ∞
 compiler	2108	Compiler hangs when comparing functions with extensible records in type signature	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2108IfBranchExtensibleRecordHangTest	lamdera-1.5.0	reproduced manually under 0.19.1: compiler hangs with unbounded memory growth (or crashes); the runner fails it at its compile memory limit
 compiler	2109	Compiler hangs forever if elm.json's dependencies field is an empty object	CERTAIN	LOW	no	NOT_E2E			hang on malformed elm.json; harness uses a fixed elm.json
 compiler	2111	Broken package documentation when @docs is on the first line of the module documentation	LIKELY	LOW	no	NOT_E2E			docs generation/parsing of @docs on first line; package docs tooling
@@ -173,7 +173,7 @@ compiler	2143	Using Browser.element and Reactor leads to Error	NOT_BUG	LOW	no	NO
 compiler	2144	calling attribute with empty strings leads to runtime error	WEAK	LOW	no	NOT_E2E			attribute "" "" throws in real DOM; elm/virtual-dom, needs real browser DOM
 compiler	2145	elm diff / publish is unaware of breaking visual changes	NOT_BUG	LOW	no	NOT_ATTEMPTED			feature request: allow manual major bump
 compiler	2146	thread blocked indefinitely in an MVar operation	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2146RoseLambdaPatternCrashTest		crash (? [rank = 1]) instead of type error
-compiler	2147	Compiler outputs pages of whitespace in middle of 'name clash' error report	CERTAIN	LOW	yes	FIXED	CompilerIssue2147NameClashWhitespaceTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	NAME CLASH report prints ~65000 spaces (column wraps at 16 bits)
+compiler	2147	Compiler outputs pages of whitespace in middle of 'name clash' error report	CERTAIN	LOW	yes	FIXED	ErrorMessage2147NameClashWhitespaceTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	NAME CLASH report prints ~65000 spaces (column wraps at 16 bits)
 compiler	2148	Compiler error: index out of bound (3,3) somewhere in Data/Vector/Generic/Mutable.hs	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2148RecordUpdateFoldrCrashTest		crash index out of bounds (3,3) instead of type error
 compiler	2149	Explicitly setting "_self" for anchor tags triggers a page reload without triggering onUrlRequest	LIKELY	MEDIUM	no	NOT_E2E			target=_self link bypasses onUrlRequest; elm/browser navigation, needs browser
 compiler	2152	Compiler error: Mutable.hs:703: index out of bounds (3,3)	CERTAIN	HIGH	no	NOT_E2E			same crash as 2148 (reproduced there); SSCCE needs aforemny/material-components-web-elm
@@ -262,7 +262,7 @@ compiler	2298	Identity type alias causes problems	CERTAIN	MEDIUM	yes	REPRODUCED	
 compiler	2299	elm publish - tried to fetch https://package.elm-lang.org... "But it came back as 413 Request Entity Too Large"	WEAK	LOW	no	NOT_E2E			package server 413 on publish; network
 compiler	2300	`elm publish` hangs indefinitely at GitHub tag check with large package	LIKELY	LOW	no	NOT_E2E			elm publish hangs on large package; network/publishing
 compiler	2301	Compiler panic when unifying inner skolem with an outer unification variable	CERTAIN	HIGH	yes	REPRODUCED	CompilerIssue2301InnerSkolemOuterVarCrashTest		crash (a [rank = 2]) when let annotation var unifies with outer var
-compiler	2302	Compiler error produces unexpected output when rendered in a terminal	CERTAIN	LOW	yes	FIXED	CompilerIssue2302NameClashListPatternWhitespaceTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	NAME CLASH report prints 65532 spaces for [ a, a ]
+compiler	2302	Compiler error produces unexpected output when rendered in a terminal	CERTAIN	LOW	yes	FIXED	ErrorMessage2302NameClashListPatternWhitespaceTest	elm-0.19.2,elm-0.19.3,lamdera-1.5.0	NAME CLASH report prints 65532 spaces for [ a, a ]
 compiler	2304	Package opvasger/comparable has been deleted & can no longer be installed	NOT_BUG	LOW	no	NOT_ATTEMPTED			package repo deleted; ecosystem
 compiler	2312	record extended with additional field not accepted as extensible record with record with same fields	LIKELY	LOW	yes	NOT_ATTEMPTED			debatable: Base (Specific other) has field base twice; whether specific should unify is unclear
 compiler	2320	elm publish under zsh not printing error message	WEAK	LOW	no	NOT_E2E			segfault under zsh during publish with TLS failure; environment/network
@@ -568,7 +568,7 @@ core	1013	Dict.get works unreliably when keys are lists and --optimize is enable
 core	1019	String.words and String.lines don't return empty list for blank string	LIKELY	MEDIUM	yes	REPRODUCED	CoreIssue1019StringWordsEmptyTest		String.words "" and of blank string return [""] instead of []
 core	1037	No placeholder def for `List` type	NOT_BUG	LOW	no	NOT_ATTEMPTED			Request for a placeholder List type definition (tooling)
 core	1038	Proposal for parallel execution of Tasks	NOT_BUG	LOW	no	NOT_ATTEMPTED			Proposal: parallel Tasks
-core	1043	Bad error message when sending the wrong thing through a port: [object Object]	LIKELY	LOW	yes	REPRODUCED	CoreIssue1043PortErrorObjectObjectTest		Port type error message prints [object Object] instead of the decode error
+core	1043	Bad error message when sending the wrong thing through a port: [object Object]	LIKELY	LOW	yes	REPRODUCED	ErrorMessage1043PortErrorObjectObjectTest		Port type error message prints [object Object] instead of the decode error
 core	1046	Side effects stop working when runtime exception in subscribe	LIKELY	MEDIUM	no	NOT_E2E			Exception inside JS port subscriber stops effects; needs host JS that throws
 core	1048	logBase implementation is insufficiently precise for base 10	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1048LogBaseTenTest		logBase 10 1000 = 2.9999999999999996
 core	1050	NaN > NaN and NaN >= NaN do not adhere to IEEE-754	CERTAIN	LOW	yes	REPRODUCED	CoreIssue1050NanGreaterThanNanTest		NaN > NaN and NaN >= NaN are True

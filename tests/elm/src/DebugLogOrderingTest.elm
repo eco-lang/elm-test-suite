@@ -7,8 +7,13 @@ The five bindings are all wildcards. The CHECK-NEXT lines require each label
 to appear on the line straight after the previous one, so a line out of order,
 missing or repeated fails the test.
 
+A Standard Definition of Elm? does not decide this test: `Debug.log l v` evaluates to `v`, and any
+output it makes, its text, its order and whether it is made at all, is outside the definition
+(ruling A62).
+
 -}
 
+-- TAGS: elm-unspecced
 -- CHECK: a: "start"
 -- CHECK-NEXT: b: "second"
 -- CHECK-NEXT: c: "mid"

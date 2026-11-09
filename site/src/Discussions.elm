@@ -266,7 +266,7 @@ discussion category =
 
 keyPattern : Regex
 keyPattern =
-    Regex.fromString "\\[\\s*((?:r|res|df|b|ch|t|p|tag):[^\\]\\s]+)\\s*\\]"
+    Regex.fromString "\\[\\s*((?:r|res|df|b|fig|ch|t|p|tag):[^\\]\\s]+)\\s*\\]"
         |> Maybe.withDefault Regex.never
 
 

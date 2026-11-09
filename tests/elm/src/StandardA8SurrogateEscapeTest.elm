@@ -3,7 +3,7 @@ module StandardA8SurrogateEscapeTest exposing (..)
 {-| `\u{D800}` is not an escape sequence: a surrogate code point is not a character.
 
 A Standard Definition of Elm?, ruling A8: the escape `\u{h}` denotes a Unicode scalar value, so
-the surrogate code points D800 to DFFF are not allowed. <https://elm-test-suite.netlify.app/standard/syntax-core#fig-core-escapes>
+the surrogate code points D800 to DFFF are not allowed. <https://elm-test-suite.netlify.app/standard/restrictions/core-escape-unicode>
 
 Elm 0.19.1 accepts `"\u{D800}"` and makes a string holding a lone surrogate. `elm`'s
 `CharLiteralSurrogateEscapeTest` checks the same for a Char literal. Three tests tagged
@@ -14,7 +14,7 @@ says so, and names a test that follows A8.
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec, fig:core-escapes
+-- TAGS: elm-spec, core-escape-unicode, fig:core-escapes
 -- COMPILE-ERROR: a surrogate escape
 -- CHECK: {{-- [A-Z ]+ -}}
 

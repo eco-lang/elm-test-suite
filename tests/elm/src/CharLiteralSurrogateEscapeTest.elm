@@ -4,7 +4,7 @@ module CharLiteralSurrogateEscapeTest exposing (main)
 
 A Standard Definition of Elm?, ruling A8: the escape `\u{h}` denotes a Unicode scalar value, so
 the surrogate code points D800 to DFFF are not allowed, in Char literals as in String literals.
-<https://elm-test-suite.netlify.app/standard/syntax-core#fig-core-escapes>
+<https://elm-test-suite.netlify.app/standard/restrictions/core-escape-unicode>
 
 This is how <https://github.com/elm/compiler/issues/2366> is resolved under A8. The issue's program
 (`CompilerIssue2366LoneSurrogateCharLiteralTest`, tagged `elm19-bug`) uses `'\u{D800}'` and
@@ -17,7 +17,7 @@ literal.
 
 -}
 
--- TAGS: elm-spec, fig:core-escapes
+-- TAGS: elm-spec, core-escape-unicode, fig:core-escapes
 -- COMPILE-ERROR: a surrogate escape in a Char literal
 -- CHECK: {{-- [A-Z ]+ -}}
 

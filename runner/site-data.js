@@ -15,8 +15,9 @@
 //   tags/<tag>.json           the same for each tag (`-- TAGS:`) but the projects and the checks
 //   checks.json               for each rule, restriction, derived form and basis entry of A Standard
 //                             Definition of Elm?, the tests that check it: those with a tag that
-//                             names it (spec-items.js); and under `places`, by the anchor of the
-//                             figure or section in its chapter, the tests tagged with its label
+//                             names it (spec-items.js), a figure under `figures` by its name; and
+//                             under `places`, by the anchor of the figure or section in its
+//                             chapter, the tests tagged with its label
 //   tests/<project>/<Test>.json
 //                             one test: its doc comment, issue links, tags, the rules and
 //                             restrictions it checks, source, and per compiler its outcome, failure
@@ -118,9 +119,9 @@ function main() {
     const tagged = new Map();   // tag -> the rows of its tests
     const items = specItems();
     const places = specPlaces();
-    const checks = { rules: {}, restrictions: {}, derivedForms: {}, basis: {}, places: {} };   // name -> the tests that check it
+    const checks = { rules: {}, restrictions: {}, derivedForms: {}, basis: {}, figures: {}, places: {} };   // name -> the tests that check it
     const bucket = { rule: 'rules', restriction: 'restrictions', 'derived-form': 'derivedForms', basis: 'basis',
-        figure: 'places', section: 'places' };
+        figure: 'figures', section: 'places' };
     for (const p of projects) {
         const srcDir = path.join(ROOT, 'tests', p, 'src');
         const names = [...new Set(runs.flatMap((r) => Object.keys(r.projects[p] || {})))].sort();
@@ -136,14 +137,22 @@ function main() {
             // A tag that names a rule, restriction, derived form or basis entry of the book is a check
             // of it, not a tag.
             const tags = all.filter((g) => !items.has(g));
-            // A figure or section is named by its title, and found at its anchor in its chapter.
-            const checked = all.filter((g) => items.has(g)).map((g) => (places.has(g)
-                ? { kind: items.get(g), name: places.get(g).title, chapter: places.get(g).chapter, anchor: places.get(g).anchor }
-                : { kind: items.get(g), name: itemName(g), chapter: '', anchor: '' }));
+            // A figure is named by its label without `fig:`, and has a page; a section is named by
+            // its title, and found at its anchor in its chapter. Both are also listed under `places`
+            // by their anchors, for the chapter's "Tested by" lines.
+            const checked = all.filter((g) => items.has(g)).map((g) => {
+                const at = places.get(g);
+                if (!at) return { kind: items.get(g), name: itemName(g), chapter: '', anchor: '' };
+                return { kind: items.get(g), name: items.get(g) === 'figure' ? itemName(g) : at.title, chapter: at.chapter, anchor: at.anchor };
+            });
+            const ref = { project: p, test: name, summary: summary(doc) };
+            // `-- XFAIL: <reason>`: the test is expected to fail, for that reason.
+            const xfail = D.directiveLines(source, '-- XFAIL:').map((l) => l.trim()).join(' ') || null;
             for (const c of checked) {
                 const k = bucket[c.kind];
                 const key = k === 'places' ? c.anchor : c.name;
-                (checks[k][key] = checks[k][key] || []).push({ project: p, test: name, summary: summary(doc) });
+                (checks[k][key] = checks[k][key] || []).push(ref);
+                if (k === 'figures') (checks.places[c.anchor] = checks.places[c.anchor] || []).push(ref);
             }
             const row = {
                 project: p,
@@ -151,6 +160,7 @@ function main() {
                 summary: summary(doc),
                 compileError: /^-- COMPILE-ERROR:/m.test(source),
                 tags,
+                xfail,
                 outcomes: outcomes.map((o) => ({ status: o.status, reason: o.reason || '' })),
             };
             rows.push(row);
@@ -164,6 +174,7 @@ function main() {
                 doc,
                 issues,
                 tags,
+                xfail,
                 checks: checked,
                 source,
                 results: outcomes.map((o, i) => ({

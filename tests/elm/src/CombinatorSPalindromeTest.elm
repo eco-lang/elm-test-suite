@@ -3,7 +3,7 @@ module CombinatorSPalindromeTest exposing (main)
 {-| The S combinator with `String.reverse`: `s (++) String.reverse "straw"` is `"straw" ++ String.reverse "straw"`, which is `"strawwarts"`.
 -}
 
--- TAGS: elm-spec, d-atexp-op, d-app-closure
+-- TAGS: elm-spec, d-atexp-op, d-app-closure, d-app-basic-partial, d-app-basic-apply
 -- CHECK: result: "strawwarts"
 
 import Html exposing (text)

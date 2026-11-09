@@ -9,7 +9,7 @@ generic helper `countWith`, counting 2 and 3 elements.
 
 -}
 
--- TAGS: elm-spec, d-atexp-op
+-- TAGS: elm-spec, d-atexp-op, d-app-basic-partial, d-app-basic-apply
 -- CHECK: lt_filter: ['a','b']
 -- CHECK: le_filter: ['a','b','c']
 -- CHECK: gt_filter: ['d','e']

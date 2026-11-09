@@ -5,7 +5,7 @@ forward pipe into a partially applied `List.map`, and a chain of backward
 pipes.
 -}
 
--- TAGS: elm-spec, b:Basics.apR, b:Basics.apL
+-- TAGS: elm-spec, b:Basics.apR, b:Basics.apL, df:infix, d-atexp-op, d-app-closure
 -- CHECK: pipe1: 12
 -- CHECK: pipe2: [2,4,6]
 -- CHECK: backpipe: 10

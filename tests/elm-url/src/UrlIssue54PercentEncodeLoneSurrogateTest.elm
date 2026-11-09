@@ -10,7 +10,7 @@ string (`percentDecode` already catches the same exception).
 
 This test is probably wrong under A Standard Definition of Elm? It writes the lone surrogate as
 the escape `"\u{d800}"`, which ruling A8 makes invalid: an escape must denote a Unicode scalar
-value. <https://elm-test-suite.netlify.app/standard/syntax-core#fig-core-escapes> Under A8 the program does not compile, so a
+value. <https://elm-test-suite.netlify.app/standard/restrictions/core-escape-unicode> Under A8 the program does not compile, so a
 compiler that follows the book fails this test without reaching the bug. `elm-url`'s
 `UrlPercentEncodeLoneSurrogateTest` tests the same bug with the lone surrogate computed by
 `Char.fromCode`. The test is kept as it is because it is the issue's program.

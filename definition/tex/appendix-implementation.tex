@@ -183,8 +183,11 @@ Section~\ref{sec:dynamic-core-simple} and
 Section~\ref{sec:appendix-dynamic-basis-apply}).
 \begin{itemize}
 \item \kw{Char} is an abstract class of characters with an injective function
-  \kw{toCode} into the integers; a string is a finite sequence of
-  characters. % A52
+  \kw{toCode} into the Int range, under which the character with code point
+  $h$ has the code $h$, for every Unicode scalar value $h$; a string is a
+  finite sequence of characters. \kw{Char.fromCode n} is the character with
+  code point $n$ when $n$ is a Unicode scalar value, and otherwise a character
+  of the implementation's choosing, which has a code like every other. % A52
 \item The escape \kw{\textbackslash u\kwlb}$h$\kw{\kwrb} denotes a Unicode
   scalar value: surrogate code points are excluded. % A8
 \item Chars are ordered by \kw{toCode}; strings are ordered lexicographically

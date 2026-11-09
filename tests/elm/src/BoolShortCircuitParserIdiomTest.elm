@@ -31,7 +31,11 @@ unsafeIndex str index =
 
         Nothing ->
             -- Unreachable under correct short-circuit semantics.
-            Char.fromCode (stackBomb 0)
+            if stackBomb 0 == 0 then
+                '?'
+
+            else
+                '?'
 
 
 {-| Returns the character at `idx`, or `Nothing` when `idx` is past the end.

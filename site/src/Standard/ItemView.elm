@@ -1,7 +1,7 @@
 module Standard.ItemView exposing (description, itemFoot, itemKey, itemNoun, itemPage, listPage, listTitle)
 
-{-| The pages of the citable items other than rules (restrictions, derived forms and entries of the
-initial basis): one list page per kind, and a page for each item. Like the rest of the book, these
+{-| The pages of the citable items other than rules (restrictions, derived forms, entries of the
+initial basis and figures): one list page per kind, and a page for each item. Like the rest of the book, these
 are put inside `View.freeze`.
 -}
 
@@ -24,6 +24,9 @@ listTitle kind =
         BasisEntry ->
             "The initial basis"
 
+        FigureItem ->
+            "Figures"
+
 
 listHref : ItemKind -> String
 listHref kind =
@@ -37,6 +40,9 @@ listHref kind =
 
             BasisEntry ->
                 Route.Standard__Basis
+
+            FigureItem ->
+                Route.Standard__Figures
         )
 
 
@@ -95,6 +101,9 @@ listPage idx kind =
 
             BasisEntry ->
                 basis items
+
+            FigureItem ->
+                Html.div [] (List.filterMap (figuresOf items) idx.chapters)
         , Render.licence idx
         ]
 
@@ -120,6 +129,11 @@ lede kind =
             , Html.text " under "
             , Html.code [] [ Html.text "add" ]
             , Html.text "), and a custom type together with its constructors. Each entry's address is its qualified name."
+            ]
+
+        FigureItem ->
+            [ Html.text "The figures of the book, by chapter: its grammar, the classes of its phrases and semantic objects, its tables of escapes and fixities, its derived forms, and the tables of its basis. "
+            , Html.text "Each has a page at an address made from its label, which does not change between editions, though its number may."
             ]
 
 
@@ -163,6 +177,49 @@ restrictionRow it =
             ]
         , Html.td [] (List.concatMap Render.inlines (List.take 1 it.summary))
         ]
+
+
+figuresOf : List IndexItem -> Standard.IndexChapter -> Maybe (Html msg)
+figuresOf items ch =
+    case List.filter (\it -> it.chapter == ch.summary.slug) items of
+        [] ->
+            Nothing
+
+        here ->
+            Just
+                (Html.section [ Attr.class "ts-section", Attr.id ch.summary.slug ]
+                    [ Html.h2 [ Attr.class "sd-h sd-h1" ]
+                        [ Html.a [ Attr.href (Render.chapterHref ch.summary.slug "") ] (Render.chapterTitle ch.summary) ]
+                    , Html.div [ Attr.class "ts-scroll" ]
+                        [ Html.table [ Attr.class "ts-table sd-rules-table" ]
+                            [ Html.thead []
+                                [ Html.tr []
+                                    [ Html.th [] [ Html.text "Figure" ]
+                                    , Html.th [] [ Html.text "Caption" ]
+                                    ]
+                                ]
+                            , Html.tbody []
+                                (List.map
+                                    (\it ->
+                                        Html.tr []
+                                            [ Html.td [ Attr.class "sd-nowrap" ]
+                                                [ Html.a [ Attr.href (Render.itemHref it.kind it.slug), Attr.class "ts-test-name" ] [ Html.text it.slug ]
+                                                , Html.div [ Attr.class "ts-muted ts-small" ] [ Html.text (figureNumber it.number) ]
+                                                ]
+                                            , Html.td [] (List.concatMap Render.inlines (List.take 1 it.summary))
+                                            ]
+                                    )
+                                    here
+                                )
+                            ]
+                        ]
+                    ]
+                )
+
+
+figureNumber : Maybe Int -> String
+figureNumber number =
+    "Figure " ++ (Maybe.map String.fromInt number |> Maybe.withDefault "")
 
 
 derivedForms : List IndexItem -> Html msg
@@ -334,6 +391,9 @@ itemKey kind slug =
 
         BasisEntry ->
             "b:"
+
+        FigureItem ->
+            "fig:"
     )
         ++ slug
 
@@ -349,6 +409,9 @@ itemNoun kind =
 
         BasisEntry ->
             "basis entry"
+
+        FigureItem ->
+            "figure"
 
 
 meta : Item -> List (Html msg)
@@ -366,6 +429,16 @@ meta it =
                     else
                         [ Html.text "A value of ", Html.code [] [ Html.text (moduleOf it.slug) ], Html.text ". Its type is in " ]
 
+                FigureItem ->
+                    [ Html.strong [] [ Html.text (figureNumber it.number) ], Html.text ", " ]
+                        ++ (case it.title of
+                                Just t ->
+                                    Render.inlines t ++ [ Html.text ", in " ]
+
+                                Nothing ->
+                                    [ Html.text "in " ]
+                           )
+
                 _ ->
                     [ Html.text "Stated in " ]
 
@@ -380,7 +453,7 @@ meta it =
                 )
 
         named =
-            case ( it.title, it.group ) of
+            case ( if it.kind == FigureItem then Nothing else it.title, it.group ) of
                 ( Just t, _ ) ->
                     [ Html.text ", under " ] ++ [ Html.strong [] (Render.inlines t) ]
 

@@ -10,7 +10,7 @@ Each check logs the character codes of a string:
   - `"\r\n"`;
   - `\r` inside a triple-quoted string.
 
-It also checks that a string built from code 13 matches the `"\r"` pattern in a
+It also checks that the string `"\u{000D}"` matches the `"\r"` pattern in a
 `case`, and that `"\r\n"` has length 2.
 
 -}
@@ -59,7 +59,7 @@ main =
             Debug.log "triple" (codes """x\ry""")
 
         _ =
-            Debug.log "pattern" (describe (String.fromList [ Char.fromCode 13 ]))
+            Debug.log "pattern" (describe "\u{000D}")
 
         _ =
             Debug.log "length" (String.length "\r\n")

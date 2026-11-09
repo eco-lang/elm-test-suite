@@ -4,7 +4,7 @@ module UrlPercentEncodeLoneSurrogateTest exposing (main)
 
 The bug of <https://github.com/elm/url/issues/54>, with a program that follows A Standard Definition of Elm? The issue, and `UrlIssue54PercentEncodeLoneSurrogateTest` (tagged `elm19-bug`), write the
 lone surrogate as the escape `"\u{d800}"`, which ruling A8 makes invalid: an escape must denote a
-Unicode scalar value. <https://elm-test-suite.netlify.app/standard/syntax-core#fig-core-escapes>
+Unicode scalar value. <https://elm-test-suite.netlify.app/standard/restrictions/core-escape-unicode>
 
 Here the lone surrogate is computed, `Char.fromCode 0xD800`, so the program is valid under A8, and
 the string is the same. elm/url 1.0.0 calls `encodeURIComponent` unguarded, which throws `URIError:

@@ -9,7 +9,7 @@ a target fourth in that list, so `(<)` counts 3 and `(>=)` counts 2.
 
 -}
 
--- TAGS: elm-spec, s-atexp-op, d-atexp-op
+-- TAGS: elm-spec, s-atexp-op, d-atexp-op, d-app-basic-partial, d-app-basic-apply
 -- CHECK: int_lt_count: 3
 -- CHECK: int_ge_count: 2
 -- CHECK: float_lt_count: 3

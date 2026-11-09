@@ -78,12 +78,14 @@ type RefKind
 
 
 {-| The citable items other than rules, each with a page: a syntactic or further restriction, a
-derived form, and an entry of the initial basis (a type with its constructors, or a value).
+derived form, an entry of the initial basis (a type with its constructors, or a value), and a
+figure.
 -}
 type ItemKind
     = Restriction
     | DerivedForm
     | BasisEntry
+    | FigureItem
 
 
 {-| An item stated in a list or table of the text, with the anchor it has there.
@@ -197,7 +199,7 @@ type alias Index =
 
 
 {-| An item in the lists of items: `summary` is its first sentence for a restriction, and its two
-forms for a derived form.
+forms for a derived form. `number` is a figure's number.
 -}
 type alias IndexItem =
     { kind : ItemKind
@@ -207,6 +209,7 @@ type alias IndexItem =
     , group : Maybe (List Inline)
     , title : Maybe (List Inline)
     , summary : List (List Inline)
+    , number : Maybe Int
     }
 
 
@@ -288,6 +291,7 @@ type alias Item =
     , referencedFrom : List Place
     , prev : Maybe ItemLink
     , next : Maybe ItemLink
+    , number : Maybe Int
     }
 
 
@@ -305,6 +309,9 @@ itemKindToString kind =
         BasisEntry ->
             "basis"
 
+        FigureItem ->
+            "figure"
+
 
 itemKindFromString : String -> Maybe ItemKind
 itemKindFromString s =
@@ -317,6 +324,9 @@ itemKindFromString s =
 
         "basis" ->
             Just BasisEntry
+
+        "figure" ->
+            Just FigureItem
 
         _ ->
             Nothing
@@ -648,7 +658,7 @@ indexDecoder =
         |> andMap
             (Decode.field "items"
                 (Decode.list
-                    (Decode.map7 IndexItem
+                    (Decode.map8 IndexItem
                         (Decode.field "kind" itemKindDecoder)
                         (Decode.field "slug" Decode.string)
                         (Decode.field "chapter" Decode.string)
@@ -656,6 +666,7 @@ indexDecoder =
                         (Decode.field "group" (Decode.nullable inlinesDecoder))
                         (Decode.field "title" (Decode.nullable inlinesDecoder))
                         (Decode.field "summary" (Decode.list inlinesDecoder))
+                        numberDecoder
                     )
                 )
             )
@@ -743,6 +754,14 @@ itemDecoder =
         |> andMap (Decode.field "referencedFrom" (Decode.list placeDecoder))
         |> andMap (Decode.field "prev" (Decode.nullable itemLinkDecoder))
         |> andMap (Decode.field "next" (Decode.nullable itemLinkDecoder))
+        |> andMap numberDecoder
+
+
+{-| A figure's number; the other items have none.
+-}
+numberDecoder : Decoder (Maybe Int)
+numberDecoder =
+    Decode.oneOf [ Decode.field "number" (Decode.nullable Decode.int), Decode.succeed Nothing ]
 
 
 chapterDecoder : Decoder Chapter

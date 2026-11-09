@@ -14,7 +14,7 @@ Fixed in Elm 0.19.2.
 -}
 
 -- TAGS: elm19-bug-fix
--- TAGS: elm-spec, df:list
+-- TAGS: elm-spec, df:list, df:infix, d-atexp-paren, d-atexp-op, d-exp-app, d-app-con, d-atexp-nil
 -- CHECK: length: 22000
 
 import Html exposing (text)

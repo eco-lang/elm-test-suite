@@ -38,8 +38,8 @@ keys =
                     |> Expect.equal [ "b:Platform.Cmd.none", "t:elm/CompilerIssue2281LongLineListTest" ]
         , test "every prefix" <|
             \_ ->
-                Discussions.keysOf "[r:a] [res:b] [df:c] [b:D.e] [ch:f] [t:g/H] [p:i] [tag:j]"
-                    |> Expect.equal [ "r:a", "res:b", "df:c", "b:D.e", "ch:f", "t:g/H", "p:i", "tag:j" ]
+                Discussions.keysOf "[r:a] [res:b] [df:c] [b:D.e] [fig:k] [ch:f] [t:g/H] [p:i] [tag:j]"
+                    |> Expect.equal [ "r:a", "res:b", "df:c", "b:D.e", "fig:k", "ch:f", "t:g/H", "p:i", "tag:j" ]
         , test "space inside the brackets" <|
             \_ -> Discussions.keysOf "[ r:d-atexp-var ] x" |> Expect.equal [ "r:d-atexp-var" ]
         , test "an unknown prefix is not a key" <|

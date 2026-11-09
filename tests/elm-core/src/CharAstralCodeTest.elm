@@ -1,20 +1,22 @@
 module CharAstralCodeTest exposing (main)
 
 {-| `Char.fromCode` and `Char.toCode` round-trip Unicode code points, including
-astral ones (above 0xFFFF) and the largest, 0x10FFFF, and `Char.fromCode` turns
-a code below 0 or above 0x10FFFF into U+FFFD (65533).
+astral ones (above 0xFFFF) and the largest, 0x10FFFF.
 
-The test round-trips U+20AC, U+1F600, U+1D11E and U+10FFFF, and converts -1
-and 0x110000.
+The test round-trips U+20AC, U+1F600, U+1D11E and U+10FFFF. What `Char.fromCode` gives for a code
+below 0 or above 0x10FFFF is the implementation's choice; `CharFromCodeWideIntTest` checks it.
+
+A Standard Definition of Elm?, the basis entries Char.fromCode and Char.toCode: for a Unicode
+scalar value n, `Char.fromCode n` is the character with code point n, and its code is n.
+<https://elm-test-suite.netlify.app/standard/basis/Char/fromCode>
 
 -}
 
+-- TAGS: elm-spec, b:Char.fromCode, b:Char.toCode
 -- CHECK: bmp: 8364
 -- CHECK: emoji: 128512
 -- CHECK: clef: 119070
 -- CHECK: maxcp: 1114111
--- CHECK: negative: 65533
--- CHECK: beyond: 65533
 
 import Char
 import Html exposing (text)
@@ -34,10 +36,5 @@ main =
         _ =
             Debug.log "maxcp" (Char.toCode (Char.fromCode 0x0010FFFF))
 
-        _ =
-            Debug.log "negative" (Char.toCode (Char.fromCode -1))
-
-        _ =
-            Debug.log "beyond" (Char.toCode (Char.fromCode 0x00110000))
     in
     text "done"

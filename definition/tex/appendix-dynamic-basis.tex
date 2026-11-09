@@ -143,11 +143,25 @@ $\dbfl(n)=n$.
 The set $\dbChr$ of characters is a parameter of the definition
 (Section~\ref{sec:appendix-implementation-chars}), with an injective function
 \[
-  \dbcode:\dbChr\to\mathbb{Z},
+  \dbcode:\dbChr\to\IntRange,
 \]
-the function that the library calls \kw{Char.toCode}. Nothing else is
-required of characters: the initial basis has no operation on characters
-other than equality and order. % A52
+the \emph{code} of a character, which the basic value \kw{Char.toCode} gives
+(Figure~\ref{fig:dynamic-basis-conv}). For every Unicode scalar value $h$
+there is a character with the code $h$, the character with code point $h$:
+it is the character that the escape \kw{\textbackslash u\kwlb}$h$\kw{\kwrb}
+denotes (Figure~\ref{fig:core-escapes}), and the one that a character
+constant holding that character itself denotes. A further parameter is a
+function
+\[
+  \mathit{other}:\mathbb{Z}\to\dbChr,
+\]
+the character that \kw{Char.fromCode} gives for an integer that is not a
+Unicode scalar value. Nothing is required of $\mathit{other}$: its result may
+be a character that is no Unicode scalar value, such as a lone surrogate, but
+it is a character, and so has a code in $\IntRange$ distinct from that of
+every other character. Nothing else is required of characters: the initial
+basis has no operation on characters other than equality, order,
+\kw{Char.toCode} and \kw{Char.fromCode}. % A52
 A string is a finite sequence $\dbch_1\cdots\dbch_k$ of characters
 ($k\geq 0$), its \emph{length} being $k$; $\effStr$ is the set of strings, and
 $s$ ranges over $\effStr$. A character constant denotes a character and a
@@ -280,6 +294,10 @@ reached through no interface. % A16, A56; decision 1 (audit X1)
 \hline
 \kw{Ok}\citealso{b:Result.Result},\ \kw{Err}\citealso{b:Result.Result} & \mapsto & \kw{Ok},\ \kw{Err} & 1\\
 \hline
+\multicolumn{4}{|l|}{\kw{Char}}\\
+\hline
+\kw{toCode}\citealso{b:Char.toCode},\ \kw{fromCode}\citealso{b:Char.fromCode} & \mapsto & \text{basic value} & 1\\
+\hline
 \multicolumn{4}{|l|}{\kw{Debug}}\\
 \hline
 \kw{log}\citealso{b:Debug.log} & \mapsto & \text{basic value} & 2\\
@@ -311,13 +329,13 @@ reached through no interface. % A16, A56; decision 1 (audit X1)
 \caption{Dynamic $\VE$ of the Other Modules of $\ME_0$}\label{fig:dynamic-basis-others}
 \end{figure}
 
-The interfaces of the modules \kw{List}, \kw{Tuple}, \kw{String}, \kw{Char},
+The interfaces of the modules \kw{List}, \kw{Tuple}, \kw{String},
 \kw{Array}, \kw{Bytes}, \kw{Json.\allowbreak Encode}, \kw{Json.\allowbreak Decode},
 \kw{VirtualDom} and \kw{Html} are $(\emptyset,\emptymap,\emptymap)$: these
 modules are in $\ME_0$ for their types, which have no dynamic counterpart
 (the values of \kw{Array} and \kw{Bytes} being given in
 Sections~\ref{sec:appendix-dynamic-basis-arrays}
-and~\ref{sec:appendix-dynamic-basis-bytes}). The interfaces of \kw{Platform},
+and~\ref{sec:appendix-dynamic-basis-bytes}). The interfaces of \kw{Char}, \kw{Platform},
 \kw{Platform.Cmd}, \kw{Platform.Sub}, \kw{Task}, \kw{Process} and \kw{Debug}
 are $(\emptyset,\emptymap,\VE)$, with $\VE$ as in
 Figure~\ref{fig:dynamic-basis-others}. These interfaces have the property of
@@ -842,6 +860,9 @@ for $k\in\mathbb{Z}\cup\{+\infty,-\infty\}$. The conversions are given in Figure
 \[
 \begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
 \APPLY(\kw{toFloat},n) & = & \{\dbfl(n)\} & \\[1ex]
+\APPLY(\kw{Char.toCode},\dbch) & = & \{\dbcode(\dbch)\} & \\
+\APPLY(\kw{Char.fromCode},n) & = & \{\dbch\} & \text{if}\ n\ \text{is a Unicode scalar value and}\ \dbcode(\dbch)=n\\
+                              & = & \{\mathit{other}(n)\} & \text{otherwise}\\[1ex]
 \APPLY(\kw{round},x) & = & \{\dbsat(\lfloor x+\tfrac{1}{2}\rfloor)\} & \text{if}\ x\in\effFltFin\\
 \APPLY(\kw{floor},x) & = & \{\dbsat(\lfloor x\rfloor)\} & \text{if}\ x\in\effFltFin\\
 \APPLY(\kw{ceiling},x) & = & \{\dbsat(\lceil x\rceil)\} & \text{if}\ x\in\effFltFin\\

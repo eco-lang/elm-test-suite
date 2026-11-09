@@ -121,8 +121,10 @@ front idx =
             , Html.a [ Attr.href (Route.toString Route.Standard__Restrictions) ] [ Html.text (count Restriction ++ " restrictions") ]
             , Html.text ", "
             , Html.a [ Attr.href (Route.toString Route.Standard__DerivedForms) ] [ Html.text (count DerivedForm ++ " derived forms") ]
-            , Html.text " and "
+            , Html.text ", "
             , Html.a [ Attr.href (Route.toString Route.Standard__Basis) ] [ Html.text (count BasisEntry ++ " entries of the initial basis") ]
+            , Html.text " and "
+            , Html.a [ Attr.href (Route.toString Route.Standard__Figures) ] [ Html.text (count FigureItem ++ " figures") ]
             , Html.text "."
             ]
         , Html.p [ Attr.class "sd-also" ]

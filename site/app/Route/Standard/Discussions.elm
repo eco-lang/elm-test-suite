@@ -101,7 +101,7 @@ top idx =
             [ Html.text "The Definition is discussed in the "
             , Html.a [ Attr.href (Discuss.categoryUrl Discuss.Standard), Attr.target "_blank", Attr.rel "noopener noreferrer" ]
                 [ Html.text "Standard category of the repository's GitHub Discussions" ]
-            , Html.text ". A discussion is about a rule, restriction, derived form, entry of the basis or chapter when its title holds that item's key in brackets, "
+            , Html.text ". A discussion is about a rule, restriction, derived form, entry of the basis, figure or chapter when its title holds that item's key in brackets, "
             , Html.code [] [ Html.text "[r:d-atexp-var]" ]
             , Html.text "; the Discuss link on each item's page starts one with the key in place, and the discussion is then shown on that page."
             ]

@@ -9,8 +9,13 @@ module DebugLogNoDropTest exposing (main)
 
 The relative order of the logged lines is not checked.
 
+A Standard Definition of Elm? does not decide this test: `Debug.log l v` evaluates to `v`, and any
+output it makes, its text, its order and whether it is made at all, is outside the definition
+(ruling A62).
+
 -}
 
+-- TAGS: elm-unspecced
 -- CHECK: kept: "logged"
 
 import Html exposing (text)

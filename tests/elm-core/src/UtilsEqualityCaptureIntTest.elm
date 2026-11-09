@@ -10,7 +10,7 @@ elements.
 
 -}
 
--- TAGS: elm-spec, d-atexp-op
+-- TAGS: elm-spec, d-atexp-op, d-app-basic-partial, d-app-basic-apply
 -- CHECK: eq_count: 2
 -- CHECK: ne_count: 3
 -- CHECK: eq_filter: [5,5]

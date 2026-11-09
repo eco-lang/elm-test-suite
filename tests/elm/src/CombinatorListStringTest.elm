@@ -16,7 +16,7 @@ The combinators are `k`, `s`, and the point-free `i = s k k`, `b = s (k s) k`,
 
 -}
 
--- TAGS: elm-spec, sm-topdec-value, d-atexp-op, d-app-basic-partial, d-app-closure
+-- TAGS: elm-spec, sm-topdec-value, d-atexp-op, d-app-basic-partial, d-app-closure, d-app-basic-apply
 -- CHECK: b_sum_map: 9
 -- CHECK: sp_mul: 84
 -- CHECK: w_concat: "hihi"

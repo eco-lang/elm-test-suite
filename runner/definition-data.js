@@ -400,6 +400,7 @@ const ITEM_KINDS = {
     res: { name: 'restriction', path: '/standard/restrictions/' },
     df: { name: 'derived-form', path: '/standard/derived-forms/' },
     b: { name: 'basis', path: '/standard/basis/', url: (slug) => slug.replace(/\./g, '/') },
+    fig: { name: 'figure', path: '/standard/figures/' },
 };
 const itemUrl = (label) => {
     const k = ITEM_KINDS[labelPrefix(label)];
@@ -1046,6 +1047,8 @@ function blocks(src, ctx) {
             const fig = ctx.figure;
             labellable = { target: () => ({ kind: 'fig', chapter: ctx.chapter, anchor: fig.id, text: String(fig.number) }) };
             Object.defineProperty(labellable, 'id', { set: (v) => { fig.id = v; } });
+            // The label is kept off the figure's data: it is only for its item (Book.defineFigure).
+            Object.defineProperty(labellable, 'label', { get: () => fig.label, set: (v) => { Object.defineProperty(fig, 'label', { value: v, enumerable: false }); } });
             continue;
         }
         if (n.k === 'env') {
@@ -1076,6 +1079,8 @@ function envBlock(n, ctx) {
             fig.c = blocks(n.body, ctx);
             ctx.figure = outer;
             if (!fig.number) throw new Error('figure without a caption in ' + ctx.chapter);
+            if (!fig.label || !fig.label.startsWith('fig:')) throw new Error('figure ' + fig.number + ' without a fig: label in ' + ctx.chapter);
+            ctx.book.defineFigure(fig, ctx);
             return fig;
         }
         case 'center':
@@ -1275,6 +1280,30 @@ class Book {
         this.labels.set(label, { kind: labelPrefix(label), chapter: ctx.chapter, anchor, text, item: slug });
         return item;
     }
+
+    // A figure, as an item with a page of its own: its title is its caption, and its one place is
+    // the figure itself. Its label stays the figure's (a \ref to it is to its place in its chapter).
+    defineFigure(fig, ctx) {
+        const label = fig.label;
+        if (this.items.has(label)) throw new Error('label defined twice: ' + label);
+        const slug = labelSlug(label);
+        const section = ctx.section ? { ...ctx.section } : null;
+        this.items.set(label, {
+            label,
+            kind: 'figure',
+            slug,
+            anchor: fig.id,
+            number: fig.number,
+            chapter: ctx.chapter,
+            section,
+            group: null,
+            title: fig.caption,
+            summary: [fig.caption],
+            places: [{ role: 'statement', figure: null, chapter: ctx.chapter, section, blocks: [fig] }],
+            referencedFrom: [],
+            ref: { kind: 'figure', slug, id: fig.id },
+        });
+    }
 }
 
 function textOfInlines(xs) {
@@ -1459,6 +1488,7 @@ function output(opts, m, book) {
         items: [...book.items.values()].map((it) => ({
             kind: it.kind,
             slug: it.slug,
+            number: it.number || null,
             chapter: it.chapter,
             section: it.section ? it.section.number : null,
             group: it.group,
@@ -1502,6 +1532,7 @@ function output(opts, m, book) {
             writeJson(path.join(opts.out, 'items', kind, it.slug + '.json'), {
                 kind,
                 slug: it.slug,
+                number: it.number || null,
                 title: it.title,
                 group: it.group,
                 chapter: chapterOf.get(it.chapter),
@@ -1523,7 +1554,7 @@ function output(opts, m, book) {
 
     // Report.
     console.log(`${m.title} (${m.edition}): ${book.chapters.length} chapters, ${book.rules.length} rules, ${book.figureNo} figures, ${katexCache.size} formulas -> ${path.relative(ROOT, opts.out)}`);
-    console.log(`  ${counts.restriction} restrictions, ${counts['derived-form']} derived forms, ${counts.basis} entries of the basis`);
+    console.log(`  ${counts.restriction} restrictions, ${counts['derived-form']} derived forms, ${counts.basis} entries of the basis, ${counts.figure} figures`);
     let failed = !ok;
     if (problems.katex.length) {
         failed = true;

@@ -3,9 +3,12 @@ module CharAstralRecordFieldTest exposing (main)
 {-| An astral `Char` (code point above 0xFFFF) in a record field keeps its code
 point, next to an `Int` field and after a record update, and a record holding
 one is equal to a record literal with the same fields.
+
+A Standard Definition of Elm?, the basis entry Char.toCode: the code of the character with code
+point h is h, and `\u{h}` denotes that character. <https://elm-test-suite.netlify.app/standard/basis/Char/toCode>
 -}
 
--- TAGS: elm-spec, d-atexp-update, d-atexp-record
+-- TAGS: elm-spec, d-atexp-update, d-atexp-record, b:Char.toCode, fig:core-escapes
 -- CHECK: rec_c: 128512
 -- CHECK: rec_n: 7
 -- CHECK: rec_updated: 119070
@@ -30,7 +33,7 @@ main =
             mk '😀' 7
 
         h =
-            { g | c = Char.fromCode 0x0001D11E }
+            { g | c = '\u{1D11E}' }
 
         _ =
             Debug.log "rec_c" (Char.toCode g.c)

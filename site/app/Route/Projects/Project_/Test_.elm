@@ -111,6 +111,15 @@ view app shared =
 
           else
             Html.p [ Attr.class "ts-small" ] (Html.text "Tags:" :: List.map TestList.tagLink test.tags)
+        , case test.xfail of
+            Just reason ->
+                Html.p [ Attr.class "ts-small" ]
+                    [ TestList.xfailChip test.xfail
+                    , Html.text (" Expected to fail: " ++ reason)
+                    ]
+
+            Nothing ->
+                Html.text ""
         , if List.isEmpty test.checks then
             Html.text ""
 
@@ -246,8 +255,8 @@ source code =
             Html.pre [ Attr.class "ts-pre" ] [ Html.text code ]
 
 
-{-| A rule, restriction, derived form or basis entry the test checks, as a link to its page in the
-book; or a figure or section, as a link to its place in its chapter.
+{-| A rule, restriction, derived form, basis entry or figure the test checks, as a link to its page in
+the book; or a section, as a link to its place in its chapter.
 -}
 checkLink : Data.Check -> Html msg
 checkLink check =
@@ -266,14 +275,11 @@ checkLink check =
                 Data.Basis ->
                     ( "basis ", Render.itemHref Standard.BasisEntry check.name )
 
-                Data.Place ->
-                    ( if String.startsWith "fig-" check.anchor then
-                        "figure "
+                Data.Figure ->
+                    ( "figure ", Render.itemHref Standard.FigureItem check.name )
 
-                      else
-                        "section "
-                    , Render.chapterHref check.chapter check.anchor
-                    )
+                Data.Place ->
+                    ( "section ", Render.chapterHref check.chapter check.anchor )
     in
     Html.a [ Attr.class "ts-tag", Attr.href href ]
         [ Html.span [ Attr.class "ts-muted" ] [ Html.text noun ], Html.text check.name ]

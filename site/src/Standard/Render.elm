@@ -46,7 +46,7 @@ ruleHref slug =
     Route.toString (Route.Standard__Rules__Rule_ { rule = slug })
 
 
-{-| The page of a restriction, derived form or entry of the basis. An entry's address is its
+{-| The page of a restriction, derived form, entry of the basis or figure. An entry's address is its
 qualified name with the dots as slashes: `/standard/basis/Platform/Cmd/none`.
 -}
 itemHref : ItemKind -> String -> String
@@ -66,6 +66,21 @@ itemHref kind slug =
                 [] ->
                     Route.toString Route.Standard__Basis
 
+        FigureItem ->
+            Route.toString (Route.Standard__Figures__Figure_ { figure = slug })
+
+
+{-| The page of the figure with this anchor in its chapter (`fig-core-escapes`): every figure has a
+`fig:` label, and so an anchor that starts `fig-`.
+-}
+figureHref : String -> String
+figureHref id =
+    if String.startsWith "fig-" id then
+        itemHref FigureItem (String.dropLeft 4 id)
+
+    else
+        "#" ++ id
+
 
 itemKindName : ItemKind -> String
 itemKindName kind =
@@ -78,6 +93,9 @@ itemKindName kind =
 
         BasisEntry ->
             "Basis entry"
+
+        FigureItem ->
+            "Figure"
 
 
 {-| The small link, after an item in the text, to the item's page, showing its name.
@@ -356,7 +374,7 @@ block b =
             Html.figure [ Attr.class "sd-figure", Attr.id f.id ]
                 [ Html.div [ Attr.class "sd-figure-body" ] (blocks f.content)
                 , Html.figcaption []
-                    (Html.a [ Attr.href ("#" ++ f.id), Attr.class "sd-figure-num" ] [ Html.text ("Figure " ++ String.fromInt f.number) ]
+                    (Html.a [ Attr.href (figureHref f.id), Attr.class "sd-figure-num", Attr.title "The figure's page" ] [ Html.text ("Figure " ++ String.fromInt f.number) ]
                         :: Html.text ": "
                         :: inlines f.caption
                     )

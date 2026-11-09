@@ -94,7 +94,7 @@ build b =
         |> andMap (Just (b + 1022))
         |> andMap (Just (b + 1023))
         |> andMap (Just (toFloat b + 25.5 - 1))
-        |> andMap (Just (Char.fromCode (b + 96)))
+        |> andMap (Just ((if b == 1 then 'a' else '?')))
         |> andMap (Just (b + 1026))
         |> andMap (Just (String.fromInt (b + 27) ++ "s"))
         |> andMap (Just (b + 1028))

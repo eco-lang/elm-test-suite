@@ -47,6 +47,9 @@
 //   (patchModeGuard). `-- UNICODE: <version>` names the Unicode version the expectations were
 //   recorded with; under a node with another, the runner warns.
 //   `-- TAGS: a, b` labels the test; its project is always its first tag.
+//   `-- XFAIL: <reason>` marks a test that is expected to fail, with the reason: it runs as any
+//   other and passes or fails as any other, but its failure is reported as XFAIL and a pass as
+//   XPASS, and the reason goes with its result (`xfail`).
 // The result cache: a test's result is kept in .work/result-cache/<compiler>/<key>.json, the key a
 // hash of everything the result depends on (the compiler's executable, this runner, Node, the
 // project's elm.json, the test's source and the modules it imports, ...), and a later run takes it
@@ -470,6 +473,7 @@ async function runProject(spec, opts, compiler, cache, projectNames) {
             t.tags.push(...D.extractTags(t.content, projectNames));
             t.modeGuard = D.directiveLines(t.content, '-- MODE-GUARD:').length > 0;
             t.noSkip = D.directiveLines(t.content, '-- NO-SKIP:').length > 0;
+            t.xfail = D.directiveLines(t.content, '-- XFAIL:').map((l) => l.trim()).join(' ') || null;
             const unicode = D.directiveLines(t.content, '-- UNICODE:').map((l) => l.trim());
             if (unicode.length && unicode[0] !== process.versions.unicode) otherUnicode.push(t.name);
             skip = D.extractSkip(t.content);
@@ -694,12 +698,16 @@ async function runProject(spec, opts, compiler, cache, projectNames) {
             message: r.status === 'pass' ? '' : (r.message || ''), output: r.output || '', tags: t.tags };
         if (r.ms !== undefined && r.ms !== null) json[t.name].ms = r.ms;
         if (r.cached) json[t.name].cached = r.cached;
-        if (r.status === 'pass') passed++;
+        if (t.xfail) json[t.name].xfail = t.xfail;
+        if (r.status === 'pass') {
+            passed++;
+            if (t.xfail) console.log('  XPASS ' + spec.name + '/' + t.name + ' (expected to fail: ' + t.xfail + ')');
+        }
         else if (r.status === 'skip') { skipped++; console.log('  SKIP ' + spec.name + '/' + t.name + ': ' + r.message); }
         else {
             failed++;
             failures.push(spec.name + '/' + t.name);
-            console.log('  FAIL ' + spec.name + '/' + t.name + '\n    ' + r.message.split('\n').join('\n    '));
+            console.log('  ' + (t.xfail ? 'XFAIL ' : 'FAIL ') + spec.name + '/' + t.name + '\n    ' + r.message.split('\n').join('\n    '));
         }
     }
     console.log('  ' + spec.name + ': passed ' + passed + ', failed ' + failed + ', skipped ' + skipped);

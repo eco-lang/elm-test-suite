@@ -4,7 +4,7 @@ module NonAsciiIdentifierTest exposing (main)
 read as one identifier and can be referenced; the program logs its value, 7.
 -}
 
--- TAGS: elm-spec, fig:core-identifiers
+-- TAGS: elm-spec, core-identifier-characters
 -- CHECK: NonAsciiIdentifierTest: 7
 
 import Html exposing (text)

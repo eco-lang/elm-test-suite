@@ -164,6 +164,9 @@ keyHref key =
                 "b" ->
                     Just (Render.itemHref BasisEntry name)
 
+                "fig" ->
+                    Just (Render.itemHref FigureItem name)
+
                 "ch" ->
                     Just (Render.chapterHref name "")
 

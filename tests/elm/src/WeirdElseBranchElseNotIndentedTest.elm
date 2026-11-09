@@ -9,7 +9,7 @@ here it is level with it.
 -}
 
 -- TAGS: elm19-compile-error
--- TAGS: elm-spec, sec:syntax-core-layout
+-- TAGS: elm-spec, core-layout-rule
 -- COMPILE-ERROR: WEIRD ELSE BRANCH
 -- CHECK: -- WEIRD ELSE BRANCH -
 
