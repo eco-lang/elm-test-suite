@@ -1,0 +1,358 @@
+% Values: PRECISE, FAITHFUL, ECONOMICAL
+% Evidence planned:
+% - PRECISE: a production for every bare module-level construct of the book
+%   plan (module, header, imports, exposing lists and items, top-level
+%   declarations, custom-type, constructor and alias bindings, type-variable
+%   sequences); every restriction a decidable condition on the module alone,
+%   with the recursion restriction defined by direct and delayed occurrences
+% - FAITHFUL: rulings A10, A16, A17, A25, A26, A28, A30, A38, A84, A89
+%   reflected
+%   and cited; the default imports exactly as the survey lists them; every
+%   module-level restriction of the survey ("Syntactic Restrictions",
+%   "Custom Types and Aliases", "Modules") stated here or assigned by name to
+%   Chapter 5 or Chapter 9
+% - ECONOMICAL: the grouping of declarations left to the derived forms of
+%   Appendix A; one class TopDec with abstract `;' and
+%   `and'; no class of single imports; no new notation
+\chapter{Syntax of Modules}\label{ch:syntax-modules}
+
+For Modules there are further reserved words and one further symbol, but no
+further special constants or identifier classes; comments and lexical analysis
+are as for the Core. Every module begins with a header, which is followed by a
+sequence of imports and a sequence of top-level declarations; a module makes its top-level names available
+to other modules by name only. % D6
+The derived forms for modules appear in
+Appendix~A (Chapter~\ref{ch:appendix-derived-forms}). The \kw{infix}
+declarations, \kw{effect module} headers and imports of kernel modules that
+Elm admits only in its own core packages are not part of Standard Elm.
+% A16, A30, A37
+
+\section{Reserved Words}\label{sec:syntax-modules-reserved}
+
+The following reserved words are used in Modules.
+\begin{center}
+\kw{as}\qquad\kw{exposing}\qquad\kw{import}\qquad\kw{module}\qquad\kw{port}\qquad\kw{type}\qquad\kw{..}
+\end{center}
+The words are among the reserved words of the Core
+(Chapter~\ref{ch:syntax-core}), so none of them may be used as an identifier
+anywhere in a program; \kw{as} is also used in patterns. The symbol \kw{..}
+occurs only in exposing lists, where white space may separate it from the
+parentheses that enclose it; since it is reserved, it is not an operator.
+% DECIDED: `..' is a reserved symbol of the module level. Elm reads `(..)' as
+% `(', `..', `)' with optional white space; no operator of the initial basis
+% is `..' and a module cannot declare an operator (A16), so reserving it
+% excludes no program.
+
+The word \kw{alias} is not reserved. It has its special meaning only directly
+after the reserved word \kw{type}, where a lower-case word cannot otherwise
+stand, since every declared \tycon{} begins with an upper-case letter;
+elsewhere \kw{alias} is a \var.
+
+\section{Identifiers}\label{sec:syntax-modules-identifiers}
+
+There are no further identifier classes. The class \cls{ModId} of module
+identifiers is introduced with the Core, because a module identifier is the
+qualifier of a long identifier \longvar, \longcon{} or \longtycon. A \modid{}
+is a sequence of one or more upper-case identifiers joined by \kw{.} with no
+white space between them. At this level a \modid{} has two further uses: it
+names a module, in a header and in an import, and it names an alias for an
+imported module, after \kw{as} in an import.
+
+The qualifiers that may be used in a module, and the module each denotes, are
+determined by the module's imports: an import \kw{import} $\modid$ \kw{as}
+$\modid'$ provides the qualifier $\modid'$ and not $\modid$, and an import
+without \kw{as} provides its own \modid{} (Chapter~\ref{ch:static-modules}).
+A qualifier never denotes the module in which it occurs.
+% A38
+The identifiers declared at this level (the \var{} of a value or a port, the
+\tycon{} of a custom type or an alias, the \con{} of a constructor) are never
+qualified where they are declared. As in the Core, the class of each
+identifier occurrence is determined by the grammatical rules which follow.
+
+\section{Infixed Operators}\label{sec:syntax-modules-infix}
+
+Standard Elm has no fixity declarations.
+% A16
+The operators that may be used in infix position in a module are those of
+the initial basis (Section~\ref{sec:syntax-core-infix}). The default imports
+(Section~\ref{sec:syntax-modules-default-imports}) expose every one of them
+to every module, and the meaning of an operator is fixed by the initial basis,
+whatever the module imports. Each has the precedence and associativity given
+for it in Section~\ref{sec:syntax-core-infix}, and infixed expressions are
+resolved as described there.
+% Design decision 1 (audit X1): operators are fixed by the operator table of
+% the initial basis; an import item (op) binds nothing.
+
+\section{Layout}\label{sec:syntax-modules-layout}
+
+The layout rule of Section~\ref{sec:syntax-core-layout} governs the phrases
+within a top-level declaration. At the top level of a module it takes the
+following form.
+\begin{itemize}
+\item The header, each import and each top-level declaration begins in column
+  1.
+\item Every other token of a header, an import or a top-level declaration lies
+  in a column greater than 1. Hence a token in column 1 ends the header,
+  import or declaration before it.
+\item The annotation $\var\ \kw{:}\ \ty$ of a top-level value begins in column
+  1, and the definition it annotates begins in column 1 on a later line, with
+  only white space and comments between them; the definition repeats \var.
+  % A17: the definition starts in the column of its annotation
+\item A doc comment may stand directly after the header and directly before a
+  top-level declaration, and nowhere else at the top level; the token that
+  follows a doc comment begins in column 1. Doc comments have no meaning and
+  are omitted from the grammar.
+  % A10
+\end{itemize}
+
+\section{Grammar for Modules}\label{sec:syntax-modules-grammar}
+
+The phrase classes for Modules are shown in Figure~\ref{fig:phrase-classes-modules}.
+We use the variable \modm{} to range over \cls{Module}, \expitem{} to range
+over \cls{ExpItem}, and the lower-case name of each other class to range over
+that class. The conventions adopted in presenting the grammatical rules for
+Modules are the same as for the Core. The grammatical rules are shown in
+Figures~\ref{fig:grammar-modules} and~\ref{fig:grammar-top-level-declarations}.
+
+\begin{figure}[htbp]
+\centering
+\begin{tabular}{@{}ll@{}}
+\cls{Module}   & modules\\
+\cls{Header}   & module headers\\
+\cls{Imports}  & import lists\\
+\cls{ExpList}  & exposing lists\\
+\cls{ExpItem}  & exposing items\\[1ex]
+\cls{TopDec}   & top-level declarations\\
+\cls{DatBind}  & custom-type bindings\\
+\cls{ConBind}  & constructor bindings\\
+\cls{TypBind}  & type-alias bindings\\
+\cls{TyVarSeq} & type-variable sequences\\
+\end{tabular}
+\caption{Modules Phrase Classes}\label{fig:phrase-classes-modules}
+\end{figure}
+
+The grammar is that of the bare language. A module as written is brought to
+this form by the derived forms of Appendix~A, which gather the custom types of
+a module into a single custom-type binding, and arrange its aliases and value
+definitions in dependency order, the values in groups. The header is written
+in every module and no derived form supplies it.
+% A16, A30; book plan "Derived Forms", TopDec rows
+Two symbols of the bare grammar are never written in a program. The symbol
+\kw{and} joins the members of one group: the custom types of a \datbind{},
+as it joins the members of a Core \valbind. The symbol \kw{;} separates two
+top-level declarations, and stands for the boundary between declarations that
+the layout of Section~\ref{sec:syntax-modules-layout} marks by column 1.
+Neither symbol is reserved; in particular \kw{and} is an ordinary \var.
+
+A top-level value declaration is a \valbind{} of the Core, whose bindings
+carry their annotations. A port declaration consists of a \var{} and its type,
+and has no definition; which types a port may have is decided by elaboration
+(Section~\ref{sec:static-modules-ports}).
+
+\begin{figure}[htbp]
+\centering
+\begin{grammar}
+\gprod{\modm}{\header\ \imports\ \topdec}{module}
+\gprod{\header}{\kw{module}\ \modid\ \kw{exposing}\ \explist}{plain}
+\galt{\kw{port}\ \kw{module}\ \modid\ \kw{exposing}\ \explist}{port module}
+\gprod{\imports}{\kw{import}\ \modid\ \opt{\kw{as}\ \modid'}}{import}
+\galt{\quad\opt{\kw{exposing}\ \explist}\ \imports}{}
+\galt{}{empty}
+\gprod{\explist}{\kw{(..)}}{everything}
+\galt{\kw{(}\,\expitem_1\ \kw{,}\ \cdots\ \kw{,}\ \expitem_n\,\kw{)}}{explicit}
+\gnote{$(n \geq 1)$}
+\gprod{\expitem}{\var}{value}
+\galt{\kw{(}\opv\kw{)}}{operator}
+\galt{\tycon}{type}
+\galt{\tycon\,\kw{(..)}}{open type}
+\end{grammar}
+\caption{Grammar: Modules, Headers, Imports and Exposing Lists}\label{fig:grammar-modules}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{grammar}
+\gprod{\topdec}{\valbind}{value}
+\galt{\kw{type}\ \datbind}{custom type}
+\galt{\kw{type}\ \kw{alias}\ \typbind}{type alias}
+\galt{\kw{port}\ \var\ \kw{:}\ \ty}{port}
+\galt{\topdec_1\ \kw{;}\ \topdec_2}{sequential}
+\gprod{\datbind}{\tycon\ \tyvarseq\ \kw{=}\ \conbind}{custom-type binding}
+\galt{\qquad\opt{\kw{and}\ \datbind}}{}
+\gprod{\conbind}{\con\ \ty_1\ \cdots\ \ty_n\ \opt{\kw{|}\ \conbind}}{constructor binding}
+\gnote{$(n \geq 0)$}
+\gprod{\typbind}{\tycon\ \tyvarseq\ \kw{=}\ \ty}{type-alias binding}
+\gprod{\tyvarseq}{\tyvar_1\ \cdots\ \tyvar_k}{type parameters}
+\gnote{$(k \geq 0)$}
+\end{grammar}
+\caption{Grammar: Top-level Declarations and Bindings}\label{fig:grammar-top-level-declarations}
+\end{figure}
+% DECIDED: the bare grammar keeps Elm's order `tycon tyvarseq' in datbind and
+% typbind (Elm writes `type Maybe a = ...'), not the order `tyvarseq tycon'
+% of the Definition of Standard ML.
+
+In a constructor binding $\con\ \ty_1\ \cdots\ \ty_n$ each $\ty_i$ is a type
+variable, a \longtycon{} without arguments, or a type enclosed in parentheses
+or braces, as for the arguments of a type constructor in the Core
+(Chapter~\ref{ch:syntax-core}); so a function type, or a type constructor
+applied to arguments, is parenthesised when it is the argument of a
+constructor. The constructor bindings of a \conbind{} are separated by
+\kw{|}, which binds less tightly than any type. In a type-alias binding and a
+port declaration the type extends to the end of the declaration.
+
+\section{Default Imports}\label{sec:syntax-modules-default-imports}
+
+The imports of every module, as elaborated (Chapter~\ref{ch:static-modules})
+and evaluated (Chapter~\ref{ch:dynamic-modules}), are the default imports of
+Figure~\ref{fig:default-imports} followed by the imports written in the
+module. Since the default imports come first, an import written in the module
+may replace a type that a default import exposes.
+% A28; the operator case of A28 does not arise, since every operator is that
+% of the initial basis (design decision 1).
+
+\begin{figure}[htbp]
+\centering
+\begin{tabular}{@{}l@{}}
+\kw{import Basics exposing (..)}\\
+\kw{import Debug}\\
+\kw{import List exposing ((::))}\\
+\kw{import Maybe exposing (Maybe(..))}\\
+\kw{import Result exposing (Result(..))}\\
+\kw{import String exposing (String)}\\
+\kw{import Char exposing (Char)}\\
+\kw{import Tuple}\\
+\kw{import Platform exposing (Program)}\\
+\kw{import Platform.Cmd as Cmd exposing (Cmd)}\\
+\kw{import Platform.Sub as Sub exposing (Sub)}\\
+\end{tabular}
+\caption{Default Imports}\label{fig:default-imports}
+\end{figure}
+
+\section{Syntactic Restrictions}\label{sec:syntax-modules-restrictions}
+
+The following restrictions are conditions on a module as a phrase, except
+those of the last item, which are conditions on a program. Each is decidable without type
+information. In them, the \emph{declarations} of a \topdec{} are the value
+declarations, custom type declarations, type alias declarations and port
+declarations of which it is the sequence.
+
+\begin{itemize}
+\item\citelabel{res:modules-ports} In a module, the \topdec{} contains a port declaration only if the
+  header is a port module header, and the \topdec{} of a module with a port
+  module header contains at least one port declaration.
+
+\item\citelabel{res:modules-header} Every module begins with a header, \kw{module} \modid{}
+  \kw{exposing} \explist{} or \kw{port module} \modid{} \kw{exposing}
+  \explist{}. A text that does not begin with a header is not a module of
+  Standard Elm.
+  % A16, A30
+
+\item\citelabel{res:modules-import-alias} In an import, the \modid{} after \kw{as} consists of a single
+  upper-case identifier.
+
+\item\citelabel{res:modules-basics-qualifier} The qualifier \kw{Basics} is provided only by an import of the module
+  \kw{Basics}: an import $\kw{import}\ \modid\ \kw{as}\ \kw{Basics}$
+  requires \modid{} to be \kw{Basics}. Since no module of a program has the
+  identifier of a module of the initial basis (the last item), the module
+  \kw{Basics} is always that of the initial basis, and the long identifiers
+  \kw{Basics.True}, \kw{Basics.False} and \kw{Basics.negate} that derived
+  forms introduce (Appendix~A) always denote its bindings.
+  % A89, A91; audit X18, V3
+
+\item\citelabel{res:modules-no-operator-exposing} An item \kw{(}\opv\kw{)} occurs only in the exposing list of an import:
+  a module declares no operator, so it has none to expose.
+  % A16
+
+\item\citelabel{res:modules-header-exposing} In the exposing list of a header, each item \var{} is bound by a value
+  declaration or a port declaration of the module's \topdec; each item
+  \tycon{} is the \tycon{} of a \datbind{} or a \typbind{} of the \topdec; and
+  each item $\tycon\,\kw{(..)}$ is the \tycon{} of a \datbind, never of a
+  \typbind. In particular a constructor cannot be exposed by name: an item
+  \tycon{} names a type, and the constructors of a custom type are exposed
+  only by $\tycon\,\kw{(..)}$ or by \kw{(..)}.
+
+\item\citelabel{res:modules-exposing-distinct} No two items of the exposing list of a header may have the same
+  identifier; thus \tycon{} and $\tycon\,\kw{(..)}$ do not both occur.
+
+\item\citelabel{res:modules-no-top-pattern} No value declaration of a \topdec{} may contain a binding other than
+  one of the form $\var\ \opt{\kw{:}\ \ty}\ \kw{=}\ \expm$; there is no
+  pattern binding at the top level.
+
+\item\citelabel{res:modules-values-distinct} No \topdec{} may bind the same \var{} twice by its value declarations
+  and port declarations together.
+
+\item\citelabel{res:modules-types-distinct} No \topdec{} may declare the same \tycon{} twice: custom types and
+  aliases share one name space.
+
+\item\citelabel{res:modules-constructors-distinct} No \topdec{} may declare the same \con{} twice. This counts the \con{}
+  of each constructor binding of every \datbind, and the \tycon{} of each
+  \emph{record alias}, that is, each \typbind{} $\tycon\ \tyvarseq\ \kw{=}\
+  \ty$ whose \ty{} is, apart from enclosing parentheses, a record type
+  $\kw{\kwlb}\,\opt{\tyrow}\,\kw{\kwrb}$ without an extension variable; a
+  record alias also declares a constructor of that name
+  (Chapter~\ref{ch:static-modules}).
+
+\item\citelabel{res:modules-no-shadowing} No variable bound within an expression of a \topdec{} (a parameter of
+  a lambda, a variable of a pattern, or a variable bound in a \kw{let}) may be
+  a \var{} bound by a value declaration or a port declaration of that
+  \topdec, wherever the declaration stands. This extends to top-level names
+  the restriction on shadowing of
+  Section~\ref{sec:syntax-core-restrictions}. Variables declared by imported
+  modules may be bound again.
+  % Audit X12: the top-level part of the shadowing restriction lives here.
+
+\item\citelabel{res:modules-tyvarseq-distinct} No \tyvarseq{} may contain the same \tyvar{} twice.
+
+\item\citelabel{res:modules-custom-type-tyvars} In a custom-type binding $\tycon\ \tyvarseq\ \kw{=}\ \conbind$, every
+  \tyvar{} occurring in \conbind{}, including the extension variable of a
+  record type, occurs in \tyvarseq. A \tyvar{} of \tyvarseq{} need not occur
+  in \conbind.
+
+\item\citelabel{res:modules-alias-tyvars} In a type-alias binding $\tycon\ \tyvarseq\ \kw{=}\ \ty$, the
+  \tyvarseq{} contains exactly the type variables occurring in \ty,
+  including extension variables of record types: an alias has no unused
+  parameter.
+
+\item\citelabel{res:modules-alias-not-recursive} No alias may be recursive. For the type-alias bindings of a \topdec,
+  say that $\tycon$ \emph{refers to} $\tycon'$ if $\tycon'$ is declared by a
+  type-alias binding of the \topdec{} and occurs, unqualified, in the type of
+  the binding of $\tycon$; this relation has no cycle. The \tycon{} of a
+  custom type is not related by it, so a cycle through a custom type is not
+  excluded.
+
+\item\citelabel{res:modules-value-recursion} An occurrence of a variable in an expression \expm{} is
+  \emph{delayed} if it lies within a lambda expression in \expm, and
+  \emph{direct} otherwise. For a value declaration \valbind{} of a \topdec,
+  say that $\var \to \var'$ if \valbind{} contains a binding $\var\
+  \opt{\kw{:}\ \ty}\ \kw{=}\ \expm$ and $\var'$ is bound by \valbind{} and
+  has a direct occurrence in \expm. No value declaration of a \topdec{} may
+  have a cycle $\var_1 \to \cdots \to \var_n \to \var_1$ $(n \geq 1)$. This
+  takes the place, for the value declarations of a \topdec, of the
+  restriction on recursive groups of
+  Section~\ref{sec:syntax-core-restrictions}. Since a binding with
+  parameters is a derived form whose equivalent form is a lambda expression
+  (Appendix~A), every occurrence in its body is delayed, and a rejected cycle
+  passes only through values without parameters. A delayed occurrence used
+  during the evaluation of the very value it refers to passes this
+  restriction; no evaluation rule applies to it
+  (Chapter~\ref{ch:dynamic-modules}).
+  % A26: only cycles through direct uses of parameterless values are
+  % rejected at top level; A25: delayed self-reference forced at evaluation
+
+\item\citelabel{res:modules-program} The following restrictions concern a program, and
+  Chapter~\ref{ch:programs} imposes them. The \var{} of every port
+  declaration of every module of a program is distinct from the \var{} of
+  every other port declaration of the program and from the name of every
+  manager of the platform (Chapter~\ref{ch:effects}). No module of a program
+  has the identifier of a module of the initial basis. In the main module,
+  \kw{main} does not occur free in the expression of its own declaration, so
+  \kw{main} is not recursive, even through a delayed occurrence.
+  % A84 (port names); A89 (basis module names reserved, main not recursive)
+\end{itemize}
+
+For an import, the conditions corresponding to those on the exposing list of
+a header depend on what the imported module exposes: an item
+$\tycon\,\kw{(..)}$ that names an alias, an item \tycon{} that names a
+constructor rather than a type, and an item that the imported module does not
+expose are rejected by the elaboration of imports
+(Chapter~\ref{ch:static-modules}).

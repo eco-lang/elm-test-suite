@@ -145,8 +145,8 @@ project depends on the latest release of each package it uses.
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 795 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
-| `elm-core` | 367 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
+| `elm` | 798 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
+| `elm-core` | 370 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
 | `elm-bytes` | 88 | elm/bytes encoders and decoders |
 | `elm-parser` | 51 | elm/parser |
 | `elm-json` | 42 | elm/json |
@@ -165,9 +165,9 @@ with its own project. The results website shows the tests by project and by tag.
 
 | Tag | Tests | What they are |
 |---|---|---|
-| `elm-spec` | 934 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
+| `elm-spec` | 940 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
 | `elm19-compile-error` | 221 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
-| `elm19-bug` | 153 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
+| `elm19-bug` | 156 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
 | `elm19-bug-fix` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
 | `elm-unspecced` | 14 | tests whose expected outcome A Standard Definition of Elm? leaves open or puts outside the definition: what `Debug.log` prints, the value of an integer constant outside the Int range, the text of a crash, shader blocks; each says why in its comment |
 | `elm-spec-contradicts` | 6 | reported bugs whose expected outcome A Standard Definition of Elm? contradicts: the book decides the program the other way, so the report is not a bug against it; each is marked XFAIL and says why in its comment |
@@ -428,9 +428,20 @@ discussion of each category. The code is `site/src/Discuss.elm` (the links), `Di
 The site also carries *A Standard Definition of Elm?*, a formal definition of the language, under
 `/standard`: its chapters, a page for every rule at an address made from the rule's name
 (`/standard/rules/d-atexp-var`), pages likewise for every restriction, derived form and entry of
-the initial basis (`/standard/basis/Basics/modBy`), and the PDF. Its LaTeX sources are in `definition/`;
+the initial basis (`/standard/basis/Basics/modBy`), the PDF, and the Lean proofs of its mechanisation
+(`/standard/proofs`, a page per theorem, read from `definition/mechanisation/` by
+`runner/mechanisation-data.js`). A test the mechanisation translates into Lean shows the translation
+on its page, with the Lean evaluator's value for each check and the theorem that proves it; where a
+translation's expected value is no longer the test's CHECK line, `definition-data.js` prints a warning
+(it does not fail) and the page marks the translation out of date. Its LaTeX sources are in `definition/tex/`;
 `runner/definition-data.js` turns them into the site's data, rendering the mathematics with KaTeX at
 build time, so the pages need no KaTeX JavaScript. See [definition/README.md](definition/README.md).
+
+The book is written by the `pl-definition-writer/` agent workspace, in eight stages from a survey of
+the implementations to the typeset PDF. The workspace holds only the agent's instructions; every
+stage writes to `definition/` (survey and rulings, notation, the LaTeX, the Lean mechanisation, audits,
+build report and PDFs), so the book can be revised with the tests by running the stages again. Start
+at [pl-definition-writer/CLAUDE.md](pl-definition-writer/CLAUDE.md).
 
 ```sh
 node runner/definition-data.js    # writes site/data-standard/ from definition/tex/
@@ -471,7 +482,9 @@ runner/dom.js         the minimal DOM that lets Html programs start on Node
 runner/site-data.js   writes the results website's data from the last results
 runner/spec-items.js  the names of the book's rules, restrictions, derived forms, basis entries, figures and sections
 runner/definition-data.js  writes the website's data for A Standard Definition of Elm?
-definition/           the LaTeX sources and PDF of A Standard Definition of Elm?
+runner/mechanisation-data.js  the data for the Lean proofs pages (called by definition-data.js)
+definition/           A Standard Definition of Elm?: LaTeX sources, PDF, and the other outputs of its stages
+pl-definition-writer/ the agent workspace that writes the book (instructions only)
 runner/check-baseline.js  lists the tests Elm 0.19.1 fails that are not tagged elm19-bug, elm19-bug-fix (CI)
 site/                 the results website (elm-pages)
 plans/                plans for work on the site

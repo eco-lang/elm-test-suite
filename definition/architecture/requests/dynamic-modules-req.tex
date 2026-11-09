@@ -1,0 +1,6 @@
+\newcommand{\dmConEnv}{\cls{ConEnv}} % class ConEnv (dynamic, Modules): TyCon ->fin ValEnv; constructor environments: the constructors of each custom type, by type
+\newcommand{\dmCE}{\mathit{CE}} % metavariable of ConEnv: CE (dynamic, Modules)
+\newcommand{\dmRA}{\mathit{RA}} % metavariable of Fin(TyCon): RA; the record aliases whose constructors an interface exposes (dynamic, Modules)
+\newcommand{\dmmerge}{\mathbin{\boxplus}} % operation E1 [+] E2 (boxed plus): modification of environments that merges the environments of a qualifier common to both (dynamic, Modules)
+\newcommand{\dmrecord}{\mathrm{record}} % basic value record(lab1...labn), n >= 1, arity n: the constructor of a record alias; record() stands for the empty record (dynamic, Modules)
+\newcommand{\dmthunk}[1]{#1^{\bullet}} % operation valbind^bullet, exp^bullet: the translation of a top-level value group in which each member is reached through a function of unit (dynamic, Modules)

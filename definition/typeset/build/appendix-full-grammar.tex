@@ -1,0 +1,235 @@
+% Values: PRECISE, FAITHFUL
+% Evidence planned:
+% - PRECISE: every alternative of the five bare grammar figures of
+%   Chapters 2 and 3 (Expressions, Matches, Declarations and Bindings;
+%   Patterns; Type Expressions; Modules, Headers, Imports and Exposing Lists;
+%   Top-level Declarations and Bindings) appears here in the same order with
+%   the same right-hand label; every row of the derived forms tables of
+%   Appendix A (infixed application, conditional, conditional chain, &&, ||,
+%   lambda with several patterns, negation, list expression, field accessor,
+%   field selection, list pattern, function binding, let with several
+%   definitions, module body as written) appears as an
+%   alternative of its phrase class, marked with a dagger (B6).
+% - FAITHFUL: precedence, layout and restrictions kept by reference to
+%   Sections 2.x and 3.x, not copied, so that the two cannot disagree; the
+%   abstract symbols ; and `and' (A17) noted as written by layout.
+
+\chapter{Full Grammar}\label{ch:appendix-full-grammar}
+
+The syntax of programs is given in Chapter~\ref{ch:programs}. The syntax of
+long identifiers is that of Chapter~\ref{ch:syntax-core}.
+
+The full grammar of the Core and of Modules consists of the grammar of
+Chapters~\ref{ch:syntax-core} and~\ref{ch:syntax-modules}, in which each
+derived form of Appendix~\ref{ch:appendix-derived-forms} is added as an
+alternative of the phrase class it belongs to. The grammatical rules are shown
+in Figures~\ref{fig:appendix-full-grammar-expressions},
+\ref{fig:appendix-full-grammar-patterns},
+\ref{fig:appendix-full-grammar-types},
+\ref{fig:appendix-full-grammar-modules}
+and~\ref{fig:appendix-full-grammar-top-level}. An alternative whose label
+carries the mark \fgderived{} is a derived form, whose equivalent form is
+given in Appendix~\ref{ch:appendix-derived-forms}; every other alternative is
+a phrase of the bare language, and has the same label as in
+Chapter~\ref{ch:syntax-core} or~\ref{ch:syntax-modules}. % B6
+No subclass of \cls{Exp} is introduced: which expressions may be the operands
+of an operator chain is stated in Section~\ref{sec:syntax-core-infix}.
+
+The grammatical conventions are those of Chapter~\ref{ch:syntax-core}, namely:
+\begin{itemize}
+\item The brackets $\opt{\ }$ enclose optional phrases.
+\item Alternative forms for each phrase class are in order of decreasing
+  precedence. L (resp.\ R) means left (resp.\ right) association.
+\item The infixed application, conjunction and disjunction alternatives are
+  grouped by the fixities of Figure~\ref{fig:core-fixities}, as
+  Section~\ref{sec:syntax-core-infix} describes, and not by their order in
+  Figure~\ref{fig:appendix-full-grammar-expressions}.
+\item Which item \kw{-} is a negation symbol, and which \kw{.} begins a field
+  selection or a field accessor, is decided by lexical analysis
+  (Section~\ref{sec:syntax-core-lexical}).
+\item The precedence of types and of patterns, and the extent of lambda
+  expressions, case expressions and \kw{let} expressions, are as stated with
+  the grammar of the Core (Figure~\ref{fig:core-grammar-expressions} and the
+  conventions before it); the extent of each phrase is decided by the layout
+  rule (Sections~\ref{sec:syntax-core-layout}
+  and~\ref{sec:syntax-modules-layout}).
+\item The separator \kw{;} between match rules and between top-level
+  declarations, and the connective \kw{and} between the members of a value
+  binding or of a custom-type binding, are abstract syntax. Neither is an
+  item of source text: match rules, the definitions of a \kw{let} and the
+  declarations of a module are separated by layout, and \kw{and} is not a
+  reserved word. Likewise an annotated binding
+  $\var\ \kw{:}\ \ty\ \kw{=}\ \expm$ is written in source text as the
+  annotation $\var\ \kw{:}\ \ty$ followed by a definition of \var. The
+  derived alternatives $\kw{let}\ \valbind_1\ \cdots\ \valbind_n\ \kw{in}\
+  \expm$ and $\topdec_1\ \cdots\ \topdec_n$ are the forms in which several
+  definitions and declarations are written; in them each $\valbind_i$ is a
+  definition, that is, a value binding without \kw{and}, and each
+  $\topdec_i$ is a single declaration, as listed in
+  Section~\ref{sec:appendix-derived-forms-modules}.
+  % A17
+\end{itemize}
+
+The syntactic restrictions are those of
+Sections~\ref{sec:syntax-core-restrictions}
+and~\ref{sec:syntax-modules-restrictions}. They apply to phrases of the full
+grammar, that is, to a program as written, before any derived form is
+replaced by its equivalent form.
+
+\begin{figure}[tbp]
+\centering
+\begin{grammar}
+\gprod{\atexp}{\scon}{special constant}
+\galt{\longvar}{value variable}
+\galt{\longcon}{value constructor}
+\galt{\kw{(}\opv\kw{)}}{operator value}
+\galt{\kw{()}}{unit}
+\galt{\kw{(}\ \expm_1\ \kw{,}\ \expm_2\ \opt{\kw{,}\ \expm_3}\ \kw{)}}{tuple}
+\galt{\kw{[}\ \kw{]}}{empty list}
+\galt{\kw{[}\expm_1\kw{,}\ \cdots\kw{,}\ \expm_n\kw{]}}{list ($n \geq 1$)\fgderived}
+\galt{\kw{\kwlb}\ \opt{\exprow}\ \kw{\kwrb}}{record}
+\galt{\kw{\kwlb}\ \var\ \kw{|}\ \exprow\ \kw{\kwrb}}{record update}
+\galt{\kw{.}\lab}{field accessor\fgderived}
+\galt{\atexp\kw{.}\lab}{field selection\fgderived}
+\galt{\kw{-}\atexp}{negation\fgderived}
+\galt{\kw{let}\ \dec\ \kw{in}\ \expm}{local declaration}
+\galt{\kw{let}\ \valbind_1\ \cdots\ \valbind_n}{definitions\fgderived}
+\galt{\quad\kw{in}\ \expm}{($n \geq 2$)}
+\galt{\kw{(}\ \expm\ \kw{)}}{parentheses}
+\noalign{\smallskip}
+\gprod{\exprow}{\lab\ \kw{=}\ \expm\ \opt{\kw{,}\ \exprow}}{expression row}
+\noalign{\smallskip}
+\gprod{\expm}{\atexp}{atomic}
+\galt{\expm\ \atexp}{application (L)}
+\galt{\expm_1\ \opv\ \expm_2}{infixed application\fgderived}
+\galt{\expm_1\ \kw{\&\&}\ \expm_2}{conjunction\fgderived}
+\galt{\expm_1\ \kw{||}\ \expm_2}{disjunction\fgderived}
+\galt{\kw{\textbackslash}\,\atpat\ \kw{->}\ \expm}{function}
+\galt{\kw{\textbackslash}\atpat_1\cdots\atpat_n\ \kw{->}\ \expm}{function ($n \geq 2$)\fgderived}
+\galt{\kw{if}\ \expm_1\ \kw{then}\ \expm_2\ \kw{else}\ \expm_3}{conditional\fgderived}
+\galt{\kw{if}\ \expm_1\ \kw{then}\ \expm'_1}{conditional chain\fgderived}
+\galt{\quad\kw{else}\ \kw{if}\ \expm_2\ \kw{then}\ \expm'_2\ \cdots}{($n \geq 2$)}
+\galt{\quad\kw{else}\ \kw{if}\ \expm_n\ \kw{then}\ \expm'_n}{}
+\galt{\quad\kw{else}\ \expm}{}
+\galt{\kw{case}\ \expm\ \kw{of}\ \match}{case analysis}
+\noalign{\smallskip}
+\gprod{\match}{\mrule\ \opt{\kw{;}\ \match}}{match}
+\noalign{\smallskip}
+\gprod{\mrule}{\pat\ \kw{->}\ \expm}{match rule}
+\noalign{\smallskip}
+\gprod{\dec}{\valbind}{value declaration}
+\noalign{\smallskip}
+\gprod{\valbind}{\var\ \opt{\kw{:}\ \ty}\ \kw{=}\ \expm\ \opt{\kw{and}\ \valbind}}{variable binding}
+\galt{\var\ \opt{\kw{:}\ \ty}\ \atpat_1\cdots\atpat_n}{function binding\fgderived}
+\galt{\qquad\kw{=}\ \expm\ \opt{\kw{and}\ \valbind}}{($n \geq 1$)}
+\galt{\atpat\ \kw{=}\ \expm}{destructuring binding}
+\end{grammar}
+\medskip
+{\small\fgderived{} derived form, Appendix~\ref{ch:appendix-derived-forms}.\par}
+\caption{Full Grammar: Expressions, Matches, Declarations and Bindings}
+\label{fig:appendix-full-grammar-expressions}
+\end{figure}
+
+In the infixed application alternative, \opv{} is neither \kw{\&\&} nor
+\kw{||}. The alternative \kw{-}\atexp{} is atomic, so that a negated
+expression may be the argument of an application.
+
+\begin{figure}[tbp]
+\centering
+\begin{grammar}
+\gprod{\atpat}{\kw{\_}}{wildcard}
+\galt{\scon}{special constant}
+\galt{\var}{variable}
+\galt{\longcon}{constructor}
+\galt{\kw{()}}{unit}
+\galt{\kw{(}\ \pat_1\ \kw{,}\ \pat_2\ \opt{\kw{,}\ \pat_3}\ \kw{)}}{tuple}
+\galt{\kw{[}\ \kw{]}}{empty list}
+\galt{\kw{[}\pat_1\kw{,}\ \cdots\kw{,}\ \pat_n\kw{]}}{list ($n \geq 1$)\fgderived}
+\galt{\kw{\kwlb}\ \opt{\patrow}\ \kw{\kwrb}}{record}
+\galt{\kw{(}\ \pat\ \kw{)}}{parentheses}
+\noalign{\smallskip}
+\gprod{\patrow}{\lab\ \opt{\kw{,}\ \patrow}}{pattern row}
+\noalign{\smallskip}
+\gprod{\pat}{\atpat}{atomic}
+\galt{\longcon\ \atpat_1\ \cdots\ \atpat_n}{constructed pattern ($n \geq 1$)}
+\galt{\pat_1\ \kw{::}\ \pat_2}{list construction (R)}
+\galt{\pat\ \kw{as}\ \var}{layered}
+\end{grammar}
+\medskip
+{\small\fgderived{} derived form, Appendix~\ref{ch:appendix-derived-forms}.\par}
+\caption{Full Grammar: Patterns}
+\label{fig:appendix-full-grammar-patterns}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\begin{grammar}
+\gprod{\ty}{\tyvar}{type variable}
+\galt{\kw{\kwlb}\ \opt{\tyrow}\ \kw{\kwrb}}{record type expression}
+\galt{\kw{\kwlb}\ \tyvar\ \kw{|}\ \tyrow\ \kw{\kwrb}}{extensible record type expression}
+\galt{\kw{()}}{unit type expression}
+\galt{\kw{(}\ \ty_1\ \kw{,}\ \ty_2\ \opt{\kw{,}\ \ty_3}\ \kw{)}}{tuple type expression}
+\galt{\longtycon\ \ty_1\ \cdots\ \ty_n}{type construction ($n \geq 0$)}
+\galt{\ty\ \kw{->}\ \ty'}{function type expression (R)}
+\galt{\kw{(}\ \ty\ \kw{)}}{parentheses}
+\noalign{\smallskip}
+\gprod{\tyrow}{\lab\ \kw{:}\ \ty\ \opt{\kw{,}\ \tyrow}}{type-expression row}
+\end{grammar}
+\caption{Full Grammar: Type Expressions}
+\label{fig:appendix-full-grammar-types}
+\end{figure}
+
+Type expressions have no derived forms; Figure~\ref{fig:appendix-full-grammar-types}
+is Figure~\ref{fig:core-grammar-types} unchanged. Modules, headers, imports and
+exposing lists have no derived forms either: every module has a header, and
+Figure~\ref{fig:appendix-full-grammar-modules} is
+Figure~\ref{fig:grammar-modules} unchanged.
+% A16, A30
+
+\begin{figure}[tbp]
+\centering
+\begin{grammar}
+\gprod{\modm}{\header\ \imports\ \topdec}{module}
+\gprod{\header}{\kw{module}\ \modid\ \kw{exposing}\ \explist}{plain}
+\galt{\kw{port}\ \kw{module}\ \modid\ \kw{exposing}\ \explist}{port module}
+\gprod{\imports}{\kw{import}\ \modid\ \opt{\kw{as}\ \modid'}}{import}
+\galt{\quad\opt{\kw{exposing}\ \explist}\ \imports}{}
+\galt{}{empty}
+\gprod{\explist}{\kw{(..)}}{everything}
+\galt{\kw{(}\,\expitem_1\ \kw{,}\ \cdots\ \kw{,}\ \expitem_n\,\kw{)}}{explicit}
+\gnote{$(n \geq 1)$}
+\gprod{\expitem}{\var}{value}
+\galt{\kw{(}\opv\kw{)}}{operator}
+\galt{\tycon}{type}
+\galt{\tycon\,\kw{(..)}}{open type}
+\end{grammar}
+\caption{Full Grammar: Modules, Headers, Imports and Exposing Lists}
+\label{fig:appendix-full-grammar-modules}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\begin{grammar}
+\gprod{\topdec}{\valbind}{value}
+\galt{\kw{type}\ \datbind}{custom type}
+\galt{\kw{type}\ \kw{alias}\ \typbind}{type alias}
+\galt{\kw{port}\ \var\ \kw{:}\ \ty}{port}
+\galt{\topdec_1\ \kw{;}\ \topdec_2}{sequential}
+\galt{\topdec_1\ \cdots\ \topdec_n}{module body ($n \geq 2$)\fgderived}
+\gprod{\datbind}{\tycon\ \tyvarseq\ \kw{=}\ \conbind}{custom-type binding}
+\galt{\qquad\opt{\kw{and}\ \datbind}}{}
+\gprod{\conbind}{\con\ \ty_1\ \cdots\ \ty_n\ \opt{\kw{|}\ \conbind}}{constructor binding}
+\gnote{$(n \geq 0)$}
+\gprod{\typbind}{\tycon\ \tyvarseq\ \kw{=}\ \ty}{type-alias binding}
+\gprod{\tyvarseq}{\tyvar_1\ \cdots\ \tyvar_k}{type parameters}
+\gnote{$(k \geq 0)$}
+\end{grammar}
+\medskip
+{\small\fgderived{} derived form, Appendix~\ref{ch:appendix-derived-forms}.\par}
+\caption{Full Grammar: Top-level Declarations and Bindings}
+\label{fig:appendix-full-grammar-top-level}
+\end{figure}
+
+A top-level value declaration as written is a variable binding or a function
+binding without \kw{and}; the function binding alternative of
+Figure~\ref{fig:appendix-full-grammar-expressions} applies to it.

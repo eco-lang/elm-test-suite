@@ -818,6 +818,22 @@ standardStyles =
         , p "overflow-x" "auto"
         ]
 
+    -- The Lean proofs.
+    , Css.Global.selector ".sd-lean" [ p "white-space" "pre", p "line-height" "1.45" ]
+    , Css.Global.class "sd-method"
+        [ p "display" "inline-block"
+        , p "font-size" "12px"
+        , p "color" colors.muted
+        , p "border" ("1px solid " ++ colors.border)
+        , p "border-radius" "999px"
+        , p "padding" "0 8px"
+        , p "vertical-align" "1px"
+        ]
+    , Css.Global.selector ".sd-proof-list > li" [ p "margin-bottom" "0.5em" ]
+    , Css.Global.class "sd-proof-summary" [ p "color" colors.muted, p "font-size" "15px" ]
+    , Css.Global.selector ".sd-kc-table td" [ p "white-space" "nowrap" ]
+    , Css.Global.class "sd-lean-drift" [ p "color" "#B3261E" ]
+
     -- Paging between chapters and rules.
     , Css.Global.class "sd-pager"
         [ p "display" "flex"

@@ -1,0 +1,1107 @@
+% Values: PRECISE, FAITHFUL
+% Evidence planned:
+% - PRECISE: one section per abstract parameter or unspecified point of the
+%   body (IntRange and norm, characters, Float operations, equality, bitwise
+%   and string conversion, evaluation order and Debug, resource limits,
+%   platform and ports, eco extensions); each states what the body requires,
+%   with a reference to the body, then a table with one row per
+%   implementation (Elm 0.19.1 on JavaScript; eco 0.2.0) giving its choice and
+%   the consequences for programs.
+% - FAITHFUL: every ruling of the ambiguity log marked UNSPECIFIED or CUSTOM
+%   that names this appendix, and every "recorded in the appendix" ruling
+%   (A8, A9, A13, A14, A33, A34, A39, A40 to A55, A57 to A59, A61 to
+%   A72, A76, A79 to A81, A83, A92), cited beside the text it shaped; every
+%   implementation fact traceable to the survey ("Implementation-Dependent
+%   Points", "Arithmetic", "Equality", "Comparison and Order", "Char and String
+%   Basics", "Bitwise", "Remaining Runtime Failures", "Ports at Runtime", "Eco
+%   Differences") or to the ruling; a closing table of known divergences with
+%   the ruling that classifies each.
+
+\chapter{Implementation-Dependent Details}\label{ch:appendix-implementation}
+
+Where implementations of Standard Elm legitimately differ, the body of the
+definition states only what every implementation must satisfy, using an
+abstract parameter where one is needed. % D8
+This appendix gives, for each such parameter or unspecified point, what the
+body requires of it and what two implementations choose. The implementations
+are Elm 0.19.1 with the elm/core 1.0.5 kernel on JavaScript, written
+\emph{Elm/JS}, and eco 0.2.0 producing native code, written \emph{eco}; eco's
+output for JavaScript behaves as Elm/JS does, except for \kw{Bytes} at the
+boundary (Section~\ref{sec:appendix-implementation-bytes}). Each section states the
+requirement, with a reference to the body, and then gives a table with one row
+per implementation: its choice, and the consequences for programs. An
+implementation \emph{conforms} on a point when its choice meets the
+requirement. Section~\ref{sec:appendix-implementation-divergences} collects
+every known point on which an implementation does not conform, with the
+ruling that settles it. The facts recorded here describe the versions named;
+they are not part of the definition.
+
+% ===========================================================================
+\section{The Int Range and Normalisation}\label{sec:appendix-implementation-int}
+
+The body requires the following of the type \kw{Int}
+(Chapter~\ref{ch:syntax-core}, Section~\ref{sec:dynamic-core-simple} and
+Section~\ref{sec:appendix-dynamic-basis-apply}).
+\begin{itemize}
+\item $\IntRange$ is a set of integers containing every integer $n$ with
+  $-2^{31}\leq n\leq 2^{31}-1$; Int has one zero. % A40, A45
+\item $\norm$ maps every integer into $\IntRange$ and is the identity on
+  $\IntRange$. Int addition, subtraction, multiplication, negation, absolute
+  value and power with a non-negative exponent give $\norm$ of the exact
+  result, and an integer constant spelling $n$ denotes $\norm(n)$. % A9, A40
+  % DECIDED: norm is the identity on IntRange; A40 calls it a normalisation
+  % into the range, which is read as leaving members of the range unchanged.
+\item For $b\neq 0$, \kw{a // b} is $\norm$ of the truncation of $a/b$ toward
+  zero; \kw{x // 0}, \kw{modBy 0 x} and \kw{remainderBy 0 x} are $0$.
+  % A41, A42, D3
+\item For $e<0$, \kw{b \textasciicircum{} e} at Int is $1$ when $b=1$, $1$ or
+  $-1$ by the parity of $e$ when $b=-1$, and $0$ otherwise. % A43
+\item \kw{round}, \kw{floor}, \kw{ceiling} and \kw{truncate} give the integer
+  they denote when it lies in $\IntRange$, the least or greatest member of
+  $\IntRange$ when it lies below or above it (an infinity included), and $0$
+  for NaN. % A44
+\end{itemize}
+A value of type \kw{Int} is always a member of $\IntRange$: never a fraction,
+NaN, an infinity or a negative zero.
+
+\subsection{The Range and Normalisation}
+% A9, A40
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & An Int is an IEEE 754 double. \kw{+}, \kw{-} and \kw{*} give the exact
+result rounded to the nearest double: exact while its magnitude is at most
+$2^{53}$, rounded above that, an infinity beyond the largest double. An
+integer constant is reduced modulo $2^{64}$ into $[-2^{63},2^{63})$ as two's
+complement. &
+No $\IntRange$ and $\norm$ describe Elm/JS: Int results above $2^{53}$ in
+magnitude are inexact, an overflow gives an infinity, and other operations
+below leave the integers. Programs whose Int results stay within $\pm 2^{53}$
+compute exactly.\\
+eco & $\IntRange$ is $[-2^{63},2^{63}-1]$, and $\norm(n)$ is the $m$ in
+$\IntRange$ with $m\equiv n \pmod{2^{64}}$ (64-bit two's complement wrap).
+Integer constants likewise: \kw{0xFFFFFFFFFFFFFFFF} denotes $-1$. &
+Conforms. Overflow wraps silently: the greatest Int plus $1$ is the least;
+\kw{abs} and \kw{negate} of the least Int give it back.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Integer Division and Remainders}
+% A41, A42
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & \kw{a // b} is the quotient $a/b$ converted to a 32-bit integer
+(truncation, then reduction modulo $2^{32}$ into $[-2^{31},2^{31})$; NaN and
+the infinities give $0$), so \kw{x // 0} is $0$. \kw{modBy 0 x} stops the
+program with the message ``Cannot perform mod 0. Division by zero error.''
+\kw{remainderBy 0 x} is NaN, held as an Int. &
+Quotients outside $\pm 2^{31}$ wrap: \kw{5000000000 // 1} is
+\kw{705032704}. \kw{modBy 0} ends the program; NaN from \kw{remainderBy 0}
+spreads through later arithmetic (\kw{remainderBy 0 7 + 1} is NaN).\\
+eco & Truncated division on 64 bits; \kw{x // 0}, \kw{modBy 0 x} and
+\kw{remainderBy 0 x} are $0$; the least Int \kw{// -1} is the least Int. &
+Conforms.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Powers with a Negative Exponent}
+% A43
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & The real power, held as an Int: \kw{2 \textasciicircum{} -1} is
+\kw{0.5} and \kw{0 \textasciicircum{} -1} is an infinity. &
+Does not conform: the result is not an integer.\\
+eco & $0$ for every base, \kw{1} and \kw{-1} included. For $e\geq 0$, the
+power reduced modulo $2^{64}$, as $\norm$. &
+Does not conform for the bases $1$ and $-1$: \kw{1 \textasciicircum{} -1} is
+$0$, not $1$.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Conversion from Float}
+% A44
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & \kw{round}, \kw{floor} and \kw{ceiling} of NaN or an infinity give NaN
+or that infinity, held as an Int. \kw{truncate} converts to a 32-bit integer
+(NaN and the infinities give $0$). &
+Does not conform: \kw{round (0/0)} is NaN, and \kw{truncate 3e10} is
+\kw{-64771072}.\\
+eco & Saturating conversion to 64 bits: NaN gives $0$; values above or below
+$\IntRange$, infinities included, give its greatest or least member. &
+Conforms: \kw{truncate 3e10} is \kw{30000000000}, and \kw{round (1/0)} and
+\kw{truncate 1e20} are \kw{9223372036854775807}.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Negative Zero}
+% A45
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & \kw{negate 0}, \kw{0 * -1}, \kw{modBy 4 -4}, \kw{remainderBy 4 -4},
+\kw{round -0.4} and \kw{ceiling -0.5} give a negative zero held as an Int. &
+Does not conform. The sign shows after conversion:
+\kw{1 / toFloat (negate 0)} is \kw{-Infinity}. Equality does not see it.\\
+eco & Int has one zero. & Conforms: \kw{1 / toFloat (negate 0)} is
+\kw{Infinity}.\\
+\hline
+\end{tabular}
+\end{center}
+
+In Elm/JS a value of type \kw{Int} may thus be a fraction, NaN, an infinity or
+a negative zero, none of which is a member of any $\IntRange$; Elm/JS does not
+conform at the extremes of Int. A program whose exact Int results, quotients
+and conversions from Float all lie between $-2^{31}$ and $2^{31}-1$, and which
+applies neither \kw{modBy 0}, \kw{remainderBy 0} nor Int
+\kw{\textasciicircum} with a negative exponent, has the same meaning in every
+implementation listed here, apart from the sign of a zero seen through
+\kw{toFloat}.
+
+% ===========================================================================
+\section{Characters and Strings}\label{sec:appendix-implementation-chars}
+
+The body requires the following (Chapter~\ref{ch:syntax-core},
+Section~\ref{sec:dynamic-core-simple} and
+Section~\ref{sec:appendix-dynamic-basis-apply}).
+\begin{itemize}
+\item \kw{Char} is an abstract class of characters with an injective function
+  \kw{toCode} into the Int range, under which the character with code point
+  $h$ has the code $h$, for every Unicode scalar value $h$; a string is a
+  finite sequence of characters. \kw{Char.fromCode n} is the character with
+  code point $n$ when $n$ is a Unicode scalar value, and otherwise a character
+  of the implementation's choosing, which has a code like every other. % A52
+\item The escape \kw{\textbackslash u\kwlb}$h$\kw{\kwrb} denotes a Unicode
+  scalar value: surrogate code points are excluded. % A8
+\item Chars are ordered by \kw{toCode}; strings are ordered lexicographically
+  by their sequences of characters. % A53
+\item The letters of identifiers are classified by the general categories of
+  a version of the Unicode standard chosen by the implementation. % A14
+\item Case mapping is outside the initial basis and has no requirement. % A54
+\end{itemize}
+
+\subsection{What a Character Is}
+% A52, A8
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & A Char is a JavaScript string of one code point, one or two UTF-16
+code units; case mapping can make it longer. \kw{toCode} gives its first code
+point, and NaN for a lone high surrogate. \kw{fromCode n} gives U+FFFD for
+$n<0$ or $n>\mathrm{10FFFF}_{16}$, and passes surrogates through. A string is
+a sequence of UTF-16 code units. A surrogate escape is accepted. &
+\kw{toCode} is not injective on the Chars Elm/JS can make: the two-character
+result of \kw{Char.toUpper \textquotesingle\ss\textquotesingle} has the code
+of \kw{\textquotesingle S\textquotesingle}. A string holding a lone surrogate
+makes \kw{String.toList} run until memory is exhausted.\\
+eco & A Char is one code point in $0$ to $\mathrm{10FFFF}_{16}$; a surrogate
+code point is a Char of its own. \kw{toCode} is the code point; \kw{fromCode}
+as Elm/JS. A string is a sequence of UTF-16 code units: a valid surrogate pair
+is one character, a lone surrogate is one character. A surrogate escape is
+accepted. &
+\kw{toCode} is injective. \kw{String.fromList (String.toList s)} is \kw{s}
+for every string.\\
+\hline
+\end{tabular}
+\end{center}
+In both, \kw{String.length} and string indices count UTF-16 code units, so a
+character above U+FFFF counts twice: the length of a three-character string
+whose middle character is U+1F600 is $4$.
+
+\subsection{The Order of Characters and Strings}
+% A53
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & Chars and strings both by UTF-16 code units. &
+The two orders agree with each other but not with \kw{toCode}: a character
+above U+FFFF sorts below the characters U+E000 to U+FFFF. Does not
+conform.\\
+eco & Chars by code point; strings by UTF-16 code units. &
+Char order conforms; string order does not, for strings comparing a character
+above U+FFFF with one in U+E000 to U+FFFF. Char order and the order of
+one-character strings then disagree.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{The Unicode Version of Identifiers}
+% A14
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & The Unicode tables of the Haskell system that built the compiler. &
+A letter assigned in a later Unicode version than one implementation knows is
+not a letter there: an identifier using it is accepted by one implementation
+and rejected by the other.\\
+eco & Unicode 14.0.0. & \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Case Mapping}
+% A54
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & Full case mapping of the host's Unicode version, with the final sigma
+rule; \kw{toLocaleUpper} and \kw{toLocaleLower} use the host's locale in a
+browser. &
+\kw{Char.toUpper \textquotesingle\ss\textquotesingle} is the two-character
+\kw{"SS"}, held as a Char. \kw{String.toLower} lowers a word-final capital
+sigma to final sigma.\\
+eco & Simple case mapping of Unicode 17.0, one code point to one; no final
+sigma rule; \kw{toLocaleUpper} and \kw{toLocaleLower} are \kw{toUpper} and
+\kw{toLower}. &
+\kw{Char.toUpper \textquotesingle\ss\textquotesingle} is
+\kw{\textquotesingle\ss\textquotesingle}; case mapping keeps the length of a
+string.\\
+\hline
+\end{tabular}
+\end{center}
+The predicates of the module \kw{Char} (\kw{isUpper}, \kw{isLower},
+\kw{isAlpha}, \kw{isDigit}, \kw{isOctDigit} and \kw{isHexDigit}) are, in
+both, defined by their elm/core text over ASCII code ranges, and agree.
+
+% ===========================================================================
+\section{Floating-Point Operations}\label{sec:appendix-implementation-float}
+
+The body requires the following of the type \kw{Float}
+(Section~\ref{sec:dynamic-core-simple} and
+Section~\ref{sec:appendix-dynamic-basis-apply}).
+\begin{itemize}
+\item \kw{compare} on Floats is a total order: $-0$ and $+0$ are equal, NaN
+  equals NaN and is greater than every other Float. % A46
+\item At Float, \kw{<}, \kw{<=}, \kw{>} and \kw{>=} are the IEEE predicates,
+  false when an operand is NaN; on tuples and lists they are the
+  lexicographic order derived from \kw{compare}. % A47
+\item At Float, \kw{min} and \kw{max} are the \emph{minimum} and
+  \emph{maximum} of IEEE 754-2019: NaN when either argument is NaN, and
+  $-0$ below $+0$, whatever the order of the arguments. At every other
+  comparable type they give the results of their elm/core definitions. % A48
+\item At Float, \kw{clamp lo hi x} is \kw{min (max x lo) hi}, with the
+  \kw{min} and \kw{max} above: $hi$ when $lo>hi$, NaN when any argument is
+  NaN, and \kw{clamp 0 1 -0} is $+0$. At Int it is given by its elm/core
+  definition through \kw{<} and \kw{>}: $lo$ when $x<lo$, else $hi$ when
+  $x>hi$, else $x$, so that \kw{clamp 10 0 5} is $10$. % A48, A49, A60
+\item At Float, \kw{+}, \kw{-}, \kw{*}, \kw{/}, \kw{sqrt} and \kw{negate}
+  are the operations of IEEE 754-2019, correctly rounded, with no latitude
+  in accuracy (Figure~\ref{fig:dynamic-basis-float}).
+\item The power and the transcendental functions (the trigonometric functions,
+  their inverses, \kw{atan2} and the logarithm under \kw{logBase}) denote the
+  real function rounded to a Float, with special values as IEEE 754-2019
+  recommends; their accuracy is implementation-dependent. % A65
+\end{itemize}
+In both implementations a Float is an IEEE 754 binary64 number, and \kw{+},
+\kw{-}, \kw{*}, \kw{/} and \kw{sqrt} are the IEEE operations rounding to
+nearest.
+% Audit Y9: IEEE 754 requires a correctly rounded square root, so sqrt is
+% with + - * / (Appendix D); A65 covers only the power and the
+% transcendental functions.
+
+\subsection{\kw{compare} with NaN}
+% A46
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & \kw{LT} if $a<b$, \kw{EQ} if $a$ and $b$ are equal, else \kw{GT}: any
+comparison with NaN is \kw{GT}. &
+Does not conform: \kw{compare 1 nan} and \kw{compare nan 1} are both
+\kw{GT}. Sorting, \kw{Dict} and \kw{Set} with NaN keys have no defined
+result.\\
+eco & The total order of the body. &
+Conforms: \kw{compare 1 nan} is \kw{LT} and \kw{compare nan nan} is \kw{EQ};
+NaNs sort last and are one key of a \kw{Dict} or \kw{Set}.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{The Order Operators}
+% A47
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & The IEEE predicate when an operand is written as a constant;
+otherwise derived from \kw{compare} above. &
+Does not conform: with \kw{one = 1}, \kw{one > nan} is \kw{True} while
+\kw{1 > nan} is \kw{False}, and \kw{nan >= nan} is \kw{True} when neither
+operand is a constant.\\
+eco & IEEE predicates at Float on every path; on tuples and lists, by
+\kw{compare}. &
+Conforms: \kw{nan < 1} is \kw{False}, and \kw{[ nan ] > [ 1 ]} is
+\kw{True}.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{\kw{min}, \kw{max} and \kw{clamp}}
+% A48, A49
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & The elm/core definitions, at every type, through the comparison of
+\kw{compare} above, which makes any comparison with NaN \kw{GT} and the two
+zeros \kw{EQ}. &
+\kw{min} and \kw{max} do not conform at Float when an argument is NaN or
+both are zeros: the result depends on the order of the arguments.
+\kw{min nan 1} and \kw{max 1 nan} are \kw{1}, where the body gives NaN.
+\kw{clamp} conforms at Int; at Float it does not conform when $lo>hi$, when
+an argument is NaN, or with zeros of different signs: \kw{clamp 10 0 5} is
+\kw{10}, \kw{clamp 0 1 nan} is \kw{1}, \kw{clamp nan 1 0.5} is \kw{0.5}
+and \kw{clamp 0 1 -0} is $-0$, where the body gives $+0$, NaN, NaN and
+$+0$.\\
+eco & At Float, IEEE 754-2019 \emph{minimum} and \emph{maximum} (NaN in
+either argument gives NaN; $-0<+0$), and \kw{clamp lo hi x} is
+\kw{min (max x lo) hi}. At every other type, the elm/core definitions. &
+\kw{min}, \kw{max} and \kw{clamp} conform.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Special Values and Accuracy}
+% A65
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & The host's ECMAScript \kw{Math} functions, whose accuracy the host
+chooses. \kw{\textasciicircum} at Float follows ECMAScript: \kw{1
+\textasciicircum{} (1/0)} is NaN. &
+Does not conform for the special values of \kw{\textasciicircum}: IEEE
+754-2019 gives $1$. \kw{logBase 10 1000} is \kw{2.9999999999999996}.\\
+eco & \kw{\textasciicircum} at Float follows C99 Annex F (\kw{1
+\textasciicircum{} (1/0)} is $1$); \kw{sin} and \kw{cos} are those of the
+code generator, \kw{tan x} is computed as \kw{sin x / cos x}, and the inverse
+trigonometric functions are those of the C mathematics library. &
+Accuracy is that of the functions named. The special values of
+\kw{\textasciicircum} conform, but no test of eco checks them.\\
+\hline
+\end{tabular}
+\end{center}
+
+% ===========================================================================
+\section{Equality}\label{sec:appendix-implementation-equality}
+
+The body requires that equality be structural, with IEEE equality at Float;
+the identity of values plays no part, so a value containing NaN is not equal
+to itself. When an equality test reaches two functions, its result is an
+unspecified Bool: $\APPLY$ gives the set of both Bools
+(Section~\ref{sec:dynamic-core-basic}, rule~\ruleref{r:d-app-basic-apply}
+and Section~\ref{sec:appendix-dynamic-basis-apply}). % A50, A51
+
+\subsection{Identity}
+% A50
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & Structural, but \kw{True} at once when both operands are the same
+object. At Float, \kw{x == 0} with \kw{0} written as an Int constant tests
+whether \kw{x} is zero or NaN. &
+Does not conform: \kw{p == p} with \kw{p = ( nan, 1 )} is \kw{True}, and
+\kw{nan == 0} is \kw{True} (\kw{nan /= 0} is \kw{False}).\\
+eco & Structural, but its code gives \kw{True} at once when both operands
+are the same object, in the equality kernel and in the inline fast path;
+whether two occurrences are the same object depends on optimisation. IEEE at
+Float on every path. &
+Does not conform for values containing NaN: by the code, \kw{p == p} as above
+is \kw{True}, while a separately built \kw{( nan, 1 )} is unequal to \kw{p}.
+Two of eco's tests of known Elm bugs expect \kw{False} for \kw{p == p} and for
+other containers compared with themselves, as the definition gives (A50), but
+eco's test harness does not run them.\\
+% eco tests: elm-bugs CompilerIssue2362NanTupleEqualityTest:13-15 and
+% CoreIssue988NanContainerSelfEqualityTest:17-24, not run by the E2E harness
+% (survey, Equality and test suite status); code: Utils.cpp:503,
+% EcoBackend.cpp:2216-2236. Mechanisation F7.
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Functions}
+% A51
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & \kw{True} for the same object; otherwise the program stops with the
+message ``Trying to use \kw{(==)} on functions''. &
+Does not conform: \kw{(\textbackslash x -> x) == (\textbackslash x -> x + 0)}
+and \kw{Just f == Just g} end the program.\\
+eco & \kw{True} if the two are the same object, else \kw{False}, at any depth.
+A lambda that captures no variable is one object however often it is
+evaluated; a partial application is a new object each time. &
+Conforms: the result is one member of the set. \kw{f == f} is \kw{True};
+\kw{(\textbackslash x -> x) == (\textbackslash x -> x + 0)} is \kw{False}.\\
+\hline
+\end{tabular}
+\end{center}
+
+% ===========================================================================
+\section{Bitwise Operations and String Conversion}%
+\label{sec:appendix-implementation-bitwise}
+
+The functions of the module \kw{Bitwise} are outside the initial basis
+(Chapter~\ref{ch:appendix-static-basis}), and so are the conversions
+\kw{String.toInt}, \kw{String.fromInt} and \kw{String.fromFloat}; the body
+places no requirement on them. % A55, A64
+They are recorded here because they reveal the Int range.
+
+\subsection{Bitwise Operations}
+% A55
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & 32 bits: operands converted to 32-bit integers, results signed
+32-bit, shift counts taken modulo 32; \kw{shiftRightZfBy} gives an unsigned
+32-bit result. &
+\kw{shiftLeftBy 32 1} is \kw{1}; \kw{shiftRightZfBy 0 -1} is
+\kw{4294967295}.\\
+eco & 64 bits, signed; shift counts taken modulo 64; \kw{shiftRightZfBy} gives
+its 64-bit result read as signed. &
+\kw{shiftLeftBy 32 1} is \kw{4294967296}, \kw{shiftLeftBy 63 1} is the least
+Int, and \kw{shiftRightZfBy 0 -1} is \kw{-1}.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Conversion between Numbers and Strings}
+% A64
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & \kw{String.toInt} reads an optional sign and decimal digits into a
+double, with no overflow check and no length limit; \kw{"-0"} gives a negative
+zero. \kw{String.fromInt} and \kw{String.fromFloat} use the host's printing of
+numbers. &
+Long numerals give rounded results rather than \kw{Nothing}.
+\kw{String.fromInt} prints $10^{21}$ as \kw{"1e+21"}, and an Int holding
+\kw{0.5} as \kw{"0.5"}.\\
+eco & \kw{String.toInt} gives \kw{Nothing} when the numeral is outside
+$\IntRange$ or longer than 64 code units, and the exact value otherwise.
+\kw{String.fromInt} prints the exact decimal. \kw{String.fromFloat} prints the
+shortest digits that read back to the same Float: fixed notation for
+magnitudes from $10^{-6}$ up to $10^{21}$, exponent notation otherwise, and
+\kw{"0"} for $-0$. &
+\kw{String.toInt} and \kw{String.fromInt} are exact over $\IntRange$.\\
+\hline
+\end{tabular}
+\end{center}
+
+% ===========================================================================
+\section{Evaluation Order and Debug}\label{sec:appendix-implementation-order}
+
+The body requires the following (Section~\ref{sec:dynamic-core-rules},
+Section~\ref{sec:dynamic-core-basic} and Chapter~\ref{ch:dynamic-modules}).
+\begin{itemize}
+\item The order in which the parts of a phrase are evaluated carries no
+  meaning; the groups of a \kw{let} are evaluated in an order consistent with
+  their dependencies, and the order among independent bindings is not
+  specified. % A57, A58
+\item Each top-level value is evaluated once, when its module is initialised,
+  in dependency order; an implementation may evaluate it later or repeatedly
+  provided the results agree. % A59
+\item \kw{Debug.log l v} evaluates to $v$, and any output it makes is outside
+  the definition; \kw{Debug.todo s} has no value; \kw{Debug.toString} gives an
+  implementation-dependent String. % A62
+\end{itemize}
+Since evaluation has no other effect, the choices below are observable only
+through the output of \kw{Debug.log}, through which of several subexpressions
+without a value is reached first, and through resources.
+
+\subsection{The Order of Evaluation within a Phrase}
+% A57, A58
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & \kw{let} bindings by dependency groups, dependencies first. Record
+fields by field name; tuple and list components, and the function and
+arguments of an application, left to right. &
+Conforms.\\
+eco & \kw{let} bindings by dependency groups, dependencies first; named
+bindings before bindings \kw{\_ = e}, and not in source order among
+themselves; a run of bindings \kw{\_ = e} in source order. Record fields of
+type Int, Float and Char first, then the rest, each by field name. Tuple and
+list components and arguments in no fixed order. The callback of a basis
+function such as \kw{List.map} may be applied in another order when it makes
+no use of \kw{Debug}. &
+Conforms. The output of several \kw{Debug.log} calls in one \kw{let} may
+appear in a different order from Elm/JS.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Top-level Values}
+% A59, A25
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & Each once, at start-up, before \kw{main} runs, in dependency order. &
+Conforms. A top-level value whose evaluation reaches \kw{Debug.todo} stops the
+program at start-up, used or not.\\
+eco & On first use. A value of type Int, Float or Char is computed again at
+each use; a top-level value of function type evaluates its body again at each
+call; any other value is computed once. &
+Conforms. A \kw{Debug.log} in a top-level value may print once per use instead
+of once.\\
+\hline
+\end{tabular}
+\end{center}
+In both, a \kw{main} in a module other than the main module is evaluated once,
+and a top-level value needed while it is itself being evaluated, which has no
+value, ends the program: by exhausting the stack, or, in Elm/JS compiled for
+debugging, with a report of infinite recursion. % A25
+
+\subsection{Debug}
+% A62
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & \kw{Debug.log l v} writes \kw{l: } followed by \kw{Debug.toString v}
+to the host's console. \kw{Debug.todo s} stops the program with ``TODO in
+module \ldots{} on line \ldots'' and \kw{s}. A program using \kw{Debug} is
+rejected when compiled with \kw{-{}-optimize}. &
+Conforms. A program using \kw{Debug} cannot be compiled for production.\\
+eco & \kw{Debug.log l v} writes \kw{l: } followed by \kw{Debug.toString v} to
+the program's output when it is evaluated. \kw{Debug.todo s} writes
+``Debug.todo: '' and \kw{s} to the error output and ends the process with
+status 1. \kw{Debug} is accepted with \kw{-{}-optimize}, and its output
+kept. &
+Conforms.\\
+\hline
+\end{tabular}
+\end{center}
+\kw{Debug.toString} gives the same text in both for the forms tested, such as
+\kw{\kwlb{} age = 3, name = "x" \kwrb}, \kw{Just -1} and \kw{0} for $-0$; for
+Floats it follows \kw{String.fromFloat}
+(Section~\ref{sec:appendix-implementation-bitwise}).
+
+% ===========================================================================
+\section{Resource Limits}\label{sec:appendix-implementation-limits}
+
+The body places no bound on the size of a phrase
+(Section~\ref{sec:syntax-core-restrictions}) or on the resources evaluation
+uses; an implementation that stops for lack of resources is outside the
+definition (Section~\ref{sec:dynamic-core-rules}). % A13, A34, A61
+
+\subsection{The Size of Phrases}
+% A13, A34, A39
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & No limit. & \\
+eco & On every target, a program is rejected that has a function or lambda
+with more than 2047 parameters, a lambda whose parameters and captured
+variables together exceed 2047, a record type or record with more than 2047
+fields, a constructor with more than 2040 fields, or a nullary constructor
+that is not among the first 1024 constructors of its type. For native code
+the closure limit is checked again after each polymorphic function is copied
+for every type at which it is used. &
+Programs beyond these limits are rejected. A closure within the limit in the
+source can exceed it in native code: 700 local polymorphic functions each used
+at three types inside one lambda make 2100 captured variables.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Stack and Memory}
+% A61
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & The host's stack and memory. Deep recursion that is not a self tail
+call stops with a \kw{RangeError} the host can catch, at about ten thousand
+frames. A \kw{Cmd.batch} nested 100000 deep exhausts the stack. &
+Recursion over a long list must be a self tail call, which runs in constant
+stack.\\
+eco & The program runs on a stack of 64\,MiB. Exhausting it ends the process
+with a segmentation fault; exhausting memory ends it with the message
+``eco: out of memory'' and an abort. Deeply nested \kw{Cmd.batch} values are
+handled without recursion. &
+Far deeper recursion succeeds than in Elm/JS, but its failure cannot be
+caught. Self tail calls run in constant stack.\\
+\hline
+\end{tabular}
+\end{center}
+
+% ===========================================================================
+\section{Platform and Ports}\label{sec:appendix-implementation-platform}
+
+The body defines tasks, commands, subscriptions and the encoding of values at
+ports in Chapter~\ref{ch:effects}, and the execution of a program in
+Section~\ref{sec:programs-execution}. It requires only that messages be
+handled one at a time, each update seeing the model the previous one
+produced, and the effects of an earlier update being dispatched before those
+of a later one. % A86
+It leaves the following unspecified or weakly specified.
+\begin{itemize}
+\item The order in which the commands of one batch are performed, and the
+  relative order of effects handled by different managers. % A66, A67
+\item An incoming port value is an event, handled after the step in progress
+  completes, never during it. % A68
+\item Outgoing port values are delivered after the step that produced them,
+  in order per port; what the host does with them is outside the definition.
+  % A69, A70
+\item An incoming value that does not match the port's type is rejected at
+  the boundary; the program is unaffected. % A71
+\item Absent flags are the JSON value null. % A72
+\item \kw{Bytes} is a payload type in every position, in ports and in flags,
+  and its values cross the boundary as byte sequences, which are not JSON
+  values; how a host represents a byte sequence is outside the definition
+  (Section~\ref{sec:effects-ports}). % A92
+\item JSON numbers are finite decimal rationals. A Float that is NaN or an
+  infinity is encoded as \kw{null}, and $-0$ as the number $0$; an incoming
+  number decodes at \kw{Int} exactly when it is an integer in $\IntRange$, an
+  incoming zero being the one Int zero, and at \kw{Float} as the nearest float,
+  $+0$ for a zero and an infinity for a number beyond the finite floats
+  (Section~\ref{sec:effects-ports}). % A73, A74, A88
+\item JSON objects are unordered, and error messages are unspecified. % A76
+\item A spawned process that fails ends, and nothing else happens; killing a
+  finished process has no effect; the task \kw{Process.sleep d} waits at least
+  $\max(0,d)$ milliseconds, and for non-finite $d$ the delay is unspecified.
+  % A79, A80, A81
+\item The set of managers, beyond the task manager and ports, is a
+  parameter of the platform. % A83
+\end{itemize}
+
+\subsection{The Order of Commands}
+% A66, A67
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & A manager receives the commands of a batch in reverse order:
+\kw{Cmd.batch [ perform a, perform b ]} runs \kw{b} first, and
+\kw{Cmd.batch [ out 1, out 2 ]} delivers \kw{2} then \kw{1}. Several
+subscriptions to one incoming port receive a value last first. Managers are
+served in the order the program declares them and its ports. &
+Conforms. Programs that depend on these orders, or on the order of port
+declarations, behave differently in eco.\\
+eco & The same reverse order within a batch and among subscriptions to one
+port. Managers are served in no fixed order. &
+Conforms.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Incoming Port Values}
+% A68, A71
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & The host's \kw{send} decodes the value and runs \kw{update} for each
+current subscription before it returns. A value that does not decode makes
+\kw{send} throw ``Trying to send an unexpected type of value through port''
+to the host; the program is unaffected. &
+Does not conform for delivery: a value sent from inside an outgoing
+subscriber is handled during the step in progress, and a reply can be lost
+because the subscription for it is not yet installed (elm/core issues 1110,
+1141, 1154). Conforms for mismatches.\\
+eco & The value is checked when the host sends it, then queued, and delivered
+after the work in progress; a send from inside a subscriber is queued too. A
+mismatch is reported to the host by an error code and the same message, and
+the program is unaffected; but when the port's type cannot be checked at the
+send, the value is checked on delivery, and a mismatch then ends the
+process. &
+Conforms for delivery. Does not conform for a mismatch found on delivery.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Outgoing Port Values}
+% A69, A70
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & Delivered later: a port waits one timer tick before its first
+delivery, so that the host can subscribe after the program starts, and after
+each batch. A value sent when the port has no subscriber is discarded. &
+Conforms.\\
+eco & Delivered at once, during the dispatch of the update that issued it; the
+program waits while subscribers run. Values are kept until the port's first
+subscriber and then handed to it in order; once a port has had a subscriber,
+a value sent when it has none is discarded. &
+Conforms.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Values at the Boundary}
+% A73, A74, A76, A88
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & Host values are JavaScript values. An incoming Int is any finite
+number with no fractional part. A \kw{Json.Encode.Value} passes any host value
+through, functions and \kw{undefined} included. Objects are written with
+their keys in field-name order; of several missing fields, the last by name
+is reported. &
+Outgoing Ints above $2^{53}$ are inexact. NaN and the infinities pass as
+Floats in both directions. Does not conform: an outgoing NaN or infinity is
+delivered as a host number, where the definition delivers \kw{null}; an
+outgoing $-0$ is delivered as $-0$; an incoming $-0$ at an \kw{Int} port
+gives a negative zero, and at a \kw{Float} port $-0$, where the definition
+gives $0$ and $+0$. An incoming NaN or infinity is a host value outside JSON,
+and outside the definition.\\ % A88
+eco & Host values are JSON text, byte sequences apart
+(Section~\ref{sec:appendix-implementation-bytes}). An incoming Int is an integer, or a float
+with an integral value, in $\IntRange$. An outgoing NaN or infinity is written
+as \kw{null}. Keys in field-name order; missing fields are reported in the
+order of the type's fields. &
+\kw{9223372036854775808} and \kw{1e300} are rejected as Ints. A host value
+that is not JSON cannot be sent. Conforms for NaN and the infinities.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Bytes at the Boundary}\label{sec:appendix-implementation-bytes}
+% A92
+The body admits \kw{Bytes} wherever a payload type may appear, alone or
+inside tuples, closed records, \kw{Maybe}, \kw{List} and \kw{Array}, in
+the types of ports and in the flags of \kw{main}
+(Section~\ref{sec:static-modules-ports}); its values cross as byte sequences
+(Section~\ref{sec:effects-ports}). This rule follows the implementations that
+provide binary data at the boundary. Each implementation chooses the host
+representation of a byte sequence; in the table, \emph{eco/JS} is eco's
+output for JavaScript.
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & No representation: a port or flags type in which \kw{Bytes}
+occurs is rejected. &
+Does not conform: every program with \kw{Bytes} in a payload or flags type
+is rejected.\\
+eco/JS & \kw{Bytes} in any payload position, in ports and in
+flags; a byte sequence is a \kw{Uint8Array} at the host. &
+Conforms.\\
+eco & \kw{Bytes} only as the whole payload of a port, a byte sequence being
+raw bytes at the host; \kw{Bytes} inside a payload type, and in flags, is
+rejected. &
+Does not conform: programs with \kw{Bytes} nested in a payload type, or in
+flags, are rejected.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Flags}
+% A72
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & Absent flags are the JavaScript value \kw{undefined}, which no
+decoder for \kw{null} or \kw{Maybe} accepts. Flags that do not decode make
+\kw{init} throw ``Problem with the flags given to your Elm program on
+initialization.'' &
+Does not conform: a program with flags of type \kw{Maybe Int} started without
+flags does not start.\\
+eco & Absent flags are \kw{null}. Flags that do not decode stop an executable
+with a message and an abort; an embedding host receives an error code and may
+try again. &
+Conforms: the program above starts with \kw{Nothing}.\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Processes}
+% A79, A80, A81
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & A failing spawned process ends silently. Killing a finished or
+already killed process throws a \kw{TypeError}. \kw{Process.sleep} uses the
+host's timers: a delay of $0$, a negative delay, a non-finite delay or one
+above $2^{31}-1$ ms is about 1 ms. &
+Killing twice ends the program (elm/core issue 955): does not conform. A delay
+above $2^{31}-1$ ms, about 24.8 days, is cut short: does not conform.\\
+eco & A failing spawned process ends with a warning on the error output.
+Killing a finished process has no effect. A delay of $0$ or less resumes at
+once; a non-finite delay, or one above $2^{31}-1$ ms, is 1 ms. &
+The warning is outside the definition: conforms. A delay above $2^{31}-1$ ms
+is cut short: does not conform.\\
+\hline
+\end{tabular}
+\end{center}
+In both, a process runs until it waits for a timer, a message or another
+primitive task, and is never suspended at an \kw{andThen} alone; this is one
+of the behaviours the body allows. % A78
+
+\subsection{Managers and Programs on a Platform}
+% A83, A82
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & Every effect module the program uses is a manager: among them
+\kw{Task}, \kw{Time}, \kw{Http}, \kw{Random}, \kw{Browser.Events} and
+\kw{Browser.AnimationManager}. Browser programs run their \kw{init} and draw
+their view; a \kw{main} of type \kw{Html msg} is drawn once. Several programs
+may be started on one page. &
+Every command and subscription of these managers is performed.\\
+eco & In native code the managers are \kw{Task}, \kw{Time}, \kw{Http}, those
+of eco's system package, and ports. A command or subscription for any other
+manager, such as \kw{Random.generate} or \kw{Browser.Events}, is discarded.
+\kw{Browser.element}, \kw{document} and \kw{application} return their record
+without running \kw{init}; \kw{Browser.Navigation} ends the program with
+status 1; \kw{Browser.Dom} tasks fail with \kw{NotFound}. A \kw{main} of type
+\kw{Html msg} is evaluated and not drawn. One program per process. &
+Only worker programs, \kw{Platform.worker}, run natively. Programs relying on
+\kw{Random} or browser managers do nothing observable in those effects.\\
+\hline
+\end{tabular}
+\end{center}
+
+% ===========================================================================
+\section{Extensions of eco}\label{sec:appendix-implementation-extensions}
+
+The body admits no flags type beyond the port payload types
+(Section~\ref{sec:static-modules-ports}); \kw{Bytes} is one of them, and is
+not an extension (Section~\ref{sec:appendix-implementation-bytes}). % A33, A92
+eco accepts the following programs, which are not Standard Elm.
+
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & None. & \\
+eco & A program of type
+\kw{Program System.Environment model msg}, with \kw{System.Environment} from
+eco's system package, has its flags decoded by a built-in decoder, with no
+check of the payload type. &
+Programs using this extension are eco programs, not Standard Elm, and are
+rejected by Elm 0.19.1.\\
+\hline
+\end{tabular}
+\end{center}
+
+% ===========================================================================
+\section{Known Divergences}\label{sec:appendix-implementation-divergences}
+
+The tables below list every known point on which an implementation does not
+conform: the implementation (Elm/JS, eco, or both), the construct, what the
+implementation does, what the definition says, and the ruling that settles
+the point. Where a ruling chose a meaning neither implementation has, both
+are listed.
+
+% The divergence tables are split by area so that each fits a page.
+
+\subsection{Int Arithmetic}
+\begin{center}\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.09\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.09\textwidth}@{}}
+\hline
+Impl. & Construct & Implementation & Definition & Ruling\\
+\hline
+Elm/JS & Int \kw{+ - *} beyond $\pm 2^{53}$ & rounded to a double; an
+infinity beyond the largest double & $\norm$ of the exact result & A40\\
+Elm/JS & integer constant at or above $2^{63}$ & reduced modulo $2^{64}$, then
+held as a double & $\norm(n)$ & A9\\
+Elm/JS & \kw{a // b}, quotient outside $\pm 2^{31}$ & reduced to 32 bits &
+$\norm$ of the truncated quotient & A41\\
+Elm/JS & \kw{modBy 0 x} & program stops & $0$ & A42\\
+Elm/JS & \kw{remainderBy 0 x} & NaN held as an Int & $0$ & A42\\
+Elm/JS & Int \kw{b \textasciicircum{} e}, $e<0$ & a fraction or an infinity &
+$1$, $\pm 1$ or $0$ & A43\\
+eco & Int \kw{b \textasciicircum{} e}, $e<0$, $b=\pm 1$ & $0$ & $1$, or $\pm 1$
+by parity & A43\\
+Elm/JS & \kw{round}, \kw{floor}, \kw{ceiling} of NaN or an infinity & NaN or
+the infinity held as an Int & $0$, or a bound of $\IntRange$ & A44\\
+Elm/JS & \kw{truncate} outside $\pm 2^{31}$ & reduced to 32 bits & saturated
+to $\IntRange$ & A44\\
+Elm/JS & \kw{negate 0} and other Int zeros & a negative zero & one zero &
+A45\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Float, Order and Equality}
+\begin{center}\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.09\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.09\textwidth}@{}}
+\hline
+Impl. & Construct & Implementation & Definition & Ruling\\
+\hline
+Elm/JS & \kw{compare} with NaN & always \kw{GT} & total order, NaN greatest &
+A46\\
+Elm/JS & \kw{<}, \kw{<=}, \kw{>}, \kw{>=} with NaN & depends on whether an
+operand is a constant & IEEE predicates & A47\\
+Elm/JS & Float \kw{min}, \kw{max} with NaN or two zeros & depends on the
+order of the arguments: \kw{min nan 1} and \kw{max 1 nan} are \kw{1} &
+IEEE 754-2019 minimum and maximum: NaN for both & A48\\
+Elm/JS & Float \kw{clamp} with $lo>hi$, a NaN argument, or zeros of
+different signs & elm/core definition: \kw{clamp 10 0 5} is \kw{10},
+\kw{clamp 0 1 nan} is \kw{1}, \kw{clamp nan 1 0.5} is \kw{0.5},
+\kw{clamp 0 1 -0} is $-0$ & \kw{min (max x lo) hi} with IEEE 754-2019
+minimum and maximum: $+0$, NaN, NaN, $+0$ & A47, A48, A49\\
+Elm/JS & Float \kw{1 \textasciicircum{} (1/0)} & NaN & $1$ & A65\\
+both & \kw{v == v} with $v$ containing NaN & \kw{True} when both operands are
+one object & \kw{False} & A50\\
+Elm/JS & Float \kw{x == 0}, \kw{0} an Int constant & \kw{True} for NaN &
+\kw{False} for NaN & A50\\
+Elm/JS & \kw{==} reaching two functions & program stops & an unspecified
+Bool & A51\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Characters and Strings}
+\begin{center}\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.09\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.09\textwidth}@{}}
+\hline
+Impl. & Construct & Implementation & Definition & Ruling\\
+\hline
+both & \kw{\textbackslash u\kwlb D800\kwrb} and other surrogate escapes &
+accepted & not an escape sequence & A8\\
+Elm/JS & \kw{toCode} of a lone surrogate; Chars from case mapping & NaN; a
+Char of two characters & \kw{toCode} injective into the integers & A52\\
+Elm/JS & Char order & by UTF-16 code units & by \kw{toCode} & A53\\
+both & String order & by UTF-16 code units & lexicographic by characters
+ordered by \kw{toCode} & A53\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Evaluation}
+\begin{center}\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.09\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.09\textwidth}@{}}
+\hline
+Impl. & Construct & Implementation & Definition & Ruling\\
+\hline
+Elm/JS & \kw{(\&\&) a b}, \kw{(||) a b} applied in prefix form & second
+argument evaluated only when needed: \kw{(\&\&) False (Debug.todo "x")} is
+\kw{False} & ordinary strict functions: no value & A56\\
+Elm/JS & lambdas made in a self tail-recursive function & share the
+function's changing parameters: three closures give \kw{[3,3,3]} & each holds
+the values of its own call: \kw{[3,2,1]} & A63\\
+both & a value whose scheme quantifies a \kw{number} variable, used only at
+Float, such as \kw{x = if 2 \textasciicircum{} -1 == 0 then Debug.todo "x"
+else 1} & Elm/JS evaluates it once, with its one kind of number; eco only at
+the instances used. Either way \kw{x} is $1$ and the program runs & the default
+copy, at Int, is also evaluated; there \kw{2 \textasciicircum{} -1} is $0$,
+so it has no value and the program has no meaning & A87\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Programs and Ports}
+\begin{center}\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.09\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.09\textwidth}@{}}
+\hline
+Impl. & Construct & Implementation & Definition & Ruling\\
+\hline
+Elm/JS & incoming port value & \kw{update} runs inside the host's \kw{send} &
+an event handled after the step in progress & A68\\
+eco & incoming value not matching the port, found on delivery & the process
+ends & rejected at the boundary; program unaffected & A71\\
+Elm/JS & absent flags & \kw{undefined}: \kw{Maybe} flags rejected & \kw{null}
+& A72\\
+Elm/JS & outgoing Float NaN or infinity & passed as a host number &
+\kw{null} & A88\\
+Elm/JS & $-0$ across a port & passed as $-0$; an incoming $-0$ at \kw{Int}
+is a negative zero & the number $0$; $0$ at \kw{Int}, $+0$ at \kw{Float} &
+A88\\
+Elm/JS & \kw{Process.kill} of a finished process & program stops & no effect
+& A80\\
+both & \kw{Process.sleep d}, $d>2^{31}-1$ & about 1 ms & at least $d$ ms &
+A81\\
+both & a \kw{main} of unsupported type outside the main module & rejected &
+an ordinary value & A32, A82\\
+both & two ports of one name, or a port named after a manager & accepted;
+the program stops at start-up & rejected by elaboration & A84\\
+Elm/JS & \kw{Bytes} in a port or flags type & rejected & a payload type,
+crossing as a byte sequence & A92\\
+eco & \kw{Bytes} inside a payload type, or in flags, native code & rejected
+& a payload type, crossing as a byte sequence & A92\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Elaboration}
+\begin{center}\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.09\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.09\textwidth}@{}}
+\hline
+Impl. & Construct & Implementation & Definition & Ruling\\
+\hline
+both & a pattern \kw{( )} with a gap & accepted as unit & not a phrase & A1\\
+both & a rigid type variable escaping its annotation & the compiler fails with
+an internal error & does not elaborate & A20\\
+eco & a record extended through a row variable by a field it already has &
+accepted, the outer field winning & does not elaborate & A23\\
+Elm/JS & unannotated mutually recursive values used at several types &
+accepted; some such programs fail at run time & each member monomorphic
+within its group & A24\\
+eco & two literal patterns that denote one value, spelt differently & second
+not reported redundant & rejected as redundant & A31\\
+eco & a constrained type variable as a row variable, \kw{\kwlb{} number | x
+: Int \kwrb} & annotation accepted; every use fails & ill formed & A36\\
+eco & polymorphic recursion through annotated functions, native code &
+rejected & elaborates & A39\\
+eco & a closure over 2047 variables after copying polymorphic functions,
+native code & rejected & elaborates & A39\\
+eco & phrases beyond the size limits of
+Section~\ref{sec:appendix-implementation-limits} & rejected & elaborate & A13,
+A34\\
+both & \kw{import} \mv{modid} \kw{as Basics} for a module other than Basics
+& accepted (not tested) & does not elaborate & A91\\
+\hline
+\end{tabular}
+\end{center}

@@ -1,21 +1,40 @@
 # A Standard Definition of Elm?
 
-The LaTeX sources of *A Standard Definition of Elm?* (Draft version 0.3), a formal definition of the
-Elm language, and the PDF of that edition. The website (`site/`) shows the book with a page for every
-rule; `runner/definition-data.js` turns these sources into the site's data.
+*A Standard Definition of Elm?* (Draft version 0.3), a formal definition of the Elm language: its
+LaTeX sources, its PDF, and everything else the stages that write it produce. The website (`site/`)
+shows the book with a page for every rule; `runner/definition-data.js` turns `tex/` into the site's
+data.
+
+This folder is the output tree of the agent workspace `../pl-definition-writer/`, which holds only
+the instructions (see its `CLAUDE.md` and `shared/run-config.md` "Output Tree"). Each stage writes
+here, and the next stage reads from here:
 
 ```
-tex/standard-elm-definition.tex   the master file: title, edition and the order of the chapters
-tex/*.tex                         the preface, chapters and appendices
-tex/defn.sty                      the layout of a formal definition: rules, rule groups, comments,
-                                  grammar, semantic object and derived form tables
-tex/macros.sty                    the book's notation, one macro per symbol
-standard-elm-definition-*.pdf     the PDF of this edition
+survey/                 stage 01: book-brief.md (the brief and the author directions D1 to D11),
+                        language-survey.md (what Elm 0.19.1 and eco do, with citations),
+                        ambiguity-log.md (the rulings A1 to A92), drafts/ (the survey's parts)
+architecture/           stage 02: book-plan.md (grid, chapter order, Chapter Checklist),
+                        notation.md (every symbol of the book), gen_notation.py (writes notation.md
+                        and tex/macros.sty), requests/ (notation added by chapter stages)
+tex/                    stages 02 to 05 and 08: the book's LaTeX, the single copy of its text
+  standard-elm-definition.tex   the master file: title, edition and the order of the chapters
+  *.tex                         the preface, chapters and appendices
+  defn.sty                      the layout of a formal definition: rules, rule groups, comments,
+                                grammar, semantic object and derived form tables
+  macros.sty                    the book's notation, one macro per symbol (generated)
+mechanisation/          stage 06: the Lean 4 encoding of Chapter 6 (standard-elm-mech/), its
+                        example run against the tests' CHECK values (example-run.md) and report
+audit/                  stage 07: audit-report.md, drafts/ (the individual audit passes)
+typeset/                stage 08: build-report.md, editions/ (PDFs of earlier editions), build/ (the
+                        LaTeX build folder, rebuilt from tex/ every time)
+standard-elm-definition-*.pdf   the PDF of the current edition (the only PDF here; the site
+                        publishes it)
 ```
 
-The book is written with the `pl-definition-writer` workspace of icm-agents, which keeps its
-working files (survey, rulings, audits, Lean mechanisation) and typesets the PDF; these files are a
-copy of its output for this edition. To publish a new edition, replace `tex/` and the PDF with the new output.
+To build the PDF by hand, as stage 08 does: copy `tex/` and
+`../pl-definition-writer/skills/latex/templates/build-config/.latexmkrc` into `typeset/build/` and
+run `latexmk standard-elm-definition.tex` there. To build the mechanisation and run the examples:
+`cd mechanisation/standard-elm-mech && lake build && lake exe run-examples` (Lean 4.35.0).
 
 ## The website data
 

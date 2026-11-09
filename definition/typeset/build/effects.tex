@@ -1,0 +1,825 @@
+% Values: PRECISE, FAITHFUL, ILLUMINATING, ECONOMICAL, TRACTABLE
+% Evidence planned:
+% - PRECISE: every effect value (task, command, subscription, process
+%   identifier, program value, JSON value, boundary value) defined by set
+%   constructions;
+%   the result of APPLY on every basic value of Task, Process, Cmd, Sub and
+%   Platform that is not written in Elm, in one figure (fig:effects-apply);
+%   task reduction by rules; Enc and Dec by one rule per admissible type
+%   form; the message of every kind of leaf by rules.
+% - FAITHFUL: D10 (tasks, commands, subscriptions as values of the
+%   language), D11 (what crosses a port, both ways, with a table), D2 and
+%   D3 (no exceptions, no run-time errors: a bad incoming value is rejected
+%   at the boundary, A71; a failing process ends alone, A79; kill of an
+%   ended process does nothing, A80); A60 (Elm-written basis functions
+%   defined by their text); A66, A67 (one order convention); A73 to A77,
+%   A81, A83, A84, A85 cited where they shape the text; A92 (Bytes at the
+%   boundary, as byte sequences that are not JSON values).
+% - ILLUMINATING: comments on the silent and labelled steps, the suspension
+%   points of a process (A78), the unconstrained process identifier of
+%   spawn, the Maybe (Maybe t) and Maybe () collapse, the extra tuple
+%   elements and record fields that decoding ignores, unit at ports versus
+%   flags, and the outgoing port leaf that gives no message.
+% - TRACTABLE: stated properties: the form of the steps of a task; Enc and
+%   Dec are partial functions, Enc is defined on every payload; decoding
+%   an encoding gives the value back, with the exceptions named.
+% - ECONOMICAL: one rule for all primitives through Out; options merge the
+%   silent and labelled inner steps and the two tuple arities; none is
+%   batch with no components; perform, attempt, map, sequence, Cmd.none
+%   and Sub.none get no definition beyond their Elm text.
+\chapter{Tasks, Commands, Subscriptions and Ports}\label{ch:effects}
+
+This chapter defines the effect values of Standard Elm: the tasks, which
+describe work that may wait, fail and start other processes; the commands and
+subscriptions, which a program hands to the platform to have tasks performed
+and values exchanged with its host (the platform and the host are as in
+Chapter~\ref{ch:introduction}); and the program values. % D10
+It defines the boundary values that cross a port, which are JSON values in
+which byte sequences may stand, and the encoding and decoding of the values of
+every type that a port admits, which settles exactly what can and cannot be
+sent over a port. % D11, A92
+Its sentences infer that a task reduces to another task, silently or by
+performing a primitive action; that a value encodes as a boundary value, or a
+boundary value decodes as a value, at a type; and that a leaf of a command or
+subscription, receiving an input, gives a message. These objects are
+defined here; the running of a program, which creates and schedules processes
+and handles their messages one at a time, is defined by
+Chapter~\ref{ch:programs} in terms of them.
+Every phrase whose value is used here is assumed to have elaborated
+(Chapter~\ref{ch:static-modules}). % S4
+
+\section{Simple Objects}\label{sec:effects-simple}
+
+The simple objects of this chapter are shown in
+Figure~\ref{fig:effects-simple}; the classes of Chapter~\ref{ch:dynamic-core}
+are used as there.
+
+\begin{figure}[htbp]
+\centering
+\begin{objtable}
+\objrow{\pid}{\ProcId}{process identifiers}
+\objrow{\pi}{\effPrim}{primitives}
+\objrow{\effp\ \text{or}\ \var}{\cls{Var}}{port names}
+\objrow{}{\effMgrPlat}{managers of the platform}
+\objrow{}{\effJNum}{JSON numbers}
+\objrow{}{\effByt}{byte sequences}
+\end{objtable}
+\caption{Simple Semantic Objects of the Effects}
+\label{fig:effects-simple}
+\end{figure}
+
+A \emph{process identifier} names a process (Section~\ref{sec:effects-tasks});
+ProcId is an infinite set. The class Prim of \emph{primitives} is
+\[
+  \effPrim=\{\effsleep,\effspawn,\effkill\}\cup\effPrimPlat ,
+\]
+where $\effsleep$, $\effspawn$ and $\effkill$ are the primitives of the module
+\kw{Process}, and $\effPrimPlat$ is a set of further primitives (reading a
+clock, an HTTP request, and so on) which is a parameter of the platform on
+which a program runs. % A83
+Each primitive $\pi$ has an \emph{arity} $\arity(\pi)\geq 1$; the arity of
+each of $\effsleep$, $\effspawn$ and $\effkill$ is 1.
+A port name $\effp$ is the variable of a \kw{port} declaration
+(Chapter~\ref{ch:syntax-modules}). Port names are global to a program and
+distinct from one another (Section~\ref{sec:syntax-modules-restrictions}). % A84
+$\effMgrPlat$, a parameter of the platform, is a set of names of
+\emph{managers}, other than the managers of tasks and ports defined in
+Section~\ref{sec:effects-commands}, and disjoint from the port names. % A83, A84
+
+$\effJNum$ is the set of \emph{JSON numbers}: the rational numbers
+$m\times 10^{e}$ with $m$ and $e$ integers, that is, the numbers a JSON text
+can spell. Every integer of $\IntRange$ and every finite floating-point number
+is a member of $\effJNum$; we omit the injections from these numbers into
+$\effJNum$. The injection takes both floating-point zeros, $0$ and $-0$, to the JSON
+number $0$: a JSON number has no sign apart from its value. % A88
+We write $\effStr$ for the set of strings of SVal, $\effFlt$ for the set of
+floating-point numbers of SVal, and $\effFltFin\subseteq\effFlt$ for its finite
+members, so that $\effFlt\setminus\effFltFin$ holds the two infinities and
+NaN. For $j\in\effJNum$, $\efffloat(j)$ is the floating-point number nearest
+$j$, rounded as the value of a floating-point constant is
+(Section~\ref{sec:dynamic-core-simple}); $\efffloat(0)$ is the float $0$, not
+$-0$. % A88
+
+$\effByt$ is the set of \emph{byte sequences}: the finite sequences of
+integers from $0$ to $255$. We write $\effbytes(o_1\cdots o_k)$, with $k\geq 0$
+and $0\leq o_i\leq 255$ for each $i$, for the byte sequence of
+$o_1,\ldots,o_k$ in order. A byte sequence is not a JSON number, a string or an
+array: $\effByt$ is disjoint from $\effJNum$, from $\effStr$ and from every
+other class of this chapter. % A92
+
+\section{Compound Objects}\label{sec:effects-compound}
+
+The compound objects of this chapter are shown in
+Figure~\ref{fig:effects-compound}. The classes EffVal and JVal, which
+Chapter~\ref{ch:dynamic-core} includes in Val
+(Figure~\ref{fig:dynamic-core-compound}), are defined here. TaskVal, CmdVal,
+SubVal and JVal are defined together with the classes of
+Figure~\ref{fig:dynamic-core-compound}; all are the smallest classes closed
+under the constructions of both figures. The class BVal of boundary values,
+which includes JVal, is defined here too; its other members are not in
+Val. % A92
+
+\begin{figure}[htbp]
+\centering
+\begin{objtable}
+\objdef{\ev}{\EffVal}{\TaskVal\cup\CmdVal\cup\SubVal\cup\ProcId\cup\ProgVal}
+\objdef{\tk}{\TaskVal}{(\{\effsucceed,\efffail\}\times\Val)}
+& & & \phantom{{}={}}\cup(\{\effandThen,\effonError\}\times\Val\times\TaskVal) & \\
+& & & \phantom{{}={}}\cup\textstyle\bigcup_{k\geq 1}(\{\effprim\}\times\effPrim\times\Val^k) & \\
+\objdef{\cm}{\CmdVal}{\textstyle\bigcup_{n\geq 0}(\{\effbatch\}\times\CmdVal^n)}
+& & & \phantom{{}={}}\cup(\{\effmap\}\times\Val\times\CmdVal) & \\
+& & & \phantom{{}={}}\cup(\{\effleaf\}\times\effMgr\times(\Val\cup\BVal)) & \\
+\objdef{\sbv}{\SubVal}{\textstyle\bigcup_{n\geq 0}(\{\effbatch\}\times\SubVal^n)}
+& & & \phantom{{}={}}\cup(\{\effmap\}\times\Val\times\SubVal) & \\
+& & & \phantom{{}={}}\cup(\{\effleaf\}\times\effMgr\times\Val) & \\
+\objdef{\effm}{\effMgr}{\{\effmtask\}\cup(\{\effmout\}\times\cls{Var})}
+& & & \phantom{{}={}}\cup(\{\effmin\}\times\cls{Var}\times\Type)\cup\effMgrPlat & \\
+\objdef{\effa}{\effAction}{\textstyle\bigcup_{k\geq 1}\effPrim\times\Val^k\times\TaskVal}
+\objdef{\pv}{\ProgVal}{\{\effprog\}\times\Record}
+\objdef{j}{\BVal}{\{\effnull,\efftrue,\efffalse\}\cup\effJNum\cup\effStr\cup\effByt}
+& & & \phantom{{}={}}\cup\textstyle\bigcup_{n\geq 0}\BVal^n\cup(\effStr\finmap\BVal) & \\
+\objdef{}{\JVal}{\{\effnull,\efftrue,\efffalse\}\cup\effJNum\cup\effStr}
+& & & \phantom{{}={}}\cup\textstyle\bigcup_{n\geq 0}\JVal^n\cup(\effStr\finmap\JVal) & \\
+\end{objtable}
+\caption{Compound Semantic Objects of the Effects}
+\label{fig:effects-compound}
+\end{figure}
+
+We write the members of these classes as follows:
+\[
+  \begin{array}{ll}
+  \text{tasks:} & \effsucceed\,v,\quad \efffail\,v,\quad \effandThen(v,\tk),\\
+    & \effonError(v,\tk),\quad \effprim(\pi,v_1\cdots v_k);\\
+  \text{commands:} & \effbatch(\cm_1\cdots\cm_n),\quad \effmap(v,\cm),\quad
+    \effleaf(\effm,v);\\
+  \text{managers:} & \effmtask,\quad \effmout\,\effp,\quad \effmin(\effp,\tau);\\
+  \text{actions:} & \effdone{\pi(v_1\cdots v_k)}{\tk};\\
+  \text{program values:} & \effprog\,r.
+  \end{array}
+\]
+Subscriptions are written as commands are, and an action
+$\effdone{\pi(v_1\cdots v_k)}{\tk}$ is the triple $(\pi,v_1\cdots v_k,\tk)$. We write $\effnone$ for
+$\effbatch(\,)$, the batch with no components, in CmdVal and in SubVal. In a
+primitive task $\effprim(\pi,v_1\cdots v_k)$, always $k=\arity(\pi)$.
+
+A \emph{boundary value} is $\effnull$, $\efftrue$, $\efffalse$, a number, a
+string, a byte sequence, an \emph{array}, which is a member
+$\effJarr{j_1,\ldots,j_n}$ of $\BVal^n$, or an \emph{object}, which is a
+finite map from strings to boundary values. An object has no order on its
+keys. % A76
+A boundary value is thus a JSON value in which a byte sequence may stand
+wherever a value may. % A92
+A \emph{JSON value} is a boundary value in which no byte sequence occurs; JVal
+is the class of JSON values, and $\JVal\subseteq\BVal$. A byte sequence is
+not a JSON value. The metavariable $j$ ranges over BVal; where only a JSON value
+is meant we write $j\in\JVal$.
+The values of the type \kw{Json.Encode.Value} (also called
+\kw{Json.Decode.Value}) are exactly the JSON values, the members of JVal, so
+no byte sequence occurs in one. % A74, A92
+As with the other classes, JVal is disjoint from the rest of Val, and we omit
+the injection: a JSON string and the String value with the same characters are
+different values, and $\effnull$ is not the unit value $()$. A boundary value
+that is not a JSON value is not a value of the language; such a boundary value
+occurs only at a port, and in the leaves of outgoing ports, which CmdVal
+admits.
+
+For values $v_1,\ldots,v_n$ we write $[v_1,\ldots,v_n]$ for the list value
+$v_1\mathbin{\kw{::}}\cdots\mathbin{\kw{::}}v_n\mathbin{\kw{::}}\kw{[]}$, and
+$[\,]$ when $n=0$. We write the value to which the initial dynamic basis
+(Appendix~\ref{ch:appendix-dynamic-basis}) binds a long identifier of the
+basis by that identifier in typewriter, as in \kw{Task.succeed}; the basic
+values \kw{Array.fromList} and \kw{Array.toList} of
+Appendix~\ref{ch:appendix-dynamic-basis}
+(Section~\ref{sec:appendix-dynamic-basis-arrays}), which no identifier of the
+basis spells, are written likewise. Finite multisets are written $\effmset{\effc_1,\ldots,\effc_n}$,
+and $\uplus$ is the union of multisets, which adds multiplicities.
+
+\section{Inference Rules}\label{sec:effects-rules}
+
+The semantic rules of this chapter allow sentences of the forms
+\[
+  \tk\effred{\opt{\effa}}\tk',\qquad
+  \Enc{\tau}(v)=j,\qquad
+  \Dec{\tau}(j)=v,\qquad
+  \effrecv{\effc}{\effx}{v}
+\]
+to be inferred. The first is pronounced ``$\tk$ reduces to $\tk'$'', and,
+when the label $\effa$ is present, ``performing $\effa$''; a reduction without
+a label is \emph{silent}. The second is pronounced ``$v$ encodes at $\tau$ as
+$j$'', and the third ``$j$ decodes at $\tau$ as $v$''; there $\tau$ is a type
+with $\Port(\tau)$ (Section~\ref{sec:static-modules-ports}). In the fourth,
+$\effc$ is a command or subscription value with no $\effbatch$ in it (a
+\emph{leaf command}, Section~\ref{sec:effects-commands}), the input $\effx$ is a
+value or a pair $(\effp,j)$ of a port name and a boundary value, and the sentence
+is pronounced ``$\effc$, receiving $\effx$, gives the message $v$''. Premises also use
+the sentence $\japp{v_1}{v_2}{v}$ of the application of values
+(Section~\ref{sec:dynamic-core-apply}). Some hypotheses in rules are not of
+these forms; they are side conditions.
+
+The convention for options is the same as for the Core static semantics. In
+particular, in a task reduction whose label is written $\opt{\effa}$, the
+label is present on every arrow of the rule or absent from every one. As in
+the Core (Section~\ref{sec:dynamic-core-rules}), sentences have no states and
+there are no exception packets, so every rule is given in full. % D2
+We allow the compound variable $\cm/\sbv$ to range over
+$\CmdVal\cup\SubVal$.
+
+$\Enc{\tau}$ and $\Dec{\tau}$ are defined by the rules alone: $\Enc{\tau}(v)$
+is the boundary value $j$ for which $\Enc{\tau}(v)=j$ can be inferred, and is
+undefined when there is none, and likewise for $\Dec{\tau}(j)$
+(Section~\ref{sec:effects-ports}).
+
+\section{Tasks}\label{sec:effects-tasks}
+
+A task value describes work; it does nothing until a process performs it, and
+a task value performed twice does its work twice. % D10
+The task $\effsucceed\,v$ has \emph{succeeded} with $v$, and $\efffail\,v$ has
+\emph{failed} with $v$; these two are the \emph{outcomes}. The task
+$\effandThen(v,\tk)$ performs $\tk$ and, if it succeeds with $v'$, goes on
+with the task to which $v$ applied to $v'$ evaluates; $\effonError(v,\tk)$ is
+the same for failure. A primitive task $\effprim(\pi,v_1\cdots v_k)$ performs
+the primitive $\pi$ on $v_1\cdots v_k$.
+
+A \emph{process} is a process identifier together with the task that it is
+reducing. A process reduces its task by the rules below, one step at a time,
+until the task is an outcome; then the process has \emph{ended}. A silent step
+concerns that process alone. A labelled step performs a primitive action
+$\effdone{\pi(v_1\cdots v_k)}{\tk}$, whose outcome $\tk$ is a member of the
+set
+\[
+  \effOut(\pi,v_1\cdots v_k)
+\]
+of possible outcomes, and which may act on the world outside the process. For
+the primitives of \kw{Process},
+\[
+  \begin{array}{rcl}
+  \effOut(\effsleep,v) &=& \{\effsucceed\,()\},\\
+  \effOut(\effspawn,\tk) &=& \{\effsucceed\,\pid \mid \pid\in\ProcId\},\\
+  \effOut(\effkill,\pid) &=& \{\effsucceed\,()\},
+  \end{array}
+\]
+and their actions mean the following.
+\begin{itemize}
+\item The action $\effdone{\effsleep(v)}{\effsucceed\,()}$, where
+  $v\in\effFlt$, takes place no sooner than $\max(0,v)$ milliseconds after the process reached
+  $\effprim(\effsleep,v)$, when $v\in\effFltFin$; when $v$ is an infinity or
+  NaN, when it takes place is not defined. % A81
+\item $\effdone{\effspawn(\tk)}{\effsucceed\,\pid}$ starts a new process,
+  named by $\pid$, reducing $\tk$. The identifier $\pid$ names no process
+  that has been started before. The new process is independent of the one
+  that started it: its outcome is delivered to no other process, and when it
+  fails it ends, and nothing else happens. % A79
+\item $\effdone{\effkill(\pid)}{\effsucceed\,()}$ ends the process named by
+  $\pid$ at once, so that it takes no further step, when that process has not
+  ended and is not the process performing the action. Otherwise the action has
+  no effect. % A80
+  % A90: a process that kills itself is not ended, and continues with
+  % succeed (); both implementations behave so (the kill binding resumes its
+  % own caller).
+\end{itemize}
+For a primitive $\pi\in\effPrimPlat$, the set $\effOut(\pi,v_1\cdots v_k)$,
+which may hold failures, and the meaning of its actions are given by the
+platform. % A83
+Chapter~\ref{ch:programs} defines the processes of a running program, and
+it is there that the conditions above on when an action may take place, and
+on what it does to other processes, are enforced.
+
+\rulegroup{Task Reduction}{\tk\effred{\opt{\effa}}\tk'}
+
+\defnrule[r:e-task-andthen-succeed]
+  {\japp{v}{v'}{\tk}}
+  {\effandThen(v,\effsucceed\,v')\effred{}\tk}
+
+\defnrule[r:e-task-andthen-fail]
+  {}
+  {\effandThen(v,\efffail\,v')\effred{}\efffail\,v'}
+
+\defnrule[r:e-task-onerror-fail]
+  {\japp{v}{v'}{\tk}}
+  {\effonError(v,\efffail\,v')\effred{}\tk}
+
+\defnrule[r:e-task-onerror-succeed]
+  {}
+  {\effonError(v,\effsucceed\,v')\effred{}\effsucceed\,v'}
+
+\defnrule[r:e-task-andthen-inner]
+  {\tk\effred{\opt{\effa}}\tk'}
+  {\effandThen(v,\tk)\effred{\opt{\effa}}\effandThen(v,\tk')}
+
+\defnrule[r:e-task-onerror-inner]
+  {\tk\effred{\opt{\effa}}\tk'}
+  {\effonError(v,\tk)\effred{\opt{\effa}}\effonError(v,\tk')}
+
+\defnrule[r:e-task-prim]
+  {\tk\in\effOut(\pi,v_1\cdots v_k)}
+  {\effprim(\pi,v_1\cdots v_k)\effred{\effdone{\pi(v_1\cdots v_k)}{\tk}}\tk}
+
+\begin{rulecomments}
+\rcomment{r:e-task-andthen-succeed} The task $\tk$ to which $v$ applied to
+$v'$ evaluates is not reduced by this step; it is the task the process
+performs next. If the application has no result (for instance, it reaches
+\kw{Debug.todo}), the task has no reduction, and the process never ends.
+% A62
+\rcomment{r:e-task-andthen-fail} The continuation $v$ is skipped: a failure
+passes over every $\effandThen$ until an $\effonError$ handles it, as rule
+\ruleref{r:e-task-onerror-fail} does. Rule \ruleref{r:e-task-onerror-succeed}
+is the dual for success.
+\rcomment{r:e-task-andthen-inner} Rules \ruleref{r:e-task-andthen-inner} and
+\ruleref{r:e-task-onerror-inner} carry both silent and labelled steps out of
+the task that is performed first. Every step of a process is a separate
+reduction, and another process may take steps between any two of them: a
+process may be suspended at any $\effandThen$, and the definition guarantees
+no more. In particular, a program cannot rely on a process running without
+interruption until it reaches a primitive. % A78
+\rcomment{r:e-task-prim} This is the only rule with a label, and it does not
+determine its result: the outcome is any member of
+$\effOut(\pi,v_1\cdots v_k)$. For $\effspawn$, the process identifier is
+unconstrained here; Chapter~\ref{ch:programs} chooses one that names no
+earlier process. For the primitives of the platform, the outcome is decided
+by the platform, which may also take time to decide it, as for
+$\effsleep$. % R9, A83
+\end{rulecomments}
+
+The following properties follow from the rules.
+\begin{property}
+An outcome has no reduction. If $\tk$ is not an outcome, then either every
+reduction of $\tk$ is silent, and all have the same right-hand side up to the
+choice of a member of a set given by $\APPLY$; or every reduction of $\tk$ is
+labelled by an action $\effdone{\pi(v_1\cdots v_k)}{\tk'}$, for one and the
+same $\pi$ and $v_1\cdots v_k$; or $\tk$ has no reduction, which happens only
+when an application in a premise of rule \ruleref{r:e-task-andthen-succeed}
+or \ruleref{r:e-task-onerror-fail} has no result.
+\end{property}
+
+\section{Commands and Subscriptions}\label{sec:effects-commands}
+
+A command value, or a subscription value, is a finite tree whose leaves are
+requests to managers. A \emph{manager} $\effm$ is one of the following.
+\begin{itemize}
+\item The \emph{task manager} $\effmtask$. Its leaves $\effleaf(\effmtask,\tk)$
+  are commands; it performs $\tk$ in a new process, and when $\tk$ succeeds
+  with $v$, the leaf gives a message from $v$.
+\item The manager $\effmout\,\effp$ of an outgoing port $\effp$. Its leaves
+  $\effleaf(\effmout\,\effp,j)$, with $j\in\BVal$, are commands; each sends
+  $j$ to the host, and gives no message.
+\item The manager $\effmin(\effp,\tau)$ of an incoming port $\effp$ of payload
+  type $\tau$. Its leaves $\effleaf(\effmin(\effp,\tau),v)$ are subscriptions,
+  where $v$ is a function value; while the subscription is current, each
+  boundary value the host sends on $\effp$ that decodes at $\tau$ gives a message
+  through $v$ (Section~\ref{sec:effects-messages}).
+\item A manager of the platform, in $\effMgrPlat$. The values its leaves hold,
+  whether they are commands or subscriptions, and the messages they give are
+  defined by the platform. % A83
+\end{itemize}
+Since port names are distinct (A84), a port name $\effp$ determines the
+payload type $\tau$ of every manager $\effmin(\effp,\tau)$ of a program. A
+batch groups commands, and $\effmap(v,\cm)$ applies the function value $v$ to
+every message that $\cm$ gives.
+
+A command or subscription value with no $\effbatch$ in it has the form
+$\effmap(v_n,\cdots\effmap(v_1,\effleaf(\effm,v))\cdots)$ with $n\geq 0$, and
+is called a \emph{leaf command} (or \emph{leaf subscription}); its manager is
+$\effm$. The \emph{flattening} $\effFlat(\cm)$ of a command value $\cm$ is the
+finite multiset of leaf commands defined by
+\[
+  \begin{array}{rcl}
+  \effFlat(\effbatch(\cm_1\cdots\cm_n)) &=&
+    \effFlat(\cm_1)\uplus\cdots\uplus\effFlat(\cm_n),\\
+  \effFlat(\effmap(v,\cm)) &=&
+    \effmset{\effmap(v,\effc)\mid \effc\in\effFlat(\cm)},\\
+  \effFlat(\effleaf(\effm,v)) &=& \effmset{\effleaf(\effm,v)},
+  \end{array}
+\]
+where a leaf command that occurs several times in $\effFlat(\cm)$ gives as
+many members of the multiset on the right of the second equation. The
+flattening $\effFlat(\sbv)$ of a subscription value is defined by the same
+equations. In particular
+$\effFlat(\effnone)=\effFlat(\effbatch(\effnone\ \effnone))=\effmset{\,}$.
+
+We have adopted the following convention, the \emph{effect order convention}.
+A command determines, through its flattening, which leaf commands it holds
+and how many times each, but no order among them. Wherever the leaf
+commands of commands are performed (Chapter~\ref{ch:programs}), the leaf
+commands of one command for one manager are performed in no specified order,
+and the leaf commands for different managers are performed in no specified
+order relative to one another. % A66, A67
+The same holds for subscriptions. The orders that implementations choose are
+recorded in Appendix~\ref{ch:appendix-implementation}.
+
+A program value $\effprog\,r$ is the meaning of a \kw{Program}: $r$ is the
+record of the functions that make it up, with at least the fields \kw{init},
+\kw{update} and \kw{subscriptions}. The function \kw{Platform.worker} makes a
+program value from its record (Figure~\ref{fig:effects-apply}). A platform
+may provide further functions whose results are program values, whose
+records have further fields, such as \kw{view}; what those fields mean is
+defined by the platform. % A82, A83
+Chapter~\ref{ch:programs} defines how a program value runs.
+
+\section{The Effect Values of the Basis}\label{sec:effects-apply}
+
+Figure~\ref{fig:effects-apply} gives the arity of each basic value of the
+initial basis that makes an effect value, and the result of $\APPLY$ on it
+(Section~\ref{sec:dynamic-core-basic}). Each set has exactly one member. One
+of these basic values, \kw{Task.command}, is bound to no identifier of the
+basis; it is applied only by the texts of \kw{Task.perform} and
+\kw{Task.attempt}, as described below
+(Appendix~\ref{ch:appendix-dynamic-basis}).
+
+\begin{figure}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.15}
+\small
+\begin{tabular}{@{}l@{\quad}c@{\quad}>{$}l<{$}@{}}
+\hline
+basic value $b$ & $\arity(b)$ & \APPLY(b,v_1\cdots v_n)\\
+\hline
+\kw{Task.succeed}  & 1 & \APPLY(b,v)=\{\effsucceed\,v\}\\
+\kw{Task.fail}     & 1 & \APPLY(b,v)=\{\efffail\,v\}\\
+\kw{Task.andThen}  & 2 & \APPLY(b,v,\tk)=\{\effandThen(v,\tk)\}\\
+\kw{Task.onError}  & 2 & \APPLY(b,v,\tk)=\{\effonError(v,\tk)\}\\
+\kw{Task.command}  & 1 & \APPLY(b,\kw{Perform}\ \tk)=\{\effleaf(\effmtask,\tk)\}\\
+\kw{Process.sleep} & 1 & \APPLY(b,v)=\{\effprim(\effsleep,v)\}\\
+\kw{Process.spawn} & 1 & \APPLY(b,\tk)=\{\effprim(\effspawn,\tk)\}\\
+\kw{Process.kill}  & 1 & \APPLY(b,\pid)=\{\effprim(\effkill,\pid)\}\\
+\kw{Cmd.batch}     & 1 & \APPLY(b,[\cm_1,\ldots,\cm_n])=\{\effbatch(\cm_1\cdots\cm_n)\}\\
+\kw{Cmd.map}       & 2 & \APPLY(b,v,\cm)=\{\effmap(v,\cm)\}\\
+\kw{Sub.batch}     & 1 & \APPLY(b,[\sbv_1,\ldots,\sbv_n])=\{\effbatch(\sbv_1\cdots\sbv_n)\}\\
+\kw{Sub.map}       & 2 & \APPLY(b,v,\sbv)=\{\effmap(v,\sbv)\}\\
+\kw{Platform.worker} & 1 & \APPLY(b,r)=\{\effprog\,r\}\\
+\hline
+\end{tabular}
+\caption{APPLY on Effect Values}
+\label{fig:effects-apply}
+\end{figure}
+
+The other functions of these modules that the initial basis provides are
+written in Elm in elm/core, and each is defined by its text
+(Section~\ref{sec:appendix-dynamic-basis-elm}). They are \kw{Task.map},
+\kw{Task.map2} to \kw{Task.map5}, \kw{Task.sequence}, \kw{Task.mapError},
+\kw{Task.perform}, \kw{Task.attempt}, \kw{Cmd.none} and \kw{Sub.none}. % A60
+Thus \kw{Cmd.none} and \kw{Sub.none} are $\effnone$, the value of
+\kw{batch []}. The texts of \kw{Task.perform} and \kw{Task.attempt} apply
+\kw{command} to a constructor value $\kw{Perform}\ \tk$, where \kw{Perform}
+is the constructor of the type \kw{MyCmd} of the module \kw{Task}, which that
+module does not expose. Effect modules are outside Standard Elm, so these two
+names are given directly: the texts of \kw{Task} are evaluated in an
+environment that binds \kw{Perform} to the constructor \kw{Perform}, of arity
+1, and \kw{command} to the basic value \kw{Task.command} of the figure, and
+neither is bound to an identifier of the basis, as
+Appendix~\ref{ch:appendix-dynamic-basis} states
+(Section~\ref{sec:appendix-dynamic-basis-elm}). % A60, A85
+Hence \kw{Task.perform $v$ $\tk$} evaluates to
+$\effleaf(\effmtask,\tk')$, where $\tk'$ is the value of
+\kw{Task.map $v$ $\tk$}, a task that cannot fail and whose success value is
+the message. Commands of outgoing ports and subscriptions of incoming ports
+are made by the values of the ports (Section~\ref{sec:effects-ports}).
+
+\section{Ports}\label{sec:effects-ports}
+
+A value crosses a port as a boundary value: the port boundary is defined over
+the boundary values of BVal, which are the JSON values of JVal together with
+those in which byte sequences occur, and host values that are not boundary
+values are outside the definition. How a host represents a byte sequence is
+outside the definition as well
+(Appendix~\ref{ch:appendix-implementation}). % A74, A92, D11
+A value $v$ sent on an outgoing port of payload type $\tau$ becomes the
+boundary value $\Enc{\tau}(v)$, and a boundary value $j$ arriving at an
+incoming port of payload type $\tau$ becomes the value $\Dec{\tau}(j)$, if
+that is defined.
+The payload types are the types $\tau$ with $\Port(\tau)$
+(Section~\ref{sec:static-modules-ports}); aliases have been expanded, and a
+payload type has no type variables. Labels are identified with the strings of
+their characters, so that a record type's labels are the keys of the objects
+that encode its records. The values of the type \kw{Bytes} are the
+constructor values $\dbbin\,[o_1,\ldots,o_k]$ of
+Appendix~\ref{ch:appendix-dynamic-basis}
+(Section~\ref{sec:appendix-dynamic-basis-bytes}), each $o_i$ an Int value
+from $0$ to $255$. % A92
+
+\rulegroup{Encoding}{\Enc{\tau}(v)=j}
+
+\defnrule[r:e-enc-int]
+  {}
+  {\Enc{\tInt}(\sv)=\sv}
+
+\defnrule[r:e-enc-float]
+  {\sv\in\effFltFin}
+  {\Enc{\tFloat}(\sv)=\sv}
+
+\defnrule[r:e-enc-float-null]
+  {\sv\in\effFlt\setminus\effFltFin}
+  {\Enc{\tFloat}(\sv)=\effnull}
+
+\defnrule[r:e-enc-true]
+  {}
+  {\Enc{\tBool}(\kw{True})=\efftrue}
+
+\defnrule[r:e-enc-false]
+  {}
+  {\Enc{\tBool}(\kw{False})=\efffalse}
+
+\defnrule[r:e-enc-string]
+  {}
+  {\Enc{\tString}(\sv)=\sv}
+
+\defnrule[r:e-enc-bytes]
+  {}
+  {\Enc{\tBytes}(\dbbin\,[o_1,\ldots,o_k])=\effbytes(o_1\cdots o_k)}
+
+\defnrule[r:e-enc-unit]
+  {}
+  {\Enc{\tunit}(())=\effnull}
+
+\defnrule[r:e-enc-nothing]
+  {}
+  {\Enc{\tau\,\tMaybe}(\kw{Nothing})=\effnull}
+
+\defnrule[r:e-enc-just]
+  {\Enc{\tau}(v)=j}
+  {\Enc{\tau\,\tMaybe}(\kw{Just}\ v)=j}
+
+\defnrule[r:e-enc-list]
+  {\Enc{\tau}(v_1)=j_1\ \ \cdots\ \ \Enc{\tau}(v_n)=j_n}
+  {\Enc{\tau\,\tList}([v_1,\ldots,v_n])=\effJarr{j_1,\ldots,j_n}}
+
+\defnrule[r:e-enc-array]
+  {\japp{\kw{Array.toList}}{v}{v'}\premsep\Enc{\tau\,\tList}(v')=j}
+  {\Enc{\tau\,\tArray}(v)=j}
+
+\defnrule[r:e-enc-tuple]
+  {\Enc{\tau_1}(v_1)=j_1\premsep\Enc{\tau_2}(v_2)=j_2\premsep
+   \opt{\Enc{\tau_3}(v_3)=j_3}\premsep k=2\opt{{}+1}}
+  {\Enc{(\tau_1,\tau_2\opt{,\tau_3})\,\tTuple{k}}((v_1,v_2\opt{,v_3}))
+   =\effJarr{j_1,j_2\opt{,j_3}}}
+
+\defnrule[r:e-enc-record]
+  {\Dom r=\Dom\varrho\premsep j\in\effStr\finmap\BVal\premsep\Dom j=\Dom\varrho\\
+   \Enc{\varrho(\lab)}(r(\lab))=j(\lab)\ \text{for each}\ \lab\in\Dom\varrho}
+  {\Enc{\rec{\varrho}}(r)=j}
+
+\defnrule[r:e-enc-value]
+  {j\in\JVal}
+  {\Enc{\tValue}(j)=j}
+
+\begin{rulecomments}
+\rcomment{r:e-enc-int} The integer itself is the JSON number. Whether a host
+can hold every integer of $\IntRange$ exactly is not a matter for the
+definition (Appendix~\ref{ch:appendix-implementation}). % A73
+\rcomment{r:e-enc-float} The sign of a zero is not kept: $-0$ encodes as the
+JSON number $0$ (Section~\ref{sec:effects-simple}). % A88
+\rcomment{r:e-enc-float-null} JSON has no number for NaN or for an infinity.
+Such a float is encoded as $\effnull$, which a \kw{Float} port does not
+decode, while a \kw{Maybe Float} port decodes it as \kw{Nothing}. % A74, A88
+\rcomment{r:e-enc-bytes} A value of type \kw{Bytes} is sent as its byte
+sequence, which is not a JSON value: not a string, and not an array of
+numbers. Here each $o_i$ on the left is an Int value and on the right the
+same integer. % A92
+\rcomment{r:e-enc-just} A \kw{Just} has no encoding of its own. Hence the
+encoding of a \kw{Maybe} value cannot tell \kw{Nothing} from a \kw{Just}
+whose argument encodes as $\effnull$: in \kw{Maybe (Maybe Int)}, both
+\kw{Nothing} and \kw{Just Nothing} encode as $\effnull$, and so do
+\kw{Nothing} and \kw{Just ()} in \kw{Maybe ()}.
+\rcomment{r:e-enc-array} An array is encoded as the list of its elements.
+\kw{Array.toList} is the basic value of
+Section~\ref{sec:appendix-dynamic-basis-arrays}, bound to no identifier of the
+basis.
+\rcomment{r:e-enc-record} The fields become the keys of an object, which has
+no order, so the order of fields is no part of what is sent. % A76
+\rcomment{r:e-enc-value} A value of type \kw{Json.Encode.Value} is already a
+JSON value and is sent as it is. The side condition $j\in\JVal$ holds of every
+value of that type, so no byte sequence is ever sent through
+\kw{Json.Encode.Value}. % A74, A92
+\end{rulecomments}
+
+\rulegroup{Decoding}{\Dec{\tau}(j)=v}
+
+\defnrule[r:e-dec-int]
+  {j\in\IntRange}
+  {\Dec{\tInt}(j)=j}
+
+\defnrule[r:e-dec-float]
+  {j\in\effJNum}
+  {\Dec{\tFloat}(j)=\efffloat(j)}
+
+\defnrule[r:e-dec-true]
+  {}
+  {\Dec{\tBool}(\efftrue)=\kw{True}}
+
+\defnrule[r:e-dec-false]
+  {}
+  {\Dec{\tBool}(\efffalse)=\kw{False}}
+
+\defnrule[r:e-dec-string]
+  {j\in\effStr}
+  {\Dec{\tString}(j)=j}
+
+\defnrule[r:e-dec-bytes]
+  {}
+  {\Dec{\tBytes}(\effbytes(o_1\cdots o_k))=\dbbin\,[o_1,\ldots,o_k]}
+
+\defnrule[r:e-dec-unit]
+  {}
+  {\Dec{\tunit}(\effnull)=()}
+
+\defnrule[r:e-dec-nothing]
+  {}
+  {\Dec{\tau\,\tMaybe}(\effnull)=\kw{Nothing}}
+
+\defnrule[r:e-dec-just]
+  {j\neq\effnull\premsep\Dec{\tau}(j)=v}
+  {\Dec{\tau\,\tMaybe}(j)=\kw{Just}\ v}
+
+\defnrule[r:e-dec-list]
+  {\Dec{\tau}(j_1)=v_1\ \ \cdots\ \ \Dec{\tau}(j_n)=v_n}
+  {\Dec{\tau\,\tList}(\effJarr{j_1,\ldots,j_n})=[v_1,\ldots,v_n]}
+
+\defnrule[r:e-dec-array]
+  {\Dec{\tau\,\tList}(j)=v\premsep\japp{\kw{Array.fromList}}{v}{v'}}
+  {\Dec{\tau\,\tArray}(j)=v'}
+
+\defnrule[r:e-dec-tuple]
+  {n\geq k\premsep k=2\opt{{}+1}\\
+   \Dec{\tau_1}(j_1)=v_1\premsep\Dec{\tau_2}(j_2)=v_2\premsep
+   \opt{\Dec{\tau_3}(j_3)=v_3}}
+  {\Dec{(\tau_1,\tau_2\opt{,\tau_3})\,\tTuple{k}}(\effJarr{j_1,\ldots,j_n})
+   =(v_1,v_2\opt{,v_3})}
+
+\defnrule[r:e-dec-record]
+  {j\in\effStr\finmap\BVal\premsep\Dom\varrho\subseteq\Dom j\premsep
+   \Dom r=\Dom\varrho\\
+   \Dec{\varrho(\lab)}(j(\lab))=r(\lab)\ \text{for each}\ \lab\in\Dom\varrho}
+  {\Dec{\rec{\varrho}}(j)=r}
+
+\defnrule[r:e-dec-value]
+  {j\in\JVal}
+  {\Dec{\tValue}(j)=j}
+
+\begin{rulecomments}
+\rcomment{r:e-dec-int} A JSON number is an Int exactly when it is an integer
+within $\IntRange$: \kw{1.0} and \kw{-0} decode as \kw{1} and \kw{0}, while
+\kw{1.5}, and an integer outside $\IntRange$, do not decode. Since
+$\IntRange$ is a parameter of the implementation, so is the set of numbers a
+port of type \kw{Int} accepts (Appendix~\ref{ch:appendix-implementation}).
+% A73
+\rcomment{r:e-dec-float} Every JSON number decodes, integers among them, as
+the nearest floating-point number. A number too large for a finite
+floating-point number decodes as the infinity of its sign, by the rounding of
+floating-point constants. An incoming $-0$ is the number $0$, and decodes as
+the float $0$, not $-0$. No boundary value decodes as NaN. % A88
+\rcomment{r:e-dec-bytes} A byte sequence, and nothing else, decodes at
+\kw{Bytes}: $\Dec{\tBytes}(j)$ is undefined for every JSON value $j$, so a
+string or an array of numbers sent to a \kw{Bytes} port is rejected at the
+boundary. % A71, A92
+\rcomment{r:e-dec-unit} At an incoming port, the unit type accepts
+$\effnull$ and nothing else. The flags of a program are decoded otherwise
+when their type is the unit type (Chapter~\ref{ch:programs}). % A77
+\rcomment{r:e-dec-just} The side condition $j\neq\effnull$ makes
+$\effnull$ always decode as \kw{Nothing}, at once, by rule
+\ruleref{r:e-dec-nothing}: in \kw{Maybe (Maybe Int)} it decodes as the outer
+\kw{Nothing}, and \kw{Just Nothing} is never the result of decoding. A value
+other than $\effnull$ that does not decode at $\tau$ does not decode at
+\kw{Maybe} $\tau$ either.
+\rcomment{r:e-dec-tuple} An array longer than the tuple is accepted, and its
+further elements are ignored; a shorter array does not decode.
+\rcomment{r:e-dec-record} An object with further keys is accepted, and they
+are ignored; an object that lacks the key of a field does not decode. Which
+missing field an implementation reports, and how, is outside the
+definition. % A76
+\rcomment{r:e-dec-value} Every JSON value decodes at \kw{Json.Encode.Value}.
+A boundary value in which a byte sequence occurs is not a JSON value, and does
+not decode there: it is rejected. % A74, A71, A92
+\end{rulecomments}
+
+\begin{figure}[htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}>{\raggedright}p{0.24\textwidth}>{\raggedright}p{0.08\textwidth}>{\raggedright}p{0.29\textwidth}>{\raggedright\arraybackslash}p{0.29\textwidth}@{}}
+\hline
+Elm type & Port? & Sent as (Enc) & Accepted (Dec)\\
+\hline
+\kw{Int} & yes & the number & a number that is an integer in $\IntRange$\\
+\kw{Float} & yes & the number; $\effnull$ for NaN and the infinities & any number, rounded\\
+\kw{Bool} & yes & $\efftrue$ or $\efffalse$ & $\efftrue$ or $\efffalse$ only\\
+\kw{String} & yes & the string & a string only\\
+\kw{Bytes} & yes & a byte sequence & a byte sequence only\\
+\kw{()} & yes & $\effnull$ & $\effnull$ only (flags: Chapter~\ref{ch:programs})\\
+\kw{Maybe} $\ty$ & if $\ty$ is & $\effnull$ for \kw{Nothing}; $v$ as $\ty$ for \kw{Just} $v$ & $\effnull$ as \kw{Nothing}; anything else as $\ty$, under \kw{Just}\\
+\kw{List} $\ty$ & if $\ty$ is & an array & an array whose elements decode as $\ty$\\
+\kw{Array} $\ty$ & if $\ty$ is & an array & an array whose elements decode as $\ty$\\
+\kw{($\ty_1$, $\ty_2$)}, \kw{($\ty_1$, $\ty_2$, $\ty_3$)} & if each $\ty_i$ is & an array of 2 or 3 elements & an array at least as long; further elements ignored\\
+closed record \kw{\kwlb{} $\lab_1$ : $\ty_1$, \ldots\ \kwrb} & if each $\ty_i$ is & an object with exactly the fields as keys & an object with at least those keys; further keys ignored\\
+\kw{Json.Encode.}\linebreak\kw{Value} & yes & itself & any JSON value; no byte sequence\\
+\hline
+\kw{Char} & no & & \\
+a function type & no & & \\
+a type variable & no & & \\
+an extensible record & no & & \\
+any other custom type (\kw{Result}, \kw{Order}, \kw{Dict}, \kw{Set}, and those of the program) & no & & \\
+any other abstract type (\kw{Cmd}, \kw{Sub}, \kw{Task}, \kw{Process.Id}, \kw{Program}) & no & & \\
+\hline
+\end{tabular}
+\caption{What Can and Cannot Be Sent over a Port}
+\label{fig:effects-port-table}
+\end{figure}
+% A92: Bytes admissible in every payload position, as a byte sequence.
+
+There is no rule for any other pair of a type and a boundary value: a string
+does not decode as an Int, nor a number as a Bool, nor an object as a tuple,
+nor a byte sequence as a String or a list. The
+rules give the following properties.
+\begin{property}
+For every $\tau$ with $\Port(\tau)$, $\Enc{\tau}$ and $\Dec{\tau}$ are
+partial functions: each value has at most one encoding, and each boundary value at
+most one decoding, at $\tau$. Every value that elaboration admits as a
+payload of type $\tau$ has an encoding at $\tau$. If $\Enc{\tau}(v)=j$, and
+$v$ has no component that is NaN, an infinity or a negative zero, and no
+component $\kw{Just}\ v'$ whose argument encodes as $\effnull$, then
+$\Dec{\tau}(j)=v''$, where $v''$ is $v$ with each array replaced by the value
+of \kw{Array.fromList} applied to the list of its elements.
+\end{property}
+
+The value of a port is a basic value of arity 1 that the dynamic semantics of
+modules binds to the port name (Chapter~\ref{ch:dynamic-modules}). For an
+outgoing port $\effp$ of payload type $\tau$, that is the basic value
+$\effoutport(\effp,\tau)$, and for an incoming port the basic value
+$\effinport(\effp,\tau)$. The class BasVal of
+Chapter~\ref{ch:dynamic-core} includes these values, defined here, for every
+port name and every payload type. Their meaning is
+\[
+  \begin{array}{rcl}
+  \APPLY(\effoutport(\effp,\tau),v) &=&
+    \{\effleaf(\effmout\,\effp,j)\mid\Enc{\tau}(v)=j\},\\
+  \APPLY(\effinport(\effp,\tau),v) &=& \{\effleaf(\effmin(\effp,\tau),v)\}.
+  \end{array}
+\]
+By the property above, the first set has exactly one member for every value
+an outgoing port is applied to: a value is encoded when the command is made.
+% D11
+A value sent to an incoming port is decoded when it arrives
+(Section~\ref{sec:effects-messages}).
+
+Figure~\ref{fig:effects-port-table} collects what can and cannot be sent over
+a port, for each form of type, in agreement with the predicate $\Port$ of
+Section~\ref{sec:static-modules-ports}. A type that is not a payload type
+makes a port declaration fail to elaborate; no such port exists at run time.
+% D11, A92
+
+
+A type alias stands for the type it expands to. \kw{Bool} and \kw{Maybe} are
+custom types, and the only custom types a port admits.
+
+\section{Messages}\label{sec:effects-messages}
+
+A leaf command gives messages from the inputs its manager receives: a task
+leaf from the success value of the process that performs its task, an
+incoming port leaf from the boundary values that arrive at its port. The rules
+below define the message given, through the functions of the $\effmap$s
+around the leaf.
+
+\rulegroup{Messages}{\effrecv{\effc}{\effx}{v}}
+
+\defnrule[r:e-msg-task]
+  {}
+  {\effrecv{\effleaf(\effmtask,\tk)}{v}{v}}
+
+\defnrule[r:e-msg-port]
+  {\Dec{\tau}(j)=v'\premsep\japp{v}{v'}{v''}}
+  {\effrecv{\effleaf(\effmin(\effp,\tau),v)}{(\effp,j)}{v''}}
+
+\defnrule[r:e-msg-map]
+  {\effrecv{\cm/\sbv}{\effx}{v'}\premsep\japp{v}{v'}{v''}}
+  {\effrecv{\effmap(v,\cm/\sbv)}{\effx}{v''}}
+
+\begin{rulecomments}
+\rcomment{r:e-msg-task} The input $v$ is the value with which the process
+performing $\tk$ succeeds. The task of a leaf made by \kw{Task.perform} or
+\kw{Task.attempt} cannot fail. For \kw{Task.perform} it is the task given,
+mapped, whose error type is \kw{Never}, of which there is no value. For
+\kw{Task.attempt} it is the task given with \kw{Task.onError} applied, which
+turns a failure into a success whose value is the message made from \kw{Err}.
+Either way the task that \kw{Perform} carries has the error type \kw{Never}
+(Section~\ref{sec:appendix-static-basis-modenv}). So every such process that
+ends gives a message.
+\rcomment{r:e-msg-port} The port name of the input must be that of the
+manager, so a boundary value arriving at one port gives no message through a
+leaf of another. When $\Dec{\tau}(j)$ is undefined, no rule applies, and the
+leaf gives no message.
+\rcomment{r:e-msg-map} The innermost function is applied first. There is no
+rule for a leaf of an outgoing port: such a leaf gives no message, and the
+functions of the $\effmap$s around it are never applied. The messages that
+the leaves of the managers of the platform give are defined by the platform.
+% A83
+\end{rulecomments}
+
+A boundary value $j$ that arrives at an incoming port $\effp$ of payload type
+$\tau$ is \emph{accepted} if $\Dec{\tau}(j)$ is defined, and otherwise
+\emph{rejected}. A rejected value is refused at the boundary: the program
+never sees it, and it is unaffected. % A71, D2
+When $j$ is accepted and $\sbv$ is the current subscription value of the
+program, every member $\effc$ of $\effFlat(\sbv)$ for which
+$\effrecv{\effc}{(\effp,j)}{v}$ gives the message $v$, once for each time it
+occurs in $\effFlat(\sbv)$. Whether a value is accepted depends on its port
+alone, not on the current subscriptions; an accepted value that no current
+subscription receives gives no message. When the messages are handled, and
+in which order, is defined in Chapter~\ref{ch:programs}.

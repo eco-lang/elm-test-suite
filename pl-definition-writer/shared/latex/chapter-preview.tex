@@ -1,0 +1,14 @@
+% chapter-preview.tex -- compile one chapter on its own.
+% Used by stages 03 to 05 before a chapter is written to definition/tex/.
+% Usage (from the chapter's folder), see latex-conventions.md "Preview":
+%   TEXINPUTS=<macros dir>:<shared/latex dir>: pdflatex -jobname=preview \
+%     "\def\chapterfile{syntax-core}\input{chapter-preview.tex}"
+% Rule and figure numbers restart at 1 in a preview; only stage 08 numbers
+% them through the whole book.
+\documentclass[11pt,a4paper,openany]{book}
+\usepackage{defn}
+\usepackage{macros}
+\usepackage[hidelinks]{hyperref}
+\begin{document}
+\input{\chapterfile}
+\end{document}

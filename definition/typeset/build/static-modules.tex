@@ -1,0 +1,602 @@
+% Values: PRECISE, FAITHFUL, TRACTABLE, ILLUMINATING, ECONOMICAL
+% Evidence planned:
+% - PRECISE: a rule for every production of the bare module grammar
+%   (Figures fig:grammar-modules and fig:grammar-top-level-declarations):
+%   19 rules in 9 groups; the exposing list of a header is covered by the
+%   operation Expose, every other production by a rule; interfaces, provider
+%   maps, ambiguity and the Port predicate defined before the first rule.
+% - FAITHFUL: default imports first; replacement of explicitly exposed types,
+%   merging of everything else, lazy ambiguity, no qualified
+%   self-reference (A28, A38); open, closed and private types, record alias
+%   constructors of status v, `Alias(..)' and constructors by name rejected;
+%   private types in exposed types legal (A29); ports as Elm 0.19.1 with
+%   Bytes added (D11, A92), with the table of what can and cannot be sent; main left to
+%   Chapter 9 (A32); port names program-wide left to Chapter 9 (A84).
+% - TRACTABLE: the property that a module generates only new type names and
+%   that the type environment of its type declarations is determined up to the
+%   choice of those names; interfaces made by Expose are well formed.
+% - ILLUMINATING: comments on the fixed point of the type declarations, the
+%   two port rules, replacement versus merging, ambiguity, the record alias
+%   constructor, and the absence of qualified self-reference.
+% - ECONOMICAL: no signatures, realisation or enrichment (D6); one rule for a
+%   header with and without `port'; options merge `as' and `exposing'.
+
+\chapter{Static Semantics for Modules}\label{ch:static-modules}
+
+This chapter defines the static semantics of Modules. % D6
+It introduces interfaces, which record what a module makes available to the
+modules that import it, module environments, port environments and static
+bases, together with provider maps, which record which imported module
+supplies each identifier that a module may use. The rules infer that a module
+elaborates, in a basis, to the part of a basis it contributes and to the
+environment of its own declarations; on the way they infer what the imports,
+exposing lists, top-level declarations and type declarations of the module
+elaborate to. Since Elm modules export top-level names only, there are no
+signatures, functors or sharing, and no matching of an environment against a
+specification. The admissible types of ports are defined in
+Section~\ref{sec:static-modules-ports}. % D11
+
+\section{Semantic Objects}\label{sec:static-modules-objects}
+
+The simple objects for the static semantics of Modules are exactly as for the
+Core (Section~\ref{sec:static-core-simple}). The compound objects are those
+for the Core, augmented by those in Figure~\ref{fig:static-modules-compound}.
+
+\begin{figure}[ht]
+\centering
+\begin{objtable}
+  \objdef{I}{\Interface}{\Env}
+  \objdef{\ME}{\ModEnv}{\cls{ModId} \finmap \Interface}
+  \objdef{\PE}{\PortEnv}{\cls{Var} \finmap \{\smdirout, \smdirin\} \times \Type}
+  \objdef{B\ \text{or}\ T, \ME, \PE}{\Basis}{\Fin(\TyName) \times \ModEnv \times \PortEnv}
+  \objdef{\pi}{\smProvMap}{\smLongId \finmap (\Fin(\cls{ModId}) \setminus \{\emptyset\})}
+\end{objtable}
+\caption{Further Compound Semantic Objects}\label{fig:static-modules-compound}
+\end{figure}
+
+An \emph{interface} $I$ is an environment whose qualified environment is empty.
+It is what a module \emph{exposes}: the types, values and constructors that
+another module may name after importing it. Every type that a module declares
+is either \emph{private}, if $\tycon \notin \Dom(\TE \of I)$, or exposed. An
+exposed custom type is \emph{open} if its constructors belong to $\Dom(\VE \of
+I)$, and \emph{closed} if none of them does; in both cases $I(\tycon)$ is the
+type structure of the type, constructors included. An exposed type alias is
+bound in $\TE \of I$, and an exposed record alias brings its constructor, of
+status $\isv$, into $\VE \of I$. In a type structure $(\theta, \VE)$ of an
+interface, $\VE$ contains a constructor of status $\isc$ exactly when the type
+constructor is a custom type, since a custom type has at least one constructor
+and an alias has none of status $\isc$
+(Section~\ref{sec:static-modules-rules}).
+% DECIDED: a closed type keeps its constructors in its type structure, but they
+% are absent from VE of I, so no importer can name them. This keeps Interface =
+% Env (registry) and tells a closed custom type from an alias, which `T(..)' in
+% an import needs (BAD IMPORT for an alias).
+
+A \emph{module environment} $\ME$ maps the identifier of each module elaborated
+so far to its interface. A \emph{port environment} $\PE$ maps the name of each
+port to its \emph{direction}, $\smdirout$ for an outgoing port and $\smdirin$
+for an incoming one, and to its \emph{payload type}, the type of the values it
+carries. A \emph{static basis} $B = T, \ME, \PE$ consists of the set of type
+names generated so far, the interfaces of the modules elaborated so far, and
+the ports they declare; port names are global to a program
+(Chapter~\ref{ch:programs}). % A84
+
+We write $\smId$ for the union of $\cls{Var} \cup \cls{Con}$ and
+$\cls{TyCon}$, and $\smLongId$ for the union of $\cls{LongVar} \cup
+\cls{LongCon}$ and $\cls{LongTyCon}$; as in the Core, the unions are disjoint,
+so a type constructor and a value constructor spelt alike are different members
+of $\smId$. We let $\smid$ range over $\smId$ and $\smlongid$ over $\smLongId$,
+and $N$ over $\Fin(\smLongId)$. For an environment $E$ whose qualified
+environment is empty, $\Dom E$ means $\Dom(\TE \of E) \cup \Dom(\VE \of E)$, a
+subset of $\smId$. For a set $N \subseteq \smId$ and a module identifier
+$\modid$, $\modid.N$ means $\{\modid.\smid \,;\, \smid \in N\}$.
+
+A \emph{provider map} $\pi$ maps each identifier that the imports of a module
+make available, unqualified or qualified, to the set of modules that provide
+it. An identifier with more than one provider is \emph{ambiguous}.
+
+The operations of projection, injection and modification are as for the Core
+(Section~\ref{sec:static-core-projection}). Moreover, for an environment $E$ we
+write $C \oplus E$ for $C + (\tynames E, \emptyset, E)$, that is, $E \of C$
+modified by $E$ and $T \of C$ extended with the type names of $E$; this
+extends the notation $C \oplus \TE$ of the Core.
+
+\section{Interfaces}\label{sec:static-modules-interfaces}
+
+The interface that a module exposes is determined by the environment $E$ of
+its own declarations and by the exposing list of its header. For an
+environment $E$ whose qualified environment is empty, $\Expose(E, \explist)$
+is defined as follows:
+\[
+\begin{array}{@{}l@{\ =\ }l@{}}
+  \Expose(E, \kw{(..)}) & E\\
+  \Expose(E, \kw{(}\expitem_1\kw{,}\ \cdots\kw{,}\ \expitem_n\kw{)})
+    & \Expose(E, \expitem_1) + \cdots\\
+  \multicolumn{1}{@{}l@{}}{} & \quad{} + \Expose(E, \expitem_n)\\
+  \Expose(E, \var) & \{\var \mapsto E(\var)\}\ \text{in}\ \Env\\
+  \Expose(E, \tycon) & (\emptymap,\ \{\tycon \mapsto (\theta, \VE)\},\ \VE_{\isv})\\
+  \Expose(E, \tycon\,\kw{(..)}) & (\emptymap,\ \{\tycon \mapsto (\theta, \VE)\},\ \VE)
+\end{array}
+\]
+where, in the last two lines, $E(\tycon) = (\theta, \VE)$ and $\VE_{\isv} =
+\{\con \mapsto (\sigma, \isv) \,;\, \VE(\con) = (\sigma, \isv)\}$. It is defined when
+every identifier of an item is bound in $E$, which the syntactic restrictions
+of a header ensure (Section~\ref{sec:syntax-modules-restrictions}); a header
+exposes no operator. Thus \kw{(..)} exposes every type open and every value,
+constructor and port; an item $\tycon$ exposes a custom type closed and a
+record alias with its constructor; and an item $\tycon\,\kw{(..)}$ exposes a
+custom type open. No condition relates the exposed values to the exposed
+types: a value may be exposed whose type mentions a private type. % A29
+
+An interface $I$ is \emph{well formed} if, for every $(\theta, \VE) \in
+\Ran(\TE \of I)$ and every $\con$ with $\VE(\con) = (\sigma, \isv)$, also $(\VE
+\of I)(\con) = (\sigma, \isv)$. The rules rely on the following property,
+which may easily be demonstrated from the rules for type declarations.
+
+\begin{property}
+If $E$ is the environment to which the top-level declarations of a module
+elaborate, and $I = \Expose(E, \explist)$ is defined, then $I$ is well formed
+and $I \subseteq E$ componentwise.
+\end{property}
+
+\noindent The interfaces of the initial basis
+(Appendix~\ref{ch:appendix-static-basis}) are well formed.
+
+\section{Provider Maps}\label{sec:static-modules-providers}
+
+The imports of a module are read in order, and each one adds to a provider map.
+For a module identifier $\modid$ and sets $N, N' \subseteq \smLongId$, the
+provider map $\pi \smmerge_{\modid} (N, N')$ is $\pi$ in which $\modid$
+\emph{replaces} the providers of the identifiers in $N$ and \emph{joins} the
+providers of those in $N'$: if $\pi' = \pi \smmerge_{\modid} (N, N')$, then
+\[
+  \pi'(\smlongid) =
+  \begin{cases}
+    \{\modid\} & \text{if } \smlongid \in N,\\
+    \pi(\smlongid) \cup \{\modid\} & \text{if } \smlongid \in N' \setminus N,\\
+    \pi(\smlongid) & \text{if } \smlongid \in \Dom\pi \setminus (N \cup N'),
+  \end{cases}
+\]
+where $\pi(\smlongid)$ is taken to be $\emptyset$ when $\smlongid \notin
+\Dom\pi$. % A28
+
+For $\modid \in \Dom\ME$, let $\TE_{\modid} = \TE \of \ME(\modid)$ and
+$\VE_{\modid} = \VE \of \ME(\modid)$, except that for the module \kw{List}
+of the initial basis
+\[
+\begin{array}{@{}l@{\ =\ }l@{}}
+  \TE_{\kw{List}} & \TE_0 + \TE \of \ME(\kw{List}),\\
+  \VE_{\kw{List}} & \VE_0 + \VE \of \ME(\kw{List}),
+\end{array}
+\]
+where $E_0 = (\emptymap, \TE_0, \VE_0)$ is the environment of the type
+constructor \kw{List} and the list constructors \kw{[]} and \kw{::} given in
+Appendix~\ref{ch:appendix-static-basis}. % audit X10: E0 by reference
+The environment that a
+provider map $\pi$ gives in $\ME$ is $\smenv(\ME, \pi) = (\QE, \TE, \VE)$, where
+\[
+\begin{array}{@{}l@{\ =\ }l@{}}
+  \TE & \{\tycon \mapsto \TE_{\modid}(\tycon) \,;\, \pi(\tycon) = \{\modid\}\}\\
+  \VE & \{\smid \mapsto \VE_{\modid}(\smid) \,;\, \smid \in \cls{Var} \cup \cls{Con},\
+        \pi(\smid) = \{\modid\}\}\\
+  \QE & \{\modid' \mapsto (\emptymap, \TE_{\modid'}', \VE_{\modid'}') \,;\,
+        \modid'.\smid \in \Dom\pi \text{ for some } \smid\}
+\end{array}
+\]
+and, for each such $\modid'$,
+\[
+\begin{array}{@{}l@{\ =\ }l@{}}
+  \TE_{\modid'}' & \{\tycon \mapsto \TE_{\modid}(\tycon) \,;\,
+        \pi(\modid'.\tycon) = \{\modid\}\}\\
+  \VE_{\modid'}' & \{\smid \mapsto \VE_{\modid}(\smid) \,;\,
+        \smid \in \cls{Var} \cup \cls{Con},\ \pi(\modid'.\smid) = \{\modid\}\}.
+\end{array}
+\]
+Thus an ambiguous identifier is bound in no component of $\smenv(\ME, \pi)$, and
+a phrase that uses it does not elaborate, while one that does not use it is
+unaffected. % A38
+The rules add a module $\modid$ to $\pi(\smlongid)$ only when the last part of
+$\smlongid$ is bound by $\TE_{\modid}$ or $\VE_{\modid}$, so $\smenv(\ME, \pi)$
+is defined for every provider map that arises.
+
+Before any import is read, the type \kw{List} and the list constructors of
+$E_0$ are available, provided by the module \kw{List}:
+\[
+  \pi_0 = \{\kw{List} \mapsto \{\kw{List}\},\ \kw{[]} \mapsto \{\kw{List}\},\
+  \kw{::} \mapsto \{\kw{List}\}\},
+\]
+where the first \kw{List} is a type constructor and the others are module
+identifiers.
+% Survey "Scoping and Recursion": the type List is in scope before any import,
+% as an entry from the module List; static-core: the initial basis binds [] and
+% :: with status c.
+
+Operators are not bound in environments: the type scheme and status of an
+operator are given by the static operator table $\OTstat$ of the initial basis,
+in every module alike (Section~\ref{sec:static-core-projection}). For a module
+identifier $\modid$, $\smops(\modid) \subseteq \Dom\OTstat$ is the set of
+operators that the module $\modid$ declares. For a module of the initial basis
+it is given in Appendix~\ref{ch:appendix-static-basis}
+(Figure~\ref{fig:static-basis-operators}); for every other module it is empty,
+since no program declares an operator. % A16; audit X1
+
+The default imports of Figure~\ref{fig:default-imports}, taken in order, form a
+phrase of the class $\cls{Imports}$, which we write $\imports_0$. For any
+$\imports$, we write $\imports_0\ \imports$ for the import list consisting of
+the default imports followed by those of $\imports$.
+
+\section{Port Types}\label{sec:static-modules-ports}
+
+The values that may cross a port are those of the types $\tau$ for which
+$\Port(\tau)$ holds. % D11
+$\Port$ is the smallest predicate on types that satisfies the conditions of
+Figure~\ref{fig:static-modules-port}; it holds for no other type. In the
+figure, $\tMaybe$, $\tArray$, $\tBytes$ and $\tValue$ are the type names of
+the initial basis for \kw{Maybe}, \kw{Array}, \kw{Bytes.Bytes} and
+\kw{Json.Encode.Value}
+(Appendix~\ref{ch:appendix-static-basis}), whatever a program binds to type
+constructors of the same spelling. The type \kw{Json.Decode.Value} is an alias
+of \kw{Json.Encode.Value}, and so denotes $\tValue$ as well.
+
+\begin{figure}[ht]
+\centering
+\[
+\begin{array}{@{}l@{\qquad}l@{}}
+  \Port(\tau) & \text{if } \tau \in \{\tInt, \tFloat, \tBool,\\
+    & \phantom{\text{if } \tau \in \{} \tString, \tBytes, \tunit, \tValue\}\\[2pt]
+  \Port(\tau\,\tList) & \text{if } \Port(\tau)\\[2pt]
+  \Port(\tau\,\tMaybe) & \text{if } \Port(\tau)\\[2pt]
+  \Port(\tau\,\tArray) & \text{if } \Port(\tau)\\[2pt]
+  \Port((\tau_1, \tau_2)\tTuple{2}) & \text{if } \Port(\tau_1) \text{ and } \Port(\tau_2)\\[2pt]
+  \Port((\tau_1, \tau_2, \tau_3)\tTuple{3})
+    & \text{if } \Port(\tau_1),\ \Port(\tau_2)\\
+    & \text{and } \Port(\tau_3)\\[2pt]
+  \Port(\rec{\varrho}) & \text{if } \Port(\varrho(\lab))\\
+    & \text{for every } \lab \in \Dom\varrho
+\end{array}
+\]
+\caption{Port Types}\label{fig:static-modules-port}
+\end{figure}
+
+Types are semantic objects, in which every alias has been replaced by its
+expansion (Section~\ref{sec:static-core-types}), so an alias of a port type is
+a port type. Every port type is built from type names of the initial basis
+alone. Figure~\ref{fig:static-modules-port-table} states the same predicate
+by kinds of type, with the reason each excluded kind is excluded; the
+encoding of the values of each port type as boundary values, which are JSON
+values in which byte sequences may stand, is given in
+Section~\ref{sec:effects-ports}. % A92
+
+\begin{figure}[ht]
+\centering
+\small
+\begin{tabular}{@{}p{0.36\textwidth}@{\quad}p{0.17\textwidth}@{\quad}p{0.37\textwidth}@{}}
+\hline
+Type & Port? & Reason\\
+\hline
+\kw{Int}, \kw{Float}, \kw{String}, \kw{Bool} & yes & JSON numbers, strings and Booleans\\
+\kw{Bytes} & yes & byte sequences, which are not JSON values\\ % A92
+\kw{()} & yes & JSON \kw{null}\\
+\kw{Json.Encode.Value}, \kw{Json.Decode.Value} & yes & any JSON value, never
+  a byte sequence\\
+\kw{List} $t$, \kw{Array} $t$ & if $t$ is & JSON arrays\\
+\kw{Maybe} $t$ & if $t$ is & \kw{null} or the value\\
+2- and 3-tuples & if each component is & JSON arrays\\
+closed records & if each field is & JSON objects\\
+\hline
+\kw{Char} & no & excluded in Standard Elm\\
+function types & no & no JSON representation\\
+type variables, constrained ones included & no & no JSON representation\\
+extensible records & no & unknown fields\\
+custom types other than \kw{Bool} and \kw{Maybe}: \kw{Result}, \kw{Order},
+  \kw{Never}, \kw{Dict}, \kw{Set}, and every custom type of a program & no &
+  no canonical encoding\\
+\kw{Cmd}, \kw{Sub}, \kw{Task}, and other abstract types of the basis & no &
+  no JSON representation\\
+\hline
+\end{tabular}
+\caption{What can and cannot be sent over a port}\label{fig:static-modules-port-table}
+\end{figure}
+% A92 (superseding A18, A75): Bytes is a payload type, alone or inside any
+% admissible type; implementations that reject it are recorded in Appendix E.
+% Survey "Ports (Static)", payload types: Char, type variables, functions,
+% extensible records and every custom type but Bool and Maybe are rejected.
+
+\section{Inference Rules}\label{sec:static-modules-rules}
+
+As for the Core, the rules of the static semantics of Modules allow sentences
+of the form
+\[
+  \jdg{A}{\mathit{phrase}}{A'}
+\]
+to be inferred, where in this case $A$ is a basis, a basis paired with a
+provider map, an environment, a module identifier paired with an interface, a
+context, or a context paired with a type, and $A'$ is a semantic object or a
+tuple of semantic objects. The sentence is pronounced ``$\mathit{phrase}$
+elaborates to $A'$ in $A$''. Hypotheses not of this form are side conditions.
+The convention for options is the same as for the Core static semantics.
+
+The rules use the following notation for phrases. For a type-variable sequence
+$\tyvarseq = \tyvar_1 \cdots \tyvar_k$ that parametrises a phrase (the
+$\conbind$ of a custom-type binding or the $\ty$ of a type-alias binding), we
+write $\tyvarseq = \tyrowvar^{(k)}$ when, for each $i$, $\tyrowvar_i$ is the
+variable named by $\tyvar_i$ (Section~\ref{sec:static-core-simple}) that is a
+row variable if $\tyvar_i$ occurs in the phrase as the extension variable of a
+record type expression $\kw{\kwlb}\ \tyvar_i\ \kw{|}\ \tyrow\ \kw{\kwrb}$, and a
+type variable otherwise. For a type constructor $\tycon$ we write $\con =
+\tycon$ when $\con$ is spelt as $\tycon$. The partial function $\smlabs$ is
+defined on a type expression $\ty$ that is a record type expression
+$\kw{\kwlb}\ \lab_1\ \kw{:}\ \ty_1\kw{,}\ \cdots\kw{,}\ \lab_n\ \kw{:}\
+\ty_n\ \kw{\kwrb}$ ($n \geq 0$), possibly enclosed in parentheses, and gives
+the sequence of its labels in the order written:
+\[
+  \smlabs(\ty) = \lab_1 \cdots \lab_n .
+\]
+It is undefined on every other type expression, an extensible record type
+expression or a type constructor among them.
+
+The type names of a basis are intended to include those of its interfaces.
+The following property can be demonstrated.
+
+\begin{property}
+Let $B$ be a basis with $\tynames(\ME \of B) \subseteq T \of B$, and let
+$\jdg{B}{\modm}{(T', \ME', \PE'), E}$ be inferred. Then $T' \cap (T \of B) =
+\emptyset$, and $\tynames E$, $\tynames \ME'$ and $\tynames \PE'$ are subsets
+of $(T \of B) \cup T'$.
+
+Moreover, in every instance of rule~\ruleref{r:sm-topdec-types}, $\TE$ is
+determined by $C$ and the phrase, up to the choice of the type names in
+$\Ran\TE$ that are not in $T \of C$.
+\end{property}
+
+\rulegroup{Modules}{\jdg{B}{\modm}{B', E}}
+
+\defnrule[r:sm-module]{\jdg{B, \pi_0}{\imports_0\ \imports}{\pi} \premsep C = (T \of B,\ \emptyset,\ \smenv(\ME \of B, \pi)) \\ \jdg{C}{\topdec}{E, \PE} \premsep \jdg{E}{\header}{(\modid, I)} \\ \modid \notin \Dom(\ME \of B) \premsep T' = \tynames E \setminus (T \of B)}{\jdg{B}{\header\ \imports\ \topdec}{(T', \{\modid \mapsto I\}, \PE), E}}
+
+\begin{rulecomments}
+\rcomment{r:sm-module} The default imports are read before the imports of the
+module, so an import written in the module may replace a type that a default
+import exposes. % A28
+The context $C$ holds only what the imports provide. The declarations of the
+module are added by rule~\ruleref{r:sm-topdec-seq} to the unqualified
+environment and never under a qualifier, so a module cannot refer to its own
+names by qualification: in a module \kw{M}, \kw{M.x} refers to an import with
+the qualifier \kw{M}, if there is one. % A38
+The header is elaborated last, in the environment $E$ of the declarations of
+the module alone; hence a module never exposes what it imports. The set $T'$
+holds every type name that the module generates, private types included,
+since an exposed value may have a type that mentions a private type. % A29
+An import names a module of $\ME \of B$, and $\modid \notin \Dom(\ME \of B)$,
+so no module imports itself and no cycle of imports elaborates;
+Chapter~\ref{ch:programs} elaborates the modules of a program in an order in
+which each follows the modules it imports. Nothing here constrains a value
+named \kw{main}: only the \kw{main} of the main module of a program is
+constrained, in Chapter~\ref{ch:programs}. % A32
+\end{rulecomments}
+
+\rulegroup{Headers}{\jdg{E}{\header}{(\modid, I)}}
+
+\defnrule[r:sm-header]{I = \Expose(E, \explist)}{\jdg{E}{\opt{\kw{port}}\ \kw{module}\ \modid\ \kw{exposing}\ \explist}{(\modid, I)}}
+
+\begin{rulecomments}
+\rcomment{r:sm-header} Whether a module is a port module matters only to the
+syntactic restrictions, which allow port declarations in it and require at
+least one. The exposing list of a header elaborates by the operation $\Expose$
+of Section~\ref{sec:static-modules-interfaces}, which the syntactic
+restrictions make defined; the rules of the groups Exposing Lists and Exposing
+Items below are for the exposing lists of imports.
+\end{rulecomments}
+
+\rulegroup{Imports}{\jdg{B, \pi}{\imports}{\pi'}}
+
+In rule~\ruleref{r:sm-imports-import}, $\modid''$ is $\modid'$ if the first
+option is present and $\modid$ if it is absent.
+
+\defnrule[r:sm-imports-import]{(\ME \of B)(\modid) = I \premsep \pi_1 = \pi \smmerge_{\modid} (\emptyset,\ \modid''.\Dom I) \\ \optt{\jdg{\modid, I}{\explist}{(N, N')}} \premsep \pi_2 = \pi_1\ \optt{{}\smmerge_{\modid} (N, N')} \\ \jdg{B, \pi_2}{\imports}{\pi'}}{\jdg{B, \pi}{\kw{import}\ \modid\ \opt{\kw{as}\ \modid'}\ \optt{\kw{exposing}\ \explist}\ \imports}{\pi'}}
+
+\defnrule[r:sm-imports-empty]{}{\jdg{B, \pi}{\ }{\pi}}
+
+\begin{rulecomments}
+\rcomment{r:sm-imports-import} Every identifier that the module exposes becomes
+available under the qualifier $\modid''$, and the identifiers listed by the
+exposing list become available unqualified. With \kw{as}, the qualifier is
+$\modid'$ instead of $\modid$: after \kw{import Dict as D} the identifier
+\kw{Dict.empty} is not available through this import. Several imports may
+share a qualifier; their identifiers are joined under it, and an identifier
+exposed under one qualifier by two modules is ambiguous. Since the imports are
+read from left to right, a later import replaces what an earlier one provides
+for the identifiers in its $N$. A module that is not in $\ME \of B$ cannot be
+imported.
+\end{rulecomments}
+
+\rulegroup{Exposing Lists}{\jdg{\modid, I}{\explist}{(N, N')}}
+
+\defnrule[r:sm-explist-all]{}{\jdg{\modid, I}{\kw{(..)}}{(\emptyset, \Dom I)}}
+
+\defnrule[r:sm-explist-items]{\jdg{\modid, I}{\expitem_i}{(N_i, N'_i)} \quad (1 \le i \le n)}{\jdg{\modid, I}{\kw{(}\expitem_1\kw{,}\ \cdots\kw{,}\ \expitem_n\kw{)}}{(N_1 \cup \cdots \cup N_n,\ N'_1 \cup \cdots \cup N'_n)}}
+
+\begin{rulecomments}
+\rcomment{r:sm-explist-all} Everything is joined and nothing replaced, so two
+imports with \kw{exposing (..)} of modules that both expose \kw{x} make
+\kw{x} ambiguous. The imports elaborate nevertheless, and only a use of
+\kw{x} fails to elaborate. % A28, A38
+The operators of $\smops(\modid)$ are also exposed, in the sense of
+Section~\ref{sec:syntax-modules-infix}, but no operator is bound.
+\end{rulecomments}
+
+\rulegroup{Exposing Items}{\jdg{\modid, I}{\expitem}{(N, N')}}
+
+\defnrule[r:sm-item-var]{\var \in \Dom(\VE \of I)}{\jdg{\modid, I}{\var}{(\emptyset, \{\var\})}}
+
+\defnrule[r:sm-item-op]{\opv \in \smops(\modid)}{\jdg{\modid, I}{\kw{(}\opv\kw{)}}{(\emptyset, \emptyset)}}
+
+\defnrule[r:sm-item-type]{I(\tycon) = (\theta, \VE) \premsep N' = \{\con \,;\, \VE(\con) = (\sigma, \isv) \text{ for some } \sigma\}}{\jdg{\modid, I}{\tycon}{(\{\tycon\}, N')}}
+
+\defnrule[r:sm-item-opentype]{I(\tycon) = (\theta, \VE) \premsep \VE(\con) = (\sigma, \isc) \text{ for some } \con, \sigma}{\jdg{\modid, I}{\tycon\,\kw{(..)}}{(\{\tycon\},\ \Dom\VE \cap \Dom(\VE \of I))}}
+
+\begin{rulecomments}
+\rcomment{r:sm-item-var} A value is joined with what earlier imports provide,
+so a value exposed by name by two modules is ambiguous. % A28
+
+\rcomment{r:sm-item-op} The rule only checks that the module declares the
+operator, and the item binds nothing: the operators exposed to a module are
+those that may be used in it in infix position
+(Section~\ref{sec:syntax-modules-infix}), and the meaning of each is given by
+$\OTstat$ (rule~\ruleref{r:s-atexp-op}), whatever the module imports.
+
+\rcomment{r:sm-item-type} A type listed by name replaces any type of that name
+provided by an earlier import: after \kw{import Foo exposing (Maybe)} the
+type constructor \kw{Maybe} denotes the type of \kw{Foo}, not that of the
+default import. % A28
+For a record alias, $N'$ holds its constructor, which is joined; for a custom
+type it is empty, so the constructors of a type are not imported by this item.
+A constructor cannot be imported by name: in \kw{import Maybe exposing (Just)},
+$I(\kw{Just})$ is undefined, and no rule applies.
+
+\rcomment{r:sm-item-opentype} The side condition holds only for a custom type,
+so \kw{Alias(..)} does not elaborate for an alias. For a type that its module
+exposes closed, no constructor is in $\Dom(\VE \of I)$, so the item
+elaborates, imports the type and imports no constructors: after
+\kw{import A exposing (T(..))}, where \kw{A} exposes \kw{T} closed, the
+constructors of \kw{T} are not available.
+\end{rulecomments}
+
+\rulegroup{Top-level Declarations}{\jdg{C}{\topdec}{E, \PE}}
+
+\defnrule[r:sm-topdec-value]{\jdg{C + \VE}{\valbind}{\VE} \premsep \VE' = \Clos_C \VE}{\jdg{C}{\valbind}{\VE'\ \text{in}\ \Env,\ \emptymap}}
+
+\defnrule[r:sm-topdec-types]{\opt{\jdg{C \oplus \TE}{\datbind}{\VE', \TE'} \premsep \forall (t, \VE'') \in \Ran\TE',\ t \notin T \of C} \\ \jdg{C \oplus \TE}{\typbind_i}{\VE_i, \TE_i} \quad (1 \le i \le l) \\ \TE = \opt{\TE' +{}} \TE_1 + \cdots + \TE_l \premsep \VE = \opt{\VE' +{}} \VE_1 + \cdots + \VE_l}{C \vdash \opt{\kw{type}\ \datbind\ \kw{;}}\ \kw{type alias}\ \typbind_1\ \kw{;}\ \cdots \\ \qquad \kw{;}\ \kw{type alias}\ \typbind_l \Rightarrow (\emptymap, \TE, \VE),\ \emptymap}
+
+\defnrule[r:sm-topdec-portout]{U \text{ is new for } \ty \text{ in } C \premsep \jdg{C + U}{\ty}{\tau} \\ \tau = \tau' \rightarrow \alpha\,\sbtCmd \premsep \Port(\tau')}{\jdg{C}{\kw{port}\ \var\ \kw{:}\ \ty}{\{\var \mapsto (\Clos_C \tau, \isv)\}\ \text{in}\ \Env,\ \{\var \mapsto (\smdirout, \tau')\}}}
+
+\defnrule[r:sm-topdec-portin]{U \text{ is new for } \ty \text{ in } C \premsep \jdg{C + U}{\ty}{\tau} \\ \tau = (\tau' \rightarrow \alpha) \rightarrow \alpha\,\sbtSub \premsep \Port(\tau')}{\jdg{C}{\kw{port}\ \var\ \kw{:}\ \ty}{\{\var \mapsto (\Clos_C \tau, \isv)\}\ \text{in}\ \Env,\ \{\var \mapsto (\smdirin, \tau')\}}}
+
+\defnrule[r:sm-topdec-seq]{\jdg{C}{\topdec_1}{E_1, \PE_1} \premsep \jdg{C \oplus E_1}{\topdec_2}{E_2, \PE_2}}{\jdg{C}{\topdec_1\ \kw{;}\ \topdec_2}{E_1 + E_2,\ \PE_1 + \PE_2}}
+
+\begin{rulecomments}
+\rcomment{r:sm-topdec-value} The rule is that for declarations in the Core
+(rule~\ruleref{r:s-dec-group}): a group of top-level values is recursive, an
+unannotated member is monomorphic within its group, and the closure makes every
+top-level value polymorphic in its other uses. % A24
+At the top level the restriction on recursive values is syntactic and weaker
+than in a \kw{let} (Section~\ref{sec:syntax-modules-restrictions}), so
+\kw{f = \textbackslash n -> f n} elaborates here. % A26
+
+\rcomment{r:sm-topdec-types} The phrase consists of the custom types of a
+module, as one group, followed by its aliases, as Appendix~A arranges them
+(Section~\ref{sec:appendix-derived-forms-modules}); here $l \geq 0$, and $l
+\geq 1$ when the option is absent, in which case the phrase begins with the
+first alias, and when $l = 0$ it is $\kw{type}\ \datbind$. Since $\TE$ occurs
+on both sides, every type constructor of the phrase is in scope in all of it: a
+constructor may take an argument whose type is an alias declared in the
+phrase, and an alias may mention a custom type of the phrase or another alias.
+The equation has a solution determined by $C$ and the phrase up to the choice
+of new type names (Section~\ref{sec:static-modules-rules}), because the type
+function of a custom type is its type name alone, and no alias refers to itself
+through aliases. The side condition on $T \of C$ makes the type names of the
+custom types new. Rule~\ruleref{r:sm-topdec-seq} also applies to such a
+phrase, splitting it at one of its separators. Where both rules apply they give
+the same result, and rule~\ruleref{r:sm-topdec-types} is needed because a custom type
+may mention an alias that follows it. A local type spelt as an imported one is
+a different type, and the unqualified type constructor denotes the local one.
+
+\rcomment{r:sm-topdec-portout} The variables of the annotation are made
+explicit, as for an annotated value. The argument of $\sbtCmd$ must be a type
+variable, so \kw{port send : String -> Cmd Msg} does not elaborate, nor does
+\kw{port send : Cmd msg}, which has no payload, nor \kw{port send : Int -> Int
+-> Cmd msg}. Since $\Port(\tau')$ excludes type variables, $\alpha$ is the only
+variable of $\tau$, and the closure generalises it. The type $\sbtCmd$ is that
+of the initial basis; a type of a program spelt \kw{Cmd} is a different type.
+A port is a value of status $\isv$, so it is used and exposed like any other
+value; $\PE$ records its direction and payload type, by which
+Chapter~\ref{ch:effects} gives it its meaning, and Chapter~\ref{ch:programs}
+requires the names of the ports of a program to be distinct. % A84
+Thus \kw{port send : Char -> Cmd msg} does not elaborate, while \kw{port
+send : List \kwlb\ id : Int, name : String \kwrb\ -> Cmd msg} does. % D11
+
+\rcomment{r:sm-topdec-portin} The variable $\alpha$ occurs in both places, so
+\kw{port recv : (Int -> a) -> Sub b} does not elaborate. As for an outgoing
+port, \kw{port recv : (Json.Decode.Value -> msg) -> Sub msg} elaborates, and
+\kw{port recv : (Result String Int -> msg) -> Sub msg} does not.
+
+\rcomment{r:sm-topdec-seq} Each declaration is elaborated in a context that
+contains the declarations before it. Since $E_1$ modifies the environment of
+$C$, a declaration of the module replaces an imported binding of the same
+identifier, or makes an ambiguous one available. The syntactic restrictions
+ensure that $\Dom E_1 \cap \Dom E_2 = \emptyset$ and $\Dom\PE_1 \cap \Dom\PE_2
+= \emptyset$.
+\end{rulecomments}
+
+\rulegroup{Custom-type Bindings}{\jdg{C}{\datbind}{\VE, \TE}}
+
+\defnrule[r:sm-datbind]{\tyvarseq = \tyrowvar^{(k)} \premsep U = \{\tyrowvar_1, \cdots, \tyrowvar_k\} \\ \jdg{C + U}{\tyvar_i}{\tau_i} \quad (1 \le i \le k) \\ \jdg{C + U, \tau^{(k)}t}{\conbind}{\VE} \premsep t \in \TyName^{(k)} \\ \opt{\jdg{C}{\datbind'}{\VE', \TE'} \premsep \forall (t', \VE'') \in \Ran\TE',\ t \neq t'}}{C \vdash \tycon\ \tyvarseq\ \kw{=}\ \conbind\ \opt{\kw{and}\ \datbind'} \Rightarrow \\ \qquad \Clos_C \VE\ \opt{{}+ \VE'},\ \{\tycon \mapsto (t, \Clos_C \VE)\}\ \opt{{}+ \TE'}}
+
+\begin{rulecomments}
+\rcomment{r:sm-datbind} The parameters are made explicit while the
+constructors elaborate, and are generalised by the closure, since $U \of C =
+\emptyset$ at the top level. A parameter need not occur in $\conbind$, so
+phantom types are allowed. A parameter used as the extension variable of a
+record type is a row variable; $\tau_i$ is then the open record type with no
+fields of its own, and an argument of $t$ in that position is a record type.
+The side condition $t \neq t'$ gives the custom types of one group distinct
+type names; rule~\ruleref{r:sm-topdec-types} makes them new. The syntactic
+restrictions ensure that $\Dom\VE \cap \Dom\VE' = \emptyset$ and $\tycon \notin
+\Dom\TE'$.
+\end{rulecomments}
+
+\rulegroup{Constructor Bindings}{\jdg{C, \tau}{\conbind}{\VE}}
+
+\defnrule[r:sm-conbind]{\jdg{C}{\ty_i}{\tau_i} \quad (1 \le i \le n) \premsep \opt{\jdg{C, \tau}{\conbind'}{\VE}}}{C, \tau \vdash \con\ \ty_1 \cdots \ty_n\ \opt{\kw{|}\ \conbind'} \Rightarrow \\ \qquad \{\con \mapsto (\tau_1 \rightarrow \cdots \rightarrow \tau_n \rightarrow \tau, \isc)\}\ \opt{{}+ \VE}}
+
+\begin{rulecomments}
+\rcomment{r:sm-conbind} When $n = 0$ the type of $\con$ is $\tau$, so a
+constructor without arguments is a value of the custom type. The syntactic
+restrictions ensure $\con \notin \Dom\VE$.
+\end{rulecomments}
+
+\rulegroup{Alias Bindings}{\jdg{C}{\typbind}{\VE, \TE}}
+
+\defnrule[r:sm-typbind]{\tyvarseq = \tyrowvar^{(k)} \premsep \jdg{C + \{\tyrowvar_1, \cdots, \tyrowvar_k\}}{\ty}{\tau} \premsep \ty \notin \Dom\smlabs}{\jdg{C}{\tycon\ \tyvarseq\ \kw{=}\ \ty}{\emptymap,\ \{\tycon \mapsto (\Lambda\tyrowvar^{(k)}.\tau, \emptymap)\}}}
+
+\defnrule[r:sm-typbind-record]{\tyvarseq = \tyrowvar^{(k)} \premsep \jdg{C + \{\tyrowvar_1, \cdots, \tyrowvar_k\}}{\ty}{\tau} \\ \smlabs(\ty) = \lab_1 \cdots \lab_n \premsep \tau = \rec{\varrho} \premsep \varrho = \{\lab_1 \mapsto \tau_1, \cdots, \lab_n \mapsto \tau_n\} \\ \con = \tycon \premsep \VE = \Clos_C \{\con \mapsto (\tau_1 \rightarrow \cdots \rightarrow \tau_n \rightarrow \tau, \isv)\}}{\jdg{C}{\tycon\ \tyvarseq\ \kw{=}\ \ty}{\VE,\ \{\tycon \mapsto (\Lambda\tyrowvar^{(k)}.\tau, \VE)\}}}
+
+\begin{rulecomments}
+\rcomment{r:sm-typbind} An alias generates no type name: it denotes a type
+function, and a type expression that applies it denotes the expansion
+(rule~\ruleref{r:s-ty-con}). Thus after \kw{type alias Id = Int}, the types
+\kw{Id} and \kw{Int} are the same type. By the syntactic restrictions the
+parameters are exactly the type variables of $\ty$, so the type function has no
+unused parameter. Rules~\ruleref{r:sm-typbind}
+and~\ruleref{r:sm-typbind-record} both cover the production; which applies is
+decided by the form of $\ty$. An alias of an extensible record type, or of
+another alias, defines no constructor, even when that alias is a record alias.
+
+\rcomment{r:sm-typbind-record} A record alias also defines a constructor,
+spelt as the alias, whose arguments are the fields in the order written: after
+\kw{type alias P = \kwlb\ y : Int, x : Int \kwrb}, the expression \kw{P 1 2}
+denotes the record \kw{\kwlb\ y = 1, x = 2 \kwrb}. Its status is $\isv$, so it
+may be applied but may not occur in a pattern (rule~\ruleref{r:s-pat-con}).
+It is exposed and imported together with the alias
+(rule~\ruleref{r:sm-item-type}).
+\end{rulecomments}
+
+\section{Further Restrictions}\label{sec:static-modules-further}
+
+The further restrictions of the Core (Section~\ref{sec:static-core-further})
+apply to the expressions and patterns of every top-level declaration. The
+following conditions concern a program rather than a module, and
+Chapter~\ref{ch:programs} imposes them: the type of \kw{main} in the main
+module, a \kw{main} in any other module being an ordinary value; % A32
+the distinctness of the names of the ports of a program from one another and
+from the names of the managers of the platform
+(Chapter~\ref{ch:effects}); % A84
+the absence of any reference of \kw{main} to itself, directly or through a
+delayed occurrence; and the distinctness of the identifiers of the modules of
+a program from those of the modules of the initial basis. % A89
+
+Some implementations accept further programs, such as those with a further
+type of flags for \kw{main}, or reject programs that Standard Elm admits, such
+as those with \kw{Bytes} in a payload type, or those that exceed limits on
+the sizes of records, constructors and functions. None of these acceptances
+or limits is part of Standard Elm; each is recorded in
+Appendix~\ref{ch:appendix-implementation}. % A33, A34, A92

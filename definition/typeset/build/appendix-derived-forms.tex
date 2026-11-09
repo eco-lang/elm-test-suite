@@ -1,0 +1,403 @@
+% Values: PRECISE, ECONOMICAL, FAITHFUL
+% Evidence planned:
+% - PRECISE: a table row for every derived form of the book plan's "Derived
+%   Forms"; the grouping of a let and of a module body stated with displayed
+%   definitions (bound variables, right-hand sides, "refers to", components,
+%   numbering); every equivalent form closed under B4; fresh identifiers
+%   stated (none).
+% - ECONOMICAL: if, else-if chains, &&, ||, negation, lists, the field
+%   accessor, field access, list patterns, lambdas with several patterns, function
+%   definitions, let with several definitions and the order of module
+%   declarations carry no rules of their own.
+% - FAITHFUL: A56 (infixed && and || are conditionals, the operator values
+%   are strict); A16, A30 as amended (every module has a header, so no
+%   derived form supplies one); A57, A58 (order among independent components is not
+%   significant); A26 (restrictions apply to definitions as written); A4
+%   (field access); D5 (accessor and access through record patterns).
+\chapter{Derived Forms}\label{ch:appendix-derived-forms}
+
+Several derived forms are provided in the Core and in Modules; they are
+presented in Figures~\ref{fig:appendix-derived-forms-expressions},
+\ref{fig:appendix-derived-forms-patterns},
+\ref{fig:appendix-derived-forms-bindings}
+and~\ref{fig:appendix-derived-forms-modules}. Each derived form is given with
+its equivalent form, and each row of the tables is a rewriting rule
+\[
+  \text{Derived form} \;\Longrightarrow\; \text{Equivalent form}
+\]
+which may be applied to any subphrase, repeatedly, until the phrase is a
+phrase of the bare language of Chapters~\ref{ch:syntax-core}
+and~\ref{ch:syntax-modules}. Within a figure the rows are ordered, and the
+figures follow one another, so that every equivalent form uses only bare
+syntax and the derived forms of earlier rows. % B4
+Two rows, the grouping of the definitions of a \kw{let} and the grouping of the
+declarations of a module, are not local rewritings; their equivalent forms
+are defined in Sections~\ref{sec:appendix-derived-forms-let}
+and~\ref{sec:appendix-derived-forms-modules}. See
+Appendix~\ref{ch:appendix-full-grammar} for the full grammar, including all
+the derived forms.
+
+In equivalent forms, \kw{Basics.True} and \kw{Basics.False} are the
+constructors of the type $\tBool$, \kw{Basics.negate} is the negation
+function, and \kw{::} is the list constructor. They are looked up as any
+other identifier of the module in which the derived form occurs. Because
+only an import of the module \kw{Basics} provides the qualifier \kw{Basics}
+(Section~\ref{sec:syntax-modules-restrictions}), \kw{Basics.True},
+\kw{Basics.False} and \kw{Basics.negate} always denote the bindings of the
+initial basis (Appendices~\ref{ch:appendix-static-basis}
+and~\ref{ch:appendix-dynamic-basis}), whatever the module imports or
+declares; \kw{::} is bound in the initial environment $E_0$ of those
+appendices, from which every module is elaborated and evaluated, and no
+program declares it. Being qualified, or an operator, none of them is a free
+occurrence of a variable in the sense below.
+% Audit X18, V3: resolved by the restriction on the qualifier Basics (A89),
+% not by the provenance of the identifier; the operator :: is fixed by the
+% operator table of the initial basis (design decision 1).
+
+In the first row of Figure~\ref{fig:appendix-derived-forms-expressions},
+$\expm_1\ \opv\ \expm_2$ is an infixed application as grouped by the
+resolution of Section~\ref{sec:syntax-core-infix}: $\expm_1$ and $\expm_2$
+are the two operands of $\opv$ after grouping, and $\opv$ is neither \kw{\&\&}
+nor \kw{||}. Each operator of a chain is rewritten in this way, outermost
+first. The infixed forms of \kw{\&\&} and \kw{||} have rows of their own, which
+make them conditionals; the operator values \kw{(\&\&)} and \kw{(||)} are
+bare, and denote functions of the initial basis that take both arguments as
+values. % A56
+In the row for negation, $\kw{-}\atexp$ is a negation as defined in
+Section~\ref{sec:syntax-core-lexical}; it is atomic, so that it may be the
+argument of an application. % DECIDED: negation is placed among the atomic
+% expressions (the survey: in `f -x` the negated term is an argument); its
+% equivalent form is parenthesised, so it is correct at either level.
+In the row for field access, the atomic expressions that may precede
+$\kw{.}\lab$ are restricted in Section~\ref{sec:syntax-core-restrictions}
+(the restrictions on records); after any other atomic expression, and after a
+field accessor, a \kw{.} begins a field accessor
+(Section~\ref{sec:syntax-core-lexical}), so $\kw{.}\lab_1\kw{.}\lab_2$ is the
+application of $\kw{.}\lab_1$ to $\kw{.}\lab_2$.
+% A4
+In the equivalent form of the field accessor $\kw{.}\lab$, the record pattern
+$\kw{\kwlb}\ \lab\ \kw{\kwrb}$ binds the variable spelt as the label $\lab$,
+and the body of the lambda is that variable. % D5
+
+An annotation $\var\ \kw{:}\ \ty$ and the definition of $\var$ that follows it
+(Chapter~\ref{ch:syntax-core}) are written together, here as in the bare
+grammar, as one value binding with $\kw{:}\ \ty$ after $\var$. Thus a
+definition is a value binding without \kw{and}, of the form
+$\var\ \opt{\kw{:}\ \ty}\ \atpat_1\cdots\atpat_n\ \kw{=}\ \expm$ ($n\geq 0$)
+or $\atpat\ \kw{=}\ \expm$.
+
+The syntactic restrictions of Chapters~\ref{ch:syntax-core}
+and~\ref{ch:syntax-modules} apply to a program as written, before any derived
+form in it is replaced by its equivalent form
+(Section~\ref{sec:syntax-core-restrictions}), and are not checked again on
+equivalent forms. In
+particular the variable bound in the equivalent form of $\kw{.}\lab$ may have
+the name of a variable in scope, and a restriction that distinguishes a
+definition with parameters from one without refers to the definition as
+written. % A26
+% DECIDED: restrictions are checked on the phrase as written. Otherwise the
+% equivalent form of `.x` would break the no-shadowing restriction when a
+% variable x is in scope, and `f n = f n` and `f = \n -> f n` (which A26
+% treats differently in a let) could not be told apart after rewriting.
+
+An occurrence of a variable in a phrase is \emph{free} if it is unqualified
+and is not within the scope of a binding of that variable, by a pattern or by
+a value binding, made inside the phrase. No equivalent form adds or removes a
+free occurrence of a variable, so the groupings of
+Sections~\ref{sec:appendix-derived-forms-let}
+and~\ref{sec:appendix-derived-forms-modules} are the same whichever other
+derived forms have already been rewritten.
+
+No equivalent form introduces a new identifier, so no table carries a note of
+fresh identifiers. % B5
+The only variable bound by an equivalent form is the one bound by the
+equivalent form of $\kw{.}\lab$, which is spelt as the label.
+
+\begin{figure}[htbp]
+\centering
+\par\noindent\textbf{Expressions}\ \expm\par\smallskip
+\begin{derivedforms}
+\dform{\citelabel{df:infix}\expm_1\ \opv\ \expm_2}
+      {\kw{(}\opv\kw{)}\ \kw{(}\expm_1\kw{)}\ \kw{(}\expm_2\kw{)}}
+\hline
+\dform{\citelabel{df:if}\kw{if}\ \expm_1\ \kw{then}\ \expm_2\ \kw{else}\ \expm_3}
+      {\begin{array}[t]{@{}l@{}}
+         \kw{case}\ \expm_1\ \kw{of}\ \kw{Basics.True}\ \kw{->}\ \kw{(}\expm_2\kw{)}\\
+         \phantom{\kw{case}\ \expm_1\ \kw{of}}\ \kw{;}\ \kw{Basics.False}\ \kw{->}\ \expm_3
+       \end{array}}
+\hline
+\dform{\citelabel{df:if-chain}\begin{array}[t]{@{}l@{}}
+         \kw{if}\ \expm_1\ \kw{then}\ \expm'_1\\
+         \kw{else}\ \kw{if}\ \expm_2\ \kw{then}\ \expm'_2\ \cdots\\
+         \kw{else}\ \kw{if}\ \expm_n\ \kw{then}\ \expm'_n\\
+         \kw{else}\ \expm
+       \end{array}}
+      {\begin{array}[t]{@{}l@{}}
+         \kw{if}\ \expm_1\ \kw{then}\ \expm'_1\ \kw{else}\ \kw{(}\\
+         \;\kw{if}\ \expm_2\ \kw{then}\ \expm'_2\ \kw{else}\ \kw{(}\ \cdots\\
+         \;\;\kw{if}\ \expm_n\ \kw{then}\ \expm'_n\ \kw{else}\ \expm
+           \ \kw{)}\cdots\kw{)}\\
+         \qquad (n\geq 2)
+       \end{array}}
+\hline
+\dform{\citelabel{df:and}\expm_1\ \kw{\&\&}\ \expm_2}
+      {\kw{if}\ \expm_1\ \kw{then}\ \expm_2\ \kw{else}\ \kw{Basics.False}}
+\hline
+\dform{\citelabel{df:or}\expm_1\ \kw{||}\ \expm_2}
+      {\kw{if}\ \expm_1\ \kw{then}\ \kw{Basics.True}\ \kw{else}\ \expm_2}
+\hline
+\dform{\citelabel{df:lambda-params}\kw{\textbackslash}\atpat_1\cdots\atpat_n\ \kw{->}\ \expm}
+      {\kw{\textbackslash}\atpat_1\ \kw{->}\ \cdots\
+       \kw{\textbackslash}\atpat_n\ \kw{->}\ \expm
+       \quad (n\geq 2)}
+\end{derivedforms}
+
+\bigskip
+\par\noindent\textbf{Atomic Expressions}\ \atexp\par\smallskip
+\begin{derivedforms}
+\dform{\citelabel{df:negation}\kw{-}\atexp}
+      {\kw{(}\kw{Basics.negate}\ \atexp\kw{)}}
+\hline
+\dform{\citelabel{df:list}\kw{[}\expm_1\kw{,}\ \cdots\kw{,}\ \expm_n\kw{]}}
+      {\kw{(}\expm_1\ \kw{::}\ \cdots\ \kw{::}\ \expm_n\ \kw{::}\ \kw{[ ]}\kw{)}
+       \qquad (n\geq 1)}
+\hline
+\dform{\citelabel{df:field-accessor}\kw{.}\lab}
+      {\kw{(}\kw{\textbackslash}\kw{\kwlb}\ \lab\ \kw{\kwrb}\ \kw{->}\ \lab\kw{)}}
+\hline
+\dform{\citelabel{df:field-selection}\atexp\kw{.}\lab}
+      {\kw{(}\kw{.}\lab\ \atexp\kw{)}}
+\end{derivedforms}
+\caption{Derived forms of Expressions and Atomic Expressions}
+\label{fig:appendix-derived-forms-expressions}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\par\noindent\textbf{Atomic Patterns}\ \atpat\par\smallskip
+\begin{derivedforms}
+\dform{\citelabel{df:list-pattern}\kw{[}\pat_1\kw{,}\ \cdots\kw{,}\ \pat_n\kw{]}}
+      {\kw{(}\pat_1\ \kw{::}\ \kw{(}\pat_2\ \kw{::}\ \cdots\
+       \kw{(}\pat_n\ \kw{::}\ \kw{[ ]}\kw{)}\cdots\kw{)}\kw{)}
+       \quad (n\geq 1)}
+\end{derivedforms}
+\caption{Derived forms of Patterns}
+\label{fig:appendix-derived-forms-patterns}
+\end{figure}
+
+In the equivalent form for lists, each \kw{::} is an infixed application
+whose right operand is everything to its right:
+\[
+  \expm_1\ \kw{::}\ \kw{(}\expm_2\ \kw{::}\ \cdots\
+  \kw{(}\expm_n\ \kw{::}\ \kw{[ ]}\kw{)}\cdots\kw{)}.
+\]
+In the equivalent form for list patterns, each \kw{::} is the bare pattern
+$\pat\ \kw{::}\ \pat$, the parentheses make the result an atomic pattern,
+and for $n=1$ the equivalent form is $\kw{(}\pat_1\ \kw{::}\ \kw{[ ]}\kw{)}$.
+% Audit Y8: the list-pattern row is given directly, without recursion (B4).
+
+\begin{figure}[htbp]
+\centering
+\par\noindent\textbf{Value Bindings}\ \valbind\par\smallskip
+\begin{derivedforms}
+\dform{\citelabel{df:function-binding}\begin{array}[t]{@{}l@{}}
+         \var\ \opt{\kw{:}\ \ty}\ \atpat_1\cdots\atpat_n\ \kw{=}\ \expm\\
+         \quad\opt{\kw{and}\ \valbind}
+       \end{array}}
+      {\begin{array}[t]{@{}l@{}}
+         \var\ \opt{\kw{:}\ \ty}\ \kw{=}\
+           \kw{\textbackslash}\atpat_1\cdots\atpat_n\ \kw{->}\ \expm\\
+         \quad\opt{\kw{and}\ \valbind}
+         \qquad (n\geq 1)
+       \end{array}}
+\end{derivedforms}
+
+\bigskip
+\par\noindent\textbf{Declarations}\ \dec\par\smallskip
+\begin{derivedforms}
+\dform{\citelabel{df:let-grouping}\kw{let}\ \valbind_1\ \cdots\ \valbind_n\ \kw{in}\ \expm}
+      {\begin{array}[t]{@{}l@{}}
+         \kw{let}\ \dec_1\ \kw{in}\ \cdots\ \kw{let}\ \dec_k\ \kw{in}\ \expm\\
+         \text{(see Section~\ref{sec:appendix-derived-forms-let})}
+         \qquad (n\geq 2)
+       \end{array}}
+\end{derivedforms}
+\caption{Derived forms of Value Bindings and Declarations}
+\label{fig:appendix-derived-forms-bindings}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\par\noindent\textbf{Top-level Declarations}\ \topdec\par\smallskip
+\begin{derivedforms}
+\dform{\citelabel{df:module-grouping}\topdec_1\ \cdots\ \topdec_n}
+      {\begin{array}[t]{@{}l@{}}
+         \kw{type}\ \datbind\ \kw{;}\\
+         \kw{type alias}\ \typbind'_1\ \kw{;}\ \cdots\
+           \kw{type alias}\ \typbind'_l\ \kw{;}\\
+         \topdec'_1\ \kw{;}\ \cdots\ \kw{;}\ \topdec'_k\\
+         \text{(see Section~\ref{sec:appendix-derived-forms-modules})}
+         \qquad (n\geq 2)
+       \end{array}}
+\end{derivedforms}
+\caption{Derived forms of Top-level Declarations}
+\label{fig:appendix-derived-forms-modules}
+\end{figure}
+
+No derived form supplies the header of a module: every module is written
+with one (Chapter~\ref{ch:syntax-modules}). % A16, A30
+
+\section{Grouping the Definitions of a Let}
+\label{sec:appendix-derived-forms-let}
+
+A \kw{let} expression as written has definitions $\valbind_1,\ldots,\valbind_n$
+($n\geq 2$), each a value binding without \kw{and}. The bare language has
+$\kw{let}\ \dec\ \kw{in}\ \expm$ only for a single group of bindings joined by
+the abstract \kw{and}, so the definitions are grouped and ordered as follows.
+% Survey "Rewrites": let block; D7
+
+The variables \emph{bound by} a definition, and its \emph{right-hand side},
+are given by the following table, in which $m\geq 1$ and a definition of the
+first two forms may carry an annotation $\kw{:}\ \ty$ after $\var$:
+\[
+  \begin{array}{lll}
+    \text{Definition} & \text{Bound} & \text{Right-hand side}\\[2pt]
+    \var\ \kw{=}\ \expm
+      & \var & \expm\\
+    \var\ \atpat_1\cdots\atpat_m\ \kw{=}\ \expm
+      & \var & \kw{\textbackslash}\atpat_1\cdots\atpat_m\ \kw{->}\ \expm\\
+    \atpat\ \kw{=}\ \expm
+      & \text{those of}\ \atpat & \expm
+  \end{array}
+\]
+The variables bound by a pattern are its variable patterns, the variables
+spelt as the labels of its record patterns, and the variables following \kw{as}
+in it.
+A definition $\valbind_i$ \emph{refers to} a definition $\valbind_j$ if a
+variable bound by $\valbind_j$ occurs free in the right-hand side of
+$\valbind_i$; $j=i$ is allowed. Two definitions are in the same
+\emph{component} if each can be reached from the other by a chain of zero or
+more steps of ``refers to''. The components partition the definitions. A
+component is \emph{recursive} if it has more than one member, or if its one
+member refers to itself. The members of the recursive components are exactly
+the definitions that lie on a cycle of ``refers to'', and the restriction on
+recursion in Section~\ref{sec:syntax-core-restrictions} requires each of them
+to be a definition with parameters; in particular a definition
+$\atpat\ \kw{=}\ \expm$ is never in a recursive component. % A26
+
+Number the components $1,\ldots,k$ so that whenever a member of component $a$
+refers to a member of component $b\neq a$, then $b<a$. Such a numbering
+exists, because a chain of ``refers to'' that returns to its start never
+leaves a component. For each $a$, let
+$\valbind_{i_1},\ldots,\valbind_{i_p}$, with $i_1<\cdots<i_p$, be the members
+of component $a$, and let
+\[
+  \dec_a \;=\; \valbind_{i_1}\ \kw{and}\ \cdots\ \kw{and}\ \valbind_{i_p}.
+\]
+Then the equivalent form is given by
+\[
+  \begin{array}{l}
+    \kw{let}\ \valbind_1\ \cdots\ \valbind_n\ \kw{in}\ \expm\\
+    \quad\Longrightarrow\;
+    \kw{let}\ \dec_1\ \kw{in}\ \kw{let}\ \dec_2\ \kw{in}\ \cdots\
+    \kw{let}\ \dec_k\ \kw{in}\ \expm .
+  \end{array}
+\]
+An annotation is part of the definition it annotates, and so goes with that
+definition into $\dec_a$.
+
+When two components are independent (neither can be reached from the other)
+the numbering is not unique, and which admissible numbering is chosen does not
+matter: independent components bind distinct variables and neither refers to
+the other, the bindings of a component add no free type variable to the
+context ($\Clos$ generalises every type variable not free in the context,
+Section~\ref{sec:static-core-closure}), and evaluation has neither state nor
+exceptions, so each component elaborates and evaluates to the same result
+whichever independent components precede it. % A57, A58
+
+\section{Grouping the Declarations of a Module}
+\label{sec:appendix-derived-forms-modules}
+
+The declarations of a module body as written stand in any order. Each
+declaration $\topdec_i$ is one of the following, where $m\geq 0$:
+\[
+  \begin{array}{ll}
+    \kw{type}\ \datbind_i & \text{a custom type, declaring one type;}\\
+    \kw{type alias}\ \typbind_i & \text{an alias, declaring one alias;}\\
+    \kw{port}\ \var\ \kw{:}\ \ty & \text{a port;}\\
+    \var\ \opt{\kw{:}\ \ty}\ \atpat_1\cdots\atpat_m\ \kw{=}\ \expm
+      & \text{a definition.}
+  \end{array}
+\] A module body has no definitions of the form
+$\atpat\ \kw{=}\ \expm$ (Chapter~\ref{ch:syntax-modules}). A module body as
+written is always rewritten by this row, even when its declarations already
+stand in an order the row could produce. The equivalent form
+\[
+  \begin{array}{l}
+    \kw{type}\ \datbind\ \kw{;}\\
+    \kw{type alias}\ \typbind'_1\ \kw{;}\ \cdots\
+      \kw{type alias}\ \typbind'_l\ \kw{;}\\
+    \topdec'_1\ \kw{;}\ \cdots\ \kw{;}\ \topdec'_k
+  \end{array}
+\]
+is built as follows, where \kw{;} is the abstract separator of top-level
+declarations in the bare grammar (Chapter~\ref{ch:syntax-modules}); a part
+that is omitted below is omitted with its separator.
+% Survey "Rewrites": top-level values; A59
+
+\begin{enumerate}
+\item \emph{Custom types.} If $\kw{type}\ \datbind_{i_1},\ldots,
+  \kw{type}\ \datbind_{i_p}$, with $i_1<\cdots<i_p$, are the custom types of
+  the body, then all of them form one group,
+  \[
+    \datbind \;=\; \datbind_{i_1}\ \kw{and}\ \cdots\ \kw{and}\ \datbind_{i_p},
+  \]
+  whose members may refer to one another. If $p=0$, the declaration
+  $\kw{type}\ \datbind$ is omitted.
+
+\item \emph{Aliases.} An alias \emph{mentions} another alias of the body if
+  the type constructor that the other binds occurs, unqualified, in its body.
+  The aliases $\typbind'_1,\ldots,\typbind'_l$ are those of the body, ordered
+  so that each comes after every alias it mentions. Such an order exists,
+  because the restrictions of Chapter~\ref{ch:syntax-modules} forbid a chain
+  of mentions that returns to its start. If $l=0$, there are no alias
+  declarations.
+
+\item \emph{Ports and definitions.} A port $\kw{port}\ \var\ \kw{:}\ \ty$
+  binds $\var$ and has no right-hand side, so it refers to nothing; a
+  definition binds its $\var$ and has the right-hand side of
+  Section~\ref{sec:appendix-derived-forms-let}. Over the ports and
+  definitions of the body, ``refers to'', components and their numbering
+  $1,\ldots,k$ are defined as in Section~\ref{sec:appendix-derived-forms-let}.
+  A port is alone in its component. For each $a$, $\topdec'_a$ is the port if
+  component $a$ is a port, and otherwise is the value group
+  \[
+    \valbind_{i_1}\ \kw{and}\ \cdots\ \kw{and}\ \valbind_{i_q},
+  \]
+  where $\valbind_{i_1},\ldots,\valbind_{i_q}$, with $i_1<\cdots<i_q$, are the
+  members of component $a$, each with its annotation.
+\end{enumerate}
+
+The type constructors bound by $\datbind$ and by the aliases are in scope
+throughout these type declarations: a constructor binding in $\datbind$ may
+mention an alias of the body, and an alias may mention a custom type of
+$\datbind$. Chapter~\ref{ch:static-modules} elaborates the group $\datbind$
+together with the aliases that follow it.
+% DECIDED: a custom type may mention a local alias and an alias may mention a
+% local custom type (survey, "Custom Types and Aliases": unions are entered
+% before aliases, and constructors see all local types), so neither order of
+% the group and the aliases is a sequence of independent declarations.
+% Expanding the aliases into datbind, as SML's withtype does, is not a
+% syntactic translation here: an alias of an extensible record applied to an
+% imported alias has no expansion in the type syntax. The type declarations
+% are therefore one unit for elaboration (a question for static-modules).
+
+The values that the type declarations bind (the constructors of $\datbind$
+and the constructors of record aliases) are thus in scope in every port and
+definition. As for a \kw{let}, which order is chosen among aliases neither of
+which mentions the other, and which admissible numbering is chosen for the
+components, does not matter: an alias denotes the same type function
+whichever unrelated aliases precede it, and a component of ports and
+definitions elaborates and evaluates to the same result whichever independent
+components precede it, for the reasons given in
+Section~\ref{sec:appendix-derived-forms-let}. % A57, A58, A59

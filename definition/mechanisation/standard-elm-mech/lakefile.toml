@@ -1,0 +1,10 @@
+name = "standard-elm-mech"
+version = "0.1.0"
+defaultTargets = ["StandardElmMech", "run-examples"]
+
+[[lean_lib]]
+name = "StandardElmMech"
+
+[[lean_exe]]
+name = "run-examples"
+root = "Main"

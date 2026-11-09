@@ -9,6 +9,8 @@ import Head
 import Head.Seo as Seo
 import Html exposing (Html)
 import Html.Attributes as Attr
+import Mechanisation
+import Mechanisation.View as MechView
 import PagesMsg exposing (PagesMsg)
 import Route
 import RouteBuilder exposing (App, StatelessRoute)
@@ -36,8 +38,13 @@ type alias RouteParams =
     }
 
 
+{-| `lean`, the test's Lean translation if the mechanisation has one, is used only inside
+`View.freeze`, so it is not sent to the browser.
+-}
 type alias Data =
-    Test
+    { test : Test
+    , lean : Maybe Mechanisation.Translation
+    }
 
 
 type alias ActionData =
@@ -72,7 +79,9 @@ pages =
 
 data : RouteParams -> BackendTask FatalError Data
 data params =
-    Data.test params.project params.test
+    BackendTask.map2 Data
+        (Data.test params.project params.test)
+        (Mechanisation.translation params.project params.test)
 
 
 head : App Data ActionData RouteParams -> List Head.Tag
@@ -81,9 +90,9 @@ head app =
         { canonicalUrlOverride = Nothing
         , siteName = Site.title
         , image = Site.socialImage
-        , description = String.left 200 app.data.doc
+        , description = String.left 200 app.data.test.doc
         , locale = Nothing
-        , title = app.data.name ++ " · " ++ Site.title
+        , title = app.data.test.name ++ " · " ++ Site.title
         }
         |> Seo.website
 
@@ -92,7 +101,7 @@ view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
 view app shared =
     let
         test =
-            app.data
+            app.data.test
 
         key =
             "t:" ++ test.project ++ "/" ++ test.name
@@ -130,6 +139,16 @@ view app shared =
                     :: Html.text ":"
                     :: List.map checkLink test.checks
                 )
+        , case app.data.lean of
+            Just _ ->
+                Html.p [ Attr.class "ts-small" ]
+                    [ Html.text "Translated into Lean for the mechanisation of the book: "
+                    , Html.a [ Attr.href "#lean" ] [ Html.text "see its Lean translation" ]
+                    , Html.text "."
+                    ]
+
+            Nothing ->
+                Html.text ""
         , Html.div [ Attr.class "ts-filters" ]
             (List.map
                 (\r ->
@@ -179,6 +198,12 @@ view app shared =
                 ]
             , source test.source
             ]
+        , case app.data.lean of
+            Just t ->
+                View.freeze (MechView.translationSection t)
+
+            Nothing ->
+                Html.text ""
         ]
     }
 

@@ -1,0 +1,149 @@
+% Values: ILLUMINATING
+% Evidence planned:
+% - ILLUMINATING: how an implementation is organised (modules elaborated,
+%   then evaluated, then the program run by the platform); the three phases
+%   and the static and dynamic basis; the levels Core, Modules and Programs
+%   and the Effects chapter; the grid table, cell for cell with the plan's
+%   Grid; bare language and derived forms; one sentence per appendix; the
+%   form of sentences; pointers to where the notational conventions are
+%   defined (finite maps, projection, options, sequences) and the convention
+%   for decorated metavariables.
+
+\chapter{Introduction}\label{ch:introduction}
+
+This book formally defines Standard Elm, the language Elm 0.19.1 as
+delimited in the Preface.
+
+The method of definition is easiest to understand by considering how an
+implementation of Elm is naturally organised. A \emph{program} consists of
+modules: a main module, and the modules it imports, directly or indirectly,
+with no cycle among the imports. The implementation treats the modules one at
+a time, each after the modules it imports. Each module is checked for the
+consistency of its types and for other conditions of form, and what it makes available to other modules is
+recorded in the top-level environment, which we call a \emph{basis}; the
+modules that import it are then checked against that basis. When every
+module has been checked, the top-level values of the modules are computed,
+again each module after those it imports, and recorded in the basis. Finally
+the platform runs the program: it starts it, performs the commands it
+issues, maintains its subscriptions, and delivers to it, one at a time, the
+messages that result.
+
+Two words name the parties to this last step. The \emph{platform} is the
+part of an implementation that runs a program, performs its effects and
+exchanges values with the host. The \emph{host} is the environment outside
+the program: a JavaScript page, an embedding application, or an operating
+system. The host sends values to the incoming ports of a program and
+receives those of its outgoing ports, through the platform. The later
+chapters use both words with these meanings only. % decision 7 (audit Y11)
+
+There are thus three phases: \emph{parsing}, \emph{elaboration} and
+\emph{evaluation}. Parsing determines the grammatical form of a module.
+Elaboration, the \emph{static} phase, determines whether its types are
+consistent and whether it meets the other conditions of form; a module that
+does both \emph{elaborates}. Elaboration records type and interface information in the
+basis. Evaluation, the \emph{dynamic} phase, determines the values of its
+declarations and records them in the basis. Corresponding to the phases,
+the definition divides into grammatical rules, elaboration rules and
+evaluation rules, and the basis divides into the \emph{static basis} and the
+\emph{dynamic basis}: a top-level variable, for example, is associated with a
+type scheme in the static basis and with a value in the dynamic basis. An
+implementation need not divide the basis so; for the definition the
+division makes each phase simpler to present. Every module of a program is
+elaborated before any is evaluated, and a program that does not elaborate
+is not evaluated at all.
+
+A further factoring follows the structure of the language. Standard Elm has
+a lower level, the \emph{Core}, of expressions, patterns, types and
+\kw{let} definitions: everything the right-hand side of a single definition
+can contain. Above it is \emph{Modules}: module headers, exposing lists,
+imports, and the top-level declarations of a module, namely value
+definitions, custom types, type aliases and ports. The top level,
+\emph{Programs}, defines what a program is, the type its \kw{main} must
+have, and how the platform runs it; all three phases of Programs are treated
+in one chapter. Commands, subscriptions and tasks add no syntax, being types
+of the basis, but their values and the behaviour of ports need a semantics
+of their own. We give it in a chapter on \emph{Effects}, which is purely
+dynamic; the static question of which types may cross a port belongs to the
+static semantics of Modules. % D10, D11
+The scheme of the chapters is therefore as follows:
+\begin{center}
+\setlength{\tabcolsep}{4pt}%
+\begin{tabular}{r|c|c|c|c|}
+  \multicolumn{1}{r}{}
+  & \multicolumn{1}{c}{\emph{Core}}
+  & \multicolumn{1}{c}{\emph{Modules}}
+  & \multicolumn{1}{c}{\emph{Effects}}
+  & \multicolumn{1}{c}{\emph{Programs}}\\
+  \cline{2-5}
+  \emph{Syntax}
+  & Chapter~\ref{ch:syntax-core}
+  & Chapter~\ref{ch:syntax-modules}
+  & none
+  & \\
+  \cline{2-4}
+  \emph{Static Semantics}
+  & Chapter~\ref{ch:static-core}
+  & Chapter~\ref{ch:static-modules}
+  & Section~\ref{sec:static-modules-ports}
+  & Chapter~\ref{ch:programs}\\
+  \cline{2-4}
+  \emph{Dynamic Semantics}
+  & Chapter~\ref{ch:dynamic-core}
+  & Chapter~\ref{ch:dynamic-modules}
+  & Chapter~\ref{ch:effects}
+  & \\
+  \cline{2-5}
+\end{tabular}
+\end{center}
+
+The Core and Modules provide many forms of phrase for the programmer's
+convenience. Many of them are \emph{derived forms}, whose meaning is given by
+translation into the remaining phrases, which we call the \emph{bare}
+language: infixed operators, conditionals, \kw{\&\&} and \kw{||}, negation,
+list expressions and patterns, field selection and field accessors,
+functions of several arguments, and the grouping of the definitions of a
+\kw{let} or of a module body into dependency groups. Each semantics chapter
+treats only the bare language; the derived forms are given in
+Appendix~\ref{ch:appendix-derived-forms}. The full grammar of the language,
+bare and derived together, is collected in
+Appendix~\ref{ch:appendix-full-grammar}.
+
+Appendices~\ref{ch:appendix-static-basis} and~\ref{ch:appendix-dynamic-basis}
+give the \emph{initial basis}, divided into its static and dynamic parts:
+the predefined types, constructors and values that the rules and the
+default imports need, with the basic arithmetic and comparison operations
+defined there precisely. % D4
+These operations are total, so that no evaluation ends in a run-time
+error. % D2, D3
+Where implementations legitimately differ, the body of the definition
+states only what each must satisfy, and
+Appendix~\ref{ch:appendix-implementation} records the choices of two
+implementations and every known point on which they do not conform. % D8
+Appendix~\ref{ch:appendix-standard-ml} compares this definition with the
+Definition of Standard ML.
+
+The semantics is presented as a set of rules allowing \emph{sentences} of the
+form
+\[
+  \jdg{A}{\mathit{phrase}}{A'}
+\]
+to be inferred, where $A$ is usually a basis or a context (static) or an
+environment (dynamic), and $A'$ is a semantic object, usually a type in the
+static semantics and a value in the dynamic semantics. Such a sentence is
+read ``against the background $A$, $\mathit{phrase}$ elaborates (or
+evaluates) to $A'$''. The rules are formal; the semantic objects are the
+subject of a small mathematical theory, given in the chapters that
+introduce them, and the properties of the objects on which the rules rely
+are stated there without proof.
+
+Some notation is defined once and used throughout. Finite subsets, finite
+maps and the modification $f+g$ of one finite map by another are defined in
+Section~\ref{sec:static-core-compound}, together with the notation
+$x^{(k)}$ for a sequence of length $k$; projection, injection and
+modification of tuples of objects in
+Section~\ref{sec:static-core-projection}; and the first and second options
+$\opt{\ }$ and $\optt{\ }$ of the rules in
+Section~\ref{sec:static-core-rules}. The conventions of the grammar figures
+are stated with the grammar of the Core (Chapter~\ref{ch:syntax-core}).
+Throughout, a metavariable decorated with primes or subscripts ranges over
+the same class as the undecorated one.

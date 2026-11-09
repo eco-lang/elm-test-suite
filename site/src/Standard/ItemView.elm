@@ -1,4 +1,4 @@
-module Standard.ItemView exposing (description, itemFoot, itemKey, itemNoun, itemPage, listPage, listTitle)
+module Standard.ItemView exposing (crumbs, description, itemFoot, itemKey, itemNoun, itemPage, listPage, listTitle)
 
 {-| The pages of the citable items other than rules (restrictions, derived forms, entries of the
 initial basis and figures): one list page per kind, and a page for each item. Like the rest of the book, these

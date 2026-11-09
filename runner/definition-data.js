@@ -12,7 +12,9 @@
 //   chapters/<slug>.json     one chapter: its text as blocks, with rules, figures and tables
 //   rules/<label>.json       one rule: its rule group, comments, place in the book and the places
 //                            that refer to it
-// It also copies the PDF of the edition (definition/*.pdf) to site/public/downloads/.
+// It also copies the PDF of the edition (definition/*.pdf) to site/public/downloads/, and writes the
+// Lean proofs of the mechanisation (definition/mechanisation/) under mechanisation/, with
+// runner/mechanisation-data.js.
 //
 // Mathematics is rendered with KaTeX here, at build time, using the book's own macros, and stored as
 // a tree of elements (["span", {"class": "mord"}, [children]], or a string for text) that the site
@@ -29,6 +31,7 @@
 const fs = require('fs');
 const path = require('path');
 const katex = require('katex');
+const { writeMechanisation } = require('./mechanisation-data');
 
 const ROOT = path.resolve(__dirname, '..');
 const DEF = path.join(ROOT, 'definition');
@@ -1552,10 +1555,18 @@ function output(opts, m, book) {
         });
     }
 
+    // The Lean proofs of the mechanisation (definition/mechanisation/), linked to the rules they name.
+    const mechProblems = writeMechanisation(opts.out, new Set(book.rules.map((r) => r.slug)), writeJson);
+
     // Report.
     console.log(`${m.title} (${m.edition}): ${book.chapters.length} chapters, ${book.rules.length} rules, ${book.figureNo} figures, ${katexCache.size} formulas -> ${path.relative(ROOT, opts.out)}`);
     console.log(`  ${counts.restriction} restrictions, ${counts['derived-form']} derived forms, ${counts.basis} entries of the basis, ${counts.figure} figures`);
     let failed = !ok;
+    if (mechProblems.length) {
+        failed = true;
+        console.error('Problems in the Lean mechanisation:');
+        for (const pr of mechProblems) console.error('  ' + pr);
+    }
     if (problems.katex.length) {
         failed = true;
         console.error(`${problems.katex.length} formula(s) KaTeX could not render:`);

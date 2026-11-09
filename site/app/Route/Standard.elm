@@ -105,6 +105,7 @@ front idx =
         , Html.div [ Attr.class "sd-actions" ]
             (List.filterMap identity
                 [ Just (Html.a [ Attr.class "sd-button", Attr.href (Route.toString Route.Standard__Rules) ] [ Html.text ("All " ++ String.fromInt (List.length idx.rules) ++ " rules") ])
+                , Just (Html.a [ Attr.class "sd-button", Attr.href (Route.toString Route.Standard__Proofs) ] [ Html.text "Lean proofs" ])
                 , idx.pdf
                     |> Maybe.map
                         (\pdf ->
@@ -126,6 +127,12 @@ front idx =
             , Html.text " and "
             , Html.a [ Attr.href (Route.toString Route.Standard__Figures) ] [ Html.text (count FigureItem ++ " figures") ]
             , Html.text "."
+            ]
+        , Html.p [ Attr.class "sd-also" ]
+            [ Html.strong [] [ Html.text "Mechanised. " ]
+            , Html.text "The dynamic semantics of the Core is encoded in the proof assistant Lean 4, with an evaluator proved sound for its rules and checked against the test programs. See the "
+            , Html.a [ Attr.href (Route.toString Route.Standard__Proofs) ] [ Html.text "Lean proofs" ]
+            , Html.text ", each with a page of its own."
             ]
         , Html.p [ Attr.class "sd-also" ]
             [ Html.strong [] [ Html.text "Take part. " ]

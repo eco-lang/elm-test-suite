@@ -861,7 +861,8 @@ for $k\in\mathbb{Z}\cup\{+\infty,-\infty\}$. The conversions are given in Figure
 \begin{array}{@{}r@{\ }c@{\ }l@{\quad}l@{}}
 \APPLY(\kw{toFloat},n) & = & \{\dbfl(n)\} & \\[1ex]
 \APPLY(\kw{Char.toCode},\dbch) & = & \{\dbcode(\dbch)\} & \\
-\APPLY(\kw{Char.fromCode},n) & = & \{\dbch\} & \text{if}\ n\ \text{is a Unicode scalar value and}\ \dbcode(\dbch)=n\\
+\APPLY(\kw{Char.fromCode},n) & = & \{\dbch\} & \text{if}\ n\ \text{is a Unicode scalar value}\\
+                              &   &            & \text{and}\ \dbcode(\dbch)=n\\
                               & = & \{\mathit{other}(n)\} & \text{otherwise}\\[1ex]
 \APPLY(\kw{round},x) & = & \{\dbsat(\lfloor x+\tfrac{1}{2}\rfloor)\} & \text{if}\ x\in\effFltFin\\
 \APPLY(\kw{floor},x) & = & \{\dbsat(\lfloor x\rfloor)\} & \text{if}\ x\in\effFltFin\\

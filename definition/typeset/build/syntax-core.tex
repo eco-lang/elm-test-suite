@@ -1,0 +1,659 @@
+% Values: PRECISE, FAITHFUL, ECONOMICAL
+% Evidence planned:
+% - PRECISE: each lexical class (reserved words, constants, comments,
+%   identifiers, operators) defined by a stated rule; the three column tests
+%   of the layout rule and every construct that sets the indentation given
+%   exactly; one production for every bare Core construct of the book plan;
+%   the grouping of operator chains stated as a rule, with the fixity of every
+%   operator of the initial basis in a figure.
+% - FAITHFUL: rulings A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A12, A13, A14,
+%   A15, A16, A17, A26, A56 cited beside the text they shaped; every Core row
+%   of the survey's "Syntactic Restrictions" table either enforced by the
+%   grammar or lexis, or listed in Section 2.10, or left to the static
+%   semantics because it needs types.
+% - ECONOMICAL: bare grammar only (every derived form deferred to Appendix A);
+%   tuple arity carried by the grammar rather than a restriction (A12);
+%   restrictions already enforced by the grammar not repeated.
+
+\chapter{Syntax of the Core}\label{ch:syntax-core}
+
+\section{Reserved Words}
+
+The following are the \emph{reserved words} of Standard Elm. They may not be
+used as identifiers or as operators.
+% A2, A16
+\begin{quote}
+\begin{tabular}{@{}*{7}{l}@{}}
+\kw{as} & \kw{case} & \kw{else} & \kw{exposing} & \kw{if} & \kw{import} & \kw{in}\\
+\kw{let} & \kw{module} & \kw{of} & \kw{port} & \kw{then} & \kw{type} & \kw{where}\\[0.5ex]
+\kw{(}\ \kw{)} & \kw{[}\ \kw{]} & \kw{\kwlb}\ \kw{\kwrb} & \kw{,}\ \ \kw{.} & \kw{:}\ \ \kw{=} & \kw{|}\ \ \kw{->} & \kw{\textbackslash}\ \ \kw{\_}
+\end{tabular}
+\end{quote}
+The words \kw{exposing}, \kw{import}, \kw{module}, \kw{port} and \kw{type} are
+used by Modules (Chapter~\ref{ch:syntax-modules}). The word \kw{where} is used
+by no phrase of Standard Elm: it belongs to the headers of effect modules,
+which are kernel-only syntax (Section~\ref{sec:syntax-core-infix}). The words
+\kw{alias}, \kw{infix}, \kw{left}, \kw{right}, \kw{non}, \kw{effect},
+\kw{command} and \kw{subscription} are not reserved; \kw{alias} serves as a
+terminal only directly after \kw{type} (Chapter~\ref{ch:syntax-modules}), and
+elsewhere each of them is an identifier.
+
+\section{Special Constants}\label{sec:syntax-core-constants}
+
+Source text is a sequence of Unicode characters. A \emph{decimal digit} is one
+of \kw{0}, \ldots, \kw{9}; a \emph{hexadecimal digit} is a decimal digit or one
+of \kw{a}, \ldots, \kw{f}, \kw{A}, \ldots, \kw{F}.
+
+An \emph{integer constant (in decimal notation)} is a non-empty sequence of
+decimal digits that does not begin with \kw{0} unless it is \kw{0} itself. An
+\emph{integer constant (in hexadecimal notation)} is \kw{0x} followed by a
+non-empty sequence of hexadecimal digits. No integer constant carries a sign:
+a negated integer is a derived form (Section~\ref{sec:syntax-core-lexical}).
+An integer constant denotes a non-negative integer; its value as an
+\kw{Int} is that integer normalised into the implementation's Int range by
+$\norm$, the normalisation of Int arithmetic, so that every integer constant
+has a value in $\IntRange$ (Appendix~\ref{ch:appendix-implementation}).
+% A9, D8
+Examples: \kw{0}\quad\kw{42}\quad\kw{0x1F}\quad\kw{0xffffffff}. Non-examples:
+\kw{007}\quad\kw{0X1F}\quad\kw{1\_000}\quad\kw{0b101}.
+
+\begin{figure}[tbp]
+\centering
+\begin{tabular}{@{}ll@{}}
+\kw{\textbackslash n} & line feed (U+000A)\\
+\kw{\textbackslash r} & carriage return (U+000D)\\
+\kw{\textbackslash t} & horizontal tab (U+0009)\\
+\kw{\textbackslash "} & \kw{"}\\
+\kw{\textbackslash\textquotesingle} & \kw{\textquotesingle}\\
+\kw{\textbackslash\textbackslash} & \kw{\textbackslash}\\
+\kw{\textbackslash u\kwlb}$h$\kw{\kwrb} & the character with code point $h$,
+  read in hexadecimal
+\end{tabular}
+\caption{Escape Sequences}\label{fig:core-escapes}
+\end{figure}
+
+A \emph{float constant} is an integer constant in decimal notation followed by
+a fraction, by an exponent, or by a fraction and then an exponent. A
+\emph{fraction} is \kw{.} followed by a non-empty sequence of decimal digits;
+an \emph{exponent} is \kw{e} or \kw{E}, then optionally \kw{+} or \kw{-}, then
+a non-empty sequence of decimal digits. The constant \kw{0} may be followed by
+a fraction but not directly by an exponent. A float constant denotes the
+rational number that it writes in decimal notation. Examples:
+\kw{0.5}\quad\kw{3.14}\quad\kw{6.02e23}\quad\kw{1E-3}\quad\kw{0.0e1}.
+Non-examples: \kw{.5}\quad\kw{1.}\quad\kw{1.e5}\quad\kw{0e5}.
+
+A \emph{character constant} is a single quote \kw{\textquotesingle}, then
+either one character other than \kw{\textquotesingle}, \kw{\textbackslash} and
+line feed, or one escape sequence, then a single quote. It denotes the
+character it contains, or the character its escape sequence denotes. Thus
+\kw{\textquotesingle\textquotesingle} and
+\kw{\textquotesingle ab\textquotesingle} are not constants.
+
+A \emph{string constant (single-line)} is a double quote \kw{"}, then a
+sequence of zero or more characters other than \kw{"}, \kw{\textbackslash} and
+line feed, and escape sequences, then a double quote. Three double quotes
+\kw{"""} always begin a multi-line string constant, so \kw{""} is the empty
+string only when no third \kw{"} follows it. A \emph{string constant
+(multi-line)} is \kw{"""}, then a sequence of characters other than
+\kw{\textbackslash}, and escape sequences, that does not contain \kw{"""}, then
+\kw{"""}. The first \kw{"""} after the opening one closes the constant; any
+further \kw{"} immediately after it begins a new item.
+% A15
+Line feeds and carriage returns inside a multi-line string constant are
+characters of the string, and so is a line feed directly after the opening
+\kw{"""}. A string constant denotes the sequence of characters it contains,
+each escape sequence standing for the character it denotes.
+
+Each escape sequence begins with \kw{\textbackslash} and stands for one
+character. The escape sequences are shown in Figure~\ref{fig:core-escapes},
+subject to this restriction:
+\begin{itemize}
+\item\citelabel{res:core-escape-unicode} In \kw{\textbackslash u\kwlb}$h$\kw{\kwrb}, $h$ is a sequence of four, five or
+  six hexadecimal digits whose value is a Unicode scalar value, that is, at most
+  \kw{10FFFF} and outside the surrogate range \kw{D800} to \kw{DFFF}. No other
+  sequence beginning with \kw{\textbackslash} is an escape sequence.
+  % A8
+\end{itemize}
+A tab character may occur, unescaped, in a character or string constant. How a
+character is represented as a value is an implementation parameter
+(Appendix~\ref{ch:appendix-implementation}).
+% A52, D8
+
+
+We denote by \cls{SCon} the class of \emph{special constants}, that is, the
+integer, float, character and string constants; we use \scon{} to range over
+\cls{SCon}.
+
+\section{Comments}
+
+A \emph{line comment} is \kw{-{}-} and the characters after it up to the end of
+the line. A \emph{block comment} is any character sequence within comment
+brackets \kw{\kwlb-}~\kw{-\kwrb} in which comment brackets are properly
+nested. No space is allowed between the two characters of a comment bracket.
+A program in which a \kw{\kwlb-} is unmatched is not a phrase of the language.
+A tab character may occur in a line comment but not in a block comment.
+
+A comment bracket \kw{\kwlb-} directly followed by \kw{|} begins a \emph{doc
+comment}, which extends, with comment brackets nested as in a block comment,
+to its matching \kw{-\kwrb}. A doc comment is not a comment: it is an item of
+the grammar of Modules, which admits it only after a module header and before
+a top-level declaration (Chapter~\ref{ch:syntax-modules}). No doc comment
+occurs in a Core phrase.
+% A10
+
+\section{Identifiers}
+
+The classes of \emph{identifiers} for the Core are shown in
+Figure~\ref{fig:core-identifiers}. We use \var, \tyvar{} and so on to range
+over \cls{Var}, \cls{TyVar}, etc. For each class marked ``long'' there is a
+class of \emph{long identifiers}: \cls{LongVar}, \cls{LongCon} and
+\cls{LongTyCon}, over which \longvar, \longcon{} and \longtycon{} range. Their
+syntax is
+\begin{center}
+\begin{grammar}
+\gprod{\longvar}{\var}{identifier}
+\galt{\modid\kw{.}\var}{qualified identifier}
+\gprod{\longcon}{\con}{identifier}
+\galt{\modid\kw{.}\con}{qualified identifier}
+\gprod{\longtycon}{\tycon}{identifier}
+\galt{\modid\kw{.}\tycon}{qualified identifier}
+\end{grammar}
+\end{center}
+with no space or comment on either side of each \kw{.}. Throughout this
+document the term ``identifier'', occurring without an adjective, refers to an
+identifier that is not qualified.
+
+A \emph{letter} is a character of one of the Unicode general categories Lu,
+Ll, Lt, Lm and Lo; the version of the Unicode standard that assigns these
+categories is an implementation parameter
+(Appendix~\ref{ch:appendix-implementation}).
+% A14
+The identifiers are formed as this restriction states:
+\begin{itemize}
+\item\citelabel{res:core-identifier-characters} A \emph{lower identifier} is a letter of category Ll (which includes \kw{a},
+  \ldots, \kw{z}) followed by a sequence of zero or more \emph{inner characters}:
+  letters, decimal digits and underbars \kw{\_}. An \emph{upper identifier} is a
+  letter of category Lu or Lt (which include \kw{A}, \ldots, \kw{Z}) followed by
+  a sequence of zero or more inner characters. A letter of category Lm or Lo may
+  continue an identifier but not begin one, and no identifier begins with
+  \kw{\_}. In either case reserved words are excluded, and no component of a
+  long identifier may be a reserved word: thus \kw{List.if} is not a long
+  identifier.
+  % A2
+\end{itemize}
+An \emph{operator} is a non-empty sequence of the \emph{symbols}
+\begin{center}
+\kw{+}\quad\kw{-}\quad\kw{*}\quad\kw{/}\quad\kw{=}\quad\kw{.}\quad\kw{<}\quad%
+\kw{>}\quad\kw{:}\quad\kw{\&}\quad\kw{|}\quad\kw{\textasciicircum}\quad%
+\kw{?}\quad\kw{\%}\quad\kw{!}
+\end{center}
+that is not a reserved word. This means that \kw{=}, \kw{:}, \kw{|} and
+\kw{->} are not operators, but \kw{==}, \kw{::}, \kw{||} and \kw{|>} are.
+Operators are never qualified.
+
+A variable \var, a type variable \tyvar{} and a record label \lab{} are lower
+identifiers. A constructor \con{} and a type constructor \tycon{} are upper
+identifiers. A module identifier \modid{} is a non-empty sequence of upper
+identifiers separated by \kw{.}, with no space or comment around each
+\kw{.}. A type variable whose name begins with \kw{number}, \kw{comparable},
+\kw{appendable} or \kw{compappend} is constrained to a class of types
+(Section~\ref{sec:static-core-classes}).
+
+\begin{figure}[tbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\var & \cls{Var} & value variables & long\\
+\con & \cls{Con} & value constructors & long\\
+\tyvar & \cls{TyVar} & type variables & \\
+\tycon & \cls{TyCon} & type constructors & long\\
+\lab & \cls{Lab} & record labels & \\
+\modid & \cls{ModId} & module identifiers & \\
+\opv & \cls{Op} & operators &
+\end{tabular}
+\caption{Identifiers}\label{fig:core-identifiers}
+\end{figure}
+
+The classes \cls{Var}, \cls{TyVar} and \cls{Lab} share the lower identifiers,
+and \cls{Con}, \cls{TyCon} and \cls{ModId} the upper identifiers. The syntax
+class of an occurrence of an identifier in a Core phrase is determined thus:
+\begin{enumerate}
+\item An upper identifier immediately followed by \kw{.} is a component of a
+  module identifier. The following rules assume that all occurrences of module
+  identifiers have been removed.
+\item Within a type expression, a lower identifier is a type variable and an
+  upper identifier is a type constructor.
+\item At the start of a component of a record expression, record update,
+  record type or record pattern, and immediately after the \kw{.} of a field
+  selection or field accessor (Appendix~\ref{ch:appendix-derived-forms}), a
+  lower identifier is a record label. A record label that forms a component of
+  a record pattern is also a variable, bound by that pattern.
+\item Elsewhere, a lower identifier is a variable and an upper identifier is a
+  constructor.
+\end{enumerate}
+For the remainder of this document we shall therefore assume that the classes
+are all disjoint.
+
+\section{Lexical Analysis}\label{sec:syntax-core-lexical}
+
+Each item of lexical analysis is either a reserved word, a special constant, a
+long identifier, an operator, or a doc comment. Comments and the
+\emph{whitespace} characters (space, line feed and carriage return) separate
+items and are otherwise ignored, except that the layout rule depends on the
+column at which each item begins (Section~\ref{sec:syntax-core-layout}) and
+that the constructs listed below depend on whether two items are separated. A
+tab character may occur only within a line comment or within a character or
+string constant. Where the remaining text begins with \kw{-{}-} or \kw{\kwlb-},
+a comment or doc comment is taken. Otherwise, at each stage the longest next
+item is taken.
+% A3
+Thus \kw{types} is an identifier, not \kw{type} followed by \kw{s}; within a
+run of symbols \kw{-{}-} is part of an operator and begins no comment, so
+\kw{a*-b} contains the single operator \kw{*-}, and \kw{2\textasciicircum-1}
+the operator \kw{\textasciicircum-}. Items are also subject to these
+restrictions:
+\begin{itemize}
+\item\citelabel{res:core-constant-separated} A special constant, and the reserved word \kw{\_}, may not be followed
+  immediately by an inner character, and the digits of an integer constant may
+  be followed immediately by \kw{.} only as part of a fraction; so \kw{12abc},
+  \kw{1.x} and \kw{\_x} are not sequences of items.
+\item\citelabel{res:core-adjacent-items} The following constructs require two items to be \emph{adjacent}, that is, to
+  have no whitespace or comment between them:
+  \begin{itemize}
+  \item the parentheses of the unit \kw{()}, and the operator and parentheses of
+    an operator value \kw{(}\opv\kw{)};
+    % A1
+  \item the \kw{.} of a long identifier and the items on either side of it;
+  \item the \kw{.} of a field selection \atexp\kw{.}\lab{} and the items on
+    either side of it, and the \kw{.} of a field accessor \kw{.}\lab{} and the
+    label after it. A \kw{.} adjacent to a following label is the \kw{.} of a
+    field selection only if it is adjacent to the item before it and that item
+    ends an atomic expression that may precede a field selection
+    (Section~\ref{sec:syntax-core-restrictions}); otherwise it begins a field
+    accessor (Appendix~\ref{ch:appendix-derived-forms}). In particular a \kw{.}
+    directly after a field accessor begins a field accessor;
+    % A4
+  \item the negation symbol and the atomic expression it negates.
+  \end{itemize}
+\end{itemize}
+An item \kw{-} is a \emph{negation symbol} when it is adjacent to a following
+atomic expression and either it begins an operand of an expression, or it
+follows an operand from which it is separated by whitespace or a comment. A
+negation symbol negates the atomic expression after it, and no more; in the
+second case the negated expression is an argument of an application. Every
+other \kw{-} is the operator \kw{-}. Thus \kw{f -x} applies \kw{f} to the
+negation of \kw{x}, while \kw{a - b} and \kw{a-b} are subtractions; \kw{-f x}
+applies the negation of \kw{f} to \kw{x}; and \kw{(-)} is the operator value
+of subtraction. Negation is a derived form
+(Appendix~\ref{ch:appendix-derived-forms}).
+
+\section{Layout}\label{sec:syntax-core-layout}
+
+The phrase structure of Elm depends on indentation. Source text is divided
+into lines by line feeds. The \emph{column} of an item is one more than the
+number of characters that precede it on its line, where a carriage return
+counts as no character.
+% A6
+Each item is read under an \emph{indentation}, a natural number $i$. An item
+whose column is $c$ is
+\begin{itemize}
+\item \emph{indented} if $c > i$ and $c > 1$;
+\item \emph{aligned} if $c = i$;
+\item \emph{at the margin} if $c = 1$.
+\end{itemize}
+These tests concern only the column at which an item begins: where the item
+before it ended, for instance on a later line than it began, is irrelevant.
+% A5
+The \emph{layout rule} is this restriction:
+\begin{itemize}
+\item\citelabel{res:core-layout-rule} Every item of a phrase is indented, except the
+  items that the constructs below require to be aligned or at the margin.
+\end{itemize}
+Only these constructs change the indentation; elsewhere an item is read under the
+indentation of the phrase that contains it.
+\begin{enumerate}
+\item \emph{Top-level declarations} (Chapter~\ref{ch:syntax-modules}). The
+  first item of each top-level declaration is at the margin, and its remaining
+  items are read under the indentation $0$; so each of them lies in column $2$
+  or beyond.
+\item \emph{Let expressions.} Let $k$ be the column of the reserved word
+  \kw{let}. The item after \kw{let} has a column $d$ with $d > k$ and $d > 1$,
+  and $d$ is the indentation under which the definitions of the \kw{let} are
+  read: the first item of each later definition, and of each annotation, is
+  aligned, and every other item of the definitions is indented. The reserved
+  word \kw{in} and the body after it are read under the indentation in force
+  at \kw{let}.
+\item \emph{Case expressions.} The items of \kw{case} \expm{} \kw{of} and the
+  first item of the first match rule are read under the indentation in force
+  at \kw{case}. The column $p$ of that first item is the indentation under
+  which the match is read: the first item of each later match rule is
+  aligned, and every other item of the match is indented.
+\end{enumerate}
+An annotation $\var\ \kw{:}\ \ty$ is followed directly by a definition of the
+same \var, whose first item has the column of the annotation's first item: at
+the margin at top level, aligned in a \kw{let}.
+% A17
+Each construct extends as far as possible: it takes in every following item
+that passes the test that applies to it and continues the phrase, and it ends
+before the first item that does not. Thus two definitions of one \kw{let}, or
+two match rules of one \kw{case}, never begin on the same line, while
+\kw{let x = 1 in x} is a phrase on one line.
+
+\section{Infixed Operators}\label{sec:syntax-core-infix}
+
+An operator \opv{} has a \emph{fixity}: a \emph{precedence}, which is one of
+the digits \kw{0}, \ldots, \kw{9}, and an \emph{associativity}, which is
+\emph{left}, \emph{right} or \emph{non}. Operators are declared, with their
+fixities, only by kernel-only syntax. Kernel-only syntax, namely operator
+declarations, effect module headers and references to \kw{Elm.Kernel}
+modules, lies outside Standard Elm.
+% A11, A16, A37
+No program can therefore declare an operator, and the operators are those of
+the initial basis, the same in every program. Their fixities are shown in
+Figure~\ref{fig:core-fixities}; the operator table of the initial basis gives
+the meaning of each, its type scheme in
+Appendix~\ref{ch:appendix-static-basis} and its value in
+Appendix~\ref{ch:appendix-dynamic-basis}. Operators of library modules beyond
+the initial basis are outside this definition.
+% Design decision 1 (audit X1, X5): operators are fixed by the operator table
+% of the initial basis, not looked up in a context or environment.
+
+\begin{figure}[tbp]
+\centering
+\begin{tabular}{@{}clll@{}}
+Precedence & Left & Right & Non\\
+\hline
+9 & \kw{<{}<} & \kw{>{}>} & \\
+8 & & \kw{\textasciicircum} & \\
+7 & \kw{*}\ \ \kw{/}\ \ \kw{//} & & \\
+6 & \kw{+}\ \ \kw{-} & & \\
+5 & & \kw{++}\ \ \kw{::} & \\
+4 & & & \kw{==}\ \ \kw{/=}\ \ \kw{<}\ \ \kw{>}\ \ \kw{<=}\ \ \kw{>=}\\
+3 & & \kw{\&\&} & \\
+2 & & \kw{||} & \\
+0 & \kw{|>} & \kw{<|} &
+\end{tabular}
+\caption{Fixities of the Operators of the Initial Basis}\label{fig:core-fixities}
+\end{figure}
+
+An expression of the form $\expm_0\ \opv_1\ \expm_1\ \cdots\ \opv_n\ \expm_n$
+($n \geq 1$), in which each $\opv_j$ is an operator and each operand $\expm_j$
+is an application or an atomic expression, possibly negated, except that the
+last operand may be any expression, is an \emph{operator chain}. Application
+binds more tightly than any operator. A chain is grouped so that an operator
+of higher precedence binds more tightly than one of lower precedence, subject
+to this restriction:
+\begin{itemize}
+\item\citelabel{res:core-operator-chain} If $\opv_j$ and $\opv_l$ ($j < l$) of a chain have equal precedence and no operator of lower
+  precedence stands between them, then either both associate to the left and
+  the chain groups to the left, or both associate to the right and it groups to
+  the right; otherwise the chain is not a phrase of the language.
+\end{itemize}
+Precisely, a
+chain is the infixed application $\expm'\ \opv_j\ \expm''$ in which
+$\opv_j$ has the least precedence in the chain and is, among the operators of
+that precedence, the rightmost if they associate to the left and the leftmost
+if they associate to the right; $\expm'$ and $\expm''$ are the chains, or
+single operands, to the left and right of $\opv_j$, grouped by the same rule.
+For example,
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\kw{a |> f |> g} & parses as & \kw{(a |> f) |> g}\\
+\kw{f <| g <| a} & parses as & \kw{f <| (g <| a)}\\
+\kw{x ::\ ys ++ zs} & parses as & \kw{x ::\ (ys ++ zs)}\\
+\kw{a < b == c} & is illegal & \\
+\kw{f <{}< g >{}> h} & is illegal &
+\end{tabular}
+\end{center}
+
+An operator value \kw{(}\opv\kw{)} is an atomic expression that denotes the
+operator \opv{} as a value; it is the only way to use an operator other than
+in a chain. There are no sections, and no operator is qualified. The infixed
+application $\expm_1\ \opv\ \expm_2$ is a derived form
+(Appendix~\ref{ch:appendix-derived-forms}); so are the infixed forms of
+\kw{\&\&} and \kw{||}, which evaluate their second operand only when needed,
+whereas the operator values \kw{(\&\&)} and \kw{(||)} are ordinary functions.
+% A56
+In the semantic rules every chain has been grouped and every infixed
+application replaced by its equivalent form, since fixity affects only
+parsing.
+
+\section{Derived Forms}
+
+Many syntactic forms of Elm have a meaning that is given by translation into a
+smaller set of forms, called the \emph{bare language}. Among them are infixed
+application, negation, conditional expressions, list expressions with
+elements, list patterns with elements, field selection and field accessors,
+lambda expressions and function bindings with parameters beyond the first,
+and \kw{let} expressions with several definitions. These derived forms, and
+their equivalent forms in the bare language, are given in
+Appendix~\ref{ch:appendix-derived-forms}. Appendix~\ref{ch:appendix-full-grammar}
+collects the bare and derived syntax into one grammar.
+
+\section{Grammar}
+
+The phrase classes for the Core are shown in
+Figure~\ref{fig:core-phrase-classes}. We use the variable \atexp{} to range
+over \cls{AtExp}, etc. The grammatical rules for the Core are shown in
+Figures~\ref{fig:core-grammar-expressions}, \ref{fig:core-grammar-patterns}
+and~\ref{fig:core-grammar-types}.
+
+\begin{figure}[tbp]
+\centering
+\begin{tabular}{@{}ll@{}}
+\cls{AtExp} & atomic expressions\\
+\cls{ExpRow} & expression rows\\
+\cls{Exp} & expressions\\
+\cls{Match} & matches\\
+\cls{MRule} & match rules\\[0.5ex]
+\cls{Dec} & declarations\\
+\cls{ValBind} & value bindings\\[0.5ex]
+\cls{AtPat} & atomic patterns\\
+\cls{PatRow} & pattern rows\\
+\cls{Pat} & patterns\\[0.5ex]
+\cls{Ty} & type expressions\\
+\cls{TyRow} & type-expression rows
+\end{tabular}
+\caption{Core Phrase Classes}\label{fig:core-phrase-classes}
+\end{figure}
+
+The following conventions are adopted in presenting the grammatical rules,
+and in their interpretation:
+\begin{itemize}
+\item The brackets $\opt{\ }$ enclose optional phrases.
+\item Alternative forms for each phrase class are in order of decreasing
+  precedence. L (resp.\ R) means left (resp.\ right) association.
+\item The phrases $\kw{\textbackslash}\,\atpat\ \kw{->}\ \expm$,
+  $\kw{case}\ \expm\ \kw{of}\ \match$ and $\kw{let}\ \dec\ \kw{in}\ \expm$
+  extend as far right as the layout rule allows
+  (Section~\ref{sec:syntax-core-layout}). Such a phrase is written in
+  parentheses when it is the argument of an application, or an operand of an
+  operator chain other than the last.
+\item In a type construction $\longtycon\ \ty_1\ \cdots\ \ty_n$ with
+  $n \geq 1$, each argument $\ty_j$ is a type variable, a type construction
+  without arguments, a record type expression, a unit or tuple type
+  expression, or a parenthesised type expression; thus \kw{Maybe List a}
+  gives \kw{Maybe} two arguments. Type construction binds more tightly than
+  \kw{->}.
+\item In patterns, a constructed pattern binds more tightly than \kw{::},
+  and \kw{::} more tightly than \kw{as}; so \kw{x ::\ xs as l} is a layered
+  pattern whose pattern is \kw{x ::\ xs}. The \kw{::} of a pattern always
+  denotes the list constructor of the initial basis. There is no negated
+  constant in a pattern.
+  % A7
+\item The separator \kw{;} between match rules and the connective \kw{and}
+  between value bindings are abstract syntax: neither is an item of source
+  text, and \kw{and} is not a reserved word. In source text the match rules of
+  a match, and the definitions of a \kw{let}, are separated by layout
+  (Section~\ref{sec:syntax-core-layout}). Likewise the annotated value binding
+  $\var\ \kw{:}\ \ty\ \kw{=}\ \expm$ is written in source text as the
+  annotation $\var\ \kw{:}\ \ty$ followed by the definition
+  $\var\ \kw{=}\ \expm$.
+  % A17
+\item In the bare language the declaration of a \kw{let} is a single value
+  binding whose members form one group; a \kw{let} with several definitions
+  is a derived form. A value binding $\atpat\ \kw{=}\ \expm$ in which \atpat{}
+  is a variable is read by the first alternative for \valbind.
+  % DECIDED: `x = e` matches both alternatives of valbind; it is read as a
+  % variable binding, as the implementation tries a named definition first
+  % (survey "Declarations": named definition then destructuring).
+\item Tuples have exactly two or three components.
+  % A12
+\end{itemize}
+
+\begin{figure}[tbp]
+\centering
+\begin{grammar}
+\gprod{\atexp}{\scon}{special constant}
+\galt{\longvar}{value variable}
+\galt{\longcon}{value constructor}
+\galt{\kw{(}\opv\kw{)}}{operator value}
+\galt{\kw{()}}{unit}
+\galt{\kw{(}\ \expm_1\ \kw{,}\ \expm_2\ \opt{\kw{,}\ \expm_3}\ \kw{)}}{tuple}
+\galt{\kw{[}\ \kw{]}}{empty list}
+\galt{\kw{\kwlb}\ \opt{\exprow}\ \kw{\kwrb}}{record}
+\galt{\kw{\kwlb}\ \var\ \kw{|}\ \exprow\ \kw{\kwrb}}{record update}
+\galt{\kw{let}\ \dec\ \kw{in}\ \expm}{local declaration}
+\galt{\kw{(}\ \expm\ \kw{)}}{parentheses}
+\noalign{\smallskip}
+\gprod{\exprow}{\lab\ \kw{=}\ \expm\ \opt{\kw{,}\ \exprow}}{expression row}
+\noalign{\smallskip}
+\gprod{\expm}{\atexp}{atomic}
+\galt{\expm\ \atexp}{application (L)}
+\galt{\kw{\textbackslash}\,\atpat\ \kw{->}\ \expm}{function}
+\galt{\kw{case}\ \expm\ \kw{of}\ \match}{case analysis}
+\noalign{\smallskip}
+\gprod{\match}{\mrule\ \opt{\kw{;}\ \match}}{match}
+\noalign{\smallskip}
+\gprod{\mrule}{\pat\ \kw{->}\ \expm}{match rule}
+\noalign{\smallskip}
+\gprod{\dec}{\valbind}{value declaration}
+\noalign{\smallskip}
+\gprod{\valbind}{\var\ \opt{\kw{:}\ \ty}\ \kw{=}\ \expm\ \opt{\kw{and}\ \valbind}}{variable binding}
+\galt{\atpat\ \kw{=}\ \expm}{destructuring binding}
+\end{grammar}
+\caption{Grammar: Expressions, Matches, Declarations and Bindings}
+\label{fig:core-grammar-expressions}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\begin{grammar}
+\gprod{\atpat}{\kw{\_}}{wildcard}
+\galt{\scon}{special constant}
+\galt{\var}{variable}
+\galt{\longcon}{constructor}
+\galt{\kw{()}}{unit}
+\galt{\kw{(}\ \pat_1\ \kw{,}\ \pat_2\ \opt{\kw{,}\ \pat_3}\ \kw{)}}{tuple}
+\galt{\kw{[}\ \kw{]}}{empty list}
+\galt{\kw{\kwlb}\ \opt{\patrow}\ \kw{\kwrb}}{record}
+\galt{\kw{(}\ \pat\ \kw{)}}{parentheses}
+\noalign{\smallskip}
+\gprod{\patrow}{\lab\ \opt{\kw{,}\ \patrow}}{pattern row}
+\noalign{\smallskip}
+\gprod{\pat}{\atpat}{atomic}
+\galt{\longcon\ \atpat_1\ \cdots\ \atpat_n}{constructed pattern ($n \geq 1$)}
+\galt{\pat_1\ \kw{::}\ \pat_2}{list construction (R)}
+\galt{\pat\ \kw{as}\ \var}{layered}
+\end{grammar}
+\caption{Grammar: Patterns}
+\label{fig:core-grammar-patterns}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\begin{grammar}
+\gprod{\ty}{\tyvar}{type variable}
+\galt{\kw{\kwlb}\ \opt{\tyrow}\ \kw{\kwrb}}{record type expression}
+\galt{\kw{\kwlb}\ \tyvar\ \kw{|}\ \tyrow\ \kw{\kwrb}}{extensible record type expression}
+\galt{\kw{()}}{unit type expression}
+\galt{\kw{(}\ \ty_1\ \kw{,}\ \ty_2\ \opt{\kw{,}\ \ty_3}\ \kw{)}}{tuple type expression}
+\galt{\longtycon\ \ty_1\ \cdots\ \ty_n}{type construction ($n \geq 0$)}
+\galt{\ty\ \kw{->}\ \ty'}{function type expression (R)}
+\galt{\kw{(}\ \ty\ \kw{)}}{parentheses}
+\noalign{\smallskip}
+\gprod{\tyrow}{\lab\ \kw{:}\ \ty\ \opt{\kw{,}\ \tyrow}}{type-expression row}
+\end{grammar}
+\caption{Grammar: Type Expressions}
+\label{fig:core-grammar-types}
+\end{figure}
+
+\section{Syntactic Restrictions}\label{sec:syntax-core-restrictions}
+
+The restrictions below are conditions on a program as it is written, before
+any derived form is replaced by its equivalent form; where a restriction
+names a derived form, the form is that of
+Appendix~\ref{ch:appendix-derived-forms}. A program that breaks one of them is
+not a phrase of the language.
+% DECIDED: restrictions are stated on source phrases, before translation of
+% derived forms, because the translation erases distinctions they depend on
+% (A26: `f = \n -> f n` and `f n = f n` have the same equivalent form) and
+% can itself bind a label as a variable (the field accessor).
+
+\emph{Records.}
+\begin{itemize}
+\item\citelabel{res:core-row-labels-distinct} No expression row, pattern row or type-expression row may contain the
+  same \lab{} twice. This applies to the expression row of a record update.
+\item\citelabel{res:core-record-update-form} In a record update $\kw{\kwlb}\ \var\ \kw{|}\ \exprow\ \kw{\kwrb}$ the
+  item before \kw{|} is a variable that is not qualified, and at least one
+  expression row follows \kw{|}; the grammar gives this shape, and an
+  extensible record type expression likewise has at least one row.
+\item\citelabel{res:core-field-selection} In a field selection $\atexp\kw{.}\lab$
+  (Appendix~\ref{ch:appendix-derived-forms}), \atexp{} is a \longvar, a
+  record, a record update, a field selection, or a phrase that begins with
+  \kw{(}: a parenthesised expression, a tuple, the unit or an operator value.
+  A field accessor is never followed by a field selection: in
+  $\kw{.}\lab_1\kw{.}\lab_2$ the second \kw{.} begins a second field accessor,
+  so the phrase is the application of $\kw{.}\lab_1$ to $\kw{.}\lab_2$.
+  Likewise \kw{"s".x} is the application of a string constant to the field
+  accessor \kw{.x}.
+  % A4
+\end{itemize}
+
+\emph{Patterns and bound variables.} The variables \emph{bound} by a pattern
+are the variables that occur in it, the labels of its pattern rows, and the
+variables after its occurrences of \kw{as}. A \emph{binding site} is one of
+the following: the parameters of a lambda expression, taken together; the
+parameters of a function binding, taken together; the pattern of a match
+rule; the pattern of a destructuring binding; and the definitions of one
+\kw{let}, taken together, which bind the variables they define and the
+variables their destructuring patterns bind. The \emph{scope} of a binding
+site is the body of the lambda expression, the right-hand side of the function
+binding, the expression of the match rule, or, for a destructuring binding
+and for the definitions of a \kw{let}, the definitions of that \kw{let} and
+its body.
+\begin{itemize}
+\item\citelabel{res:core-binding-site-distinct} No binding site may bind the same \var{} twice.
+\item\citelabel{res:core-no-shadowing} No binding site may bind a \var{} that is already bound by a binding site
+  in whose scope it lies. Constructors, type constructors and type variables
+  are not subject to this restriction.
+  % Audit X12: the top-level part of this restriction is stated in
+  % Chapter syntax-modules only (S3).
+\item\citelabel{res:core-no-float-pattern} No float constant may occur in a pattern.
+\end{itemize}
+The number of arguments in a constructed pattern is not restricted here: a
+constructed pattern with too few or too many arguments for its constructor
+does not elaborate (Chapter~\ref{ch:static-core}).
+% Audit Y7: the arity restriction was removed; it needs the constructor's
+% declaration (G6), and the static rules for constructed patterns enforce it.
+
+\emph{Value bindings.}
+\begin{itemize}
+\item\citelabel{res:core-annotation-placement} In source text each annotation $\var\ \kw{:}\ \ty$ is followed directly
+  by a definition of the same \var, laid out as
+  Section~\ref{sec:syntax-core-layout} requires.
+  % A17
+\item\citelabel{res:core-let-recursion} In a \kw{let}, a definition \emph{refers to} a definition (possibly
+  itself) if a variable that the second binds occurs in the first. Every
+  definition that lies on a cycle of this relation is a function binding
+  $\var\ \atpat_1\ \cdots\ \atpat_n\ \kw{=}\ \expm$ with $n \geq 1$; in
+  particular, no destructuring binding and no definition
+  $\var\ \kw{=}\ \expm$ without parameters lies on a cycle, even when \expm{}
+  is a lambda expression. The corresponding restriction for top-level
+  declarations is given in Chapter~\ref{ch:syntax-modules}.
+  % A26
+\end{itemize}
+
+There is no limit on the size of a phrase: the number of parameters,
+components, fields or constructors is unbounded, and the limits of an
+implementation are listed in Appendix~\ref{ch:appendix-implementation}.
+% A13, A34
