@@ -376,9 +376,11 @@ skipped.
 
 ## The results website
 
-`site/` is an [elm-pages](https://elm-pages.com) site built from a run's results: each compiler's
-totals, each project's and each tag's totals per compiler with a page listing its tests, the tests
-whose outcome differs between compilers, and a page per test with its description, issue link,
+`site/` is an [elm-pages](https://elm-pages.com) site. Its main page is `/about`, which `/` redirects
+to (`site/public/_redirects` on Netlify, and a refresh in the page elsewhere); `/standard` holds A
+Standard Definition of Elm?. `/results` is built from a run's results: each compiler's totals,
+each project's and each tag's totals per compiler with a page listing its tests, and the tests
+whose outcome differs between compilers; and a page per test gives its description, issue link,
 tags, source, and per compiler its outcome, failure message and output. To build it after `pnpm test:all`:
 
 ```sh

@@ -100,7 +100,7 @@ view app shared model =
     in
     { title = tag.name ++ " · " ++ Site.title
     , body =
-        [ Html.div [ Attr.class "ts-crumbs" ] [ Route.link [] [ Html.text "Results" ] Route.Index, Html.text " / tags / " ]
+        [ Html.div [ Attr.class "ts-crumbs" ] [ Route.link [] [ Html.text "Results" ] Route.Results, Html.text " / tags / " ]
         , Html.h1 [ Attr.class "ts-h1" ] [ Html.text tag.name ]
         , Html.p [ Attr.class "ts-lede" ] [ Html.text tag.description ]
         , Html.p [ Attr.class "ts-small" ] [ Html.a [ Attr.href "#discussions" ] [ Html.text "Discussions of this tag and its tests ↓" ] ]

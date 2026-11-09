@@ -100,7 +100,7 @@ view app shared =
     { title = test.name ++ " · " ++ Site.title
     , body =
         [ Html.div [ Attr.class "ts-crumbs" ]
-            [ Route.link [] [ Html.text "Results" ] Route.Index
+            [ Route.link [] [ Html.text "Results" ] Route.Results
             , Html.text " / "
             , Route.link [] [ Html.text test.project ] (Route.Projects__Project_ { project = test.project })
             , Html.text " / "

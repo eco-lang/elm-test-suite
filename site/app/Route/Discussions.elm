@@ -66,7 +66,7 @@ view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
 view _ shared =
     { title = "Discussions · " ++ Site.title
     , body =
-        [ Html.div [ Attr.class "ts-crumbs" ] [ Route.link [] [ Html.text "Results" ] Route.Index, Html.text " / " ]
+        [ Html.div [ Attr.class "ts-crumbs" ] [ Route.link [] [ Html.text "Results" ] Route.Results, Html.text " / " ]
         , Html.h1 [ Attr.class "ts-h1" ] [ Html.text "Discussions" ]
         , Html.p [ Attr.class "ts-lede" ]
             [ Html.text "The tests and their results are discussed in the "

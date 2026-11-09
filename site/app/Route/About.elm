@@ -68,7 +68,7 @@ view _ _ =
             [ Html.text (Site.title ++ " has two parts: ")
             , Route.link [] [ Html.em [] [ Html.text bookTitle ] ] Route.Standard
             , Html.text ", a precise specification of the Elm language, and the "
-            , Route.link [] [ Html.text "results" ] Route.Index
+            , Route.link [] [ Html.text "results" ] Route.Results
             , Html.text " of a suite of Elm programs run under several compilers, many of which check the specification."
             ]
         , section "Why the title is a question"

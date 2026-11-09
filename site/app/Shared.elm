@@ -153,11 +153,11 @@ view report _ _ _ pageView =
                     [ Icons.elmTangram "ts-brand-mark"
                     , Html.text Site.title
                     ]
-                    Route.Index
+                    Route.About
                 , Html.nav [ Attr.class "ts-nav" ]
                     [ Route.link [] [ Html.text "About" ] Route.About
                     , Route.link [] [ Html.text "Standard" ] Route.Standard
-                    , Route.link [] [ Html.text "Results" ] Route.Index
+                    , Route.link [] [ Html.text "Results" ] Route.Results
                     ]
                 , Html.a
                     [ Attr.class "ts-github"
