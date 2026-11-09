@@ -72,6 +72,20 @@ view app _ =
     { title = Site.title ++ ": results"
     , body =
         [ Html.h1 [ Attr.class "ts-h1" ] [ Html.text "Results" ]
+        , Html.a [ Attr.class "ts-jump", Attr.href "#differing" ]
+            [ Html.strong []
+                [ Html.text
+                    (case List.length report.differing of
+                        1 ->
+                            "1 test has"
+
+                        n ->
+                            String.fromInt n ++ " tests have"
+                    )
+                ]
+            , Html.text " a different outcome under different compilers. "
+            , Html.span [ Attr.class "ts-jump-action" ] [ Html.text "See the differences ↓" ]
+            ]
         , Html.p [ Attr.class "ts-lede" ]
             [ Html.text "Each test is a real Elm program: the suite compiles it with each compiler, runs it, and checks its output against the expected output in its comments. "
             , Html.text "The tests tagged "

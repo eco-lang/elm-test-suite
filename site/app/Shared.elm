@@ -155,9 +155,9 @@ view report _ _ _ pageView =
                     ]
                     Route.Index
                 , Html.nav [ Attr.class "ts-nav" ]
-                    [ Route.link [] [ Html.text "Results" ] Route.Index
-                    , Html.a [ Attr.href (Route.toString Route.Index ++ "#differing") ] [ Html.text "Differences" ]
+                    [ Route.link [] [ Html.text "About" ] Route.About
                     , Route.link [] [ Html.text "Standard" ] Route.Standard
+                    , Route.link [] [ Html.text "Results" ] Route.Index
                     ]
                 , Html.a
                     [ Attr.class "ts-github"

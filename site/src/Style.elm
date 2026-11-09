@@ -436,6 +436,19 @@ filterStyles =
         , p "text-decoration" "none"
         , p "white-space" "nowrap"
         ]
+    , Css.Global.class "ts-jump"
+        [ p "display" "block"
+        , p "margin" "4px 0 18px"
+        , p "padding" "10px 14px"
+        , p "border" ("1px solid " ++ colors.border)
+        , p "border-left" ("4px solid " ++ colors.fail)
+        , p "border-radius" "6px"
+        , p "background-color" colors.failBg
+        , p "color" colors.text
+        , p "text-decoration" "none"
+        ]
+    , Css.Global.selector ".ts-jump:hover" [ p "text-decoration" "none", p "border-color" colors.fail ]
+    , Css.Global.class "ts-jump-action" [ p "font-weight" "600", p "color" colors.fail, p "white-space" "nowrap" ]
     , Css.Global.class "ts-xfail"
         [ p "display" "inline-block"
         , p "border" ("1px dashed " ++ colors.fail)
