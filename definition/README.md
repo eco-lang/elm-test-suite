@@ -22,8 +22,14 @@ tex/                    stages 02 to 05 and 08: the book's LaTeX, the single cop
   defn.sty                      the layout of a formal definition: rules, rule groups, comments,
                                 grammar, semantic object and derived form tables
   macros.sty                    the book's notation, one macro per symbol (generated)
-mechanisation/          stage 06: the Lean 4 encoding of Chapter 6 (standard-elm-mech/), its
-                        example run against the tests' CHECK values (example-run.md) and report
+mechanisation/          stage 06: the Lean 4 encoding of Chapter 6 (standard-elm-mech/), whose
+                        examples are the elm-spec tests translated by tools/ (standard-elm-mech/
+                        StandardElmMech/Generated/, translation-manifest.json), the run of the
+                        examples against the tests' CHECK values (example-run.md and .json), and
+                        the report
+tools/                  the Elm tools: Translate.elm (the tests into Lean) and
+                        GenerateDerivedForms.elm (Appendix A's tables and Derived.lean's derived
+                        forms, from one table); see tools/README.md
 audit/                  stage 07: audit-report.md, drafts/ (the individual audit passes)
 typeset/                stage 08: build-report.md, editions/ (PDFs of earlier editions), build/ (the
                         LaTeX build folder, rebuilt from tex/ every time)

@@ -20,6 +20,71 @@ def basicsTrue : LongId := ⟨some "Basics", "True"⟩
 def basicsFalse : LongId := ⟨some "Basics", "False"⟩
 def basicsNegate : LongId := ⟨some "Basics", "negate"⟩
 
+-- BEGIN GENERATED derived forms (definition/tools/src/GenerateDerivedForms.elm); edit the table, not this
+/-- Row "exp1 opv exp2" (df:infix): `(opv) (exp1) (exp2)`. -/
+def bin (o : Op) (e1 : Exp) (e2 : Exp) : Exp :=
+  .app (.app (.atexp (.op o)) (.paren e1)) (.paren e2)
+
+/-- Row "if exp1 then exp2 else exp3" (df:if): `case exp1 of Basics.True -> (exp2) ; Basics.False -> exp3`. -/
+def ifte (e1 : Exp) (e2 : Exp) (e3 : Exp) : Exp :=
+  .caseE e1 (.mk (.mk (.atpat (.con basicsTrue)) (.atexp (.paren e2))) (some (.mk (.mk (.atpat (.con basicsFalse)) e3) none)))
+
+/-- Row "\atpat1...atpatn -> exp" (df:lambda-params): `\atpat1 -> ... \atpatn -> exp (n >= 2)`. -/
+def lams (ps : List AtPat) (e : Exp) : Exp :=
+  go ps
+where
+  go : List AtPat → Exp
+    | [] => e
+    | x0 :: rest => .lam x0 (go rest)
+
+/-- Row "-atexp" (df:negation): `(Basics.negate atexp)`. -/
+def neg (a : AtExp) : AtExp :=
+  .paren (.app (.atexp (.var basicsNegate)) a)
+
+/-- Row ".lab" (df:field-accessor): `(\{ lab } -> lab)`. -/
+def accessor (l : Lab) : AtExp :=
+  .paren (.lam (.record (some (.field l none))) (.atexp (.var ⟨none, l⟩)))
+
+/-- Row "[pat1, ..., patn]" (df:list-pattern): `(pat1 :: (pat2 :: ... (patn :: [ ])...)) (n >= 1)`. -/
+def listP (ps : List Pat) : AtPat :=
+  go ps
+where
+  go : List Pat → AtPat
+    | [] => .nil
+    | x0 :: rest => .paren (.cons x0 (.atpat (go rest)))
+
+/-- Row "if exp1 then exp'1 else if exp2 then exp'2 ... else if expn then exp'n else exp" (df:if-chain): `if exp1 then exp'1 else ( if exp2 then exp'2 else ( ... if expn then exp'n else exp )...) (n >= 2)`. -/
+def ifChain (arms : List (Exp × Exp)) (e : Exp) : Exp :=
+  go arms
+where
+  go : List (Exp × Exp) → Exp
+    | [] => e
+    | [(x0, x1)] => ifte x0 x1 e
+    | (x0, x1) :: rest => ifte x0 x1 (.atexp (.paren (go rest)))
+
+/-- Row "exp1 && exp2" (df:and): `if exp1 then exp2 else Basics.False`. -/
+def andalso (e1 : Exp) (e2 : Exp) : Exp :=
+  ifte e1 e2 (.atexp (.con basicsFalse))
+
+/-- Row "exp1 || exp2" (df:or): `if exp1 then Basics.True else exp2`. -/
+def orelse (e1 : Exp) (e2 : Exp) : Exp :=
+  ifte e1 (.atexp (.con basicsTrue)) e2
+
+/-- Row "[exp1, ..., expn]" (df:list): `(exp1 :: ... :: expn :: [ ]) (n >= 1)`. -/
+def listE (es : List Exp) : Exp :=
+  match es with
+  | [] => .atexp .nil
+  | _ => .atexp (.paren (go es))
+where
+  go : List Exp → Exp
+    | [] => .atexp .nil
+    | x0 :: rest => bin "::" x0 (go rest)
+
+/-- Row "atexp.lab" (df:field-selection): `(.lab atexp)`. -/
+def access (a : AtExp) (l : Lab) : AtExp :=
+  .paren (.app (.atexp (accessor l)) a)
+-- END GENERATED derived forms
+
 /-- A variable as an atomic expression. -/
 def vA (x : String) : AtExp := .var ⟨none, x⟩
 /-- A variable as an expression. -/
@@ -35,9 +100,6 @@ def litA (n : Nat) : AtExp := .scon (.int n)
 def chA (ch : Char) : AtExp := .scon (.char ch)
 def strA (s : String) : AtExp := .scon (.str s)
 def str (s : String) : Exp := .atexp (strA s)
-
-/-- Row "-atexp": `-atexp` is `(negate atexp)`. -/
-def neg (a : AtExp) : AtExp := .paren (.app (.atexp (.var basicsNegate)) a)
 
 /-- An integer as written in the source: a constant, or the negation of one. -/
 def iA (n : Int) : AtExp := if n < 0 then neg (litA n.natAbs) else litA n.natAbs
@@ -55,36 +117,6 @@ instance : Coe AtExp Exp := ⟨.atexp⟩
 def ap (f : Exp) (args : List Exp) : Exp := args.foldl (fun acc a => .app acc (A a)) f
 
 /-! ## Expressions (fig:appendix-derived-forms-expressions) -/
-
-/-- Row "exp1 opv exp2": `(opv) (exp1) (exp2)`, for opv other than && and ||. -/
-def bin (o : Op) (e1 e2 : Exp) : Exp := .app (.app (.atexp (.op o)) (.paren e1)) (.paren e2)
-
-/-- Row "if exp1 then exp2 else exp3":
-    `case exp1 of True -> (exp2) ; False -> exp3`. -/
-def ifte (e1 e2 e3 : Exp) : Exp :=
-  .caseE e1 (.mk (.mk (.atpat (.con basicsTrue)) (.atexp (.paren e2)))
-                 (some (.mk (.mk (.atpat (.con basicsFalse)) e3) none)))
-
-/-- Row "exp1 && exp2": `if exp1 then exp2 else False`. -/
-def andalso (e1 e2 : Exp) : Exp := ifte e1 e2 (.atexp (.con basicsFalse))
-/-- Row "exp1 || exp2": `if exp1 then True else exp2`. -/
-def orelse (e1 e2 : Exp) : Exp := ifte e1 (.atexp (.con basicsTrue)) e2
-
-/-- Row "\atpat1 ... atpatn -> exp": nested lambdas (n >= 1). -/
-def lams (ps : List AtPat) (e : Exp) : Exp := ps.foldr (fun p acc => .lam p acc) e
-
-/-- Row "[exp1, ..., expn]": `(exp1 :: ... :: expn :: [ ])`, each :: infixed
-    and grouped to the right; `[ ]` itself is bare. -/
-def listE : List Exp → Exp
-  | [] => .atexp .nil
-  | es => .atexp (.paren (es.foldr (fun e acc => bin "::" e acc) (.atexp .nil)))
-
-/-- Row ".lab": `(\{ lab } -> lab)`. -/
-def accessor (l : Lab) : AtExp :=
-  .paren (.lam (.record (some (.field l none))) (.atexp (.var ⟨none, l⟩)))
-
-/-- Row "atexp.lab": `(.lab atexp)`. -/
-def access (a : AtExp) (l : Lab) : AtExp := .paren (.app (.atexp (accessor l)) a)
 
 /-- Record expression `{ lab1 = exp1, ..., labn = expn }` (bare). -/
 def recE : List (Lab × Exp) → Exp
@@ -137,11 +169,6 @@ where
   rowOf : List Lab → Option PatRow
     | [] => none
     | l :: rest => some (.field l (rowOf rest))
-/-- Row "[pat1, ..., patn]": `(pat1 :: [pat2, ..., patn])`. -/
-def listP : List Pat → AtPat
-  | [] => .nil
-  | p :: ps => .paren (.cons p (.atpat (listP ps)))
-
 /-! ## Definitions and the grouping of a let (sec:appendix-derived-forms-let) -/
 
 /-- A definition as written: `var atpat1 ... atpatm = exp` (m >= 0), or

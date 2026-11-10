@@ -63,7 +63,13 @@ replaced by the following copies of it:
   distinct new variables.
 \end{itemize}
 Each occurrence of a variable the declaration binds is made to refer to the
-copy for the instance at which that occurrence was elaborated. A declaration
+copy for the instance at which that occurrence was elaborated. Every binding
+of a declaration quantifies all the variables of class $\knum$ of the
+declaration, those its own type does not mention included
+(Section~\ref{sec:static-core-closure}), so an instance assigns a type to each
+of them; a variable that nothing at the occurrence fixes is $\tInt$, as a
+variable left free in the program is below. % A93
+A declaration
 whose bindings quantify no type variable of class $\knum$ is not copied, and
 is its own default copy. Since the
 default copy is made whether or not the program uses the declaration at that

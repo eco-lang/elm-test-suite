@@ -2,9 +2,10 @@
 
 A Lean 4 encoding of Chapter 6 of *A Standard Definition of Elm?* (Dynamic
 Semantics for the Core, `dynamic-core.tex`) and of the arithmetic, equality,
-order and Boolean part of APPLY (Appendix D,
-`sec:appendix-dynamic-basis-apply`), with an executable evaluator proved sound
-for the rules, and a corpus of examples from the test programs that accompany the book.
+order, Boolean, conversion, power and elementary-function, append and
+character part of APPLY (Appendix D, `sec:appendix-dynamic-basis-apply`), with an executable evaluator proved sound
+for the rules, and as examples the test programs that accompany the book, translated into Lean
+by `definition/tools/src/Translate.elm` (every `elm-spec` test it can translate).
 
 ## Build and run
 
@@ -16,11 +17,14 @@ lake build && lake exe run-examples
 ```
 
 `lake build` checks every definition and proof: the 48 rules, the soundness
-theorem, and one `decide +kernel` theorem per kernel-checkable example (the
-build prints how many). `lake exe run-examples` evaluates every example with
-both choices of a member of APPLY and prints a Markdown table of
-implementation value, definition value and status. The first build takes
-about a minute.
+theorem, one `decide +kernel` theorem per kernel-checkable check of the
+translated tests (each shard's file prints how many), and each shard's
+derivability theorem. `lake exe run-examples` evaluates every example with
+both choices of a member of APPLY and writes `../example-run.md` (a table per
+shard) and `../example-run.json` (for the site), and prints a summary and any
+disagreement. A build from clean takes about a minute and a half and needs about 6.3 GB of memory
+at its peak (2026-11-09); after a change to the tests, run the translator first
+(definition/tools/README.md).
 
 ## Files
 
@@ -35,9 +39,12 @@ about a minute.
 | `StandardElmMech/Sound.lean` | `soundAt`, `evExp_sound`: every result of the evaluator is derivable by the rules |
 | `StandardElmMech/Derived.lean` | Derived forms of Appendix A as functions, including the grouping of a let into components |
 | `StandardElmMech/Basis.lean` | E0 for the examples: E0 of Appendix D plus what the default imports add |
-| `StandardElmMech/Show.lean` | Prints values as eco's Debug.log output does (test harness only) |
-| `StandardElmMech/Examples.lean` | The examples, every one a test program of `tests/`: a corpus of 40, 12 tests of the rulings, 3 tests for rule coverage |
-| `StandardElmMech/Theorems.lean` | Theorems that the rules derive the examples' values |
+| `StandardElmMech/Show.lean` | Prints values as Elm's Debug.log does, a float as the shortest decimal that reads back as it (JavaScript's Number::toString, computed exactly with integers); also the string of `Debug.toString` |
+| `StandardElmMech/Examples.lean` | `Check` (with the kind of its value), `Program`, the phrase of a check; `handPartial`, the partial hand translations of tests the translator refuses |
+| `StandardElmMech/Generated/` | Written by the translator: the translated tests in shards (`Elm01.lean`, ..., `ElmCore01.lean`, ...), `All.lean`, and per shard `Checks<Shard>.lean` with its generated theorems and `derivable_<Shard>` |
+| `StandardElmMech/AllPrograms.lean` | `exampleShards` and `allPrograms`: the generated shards and `handPartial`, for the executables |
+| `StandardElmMech/Theorems.lean` | `kernelCheck?` (which checks the kernel proves), the command `#kernel_checks`, `derivableOf`, and the rulings stated directly |
+| `DumpPhrases.lean` | `lake exe dump-phrases`: every check's phrase, to show a change to the derived forms changes none |
 | `Main.lean` | The `run-examples` executable |
 
 ## Encoding conventions
@@ -55,10 +62,22 @@ about a minute.
   or its last (`ch = true`), so for function equality the two runs give the
   two results.
 * Floats are Lean's `Float` (IEEE 754 binary64) for add, sub, mul, fdiv and
-  negate, equality, order, min, max and clamp. Float `pow`, the elementary functions and the
-  conversions are not encoded.
-* Number specialisation is not computed: examples are written after it, with
-  `SCon.int` for an integer constant at Int and `SCon.intF` for one at Float.
+  negate, equality, order, min, max, clamp and sqrt. The conversions to Int saturate into
+  [-2^63, 2^63 - 1] (`satOfFloat`, by `Float.toInt64`), NaN giving 0; `round` is floor x, plus 1
+  when x - floor x >= 1/2 (exact). Float `pow` and the elementary functions follow the special
+  lines of fig:dynamic-basis-pow and fig:dynamic-basis-elem in order; their last line, fl(f(x)), is
+  the C library's rounding, which the book leaves to the implementation. `append` is string
+  concatenation or list append; `Char.fromCode` gives U+FFFD (the encoding's `other(n)`) for an
+  integer that is no Unicode scalar value; `Debug.toString` gives `showElm`.
+* `Float.floor`, `Float.ceil`, the elementary functions, `Float.pow` and float printing are not
+  reduced by the kernel, so a program that uses round, floor, ceiling, truncate, an elementary
+  function, `^` at Float or `Debug.toString` is marked `native := true` by the translator and
+  its checks are proved by `derivable_<Shard>` (`native_decide`) only.
+* Number specialisation is done by the translator, which writes the examples
+  after it: `SCon.int` for an integer constant at Int, `SCon.intF` for one at
+  Float, and the copies of declarations used at Float named with `$`
+  (`incF$Float`). The Elm texts of the basis are copied likewise: `abs$Float`
+  in InitialBasis.lean.
 * Top-level definitions of an example's module are placed in a `let` around
   the logged expression, and its custom types' constructors are bound in the
   environment (Chapter 7 is outside this encoding).
@@ -69,17 +88,16 @@ about a minute.
 ## What the theorems say
 
 * `evExp_sound`: if `evExp ch n E e = some v` then `EvalExp E e v`.
-* `kc_<n>` (generated): for an example whose value is an Int, a constructor
-  without arguments or a string, `∃ v, EvalExp E e v ∧ v` is that value;
-  proved by the kernel (`decide +kernel`), no `native_decide`.
-* `corpus_derivable`: for every check of the 40 corpus programs,
-  `∃ v, EvalExp E e v ∧ showElm v = CHECK value` (by `native_decide`).
-* `rulings_derivable`: the same for the ruling programs (but for any check
-  listed in `knownDiv`, which is now empty).
-* `coverage_derivable`: the same for the coverage programs' checks that
-  expect a value. A check that expects no value (the program stops at
-  `Debug.todo`) is checked by `run-examples` only: soundness speaks only of
-  the values the evaluator gives.
+* `kc_<Shard>_<n>` (generated): for a check whose value is an Int, a
+  constructor without arguments or a string (by the kind the translator
+  inferred), in a program not marked `native`, `∃ v, EvalExp E e v ∧ v` is that value; proved by the kernel
+  (`decide +kernel`), no `native_decide`.
+* `derivable_<Shard>`, `derivable_Hand` (from `derivableOf`): for every check
+  of a shard that expects a value and is not in `knownDiv` (now empty),
+  `∃ v, EvalExp E e v ∧ showElm v = CHECK value` (by `native_decide`). A check
+  that expects no value (the program stops at `Debug.todo`) is checked by
+  `run-examples` only: soundness speaks only of the values the evaluator
+  gives.
 * `a48_float`, `a48_int_max`, `a48_int_min`: APPLY(max) and APPLY(min) are
   IEEE 754-2019 maximum and minimum at floats in either argument order, and
   the comparison at Int.
@@ -92,6 +110,9 @@ about a minute.
   text's result, and APPLY's set has that one member.
 * `elmTexts_eval`: each Elm text of the fragment evaluates in E_K, by
   r:d-dec-nonrec, to the closure that InitialBasis.lean binds.
+* `a44_conversions` (`native_decide`): round, floor, ceiling and truncate at 2.5, -2.5, NaN,
+  the infinities and 1e300: `round` rounds a half upward and every conversion saturates, NaN
+  giving 0. `a44_round_minus_half`: `round -2.5` is -2 by the rules from E0.
 * `a43_*`, `a42_*`, `a51_true`, `a51_false`: the rulings stated directly;
   `a51_true` and `a51_false` show that `(\x -> x) == (\x -> x)` evaluates to
   both True and False.

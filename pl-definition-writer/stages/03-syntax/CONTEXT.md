@@ -28,7 +28,7 @@ Paths starting `definition/` are in the book's output tree, `elm-test-suite/defi
 3. Write the lexis sections in the order definition-style G1 gives, following `syntax-guide.md` "Lexis".
 4. Write the grammar figures for the bare productions, one figure per group of related phrase classes, following `syntax-guide.md` "Grammar Figures".
 5. Write precedence and associativity in prose, then the syntactic restrictions list.
-6. For the derived forms appendix: one table per phrase class from the plan's "Derived Forms", with fresh identifier notes.
+6. For the derived forms appendix: one table per phrase class from the plan's "Derived Forms", with fresh identifier notes. The tables are generated: each row is written in `definition/tools/src/DerivedForms/Table.elm` (its derived form, its equivalent form as a term of the bare syntax, and its Lean function), and `site/node_modules/.bin/elm-pages run definition/tools/src/GenerateDerivedForms.elm`, run from the repository's root, writes them between the `% BEGIN GENERATED derived-forms:<Block>` and `% END GENERATED` lines of `appendix-derived-forms.tex`, and the same rows' functions into `Derived.lean`. Write the appendix's prose, figures and headings by hand; never edit inside the markers.
 7. Compile a preview as `../../shared/latex/latex-conventions.md` "Preview" describes, with `macros.sty` from `definition/tex/`, and fix every error.
 8. Run the audit below, write the chapter to `definition/tex/`, and set its checklist row to `drafted`.
 9. Return to step 1 until no syntax chapter is `pending`.
@@ -59,5 +59,5 @@ Paths starting `definition/` are in the book's output tree, `elm-test-suite/defi
 | Artifact | Location | Format |
 |----------|----------|--------|
 | Syntax chapter per level | `definition/tex/syntax-<level>.tex` | LaTeX chapter file |
-| Derived forms appendix | `definition/tex/appendix-derived-forms.tex` | LaTeX chapter file |
+| Derived forms appendix | `definition/tex/appendix-derived-forms.tex` | LaTeX chapter file; its tables generated from `definition/tools/src/DerivedForms/Table.elm` |
 | Advanced checklist | `definition/architecture/book-plan.md` | Status column set to `drafted` |

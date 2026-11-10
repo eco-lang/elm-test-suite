@@ -145,7 +145,7 @@ project depends on the latest release of each package it uses.
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 798 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
+| `elm` | 799 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
 | `elm-core` | 370 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
 | `elm-bytes` | 88 | elm/bytes encoders and decoders |
 | `elm-parser` | 51 | elm/parser |
@@ -165,9 +165,9 @@ with its own project. The results website shows the tests by project and by tag.
 
 | Tag | Tests | What they are |
 |---|---|---|
-| `elm-spec` | 940 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
+| `elm-spec` | 941 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
 | `elm19-compile-error` | 221 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
-| `elm19-bug` | 156 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
+| `elm19-bug` | 157 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
 | `elm19-bug-fix` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
 | `elm-unspecced` | 14 | tests whose expected outcome A Standard Definition of Elm? leaves open or puts outside the definition: what `Debug.log` prints, the value of an integer constant outside the Int range, the text of a crash, shader blocks; each says why in its comment |
 | `elm-spec-contradicts` | 6 | reported bugs whose expected outcome A Standard Definition of Elm? contradicts: the book decides the program the other way, so the report is not a bug against it; each is marked XFAIL and says why in its comment |
@@ -430,10 +430,18 @@ The site also carries *A Standard Definition of Elm?*, a formal definition of th
 (`/standard/rules/d-atexp-var`), pages likewise for every restriction, derived form and entry of
 the initial basis (`/standard/basis/Basics/modBy`), the PDF, and the Lean proofs of its mechanisation
 (`/standard/proofs`, a page per theorem, read from `definition/mechanisation/` by
-`runner/mechanisation-data.js`). A test the mechanisation translates into Lean shows the translation
-on its page, with the Lean evaluator's value for each check and the theorem that proves it; where a
-translation's expected value is no longer the test's CHECK line, `definition-data.js` prints a warning
-(it does not fail) and the page marks the translation out of date. Its LaTeX sources are in `definition/tex/`;
+`runner/mechanisation-data.js`). The examples of the mechanisation are the tests tagged `elm-spec`,
+translated into Lean by a program, `definition/tools/src/Translate.elm` (487 of the 941 today; the
+others are listed with the reason they are not, from compile-error tests to library functions the
+encoding does not include). Every such test shows on its page its Lean translation, with the Lean
+evaluator's value for each check and the theorem that proves it, or why it is not translated; a
+translation made from an older version of its test is marked out of date. Lean is built when the
+mechanisation stage runs, not in CI; CI runs the translator with `--check` and reports in the job
+summary when the committed translations are behind the tests. The derived forms of Appendix A are
+generated from one table into both the book's LaTeX and the Lean encoding,
+`definition/tools/src/GenerateDerivedForms.elm`. See
+[definition/tools/README.md](definition/tools/README.md) and
+[plans/elm-to-lean-translator.md](plans/elm-to-lean-translator.md). Its LaTeX sources are in `definition/tex/`;
 `runner/definition-data.js` turns them into the site's data, rendering the mathematics with KaTeX at
 build time, so the pages need no KaTeX JavaScript. See [definition/README.md](definition/README.md).
 
@@ -484,6 +492,7 @@ runner/spec-items.js  the names of the book's rules, restrictions, derived forms
 runner/definition-data.js  writes the website's data for A Standard Definition of Elm?
 runner/mechanisation-data.js  the data for the Lean proofs pages (called by definition-data.js)
 definition/           A Standard Definition of Elm?: LaTeX sources, PDF, and the other outputs of its stages
+definition/tools/     the translator of tests into Lean, and the generator of Appendix A's derived forms (Elm)
 pl-definition-writer/ the agent workspace that writes the book (instructions only)
 runner/check-baseline.js  lists the tests Elm 0.19.1 fails that are not tagged elm19-bug, elm19-bug-fix (CI)
 site/                 the results website (elm-pages)

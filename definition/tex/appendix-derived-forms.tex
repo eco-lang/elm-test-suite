@@ -116,6 +116,7 @@ equivalent form of $\kw{.}\lab$, which is spelt as the label.
 \begin{figure}[htbp]
 \centering
 \par\noindent\textbf{Expressions}\ \expm\par\smallskip
+% BEGIN GENERATED derived-forms:Expressions (definition/tools/src/GenerateDerivedForms.elm); edit the table, not this
 \begin{derivedforms}
 \dform{\citelabel{df:infix}\expm_1\ \opv\ \expm_2}
       {\kw{(}\opv\kw{)}\ \kw{(}\expm_1\kw{)}\ \kw{(}\expm_2\kw{)}}
@@ -151,9 +152,11 @@ equivalent form of $\kw{.}\lab$, which is spelt as the label.
        \kw{\textbackslash}\atpat_n\ \kw{->}\ \expm
        \quad (n\geq 2)}
 \end{derivedforms}
+% END GENERATED derived-forms:Expressions
 
 \bigskip
 \par\noindent\textbf{Atomic Expressions}\ \atexp\par\smallskip
+% BEGIN GENERATED derived-forms:AtomicExpressions (definition/tools/src/GenerateDerivedForms.elm); edit the table, not this
 \begin{derivedforms}
 \dform{\citelabel{df:negation}\kw{-}\atexp}
       {\kw{(}\kw{Basics.negate}\ \atexp\kw{)}}
@@ -168,6 +171,7 @@ equivalent form of $\kw{.}\lab$, which is spelt as the label.
 \dform{\citelabel{df:field-selection}\atexp\kw{.}\lab}
       {\kw{(}\kw{.}\lab\ \atexp\kw{)}}
 \end{derivedforms}
+% END GENERATED derived-forms:AtomicExpressions
 \caption{Derived forms of Expressions and Atomic Expressions}
 \label{fig:appendix-derived-forms-expressions}
 \end{figure}
@@ -175,12 +179,14 @@ equivalent form of $\kw{.}\lab$, which is spelt as the label.
 \begin{figure}[htbp]
 \centering
 \par\noindent\textbf{Atomic Patterns}\ \atpat\par\smallskip
+% BEGIN GENERATED derived-forms:AtomicPatterns (definition/tools/src/GenerateDerivedForms.elm); edit the table, not this
 \begin{derivedforms}
 \dform{\citelabel{df:list-pattern}\kw{[}\pat_1\kw{,}\ \cdots\kw{,}\ \pat_n\kw{]}}
       {\kw{(}\pat_1\ \kw{::}\ \kw{(}\pat_2\ \kw{::}\ \cdots\
        \kw{(}\pat_n\ \kw{::}\ \kw{[ ]}\kw{)}\cdots\kw{)}\kw{)}
        \quad (n\geq 1)}
 \end{derivedforms}
+% END GENERATED derived-forms:AtomicPatterns
 \caption{Derived forms of Patterns}
 \label{fig:appendix-derived-forms-patterns}
 \end{figure}
@@ -199,6 +205,7 @@ and for $n=1$ the equivalent form is $\kw{(}\pat_1\ \kw{::}\ \kw{[ ]}\kw{)}$.
 \begin{figure}[htbp]
 \centering
 \par\noindent\textbf{Value Bindings}\ \valbind\par\smallskip
+% BEGIN GENERATED derived-forms:ValueBindings (definition/tools/src/GenerateDerivedForms.elm); edit the table, not this
 \begin{derivedforms}
 \dform{\citelabel{df:function-binding}\begin{array}[t]{@{}l@{}}
          \var\ \opt{\kw{:}\ \ty}\ \atpat_1\cdots\atpat_n\ \kw{=}\ \expm\\
@@ -211,9 +218,11 @@ and for $n=1$ the equivalent form is $\kw{(}\pat_1\ \kw{::}\ \kw{[ ]}\kw{)}$.
          \qquad (n\geq 1)
        \end{array}}
 \end{derivedforms}
+% END GENERATED derived-forms:ValueBindings
 
 \bigskip
 \par\noindent\textbf{Declarations}\ \dec\par\smallskip
+% BEGIN GENERATED derived-forms:Declarations (definition/tools/src/GenerateDerivedForms.elm); edit the table, not this
 \begin{derivedforms}
 \dform{\citelabel{df:let-grouping}\kw{let}\ \valbind_1\ \cdots\ \valbind_n\ \kw{in}\ \expm}
       {\begin{array}[t]{@{}l@{}}
@@ -222,6 +231,7 @@ and for $n=1$ the equivalent form is $\kw{(}\pat_1\ \kw{::}\ \kw{[ ]}\kw{)}$.
          \qquad (n\geq 2)
        \end{array}}
 \end{derivedforms}
+% END GENERATED derived-forms:Declarations
 \caption{Derived forms of Value Bindings and Declarations}
 \label{fig:appendix-derived-forms-bindings}
 \end{figure}
@@ -229,6 +239,7 @@ and for $n=1$ the equivalent form is $\kw{(}\pat_1\ \kw{::}\ \kw{[ ]}\kw{)}$.
 \begin{figure}[htbp]
 \centering
 \par\noindent\textbf{Top-level Declarations}\ \topdec\par\smallskip
+% BEGIN GENERATED derived-forms:TopLevelDeclarations (definition/tools/src/GenerateDerivedForms.elm); edit the table, not this
 \begin{derivedforms}
 \dform{\citelabel{df:module-grouping}\topdec_1\ \cdots\ \topdec_n}
       {\begin{array}[t]{@{}l@{}}
@@ -240,6 +251,7 @@ and for $n=1$ the equivalent form is $\kw{(}\pat_1\ \kw{::}\ \kw{[ ]}\kw{)}$.
          \qquad (n\geq 2)
        \end{array}}
 \end{derivedforms}
+% END GENERATED derived-forms:TopLevelDeclarations
 \caption{Derived forms of Top-level Declarations}
 \label{fig:appendix-derived-forms-modules}
 \end{figure}

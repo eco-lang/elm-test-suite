@@ -50,7 +50,14 @@ def VE_BasicsKernel : ValEnv :=
     ("LT", conv conLT), ("EQ", conv conEQ), ("GT", conv conGT),
     ("compare", bas .compare), ("not", bas .not), ("xor", bas .xor),
     ("modBy", bas .modBy), ("remainderBy", bas .remainderBy), ("negate", bas .negate),
-    ("min", bas .min), ("max", bas .max), ("clamp", bas .clamp) ]
+    ("min", bas .min), ("max", bas .max), ("clamp", bas .clamp),
+    ("isNaN", bas .isNaN), ("isInfinite", bas .isInfinite),
+    ("toFloat", bas .toFloat), ("round", bas .round), ("floor", bas .floor),
+    ("ceiling", bas .ceiling), ("truncate", bas .truncate),
+    ("sqrt", bas .sqrt), ("sin", bas .sin), ("cos", bas .cos), ("tan", bas .tan),
+    ("asin", bas .asin), ("acos", bas .acos), ("atan", bas .atan), ("atan2", bas .atan2),
+    ("e", .sv (.float fE)), ("pi", .sv (.float fPi)),
+    ("append", bas .append) ]
 
 def VE_K : ValEnv := VE_BasicsKernel ++ hiddenOpVars
 
@@ -60,6 +67,9 @@ def E_K : Env := E0base.plus [("Basics", .mk [] VE_K)] VE_K
     forms. `composeL`, `composeR`, `apR` and `apL` are hidden variables. -/
 def elmTexts : List Def :=
   [ .fn "abs" [pv "n"] (ifte (ap (v "lt") [v "n", i 0]) (.atexp (neg (vA "n"))) (v "n")),
+    -- abs quantifies a number variable, so number specialisation also makes its copy at Float
+    -- (sec:dynamic-core-numbers): the same text with its constant 0 at Float
+    .fn "abs$Float" [pv "n"] (ifte (ap (v "lt") [v "n", .atexp (.scon (.intF 0))]) (.atexp (neg (vA "n"))) (v "n")),
     .fn "composeL" [pv "g", pv "f", pv "x"] (ap (v "g") [ap (v "f") [v "x"]]),
     .fn "composeR" [pv "f", pv "g", pv "x"] (ap (v "g") [ap (v "f") [v "x"]]),
     .fn "apR" [pv "x", pv "f"] (ap (v "f") [v "x"]),
@@ -76,8 +86,8 @@ def elmTextValue : Def → Option (Var × Val)
 def VE_elm : ValEnv := elmTexts.filterMap elmTextValue
 
 /-- OT_dyn: each operator of the fragment to the value of the identifier it
-    stands for (fig:dynamic-basis-operators). `++` (append) is outside the
-    fragment. -/
+    stands for (fig:dynamic-basis-operators). `++` is `append`, which Basics
+    exposes. -/
 def OTdyn (o : Op) : Option Val :=
   match o with
   | "::" => some (conv conCons)
@@ -87,6 +97,7 @@ def OTdyn (o : Op) : Option Val :=
   | "/" => fmLookup hiddenOpVars "fdiv"
   | "//" => fmLookup hiddenOpVars "idiv"
   | "^" => fmLookup hiddenOpVars "pow"
+  | "++" => fmLookup VE_BasicsKernel "append"
   | "==" => fmLookup hiddenOpVars "eq"
   | "/=" => fmLookup hiddenOpVars "neq"
   | "<" => fmLookup hiddenOpVars "lt"

@@ -417,6 +417,17 @@ never generalises an explicit variable in scope. Closure applies to every group
 of value bindings, pattern bindings included, whatever the form of their
 expressions.
 
+A group of value bindings is closed as one. When
+rules~\ruleref{r:s-dec-group} and~\ruleref{r:sm-topdec-value} take
+$\Clos_C \VE$ of the value environment $\VE$ of a group, the scheme $\sigma$ of
+each binding is closed also over the type variables of class $\knum$ in
+$\tyvars\VE \setminus (\tyvars\sigma \cup \tyvars C)$: those of the other
+bindings of the group that its own type does not mention. Since such a variable
+does not occur in the binding's type, it changes no instance of the scheme. It
+matters only to number specialisation
+(Section~\ref{sec:dynamic-core-numbers}): an occurrence of the binding gives it
+a type that nothing fixes, which is then $\tInt$. % A93
+
 \section{Inference Rules}\label{sec:static-core-rules}
 
 Each rule of the semantics allows inferences among sentences of the form

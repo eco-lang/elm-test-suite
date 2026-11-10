@@ -140,12 +140,20 @@ view app shared =
                     :: List.map checkLink test.checks
                 )
         , case app.data.lean of
-            Just _ ->
+            Just t ->
                 Html.p [ Attr.class "ts-small" ]
-                    [ Html.text "Translated into Lean for the mechanisation of the book: "
-                    , Html.a [ Attr.href "#lean" ] [ Html.text "see its Lean translation" ]
-                    , Html.text "."
-                    ]
+                    (if t.status == "refused" then
+                        [ Html.text "Not translated into Lean for the mechanisation of the book: "
+                        , Html.a [ Attr.href "#lean" ] [ Html.text "see why" ]
+                        , Html.text "."
+                        ]
+
+                     else
+                        [ Html.text "Translated into Lean for the mechanisation of the book: "
+                        , Html.a [ Attr.href "#lean" ] [ Html.text "see its Lean translation" ]
+                        , Html.text "."
+                        ]
+                    )
 
             Nothing ->
                 Html.text ""

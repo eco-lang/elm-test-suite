@@ -19,8 +19,13 @@ def VE_Basics : ValEnv :=
   fmPlus VE_BasicsKernel (VE_elm.filter fun (x, _) =>
     !(["composeL", "composeR", "apR", "apL"].contains x))
 
-/-- Debug: Debug.log and Debug.todo. -/
-def VE_Debug : ValEnv := [("log", bas .debugLog), ("todo", bas .debugTodo)]
+/-- Debug: Debug.log, Debug.todo and Debug.toString. -/
+def VE_Debug : ValEnv :=
+  [("log", bas .debugLog), ("todo", bas .debugTodo), ("toString", bas .debugToString)]
+
+/-- Char, as far as the book's basis has it: toCode and fromCode, reached by
+    their qualified names only (the default imports expose none of Char). -/
+def VE_Char : ValEnv := [("toCode", bas .charToCode), ("fromCode", bas .charFromCode)]
 
 /-- Maybe: Just and Nothing. -/
 def VE_Maybe : ValEnv := [("Just", conv conJust), ("Nothing", conv conNothing)]
@@ -28,7 +33,8 @@ def VE_Maybe : ValEnv := [("Just", conv conJust), ("Nothing", conv conNothing)]
 /-- E0: the environment of the examples, before the program's own
     constructors are added. -/
 def E0 : Env :=
-  E0base.plus [("Basics", .mk [] VE_Basics), ("Debug", .mk [] VE_Debug), ("Maybe", .mk [] VE_Maybe)]
+  E0base.plus [("Basics", .mk [] VE_Basics), ("Char", .mk [] VE_Char), ("Debug", .mk [] VE_Debug),
+    ("Maybe", .mk [] VE_Maybe)]
     (fmPlus VE_Basics VE_Maybe)
 
 /-- E0 extended with the constructors of a program's custom types, given as

@@ -132,6 +132,27 @@ jobs:
         continue-on-error: true
         run: npm test
 
+      # The Lean translations of the elm-spec tests (definition/mechanisation/) are made by
+      # definition/tools/src/Translate.elm and committed; Lean itself is built only when the
+      # mechanisation stage runs. This compares what the translator would write now with the
+      # committed files and reports in the job summary; it never fails the job.
+      - name: Check the Lean translations
+        continue-on-error: true
+        run: |
+          {
+            echo "## Lean translations"
+            echo
+            echo '```'
+            site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check 2>&1 | grep -v 'BackendTask.Custom.run' || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # The translator's and the Appendix A generator's own Elm unit tests (definition/tools/tests/).
+      - name: Test the Definition's tools
+        working-directory: definition/tools
+        continue-on-error: true
+        run: ../../site/node_modules/.bin/elm-test --compiler ../../site/node_modules/.bin/elm
+
       - name: Keep the site
         uses: actions/upload-artifact@v4
         with:

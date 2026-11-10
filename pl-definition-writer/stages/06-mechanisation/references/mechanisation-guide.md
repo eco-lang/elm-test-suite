@@ -43,32 +43,52 @@ OCaml for fast testing.
 random testing (`redex-check`) out of the box. Fastest route to testing
 rules against examples; no proofs.
 
+## Derived Forms in the Encoding
+
+The derived-form functions of `Derived.lean` (`bin`, `ifte`, `ifChain`, `andalso`, `orelse`,
+`lams`, `neg`, `listE`, `accessor`, `access`, `listP`) are generated from the same table as the
+book's Appendix A, `definition/tools/src/DerivedForms/Table.elm`, by
+`GenerateDerivedForms.elm`, between the `-- BEGIN GENERATED derived forms` and
+`-- END GENERATED derived forms` lines. Change a derived form in the table and run the generator;
+the groupings (`components`, `groupBind`, `letDefs`) stay hand-written. After any change, run
+`lake exe dump-phrases` before and after and compare: the phrases of the examples must not change
+unless the derived form was meant to.
+
 ## Example Corpus
 
 Every example is a test program of this repository's `tests/`, as
-`../../../shared/run-config.md` "Example corpus" requires:
+`../../../shared/run-config.md` "Example corpus" requires, and the examples
+are made by the translator, not by hand:
 
-1. A corpus of the tests tagged `elm-spec` whose checks the encoded fragment
-   can express, enough to exercise every encoded rule.
-2. The tests of the rulings the encoded part of the basis bears on (the
-   `StandardA<n>...Test` programs, and issue tests such as
-   `CoreIssue1080ClampNanTest`).
-3. For each rule that no example exercises, and each example the book gives
-   in its Comments, a test written for it first (in `tests/elm/`, tagged
-   `elm-spec` and the rule's label, expected values the book's), then
-   translated. A check whose expression has no value (it stops at
-   `Debug.todo`) is a test with `-- EXIT: 1` and `-- CHECK-NOT: <label>:`,
-   translated with the expected value `(no value)`.
+1. `Translate.elm` reads every test tagged `elm-spec`, and either translates
+   it (a `Program` in a shard of `StandardElmMech/Generated/`, its checks with
+   the kinds of their values, its integer constants at Int or Float by number
+   specialisation) or refuses it with a reason (`compile-error`, `effects`,
+   `import:<Module>`, `basis:<name>`, `construct:<name>`, `checks:<detail>`,
+   `type`, `number`, `parse`), all listed in the manifest. The design is
+   `plans/elm-to-lean-translator.md`.
+2. The manifest's refusals are the to-do list for widening the encoding: a
+   `basis:` reason names a value of the basis the encoding does not include,
+   and its count says how many tests it keeps out.
+3. For each rule that no translated test exercises, and each example the book
+   gives in its Comments, write a test first (in `tests/elm/`, tagged
+   `elm-spec` and the rule's label, expected values the book's); the
+   translator then translates it. A check whose expression has no value (it
+   stops at `Debug.todo`) is a test with `-- EXIT: 1` and
+   `-- CHECK-NOT: <label>:`, translated with the expected value `(no value)`.
+4. Hand translation is only for a test the translator refuses whose other
+   checks the encoding can express: translate those checks in `handPartial`
+   (Examples.lean), keeping every label and expected value exactly as the
+   test states them, and say in the doc comment which checks are left out.
 
-Translate a test whole where the fragment allows; where some checks use
-something the encoding does not cover (a library function outside the encoded
-part of the basis), translate the others and say which are left out in the
-example's doc comment. Keep the label of every check exactly as the test
-logs it, and its expected value exactly as the test's CHECK line states it.
+The translator's own tests are `definition/tools/tests/` (run with
+`site/node_modules/.bin/elm-test` from `definition/tools/`); a change to the
+translator is tested there and then checked by a full `lake build` and
+`lake exe run-examples`.
 
 Record for each example: the program, the implementation's static result
 (accepted, rejected and why) and dynamic result (value, exception), and the
-encoding's results.
+encoding's results (example-run.md and example-run.json).
 
 ## Report
 

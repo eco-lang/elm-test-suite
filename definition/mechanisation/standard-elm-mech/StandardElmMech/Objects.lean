@@ -50,12 +50,19 @@ inductive BasVal where
   | eq | neq
   | compare | lt | gt | le | ge | min | max | clamp
   | not | and | or | xor
-  | debugLog | debugTodo
+  | isNaN | isInfinite
+  | toFloat | round | floor | ceiling | truncate
+  | sqrt | sin | cos | tan | asin | acos | atan | atan2
+  | append | charToCode | charFromCode
+  | debugLog | debugTodo | debugToString
   deriving Repr, DecidableEq, Inhabited
 
 /-- arity(b), from the figures of Appendix D. -/
 def BasVal.arity : BasVal → Nat
-  | .negate | .not | .debugTodo => 1
+  | .negate | .not | .isNaN | .isInfinite | .debugTodo => 1
+  | .toFloat | .round | .floor | .ceiling | .truncate => 1
+  | .sqrt | .sin | .cos | .tan | .asin | .acos | .atan => 1
+  | .charToCode | .charFromCode | .debugToString => 1
   | .clamp => 3
   | _ => 2
 

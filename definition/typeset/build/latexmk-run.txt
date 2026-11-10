@@ -113,7 +113,7 @@ Underfull \hbox (badness 2245) in paragraph at lines 289--289
 [43] [44] [45] [46] [47] [48] [49] [50]) [51] (./dynamic-core.tex
 Chapter 6.
 [52] [53] [54]
-Underfull \vbox (badness 10000) has occurred while \output is active [55]
+Underfull \vbox (badness 1019) has occurred while \output is active [55]
 [56] [57] [58] [59] [60] [61] [62] [63]) [64] (./dynamic-modules.tex
 Chapter 7.
 [65] [66] [67] [68] [69] [70] [71] [72]) [73] (./effects.tex
@@ -223,7 +223,7 @@ s/type1/public/cm-super/sftt0800.pfb></usr/share/texmf/fonts/type1/public/cm-su
 per/sftt0900.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt1000.pfb></u
 sr/share/texmf/fonts/type1/public/cm-super/sftt1095.pfb></usr/share/texmf/fonts
 /type1/public/cm-super/sftt1200.pfb>
-Output written on out/standard-elm-definition.pdf (182 pages, 1333633 bytes).
+Output written on out/standard-elm-definition.pdf (182 pages, 1334441 bytes).
 SyncTeX written on out/standard-elm-definition.synctex.gz.
 Transcript written on out/standard-elm-definition.log.
 Latexmk: Getting log file 'out/standard-elm-definition.log'

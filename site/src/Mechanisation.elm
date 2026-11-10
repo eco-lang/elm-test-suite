@@ -50,6 +50,7 @@ type alias Index =
     , files : List { path : String, description : String }
     , theorems : List ProofSummary
     , generatedCount : Int
+    , coverage : { total : Int, reasons : List { reason : String, count : Int, tests : List { project : String, name : String } } }
     }
 
 
@@ -109,24 +110,27 @@ type alias Generated =
     { count : Int
     , source : Maybe { file : String, line : Int, text : String }
     , groups : List { key : String, title : String, programs : Int, checks : Int, generated : Int }
-    , skipped : { divergence : Int, float : Int, value : Int }
+    , skipped : { divergence : Int, native : Int, float : Int, value : Int }
     , checks : List GeneratedCheck
     }
 
 
-{-| A test program as the mechanisation's examples translate it: the Lean definition, and what became
-of each of its checks. `checkLine` is the test's CHECK value now, which the translation's `expected`
-should still be.
+{-| An `elm-spec` test as the mechanisation sees it: `status` is "translated" (by the translator,
+in the shard `shard`), "hand" (refused by the translator, but translated in part by hand) or
+"refused" (with its `reason`). `current` is false when the test has changed since its translation
+was made.
 -}
 type alias Translation =
     { name : String
     , project : String
+    , status : String
+    , reason : Maybe String
+    , detail : Maybe String
     , def : String
     , file : String
-    , line : Int
-    , doc : String
-    , group : String
+    , shard : String
     , source : String
+    , current : Bool
     , checks : List TranslatedCheck
     }
 
@@ -261,6 +265,28 @@ indexDecoder =
             )
         |> andMap (Decode.field "theorems" (Decode.list summaryDecoder))
         |> andMap (Decode.at [ "generated", "count" ] Decode.int)
+        |> andMap
+            (Decode.field "coverage"
+                (Decode.map2 (\t r -> { total = t, reasons = r })
+                    (Decode.field "total" Decode.int)
+                    (Decode.field "reasons"
+                        (Decode.list
+                            (Decode.map3 (\reason count tests -> { reason = reason, count = count, tests = tests })
+                                (Decode.field "reason" Decode.string)
+                                (Decode.field "count" Decode.int)
+                                (Decode.field "tests"
+                                    (Decode.list
+                                        (Decode.map2 (\pr nm -> { project = pr, name = nm })
+                                            (Decode.field "project" Decode.string)
+                                            (Decode.field "name" Decode.string)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
 
 
 summaryDecoder : Decoder ProofSummary
@@ -334,8 +360,9 @@ generatedDecoder =
             )
         )
         (Decode.field "skipped"
-            (Decode.map3 (\d f v -> { divergence = d, float = f, value = v })
+            (Decode.map4 (\d nat f v -> { divergence = d, native = nat, float = f, value = v })
                 (Decode.field "divergence" Decode.int)
+                (Decode.field "native" Decode.int)
                 (Decode.field "float" Decode.int)
                 (Decode.field "value" Decode.int)
             )
@@ -359,12 +386,14 @@ translationDecoder =
     Decode.succeed Translation
         |> andMap (Decode.field "name" Decode.string)
         |> andMap (Decode.field "project" Decode.string)
+        |> andMap (Decode.field "status" Decode.string)
+        |> andMap (Decode.field "reason" (Decode.nullable Decode.string))
+        |> andMap (Decode.field "detail" (Decode.nullable Decode.string))
         |> andMap (Decode.field "def" Decode.string)
         |> andMap (Decode.field "file" Decode.string)
-        |> andMap (Decode.field "line" Decode.int)
-        |> andMap (Decode.field "doc" Decode.string)
-        |> andMap (Decode.field "group" Decode.string)
+        |> andMap (Decode.field "shard" Decode.string)
         |> andMap (Decode.field "source" Decode.string)
+        |> andMap (Decode.field "current" Decode.bool)
         |> andMap
             (Decode.field "checks"
                 (Decode.list

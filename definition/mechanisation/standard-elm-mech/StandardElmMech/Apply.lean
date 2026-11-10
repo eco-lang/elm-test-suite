@@ -18,6 +18,7 @@
   defined by structural recursion on values.
 -/
 import StandardElmMech.Objects
+import StandardElmMech.Show
 
 set_option linter.unusedSimpArgs false
 
@@ -171,6 +172,120 @@ def fMaximum (x y : Float) : Float :=
     min (max z x) y with the IEEE 754-2019 minimum and maximum of A48. -/
 def fClamp (x y z : Float) : Float := fMinimum (fMaximum z x) y
 
+/-! ## Conversions, square root, powers, elementary functions
+    (sec:appendix-dynamic-basis-conv, -floatarith, -elementary) -/
+
+def fNaN : Float := 0 / 0
+def fInf : Float := 1 / 0
+/-- fl(pi), and fl(pi/2), fl(pi/4), fl(3pi/4), fl(e). -/
+def fPi : Float := 3.141592653589793
+def fHalfPi : Float := 1.5707963267948966
+def fQuarterPi : Float := 0.7853981633974483
+def fThreeQuarterPi : Float := 2.356194490192345
+def fE : Float := 2.718281828459045
+
+/-- sgn(x) for x not NaN: +1 for +0, +infinity and positive floats, -1 for -0,
+    -infinity and negative ones. -/
+def fSgn (x : Float) : Float := if x < 0 || (x == 0 && 1 / x < 0) then -1 else 1
+def fIsInt (y : Float) : Bool := !y.isNaN && !y.isInf && y.floor == y
+def fIsOdd (y : Float) : Bool := fIsInt y && (y / 2).floor != y / 2
+
+/-- sat into the Int range [-2^63, 2^63 - 1]: Lean's `Float.toInt64` truncates
+    towards zero and saturates into that range, giving 0 for NaN, so on an
+    integral float or an infinity it is sat, and on NaN it gives the 0 that
+    APPLY(b, NaN) is for each conversion b. -/
+def satOfFloat (x : Float) : Int := x.toInt64.toInt
+
+/-- fl(n): the float nearest an Int value. -/
+def fToFloat (n : Int) : Float := Float.ofInt n
+def fTruncate (x : Float) : Int := satOfFloat x
+def fFloor (x : Float) : Int := satOfFloat x.floor
+def fCeiling (x : Float) : Int := satOfFloat x.ceil
+/-- sat(floor(x + 1/2)), the sum exact: x - floor x is exact for a finite
+    float, so this rounds a half upward (round 2.5 is 3, round -2.5 is -2). -/
+def fRound (x : Float) : Int :=
+  let r := x.floor
+  satOfFloat (if x - r ≥ 0.5 then r + 1 else r)
+
+/-- APPLY(sqrt, x), fig:dynamic-basis-float, the first applicable line. -/
+def fSqrt (x : Float) : Float :=
+  if x.isNaN || x < 0 then fNaN
+  else if x == 0 || x == fInf then x
+  else x.sqrt
+
+/-- APPLY(pow, x, y) at floats, fig:dynamic-basis-pow, the first applicable
+    line; the last line, fl(x^y), is the implementation's (here the C
+    library's) rounding of the real power, which the book allows (A65). -/
+def fPow (x y : Float) : Float :=
+  if y == 0 then 1
+  else if x == 1 then 1
+  else if x.isNaN || y.isNaN then fNaN
+  else if x == 0 && y < 0 && fIsOdd y then fSgn x * fInf
+  else if x == 0 && y < 0 then fInf
+  else if x == 0 && y > 0 && fIsOdd y then x
+  else if x == 0 && y > 0 then 0
+  else if x == -1 && y.isInf then 1
+  else if x.abs < 1 && y == fInf then 0
+  else if x.abs > 1 && y == -fInf then 0
+  else if x.abs > 1 && y == fInf then fInf
+  else if x.abs < 1 && y == -fInf then fInf
+  else if x == fInf && y < 0 then 0
+  else if x == fInf && y > 0 then fInf
+  else if x == -fInf && y < 0 && fIsOdd y then -(0 : Float)
+  else if x == -fInf && y > 0 && fIsOdd y then -fInf
+  else if x == -fInf && y < 0 then 0
+  else if x == -fInf && y > 0 then fInf
+  else if x < 0 && !fIsInt y then fNaN
+  else Float.pow x y
+
+/-- APPLY(b, x) for b among sin, cos, tan, asin, acos, atan,
+    fig:dynamic-basis-elem; the last line, fl(f(x)), is the implementation's
+    (the C library's) rounding, which the book allows. -/
+def fElem (b : BasVal) (x : Float) : Float :=
+  if x.isNaN then fNaN
+  else if x == 0 && (b == .sin || b == .tan || b == .asin || b == .atan) then x
+  else if x.isInf && (b == .sin || b == .cos || b == .tan) then fNaN
+  else if x.abs > 1 && (b == .asin || b == .acos) then fNaN
+  else if b == .atan && x.isInf then fSgn x * fHalfPi
+  else match b with
+    | .sin => x.sin | .cos => x.cos | .tan => x.tan
+    | .asin => x.asin | .acos => x.acos | .atan => x.atan
+    | _ => fNaN
+
+/-- APPLY(atan2, y, x), fig:dynamic-basis-elem, the first applicable line. -/
+def fAtan2 (y x : Float) : Float :=
+  if x.isNaN || y.isNaN then fNaN
+  else if y == 0 && (x > 0 || (x == 0 && fSgn x > 0)) then y
+  else if y == 0 && (x < 0 || (x == 0 && fSgn x < 0)) then fSgn y * fPi
+  else if x == 0 then fSgn y * fHalfPi
+  else if y.isInf && !x.isInf then fSgn y * fHalfPi
+  else if y.isInf && x == -fInf then fSgn y * fThreeQuarterPi
+  else if y.isInf && x == fInf then fSgn y * fQuarterPi
+  else if x == -fInf then fSgn y * fPi
+  else if x == fInf then fSgn y * 0
+  else Float.atan2 y x
+
+/-! ## append, characters (sec:appendix-dynamic-basis-append,
+    sec:appendix-dynamic-basis-chars) -/
+
+/-- APPLY(append, v, v'): strings concatenated; at lists, `[]` gives v', and
+    v1 :: v2 gives v1 :: v'' where APPLY(append, v2, v') = {v''}. -/
+def appendVal : Val → Val → Option Val
+  | .sv (.str s), .sv (.str s') => some (.sv (.str (s ++ s')))
+  | .con c [], v => if c == conNil then some v else none
+  | .con c [h, t], v => if c == conCons then (appendVal t v).map (fun t' => .con conCons [h, t']) else none
+  | _, _ => none
+
+/-- A Unicode scalar value: 0 to 0x10FFFF, surrogates excluded. -/
+def isScalar (n : Int) : Bool := 0 ≤ n && n ≤ 0x10FFFF && !(0xD800 ≤ n && n ≤ 0xDFFF)
+
+/-- other(n), the character `Char.fromCode` gives for an integer that is no
+    Unicode scalar value: a parameter of the definition, which this encoding
+    sets to U+FFFD (Lean's characters are Unicode scalar values only). -/
+def otherChar (_n : Int) : Char := Char.ofNat 0xFFFD
+
+def charFromCode (n : Int) : Char := if isScalar n then Char.ofNat n.toNat else otherChar n
+
 /-- `pickFirst b v v'` is v if b, else v'. A definition, not an `if`, so that
     the proof of `applySet_sound` does not split on it. -/
 def pickFirst (b : Bool) (v v' : Val) : Val := if b then v else v'
@@ -252,6 +367,33 @@ inductive Apply : BasVal → List Val → Val → Prop where
   | and_ (v v' : Val) : Apply .and [v, v'] (.bool (isTrue v && isTrue v'))
   | or_ (v v' : Val) : Apply .or [v, v'] (.bool (!(isFalse v && isFalse v')))
   | xor_ (v v' : Val) : Apply .xor [v, v'] (.bool (isTrue v != isTrue v'))
+  -- isNaN, isInfinite (sec:appendix-dynamic-basis-floatarith): True exactly
+  -- when the float is NaN, or +infinity or -infinity
+  | isNaN_ (x : Float) : Apply .isNaN [.sv (.float x)] (.bool x.isNaN)
+  | isInfinite_ (x : Float) : Apply .isInfinite [.sv (.float x)] (.bool x.isInf)
+  -- conversions (fig:dynamic-basis-conv)
+  | toFloat_ (n : Int) : Apply .toFloat [.int n] (.sv (.float (fToFloat n)))
+  | round_ (x : Float) : Apply .round [.sv (.float x)] (.int (fRound x))
+  | floor_ (x : Float) : Apply .floor [.sv (.float x)] (.int (fFloor x))
+  | ceiling_ (x : Float) : Apply .ceiling [.sv (.float x)] (.int (fCeiling x))
+  | truncate_ (x : Float) : Apply .truncate [.sv (.float x)] (.int (fTruncate x))
+  -- sqrt (fig:dynamic-basis-float), powers and elementary functions
+  -- (fig:dynamic-basis-pow, fig:dynamic-basis-elem)
+  | sqrt_ (x : Float) : Apply .sqrt [.sv (.float x)] (.sv (.float (fSqrt x)))
+  | pow_float (x y : Float) : Apply .pow [.sv (.float x), .sv (.float y)] (.sv (.float (fPow x y)))
+  | sin_ (x : Float) : Apply .sin [.sv (.float x)] (.sv (.float (fElem .sin x)))
+  | cos_ (x : Float) : Apply .cos [.sv (.float x)] (.sv (.float (fElem .cos x)))
+  | tan_ (x : Float) : Apply .tan [.sv (.float x)] (.sv (.float (fElem .tan x)))
+  | asin_ (x : Float) : Apply .asin [.sv (.float x)] (.sv (.float (fElem .asin x)))
+  | acos_ (x : Float) : Apply .acos [.sv (.float x)] (.sv (.float (fElem .acos x)))
+  | atan_ (x : Float) : Apply .atan [.sv (.float x)] (.sv (.float (fElem .atan x)))
+  | atan2_ (y x : Float) : Apply .atan2 [.sv (.float y), .sv (.float x)] (.sv (.float (fAtan2 y x)))
+  -- append (sec:appendix-dynamic-basis-append), characters, Debug.toString
+  | append_ (v v' w : Val) : appendVal v v' = some w → Apply .append [v, v'] w
+  | toCode_ (c : Char) : Apply .charToCode [.sv (.char c)] (.int c.toNat)
+  | fromCode_ (n : Int) : Apply .charFromCode [.int n] (.sv (.char (charFromCode n)))
+  -- the string of Debug.toString is the implementation's: here as Elm prints
+  | toString_ (v : Val) : Apply .debugToString [v] (.sv (.str (showElm v)))
   -- sec:appendix-dynamic-basis-debug; Debug.todo has no constructor: APPLY is empty
   | debugLog (s : String) (v : Val) : Apply .debugLog [.sv (.str s), v] v
 
@@ -317,6 +459,26 @@ def applySet : BasVal → List Val → List Val
   | .and, [v, v'] => [.bool (isTrue v && isTrue v')]
   | .or, [v, v'] => [.bool (!(isFalse v && isFalse v'))]
   | .xor, [v, v'] => [.bool (isTrue v != isTrue v')]
+  | .isNaN, [.sv (.float x)] => [.bool x.isNaN]
+  | .isInfinite, [.sv (.float x)] => [.bool x.isInf]
+  | .toFloat, [.sv (.int n)] => [.sv (.float (fToFloat n))]
+  | .round, [.sv (.float x)] => [.int (fRound x)]
+  | .floor, [.sv (.float x)] => [.int (fFloor x)]
+  | .ceiling, [.sv (.float x)] => [.int (fCeiling x)]
+  | .truncate, [.sv (.float x)] => [.int (fTruncate x)]
+  | .sqrt, [.sv (.float x)] => [.sv (.float (fSqrt x))]
+  | .pow, [.sv (.float x), .sv (.float y)] => [.sv (.float (fPow x y))]
+  | .sin, [.sv (.float x)] => [.sv (.float (fElem .sin x))]
+  | .cos, [.sv (.float x)] => [.sv (.float (fElem .cos x))]
+  | .tan, [.sv (.float x)] => [.sv (.float (fElem .tan x))]
+  | .asin, [.sv (.float x)] => [.sv (.float (fElem .asin x))]
+  | .acos, [.sv (.float x)] => [.sv (.float (fElem .acos x))]
+  | .atan, [.sv (.float x)] => [.sv (.float (fElem .atan x))]
+  | .atan2, [.sv (.float y), .sv (.float x)] => [.sv (.float (fAtan2 y x))]
+  | .append, [v, v'] => match appendVal v v' with | some w => [w] | none => []
+  | .charToCode, [.sv (.char c)] => [.int c.toNat]
+  | .charFromCode, [.sv (.int n)] => [.sv (.char (charFromCode n))]
+  | .debugToString, [v] => [.sv (.str (showElm v))]
   | .debugLog, [.sv (.str _), v] => [v]
   | _, _ => []
 

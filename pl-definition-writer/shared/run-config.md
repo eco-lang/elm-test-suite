@@ -21,6 +21,7 @@ written inside the workspace, and the workspace has no `output/` folders.
 | `definition/mechanisation/` | 06 | The encoding, its README and example run, `mechanisation-report.md` |
 | `definition/audit/` | 07 | `audit-report.md`, `drafts/` |
 | `definition/typeset/` | 08 | `build-report.md`, `editions/` (PDFs of earlier editions), `build/` (rebuilt every time) |
+| `definition/tools/` | 03 and 06 (maintained, not a stage's output) | The Elm tools: `GenerateDerivedForms.elm` (Appendix A's tables and `Derived.lean`'s derived forms, from one table) and `Translate.elm` (the tests into Lean); run from the repository's root with `site/node_modules/.bin/elm-pages run definition/tools/src/<Script>.elm` |
 | `definition/` | 08 | `<slug>-<stamp>.pdf`, the PDF of the current edition |
 
 `definition/tex/` is the single copy of the book's text. The website
@@ -44,11 +45,14 @@ place; never keep a second copy of it elsewhere.
 
 - **Tool:** Lean 4
 - **Example corpus:** every example is a test program of this repository's
-  `tests/` (most of them in `tests/elm/` and `tests/elm-core/`), translated by
-  hand into the encoding, with its expected values copied from the test's
-  `-- CHECK:` lines. No example is taken from another implementation's test
-  suite, from the survey or from the book's text alone: an example the
-  mechanisation needs that no test provides is first written as a test (tagged
-  `elm-spec`, with its expected values the book's), and then translated. The
-  site's build compares each translation's expected values with its test's
-  CHECK lines and reports a difference.
+  `tests/` tagged `elm-spec`, translated into the encoding by the translator,
+  `definition/tools/src/Translate.elm`, with its expected values copied from
+  the test's `-- CHECK:` lines. No example is taken from another
+  implementation's test suite, from the survey or from the book's text alone:
+  an example the mechanisation needs that no test provides is first written as
+  a test (tagged `elm-spec`, with its expected values the book's). A test the
+  translator refuses is listed, with its reason, in
+  `definition/mechanisation/translation-manifest.json`; hand translation is
+  only for the checks of such a test that the encoding can express
+  (`handPartial` in Examples.lean). CI runs the translator with `--check` and
+  reports in the job summary when the committed translations are out of date.

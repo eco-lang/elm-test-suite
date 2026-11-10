@@ -12,19 +12,99 @@ def showStr (s : String) : String :=
   "\"" ++ String.join (s.toList.map fun ch =>
     if ch == '"' then "\\\"" else if ch == '\\' then "\\\\" else ch.toString) ++ "\""
 
-/-- Floats print as the eco test helper `f` prints them: `NaN`, `+0`, `-0`,
-    `Infinity`, `-Infinity`, or the number with no trailing zeros. -/
+/-! ## Floats as Elm prints them
+
+Elm prints a float as JavaScript's `Number.prototype.toString` does: the
+shortest decimal that reads back as the same float (the nearest of that
+length), in positional notation for decimal exponents from -6 to 21 and in
+exponent notation otherwise. Computed exactly, with integers: a finite float is
+m * 2^e, and a decimal reads back as it when it lies in the float's rounding
+interval (its ends included when m is even, ties going to even). -/
+
+/-- A positive finite float as (m, e), its value m * 2^e, and whether its
+    rounding interval is narrower below (a power of two above the least
+    normal exponent). -/
+def floatParts (x : Float) : Nat × Int × Bool :=
+  let b := x.toBits
+  let ex := ((b >>> 52) &&& 0x7FF).toNat
+  let fr := (b &&& 0xFFFFFFFFFFFFF).toNat
+  if ex == 0 then (fr, -1074, false) else (fr + 2 ^ 52, (ex : Int) - 1075, fr == 0 && ex > 1)
+
+/-- a * 10^ka compared with b * 2^eb. -/
+def cmpDecBin (a : Nat) (ka : Int) (b : Nat) (eb : Int) : Ordering :=
+  compare (a * 10 ^ ka.toNat * 2 ^ (-eb).toNat) (b * 2 ^ eb.toNat * 10 ^ (-ka).toNat)
+
+/-- Whether d * 10^k reads back as the positive float m * 2^e. -/
+def readsBack (m : Nat) (e : Int) (narrow : Bool) (d : Nat) (k : Int) : Bool :=
+  -- the interval's ends, in units of 2^(e-2)
+  let lo := if narrow then 4 * m - 1 else 4 * m - 2
+  let hi := 4 * m + 2
+  let incl := m % 2 == 0
+  let above := match cmpDecBin d k lo (e - 2) with
+    | .gt => true | .eq => incl | .lt => false
+  let below := match cmpDecBin d k hi (e - 2) with
+    | .lt => true | .eq => incl | .gt => false
+  above && below
+
+def decDigits (n : Nat) : Nat := (toString n).length
+
+/-- The shortest decimal d * 10^k that reads back as the positive float
+    m * 2^e, the nearest of that length. -/
+def shortestDecimal (m : Nat) (e : Int) (narrow : Bool) : Nat × Int :=
+  -- the exact value as D * 10^q
+  let (D, q) : Nat × Int := if e ≥ 0 then (m * 2 ^ e.toNat, 0) else (m * 5 ^ (-e).toNat, e)
+  let L := decDigits D
+  let rec go (p : Nat) (fuel : Nat) : Nat × Int :=
+    match fuel with
+    | 0 => (D, q)
+    | fuel + 1 =>
+      if p ≥ L then (D, q) else
+      let drop := L - p
+      let s := 10 ^ drop
+      let lo := D / s
+      let r := D % s
+      let k := q + drop
+      let (first, second) := if 2 * r ≥ s then (lo + 1, lo) else (lo, lo + 1)
+      if readsBack m e narrow first k then (first, k)
+      else if r != 0 && readsBack m e narrow second k then (second, k)
+      else go (p + 1) fuel
+  go 1 20
+
+/-- The digits of d * 10^k with trailing zeros moved into the exponent. -/
+def stripZeros (d : Nat) (k : Int) (fuel : Nat := 400) : Nat × Int :=
+  match fuel with
+  | 0 => (d, k)
+  | fuel + 1 => if d != 0 && d % 10 == 0 then stripZeros (d / 10) (k + 1) fuel else (d, k)
+
+/-- JavaScript's Number::toString for a positive finite float. -/
+def showPositive (x : Float) : String :=
+  let (m, e, narrow) := floatParts x
+  let (d, k) := shortestDecimal m e narrow
+  let (d, k) := stripZeros d k
+  let s := toString d
+  let len := s.length
+  -- the value is 0.s * 10^n
+  let n : Int := len + k
+  let zeros (j : Int) := String.ofList (List.replicate j.toNat '0')
+  if len ≤ n && n ≤ 21 then s ++ zeros (n - len)
+  else if 0 < n && n ≤ 21 then
+    String.ofList (s.toList.take n.toNat) ++ "." ++ String.ofList (s.toList.drop n.toNat)
+  else if -6 < n && n ≤ 0 then "0." ++ zeros (-n) ++ s
+  else
+    let x := n - 1
+    let mant := if len == 1 then s else
+      String.ofList (s.toList.take 1) ++ "." ++ String.ofList (s.toList.drop 1)
+    mant ++ "e" ++ (if x > 0 then "+" else "-") ++ toString x.natAbs
+
+/-- Floats print as Elm's `Debug.log` prints them: `NaN`, `Infinity`,
+    `-Infinity`, `0` for either zero, or the shortest decimal that reads back
+    as the float, as JavaScript prints it. -/
 def showFloat (x : Float) : String :=
   if x.isNaN then "NaN"
-  else if x == 0 then (if 1 / x > 0 then "+0" else "-0")
+  else if x == 0 then "0"
   else if x.isInf then (if x > 0 then "Infinity" else "-Infinity")
-  else
-    let s := toString x
-    if s.contains '.' then
-      let t := (s.toList.reverse.dropWhile (· == '0')).reverse
-      let t := if t.getLast? == some '.' then t.dropLast else t
-      String.ofList t
-    else s
+  else if x < 0 then "-" ++ showPositive (-x)
+  else showPositive x
 
 def isAtomicShow : Val → Bool
   | .con c args => args.isEmpty || c == conCons || c == conNil
@@ -87,5 +167,12 @@ mutual
 end
 
 def showElm (x : Val) : String := showVal (normVal x)
+
+/-- As `showElm`, but a float zero prints with its sign, `+0` or `-0`: for
+    the theorems about signed zeros (rulings A48 and A49). -/
+def showElmSigned (x : Val) : String :=
+  match x with
+  | .sv (.float f) => if f == 0 then (if 1 / f > 0 then "+0" else "-0") else showElm x
+  | _ => showElm x
 
 end StandardElm

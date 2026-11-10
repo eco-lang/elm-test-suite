@@ -104,6 +104,8 @@ mutual
     | as (p : Pat) (x : Var)                        -- pat as var
 end
 
+deriving instance Repr for AtExp, ExpRow, Exp, Match, MRule, Dec, ValBind, AtPat, PatRow, Pat
+
 instance : Inhabited Exp := ⟨.atexp .unit⟩
 instance : Inhabited AtPat := ⟨.wild⟩
 

@@ -1022,3 +1022,21 @@ Principles applied: Standard Elm is Elm 0.19.1 as intended; eco-only extensions 
 - **Ruling:** CUSTOM, decided by the author: option (c). `Bytes` is a payload type: Port(Bytes) holds, so `Bytes` may appear anywhere a payload type may (alone, in tuples, closed records, `Maybe`, `List`, `Array`), in ports and in flags. The boundary model is extended: a boundary value is a JSON value in which a byte sequence may stand wherever a value may; `Enc` at `Bytes` gives the byte sequence of the value and `Dec` at `Bytes` accepts exactly a byte sequence. Values of type `Json.Encode.Value` remain pure JSON. How a host represents a byte sequence is the host's affair (Appendix E). Supersedes A18 and A75.
 - **Reason:** Two of the three implementations (eco, Lamdera) already provide it, it is much requested, and binary data has no faithful JSON encoding. Elm 0.19.1 is non-conforming in rejecting such programs; eco's native target is non-conforming for nested `Bytes` and `Bytes` flags.
 - **Affects:** static, dynamic, basis
+
+## A93: A `number` variable of a recursive group that one binding's type does not mention
+- **Origin:** author decision, 2026-11-09, raised while planning the Elm-to-Lean translator (plans/elm-to-lean-translator.md, B.8)
+- Construct: a group of mutually recursive value bindings in which a type variable of class `number` occurs in the type of one binding and, through a use inside the group, in the derivation of another binding whose type does not mention it.
+- Question: Number specialisation (A87) copies a declaration once per assignment of Int or Float to its `number` variables, and makes each occurrence refer to the copy for its instance. An occurrence of a binding whose own scheme does not quantify the variable gives it no assignment. Which copy does the occurrence refer to?
+- Example (accepted by Elm 0.19.1, which prints `f 3: 1`):
+  ```elm
+  f n = if n <= 0 then 0 else if g 1 (n - 1) ^ -1 > 0 then 1 else 0
+  g y k = if k <= 0 then y + 1 else let _ = f k in y + 1
+  main = let _ = Debug.log "f 3" (f 3) in text "done"
+  ```
+  `g : b -> number -> b` with `b` of class `number`; `f`'s type does not mention `b`, but its body uses `g` at `b`. With `b` Int, `2 ^ -1` is `0` (A43) and `f 3` is `0`; with `b` Float it is `0.5` and `f 3` is `1`.
+- Implementation: Elm on JavaScript has one number representation, so the question does not arise there (it behaves as Float). eco monomorphises; not surveyed for this case.
+- Notes say: silent. The Discourse threads "Can an Elm program ever be untyped?" and "Untyped Elm programs (oh no not again!)" (2026) hold that a free `number` may be specialised to Int or Float without changing the program; that holds on JavaScript only.
+- Options: (a) the variables an occurrence does not fix are Int; (b) the same, stated as a rule of closure: every binding of a group is closed over all the group's `number` variables, so an occurrence instantiates them freshly and A27 makes them Int; (c) reject such programs; (d) Float, as JavaScript behaves.
+- **Ruling:** option (b), decided by the author. Closure of a group of value bindings (r:s-dec-group, r:sm-topdec-value) closes the scheme of each binding also over the `number` variables of the other bindings of the group (static-core, sec:static-core-closure); in number specialisation an occurrence assigns each of them, and one that nothing at the occurrence fixes is Int (dynamic-core, sec:dynamic-core-numbers). In the example, `f 3` is `0`.
+- **Reason:** Gives the same answer as A27 gives a `number` variable left free, by a rule of the static semantics rather than a special case of specialisation; a variable that a binding's type does not mention changes no instance of its scheme, so typing is unaffected. Elm 0.19.1, which answers `1`, is non-conforming for such programs (test StandardA93MutualNumberDefaultTest).
+- **Affects:** static, dynamic

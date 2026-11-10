@@ -8,3 +8,7 @@ name = "StandardElmMech"
 [[lean_exe]]
 name = "run-examples"
 root = "Main"
+
+[[lean_exe]]
+name = "dump-phrases"
+root = "DumpPhrases"

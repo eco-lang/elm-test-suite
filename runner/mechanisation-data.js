@@ -7,14 +7,16 @@
 //                                       proof) and the summary of the generated theorems
 //   mechanisation/proofs/<slug>.json    one theorem: doc comment, statement, proof, the theorems it
 //                                       uses and that use it, the book's rules it names
-//   mechanisation/proofs/kc.json        the theorems kc_0, kc_1, ... that the command #kernel_checks
-//                                       of Theorems.lean generates at compile time, one per check
+//   mechanisation/proofs/kc.json        the theorems kc_<Shard>_<n> that the command #kernel_checks
+//                                       generates at compile time, one per check the kernel can compare
+//   mechanisation/translations/<project>/<Test>.json
+//                                       an elm-spec test's Lean translation and what became of each of
+//                                       its checks, or why it is not translated
 //
 // The theorems are read from the Lean source text, so nothing here needs Lean. The generated ones are
-// not in the source: they are listed from example-run.md (the output of `lake exe run-examples`) by
-// the selection #kernel_checks makes (see generatedChecks below), in the same order, so that kc_<n>
-// here is kc_<n> in Lean. The build of the Lean project prints their number; if Theorems.lean
-// changes how it selects them, change generatedChecks to match.
+// not in the source: their names come from example-run.json, which `lake exe run-examples` writes with
+// the selection #kernel_checks makes (kernelCheck? in Theorems.lean). The translations and the reasons
+// come from translation-manifest.json, which definition/tools/src/Translate.elm writes.
 'use strict';
 
 const fs = require('fs');
@@ -101,75 +103,46 @@ function dedent(text) {
     return lines.map((l) => l.slice(Number.isFinite(ind) ? ind : 0)).join('\n');
 }
 
-// The rows of example-run.md: program, label, CHECK value, the definition's value, status, and the
-// group (corpus, rulings or coverage) whose table the row is in.
+// The run of the examples, as `lake exe run-examples` writes it (example-run.json): every check of
+// every program, by shard, with the definition's value, the status, and the theorem #kernel_checks
+// made for it (kc_<Shard>_<n>) or why it made none.
 function exampleRun() {
-    const text = fs.readFileSync(path.join(MECH, 'example-run.md'), 'utf8');
-    const rows = [];
-    let group = null;
-    for (const l of text.split('\n')) {
-        const h = l.match(/^## (\S+)/);
-        if (h) group = h[1].toLowerCase().startsWith('corpus') ? 'corpus' : h[1].toLowerCase().startsWith('ruling') ? 'rulings' : 'coverage';
-        if (!/^\| (?!Program \||---)/.test(l)) continue;
-        const c = l.slice(2, -2).split(' | ');
-        rows.push({ group, program: c[0], label: c[1], expected: c[2], definition: c[3], status: c[4] });
-    }
-    const total = text.match(/^Total: (\d+) checks, (\d+) agree, (\d+) diverge\./m);
-    return { rows, total: total ? { checks: +total[1], agree: +total[2], diverge: +total[3] } : null };
-}
-
-// What #kernel_checks (Theorems.lean) does with each check of allPrograms (corpus ++ rulings ++
-// coverage, the order of example-run.md): a known divergence (knownDiv) and a check compared as a
-// printed float (floatValued) are skipped, and so is a check whose value expectOf cannot read as an
-// Int, a constructor without arguments or a string; every other check gets the theorem kc_<n>, n
-// counting from 0 in that order. Returns the rows with `theorem` (its name, or null), `kind` and
-// `skipped` (null, 'divergence', 'float' or 'value').
-function classifyChecks(rows) {
-    // knownDiv and floatValued of Theorems.lean.
-    const knownDiv = new Set([]);
-    const floatValued = (r) => r.program === 'CoreIssue1080ClampNanTest';
-    const expectOf = (s) => {
-        if (/^-?\d+$/.test(s)) return 'Int';
-        const inner = s.slice(1, -1);
-        if (s.length >= 2 && s[0] === '"' && s[s.length - 1] === '"' && !inner.includes('"')) return 'String';
-        if (/^[A-Z][A-Za-z0-9]*$/.test(s)) return 'constructor';
-        return null;
+    const file = path.join(MECH, 'example-run.json');
+    if (!fs.existsSync(file)) return { rows: [], total: null };
+    const run = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return {
+        rows: run.checks.map((c) => ({ ...c, definition: c.definition.join(' or ') })),
+        total: { checks: run.total.checks, agree: run.total.agree, diverge: run.total.diverge },
     };
-    let k = 0;
-    return rows.map((r) => {
-        const skipped = knownDiv.has(r.program + '\u0000' + r.label) ? 'divergence' : floatValued(r) ? 'float' : expectOf(r.expected) ? null : 'value';
-        return { ...r, kind: skipped ? null : expectOf(r.expected), skipped, theorem: skipped ? null : 'kc_' + k++ };
-    });
 }
 
-// The program definitions of Examples.lean (def pX : Program := { name := "...", ... }), with the
-// doc comment before each, by the program's name.
-function programsOf() {
+// The translator's manifest: every elm-spec test, translated or refused with its reason.
+function manifest() {
+    const file = path.join(MECH, 'translation-manifest.json');
+    return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')).tests : [];
+}
+
+// The hand translations of `handPartial` (Examples.lean): def pX : Program := { name := "...", ... },
+// with the doc comment before each, by the program's name.
+function handPrograms() {
     const rel = 'StandardElmMech/Examples.lean';
     const lines = fs.readFileSync(path.join(PROJECT, rel), 'utf8').split('\n');
     const out = new Map();
     for (let i = 0; i < lines.length; i++) {
         const m = lines[i].match(/^def (\w+) : Program := \{/);
         if (!m) continue;
-        let doc = '';
-        if (i > 0 && /-\/\s*$/.test(lines[i - 1])) {
-            let j = i - 1;
-            while (j >= 0 && !lines[j].startsWith('/--')) j--;
-            if (j >= 0) doc = lines.slice(j, i).map((l) => l.trim()).join(' ').replace(/^\/--\s*/, '').replace(/\s*-\/$/, '');
-        }
         let end = i + 1;
         while (end < lines.length && (lines[end] === '' || /^\s/.test(lines[end]))) end++;
         while (end > i + 1 && lines[end - 1].trim() === '') end--;
         const text = lines.slice(i, end).join('\n');
         const name = text.match(/name := "([^"]+)"/);
-        if (name) out.set(name[1], { def: m[1], file: rel, line: i + 1, doc, source: text });
+        if (name) out.set(name[1], { def: m[1], file: rel, line: i + 1, source: text });
     }
     return out;
 }
 
 // The CHECK lines of a test program: label -> expected value. A label the test must not print
-// (`-- CHECK-NOT: label:`, in a test that stops at Debug.todo) expects no value, which the
-// examples write "(no value)".
+// (`-- CHECK-NOT: label:`, in a test that stops at Debug.todo) expects no value, written "(no value)".
 function checkLines(project, name) {
     const file = path.join(ROOT, 'tests', project, 'src', name + '.elm');
     const out = new Map();
@@ -183,16 +156,8 @@ function checkLines(project, name) {
     return out;
 }
 
-// Where each test program is in tests/, for links to its page.
-function testIndex() {
-    const out = new Map();
-    const tests = path.join(ROOT, 'tests');
-    for (const project of fs.readdirSync(tests)) {
-        const src = path.join(tests, project, 'src');
-        if (!fs.existsSync(src)) continue;
-        for (const f of fs.readdirSync(src)) if (f.endsWith('.elm') && !out.has(f.slice(0, -4))) out.set(f.slice(0, -4), project);
-    }
-    return out;
+function sha256(file) {
+    return require('crypto').createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 }
 
 // Writes the data under <out>/mechanisation. ruleSlugs: the slugs of the book's rules, so that a rule
@@ -201,6 +166,14 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
     const problems = [];
     if (!fs.existsSync(PROJECT)) return problems;
     const descriptions = fileDescriptions();
+    // The theorems of each shard of the translated tests, in their own files.
+    const generatedDir = path.join(PROJECT, 'StandardElmMech', 'Generated');
+    const checkFiles = fs.existsSync(generatedDir)
+        ? fs.readdirSync(generatedDir).filter((f) => /^Checks.*\.lean$/.test(f)).sort().map((f) => 'StandardElmMech/Generated/' + f)
+        : [];
+    for (const f of checkFiles) {
+        descriptions.set(f, 'The theorems of the translated tests of shard ' + f.replace(/^.*Checks(.*)\.lean$/, '$1') + ': one generated theorem per check the kernel can compare, and the derivability of every check');
+    }
     const files = [...descriptions.keys()].filter((f) => f.endsWith('.lean') && fs.existsSync(path.join(PROJECT, f)));
     const declared = files.flatMap(theoremsOf);
     const theorems = declared.filter((t) => !t.macro);
@@ -227,17 +200,16 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
     const usedBy = new Map(names.map((n) => [n, names.filter((m) => uses.get(m).includes(n))]));
 
     const run = exampleRun();
-    const classified = classifyChecks(run.rows);
-    const generated = classified.filter((c) => c.theorem);
-    const tests = testIndex();
-    const programs = programsOf();
+    const generated = run.rows.filter((c) => c.theorem);
+    const tests = manifest();
     const kernelSource = (() => {
         const lines = fs.readFileSync(path.join(PROJECT, 'StandardElmMech/Theorems.lean'), 'utf8').split('\n');
-        const from = lines.findIndex((l) => l.startsWith('open Lean Elab Command in'));
-        const to = lines.findIndex((l) => l.trim() === '#kernel_checks');
+        const from = lines.findIndex((l) => l.startsWith('/-- The expectation the kernel checks'));
+        const to = lines.findIndex((l) => l.includes('logInfo m!"#kernel_checks'));
         return from >= 0 && to > from ? { file: 'StandardElmMech/Theorems.lean', line: from + 1, text: lines.slice(from, to + 1).join('\n') } : null;
     })();
     if (!kernelSource) problems.push('Theorems.lean: the command #kernel_checks was not found');
+    if (!run.total) problems.push('definition/mechanisation/example-run.json is missing: run `lake exe run-examples`');
 
     const toolchain = fs.readFileSync(path.join(PROJECT, 'lean-toolchain'), 'utf8').trim();
     const ruleCount = (fs.readFileSync(path.join(PROJECT, 'StandardElmMech/Rules.lean'), 'utf8').match(/^\s*\|\s*r_d_\w+/gm) || []).length;
@@ -250,6 +222,19 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
         summary: firstSentence(t.doc),
         method: methodOf(t.proof),
     });
+
+    // The elm-spec tests by status and reason, for the coverage table.
+    const reasonClass = (r) => (r.startsWith('checks:unmatched:') ? 'checks:unmatched' : r);
+    const byReason = new Map();
+    for (const t of tests) {
+        const k = t.status === 'translated' ? 'translated' : reasonClass(t.reason);
+        if (!byReason.has(k)) byReason.set(k, []);
+        byReason.get(k).push({ project: t.project, name: t.name });
+    }
+    const coverage = [...byReason.entries()]
+        .map(([reason, list]) => ({ reason, count: list.length, tests: list }))
+        .sort((a, b) => (a.reason === 'translated' ? -1 : b.reason === 'translated' ? 1 : b.count - a.count || (a.reason < b.reason ? -1 : 1)));
+
     const dir = path.join(out, 'mechanisation');
     writeJson(path.join(dir, 'index.json'), {
         lean: toolchain.replace(/^leanprover\/lean4:/, ''),
@@ -260,6 +245,7 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
             .map((f) => ({ path: f, description: descriptions.get(f) || '' })),
         theorems: theorems.map(summary),
         generated: { count: generated.length, slug: 'kc' },
+        coverage: { total: tests.length, reasons: coverage },
     });
     theorems.forEach((t, i) => {
         const link = (u) => (u ? { name: u.name, slug: slugOf(u.name) } : null);
@@ -278,67 +264,76 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
             next: link(theorems[i + 1]),
         });
     });
-    // The three lists of examples, with how many checks of each became theorems.
-    const groupTitles = {
-        corpus: 'corpus: test programs that accompany the book',
-        rulings: "rulings: test programs for the book's rulings",
-        coverage: "coverage: test programs for rules the corpus reaches only in passing, and for the book's Comments",
-    };
-    const groups = ['corpus', 'rulings', 'coverage'].map((g) => {
-        const rows = classified.filter((c) => c.group === g);
-        return { key: g, title: groupTitles[g], programs: new Set(rows.map((r) => r.program)).size, checks: rows.length, generated: rows.filter((r) => r.theorem).length };
+
+    // The shards, with how many checks of each became theorems.
+    const shardNames = [...new Set(run.rows.map((r) => r.shard))];
+    const groups = shardNames.map((g) => {
+        const rows = run.rows.filter((c) => c.shard === g);
+        const projects = [...new Set(rows.map((r) => r.project))].filter((x) => x);
+        return {
+            key: g,
+            title: g === 'Hand' ? 'Hand: partial hand translations of tests the translator refuses' : g + ': tests/' + projects.join(', tests/'),
+            programs: new Set(rows.map((r) => r.program)).size,
+            checks: rows.length,
+            generated: rows.filter((r) => r.theorem).length,
+        };
     });
-    const skipped = (why) => classified.filter((c) => c.skipped === why).length;
+    const skipped = (why) => run.rows.filter((c) => c.skipped === why).length;
     writeJson(path.join(dir, 'proofs', 'kc.json'), {
         count: generated.length,
         source: kernelSource,
         groups,
-        skipped: { divergence: skipped('divergence'), float: skipped('float'), value: skipped('value') },
+        skipped: { divergence: skipped('divergence'), native: skipped('native'), float: skipped('float'), value: skipped('value') },
         checks: generated.map((c) => ({
             name: c.theorem,
             program: c.program,
-            project: tests.get(c.program) || null,
+            project: c.project || null,
             label: c.label,
             expected: c.expected,
             kind: c.kind,
         })),
     });
 
-    // The translation of each test program of tests/ that the examples include, for the test's page,
-    // with what became of each of its checks; and a warning where a translation's expected value is no
-    // longer the test's CHECK line (the translations are kept by hand, so they can fall behind).
-    for (const name of new Set(classified.map((r) => r.program))) {
-        if (!tests.has(name)) problems.push(`the example ${name} is not a test program of tests/`);
-    }
-    const translated = [];
-    for (const [name, prog] of programs) {
-        const project = tests.get(name);
-        const rows = classified.filter((c) => c.program === name);
-        if (!project || !rows.length) continue;
-        const lines = checkLines(project, name);
-        const checks = rows.map((r) => {
-            const now = lines.has(r.label) ? lines.get(r.label) : null;
-            if (now !== r.expected) {
-                console.warn(`  warning: the Lean translation of ${project}/${name} expects ${r.label}: ${r.expected}, but the test's CHECK line ` +
-                    (now === null ? 'is gone' : `says ${now}`));
-            }
-            return { label: r.label, expected: r.expected, checkLine: now, definition: r.definition, status: r.status, theorem: r.theorem, skipped: r.skipped };
-        });
-        translated.push(project + '/' + name);
-        writeJson(path.join(dir, 'translations', project, name + '.json'), {
-            name,
-            project,
-            def: prog.def,
-            file: prog.file,
-            line: prog.line,
-            doc: prog.doc,
-            group: rows[0].group,
-            source: prog.source,
+    // Each elm-spec test's page: its Lean translation, with what became of each check, or why it is
+    // not translated. A translation made from an older version of the test is marked out of date.
+    const hand = handPrograms();
+    const written = [];
+    let outOfDate = 0;
+    for (const t of tests) {
+        const key = t.project + '/' + t.name;
+        const file = path.join(ROOT, 'tests', t.project, 'src', t.name + '.elm');
+        const current = fs.existsSync(file) && sha256(file) === t.sha256;
+        const rows = run.rows.filter((r) => r.program === t.name && (r.project === t.project || r.shard === 'Hand'));
+        const isHand = t.status !== 'translated' && hand.has(t.name) && rows.length > 0;
+        const lines = checkLines(t.project, t.name);
+        const checks = rows.map((r) => ({
+            label: r.label,
+            expected: r.expected,
+            checkLine: lines.has(r.label) ? lines.get(r.label) : null,
+            definition: r.definition,
+            status: r.status,
+            theorem: r.theorem,
+            skipped: r.skipped,
+        }));
+        if (t.status === 'translated' && !current) outOfDate++;
+        written.push(key);
+        writeJson(path.join(dir, 'translations', t.project, t.name + '.json'), {
+            name: t.name,
+            project: t.project,
+            status: isHand ? 'hand' : t.status,
+            reason: t.reason || null,
+            detail: t.detail || null,
+            def: isHand ? hand.get(t.name).def : t.def || '',
+            file: isHand ? hand.get(t.name).file : t.shard ? 'StandardElmMech/Generated/' + t.shard + '.lean' : '',
+            shard: isHand ? 'Hand' : t.shard || '',
+            source: isHand ? hand.get(t.name).source : t.lean || '',
+            current,
             checks,
         });
     }
-    writeJson(path.join(dir, 'translations', 'index.json'), translated);
-    console.log(`  Lean mechanisation: ${theorems.length} theorems in ${files.filter((f) => theorems.some((t) => t.file === f)).length} files, ${generated.length} generated by #kernel_checks, ${translated.length} test programs translated`);
+    writeJson(path.join(dir, 'translations', 'index.json'), written);
+    if (outOfDate) console.warn(`  warning: ${outOfDate} Lean translations were made from an older version of their test; run the translator and the mechanisation stage`);
+    console.log(`  Lean mechanisation: ${theorems.length} theorems in ${files.filter((f) => theorems.some((t) => t.file === f)).length} files, ${generated.length} generated by #kernel_checks, ${tests.filter((t) => t.status === 'translated').length} of ${tests.length} elm-spec tests translated`);
     return problems;
 }
 
