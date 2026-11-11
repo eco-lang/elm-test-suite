@@ -8,7 +8,9 @@ Most rows log `Debug.toString` of the result.
   - `round` of plus and minus 0.5, 1.5 and 2.5 rounds halves up, towards positive infinity, also
     inside a list (`map round`).
   - NaN is not equal to itself (`==`, `/=`, also inside `Just` and a list) or to 1.
-  - `min 1 nan`, and `min` folded over `[ 1 ]` from NaN by a local `foldl`, give NaN.
+  - `min 1 nan`, and `min` folded over `[ 1 ]` from NaN by a local `foldl`, give NaN (A48): each
+    is checked with `isNaN`, which the book defines, and then by its printed form, which it does
+    not (A62), though every implementation prints `NaN`.
   - `compare nan 1` is `GT`, also through a `case` on `compare` (`orderName`) and when the NaN is
     the first element of a tuple or list; `orderName` also gives `LT` and `EQ` for ordinary
     numbers.
@@ -18,7 +20,7 @@ Most rows log `Debug.toString` of the result.
 That `String.toFloat "1.5"` equals the literal `1.5` is checked by StringToFloatLiteralTest.
 -}
 
--- TAGS: elm-spec, b:Basics.round, b:Basics.eq, b:Basics.neq, b:Basics.min, b:Basics.compare, b:Basics.truncate, b:Basics.pow
+-- TAGS: elm-spec, b:Basics.round, b:Basics.eq, b:Basics.neq, b:Basics.min, b:Basics.isNaN, b:Basics.compare, b:Basics.truncate, b:Basics.pow
 -- MODE-GUARD: a Char equality must give the same answer as under --optimize
 -- NO-SKIP: an edge case every compiler must run
 -- CHECK: round 2.5: "3"
@@ -30,8 +32,10 @@ That `String.toFloat "1.5"` equals the literal `1.5` is checked by StringToFloat
 -- CHECK: nan == nan: "False"
 -- CHECK: nan /= nan: "True"
 -- CHECK: 1 /= nan: "True"
+-- CHECK: min 1 nan is NaN: "True"
 -- CHECK: min 1 nan: "NaN"
 -- CHECK: compare nan 1: "GT"
+-- CHECK: foldl min is NaN: "True"
 -- CHECK: foldl min: "NaN"
 -- CHECK: map round: "[-2,0,3]"
 -- CHECK: case compare nan 1: "GT"
@@ -119,10 +123,16 @@ main =
             Debug.log "1 /= nan" (show (1 /= nan))
 
         _ =
+            Debug.log "min 1 nan is NaN" (show (isNaN (min 1 nan)))
+
+        _ =
             Debug.log "min 1 nan" (show (min 1 nan))
 
         _ =
             Debug.log "compare nan 1" (show (compare nan 1))
+
+        _ =
+            Debug.log "foldl min is NaN" (show (isNaN (foldl min nan [ 1 ])))
 
         _ =
             Debug.log "foldl min" (show (foldl min nan [ 1 ]))

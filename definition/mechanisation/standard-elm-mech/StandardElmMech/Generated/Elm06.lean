@@ -4,6 +4,37 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/LetMultiFuncTest.elm -/
+def g_elm_LetMultiFuncTest : Program := {
+  name := "LetMultiFuncTest", source := "tests/elm/src",
+  cons := [],
+  defs := [ ],
+  locals := [
+    .fn "identity" [pv "x"] (v "x"),
+    .fn "const" [pv "x", pv "y"] (v "x"),
+    .fn "r1" [] (ap (v "identity") [.atexp (.scon (.intF 1))]),
+    .fn "r2" [] (ap (v "const") [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) ],
+  checks := [
+    ckk "r1" "1" .float (v "r1"),
+    ckk "r2" "2" .float (v "r2") ] }
+
+/-- tests/elm/src/LetMultipleTest.elm -/
+def g_elm_LetMultipleTest : Program := {
+  name := "LetMultipleTest", source := "tests/elm/src",
+  cons := [],
+  defs := [ ],
+  locals := [
+    .fn "a" [] (.atexp (.scon (.intF 1))),
+    .fn "b" [] (.atexp (.scon (.intF 2))),
+    .fn "c" [] (.atexp (.scon (.intF 3))),
+    .fn "d" [] (.atexp (.scon (.intF 4))),
+    .fn "e" [] (.atexp (.scon (.intF 5))),
+    .fn "sum" [] (bin "+" (bin "+" (bin "+" (bin "+" (v "a") (v "b")) (v "c")) (v "d")) (v "e")),
+    .fn "product" [] (bin "*" (bin "*" (bin "*" (bin "*" (v "a") (v "b")) (v "c")) (v "d")) (v "e")) ],
+  checks := [
+    ckk "sum" "15" .float (v "sum"),
+    ckk "product" "120" .float (v "product") ] }
+
 /-- tests/elm/src/LetMutualRecursionBetweenLocalsTest.elm -/
 def g_elm_LetMutualRecursionBetweenLocalsTest : Program := {
   name := "LetMutualRecursionBetweenLocalsTest", source := "tests/elm/src",
@@ -424,31 +455,11 @@ def g_elm_LetRecMultiArgTest : Program := {
   checks := [
     ckk "result" "2" .float (v "result") ] }
 
-/-- tests/elm/src/LetSeparatedStagingTest.elm -/
-def g_elm_LetSeparatedStagingTest : Program := {
-  name := "LetSeparatedStagingTest", source := "tests/elm/src",
-  cons := [],
-  defs := [
-    .fn "caseFunc" [pv "n", pv "k"] (caseOf (v "n") [(P (pint 0), lams [pv "a"] (letDefs [.fn "y" [] (bin "+" (v "a") (v "k"))] (lams [pv "z"] (bin "+" (v "y") (v "z"))))), (P pw, lams [pv "a", pv "z"] (bin "+" (v "a") (v "z")))]) ],
-  locals := [ ],
-  checks := [
-    ckk "result" "18" .int (ap (v "caseFunc") [i 0, i 10, i 5, i 3]) ] }
-
-/-- tests/elm/src/ListConsCharTest.elm -/
-def g_elm_ListConsCharTest : Program := {
-  name := "ListConsCharTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "xs" [] (listE [.atexp (chA 'a'), .atexp (chA 'b'), .atexp (chA 'c')]) ],
-  checks := [
-    ckk "list" "['a','b','c']" .data (v "xs"),
-    ckk "head" "Just 'a'" .data (caseOf (v "xs") [(.cons (P (pv "h")) (P pw), ap (c "Just") [v "h"]), (P (listP []), c "Nothing")]),
-    ckk "prepend" "['z','a','b','c']" .data (bin "::" (.atexp (chA 'z')) (v "xs")) ] }
-
 /-- The programs of this shard. -/
 def shard_Elm06 : List Program :=
-  [g_elm_LetMutualRecursionBetweenLocalsTest,
+  [g_elm_LetMultiFuncTest,
+   g_elm_LetMultipleTest,
+   g_elm_LetMutualRecursionBetweenLocalsTest,
    g_elm_LetNestedTest,
    g_elm_LetNumberApplyToTest,
    g_elm_LetNumberCaseLetTest,
@@ -485,8 +496,6 @@ def shard_Elm06 : List Program :=
    g_elm_LetNumberUnionBranchTest,
    g_elm_LetNumberWildcardSlotTest,
    g_elm_LetRecClosureTest,
-   g_elm_LetRecMultiArgTest,
-   g_elm_LetSeparatedStagingTest,
-   g_elm_ListConsCharTest]
+   g_elm_LetRecMultiArgTest]
 
 end StandardElm

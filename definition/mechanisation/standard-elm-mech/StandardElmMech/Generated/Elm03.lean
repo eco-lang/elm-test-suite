@@ -462,6 +462,26 @@ def g_elm_CustomTypeFuncFieldTest : Program := {
     ckk "op1" "11" .int (ap (v "runOp") [.atexp (.paren (ap (c "Op") [.atexp (.paren (lams [pv "x"] (bin "+" (v "x") (i 1))))]))]),
     ckk "op2" "20" .int (ap (v "runOp") [.atexp (.paren (ap (c "Op") [.atexp (.paren (lams [pv "x"] (bin "*" (v "x") (i 2))))]))]) ] }
 
+/-- tests/elm/src/CustomTypeMultiFieldTest.elm -/
+def g_elm_CustomTypeMultiFieldTest : Program := {
+  name := "CustomTypeMultiFieldTest", source := "tests/elm/src",
+  cons := [("Person", 3)],
+  defs := [ ],
+  locals := [
+    .fn "p" [] (ap (c "Person") [str "Alice", i 30, c "True"]) ],
+  checks := [
+    ckk "person" "Person \"Alice\" 30 True" .data (v "p") ] }
+
+/-- tests/elm/src/CustomTypeNestedTest.elm -/
+def g_elm_CustomTypeNestedTest : Program := {
+  name := "CustomTypeNestedTest", source := "tests/elm/src",
+  cons := [("Leaf", 1), ("Node", 2)],
+  defs := [ ],
+  locals := [
+    .fn "tree" [] (ap (c "Node") [.atexp (.paren (ap (c "Leaf") [.atexp (.scon (.intF 1))])), .atexp (.paren (ap (c "Node") [.atexp (.paren (ap (c "Leaf") [.atexp (.scon (.intF 2))])), .atexp (.paren (ap (c "Leaf") [.atexp (.scon (.intF 3))]))]))]) ],
+  checks := [
+    ckk "nested" "Node (Leaf 1) (Node (Leaf 2) (Leaf 3))" .data (v "tree") ] }
+
 /-- tests/elm/src/CustomTypePatternTest.elm -/
 def g_elm_CustomTypePatternTest : Program := {
   name := "CustomTypePatternTest", source := "tests/elm/src",
@@ -485,41 +505,6 @@ def g_elm_DecisionTreeAdvancedDeepNestingWithFallbackTest : Program := {
   locals := [ ],
   checks := [
     ckk "testValue" "5" .int (v "testValue") ] }
-
-/-- tests/elm/src/DeepEqualityTest.elm -/
-def g_elm_DeepEqualityTest : Program := {
-  name := "DeepEqualityTest", source := "tests/elm/src",
-  cons := [("Z", 0), ("S", 1), ("Leaf", 1), ("Wrap", 1), ("Chain", 1)],
-  defs := [
-    .fn "nat" [pv "n"] (ifte (bin "<=" (v "n") (i 0)) (c "Z") (ap (c "S") [.atexp (.paren (ap (v "nat") [.atexp (.paren (bin "-" (v "n") (i 1)))]))])),
-    .fn "nest" [pv "n", pv "leaf"] (ifte (bin "<=" (v "n") (i 0)) (ap (c "Leaf") [v "leaf"]) (ap (c "Wrap") [.atexp (.paren (ap (v "nest") [.atexp (.paren (bin "-" (v "n") (i 1))), v "leaf"]))])),
-    .fn "chain" [pv "n", pv "bottom"] (ifte (bin "<=" (v "n") (i 0)) (ap (c "Chain") [recE [("next", c "Nothing"), ("v", v "bottom")]]) (ap (c "Chain") [recE [("next", ap (c "Just") [.atexp (.paren (ap (v "chain") [.atexp (.paren (bin "-" (v "n") (i 1))), v "bottom"]))]), ("v", i 0)]])),
-    .fn "bool" [pv "b"] (ifte (v "b") (str "True") (str "False")) ],
-  locals := [ ],
-  checks := [
-    ckk "nat 150 vs 200" "\"False\"" .string (ap (v "bool") [.atexp (.paren (bin "==" (ap (v "nat") [i 150]) (ap (v "nat") [i 200])))]),
-    ckk "nat 150 vs 150" "\"True\"" .string (ap (v "bool") [.atexp (.paren (bin "==" (ap (v "nat") [i 150]) (ap (v "nat") [i 150])))]),
-    ckk "nest 120" "\"False\"" .string (ap (v "bool") [.atexp (.paren (bin "==" (ap (v "nest") [i 120, i 1]) (ap (v "nest") [i 120, i 2])))]),
-    ckk "nest 500 /=" "\"True\"" .string (ap (v "bool") [.atexp (.paren (bin "/=" (ap (v "nest") [i 500, i 1]) (ap (v "nest") [i 500, i 2])))]),
-    ckk "record chain 300" "\"False\"" .string (ap (v "bool") [.atexp (.paren (bin "==" (ap (v "chain") [i 300, i 1]) (ap (v "chain") [i 300, i 2])))]) ] }
-
-/-- tests/elm/src/DeepNestStressTest.elm -/
-def g_elm_DeepNestStressTest : Program := {
-  name := "DeepNestStressTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "nl" [] (listE [listE [listE [listE [.atexp (.scon (.intF 1))]]]]),
-    .fn "nlVal" [] (caseOf (v "nl") [(P (listP [P (listP [P (listP [P (listP [P (pv "x")])])])]), v "x"), (P pw, .atexp (.scon (.intF 0)))]),
-    .fn "nt" [] (tup2 (tup2 (tup2 (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 4)))) (.atexp (.scon (.intF 5)))),
-    .pat (ptup2 (P (ptup2 (P (ptup2 (P (ptup2 (P (pv "first")) (P pw))) (P pw))) (P pw))) (P pw)) (v "nt"),
-    .fn "nr" [] (recE [("n", recE [("n", recE [("n", recE [("v", .atexp (.scon (.intF 1)))])])])]),
-    .fn "a" [] (letDefs [.fn "b" [] (letDefs [.fn "c" [] (letDefs [.fn "d" [] (.atexp (.scon (.intF 10)))] (v "d"))] (v "c"))] (v "b")) ],
-  checks := [
-    ckk "nested_list" "1" .float (v "nlVal"),
-    ckk "nested_tuple" "1" .float (v "first"),
-    ckk "nested_record" "1" .float (.atexp (access (access (access (access (A (v "nr")) "n") "n") "n") "v")),
-    ckk "nested_let" "10" .float (v "a") ] }
 
 /-- The programs of this shard. -/
 def shard_Elm03 : List Program :=
@@ -559,9 +544,9 @@ def shard_Elm03 : List Program :=
    g_elm_CovTailRecPairParametersSwappedAndALoopReturningALambdaTest,
    g_elm_CovTailRecSplitATripleParameterTest,
    g_elm_CustomTypeFuncFieldTest,
+   g_elm_CustomTypeMultiFieldTest,
+   g_elm_CustomTypeNestedTest,
    g_elm_CustomTypePatternTest,
-   g_elm_DecisionTreeAdvancedDeepNestingWithFallbackTest,
-   g_elm_DeepEqualityTest,
-   g_elm_DeepNestStressTest]
+   g_elm_DecisionTreeAdvancedDeepNestingWithFallbackTest]
 
 end StandardElm

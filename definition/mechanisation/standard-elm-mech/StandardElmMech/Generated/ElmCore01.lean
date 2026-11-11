@@ -535,6 +535,7 @@ def g_elm_core_CoreIssue1080ClampNanTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
+    ckk "clamp nan is NaN" "True" .data (ap (v "isNaN") [.atexp (.paren (ap (v "clamp") [.atexp (neg (.scon (.intF 100))), .atexp (.scon (.intF 100)), .atexp (.paren (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))))]))]),
     ckk "clamp nan" "NaN" .float (ap (v "clamp") [.atexp (neg (.scon (.intF 100))), .atexp (.scon (.intF 100)), .atexp (.paren (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))))]) ] }
 
 /-- tests/elm-core/src/CoreIssue1115NanEqualsLiteralZeroTest.elm -/

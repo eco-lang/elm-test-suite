@@ -6,7 +6,7 @@
 | Slug | standard-elm-definition |
 | Authors | Rupert Smith (provisional; confirm at the first checkpoint) |
 | Year | 2026 |
-| Edition | Draft version 0.3 |
+| Edition | Draft version 0.4 |
 | Language | Elm |
 | Version | Elm 0.19.1, as implemented by eco 0.2.0 |
 | Implementation | /home/rupert/sc/gitlab/eco-compiler (compiler front end in `compiler/src`, written in Elm; runtime and kernels in C++) |

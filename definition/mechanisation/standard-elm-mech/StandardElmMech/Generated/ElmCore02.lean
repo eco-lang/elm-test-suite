@@ -377,6 +377,19 @@ def g_elm_core_FloatMulTest : Program := {
     ckk "mul3" "6" .float (bin "*" (.atexp (neg (.scon (.float 20 (-1))))) (.atexp (neg (.scon (.float 30 (-1)))))),
     ckk "mul4" "0" .float (bin "*" (.atexp (.scon (.float 0 (-1)))) (.atexp (.scon (.float 1000 (-1))))) ] }
 
+/-- tests/elm-core/src/FloatNaNTest.elm -/
+def g_elm_core_FloatNaNTest : Program := {
+  name := "FloatNaNTest", source := "tests/elm-core/src",
+  cons := [],
+  defs := [ ],
+  locals := [
+    .fn "nan" [] (bin "/" (.atexp (.scon (.float 0 (-1)))) (.atexp (.scon (.float 0 (-1))))) ],
+  checks := [
+    ckk "isNaN1" "True" .data (ap (v "isNaN") [v "nan"]),
+    ckk "isNaN2" "False" .data (ap (v "isNaN") [.atexp (.scon (.float 314 (-2)))]),
+    ckk "nanProp" "True" .data (ap (v "isNaN") [.atexp (.paren (bin "+" (v "nan") (.atexp (.scon (.float 10 (-1))))))]),
+    ckk "nanShown" "NaN" .float (bin "+" (v "nan") (.atexp (.scon (.float 10 (-1))))) ] }
+
 /-- tests/elm-core/src/FloatNegateTest.elm -/
 def g_elm_core_FloatNegateTest : Program := {
   name := "FloatNegateTest", source := "tests/elm-core/src",
@@ -507,16 +520,6 @@ def g_elm_core_IntCompareTest : Program := {
     ckk "eq" "True" .data (bin "==" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))),
     ckk "ne" "True" .data (bin "/=" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 3)))) ] }
 
-/-- tests/elm-core/src/IntDivByZeroTest.elm -/
-def g_elm_core_IntDivByZeroTest : Program := {
-  name := "IntDivByZeroTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "divZero1" "0" .int (bin "//" (i 10) (i 0)),
-    ckk "divZero2" "0" .int (bin "//" (.atexp (neg (A (i 5)))) (i 0)) ] }
-
 /-- The programs of this shard. -/
 def shard_ElmCore02 : List Program :=
   [g_elm_core_EqualityBoolCaseTest,
@@ -547,6 +550,7 @@ def shard_ElmCore02 : List Program :=
    g_elm_core_FloatMathTanTest,
    g_elm_core_FloatMinMaxTest,
    g_elm_core_FloatMulTest,
+   g_elm_core_FloatNaNTest,
    g_elm_core_FloatNegateTest,
    g_elm_core_FloatNegativeZeroTest,
    g_elm_core_FloatPowTest,
@@ -557,7 +561,6 @@ def shard_ElmCore02 : List Program :=
    g_elm_core_FloorToIntTest,
    g_elm_core_IntAbsTest,
    g_elm_core_IntAddTest,
-   g_elm_core_IntCompareTest,
-   g_elm_core_IntDivByZeroTest]
+   g_elm_core_IntCompareTest]
 
 end StandardElm

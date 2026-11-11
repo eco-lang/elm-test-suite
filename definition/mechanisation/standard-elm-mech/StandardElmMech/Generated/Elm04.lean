@@ -4,6 +4,41 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/DeepEqualityTest.elm -/
+def g_elm_DeepEqualityTest : Program := {
+  name := "DeepEqualityTest", source := "tests/elm/src",
+  cons := [("Z", 0), ("S", 1), ("Leaf", 1), ("Wrap", 1), ("Chain", 1)],
+  defs := [
+    .fn "nat" [pv "n"] (ifte (bin "<=" (v "n") (i 0)) (c "Z") (ap (c "S") [.atexp (.paren (ap (v "nat") [.atexp (.paren (bin "-" (v "n") (i 1)))]))])),
+    .fn "nest" [pv "n", pv "leaf"] (ifte (bin "<=" (v "n") (i 0)) (ap (c "Leaf") [v "leaf"]) (ap (c "Wrap") [.atexp (.paren (ap (v "nest") [.atexp (.paren (bin "-" (v "n") (i 1))), v "leaf"]))])),
+    .fn "chain" [pv "n", pv "bottom"] (ifte (bin "<=" (v "n") (i 0)) (ap (c "Chain") [recE [("next", c "Nothing"), ("v", v "bottom")]]) (ap (c "Chain") [recE [("next", ap (c "Just") [.atexp (.paren (ap (v "chain") [.atexp (.paren (bin "-" (v "n") (i 1))), v "bottom"]))]), ("v", i 0)]])),
+    .fn "bool" [pv "b"] (ifte (v "b") (str "True") (str "False")) ],
+  locals := [ ],
+  checks := [
+    ckk "nat 150 vs 200" "\"False\"" .string (ap (v "bool") [.atexp (.paren (bin "==" (ap (v "nat") [i 150]) (ap (v "nat") [i 200])))]),
+    ckk "nat 150 vs 150" "\"True\"" .string (ap (v "bool") [.atexp (.paren (bin "==" (ap (v "nat") [i 150]) (ap (v "nat") [i 150])))]),
+    ckk "nest 120" "\"False\"" .string (ap (v "bool") [.atexp (.paren (bin "==" (ap (v "nest") [i 120, i 1]) (ap (v "nest") [i 120, i 2])))]),
+    ckk "nest 500 /=" "\"True\"" .string (ap (v "bool") [.atexp (.paren (bin "/=" (ap (v "nest") [i 500, i 1]) (ap (v "nest") [i 500, i 2])))]),
+    ckk "record chain 300" "\"False\"" .string (ap (v "bool") [.atexp (.paren (bin "==" (ap (v "chain") [i 300, i 1]) (ap (v "chain") [i 300, i 2])))]) ] }
+
+/-- tests/elm/src/DeepNestStressTest.elm -/
+def g_elm_DeepNestStressTest : Program := {
+  name := "DeepNestStressTest", source := "tests/elm/src",
+  cons := [],
+  defs := [ ],
+  locals := [
+    .fn "nl" [] (listE [listE [listE [listE [.atexp (.scon (.intF 1))]]]]),
+    .fn "nlVal" [] (caseOf (v "nl") [(P (listP [P (listP [P (listP [P (listP [P (pv "x")])])])]), v "x"), (P pw, .atexp (.scon (.intF 0)))]),
+    .fn "nt" [] (tup2 (tup2 (tup2 (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 4)))) (.atexp (.scon (.intF 5)))),
+    .pat (ptup2 (P (ptup2 (P (ptup2 (P (ptup2 (P (pv "first")) (P pw))) (P pw))) (P pw))) (P pw)) (v "nt"),
+    .fn "nr" [] (recE [("n", recE [("n", recE [("n", recE [("v", .atexp (.scon (.intF 1)))])])])]),
+    .fn "a" [] (letDefs [.fn "b" [] (letDefs [.fn "c" [] (letDefs [.fn "d" [] (.atexp (.scon (.intF 10)))] (v "d"))] (v "c"))] (v "b")) ],
+  checks := [
+    ckk "nested_list" "1" .float (v "nlVal"),
+    ckk "nested_tuple" "1" .float (v "first"),
+    ckk "nested_record" "1" .float (.atexp (access (access (access (access (A (v "nr")) "n") "n") "n") "v")),
+    ckk "nested_let" "10" .float (v "a") ] }
+
 /-- tests/elm/src/DestructCaptureTest.elm -/
 def g_elm_DestructCaptureTest : Program := {
   name := "DestructCaptureTest", source := "tests/elm/src",
@@ -369,8 +404,10 @@ def g_elm_FloatEdgeTest : Program := {
     ckk "nan == nan" "\"False\"" .string (ap (v "show") [.atexp (.paren (bin "==" (v "nan") (v "nan")))]),
     ckk "nan /= nan" "\"True\"" .string (ap (v "show") [.atexp (.paren (bin "/=" (v "nan") (v "nan")))]),
     ckk "1 /= nan" "\"True\"" .string (ap (v "show") [.atexp (.paren (bin "/=" (.atexp (.scon (.intF 1))) (v "nan")))]),
+    ckk "min 1 nan is NaN" "\"True\"" .string (ap (v "show") [.atexp (.paren (ap (v "isNaN") [.atexp (.paren (ap (v "min") [.atexp (.scon (.intF 1)), v "nan"]))]))]),
     ckk "min 1 nan" "\"NaN\"" .string (ap (v "show") [.atexp (.paren (ap (v "min") [.atexp (.scon (.intF 1)), v "nan"]))]),
     ckk "compare nan 1" "\"GT\"" .string (ap (v "show") [.atexp (.paren (ap (v "compare") [v "nan", .atexp (.scon (.intF 1))]))]),
+    ckk "foldl min is NaN" "\"True\"" .string (ap (v "show") [.atexp (.paren (ap (v "isNaN") [.atexp (.paren (ap (v "foldl") [v "min", v "nan", listE [.atexp (.scon (.intF 1))]]))]))]),
     ckk "foldl min" "\"NaN\"" .string (ap (v "show") [.atexp (.paren (ap (v "foldl") [v "min", v "nan", listE [.atexp (.scon (.intF 1))]]))]),
     ckk "map round" "\"[-2,0,3]\"" .string (ap (v "show") [listE [ap (v "round") [.atexp (neg (.scon (.float 25 (-1))))], ap (v "round") [.atexp (neg (.scon (.float 5 (-1))))], ap (v "round") [.atexp (.scon (.float 25 (-1)))]]]),
     ckk "case compare nan 1" "\"GT\"" .string (ap (v "orderName") [v "nan", .atexp (.scon (.intF 1))]),
@@ -512,30 +549,11 @@ def g_elm_HigherOrderFilterLikeFunctionTest : Program := {
   checks := [
     ckk "testValue" "[1]" .data (v "testValue") ] }
 
-/-- tests/elm/src/HigherOrderFunctionChosenByIfTest.elm -/
-def g_elm_HigherOrderFunctionChosenByIfTest : Program := {
-  name := "HigherOrderFunctionChosenByIfTest", source := "tests/elm/src",
-  cons := [],
-  defs := [
-    .fn "useH" [pv "b", pv "hof1", pv "hof2", pv "k"] (letDefs [.fn "h" [] (ifte (v "b") (v "hof1") (v "hof2"))] (ap (v "h") [v "k"])),
-    .fn "testValue" [] (ap (v "useH") [.atexp (.con ⟨some "Basics", "True"⟩), .atexp (.paren (lams [pv "f"] (ap (v "f") [i 1]))), .atexp (.paren (lams [pv "g"] (ap (v "g") [i 2]))), .atexp (.paren (lams [pv "x"] (bin "*" (v "x") (i 2))))]) ],
-  locals := [ ],
-  checks := [
-    ckk "testValue" "2" .int (v "testValue") ] }
-
-/-- tests/elm/src/HigherOrderFunctionFactoryTest.elm -/
-def g_elm_HigherOrderFunctionFactoryTest : Program := {
-  name := "HigherOrderFunctionFactoryTest", source := "tests/elm/src",
-  cons := [],
-  defs := [
-    .fn "testValue" [] (letDefs [.fn "makeTransform" [pv "factor"] (lams [pv "x"] (tup2 (v "x") (v "factor"))), .fn "double" [] (ap (v "makeTransform") [.atexp (.scon (.intF 2))])] (ap (v "double") [.atexp (.scon (.intF 5))])) ],
-  locals := [ ],
-  checks := [
-    ckk "testValue" "(5,2)" .data (v "testValue") ] }
-
 /-- The programs of this shard. -/
 def shard_Elm04 : List Program :=
-  [g_elm_DestructCaptureTest,
+  [g_elm_DeepEqualityTest,
+   g_elm_DeepNestStressTest,
+   g_elm_DestructCaptureTest,
    g_elm_EdgeCaseAllDestructPatternsTest,
    g_elm_EitherTypeTest,
    g_elm_EmbeddedEmptyStringCaptureTest,
@@ -572,8 +590,6 @@ def shard_Elm04 : List Program :=
    g_elm_FunctionValueChoiceTest,
    g_elm_HOParamApplyTwoTest,
    g_elm_HeteroClosureIntFloatTest,
-   g_elm_HigherOrderFilterLikeFunctionTest,
-   g_elm_HigherOrderFunctionChosenByIfTest,
-   g_elm_HigherOrderFunctionFactoryTest]
+   g_elm_HigherOrderFilterLikeFunctionTest]
 
 end StandardElm

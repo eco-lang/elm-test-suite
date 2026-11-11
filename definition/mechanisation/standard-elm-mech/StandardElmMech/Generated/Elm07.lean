@@ -4,6 +4,28 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/LetSeparatedStagingTest.elm -/
+def g_elm_LetSeparatedStagingTest : Program := {
+  name := "LetSeparatedStagingTest", source := "tests/elm/src",
+  cons := [],
+  defs := [
+    .fn "caseFunc" [pv "n", pv "k"] (caseOf (v "n") [(P (pint 0), lams [pv "a"] (letDefs [.fn "y" [] (bin "+" (v "a") (v "k"))] (lams [pv "z"] (bin "+" (v "y") (v "z"))))), (P pw, lams [pv "a", pv "z"] (bin "+" (v "a") (v "z")))]) ],
+  locals := [ ],
+  checks := [
+    ckk "result" "18" .int (ap (v "caseFunc") [i 0, i 10, i 5, i 3]) ] }
+
+/-- tests/elm/src/ListConsCharTest.elm -/
+def g_elm_ListConsCharTest : Program := {
+  name := "ListConsCharTest", source := "tests/elm/src",
+  cons := [],
+  defs := [ ],
+  locals := [
+    .fn "xs" [] (listE [.atexp (chA 'a'), .atexp (chA 'b'), .atexp (chA 'c')]) ],
+  checks := [
+    ckk "list" "['a','b','c']" .data (v "xs"),
+    ckk "head" "Just 'a'" .data (caseOf (v "xs") [(.cons (P (pv "h")) (P pw), ap (c "Just") [v "h"]), (P (listP []), c "Nothing")]),
+    ckk "prepend" "['z','a','b','c']" .data (bin "::" (.atexp (chA 'z')) (v "xs")) ] }
+
 /-- tests/elm/src/ListConsFloatTest.elm -/
 def g_elm_ListConsFloatTest : Program := {
   name := "ListConsFloatTest", source := "tests/elm/src",
@@ -507,35 +529,11 @@ def g_elm_PhantomTypeVarTest : Program := {
   checks := [
     ckk "result" "42" .float (v "result") ] }
 
-/-- tests/elm/src/PolyApplyLambdaTest.elm -/
-def g_elm_PolyApplyLambdaTest : Program := {
-  name := "PolyApplyLambdaTest", source := "tests/elm/src",
-  cons := [],
-  defs := [
-    .fn "apply" [pv "f", pv "x"] (ap (v "f") [v "x"]),
-    .fn "intId" [pv "n"] (v "n"),
-    .fn "strId" [pv "s"] (v "s") ],
-  locals := [ ],
-  checks := [
-    ckk "applyIntId" "1" .float (ap (v "apply") [v "intId", .atexp (.scon (.intF 1))]),
-    ckk "applyStrId" "\"hi\"" .string (ap (v "apply") [v "strId", str "hi"]),
-    ckk "applyLambda" "42" .float (ap (v "apply") [.atexp (.paren (lams [pv "n"] (v "n"))), .atexp (.scon (.intF 42))]) ] }
-
-/-- tests/elm/src/PolyChainCallTest.elm -/
-def g_elm_PolyChainCallTest : Program := {
-  name := "PolyChainCallTest", source := "tests/elm/src",
-  cons := [("Leaf", 0), ("Node", 3)],
-  defs := [
-    .fn "insertTree" [pv "val", pv "tree"] (ap (c "Node") [v "tree", v "val", c "Leaf"]),
-    .fn "buildTree" [pv "x", pv "y"] (letDefs [.fn "t1" [] (ap (v "insertTree") [v "x", c "Leaf"]), .fn "t2" [] (ap (v "insertTree") [v "y", v "t1"])] (v "t2")),
-    .fn "sizeTree" [pv "t"] (caseOf (v "t") [(P (pcA "Leaf"), i 0), (pcon "Node" [pv "left", pw, pv "right"], bin "+" (bin "+" (i 1) (ap (v "sizeTree") [v "left"])) (ap (v "sizeTree") [v "right"]))]) ],
-  locals := [ ],
-  checks := [
-    ckk "size" "2" .int (ap (v "sizeTree") [.atexp (.paren (ap (v "buildTree") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]))]) ] }
-
 /-- The programs of this shard. -/
 def shard_Elm07 : List Program :=
-  [g_elm_ListConsFloatTest,
+  [g_elm_LetSeparatedStagingTest,
+   g_elm_ListConsCharTest,
+   g_elm_ListConsFloatTest,
    g_elm_ListConsIntTest,
    g_elm_ListConsTest,
    g_elm_ListIndexedMapTest,
@@ -572,8 +570,6 @@ def shard_Elm07 : List Program :=
    g_elm_PartialAppCaptureTypesTest,
    g_elm_PartialAppChainTest,
    g_elm_PartialApplicationTest,
-   g_elm_PhantomTypeVarTest,
-   g_elm_PolyApplyLambdaTest,
-   g_elm_PolyChainCallTest]
+   g_elm_PhantomTypeVarTest]
 
 end StandardElm

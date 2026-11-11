@@ -4,6 +4,17 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm-core/src/StandardA53CharOrderTest.elm -/
+def g_elm_core_StandardA53CharOrderTest : Program := {
+  name := "StandardA53CharOrderTest", source := "tests/elm-core/src",
+  cons := [],
+  defs := [ ],
+  locals := [ ],
+  checks := [
+    ckk "compare '😀' 'ﬀ'" "GT" .data (ap (v "compare") [.atexp (chA '😀'), .atexp (chA 'ﬀ')]),
+    ckk "'😀' > 'ﬀ'" "True" .data (bin ">" (.atexp (chA '😀')) (.atexp (chA 'ﬀ'))),
+    ckk "toCode order agrees" "True" .data (bin "==" (ap (v "compare") [.atexp (chA '😀'), .atexp (chA 'ﬀ')]) (ap (v "compare") [.atexp (.paren (ap (qv "Char" "toCode") [.atexp (chA '😀')])), .atexp (.paren (ap (qv "Char" "toCode") [.atexp (chA 'ﬀ')]))])) ] }
+
 /-- tests/elm-core/src/StandardA53StringOrderTest.elm -/
 def g_elm_core_StandardA53StringOrderTest : Program := {
   name := "StandardA53StringOrderTest", source := "tests/elm-core/src",
@@ -173,7 +184,8 @@ def g_elm_core_UtilsOrderingCaptureIntTest : Program := {
 
 /-- The programs of this shard. -/
 def shard_ElmCore04 : List Program :=
-  [g_elm_core_StandardA53StringOrderTest,
+  [g_elm_core_StandardA53CharOrderTest,
+   g_elm_core_StandardA53StringOrderTest,
    g_elm_core_StandardA65PowOneTest,
    g_elm_core_StringConcatContentTest,
    g_elm_core_StringConcatTest,

@@ -9,7 +9,7 @@ text itself is not checked.
 -}
 
 -- TAGS: elm-spec, sm-datbind, sm-conbind, d-app-con
--- CHECK: nested
+-- CHECK: nested: Node (Leaf 1) (Node (Leaf 2) (Leaf 3))
 
 import Html exposing (text)
 

@@ -4,6 +4,32 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/PolyApplyLambdaTest.elm -/
+def g_elm_PolyApplyLambdaTest : Program := {
+  name := "PolyApplyLambdaTest", source := "tests/elm/src",
+  cons := [],
+  defs := [
+    .fn "apply" [pv "f", pv "x"] (ap (v "f") [v "x"]),
+    .fn "intId" [pv "n"] (v "n"),
+    .fn "strId" [pv "s"] (v "s") ],
+  locals := [ ],
+  checks := [
+    ckk "applyIntId" "1" .float (ap (v "apply") [v "intId", .atexp (.scon (.intF 1))]),
+    ckk "applyStrId" "\"hi\"" .string (ap (v "apply") [v "strId", str "hi"]),
+    ckk "applyLambda" "42" .float (ap (v "apply") [.atexp (.paren (lams [pv "n"] (v "n"))), .atexp (.scon (.intF 42))]) ] }
+
+/-- tests/elm/src/PolyChainCallTest.elm -/
+def g_elm_PolyChainCallTest : Program := {
+  name := "PolyChainCallTest", source := "tests/elm/src",
+  cons := [("Leaf", 0), ("Node", 3)],
+  defs := [
+    .fn "insertTree" [pv "val", pv "tree"] (ap (c "Node") [v "tree", v "val", c "Leaf"]),
+    .fn "buildTree" [pv "x", pv "y"] (letDefs [.fn "t1" [] (ap (v "insertTree") [v "x", c "Leaf"]), .fn "t2" [] (ap (v "insertTree") [v "y", v "t1"])] (v "t2")),
+    .fn "sizeTree" [pv "t"] (caseOf (v "t") [(P (pcA "Leaf"), i 0), (pcon "Node" [pv "left", pw, pv "right"], bin "+" (bin "+" (i 1) (ap (v "sizeTree") [v "left"])) (ap (v "sizeTree") [v "right"]))]) ],
+  locals := [ ],
+  checks := [
+    ckk "size" "2" .int (ap (v "sizeTree") [.atexp (.paren (ap (v "buildTree") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]))]) ] }
+
 /-- tests/elm/src/PolyChainDictLikeInsertChained5TimesWithTupleKeysConcreteCallerTest.elm -/
 def g_elm_PolyChainDictLikeInsertChained5TimesWithTupleKeysConcreteCallerTest : Program := {
   name := "PolyChainDictLikeInsertChained5TimesWithTupleKeysConcreteCallerTest", source := "tests/elm/src",
@@ -488,30 +514,11 @@ def g_elm_SingleCtorPairUnitIntTest : Program := {
     ckk "unwrap_int" "77" .int (ap (v "unwrapInt") [.atexp (.paren (ap (c "WrapInt") [i 77]))]),
     ckk "match_unit" "\"got_unit\"" .string (ap (v "matchUnit") [.atexp .unit]) ] }
 
-/-- tests/elm/src/StandardA93MutualNumberDefaultTest.elm -/
-def g_elm_StandardA93MutualNumberDefaultTest : Program := {
-  name := "StandardA93MutualNumberDefaultTest", source := "tests/elm/src", native := true,
-  cons := [],
-  defs := [
-    .fn "f" [pv "n"] (ifChain [(bin "<=" (v "n") (.atexp (.scon (.intF 0))), .atexp (.scon (.intF 0))), (bin ">" (bin "^" (ap (v "g") [.atexp (.scon (.intF 1)), .atexp (.paren (bin "-" (v "n") (.atexp (.scon (.intF 1)))))]) (.atexp (neg (.scon (.intF 1))))) (.atexp (.scon (.intF 0))), .atexp (.scon (.intF 1)))] (.atexp (.scon (.intF 0)))),
-    .fn "g" [pv "y", pv "k"] (ifte (bin "<=" (v "k") (.atexp (.scon (.intF 0)))) (bin "+" (v "y") (.atexp (.scon (.intF 1)))) (letDefs [.pat pw (ap (v "f") [v "k"])] (bin "+" (v "y") (.atexp (.scon (.intF 1)))))) ],
-  locals := [ ],
-  checks := [
-    ckk "f 3" "1" .float (ap (v "f") [.atexp (.scon (.intF 3))]) ] }
-
-/-- tests/elm/src/StandardApplicationStrictTest.elm -/
-def g_elm_StandardApplicationStrictTest : Program := {
-  name := "StandardApplicationStrictTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "before" "()" .data (.atexp .unit),
-    ckk "app strict" "(no value)" .float (ap (.atexp (.paren (lams [pw] (.atexp (.scon (.intF 1)))))) [.atexp (.paren (ap (qv "Debug" "todo") [str "x"]))]) ] }
-
 /-- The programs of this shard. -/
 def shard_Elm08 : List Program :=
-  [g_elm_PolyChainDictLikeInsertChained5TimesWithTupleKeysConcreteCallerTest,
+  [g_elm_PolyApplyLambdaTest,
+   g_elm_PolyChainCallTest,
+   g_elm_PolyChainDictLikeInsertChained5TimesWithTupleKeysConcreteCallerTest,
    g_elm_PolyChainFoldlLikeCalled8TimesOverTupleKeyedStructureTest,
    g_elm_PolyEscapePolymorphicFunctionExtractedFromTupleTest,
    g_elm_PolyEscapeRecordTest,
@@ -548,8 +555,6 @@ def shard_Elm08 : List Program :=
    g_elm_SingleCtorPairIntFloatTest,
    g_elm_SingleCtorPairStringBoolTest,
    g_elm_SingleCtorPairStringIntTest,
-   g_elm_SingleCtorPairUnitIntTest,
-   g_elm_StandardA93MutualNumberDefaultTest,
-   g_elm_StandardApplicationStrictTest]
+   g_elm_SingleCtorPairUnitIntTest]
 
 end StandardElm

@@ -9,7 +9,7 @@ text itself is not checked.
 -}
 
 -- TAGS: elm-spec, sm-conbind, d-app-con, dm-topdec-type, dm-datbind
--- CHECK: person
+-- CHECK: person: Person "Alice" 30 True
 
 import Html exposing (text)
 

@@ -1,6 +1,6 @@
 # A Standard Definition of Elm?
 
-*A Standard Definition of Elm?* (Draft version 0.3), a formal definition of the Elm language: its
+*A Standard Definition of Elm?* (Draft version 0.4), a formal definition of the Elm language: its
 LaTeX sources, its PDF, and everything else the stages that write it produce. The website (`site/`)
 shows the book with a page for every rule; `runner/definition-data.js` turns `tex/` into the site's
 data.

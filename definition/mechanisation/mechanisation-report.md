@@ -1,5 +1,12 @@
 # Mechanisation Report
 
+> **Update, 2026-11-11 (CHECK lines tightened).** CustomTypeMultiFieldTest, CustomTypeNestedTest and
+> FloatNaNTest had CHECK lines naming only a label, which the translator cannot compare; with their
+> values written out they translate, and FloatNaNTest now checks `isNaN (nan + 1.0)`; FloatEdgeTest
+> and CoreIssue1080ClampNanTest check each NaN they expect with `isNaN` too. 491 of 939 `elm-spec`
+> tests translate; the run has 1,487 checks, all agreeing with the book, and 1,162 theorems by
+> `decide +kernel`.
+
 > **Update, 2026-11-10 (review round 3).** After the book's third review and the test changes it
 > led to (six tests retagged `elm-unspecced`, LetSeparatedStagingTest given its CHECK line, two tests
 > annotated to keep an Int use), 488 of 939 `elm-spec` tests translate. The run has 1,478 checks,

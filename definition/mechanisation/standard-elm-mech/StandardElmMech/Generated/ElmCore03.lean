@@ -4,6 +4,16 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm-core/src/IntDivByZeroTest.elm -/
+def g_elm_core_IntDivByZeroTest : Program := {
+  name := "IntDivByZeroTest", source := "tests/elm-core/src",
+  cons := [],
+  defs := [ ],
+  locals := [ ],
+  checks := [
+    ckk "divZero1" "0" .int (bin "//" (i 10) (i 0)),
+    ckk "divZero2" "0" .int (bin "//" (.atexp (neg (A (i 5)))) (i 0)) ] }
+
 /-- tests/elm-core/src/IntDivTest.elm -/
 def g_elm_core_IntDivTest : Program := {
   name := "IntDivTest", source := "tests/elm-core/src",
@@ -569,20 +579,10 @@ def g_elm_core_StandardA51FunctionEqualityTest : Program := {
   checks := [
     ckk "compared" "True" .data (orelse (v "same") (ap (v "not") [v "same"])) ] }
 
-/-- tests/elm-core/src/StandardA53CharOrderTest.elm -/
-def g_elm_core_StandardA53CharOrderTest : Program := {
-  name := "StandardA53CharOrderTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "compare '😀' 'ﬀ'" "GT" .data (ap (v "compare") [.atexp (chA '😀'), .atexp (chA 'ﬀ')]),
-    ckk "'😀' > 'ﬀ'" "True" .data (bin ">" (.atexp (chA '😀')) (.atexp (chA 'ﬀ'))),
-    ckk "toCode order agrees" "True" .data (bin "==" (ap (v "compare") [.atexp (chA '😀'), .atexp (chA 'ﬀ')]) (ap (v "compare") [.atexp (.paren (ap (qv "Char" "toCode") [.atexp (chA '😀')])), .atexp (.paren (ap (qv "Char" "toCode") [.atexp (chA 'ﬀ')]))])) ] }
-
 /-- The programs of this shard. -/
 def shard_ElmCore03 : List Program :=
-  [g_elm_core_IntDivTest,
+  [g_elm_core_IntDivByZeroTest,
+   g_elm_core_IntDivTest,
    g_elm_core_IntMinMaxTest,
    g_elm_core_IntModByTest,
    g_elm_core_IntMulTest,
@@ -620,7 +620,6 @@ def shard_ElmCore03 : List Program :=
    g_elm_core_StandardA46CompareNanTest,
    g_elm_core_StandardA48MinMaxNanTest,
    g_elm_core_StandardA49ClampTest,
-   g_elm_core_StandardA51FunctionEqualityTest,
-   g_elm_core_StandardA53CharOrderTest]
+   g_elm_core_StandardA51FunctionEqualityTest]
 
 end StandardElm

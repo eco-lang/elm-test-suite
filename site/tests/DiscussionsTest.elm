@@ -67,7 +67,7 @@ target =
     , key = "r:d-atexp-var"
     , noun = "rule"
     , url = "https://elm-test-suite.netlify.app/standard/rules/d-atexp-var"
-    , context = "Rule 66, d-atexp-var, of A Standard Definition of Elm? (Draft version 0.3)."
+    , context = "Rule 66, d-atexp-var, of A Standard Definition of Elm? (Draft version 0.4)."
     }
 
 

@@ -1771,16 +1771,22 @@
     {
       "project": "elm",
       "name": "CustomTypeMultiFieldTest",
-      "sha256": "6e2d12a17e841dc38d30c117b7813d7135f6e5c989dfa6bcb9829c4fba805963",
-      "status": "refused",
-      "reason": "checks:unlabelled"
+      "sha256": "c4c4a9df93f99c749d1a9abb282bb9d175a91155365bb11102d6627b4621b6bc",
+      "status": "translated",
+      "shard": "Elm03",
+      "def": "g_elm_CustomTypeMultiFieldTest",
+      "checks": 1,
+      "lean": "/-- tests/elm/src/CustomTypeMultiFieldTest.elm -/\ndef g_elm_CustomTypeMultiFieldTest : Program := {\n  name := \"CustomTypeMultiFieldTest\", source := \"tests/elm/src\",\n  cons := [(\"Person\", 3)],\n  defs := [ ],\n  locals := [\n    .fn \"p\" [] (ap (c \"Person\") [str \"Alice\", i 30, c \"True\"]) ],\n  checks := [\n    ckk \"person\" \"Person \\\"Alice\\\" 30 True\" .data (v \"p\") ] }"
     },
     {
       "project": "elm",
       "name": "CustomTypeNestedTest",
-      "sha256": "1755ad5dc224032231f31fb565418feb63534f01f7275e4169425349600becc1",
-      "status": "refused",
-      "reason": "checks:unlabelled"
+      "sha256": "405088940f30400bbb117338042d74f8b38e965b0dc1e9c94a023913c5b8c88b",
+      "status": "translated",
+      "shard": "Elm03",
+      "def": "g_elm_CustomTypeNestedTest",
+      "checks": 1,
+      "lean": "/-- tests/elm/src/CustomTypeNestedTest.elm -/\ndef g_elm_CustomTypeNestedTest : Program := {\n  name := \"CustomTypeNestedTest\", source := \"tests/elm/src\",\n  cons := [(\"Leaf\", 1), (\"Node\", 2)],\n  defs := [ ],\n  locals := [\n    .fn \"tree\" [] (ap (c \"Node\") [.atexp (.paren (ap (c \"Leaf\") [.atexp (.scon (.intF 1))])), .atexp (.paren (ap (c \"Node\") [.atexp (.paren (ap (c \"Leaf\") [.atexp (.scon (.intF 2))])), .atexp (.paren (ap (c \"Leaf\") [.atexp (.scon (.intF 3))]))]))]) ],\n  checks := [\n    ckk \"nested\" \"Node (Leaf 1) (Node (Leaf 2) (Leaf 3))\" .data (v \"tree\") ] }"
     },
     {
       "project": "elm",
@@ -1859,7 +1865,7 @@
       "name": "DeepEqualityTest",
       "sha256": "b146b40509dc1e86dc9ac37727d72d484facb1539b6eae10c334c1d1345c1187",
       "status": "translated",
-      "shard": "Elm03",
+      "shard": "Elm04",
       "def": "g_elm_DeepEqualityTest",
       "checks": 5,
       "lean": "/-- tests/elm/src/DeepEqualityTest.elm -/\ndef g_elm_DeepEqualityTest : Program := {\n  name := \"DeepEqualityTest\", source := \"tests/elm/src\",\n  cons := [(\"Z\", 0), (\"S\", 1), (\"Leaf\", 1), (\"Wrap\", 1), (\"Chain\", 1)],\n  defs := [\n    .fn \"nat\" [pv \"n\"] (ifte (bin \"<=\" (v \"n\") (i 0)) (c \"Z\") (ap (c \"S\") [.atexp (.paren (ap (v \"nat\") [.atexp (.paren (bin \"-\" (v \"n\") (i 1)))]))])),\n    .fn \"nest\" [pv \"n\", pv \"leaf\"] (ifte (bin \"<=\" (v \"n\") (i 0)) (ap (c \"Leaf\") [v \"leaf\"]) (ap (c \"Wrap\") [.atexp (.paren (ap (v \"nest\") [.atexp (.paren (bin \"-\" (v \"n\") (i 1))), v \"leaf\"]))])),\n    .fn \"chain\" [pv \"n\", pv \"bottom\"] (ifte (bin \"<=\" (v \"n\") (i 0)) (ap (c \"Chain\") [recE [(\"next\", c \"Nothing\"), (\"v\", v \"bottom\")]]) (ap (c \"Chain\") [recE [(\"next\", ap (c \"Just\") [.atexp (.paren (ap (v \"chain\") [.atexp (.paren (bin \"-\" (v \"n\") (i 1))), v \"bottom\"]))]), (\"v\", i 0)]])),\n    .fn \"bool\" [pv \"b\"] (ifte (v \"b\") (str \"True\") (str \"False\")) ],\n  locals := [ ],\n  checks := [\n    ckk \"nat 150 vs 200\" \"\\\"False\\\"\" .string (ap (v \"bool\") [.atexp (.paren (bin \"==\" (ap (v \"nat\") [i 150]) (ap (v \"nat\") [i 200])))]),\n    ckk \"nat 150 vs 150\" \"\\\"True\\\"\" .string (ap (v \"bool\") [.atexp (.paren (bin \"==\" (ap (v \"nat\") [i 150]) (ap (v \"nat\") [i 150])))]),\n    ckk \"nest 120\" \"\\\"False\\\"\" .string (ap (v \"bool\") [.atexp (.paren (bin \"==\" (ap (v \"nest\") [i 120, i 1]) (ap (v \"nest\") [i 120, i 2])))]),\n    ckk \"nest 500 /=\" \"\\\"True\\\"\" .string (ap (v \"bool\") [.atexp (.paren (bin \"/=\" (ap (v \"nest\") [i 500, i 1]) (ap (v \"nest\") [i 500, i 2])))]),\n    ckk \"record chain 300\" \"\\\"False\\\"\" .string (ap (v \"bool\") [.atexp (.paren (bin \"==\" (ap (v \"chain\") [i 300, i 1]) (ap (v \"chain\") [i 300, i 2])))]) ] }"
@@ -1869,7 +1875,7 @@
       "name": "DeepNestStressTest",
       "sha256": "efc3bf56c63c76074e9e2d8e1681c183d28e4af70b5f4cb1235f1a6be657ab3a",
       "status": "translated",
-      "shard": "Elm03",
+      "shard": "Elm04",
       "def": "g_elm_DeepNestStressTest",
       "checks": 4,
       "lean": "/-- tests/elm/src/DeepNestStressTest.elm -/\ndef g_elm_DeepNestStressTest : Program := {\n  name := \"DeepNestStressTest\", source := \"tests/elm/src\",\n  cons := [],\n  defs := [ ],\n  locals := [\n    .fn \"nl\" [] (listE [listE [listE [listE [.atexp (.scon (.intF 1))]]]]),\n    .fn \"nlVal\" [] (caseOf (v \"nl\") [(P (listP [P (listP [P (listP [P (listP [P (pv \"x\")])])])]), v \"x\"), (P pw, .atexp (.scon (.intF 0)))]),\n    .fn \"nt\" [] (tup2 (tup2 (tup2 (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 4)))) (.atexp (.scon (.intF 5)))),\n    .pat (ptup2 (P (ptup2 (P (ptup2 (P (ptup2 (P (pv \"first\")) (P pw))) (P pw))) (P pw))) (P pw)) (v \"nt\"),\n    .fn \"nr\" [] (recE [(\"n\", recE [(\"n\", recE [(\"n\", recE [(\"v\", .atexp (.scon (.intF 1)))])])])]),\n    .fn \"a\" [] (letDefs [.fn \"b\" [] (letDefs [.fn \"c\" [] (letDefs [.fn \"d\" [] (.atexp (.scon (.intF 10)))] (v \"d\"))] (v \"c\"))] (v \"b\")) ],\n  checks := [\n    ckk \"nested_list\" \"1\" .float (v \"nlVal\"),\n    ckk \"nested_tuple\" \"1\" .float (v \"first\"),\n    ckk \"nested_record\" \"1\" .float (.atexp (access (access (access (access (A (v \"nr\")) \"n\") \"n\") \"n\") \"v\")),\n    ckk \"nested_let\" \"10\" .float (v \"a\") ] }"
@@ -2178,12 +2184,12 @@
     {
       "project": "elm",
       "name": "FloatEdgeTest",
-      "sha256": "b4f4a1f44bb9c2f57d414ea7f3d0cbae5591d6c7adfffb3662d3f3f7886fa7e2",
+      "sha256": "1bd251c94475bef635a0c92117ae9de14abed6f988b8eb4d355f9a108a3e5e62",
       "status": "translated",
       "shard": "Elm04",
       "def": "g_elm_FloatEdgeTest",
-      "checks": 22,
-      "lean": "/-- tests/elm/src/FloatEdgeTest.elm -/\ndef g_elm_FloatEdgeTest : Program := {\n  name := \"FloatEdgeTest\", source := \"tests/elm/src\", native := true,\n  cons := [],\n  defs := [\n    .fn \"nan\" [] (bin \"/\" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))),\n    .fn \"inf\" [] (bin \"/\" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 0)))),\n    .fn \"show\" [] (qv \"Debug\" \"toString\"),\n    .fn \"foldl\" [pv \"f\", pv \"acc\", pv \"xs\"] (caseOf (v \"xs\") [(P (listP []), v \"acc\"), (.cons (P (pv \"x\")) (P (pv \"rest\")), ap (v \"foldl\") [v \"f\", .atexp (.paren (ap (v \"f\") [v \"x\", v \"acc\"])), v \"rest\"])]),\n    .fn \"orderName\" [pv \"a\", pv \"b\"] (caseOf (ap (v \"compare\") [v \"a\", v \"b\"]) [(P (pcA \"LT\"), str \"LT\"), (P (pcA \"EQ\"), str \"EQ\"), (P (pcA \"GT\"), str \"GT\")]) ],\n  locals := [ ],\n  checks := [\n    ckk \"round 2.5\" \"\\\"3\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (.scon (.float 25 (-1)))]))]),\n    ckk \"round -2.5\" \"\\\"-2\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (neg (.scon (.float 25 (-1))))]))]),\n    ckk \"round 0.5\" \"\\\"1\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (.scon (.float 5 (-1)))]))]),\n    ckk \"round -0.5\" \"\\\"0\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (neg (.scon (.float 5 (-1))))]))]),\n    ckk \"round 1.5\" \"\\\"2\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (.scon (.float 15 (-1)))]))]),\n    ckk \"round -1.5\" \"\\\"-1\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (neg (.scon (.float 15 (-1))))]))]),\n    ckk \"nan == nan\" \"\\\"False\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"==\" (v \"nan\") (v \"nan\")))]),\n    ckk \"nan /= nan\" \"\\\"True\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"/=\" (v \"nan\") (v \"nan\")))]),\n    ckk \"1 /= nan\" \"\\\"True\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"/=\" (.atexp (.scon (.intF 1))) (v \"nan\")))]),\n    ckk \"min 1 nan\" \"\\\"NaN\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"min\") [.atexp (.scon (.intF 1)), v \"nan\"]))]),\n    ckk \"compare nan 1\" \"\\\"GT\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"compare\") [v \"nan\", .atexp (.scon (.intF 1))]))]),\n    ckk \"foldl min\" \"\\\"NaN\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"foldl\") [v \"min\", v \"nan\", listE [.atexp (.scon (.intF 1))]]))]),\n    ckk \"map round\" \"\\\"[-2,0,3]\\\"\" .string (ap (v \"show\") [listE [ap (v \"round\") [.atexp (neg (.scon (.float 25 (-1))))], ap (v \"round\") [.atexp (neg (.scon (.float 5 (-1))))], ap (v \"round\") [.atexp (.scon (.float 25 (-1)))]]]),\n    ckk \"case compare nan 1\" \"\\\"GT\\\"\" .string (ap (v \"orderName\") [v \"nan\", .atexp (.scon (.intF 1))]),\n    ckk \"case compare 1 2\" \"\\\"LT\\\"\" .string (ap (v \"orderName\") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]),\n    ckk \"case compare 2 2\" \"\\\"EQ\\\"\" .string (ap (v \"orderName\") [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 2))]),\n    ckk \"compare tuple nan\" \"\\\"GT\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"compare\") [tup2 (v \"nan\") (.atexp (.scon (.intF 1))), tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 1)))]))]),\n    ckk \"compare list nan\" \"\\\"GT\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"compare\") [listE [v \"nan\"], listE [.atexp (.scon (.intF 1))]]))]),\n    ckk \"just nan == just nan\" \"\\\"False\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"==\" (ap (c \"Just\") [v \"nan\"]) (ap (c \"Just\") [v \"nan\"])))]),\n    ckk \"list nan /= list nan\" \"\\\"True\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"/=\" (listE [v \"nan\"]) (listE [v \"nan\"])))]),\n    ckk \"truncate nan\" \"\\\"0\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"truncate\") [v \"nan\"]))]),\n    ckk \"pow 3 33\" \"\\\"5559060566555523\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"^\" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 33)))))]) ] }"
+      "checks": 24,
+      "lean": "/-- tests/elm/src/FloatEdgeTest.elm -/\ndef g_elm_FloatEdgeTest : Program := {\n  name := \"FloatEdgeTest\", source := \"tests/elm/src\", native := true,\n  cons := [],\n  defs := [\n    .fn \"nan\" [] (bin \"/\" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))),\n    .fn \"inf\" [] (bin \"/\" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 0)))),\n    .fn \"show\" [] (qv \"Debug\" \"toString\"),\n    .fn \"foldl\" [pv \"f\", pv \"acc\", pv \"xs\"] (caseOf (v \"xs\") [(P (listP []), v \"acc\"), (.cons (P (pv \"x\")) (P (pv \"rest\")), ap (v \"foldl\") [v \"f\", .atexp (.paren (ap (v \"f\") [v \"x\", v \"acc\"])), v \"rest\"])]),\n    .fn \"orderName\" [pv \"a\", pv \"b\"] (caseOf (ap (v \"compare\") [v \"a\", v \"b\"]) [(P (pcA \"LT\"), str \"LT\"), (P (pcA \"EQ\"), str \"EQ\"), (P (pcA \"GT\"), str \"GT\")]) ],\n  locals := [ ],\n  checks := [\n    ckk \"round 2.5\" \"\\\"3\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (.scon (.float 25 (-1)))]))]),\n    ckk \"round -2.5\" \"\\\"-2\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (neg (.scon (.float 25 (-1))))]))]),\n    ckk \"round 0.5\" \"\\\"1\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (.scon (.float 5 (-1)))]))]),\n    ckk \"round -0.5\" \"\\\"0\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (neg (.scon (.float 5 (-1))))]))]),\n    ckk \"round 1.5\" \"\\\"2\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (.scon (.float 15 (-1)))]))]),\n    ckk \"round -1.5\" \"\\\"-1\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"round\") [.atexp (neg (.scon (.float 15 (-1))))]))]),\n    ckk \"nan == nan\" \"\\\"False\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"==\" (v \"nan\") (v \"nan\")))]),\n    ckk \"nan /= nan\" \"\\\"True\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"/=\" (v \"nan\") (v \"nan\")))]),\n    ckk \"1 /= nan\" \"\\\"True\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"/=\" (.atexp (.scon (.intF 1))) (v \"nan\")))]),\n    ckk \"min 1 nan is NaN\" \"\\\"True\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"isNaN\") [.atexp (.paren (ap (v \"min\") [.atexp (.scon (.intF 1)), v \"nan\"]))]))]),\n    ckk \"min 1 nan\" \"\\\"NaN\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"min\") [.atexp (.scon (.intF 1)), v \"nan\"]))]),\n    ckk \"compare nan 1\" \"\\\"GT\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"compare\") [v \"nan\", .atexp (.scon (.intF 1))]))]),\n    ckk \"foldl min is NaN\" \"\\\"True\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"isNaN\") [.atexp (.paren (ap (v \"foldl\") [v \"min\", v \"nan\", listE [.atexp (.scon (.intF 1))]]))]))]),\n    ckk \"foldl min\" \"\\\"NaN\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"foldl\") [v \"min\", v \"nan\", listE [.atexp (.scon (.intF 1))]]))]),\n    ckk \"map round\" \"\\\"[-2,0,3]\\\"\" .string (ap (v \"show\") [listE [ap (v \"round\") [.atexp (neg (.scon (.float 25 (-1))))], ap (v \"round\") [.atexp (neg (.scon (.float 5 (-1))))], ap (v \"round\") [.atexp (.scon (.float 25 (-1)))]]]),\n    ckk \"case compare nan 1\" \"\\\"GT\\\"\" .string (ap (v \"orderName\") [v \"nan\", .atexp (.scon (.intF 1))]),\n    ckk \"case compare 1 2\" \"\\\"LT\\\"\" .string (ap (v \"orderName\") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]),\n    ckk \"case compare 2 2\" \"\\\"EQ\\\"\" .string (ap (v \"orderName\") [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 2))]),\n    ckk \"compare tuple nan\" \"\\\"GT\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"compare\") [tup2 (v \"nan\") (.atexp (.scon (.intF 1))), tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 1)))]))]),\n    ckk \"compare list nan\" \"\\\"GT\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"compare\") [listE [v \"nan\"], listE [.atexp (.scon (.intF 1))]]))]),\n    ckk \"just nan == just nan\" \"\\\"False\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"==\" (ap (c \"Just\") [v \"nan\"]) (ap (c \"Just\") [v \"nan\"])))]),\n    ckk \"list nan /= list nan\" \"\\\"True\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"/=\" (listE [v \"nan\"]) (listE [v \"nan\"])))]),\n    ckk \"truncate nan\" \"\\\"0\\\"\" .string (ap (v \"show\") [.atexp (.paren (ap (v \"truncate\") [v \"nan\"]))]),\n    ckk \"pow 3 33\" \"\\\"5559060566555523\\\"\" .string (ap (v \"show\") [.atexp (.paren (bin \"^\" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 33)))))]) ] }"
     },
     {
       "project": "elm",
@@ -2348,7 +2354,7 @@
       "name": "HigherOrderFunctionChosenByIfTest",
       "sha256": "7406ff71a5c4c816d718a23fa368c0a6b0e93ed0a410f05341eb10729f367a69",
       "status": "translated",
-      "shard": "Elm04",
+      "shard": "Elm05",
       "def": "g_elm_HigherOrderFunctionChosenByIfTest",
       "checks": 1,
       "lean": "/-- tests/elm/src/HigherOrderFunctionChosenByIfTest.elm -/\ndef g_elm_HigherOrderFunctionChosenByIfTest : Program := {\n  name := \"HigherOrderFunctionChosenByIfTest\", source := \"tests/elm/src\",\n  cons := [],\n  defs := [\n    .fn \"useH\" [pv \"b\", pv \"hof1\", pv \"hof2\", pv \"k\"] (letDefs [.fn \"h\" [] (ifte (v \"b\") (v \"hof1\") (v \"hof2\"))] (ap (v \"h\") [v \"k\"])),\n    .fn \"testValue\" [] (ap (v \"useH\") [.atexp (.con ⟨some \"Basics\", \"True\"⟩), .atexp (.paren (lams [pv \"f\"] (ap (v \"f\") [i 1]))), .atexp (.paren (lams [pv \"g\"] (ap (v \"g\") [i 2]))), .atexp (.paren (lams [pv \"x\"] (bin \"*\" (v \"x\") (i 2))))]) ],\n  locals := [ ],\n  checks := [\n    ckk \"testValue\" \"2\" .int (v \"testValue\") ] }"
@@ -2358,7 +2364,7 @@
       "name": "HigherOrderFunctionFactoryTest",
       "sha256": "7f47548121065f0a2cd9b2f268de6d1fedf9cc6bf70962d0b8025b9b5c331180",
       "status": "translated",
-      "shard": "Elm04",
+      "shard": "Elm05",
       "def": "g_elm_HigherOrderFunctionFactoryTest",
       "checks": 1,
       "lean": "/-- tests/elm/src/HigherOrderFunctionFactoryTest.elm -/\ndef g_elm_HigherOrderFunctionFactoryTest : Program := {\n  name := \"HigherOrderFunctionFactoryTest\", source := \"tests/elm/src\",\n  cons := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.fn \"makeTransform\" [pv \"factor\"] (lams [pv \"x\"] (tup2 (v \"x\") (v \"factor\"))), .fn \"double\" [] (ap (v \"makeTransform\") [.atexp (.scon (.intF 2))])] (ap (v \"double\") [.atexp (.scon (.intF 5))])) ],\n  locals := [ ],\n  checks := [\n    ckk \"testValue\" \"(5,2)\" .data (v \"testValue\") ] }"
@@ -2899,7 +2905,7 @@
       "name": "LetMultiFuncTest",
       "sha256": "6824c6b284d2bd46cbd3e929522be0ae58832cb7dad25624ae6a86fe305eb684",
       "status": "translated",
-      "shard": "Elm05",
+      "shard": "Elm06",
       "def": "g_elm_LetMultiFuncTest",
       "checks": 2,
       "lean": "/-- tests/elm/src/LetMultiFuncTest.elm -/\ndef g_elm_LetMultiFuncTest : Program := {\n  name := \"LetMultiFuncTest\", source := \"tests/elm/src\",\n  cons := [],\n  defs := [ ],\n  locals := [\n    .fn \"identity\" [pv \"x\"] (v \"x\"),\n    .fn \"const\" [pv \"x\", pv \"y\"] (v \"x\"),\n    .fn \"r1\" [] (ap (v \"identity\") [.atexp (.scon (.intF 1))]),\n    .fn \"r2\" [] (ap (v \"const\") [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) ],\n  checks := [\n    ckk \"r1\" \"1\" .float (v \"r1\"),\n    ckk \"r2\" \"2\" .float (v \"r2\") ] }"
@@ -2909,7 +2915,7 @@
       "name": "LetMultipleTest",
       "sha256": "f6875e97610449e69687df3793ada8bc97239e8001374671b9ec38251976cfb9",
       "status": "translated",
-      "shard": "Elm05",
+      "shard": "Elm06",
       "def": "g_elm_LetMultipleTest",
       "checks": 2,
       "lean": "/-- tests/elm/src/LetMultipleTest.elm -/\ndef g_elm_LetMultipleTest : Program := {\n  name := \"LetMultipleTest\", source := \"tests/elm/src\",\n  cons := [],\n  defs := [ ],\n  locals := [\n    .fn \"a\" [] (.atexp (.scon (.intF 1))),\n    .fn \"b\" [] (.atexp (.scon (.intF 2))),\n    .fn \"c\" [] (.atexp (.scon (.intF 3))),\n    .fn \"d\" [] (.atexp (.scon (.intF 4))),\n    .fn \"e\" [] (.atexp (.scon (.intF 5))),\n    .fn \"sum\" [] (bin \"+\" (bin \"+\" (bin \"+\" (bin \"+\" (v \"a\") (v \"b\")) (v \"c\")) (v \"d\")) (v \"e\")),\n    .fn \"product\" [] (bin \"*\" (bin \"*\" (bin \"*\" (bin \"*\" (v \"a\") (v \"b\")) (v \"c\")) (v \"d\")) (v \"e\")) ],\n  checks := [\n    ckk \"sum\" \"15\" .float (v \"sum\"),\n    ckk \"product\" \"120\" .float (v \"product\") ] }"
@@ -3443,7 +3449,7 @@
       "name": "LetSeparatedStagingTest",
       "sha256": "8e73c84b4970d5e51c66104471fa94cdf8adff05cdc6d7949241f5502ee40d55",
       "status": "translated",
-      "shard": "Elm06",
+      "shard": "Elm07",
       "def": "g_elm_LetSeparatedStagingTest",
       "checks": 1,
       "lean": "/-- tests/elm/src/LetSeparatedStagingTest.elm -/\ndef g_elm_LetSeparatedStagingTest : Program := {\n  name := \"LetSeparatedStagingTest\", source := \"tests/elm/src\",\n  cons := [],\n  defs := [\n    .fn \"caseFunc\" [pv \"n\", pv \"k\"] (caseOf (v \"n\") [(P (pint 0), lams [pv \"a\"] (letDefs [.fn \"y\" [] (bin \"+\" (v \"a\") (v \"k\"))] (lams [pv \"z\"] (bin \"+\" (v \"y\") (v \"z\"))))), (P pw, lams [pv \"a\", pv \"z\"] (bin \"+\" (v \"a\") (v \"z\")))]) ],\n  locals := [ ],\n  checks := [\n    ckk \"result\" \"18\" .int (ap (v \"caseFunc\") [i 0, i 10, i 5, i 3]) ] }"
@@ -3461,7 +3467,7 @@
       "name": "ListConsCharTest",
       "sha256": "7c85ba0c513e3f20c0bff217c04c4e29640d2020a5933c883027b26f67534e2b",
       "status": "translated",
-      "shard": "Elm06",
+      "shard": "Elm07",
       "def": "g_elm_ListConsCharTest",
       "checks": 3,
       "lean": "/-- tests/elm/src/ListConsCharTest.elm -/\ndef g_elm_ListConsCharTest : Program := {\n  name := \"ListConsCharTest\", source := \"tests/elm/src\",\n  cons := [],\n  defs := [ ],\n  locals := [\n    .fn \"xs\" [] (listE [.atexp (chA 'a'), .atexp (chA 'b'), .atexp (chA 'c')]) ],\n  checks := [\n    ckk \"list\" \"['a','b','c']\" .data (v \"xs\"),\n    ckk \"head\" \"Just 'a'\" .data (caseOf (v \"xs\") [(.cons (P (pv \"h\")) (P pw), ap (c \"Just\") [v \"h\"]), (P (listP []), c \"Nothing\")]),\n    ckk \"prepend\" \"['z','a','b','c']\" .data (bin \"::\" (.atexp (chA 'z')) (v \"xs\")) ] }"
@@ -3990,7 +3996,7 @@
       "name": "PolyApplyLambdaTest",
       "sha256": "8f6ed7db12aa04ada24dd7384a92b864718a755ce947741e5588753e518daf48",
       "status": "translated",
-      "shard": "Elm07",
+      "shard": "Elm08",
       "def": "g_elm_PolyApplyLambdaTest",
       "checks": 3,
       "lean": "/-- tests/elm/src/PolyApplyLambdaTest.elm -/\ndef g_elm_PolyApplyLambdaTest : Program := {\n  name := \"PolyApplyLambdaTest\", source := \"tests/elm/src\",\n  cons := [],\n  defs := [\n    .fn \"apply\" [pv \"f\", pv \"x\"] (ap (v \"f\") [v \"x\"]),\n    .fn \"intId\" [pv \"n\"] (v \"n\"),\n    .fn \"strId\" [pv \"s\"] (v \"s\") ],\n  locals := [ ],\n  checks := [\n    ckk \"applyIntId\" \"1\" .float (ap (v \"apply\") [v \"intId\", .atexp (.scon (.intF 1))]),\n    ckk \"applyStrId\" \"\\\"hi\\\"\" .string (ap (v \"apply\") [v \"strId\", str \"hi\"]),\n    ckk \"applyLambda\" \"42\" .float (ap (v \"apply\") [.atexp (.paren (lams [pv \"n\"] (v \"n\"))), .atexp (.scon (.intF 42))]) ] }"
@@ -4000,7 +4006,7 @@
       "name": "PolyChainCallTest",
       "sha256": "c2893c31a3cf4beb5902b3d362e68e33ea7d51f7cc8709b51e561cfc873c7344",
       "status": "translated",
-      "shard": "Elm07",
+      "shard": "Elm08",
       "def": "g_elm_PolyChainCallTest",
       "checks": 1,
       "lean": "/-- tests/elm/src/PolyChainCallTest.elm -/\ndef g_elm_PolyChainCallTest : Program := {\n  name := \"PolyChainCallTest\", source := \"tests/elm/src\",\n  cons := [(\"Leaf\", 0), (\"Node\", 3)],\n  defs := [\n    .fn \"insertTree\" [pv \"val\", pv \"tree\"] (ap (c \"Node\") [v \"tree\", v \"val\", c \"Leaf\"]),\n    .fn \"buildTree\" [pv \"x\", pv \"y\"] (letDefs [.fn \"t1\" [] (ap (v \"insertTree\") [v \"x\", c \"Leaf\"]), .fn \"t2\" [] (ap (v \"insertTree\") [v \"y\", v \"t1\"])] (v \"t2\")),\n    .fn \"sizeTree\" [pv \"t\"] (caseOf (v \"t\") [(P (pcA \"Leaf\"), i 0), (pcon \"Node\" [pv \"left\", pw, pv \"right\"], bin \"+\" (bin \"+\" (i 1) (ap (v \"sizeTree\") [v \"left\"])) (ap (v \"sizeTree\") [v \"right\"]))]) ],\n  locals := [ ],\n  checks := [\n    ckk \"size\" \"2\" .int (ap (v \"sizeTree\") [.atexp (.paren (ap (v \"buildTree\") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]))]) ] }"
@@ -4817,7 +4823,7 @@
       "name": "StandardA93MutualNumberDefaultTest",
       "sha256": "efde5b14ec8d34abb03da9d58b4f1a1308d97d808ee8e1b1f76634196e379479",
       "status": "translated",
-      "shard": "Elm08",
+      "shard": "Elm09",
       "def": "g_elm_StandardA93MutualNumberDefaultTest",
       "checks": 1,
       "lean": "/-- tests/elm/src/StandardA93MutualNumberDefaultTest.elm -/\ndef g_elm_StandardA93MutualNumberDefaultTest : Program := {\n  name := \"StandardA93MutualNumberDefaultTest\", source := \"tests/elm/src\", native := true,\n  cons := [],\n  defs := [\n    .fn \"f\" [pv \"n\"] (ifChain [(bin \"<=\" (v \"n\") (.atexp (.scon (.intF 0))), .atexp (.scon (.intF 0))), (bin \">\" (bin \"^\" (ap (v \"g\") [.atexp (.scon (.intF 1)), .atexp (.paren (bin \"-\" (v \"n\") (.atexp (.scon (.intF 1)))))]) (.atexp (neg (.scon (.intF 1))))) (.atexp (.scon (.intF 0))), .atexp (.scon (.intF 1)))] (.atexp (.scon (.intF 0)))),\n    .fn \"g\" [pv \"y\", pv \"k\"] (ifte (bin \"<=\" (v \"k\") (.atexp (.scon (.intF 0)))) (bin \"+\" (v \"y\") (.atexp (.scon (.intF 1)))) (letDefs [.pat pw (ap (v \"f\") [v \"k\"])] (bin \"+\" (v \"y\") (.atexp (.scon (.intF 1)))))) ],\n  locals := [ ],\n  checks := [\n    ckk \"f 3\" \"1\" .float (ap (v \"f\") [.atexp (.scon (.intF 3))]) ] }"
@@ -4857,7 +4863,7 @@
       "name": "StandardApplicationStrictTest",
       "sha256": "e6b736cdf3d7bc830b35716409ed3171922e6c18f091fd623a7ffc9874ed1f2d",
       "status": "translated",
-      "shard": "Elm08",
+      "shard": "Elm09",
       "def": "g_elm_StandardApplicationStrictTest",
       "checks": 2,
       "lean": "/-- tests/elm/src/StandardApplicationStrictTest.elm -/\ndef g_elm_StandardApplicationStrictTest : Program := {\n  name := \"StandardApplicationStrictTest\", source := \"tests/elm/src\",\n  cons := [],\n  defs := [ ],\n  locals := [ ],\n  checks := [\n    ckk \"before\" \"()\" .data (.atexp .unit),\n    ckk \"app strict\" \"(no value)\" .float (ap (.atexp (.paren (lams [pw] (.atexp (.scon (.intF 1)))))) [.atexp (.paren (ap (qv \"Debug\" \"todo\") [str \"x\"]))]) ] }"
@@ -7046,12 +7052,12 @@
     {
       "project": "elm-core",
       "name": "CoreIssue1080ClampNanTest",
-      "sha256": "d0630473393718f6a35dea32216efd1b2d0613c2ab0d9c7740a72e228cedd46d",
+      "sha256": "1c9626b7a145ad8cce7d2ff203df42290d9fc1f459d68635cc60c7d6e4644518",
       "status": "translated",
       "shard": "ElmCore01",
       "def": "g_elm_core_CoreIssue1080ClampNanTest",
-      "checks": 1,
-      "lean": "/-- tests/elm-core/src/CoreIssue1080ClampNanTest.elm -/\ndef g_elm_core_CoreIssue1080ClampNanTest : Program := {\n  name := \"CoreIssue1080ClampNanTest\", source := \"tests/elm-core/src\",\n  cons := [],\n  defs := [ ],\n  locals := [ ],\n  checks := [\n    ckk \"clamp nan\" \"NaN\" .float (ap (v \"clamp\") [.atexp (neg (.scon (.intF 100))), .atexp (.scon (.intF 100)), .atexp (.paren (bin \"/\" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))))]) ] }"
+      "checks": 2,
+      "lean": "/-- tests/elm-core/src/CoreIssue1080ClampNanTest.elm -/\ndef g_elm_core_CoreIssue1080ClampNanTest : Program := {\n  name := \"CoreIssue1080ClampNanTest\", source := \"tests/elm-core/src\",\n  cons := [],\n  defs := [ ],\n  locals := [ ],\n  checks := [\n    ckk \"clamp nan is NaN\" \"True\" .data (ap (v \"isNaN\") [.atexp (.paren (ap (v \"clamp\") [.atexp (neg (.scon (.intF 100))), .atexp (.scon (.intF 100)), .atexp (.paren (bin \"/\" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))))]))]),\n    ckk \"clamp nan\" \"NaN\" .float (ap (v \"clamp\") [.atexp (neg (.scon (.intF 100))), .atexp (.scon (.intF 100)), .atexp (.paren (bin \"/\" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))))]) ] }"
     },
     {
       "project": "elm-core",
@@ -7105,7 +7111,7 @@
     {
       "project": "elm-core",
       "name": "CoreIssue960PowNegativeExponentIntTest",
-      "sha256": "af0e240bda1043c4320299b6e301d9dc5d848bb3a8f8710764ffd5012effce4d",
+      "sha256": "ce403a025dd61307f9c58f28de6bbe8110ae80b597f7f02f8bccee404669507c",
       "status": "refused",
       "reason": "checks:regex"
     },
@@ -7412,9 +7418,12 @@
     {
       "project": "elm-core",
       "name": "FloatNaNTest",
-      "sha256": "8ab481871204301921278222ad977ab9137a51d062668a1c9b3abbf5f77b73bf",
-      "status": "refused",
-      "reason": "checks:unlabelled"
+      "sha256": "18af15d2dd45a8e1d2395154b6dd0aa864fe9e0663935519c1778c9d1b9c4f92",
+      "status": "translated",
+      "shard": "ElmCore02",
+      "def": "g_elm_core_FloatNaNTest",
+      "checks": 4,
+      "lean": "/-- tests/elm-core/src/FloatNaNTest.elm -/\ndef g_elm_core_FloatNaNTest : Program := {\n  name := \"FloatNaNTest\", source := \"tests/elm-core/src\",\n  cons := [],\n  defs := [ ],\n  locals := [\n    .fn \"nan\" [] (bin \"/\" (.atexp (.scon (.float 0 (-1)))) (.atexp (.scon (.float 0 (-1))))) ],\n  checks := [\n    ckk \"isNaN1\" \"True\" .data (ap (v \"isNaN\") [v \"nan\"]),\n    ckk \"isNaN2\" \"False\" .data (ap (v \"isNaN\") [.atexp (.scon (.float 314 (-2)))]),\n    ckk \"nanProp\" \"True\" .data (ap (v \"isNaN\") [.atexp (.paren (bin \"+\" (v \"nan\") (.atexp (.scon (.float 10 (-1))))))]),\n    ckk \"nanShown\" \"NaN\" .float (bin \"+\" (v \"nan\") (.atexp (.scon (.float 10 (-1))))) ] }"
     },
     {
       "project": "elm-core",
@@ -7531,7 +7540,7 @@
       "name": "IntDivByZeroTest",
       "sha256": "e9f1f13bf30e0a59ce157178c76111d137f984904b018f5f8b9c6a6ba581d185",
       "status": "translated",
-      "shard": "ElmCore02",
+      "shard": "ElmCore03",
       "def": "g_elm_core_IntDivByZeroTest",
       "checks": 2,
       "lean": "/-- tests/elm-core/src/IntDivByZeroTest.elm -/\ndef g_elm_core_IntDivByZeroTest : Program := {\n  name := \"IntDivByZeroTest\", source := \"tests/elm-core/src\",\n  cons := [],\n  defs := [ ],\n  locals := [ ],\n  checks := [\n    ckk \"divZero1\" \"0\" .int (bin \"//\" (i 10) (i 0)),\n    ckk \"divZero2\" \"0\" .int (bin \"//\" (.atexp (neg (A (i 5)))) (i 0)) ] }"
@@ -7971,7 +7980,7 @@
       "name": "StandardA53CharOrderTest",
       "sha256": "4ddd2f56b6ae71bafee7ff7a0d5dc8e7167746eed14dc6ada3394a71f1c8dc77",
       "status": "translated",
-      "shard": "ElmCore03",
+      "shard": "ElmCore04",
       "def": "g_elm_core_StandardA53CharOrderTest",
       "checks": 3,
       "lean": "/-- tests/elm-core/src/StandardA53CharOrderTest.elm -/\ndef g_elm_core_StandardA53CharOrderTest : Program := {\n  name := \"StandardA53CharOrderTest\", source := \"tests/elm-core/src\",\n  cons := [],\n  defs := [ ],\n  locals := [ ],\n  checks := [\n    ckk \"compare '😀' 'ﬀ'\" \"GT\" .data (ap (v \"compare\") [.atexp (chA '😀'), .atexp (chA 'ﬀ')]),\n    ckk \"'😀' > 'ﬀ'\" \"True\" .data (bin \">\" (.atexp (chA '😀')) (.atexp (chA 'ﬀ'))),\n    ckk \"toCode order agrees\" \"True\" .data (bin \"==\" (ap (v \"compare\") [.atexp (chA '😀'), .atexp (chA 'ﬀ')]) (ap (v \"compare\") [.atexp (.paren (ap (qv \"Char\" \"toCode\") [.atexp (chA '😀')])), .atexp (.paren (ap (qv \"Char\" \"toCode\") [.atexp (chA 'ﬀ')]))])) ] }"

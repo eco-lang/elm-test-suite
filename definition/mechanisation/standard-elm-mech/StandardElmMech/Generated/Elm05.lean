@@ -4,6 +4,27 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/HigherOrderFunctionChosenByIfTest.elm -/
+def g_elm_HigherOrderFunctionChosenByIfTest : Program := {
+  name := "HigherOrderFunctionChosenByIfTest", source := "tests/elm/src",
+  cons := [],
+  defs := [
+    .fn "useH" [pv "b", pv "hof1", pv "hof2", pv "k"] (letDefs [.fn "h" [] (ifte (v "b") (v "hof1") (v "hof2"))] (ap (v "h") [v "k"])),
+    .fn "testValue" [] (ap (v "useH") [.atexp (.con ⟨some "Basics", "True"⟩), .atexp (.paren (lams [pv "f"] (ap (v "f") [i 1]))), .atexp (.paren (lams [pv "g"] (ap (v "g") [i 2]))), .atexp (.paren (lams [pv "x"] (bin "*" (v "x") (i 2))))]) ],
+  locals := [ ],
+  checks := [
+    ckk "testValue" "2" .int (v "testValue") ] }
+
+/-- tests/elm/src/HigherOrderFunctionFactoryTest.elm -/
+def g_elm_HigherOrderFunctionFactoryTest : Program := {
+  name := "HigherOrderFunctionFactoryTest", source := "tests/elm/src",
+  cons := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.fn "makeTransform" [pv "factor"] (lams [pv "x"] (tup2 (v "x") (v "factor"))), .fn "double" [] (ap (v "makeTransform") [.atexp (.scon (.intF 2))])] (ap (v "double") [.atexp (.scon (.intF 5))])) ],
+  locals := [ ],
+  checks := [
+    ckk "testValue" "(5,2)" .data (v "testValue") ] }
+
 /-- tests/elm/src/HigherOrderReturnLambdaBasedOnConditionTest.elm -/
 def g_elm_HigherOrderReturnLambdaBasedOnConditionTest : Program := {
   name := "HigherOrderReturnLambdaBasedOnConditionTest", source := "tests/elm/src",
@@ -450,40 +471,11 @@ def g_elm_LetDestructuringTest : Program := {
     ckk "second" "2" .float (v "second"),
     ckk "head" "10" .float (v "a") ] }
 
-/-- tests/elm/src/LetMultiFuncTest.elm -/
-def g_elm_LetMultiFuncTest : Program := {
-  name := "LetMultiFuncTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "identity" [pv "x"] (v "x"),
-    .fn "const" [pv "x", pv "y"] (v "x"),
-    .fn "r1" [] (ap (v "identity") [.atexp (.scon (.intF 1))]),
-    .fn "r2" [] (ap (v "const") [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) ],
-  checks := [
-    ckk "r1" "1" .float (v "r1"),
-    ckk "r2" "2" .float (v "r2") ] }
-
-/-- tests/elm/src/LetMultipleTest.elm -/
-def g_elm_LetMultipleTest : Program := {
-  name := "LetMultipleTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "a" [] (.atexp (.scon (.intF 1))),
-    .fn "b" [] (.atexp (.scon (.intF 2))),
-    .fn "c" [] (.atexp (.scon (.intF 3))),
-    .fn "d" [] (.atexp (.scon (.intF 4))),
-    .fn "e" [] (.atexp (.scon (.intF 5))),
-    .fn "sum" [] (bin "+" (bin "+" (bin "+" (bin "+" (v "a") (v "b")) (v "c")) (v "d")) (v "e")),
-    .fn "product" [] (bin "*" (bin "*" (bin "*" (bin "*" (v "a") (v "b")) (v "c")) (v "d")) (v "e")) ],
-  checks := [
-    ckk "sum" "15" .float (v "sum"),
-    ckk "product" "120" .float (v "product") ] }
-
 /-- The programs of this shard. -/
 def shard_Elm05 : List Program :=
-  [g_elm_HigherOrderReturnLambdaBasedOnConditionTest,
+  [g_elm_HigherOrderFunctionChosenByIfTest,
+   g_elm_HigherOrderFunctionFactoryTest,
+   g_elm_HigherOrderReturnLambdaBasedOnConditionTest,
    g_elm_HigherOrderTest,
    g_elm_HigherOrderTripleNestedFunctionTest,
    g_elm_HoleyAliasTwoParamsTest,
@@ -520,8 +512,6 @@ def shard_Elm05 : List Program :=
    g_elm_LetDestructNestedSingleConstructorNumberTest,
    g_elm_LetDestructRecordTest,
    g_elm_LetDestructTupleNestedTest,
-   g_elm_LetDestructuringTest,
-   g_elm_LetMultiFuncTest,
-   g_elm_LetMultipleTest]
+   g_elm_LetDestructuringTest]
 
 end StandardElm

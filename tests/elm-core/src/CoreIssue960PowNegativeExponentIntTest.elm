@@ -5,7 +5,7 @@ module CoreIssue960PowNegativeExponentIntTest exposing (main)
 <https://github.com/elm/core/issues/960>
 
 Elm 0.19.1 evaluates `(2 : Int) ^ -1` to `0.5`, so logging that `Int` prints `0.5`.
-Whatever the result, a value of type `Int` must be a whole number.
+The book gives 0: `^` at `Int` with a negative exponent is 0 when the base is not 1 or -1 (A43).
 
 The issue's own program used the library function `String.fromInt` to show the result; this
 version reproduces the same bug by logging the `Int` directly with `Debug.log`.
@@ -14,7 +14,7 @@ version reproduces the same bug by logging the `Int` directly with `Debug.log`.
 
 -- TAGS: elm19-bug
 -- TAGS: elm-spec, b:Basics.pow, b:Basics.Int
--- CHECK: {{pow: -?[0-9]+(\n|$)}}
+-- CHECK: {{pow: 0(\n|$)}}
 
 import Html exposing (text)
 

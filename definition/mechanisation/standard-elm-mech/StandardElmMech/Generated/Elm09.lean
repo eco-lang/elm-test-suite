@@ -4,6 +4,27 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/StandardA93MutualNumberDefaultTest.elm -/
+def g_elm_StandardA93MutualNumberDefaultTest : Program := {
+  name := "StandardA93MutualNumberDefaultTest", source := "tests/elm/src", native := true,
+  cons := [],
+  defs := [
+    .fn "f" [pv "n"] (ifChain [(bin "<=" (v "n") (.atexp (.scon (.intF 0))), .atexp (.scon (.intF 0))), (bin ">" (bin "^" (ap (v "g") [.atexp (.scon (.intF 1)), .atexp (.paren (bin "-" (v "n") (.atexp (.scon (.intF 1)))))]) (.atexp (neg (.scon (.intF 1))))) (.atexp (.scon (.intF 0))), .atexp (.scon (.intF 1)))] (.atexp (.scon (.intF 0)))),
+    .fn "g" [pv "y", pv "k"] (ifte (bin "<=" (v "k") (.atexp (.scon (.intF 0)))) (bin "+" (v "y") (.atexp (.scon (.intF 1)))) (letDefs [.pat pw (ap (v "f") [v "k"])] (bin "+" (v "y") (.atexp (.scon (.intF 1)))))) ],
+  locals := [ ],
+  checks := [
+    ckk "f 3" "1" .float (ap (v "f") [.atexp (.scon (.intF 3))]) ] }
+
+/-- tests/elm/src/StandardApplicationStrictTest.elm -/
+def g_elm_StandardApplicationStrictTest : Program := {
+  name := "StandardApplicationStrictTest", source := "tests/elm/src",
+  cons := [],
+  defs := [ ],
+  locals := [ ],
+  checks := [
+    ckk "before" "()" .data (.atexp .unit),
+    ckk "app strict" "(no value)" .float (ap (.atexp (.paren (lams [pw] (.atexp (.scon (.intF 1)))))) [.atexp (.paren (ap (qv "Debug" "todo") [str "x"]))]) ] }
+
 /-- tests/elm/src/StandardCoreEvaluationExamplesTest.elm -/
 def g_elm_StandardCoreEvaluationExamplesTest : Program := {
   name := "StandardCoreEvaluationExamplesTest", source := "tests/elm/src",
@@ -497,7 +518,9 @@ def g_elm_WrapperUnionFieldTest : Program := {
 
 /-- The programs of this shard. -/
 def shard_Elm09 : List Program :=
-  [g_elm_StandardCoreEvaluationExamplesTest,
+  [g_elm_StandardA93MutualNumberDefaultTest,
+   g_elm_StandardApplicationStrictTest,
+   g_elm_StandardCoreEvaluationExamplesTest,
    g_elm_StandardLetStrictTest,
    g_elm_StringCasePatternCommaTest,
    g_elm_StringCreationMatrixTest,
