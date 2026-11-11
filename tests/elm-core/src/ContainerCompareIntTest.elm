@@ -7,6 +7,10 @@ The cases cover order decided at different positions, negative against positive
 values, a list that is a prefix of another being less, and the empty list being
 less than any other list.
 
+The number literals are not annotated, so where nothing else fixes their type A Standard
+Definition of Elm? takes them to be Float (ruling A27); Floats with these integral values order and
+compare as the Ints would, so the results are the same.
+
 -}
 
 -- TAGS: elm-spec, b:Basics.compare, b:Basics.lt, b:Basics.ge, b:Basics.gt

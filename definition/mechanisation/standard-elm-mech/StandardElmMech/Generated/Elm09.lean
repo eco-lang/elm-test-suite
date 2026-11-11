@@ -4,6 +4,30 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/StandardCoreEvaluationExamplesTest.elm -/
+def g_elm_StandardCoreEvaluationExamplesTest : Program := {
+  name := "StandardCoreEvaluationExamplesTest", source := "tests/elm/src",
+  cons := [("Leaf", 0), ("Node", 3)],
+  defs := [
+    .fn "add1" [pv "n"] (bin "+" (v "n") (i 1)) ],
+  locals := [ ],
+  checks := [
+    ckk "as-pattern" "(1,[1,2])" .data (caseOf (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) [(P (.paren (.as (P (.paren (.cons (P (pv "x")) (P pw)))) "whole")), tup2 (v "x") (v "whole")), (P pw, tup2 (.atexp (.scon (.intF 0))) (listE []))]),
+    ckk "unit pattern" "5" .float (ap (.atexp (.paren (lams [.unit] (.atexp (.scon (.intF 5)))))) [.atexp .unit]),
+    ckk "operator value" "3" .float (ap (.atexp (.op "+")) [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]),
+    ckk "partial basic value" "<function>" .function (ap (.atexp (.op "+")) [.atexp (.scon (.intF 1))]),
+    ckk "partial constructor" "<function>" .function (ap (c "Node") [c "Leaf"]),
+    ckk "(&&) is strict" "False" .data (ap (.atexp (.op "&&")) [c "False", c "True"]),
+    ckk "pipe" "6" .int (bin "|>" (i 5) (v "add1")),
+    ckk "mrule-fail" "2" .float (caseOf (i 1) [(P (pint 0), ap (qv "Debug" "todo") [str "x"]), (P pw, .atexp (.scon (.intF 2)))]),
+    ckk "Just 1" "Just 1" .data (ap (c "Just") [.atexp (.scon (.intF 1))]),
+    ckk "inc 0.5" "1.5" .float (letDefs [.fn "incF" [pv "n"] (bin "+" (v "n") (.atexp (.scon (.intF 1))))] (ap (v "incF") [.atexp (.scon (.float 5 (-1)))])),
+    ckk "modBy 4 -5" "3" .int (ap (v "modBy") [i 4, .atexp (neg (A (i 5)))]),
+    ckk "remainderBy 4 -5" "-1" .int (ap (v "remainderBy") [i 4, .atexp (neg (A (i 5)))]),
+    ckk "record field order" "True" .data (bin "==" (recE [("a", .atexp (.scon (.intF 1))), ("b", .atexp (.scon (.intF 2)))]) (recE [("b", .atexp (.scon (.intF 2))), ("a", .atexp (.scon (.intF 1)))])),
+    ckk "compare strings" "LT" .data (ap (v "compare") [str "ab", str "abc"]),
+    ckk "accessor" "7" .float (ap (.atexp (accessor "k")) [recE [("k", .atexp (.scon (.intF 7))), ("j", .atexp (.scon (.intF 8)))]]) ] }
+
 /-- tests/elm/src/StandardLetStrictTest.elm -/
 def g_elm_StandardLetStrictTest : Program := {
   name := "StandardLetStrictTest", source := "tests/elm/src",
@@ -12,7 +36,7 @@ def g_elm_StandardLetStrictTest : Program := {
   locals := [ ],
   checks := [
     ckk "before" "()" .data (.atexp .unit),
-    ckk "let strict" "(no value)" .int (letDefs [.pat pw (ap (qv "Debug" "todo") [str "x"])] (i 1)) ] }
+    ckk "let strict" "(no value)" .float (letDefs [.pat pw (ap (qv "Debug" "todo") [str "x"])] (.atexp (.scon (.intF 1)))) ] }
 
 /-- tests/elm/src/StringCasePatternCommaTest.elm -/
 def g_elm_StringCasePatternCommaTest : Program := {
@@ -88,7 +112,7 @@ def g_elm_TailLoopMutualRecMutualRecursionInsideATailLoopTest : Program := {
   name := "TailLoopMutualRecMutualRecursionInsideATailLoopTest", source := "tests/elm/src",
   cons := [],
   defs := [
-    .fn "loop" [pv "n", pv "acc"] (ifte (bin "<=" (v "n") (i 0)) (v "acc") (letDefs [.fn "isEven" [pv "k"] (ifte (bin "==" (v "k") (i 0)) (c "True") (ap (v "isOdd") [.atexp (.paren (bin "-" (v "k") (i 1)))])), .fn "isOdd" [pv "k"] (ifte (bin "==" (v "k") (i 0)) (c "False") (ap (v "isEven") [.atexp (.paren (bin "-" (v "k") (i 1)))]))] (ap (v "loop") [.atexp (.paren (bin "-" (v "n") (i 1))), .atexp (.paren (ifte (ap (v "isEven") [v "n"]) (bin "+" (v "acc") (i 1)) (v "acc")))]))),
+    .fn "loop" [pv "n", pv "acc"] (ifte (bin "<=" (v "n") (i 0)) (v "acc") (letDefs [.fn "isEven" [pv "k"] (ifte (bin "==" (v "k") (.atexp (.scon (.intF 0)))) (c "True") (ap (v "isOdd") [.atexp (.paren (bin "-" (v "k") (.atexp (.scon (.intF 1)))))])), .fn "isOdd" [pv "k"] (ifte (bin "==" (v "k") (.atexp (.scon (.intF 0)))) (c "False") (ap (v "isEven") [.atexp (.paren (bin "-" (v "k") (.atexp (.scon (.intF 1)))))])), .fn "isEven$Int" [pv "k"] (ifte (bin "==" (v "k") (i 0)) (c "True") (ap (v "isOdd$Int") [.atexp (.paren (bin "-" (v "k") (i 1)))])), .fn "isOdd$Int" [pv "k"] (ifte (bin "==" (v "k") (i 0)) (c "False") (ap (v "isEven$Int") [.atexp (.paren (bin "-" (v "k") (i 1)))]))] (ap (v "loop") [.atexp (.paren (bin "-" (v "n") (i 1))), .atexp (.paren (ifte (ap (v "isEven$Int") [v "n"]) (bin "+" (v "acc") (i 1)) (v "acc")))]))),
     .fn "testValue" [] (ap (v "loop") [i 4, i 0]) ],
   locals := [ ],
   checks := [
@@ -116,9 +140,9 @@ def g_elm_TailRecCaseDestructTest : Program := {
     .fn "myCountHelper" [pv "acc", pv "list"] (caseOf (v "list") [(P (listP []), v "acc"), (.cons (P pw) (P (pv "rest")), ap (v "myCountHelper") [.atexp (.paren (bin "+" (v "acc") (i 1))), v "rest"])]) ],
   locals := [ ],
   checks := [
-    ckk "foldl" "15" .int (ap (v "myFoldl") [.atexp (.op "+"), i 0, listE [i 1, i 2, i 3, i 4, i 5]]),
+    ckk "foldl" "15" .float (ap (v "myFoldl") [.atexp (.op "+"), .atexp (.scon (.intF 0)), listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3)), .atexp (.scon (.intF 4)), .atexp (.scon (.intF 5))]]),
     ckk "sum" "10" .int (ap (v "mySum") [listE [i 1, i 2, i 3, i 4]]),
-    ckk "count" "3" .int (ap (v "myCountHelper") [i 0, listE [i 10, i 20, i 30]]) ] }
+    ckk "count" "3" .int (ap (v "myCountHelper") [i 0, listE [.atexp (.scon (.intF 10)), .atexp (.scon (.intF 20)), .atexp (.scon (.intF 30))]]) ] }
 
 /-- tests/elm/src/TailRecCaseMultiBranchTypesTest.elm -/
 def g_elm_TailRecCaseMultiBranchTypesTest : Program := {
@@ -136,7 +160,7 @@ def g_elm_TailRecClosureAccTest : Program := {
   name := "TailRecClosureAccTest", source := "tests/elm/src",
   cons := [],
   defs := [
-    .fn "recursiveLet" [pv "n"] (letDefs [.fn "go" [pv "acc", pv "m"] (ifte (bin "<=" (v "m") (i 0)) (v "acc") (ap (v "go") [.atexp (.paren (bin "+" (v "acc") (v "m"))), .atexp (.paren (bin "-" (v "m") (i 1)))]))] (ap (v "go") [i 0, v "n"])) ],
+    .fn "recursiveLet" [pv "n"] (letDefs [.fn "go" [pv "acc", pv "m"] (ifte (bin "<=" (v "m") (.atexp (.scon (.intF 0)))) (v "acc") (ap (v "go") [.atexp (.paren (bin "+" (v "acc") (v "m"))), .atexp (.paren (bin "-" (v "m") (.atexp (.scon (.intF 1)))))])), .fn "go$Int" [pv "acc", pv "m"] (ifte (bin "<=" (v "m") (i 0)) (v "acc") (ap (v "go$Int") [.atexp (.paren (bin "+" (v "acc") (v "m"))), .atexp (.paren (bin "-" (v "m") (i 1)))]))] (ap (v "go$Int") [i 0, v "n"])) ],
   locals := [
     .fn "result" [] (ap (v "recursiveLet") [i 5]) ],
   checks := [
@@ -149,9 +173,10 @@ def g_elm_TailRecCustomCaseTest : Program := {
   defs := [
     .fn "sumMyList" [pv "acc", pv "list"] (caseOf (v "list") [(P (pcA "Nil"), v "acc"), (pcon "Cons" [pv "x", pv "rest"], ap (v "sumMyList") [.atexp (.paren (bin "+" (v "acc") (v "x"))), v "rest"])]) ],
   locals := [
-    .fn "myList" [] (ap (c "Cons") [i 1, .atexp (.paren (ap (c "Cons") [i 2, .atexp (.paren (ap (c "Cons") [i 3, .atexp (.paren (ap (c "Cons") [i 4, c "Nil"]))]))]))]) ],
+    .fn "myList" [] (ap (c "Cons") [.atexp (.scon (.intF 1)), .atexp (.paren (ap (c "Cons") [.atexp (.scon (.intF 2)), .atexp (.paren (ap (c "Cons") [.atexp (.scon (.intF 3)), .atexp (.paren (ap (c "Cons") [.atexp (.scon (.intF 4)), c "Nil"]))]))]))]),
+    .fn "myList$Int" [] (ap (c "Cons") [i 1, .atexp (.paren (ap (c "Cons") [i 2, .atexp (.paren (ap (c "Cons") [i 3, .atexp (.paren (ap (c "Cons") [i 4, c "Nil"]))]))]))]) ],
   checks := [
-    ckk "total" "10" .int (ap (v "sumMyList") [i 0, v "myList"]) ] }
+    ckk "total" "10" .int (ap (v "sumMyList") [i 0, v "myList$Int"]) ] }
 
 /-- tests/elm/src/TailRecDeciderSearchTest.elm -/
 def g_elm_TailRecDeciderSearchTest : Program := {
@@ -186,9 +211,9 @@ def g_elm_TailRecFoldlCaseTest : Program := {
   defs := [ ],
   locals := [
     .fn "myFoldl" [pv "f", pv "acc", pv "list"] (caseOf (v "list") [(P (listP []), v "acc"), (.cons (P (pv "x")) (P (pv "xs")), ap (v "myFoldl") [v "f", .atexp (.paren (ap (v "f") [v "x", v "acc"])), v "xs"])]),
-    .fn "result" [] (ap (v "myFoldl") [.atexp (.paren (lams [pv "a", pv "b"] (bin "+" (v "a") (v "b")))), i 0, listE [i 1, i 2, i 3]]) ],
+    .fn "result" [] (ap (v "myFoldl") [.atexp (.paren (lams [pv "a", pv "b"] (bin "+" (v "a") (v "b")))), .atexp (.scon (.intF 0)), listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]]) ],
   checks := [
-    ckk "result" "6" .int (v "result") ] }
+    ckk "result" "6" .float (v "result") ] }
 
 /-- tests/elm/src/TailRecManyBranchStringTest.elm -/
 def g_elm_TailRecManyBranchStringTest : Program := {
@@ -223,9 +248,9 @@ def g_elm_TailRecNestedCaseTest : Program := {
     .fn "myLast" [pv "default", pv "list"] (caseOf (v "list") [(P (listP []), v "default"), (.cons (P (pv "x")) (P (listP [])), v "x"), (.cons (P pw) (P (pv "rest")), ap (v "myLast") [v "default", v "rest"])]) ],
   locals := [ ],
   checks := [
-    ckk "find" "True" .data (ap (v "contains") [i 3, listE [i 1, i 2, i 3, i 4]]),
-    ckk "nofind" "False" .data (ap (v "contains") [i 5, listE [i 1, i 2, i 3, i 4]]),
-    ckk "last" "4" .int (ap (v "myLast") [i 0, listE [i 1, i 2, i 3, i 4]]) ] }
+    ckk "find" "True" .data (ap (v "contains") [.atexp (.scon (.intF 3)), listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))]]),
+    ckk "nofind" "False" .data (ap (v "contains") [.atexp (.scon (.intF 5)), listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))]]),
+    ckk "last" "4" .float (ap (v "myLast") [.atexp (.scon (.intF 0)), listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))]]) ] }
 
 /-- tests/elm/src/TailRecNestedStringCaseTest.elm -/
 def g_elm_TailRecNestedStringCaseTest : Program := {
@@ -254,13 +279,13 @@ def g_elm_TailRecursiveSumTest : Program := {
   name := "TailRecursiveSumTest", source := "tests/elm/src",
   cons := [],
   defs := [
-    .fn "sumHelper" [pv "n", pv "acc"] (ifte (bin "<=" (v "n") (i 0)) (v "acc") (ap (v "sumHelper") [.atexp (.paren (bin "-" (v "n") (i 1))), .atexp (.paren (bin "+" (v "acc") (v "n")))])),
-    .fn "sumTo" [pv "n"] (ap (v "sumHelper") [v "n", i 0]) ],
+    .fn "sumHelper" [pv "n", pv "acc"] (ifte (bin "<=" (v "n") (.atexp (.scon (.intF 0)))) (v "acc") (ap (v "sumHelper") [.atexp (.paren (bin "-" (v "n") (.atexp (.scon (.intF 1))))), .atexp (.paren (bin "+" (v "acc") (v "n")))])),
+    .fn "sumTo" [pv "n"] (ap (v "sumHelper") [v "n", .atexp (.scon (.intF 0))]) ],
   locals := [ ],
   checks := [
-    ckk "sum1" "15" .int (ap (v "sumTo") [i 5]),
-    ckk "sum2" "55" .int (ap (v "sumTo") [i 10]),
-    ckk "sum3" "5050" .int (ap (v "sumTo") [i 100]) ] }
+    ckk "sum1" "15" .float (ap (v "sumTo") [.atexp (.scon (.intF 5))]),
+    ckk "sum2" "55" .float (ap (v "sumTo") [.atexp (.scon (.intF 10))]),
+    ckk "sum3" "5050" .float (ap (v "sumTo") [.atexp (.scon (.intF 100))]) ] }
 
 /-- tests/elm/src/TopLevelNameReplacesImportTest.elm -/
 def g_elm_TopLevelNameReplacesImportTest : Program := {
@@ -271,7 +296,7 @@ def g_elm_TopLevelNameReplacesImportTest : Program := {
   locals := [ ],
   checks := [
     ckk "own max" "3" .int (ap (v "max") [i 1, i 2]),
-    ckk "Basics.max" "2" .int (ap (qv "Basics" "max") [i 1, i 2]) ] }
+    ckk "Basics.max" "2" .float (ap (qv "Basics" "max") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) ] }
 
 /-- tests/elm/src/TupleCharFieldTest.elm -/
 def g_elm_TupleCharFieldTest : Program := {
@@ -290,7 +315,7 @@ def g_elm_TuplePairTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "pair1" "(1,2)" .data (tup2 (i 1) (i 2)),
+    ckk "pair1" "(1,2)" .data (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))),
     ckk "pair2" "(\"a\",\"b\")" .data (tup2 (str "a") (str "b")),
     ckk "pair3" "(True,False)" .data (tup2 (c "True") (c "False")) ] }
 
@@ -301,7 +326,7 @@ def g_elm_TupleTripleTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "triple1" "(1,2,3)" .data (tup3 (i 1) (i 2) (i 3)),
+    ckk "triple1" "(1,2,3)" .data (tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))),
     ckk "triple2" "(\"a\",\"b\",\"c\")" .data (tup3 (str "a") (str "b") (str "c")) ] }
 
 /-- tests/elm/src/TypeClassConstraintTest.elm -/
@@ -309,15 +334,14 @@ def g_elm_TypeClassConstraintTest : Program := {
   name := "TypeClassConstraintTest", source := "tests/elm/src",
   cons := [],
   defs := [
-    .fn "zabs" [pv "n"] (ifte (bin "<" (v "n") (i 0)) (.atexp (neg (A (v "n")))) (v "n")),
-    .fn "zabs$Float" [pv "n"] (ifte (bin "<" (v "n") (.atexp (.scon (.intF 0)))) (.atexp (neg (A (v "n")))) (v "n")),
+    .fn "zabs" [pv "n"] (ifte (bin "<" (v "n") (.atexp (.scon (.intF 0)))) (.atexp (neg (A (v "n")))) (v "n")),
     .fn "zmin" [pv "a", pv "b"] (ifte (bin "<" (v "a") (v "b")) (v "a") (v "b")),
     .fn "zconcat" [pv "a", pv "b"] (bin "++" (v "a") (v "b")) ],
   locals := [ ],
   checks := [
-    ckk "absInt" "5" .int (ap (v "zabs") [.atexp (neg (A (i 5)))]),
-    ckk "absFloat" "3.14" .float (ap (v "zabs$Float") [.atexp (neg (.scon (.float 314 (-2))))]),
-    ckk "minInt" "3" .int (ap (v "zmin") [i 3, i 5]),
+    ckk "absInt" "5" .float (ap (v "zabs") [.atexp (neg (.scon (.intF 5)))]),
+    ckk "absFloat" "3.14" .float (ap (v "zabs") [.atexp (neg (.scon (.float 314 (-2))))]),
+    ckk "minInt" "3" .float (ap (v "zmin") [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 5))]),
     ckk "concatStr" "\"hello world\"" .string (ap (v "zconcat") [str "hello ", str "world"]) ] }
 
 /-- tests/elm/src/UnreachableModuleTest.elm -/
@@ -473,7 +497,8 @@ def g_elm_WrapperUnionFieldTest : Program := {
 
 /-- The programs of this shard. -/
 def shard_Elm09 : List Program :=
-  [g_elm_StandardLetStrictTest,
+  [g_elm_StandardCoreEvaluationExamplesTest,
+   g_elm_StandardLetStrictTest,
    g_elm_StringCasePatternCommaTest,
    g_elm_StringCreationMatrixTest,
    g_elm_StringEscapeCrTest,

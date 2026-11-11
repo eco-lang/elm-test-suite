@@ -8,7 +8,7 @@ exposes `Shape` closed, so `import ModuleExposingHelper exposing (Shape)` import
 
 -}
 
--- TAGS: elm-spec, sm-item-type, dm-expitem-type
+-- TAGS: elm-spec, sm-item-type, s-atexp-longcon, dm-expitem-type
 -- COMPILE-ERROR: a use of a constructor of a type exposed closed
 -- CHECK: {{-- [A-Z ]+ -}}
 

@@ -11,7 +11,7 @@ by `a :: b :: _`.
 
 -}
 
--- TAGS: elm-spec, s-dec-group, s-atexp-longvar, core-number-default, d-atexp-scon
+-- TAGS: elm-spec, s-dec-group, s-atexp-longvar, sec:dynamic-core-numbers, d-atexp-scon
 -- CHECK: list-case-int: 2
 -- CHECK: list-case-float: 3
 

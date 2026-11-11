@@ -15,7 +15,7 @@
 %   progress); A69, A70 (outgoing order per port, host outside); A71 (bad
 %   incoming value rejected); A78 (suspension at any andThen); A79, A80, A81
 %   (process primitives); A83, A85 (platform parameter, no effect modules);
-%   A92 (Bytes flags, boundary values);
+%   A92 (Bytes flags, boundary values); A96 (main's principal scheme);
 %   A86 (the three guarantees and no more); D2, D10, D11.
 % - ILLUMINATING: comments on the absence of a rule for failing
 %   elaboration, the choice of E over the interface for main, the defaulting
@@ -132,23 +132,26 @@ in $B$''. Premises also use the sentences about modules of
 Chapters~\ref{ch:static-modules} and~\ref{ch:dynamic-modules}, in their forms
 there; other hypotheses are side conditions.
 
-The type of \kw{main} is the instance of its type scheme that takes $\tInt$
+The type of \kw{main} is the instance of its type scheme that takes $\tFloat$
 for each bound type variable of class $\knum$. It is the type of the default
 copy of the declaration of \kw{main}, the copy that number specialisation
-makes of every top-level declaration, taking $\tInt$ for each of its variables
+makes of every top-level declaration, taking $\tFloat$ for each of its variables
 of class $\knum$ (Section~\ref{sec:dynamic-core-numbers}). % A27, A87
 For a type scheme $\sigma=\forall\tyrowvar^{(k)}.\tau$, let
 $\alpha_1,\ldots,\alpha_l$ be those of the bound variables
 $\tyrowvar_1,\ldots,\tyrowvar_k$ that are type variables of class $\knum$; then
 \[
-  \pgDflt\sigma=\tau\{\tInt,\ldots,\tInt/\alpha_1,\ldots,\alpha_l\} .
+  \pgDflt\sigma=\tau\{\tFloat,\ldots,\tFloat/\alpha_1,\ldots,\alpha_l\} .
 \]
-The substitution respects classes, since $\tInt\in\Adm{\knum}$. In the rules
+The substitution respects classes, since $\tFloat\in\Adm{\knum}$. In the rules
 below, $\sbtProgram$ is the type name of \kw{Platform.Program}, of arity 3,
 and $\sbtNode$ that of \kw{VirtualDom.Node}, of arity 1, of which \kw{Html} is
 an alias (Appendix~\ref{ch:appendix-static-basis}); $\effMgrPlat$ is the set
 of the names of the managers of the platform
-(Section~\ref{sec:effects-simple}).
+(Section~\ref{sec:effects-simple}). In each rule, the premise
+$\jdg{\pgBstat}{\modm}{\pgBstat',E}$ is inferred by a principal derivation for
+the module (Section~\ref{sec:static-modules-principal}), so that $E$, and the
+scheme $\sigma$ of \kw{main} in it, are principal. % A96
 
 \rulegroup{Elaboration of Programs}{\jstat{\pgBstat}{\program}{(\tau,\PE)}}
 
@@ -162,9 +165,9 @@ of the names of the managers of the platform
   {\jdg{\pgBstat}{\modm}{\pgBstat',E}\\
    \Dom(\PE\of\pgBstat')\cap\big(\Dom(\PE\of\pgBstat)\cup\effMgrPlat\big)=\emptyset\\
    E(\kw{main})=(\sigma,\isv)\premsep
-   \pgDflt\sigma=(\tau_1,\tau_2,\tau_3)\sbtProgram\premsep
+   \sigma=\forall\tyrowvar^{(k)}.(\tau_1,\tau_2,\tau_3)\sbtProgram\premsep
    \Port(\tau_1)}
-  {\jstat{\pgBstat}{\modm}{\big((\tau_1,\tau_2,\tau_3)\sbtProgram,\ \PE\of(\pgBstat+\pgBstat')\big)}}
+  {\jstat{\pgBstat}{\modm}{\big(\pgDflt\sigma,\ \PE\of(\pgBstat+\pgBstat')\big)}}
 
 \defnrule[r:p-stat-main-view]
   {\jdg{\pgBstat}{\modm}{\pgBstat',E}\\
@@ -188,14 +191,19 @@ is constrained; a \kw{main} in another module is an ordinary value. % A32
 The scheme of \kw{main} is taken from $E$, the environment of all the
 declarations of the module, not from its interface, so \kw{main} need not be
 exposed. % A82
-A bound variable of class $\knum$ in the scheme of \kw{main} is $\tInt$ in
-its type: with \kw{init = \textbackslash\_ -> (0, Cmd.none)} and no other
-constraint on the model, the model type is $\tInt$, and the value of
-\kw{main} is that of its default copy, at $\tInt$
+A bound variable of class $\knum$ in the scheme of \kw{main} is $\tFloat$ in
+its type: with \kw{init = \textbackslash() -> (0, Cmd.none)} and no other
+constraint on the model, the model type is $\tFloat$, and the value of
+\kw{main} is that of its default copy, at $\tFloat$
 (rule~\ruleref{r:p-dyn-main}). % A27, A87
-The flags type $\tau_1$ is a port type, so \kw{main : Program (Int -> Int)
-Model Msg} and \kw{main : Program flags Model Msg}, with \kw{flags} a type
-variable, do not elaborate; the unit type is a port type, and as flags it is
+The flags type $\tau_1$ is a port type, and is taken from the scheme before
+the default, so it contains no type variable. Thus
+\kw{main : Program (Int -> Int) Model Msg} and
+\kw{main : Program flags Model Msg}, with \kw{flags} a type variable, do not
+elaborate, and nor does an unannotated \kw{main} whose \kw{init} is
+\kw{\textbackslash n -> (n + 1, Cmd.none)}, whose flags type is a variable of
+class $\knum$. % A96
+The unit type is a port type, and as flags it is
 treated specially (Section~\ref{sec:programs-execution}). Since \kw{Bytes}
 is a port type, flags may be, or contain, values of type \kw{Bytes}. % A92
 The model type $\tau_2$ and the message type $\tau_3$ are unconstrained. Some
@@ -206,6 +214,13 @@ implementations admit further types of flags, which are not port types
 \kw{Svg msg} has a type $\tau\,\sbtNode$, since both are aliases. No function
 type is of either form, so a \kw{main} with parameters does not elaborate. % A82
 \end{rulecomments}
+
+Since the derivations for the modules of a program are principal, a flags
+type that the program leaves undetermined is a type variable in the scheme of
+\kw{main}, which is not a port type: an unannotated
+\kw{main = Platform.worker \{ init = \textbackslash\_ -> (0, Cmd.none), \ldots\ \}},
+whose \kw{init} ignores its flags, does not elaborate, although a derivation
+that took the flags to be $\tunit$ would satisfy the rule. % A96, A72, A82
 
 There is no rule for a program one of whose modules does not elaborate. Such
 a program has no meaning, and no part of it is evaluated
@@ -381,12 +396,12 @@ which is undefined when $\Dec{\tau}(j)$ is. % A77
 
 The rules of this section and the next allow sentences of the forms
 \[
-  \jdg{s,P,Q,H}{D}{(P',Q',H')},\qquad
+  \jdg{s,P,Q,H}{L}{(P',Q',H')},\qquad
   \jdg{\PE,\tau_1,j}{\effprog\,r}{K},\qquad
   K\step{\opt{\ell}}K'
 \]
-to be inferred. In the first, $D$ is a sequence of leaf commands, and the
-sentence is pronounced ``dispatching $D$ at time $s$ turns $P$, $Q$, $H$ into
+to be inferred. In the first, $L$ is a sequence of leaf commands, and the
+sentence is pronounced ``dispatching $L$ at time $s$ turns $P$, $Q$, $H$ into
 $P'$, $Q'$, $H'$''. The second is pronounced ``$\effprog\,r$, started with
 the flags $j$, begins in $K$''. The third is pronounced ``$K$ moves to $K'$'',
 and, when the event $\ell$ is present, ``with $\ell$''; a transition without
@@ -403,7 +418,7 @@ commands, each as many times as $\effFlat$ gives it, in any order. Which
 order is no part of the meaning, by the effect order convention of
 Section~\ref{sec:effects-commands}. % A66, A67
 
-\rulegroup{Dispatch}{\jdg{s,P,Q,H}{D}{(P',Q',H')}}
+\rulegroup{Dispatch}{\jdg{s,P,Q,H}{L}{(P',Q',H')}}
 
 \defnrule[r:p-disp-empty]
   {}
@@ -411,18 +426,18 @@ Section~\ref{sec:effects-commands}. % A66, A67
 
 \defnrule[r:p-disp-task]
   {\effc\in\pgLeaf(\effmtask,\tk)\premsep\pid\notin\Dom P\\
-   \jdg{s,\ P+\{\pid\mapsto(\tk,s,\effc)\},\ Q,H}{D}{(P',Q',H')}}
-  {\jdg{s,P,Q,H}{\effc\cdot D}{(P',Q',H')}}
+   \jdg{s,\ P+\{\pid\mapsto(\tk,s,\effc)\},\ Q,H}{L}{(P',Q',H')}}
+  {\jdg{s,P,Q,H}{\effc\cdot L}{(P',Q',H')}}
 
 \defnrule[r:p-disp-out]
   {\effc\in\pgLeaf(\effmout\,\effp,j)\\
-   \jdg{s,P,\ Q+\{\effp\mapsto Q(\effp)\cdot j\},\ H}{D}{(P',Q',H')}}
-  {\jdg{s,P,Q,H}{\effc\cdot D}{(P',Q',H')}}
+   \jdg{s,P,\ Q+\{\effp\mapsto Q(\effp)\cdot j\},\ H}{L}{(P',Q',H')}}
+  {\jdg{s,P,Q,H}{\effc\cdot L}{(P',Q',H')}}
 
 \defnrule[r:p-disp-plat]
   {\effc\in\pgLeaf(\effm,v)\premsep\effm\in\effMgrPlat\\
-   \jdg{s,P,Q,\ H\uplus\effmset{\effc}}{D}{(P',Q',H')}}
-  {\jdg{s,P,Q,H}{\effc\cdot D}{(P',Q',H')}}
+   \jdg{s,P,Q,\ H\uplus\effmset{\effc}}{L}{(P',Q',H')}}
+  {\jdg{s,P,Q,H}{\effc\cdot L}{(P',Q',H')}}
 
 \begin{rulecomments}
 \rcomment{r:p-disp-task} Each task leaf starts a process of its own, with an
@@ -435,7 +450,7 @@ its task succeeds, comes from the leaf (rule~\ruleref{r:p-proc-message}).
 (Section~\ref{sec:effects-ports}); dispatch only appends it to the queue of
 its port. Since $Q(\effp)$ is defined only for the outgoing ports of the
 program, $\effp$ is one of them. The values of one command for one port
-join the queue in the order of $D$, which is unspecified: with
+join the queue in the order of $L$, which is unspecified: with
 \kw{Cmd.batch [send 1, send 2]}, either value may be delivered first. % A66
 \rcomment{r:p-disp-plat} What the managers of the platform do with the leaves
 handed to them is given by the platform steps

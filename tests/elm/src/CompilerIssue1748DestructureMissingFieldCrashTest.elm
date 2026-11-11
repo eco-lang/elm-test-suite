@@ -12,7 +12,7 @@ same bug with a local `sandbox` of the same type, built on `Platform.worker`, in
 -}
 
 -- TAGS: elm19-bug
--- TAGS: elm-spec, s-atpat-record
+-- TAGS: elm-spec, s-atpat-record, s-exp-app
 -- COMPILE-ERROR: field iDontExist does not exist
 -- CHECK: {{-- [A-Z ]+ -}}
 -- CHECK-NOT: out of bounds

@@ -23,10 +23,10 @@ def g_elm_core_IntMinMaxTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "min1" "3" .int (ap (v "min") [i 10, i 3]),
-    ckk "min2" "-5" .int (ap (v "min") [.atexp (neg (A (i 5))), i 5]),
-    ckk "max1" "10" .int (ap (v "max") [i 10, i 3]),
-    ckk "max2" "5" .int (ap (v "max") [.atexp (neg (A (i 5))), i 5]) ] }
+    ckk "min1" "3" .float (ap (v "min") [.atexp (.scon (.intF 10)), .atexp (.scon (.intF 3))]),
+    ckk "min2" "-5" .float (ap (v "min") [.atexp (neg (.scon (.intF 5))), .atexp (.scon (.intF 5))]),
+    ckk "max1" "10" .float (ap (v "max") [.atexp (.scon (.intF 10)), .atexp (.scon (.intF 3))]),
+    ckk "max2" "5" .float (ap (v "max") [.atexp (neg (.scon (.intF 5))), .atexp (.scon (.intF 5))]) ] }
 
 /-- tests/elm-core/src/IntModByTest.elm -/
 def g_elm_core_IntModByTest : Program := {
@@ -48,10 +48,10 @@ def g_elm_core_IntMulTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "mul1" "30" .int (bin "*" (i 10) (i 3)),
-    ckk "mul2" "-15" .int (bin "*" (i 5) (.atexp (neg (A (i 3))))),
-    ckk "mul3" "6" .int (bin "*" (.atexp (neg (A (i 2)))) (.atexp (neg (A (i 3))))),
-    ckk "mul4" "0" .int (bin "*" (i 0) (i 100)) ] }
+    ckk "mul1" "30" .float (bin "*" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))),
+    ckk "mul2" "-15" .float (bin "*" (.atexp (.scon (.intF 5))) (.atexp (neg (.scon (.intF 3))))),
+    ckk "mul3" "6" .float (bin "*" (.atexp (neg (.scon (.intF 2)))) (.atexp (neg (.scon (.intF 3))))),
+    ckk "mul4" "0" .float (bin "*" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 100)))) ] }
 
 /-- tests/elm-core/src/IntNegateTest.elm -/
 def g_elm_core_IntNegateTest : Program := {
@@ -60,21 +60,21 @@ def g_elm_core_IntNegateTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "neg1" "-5" .int (ap (v "negate") [i 5]),
-    ckk "neg2" "5" .int (ap (v "negate") [.atexp (neg (A (i 5)))]),
-    ckk "neg3" "0" .int (ap (v "negate") [i 0]) ] }
+    ckk "neg1" "-5" .float (ap (v "negate") [.atexp (.scon (.intF 5))]),
+    ckk "neg2" "5" .float (ap (v "negate") [.atexp (neg (.scon (.intF 5)))]),
+    ckk "neg3" "0" .float (ap (v "negate") [.atexp (.scon (.intF 0))]) ] }
 
 /-- tests/elm-core/src/IntPowTest.elm -/
 def g_elm_core_IntPowTest : Program := {
-  name := "IntPowTest", source := "tests/elm-core/src",
+  name := "IntPowTest", source := "tests/elm-core/src", native := true,
   cons := [],
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "pow1" "8" .int (bin "^" (i 2) (i 3)),
-    ckk "pow2" "1" .int (bin "^" (i 5) (i 0)),
-    ckk "pow3" "1024" .int (bin "^" (i 2) (i 10)),
-    ckk "pow4" "-8" .int (bin "^" (.atexp (.paren (.atexp (neg (A (i 2)))))) (i 3)) ] }
+    ckk "pow1" "8" .float (bin "^" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))),
+    ckk "pow2" "1" .float (bin "^" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 0)))),
+    ckk "pow3" "1024" .float (bin "^" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 10)))),
+    ckk "pow4" "-8" .float (bin "^" (.atexp (.paren (.atexp (neg (.scon (.intF 2)))))) (.atexp (.scon (.intF 3)))) ] }
 
 /-- tests/elm-core/src/IntRemainderByTest.elm -/
 def g_elm_core_IntRemainderByTest : Program := {
@@ -95,9 +95,9 @@ def g_elm_core_IntSubTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "sub1" "7" .int (bin "-" (i 10) (i 3)),
-    ckk "sub2" "10" .int (bin "-" (i 5) (.atexp (neg (A (i 5))))),
-    ckk "sub3" "1" .int (bin "-" (.atexp (neg (A (i 2)))) (.atexp (neg (A (i 3))))) ] }
+    ckk "sub1" "7" .float (bin "-" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))),
+    ckk "sub2" "10" .float (bin "-" (.atexp (.scon (.intF 5))) (.atexp (neg (.scon (.intF 5))))),
+    ckk "sub3" "1" .float (bin "-" (.atexp (neg (.scon (.intF 2)))) (.atexp (neg (.scon (.intF 3))))) ] }
 
 /-- tests/elm-core/src/ListAppendTest.elm -/
 def g_elm_core_ListAppendTest : Program := {
@@ -106,9 +106,9 @@ def g_elm_core_ListAppendTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "append1" "[1,2,3,4]" .data (bin "++" (listE [i 1, i 2]) (listE [i 3, i 4])),
-    ckk "append_empty" "[1,2]" .data (bin "++" (listE [i 1, i 2]) (listE [])),
-    ckk "concat_op" "[1,2,3]" .data (bin "++" (listE [i 1]) (listE [i 2, i 3])) ] }
+    ckk "append1" "[1,2,3,4]" .data (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (listE [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))])),
+    ckk "append_empty" "[1,2]" .data (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (listE [])),
+    ckk "concat_op" "[1,2,3]" .data (bin "++" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])) ] }
 
 /-- tests/elm-core/src/ListConcatTest.elm -/
 def g_elm_core_ListConcatTest : Program := {
@@ -117,9 +117,9 @@ def g_elm_core_ListConcatTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "append" "[1,2,3,4]" .data (bin "++" (listE [i 1, i 2]) (listE [i 3, i 4])),
-    ckk "concat" "[1,2,3,4,5,6]" .data (bin "++" (listE [i 1, i 2]) (bin "++" (listE [i 3, i 4]) (listE [i 5, i 6]))),
-    ckk "empty" "[1,2,3]" .data (bin "++" (listE []) (listE [i 1, i 2, i 3])) ] }
+    ckk "append" "[1,2,3,4]" .data (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (listE [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))])),
+    ckk "concat" "[1,2,3,4,5,6]" .data (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (bin "++" (listE [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))]) (listE [.atexp (.scon (.intF 5)), .atexp (.scon (.intF 6))]))),
+    ckk "empty" "[1,2,3]" .data (bin "++" (listE []) (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])) ] }
 
 /-- tests/elm-core/src/NotEqualBoolCaseTest.elm -/
 def g_elm_core_NotEqualBoolCaseTest : Program := {
@@ -269,8 +269,8 @@ def g_elm_core_OrderingEmptyListTest : Program := {
     ckk "ge_ee" "True" .data (bin ">=" (v "emptyL") (v "emptyL")),
     ckk "ge_ea" "False" .data (bin ">=" (v "emptyL") (listE [i 1])),
     ckk "ge_ae" "True" .data (bin ">=" (listE [i 1]) (v "emptyL")),
-    ckk "lt_ab" "True" .data (bin "<" (listE [i 1]) (listE [i 2])),
-    ckk "ge_ab" "False" .data (bin ">=" (listE [i 1]) (listE [i 2])) ] }
+    ckk "lt_ab" "True" .data (bin "<" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2))])),
+    ckk "ge_ab" "False" .data (bin ">=" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2))])) ] }
 
 /-- tests/elm-core/src/OrderingEmptyStringPapTest.elm -/
 def g_elm_core_OrderingEmptyStringPapTest : Program := {
@@ -377,14 +377,14 @@ def g_elm_core_PipelineTest : Program := {
   name := "PipelineTest", source := "tests/elm-core/src",
   cons := [],
   defs := [
-    .fn "double" [pv "x"] (bin "*" (v "x") (i 2)),
-    .fn "addOne" [pv "x"] (bin "+" (v "x") (i 1)),
+    .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))),
+    .fn "addOne" [pv "x"] (bin "+" (v "x") (.atexp (.scon (.intF 1)))),
     .fn "map" [pv "f", pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]) ],
   locals := [ ],
   checks := [
-    ckk "pipe1" "12" .int (bin "|>" (bin "|>" (bin "|>" (i 5) (v "double")) (v "addOne")) (v "addOne")),
-    ckk "pipe2" "[2,4,6]" .data (bin "|>" (listE [i 1, i 2, i 3]) (ap (v "map") [v "double"])),
-    ckk "backpipe" "10" .int (bin "<|" (v "double") (bin "<|" (v "addOne") (i 4))) ] }
+    ckk "pipe1" "12" .float (bin "|>" (bin "|>" (bin "|>" (.atexp (.scon (.intF 5))) (v "double")) (v "addOne")) (v "addOne")),
+    ckk "pipe2" "[2,4,6]" .data (bin "|>" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) (ap (v "map") [v "double"])),
+    ckk "backpipe" "10" .float (bin "<|" (v "double") (bin "<|" (v "addOne") (.atexp (.scon (.intF 4))))) ] }
 
 /-- tests/elm-core/src/RoundToIntTest.elm -/
 def g_elm_core_RoundToIntTest : Program := {
@@ -454,14 +454,15 @@ def g_elm_core_StandardA42ZeroDivisorTest : Program := {
 def g_elm_core_StandardA43PowNegativeTest : Program := {
   name := "StandardA43PowNegativeTest", source := "tests/elm-core/src",
   cons := [],
-  defs := [ ],
+  defs := [
+    .fn "ipow" [pv "b", pv "e"] (bin "^" (v "b") (v "e")) ],
   locals := [ ],
   checks := [
-    ckk "1 ^ -1" "1" .int (bin "^" (i 1) (.atexp (neg (A (i 1))))),
-    ckk "(-1) ^ -3" "-1" .int (bin "^" (.atexp (.paren (.atexp (neg (A (i 1)))))) (.atexp (neg (A (i 3))))),
-    ckk "(-1) ^ -2" "1" .int (bin "^" (.atexp (.paren (.atexp (neg (A (i 1)))))) (.atexp (neg (A (i 2))))),
-    ckk "2 ^ -1 + 1 == 1" "True" .data (bin "==" (bin "+" (bin "^" (i 2) (.atexp (neg (A (i 1))))) (i 1)) (i 1)),
-    ckk "0 ^ -1 + 1 == 1" "True" .data (bin "==" (bin "+" (bin "^" (i 0) (.atexp (neg (A (i 1))))) (i 1)) (i 1)) ] }
+    ckk "1 ^ -1" "1" .int (ap (v "ipow") [i 1, .atexp (neg (A (i 1)))]),
+    ckk "(-1) ^ -3" "-1" .int (ap (v "ipow") [.atexp (neg (A (i 1))), .atexp (neg (A (i 3)))]),
+    ckk "(-1) ^ -2" "1" .int (ap (v "ipow") [.atexp (neg (A (i 1))), .atexp (neg (A (i 2)))]),
+    ckk "2 ^ -1 + 1 == 1" "True" .data (bin "==" (bin "+" (ap (v "ipow") [i 2, .atexp (neg (A (i 1)))]) (i 1)) (i 1)),
+    ckk "0 ^ -1 + 1 == 1" "True" .data (bin "==" (bin "+" (ap (v "ipow") [i 0, .atexp (neg (A (i 1)))]) (i 1)) (i 1)) ] }
 
 /-- tests/elm-core/src/StandardA44RoundNonFiniteTest.elm -/
 def g_elm_core_StandardA44RoundNonFiniteTest : Program := {
@@ -544,6 +545,7 @@ def g_elm_core_StandardA49ClampTest : Program := {
     .fn "negZero" [] (.atexp (neg (.scon (.intF 0)))),
     .fn "isNotSelf" [pv "x"] (bin "/=" (v "x") (v "x")),
     .fn "isPositiveZero" [pv "x"] (andalso (bin "==" (v "x") (.atexp (.scon (.intF 0)))) (bin ">" (bin "/" (.atexp (.scon (.intF 1))) (v "x")) (.atexp (.scon (.intF 0))))),
+    .fn "iclamp" [pv "lo", pv "hi", pv "x"] (ap (v "clamp") [v "lo", v "hi", v "x"]),
     .fn "isNegativeZero" [pv "x"] (andalso (bin "==" (v "x") (.atexp (.scon (.intF 0)))) (bin "<" (bin "/" (.atexp (.scon (.intF 1))) (v "x")) (.atexp (.scon (.intF 0))))) ],
   locals := [ ],
   checks := [
@@ -551,11 +553,11 @@ def g_elm_core_StandardA49ClampTest : Program := {
     ckk "clamp nan 1 0.5 is NaN" "True" .data (ap (v "isNotSelf") [.atexp (.paren (ap (v "clamp") [v "nan", .atexp (.scon (.intF 1)), .atexp (.scon (.float 5 (-1)))]))]),
     ckk "clamp 0 1 -0 is +0" "True" .data (ap (v "isPositiveZero") [.atexp (.paren (ap (v "clamp") [.atexp (.scon (.intF 0)), .atexp (.scon (.intF 1)), v "negZero"]))]),
     ckk "clamp -1 -0 0 is -0" "True" .data (ap (v "isNegativeZero") [.atexp (.paren (ap (v "clamp") [.atexp (neg (.scon (.intF 1))), v "negZero", .atexp (.scon (.intF 0))]))]),
-    ckk "clamp 10 0 5 at Int" "10" .int (ap (v "clamp") [i 10, i 0, i 5]),
-    ckk "clamp 10 0 20 at Int" "0" .int (ap (v "clamp") [i 10, i 0, i 20]),
-    ckk "clamp 0 10 -5 at Int" "0" .int (ap (v "clamp") [i 0, i 10, .atexp (neg (A (i 5)))]),
-    ckk "clamp 0 10 15 at Int" "10" .int (ap (v "clamp") [i 0, i 10, i 15]),
-    ckk "clamp 0 10 7 at Int" "7" .int (ap (v "clamp") [i 0, i 10, i 7]) ] }
+    ckk "clamp 10 0 5 at Int" "10" .int (ap (v "iclamp") [i 10, i 0, i 5]),
+    ckk "clamp 10 0 20 at Int" "0" .int (ap (v "iclamp") [i 10, i 0, i 20]),
+    ckk "clamp 0 10 -5 at Int" "0" .int (ap (v "iclamp") [i 0, i 10, .atexp (neg (A (i 5)))]),
+    ckk "clamp 0 10 15 at Int" "10" .int (ap (v "iclamp") [i 0, i 10, i 15]),
+    ckk "clamp 0 10 7 at Int" "7" .int (ap (v "iclamp") [i 0, i 10, i 7]) ] }
 
 /-- tests/elm-core/src/StandardA51FunctionEqualityTest.elm -/
 def g_elm_core_StandardA51FunctionEqualityTest : Program := {
@@ -563,7 +565,7 @@ def g_elm_core_StandardA51FunctionEqualityTest : Program := {
   cons := [],
   defs := [ ],
   locals := [
-    .fn "same" [] (bin "==" (.atexp (.paren (lams [pv "k"] (bin "+" (v "k") (i 1))))) (.atexp (.paren (lams [pv "k"] (bin "+" (v "k") (i 2)))))) ],
+    .fn "same" [] (bin "==" (.atexp (.paren (lams [pv "k"] (bin "+" (v "k") (.atexp (.scon (.intF 1))))))) (.atexp (.paren (lams [pv "k"] (bin "+" (v "k") (.atexp (.scon (.intF 2)))))))) ],
   checks := [
     ckk "compared" "True" .data (orelse (v "same") (ap (v "not") [v "same"])) ] }
 

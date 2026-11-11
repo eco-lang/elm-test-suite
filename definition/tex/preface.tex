@@ -182,7 +182,8 @@ depend on how a program is optimised. Some rulings declare existing
 behaviour non-conforming. On Elm on JavaScript, \kw{modBy 0 x} stops the
 program and comparing two functions with \kw{==} stops it too, where the
 definition gives \kw{0} and a Boolean; on eco, a negative power of
-\kw{-1} or \kw{1} is \kw{0} where the definition gives \kw{1} or \kw{-1};
+\kw{1} or \kw{-1} at Int is \kw{0} where the definition gives \kw{1}, or
+\kw{1} or \kw{-1} by the parity of the exponent;
 on both, a value containing a NaN may be equal to itself, where the
 definition says that it is not. % A42, A43, A50, A51
 Appendix~\ref{ch:appendix-implementation} lists every such point with the

@@ -76,7 +76,7 @@ suite =
             , test "an import outside the fragment" <|
                 \_ -> refusedWith "import:Dict" (program { imports = "import Dict\n", directives = "", decls = "", checks = [ ( "x", "1", "1" ) ] })
             , test "a restated default import is accepted" <|
-                \_ -> translatedContaining [ "ckk \"x\" \"1\" .int (i 1)" ] (program { imports = "import Basics exposing (..)\nimport Maybe exposing (Maybe(..))\n", directives = "", decls = "", checks = [ ( "x", "1", "1" ) ] })
+                \_ -> translatedContaining [ "ckk \"x\" \"1\" .float (.atexp (.scon (.intF 1)))" ] (program { imports = "import Basics exposing (..)\nimport Maybe exposing (Maybe(..))\n", directives = "", decls = "", checks = [ ( "x", "1", "1" ) ] })
             , test "a use of an effect module" <|
                 \_ -> refusedWith "effects" (program { imports = "import Task\n", directives = "", decls = "t = Task.succeed 1", checks = [ ( "x", "1", "1" ) ] })
             , test "a value of the basis the encoding does not include" <|
@@ -99,8 +99,8 @@ suite =
                 \_ ->
                     refusedWith "construct:check-shape"
                         ("module T exposing (main)\n-- TAGS: elm-spec\n-- CHECK: x: 1\nimport Html exposing (text)\nmain =\n    let\n        _ = 1 |> Debug.log \"x\"\n    in\n    text \"done\"\n")
-            , test "a record pattern binding needed at Float (its variables are the fields, so they cannot be renamed for a copy)" <|
-                \_ -> refusedWith "number" (simple "" [ ( "x", "let { a } = { a = 1 } in a / 2", "0.5" ) ])
+            , test "a record pattern binding needed at Int (its variables are the fields, so they cannot be renamed for a copy)" <|
+                \_ -> refusedWith "number" (simple "" [ ( "x", "let { a } = { a = 1 } in a // 2", "0" ) ])
             , test "a program that does not type" <|
                 \_ -> refusedWith "type" (simple "" [ ( "x", "1 + \"a\"", "1" ) ])
             , test "a program too large" <|
@@ -111,8 +111,8 @@ suite =
                 \_ -> translatedContaining [ "bin \"/\" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))" ] (simple "" [ ( "x", "1 / 2", "0.5" ) ])
             , test "a literal under // is Int" <|
                 \_ -> translatedContaining [ "bin \"//\" (i 7) (i 2)" ] (simple "" [ ( "x", "7 // 2", "3" ) ])
-            , test "a literal alone is Int by default" <|
-                \_ -> translatedContaining [ "ckk \"x\" \"3\" .int (bin \"+\" (i 1) (i 2))" ] (simple "" [ ( "x", "1 + 2", "3" ) ])
+            , test "a literal alone is Float by default (ruling A27)" <|
+                \_ -> translatedContaining [ "ckk \"x\" \"3\" .float (bin \"+\" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))))" ] (simple "" [ ( "x", "1 + 2", "3" ) ])
             , test "through a record field" <|
                 \_ -> translatedContaining [ "recE [(\"a\", .atexp (.scon (.intF 1)))]" ] (simple "r = { a = 1 }" [ ( "x", "r.a / 2", "0.5" ) ])
             , test "through Maybe and a case" <|
@@ -120,29 +120,37 @@ suite =
             , test "through a lambda" <|
                 \_ -> translatedContaining [ "lams [pv \"z\"] (bin \"+\" (v \"z\") (.atexp (.scon (.intF 1))))" ] (simple "" [ ( "x", "(\\z -> z + 1) 0.5", "1.5" ) ])
             , test "a hex literal is exact" <|
-                \_ -> translatedContaining [ "i 18446744073709551615" ] (simple "" [ ( "x", "0xFFFFFFFFFFFFFFFF", "-1" ) ])
+                \_ -> translatedContaining [ "i 18446744073709551615" ] (simple "" [ ( "x", "0xFFFFFFFFFFFFFFFF // 1", "-1" ) ])
             , test "a literal after an astral character on its line" <|
-                \_ -> translatedContaining [ "ckk \"x\" \"( '😀', 12 )\" .data (tup2 (.atexp (chA '😀')) (i 12))" ] (simple "" [ ( "x", "( '😀', 12 )", "( '😀', 12 )" ) ])
+                \_ -> translatedContaining [ "ckk \"x\" \"( '😀', 12 )\" .data (tup2 (.atexp (chA '😀')) (.atexp (.scon (.intF 12))))" ] (simple "" [ ( "x", "( '😀', 12 )", "( '😀', 12 )" ) ])
             , test "a negative literal is a negation" <|
-                \_ -> translatedContaining [ ".atexp (neg (A (i 7)))" ] (simple "" [ ( "x", "-7", "-7" ) ])
+                \_ -> translatedContaining [ ".atexp (neg (A (i 7)))" ] (simple "" [ ( "x", "-7 // 1", "-7" ) ])
             ]
         , describe "number specialisation"
             [ test "a declaration used at Int and Float gets two copies" <|
                 \_ ->
-                    translatedContaining [ ".fn \"inc\" [pv \"n\"] (bin \"+\" (v \"n\") (i 1))", ".fn \"inc$Float\" [pv \"n\"] (bin \"+\" (v \"n\") (.atexp (.scon (.intF 1))))", "ap (v \"inc$Float\")", "ap (v \"inc\") [i 1]" ]
-                        (simple "inc n = n + 1" [ ( "x", "inc 0.5", "1.5" ), ( "y", "inc 1", "2" ) ])
+                    translatedContaining [ ".fn \"inc\" [pv \"n\"] (bin \"+\" (v \"n\") (.atexp (.scon (.intF 1))))", ".fn \"inc$Int\" [pv \"n\"] (bin \"+\" (v \"n\") (i 1))", "ap (v \"inc\") [.atexp (.scon (.float", "ap (v \"inc$Int\")" ]
+                        (simple "inc n = n + 1" [ ( "x", "inc 0.5", "1.5" ), ( "y", "inc (7 // 2)", "4" ) ])
             , test "an unused declaration keeps its default copy" <|
-                \_ -> translatedContaining [ ".fn \"unused\" [pv \"n\"] (bin \"*\" (v \"n\") (i 2))" ] (simple "unused n = n * 2" [ ( "x", "1", "1" ) ])
+                \_ -> translatedContaining [ ".fn \"unused\" [pv \"n\"] (bin \"*\" (v \"n\") (.atexp (.scon (.intF 2))))" ] (simple "unused n = n * 2" [ ( "x", "1", "1" ) ])
             , test "an annotated number function" <|
                 \_ ->
-                    translatedContaining [ ".fn \"twice$Float\"" ]
-                        (simple "twice : number -> number\ntwice n = n * 2" [ ( "x", "twice 1.5", "3" ) ])
+                    translatedContaining [ ".fn \"twice$Int\"" ]
+                        (simple "twice : number -> number\ntwice n = n * 2" [ ( "x", "twice (7 // 2)", "6" ) ])
+            , test "an annotated number function used at Int computes at Int, at Float at Float" <|
+                \_ ->
+                    translatedContaining
+                        [ ".fn \"myfun\" [pv \"x\"] (bin \"^\" (v \"x\") (.atexp (neg (.scon (.intF 1)))))"
+                        , ".fn \"myfun$Int\" [pv \"x\"] (bin \"^\" (v \"x\") (.atexp (neg (A (i 1)))))"
+                        , "ap (v \"myfun$Int\")"
+                        ]
+                        (simple "myfun : number -> number\nmyfun x =\n    x ^ -1" [ ( "x", "myfun (2 // 1)", "0" ), ( "y", "myfun 2", "0.5" ) ])
             , test "a pattern binding used at Float is copied, every variable renamed (one word per number variable: a, then b)" <|
-                \_ -> translatedContaining [ ".pat (ptup2 (P (pv \"a$Float$Int\")) (P (pv \"b$Float$Int\")))", "v \"a$Float$Int\"" ] (simple "" [ ( "x", "let ( a, b ) = ( 1, 2 ) in a / 2", "0.5" ) ])
+                \_ -> translatedContaining [ ".pat (ptup2 (P (pv \"a$Float$Int\")) (P (pv \"b$Float$Int\")))", "v \"a$Float$Int\"" ] (simple "" [ ( "x", "let ( a, b ) = ( 1, 2 ) in a / 2 + toFloat (b // 1)", "2.5" ) ])
             , test "isNaN and isInfinite are values of E0" <|
                 \_ -> translatedContaining [ "ap (v \"isNaN\")", "ap (v \"isInfinite\")" ] (simple "" [ ( "x", "isNaN (0 / 0)", "True" ), ( "y", "isInfinite (1 / 0)", "True" ) ])
             , test "++ is the operator of append, at String and at List" <|
-                \_ -> translatedContaining [ "bin \"++\" (str \"a\") (str \"b\")", "bin \"++\" (listE [i 1]) (listE [i 2])" ] (simple "" [ ( "x", "\"a\" ++ \"b\"", "\"ab\"" ), ( "y", "[ 1 ] ++ [ 2 ]", "[1,2]" ) ])
+                \_ -> translatedContaining [ "bin \"++\" (str \"a\") (str \"b\")", "bin \"++\" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2))])" ] (simple "" [ ( "x", "\"a\" ++ \"b\"", "\"ab\"" ), ( "y", "[ 1 ] ++ [ 2 ]", "[1,2]" ) ])
             , test "the conversions: a program that uses round is checked natively" <|
                 \_ -> translatedContaining [ "native := true", "ap (v \"round\")", "ap (v \"toFloat\") [i 2]" ] (simple "" [ ( "x", "round 1.5", "2" ), ( "y", "toFloat 2", "2" ) ])
             , test "toFloat and sqrt alone are computed by the kernel" <|
@@ -150,15 +158,15 @@ suite =
             , test "^ at Float is ^, its program checked natively" <|
                 \_ -> translatedContaining [ "native := true", "bin \"^\" (.atexp (.scon (.float 20 (-1))))" ] (simple "" [ ( "x", "2.0 ^ 2", "4" ) ])
             , test "^ at Int stays with the kernel" <|
-                \_ -> translatedContaining [ "def g : Program := {\n  name := \"T\", source := \"tests/elm/src\",\n", "bin \"^\" (i 2) (i 3)" ] (simple "" [ ( "x", "2 ^ 3", "8" ) ])
+                \_ -> translatedContaining [ "def g : Program := {\n  name := \"T\", source := \"tests/elm/src\",\n", "bin \"^\" (i 2) (i 3)" ] (simple "" [ ( "x", "2 ^ 3 // 1", "8" ) ])
             , test "Char.toCode, Char.fromCode and Debug.toString are qualified values of E0" <|
                 \_ -> translatedContaining [ "qv \"Char\" \"toCode\"", "qv \"Char\" \"fromCode\"", "qv \"Debug\" \"toString\"", "native := true" ] (simple "" [ ( "x", "Char.toCode 'a'", "97" ), ( "y", "Char.fromCode 98", "'b'" ), ( "z", "Debug.toString 1", "\"1\"" ) ])
-            , test "abs at Float is its copy at Float" <|
-                \_ -> translatedContaining [ "v \"abs$Float\"" ] (simple "" [ ( "x", "abs -1.5", "1.5" ) ])
-            , test "ruling A93: a group's number variable a use does not fix is Int" <|
+            , test "abs at Int is its copy at Int" <|
+                \_ -> translatedContaining [ "v \"abs$Int\"" ] (simple "" [ ( "x", "abs (3 // -1)", "3" ) ])
+            , test "ruling A93: a group's number variable a use does not fix is Float" <|
                 \_ ->
-                    translatedContaining [ "bin \"^\" (ap (v \"g\") [i 1" ]
-                        (simple "f n =\n    if n <= 0 then 0 else if g 1 (n - 1) ^ -1 > 0 then 1 else 0\n\ng y k =\n    if k <= 0 then y + 1 else let _ = f k in y + 1" [ ( "f 3", "f 3", "0" ) ])
+                    translatedContaining [ "bin \"^\" (ap (v \"g\") [.atexp (.scon (.intF 1))" ]
+                        (simple "f n =\n    if n <= 0 then 0 else if g 1 (n - 1) ^ -1 > 0 then 1 else 0\n\ng y k =\n    if k <= 0 then y + 1 else let _ = f k in y + 1" [ ( "f 3", "f 3", "1" ) ])
             ]
         , describe "literals"
             [ test "hex to decimal" <|

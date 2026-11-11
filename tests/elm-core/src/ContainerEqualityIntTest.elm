@@ -9,6 +9,10 @@ module ContainerEqualityIntTest exposing (main)
   - Lists: equal, the shorter list on either side, two empty lists, negative
     numbers, and mixed signs.
 
+The number literals are not annotated, so where nothing else fixes their type A Standard
+Definition of Elm? takes them to be Float (ruling A27); Floats with these integral values order and
+compare as the Ints would, so the results are the same.
+
 -}
 
 -- TAGS: elm-spec, b:Basics.eq

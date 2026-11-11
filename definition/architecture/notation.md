@@ -1,6 +1,6 @@
 # Notation Registry: A Standard Definition of Elm?
 
-The single home of every name and symbol in the book. `macros.sty` is generated from this file (with `gen_notation.py`); chapters write registered notation only through its macro. Single-letter metavariables written as plain letters (C, E, T, U, B) are registered with macro "(plain)".
+The single home of every name and symbol in the book. `macros.sty` is generated from this file (with `gen_notation.py`); chapters write registered notation only through its macro. Single-letter metavariables written as plain letters (C, E, T, U, B, D, S) are registered with macro "(plain)".
 
 ## Conventions
 
@@ -115,6 +115,11 @@ The single home of every name and symbol in the book. `macros.sty` is generated 
 | generalisation | sigma > sigma' | (plain \succ) | static-core | sigma generalises sigma' |
 | closure | Clos_C tau | `\Clos` | static-core | generalise over variables not free in C |
 | type function application | theta(tau1 ... tauk) | (plain) | static-core | beta-reduce a type function |
+| substitution | S = {tau^(k)/xi^(k)}, written tau{tau^(k)/xi^(k)} or S sigma | (plain) | static-core | replace each xi_i by tau_i; respects classes when each tau_i is in Adm_kappa for kappa the class of xi_i; S ranges over substitutions (A95) |
+| derivation | D, D' | (plain) | static-core | a derivation of a sentence by the rules; D ranges over derivations for one phrase in one context (A95) |
+| instance of a derivation | D' an instance of D | (plain) | static-core | for some class-respecting S, each type of D' is S applied to the corresponding type of D, each scheme of D' is no more general than S applied to that of D, and S maps U of each context of D onto U of the corresponding context of D' (A95) |
+| principal derivation | D principal | (plain) | static-core | every derivation for the phrase in the context is an instance of D; legality is judged on it and evaluation follows it (A95, A96) |
+| type-name renaming | rho | (plain) | static-modules | a bijection from the type names one derivation for a module generates to those another generates; instances of module derivations are taken up to rho (A96) |
 | row join | {varrho \| epsilon} | `\rec` | static-core | closed record type {varrho} |
 | open record | {varrho \| epsilon} | `\orec` | static-core | open record type |
 | constructor type | tau t | (plain) | static-core | type construction |
@@ -129,6 +134,7 @@ The single home of every name and symbol in the book. `macros.sty` is generated 
 | decode | Dec_tau(j) | `\Dec` | effects | JSON to value at a port; partial |
 | Int normalisation | norm(n) | `\norm` | appendix-dynamic-basis | integer into the Int range (Appendix E) |
 | Int range | IntRange | `\IntRange` | appendix-dynamic-basis | the implementation's set of Int values (Appendix E) |
+| leaf-command sequence | L, c . L | (plain) | programs | L ranges over finite sequences of leaf commands, the input of the dispatch sentences s, P, Q, H \|- L => (P', Q', H') |
 | transition | K --ell--> K' | `\step` | programs | program transition with label |
 | static operator table | OT_STAT(op) | `\OTstat` | appendix-static-basis | Op ->fin TypeScheme x IdStatus: the scheme and status of each operator of the initial basis, fixed for every program (audit X1) |
 | dynamic operator table | OT_DYN(op) | `\OTdyn` | appendix-dynamic-basis | Op ->fin Val: the value of each operator of the initial basis, fixed for every program (audit X1) |
@@ -293,7 +299,7 @@ Symbols added by chapter agents through `requests/<chapter>-req.tex`, merged her
 | `\pgDynamicBasis` | `{\cls{DynamicBasis}}` | class DynamicBasis: the class Basis of the dynamic semantics of Modules (Chapter 7), ModEnv, renamed in Chapter 9 (programs) | programs |
 | `\pgBstat` | `{B_{\mathrm{STAT}}}` | metavariable of StaticBasis: B_STAT; B or (B_STAT, B_DYN) ranges over Basis = StaticBasis x DynamicBasis (programs) | programs |
 | `\pgBdyn` | `{B_{\mathrm{DYN}}}` | metavariable of DynamicBasis: B_DYN (programs) | programs |
-| `\pgDflt` | `{\mathrm{Dflt}\,}` | operation Dflt sigma: the body of the type scheme sigma with Int for each bound type variable of class number (A27) (programs) | programs |
+| `\pgDflt` | `{\mathrm{Dflt}\,}` | operation Dflt sigma: the body of the type scheme sigma with Float for each bound type variable of class number (A27) (programs) | programs |
 | `\pgTime` | `{\cls{Time}}` | class Time = {x in R / x >= 0}, metavariables s (instants, milliseconds since the program started) and d (durations) (programs) | programs |
 | `\pgProc` | `{\cls{Proc}}` | class Proc: (TaskVal x Time x (CmdVal u {spawned})) u {ended}; the state of a process (programs) | programs |
 | `\pgProcMap` | `{\cls{ProcMap}}` | class ProcMap = ProcId ->fin Proc, metavariable P (plain): the processes started so far (programs) | programs |

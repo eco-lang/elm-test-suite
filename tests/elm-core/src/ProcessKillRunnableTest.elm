@@ -12,9 +12,13 @@ The parent spawns a child, kills it, and does the same with a second child:
 
 The parent then sleeps for 50 ms and logs "done".
 
+Tagged `elm-unspecced`: whether `survived queued` is logged, and `survived runnable` is not,
+depends on how processes interleave after `Process.spawn`, which A Standard Definition of Elm?
+leaves open (ruling A78). The test records what Elm 0.19.1 does.
+
 -}
 
--- TAGS: elm-spec, p-proc-kill, p-proc-spawn, e-task-andthen-inner
+-- TAGS: elm-unspecced
 -- MODE-GUARD: a Char equality must give the same answer as under --optimize
 -- NO-SKIP: an edge case every compiler must run
 -- CHECK: kill: "survived queued"

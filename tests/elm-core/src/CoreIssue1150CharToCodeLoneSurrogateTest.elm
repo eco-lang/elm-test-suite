@@ -18,7 +18,7 @@ integer; NaN is the divergence the book records under ruling A52.
 
 -- TAGS: elm19-bug
 -- TAGS: elm-spec, b:Char.fromCode, b:Char.toCode, b:Char.Char, b:Basics.Int
--- CHECK: {{code: [0-9]+(\n|$)}}
+-- CHECK: {{code: -?[0-9]+(\n|$)}}
 
 import Html exposing (text)
 

@@ -13,9 +13,13 @@ port's order relies on the host echoing each `echoOut` value back on `echoIn` in
 the order the port delivered it; the list is logged once five values have come
 back.
 
+Tagged `elm-unspecced`: A Standard Definition of Elm? leaves the order of the commands of a batch
+open (ruling A66); the reverse order expected here is what Elm 0.19.1 and eco do (Appendix E, The
+Order of Commands).
+
 -}
 
--- TAGS: elm-spec, p-init, p-disp-out, p-disp-task
+-- TAGS: elm-unspecced
 -- CHECK: CmdBatchOrderTest tasks: [3,2,1]
 -- CHECK: CmdBatchOrderTest port: [5,4,3,2,1]
 

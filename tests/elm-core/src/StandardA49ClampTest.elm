@@ -9,7 +9,8 @@ is `+0` (the bounds the wrong way round give `hi`), `clamp nan 1 0.5` is NaN, `c
 <https://elm-test-suite.netlify.app/standard/basis/Basics/clamp>
 
 The float results are tested without printing a float: a value is NaN when it is not equal to
-itself, and a zero's sign is the sign of `1` divided by it.
+itself, and a zero's sign is the sign of `1` divided by it. The Int examples go through `iclamp`,
+annotated at `Int`: an integer constant that nothing fixes is `Float` (ruling A27).
 
 Elm 0.19.1 computes `clamp` at Float by elm/core's text too, so it gives `10`, `0.5`, `-0` and `0`
 for the four float examples.
@@ -51,6 +52,11 @@ isPositiveZero x =
     x == 0 && 1 / x > 0
 
 
+iclamp : Int -> Int -> Int -> Int
+iclamp lo hi x =
+    clamp lo hi x
+
+
 isNegativeZero : Float -> Bool
 isNegativeZero x =
     x == 0 && 1 / x < 0
@@ -71,18 +77,18 @@ main =
             Debug.log "clamp -1 -0 0 is -0" (isNegativeZero (clamp -1 negZero 0))
 
         _ =
-            Debug.log "clamp 10 0 5 at Int" (clamp 10 0 5)
+            Debug.log "clamp 10 0 5 at Int" (iclamp 10 0 5)
 
         _ =
-            Debug.log "clamp 10 0 20 at Int" (clamp 10 0 20)
+            Debug.log "clamp 10 0 20 at Int" (iclamp 10 0 20)
 
         _ =
-            Debug.log "clamp 0 10 -5 at Int" (clamp 0 10 -5)
+            Debug.log "clamp 0 10 -5 at Int" (iclamp 0 10 -5)
 
         _ =
-            Debug.log "clamp 0 10 15 at Int" (clamp 0 10 15)
+            Debug.log "clamp 0 10 15 at Int" (iclamp 0 10 15)
 
         _ =
-            Debug.log "clamp 0 10 7 at Int" (clamp 0 10 7)
+            Debug.log "clamp 0 10 7 at Int" (iclamp 0 10 7)
     in
     Html.text "done"

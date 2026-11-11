@@ -1,6 +1,6 @@
 # Standard Elm mechanisation: example run
 
-Programs: 487, in 13 shards; checks: 1477.
+Programs: 488, in 13 shards; checks: 1478.
 
 ## Elm01
 
@@ -321,84 +321,83 @@ Elm02: 40 programs, 123 checks, 123 agree.
 | CoreIssue988NanContainerSelfEqualityTest | shared inner list | False | False | agree | kc_Elm03_37 |
 | CovLambdaBoundaryCaseBoundaryInARecursiveValueTest | testValue | 4 | 4 | agree | kc_Elm03_38 |
 | CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest | testValue | 4 | 4 | agree | kc_Elm03_39 |
-| CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest | testValue | 9 | 9 | agree | kc_Elm03_40 |
-| CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest | testValue | 14 | 14 | agree | kc_Elm03_41 |
+| CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest | testValue | 14 | 14 | agree | kc_Elm03_40 |
 | CovPatternSplitTupleAndConstructorParametersMatchedByCaseTest | testValue | <function> | <function> | agree |  |
 | CovTailRecPairParameterPassedUnchangedLetBoundAndRebuiltTest | testValue | <function> | <function> | agree |  |
 | CovTailRecPairParametersSwappedAndALoopReturningALambdaTest | testValue | <function> | <function> | agree |  |
 | CovTailRecSplitATripleParameterTest | testValue | <function> | <function> | agree |  |
-| CustomTypeFuncFieldTest | op1 | 11 | 11 | agree | kc_Elm03_42 |
-| CustomTypeFuncFieldTest | op2 | 20 | 20 | agree | kc_Elm03_43 |
-| CustomTypePatternTest | name | "Alice" | "Alice" | agree | kc_Elm03_44 |
-| CustomTypePatternTest | age | 30 | 30 | agree | kc_Elm03_45 |
-| DecisionTreeAdvancedDeepNestingWithFallbackTest | testValue | 5 | 5 | agree | kc_Elm03_46 |
-| DeepEqualityTest | nat 150 vs 200 | "False" | "False" | agree | kc_Elm03_47 |
-| DeepEqualityTest | nat 150 vs 150 | "True" | "True" | agree | kc_Elm03_48 |
-| DeepEqualityTest | nest 120 | "False" | "False" | agree | kc_Elm03_49 |
-| DeepEqualityTest | nest 500 /= | "True" | "True" | agree | kc_Elm03_50 |
-| DeepEqualityTest | record chain 300 | "False" | "False" | agree | kc_Elm03_51 |
+| CustomTypeFuncFieldTest | op1 | 11 | 11 | agree | kc_Elm03_41 |
+| CustomTypeFuncFieldTest | op2 | 20 | 20 | agree | kc_Elm03_42 |
+| CustomTypePatternTest | name | "Alice" | "Alice" | agree | kc_Elm03_43 |
+| CustomTypePatternTest | age | 30 | 30 | agree | kc_Elm03_44 |
+| DecisionTreeAdvancedDeepNestingWithFallbackTest | testValue | 5 | 5 | agree | kc_Elm03_45 |
+| DeepEqualityTest | nat 150 vs 200 | "False" | "False" | agree | kc_Elm03_46 |
+| DeepEqualityTest | nat 150 vs 150 | "True" | "True" | agree | kc_Elm03_47 |
+| DeepEqualityTest | nest 120 | "False" | "False" | agree | kc_Elm03_48 |
+| DeepEqualityTest | nest 500 /= | "True" | "True" | agree | kc_Elm03_49 |
+| DeepEqualityTest | record chain 300 | "False" | "False" | agree | kc_Elm03_50 |
+| DeepNestStressTest | nested_list | 1 | 1 | agree | kc_Elm03_51 |
+| DeepNestStressTest | nested_tuple | 1 | 1 | agree | kc_Elm03_52 |
+| DeepNestStressTest | nested_record | 1 | 1 | agree | kc_Elm03_53 |
+| DeepNestStressTest | nested_let | 10 | 10 | agree | kc_Elm03_54 |
 
-Elm03: 40 programs, 64 checks, 64 agree.
+Elm03: 40 programs, 67 checks, 67 agree.
 
 ## Elm04
 
 | Program | Label | Expected (CHECK) | Definition | Status | Theorem |
 |---|---|---|---|---|---|
-| DeepNestStressTest | nested_list | 1 | 1 | agree | kc_Elm04_0 |
-| DeepNestStressTest | nested_tuple | 1 | 1 | agree | kc_Elm04_1 |
-| DeepNestStressTest | nested_record | 1 | 1 | agree | kc_Elm04_2 |
-| DeepNestStressTest | nested_let | 10 | 10 | agree | kc_Elm04_3 |
-| DestructCaptureTest | captured | 56 | 56 | agree | kc_Elm04_4 |
+| DestructCaptureTest | captured | 56 | 56 | agree | kc_Elm04_0 |
 | EdgeCaseAllDestructPatternsTest | testValue | [1,3,4,6] | [1,3,4,6] | agree |  |
-| EitherTypeTest | left | 42 | 42 | agree | kc_Elm04_5 |
-| EitherTypeTest | right | 0 | 0 | agree | kc_Elm04_6 |
-| EitherTypeTest | mapLeft | 84 | 84 | agree | kc_Elm04_7 |
-| EitherTypeTest | isLeft | True | True | agree | kc_Elm04_8 |
-| EmbeddedEmptyStringCaptureTest | isEmpty | True | True | agree | kc_Elm04_9 |
-| EmbeddedEmptyStringCaptureTest | captured | "" | "" | agree | kc_Elm04_10 |
-| EmbeddedMixedConstantsTest | m | Nothing | Nothing | agree | kc_Elm04_11 |
+| EitherTypeTest | left | 42 | 42 | agree | kc_Elm04_1 |
+| EitherTypeTest | right | 0 | 0 | agree | kc_Elm04_2 |
+| EitherTypeTest | mapLeft | 84 | 84 | agree | kc_Elm04_3 |
+| EitherTypeTest | isLeft | True | True | agree | kc_Elm04_4 |
+| EmbeddedEmptyStringCaptureTest | isEmpty | True | True | agree | kc_Elm04_5 |
+| EmbeddedEmptyStringCaptureTest | captured | "" | "" | agree | kc_Elm04_6 |
+| EmbeddedMixedConstantsTest | m | Nothing | Nothing | agree | kc_Elm04_7 |
 | EmbeddedMixedConstantsTest | l | [] | [] | agree |  |
-| EmbeddedMixedConstantsTest | b | True | True | agree | kc_Elm04_12 |
-| EmbeddedMixedConstantsTest | s | "" | "" | agree | kc_Elm04_13 |
+| EmbeddedMixedConstantsTest | b | True | True | agree | kc_Elm04_8 |
+| EmbeddedMixedConstantsTest | s | "" | "" | agree | kc_Elm04_9 |
 | EmbeddedMixedConstantsTest | u | () | () | agree |  |
-| EmbeddedNilCaptureTest | result | "empty" | "empty" | agree | kc_Elm04_14 |
-| EmbeddedNilInCustomTypeTest | isEmpty | True | True | agree | kc_Elm04_15 |
-| EmbeddedNilInCustomTypeTest | len | 0 | 0 | agree | kc_Elm04_16 |
+| EmbeddedNilCaptureTest | result | "empty" | "empty" | agree | kc_Elm04_10 |
+| EmbeddedNilInCustomTypeTest | isEmpty | True | True | agree | kc_Elm04_11 |
+| EmbeddedNilInCustomTypeTest | len | 0 | 0 | agree | kc_Elm04_12 |
 | EmbeddedNilRecursiveTest | result | [2,4,6] | [2,4,6] | agree |  |
-| EmbeddedNothingCallbackTest | applied1 | Nothing | Nothing | agree | kc_Elm04_17 |
+| EmbeddedNothingCallbackTest | applied1 | Nothing | Nothing | agree | kc_Elm04_13 |
 | EmbeddedNothingCallbackTest | applied2 | Just 11 | Just 11 | agree |  |
-| EmbeddedNothingCaptureTest | result | -1 | -1 | agree | kc_Elm04_18 |
-| EmbeddedNothingInCustomTypeTest | result | -1 | -1 | agree | kc_Elm04_19 |
-| EmbeddedNothingInRecordTest | result | "nothing" | "nothing" | agree | kc_Elm04_20 |
-| EmbeddedNothingInTupleTest | first | "nothing" | "nothing" | agree | kc_Elm04_21 |
-| EmbeddedNothingInTupleTest | second | 42 | 42 | agree | kc_Elm04_22 |
+| EmbeddedNothingCaptureTest | result | -1 | -1 | agree | kc_Elm04_14 |
+| EmbeddedNothingInCustomTypeTest | result | -1 | -1 | agree | kc_Elm04_15 |
+| EmbeddedNothingInRecordTest | result | "nothing" | "nothing" | agree | kc_Elm04_16 |
+| EmbeddedNothingInTupleTest | first | "nothing" | "nothing" | agree | kc_Elm04_17 |
+| EmbeddedNothingInTupleTest | second | 42 | 42 | agree | kc_Elm04_18 |
 | EmbeddedNothingMapTest | results | [-1,1,-1,2] | [-1,1,-1,2] | agree |  |
-| EmbeddedNothingPolymorphicTest | r1 | Nothing | Nothing | agree | kc_Elm04_23 |
+| EmbeddedNothingPolymorphicTest | r1 | Nothing | Nothing | agree | kc_Elm04_19 |
 | EmbeddedNothingPolymorphicTest | r2 | [] | [] | agree |  |
-| EmbeddedNothingPolymorphicTest | r3 | "" | "" | agree | kc_Elm04_24 |
+| EmbeddedNothingPolymorphicTest | r3 | "" | "" | agree | kc_Elm04_20 |
 | EmbeddedNothingRecursiveTest | find1 | Just 3 | Just 3 | agree |  |
-| EmbeddedNothingRecursiveTest | find2 | Nothing | Nothing | agree | kc_Elm04_25 |
+| EmbeddedNothingRecursiveTest | find2 | Nothing | Nothing | agree | kc_Elm04_21 |
 | EmbeddedReturnNilTest | r1 | [2,4] | [2,4] | agree |  |
 | EmbeddedReturnNilTest | r2 | [] | [] | agree |  |
-| EmbeddedReturnNothingTest | r1 | 5 | 5 | agree | kc_Elm04_26 |
-| EmbeddedReturnNothingTest | r2 | -1 | -1 | agree | kc_Elm04_27 |
+| EmbeddedReturnNothingTest | r1 | 5 | 5 | agree | kc_Elm04_22 |
+| EmbeddedReturnNothingTest | r2 | -1 | -1 | agree | kc_Elm04_23 |
 | EmbeddedUnitCaptureTest | first | () | () | agree |  |
-| EmbeddedUnitCaptureTest | second | 42 | 42 | agree | kc_Elm04_28 |
-| EqualityStringChainCaseTest | case1 | "matched foo+True" | "matched foo+True" | agree | kc_Elm04_29 |
-| EqualityStringChainCaseTest | case2 | "matched bar+False" | "matched bar+False" | agree | kc_Elm04_30 |
-| EqualityStringChainCaseTest | case3 | "other" | "other" | agree | kc_Elm04_31 |
-| EqualityStringChainCaseTest | eq1 | True | True | agree | kc_Elm04_32 |
-| EqualityStringChainCaseTest | eq2 | False | False | agree | kc_Elm04_33 |
-| ErasedListSpecializationTest | n | 2 | 2 | agree | kc_Elm04_34 |
-| ErasedListSpecializationTest | m | 3 | 3 | agree | kc_Elm04_35 |
-| EscapeCustomCaseScrutineeTest | just | 7 | 7 | agree | kc_Elm04_36 |
-| EscapeCustomCaseScrutineeTest | nothing | 0 | 0 | agree | kc_Elm04_37 |
-| EscapeTopLevelTupleTest | a | 11 | 11 | agree | kc_Elm04_38 |
-| EscapeTopLevelTupleTest | b | 22 | 22 | agree | kc_Elm04_39 |
-| EtaExpandStateFunctionSequenceTest | testValue | 0 | 0 | agree | kc_Elm04_40 |
+| EmbeddedUnitCaptureTest | second | 42 | 42 | agree | kc_Elm04_24 |
+| EqualityStringChainCaseTest | case1 | "matched foo+True" | "matched foo+True" | agree | kc_Elm04_25 |
+| EqualityStringChainCaseTest | case2 | "matched bar+False" | "matched bar+False" | agree | kc_Elm04_26 |
+| EqualityStringChainCaseTest | case3 | "other" | "other" | agree | kc_Elm04_27 |
+| EqualityStringChainCaseTest | eq1 | True | True | agree | kc_Elm04_28 |
+| EqualityStringChainCaseTest | eq2 | False | False | agree | kc_Elm04_29 |
+| ErasedListSpecializationTest | n | 2 | 2 | agree | kc_Elm04_30 |
+| ErasedListSpecializationTest | m | 3 | 3 | agree | kc_Elm04_31 |
+| EscapeCustomCaseScrutineeTest | just | 7 | 7 | agree | kc_Elm04_32 |
+| EscapeCustomCaseScrutineeTest | nothing | 0 | 0 | agree | kc_Elm04_33 |
+| EscapeTopLevelTupleTest | a | 11 | 11 | agree | kc_Elm04_34 |
+| EscapeTopLevelTupleTest | b | 22 | 22 | agree | kc_Elm04_35 |
+| EtaExpandStateFunctionSequenceTest | testValue | 0 | 0 | agree | kc_Elm04_36 |
 | EtaExpandStateTest | r | [30,42,54] | [30,42,54] | agree |  |
-| File | compiled | True | True | agree | kc_Elm04_41 |
-| FlipFunctionTest | result | 3.14 | 3.14 | agree |  |
+| File | compiled | True | True | agree | kc_Elm04_37 |
+| FlipFunctionTest | result | 3.14 | 3.14 | agree | kc_Elm04_38 |
 | FloatEdgeTest | round 2.5 | "3" | "3" | agree |  |
 | FloatEdgeTest | round -2.5 | "-2" | "-2" | agree |  |
 | FloatEdgeTest | round 0.5 | "1" | "1" | agree |  |
@@ -421,36 +420,36 @@ Elm03: 40 programs, 64 checks, 64 agree.
 | FloatEdgeTest | list nan /= list nan | "True" | "True" | agree |  |
 | FloatEdgeTest | truncate nan | "0" | "0" | agree |  |
 | FloatEdgeTest | pow 3 33 | "5559060566555523" | "5559060566555523" | agree |  |
-| FunctionAccumulatorFunctionLookupTest | testValue | 15 | 15 | agree | kc_Elm04_42 |
-| FunctionBasicTest | add1 | 5 | 5 | agree | kc_Elm04_43 |
-| FunctionBasicTest | double1 | 10 | 10 | agree | kc_Elm04_44 |
-| FunctionBasicTest | identity1 | 42 | 42 | agree | kc_Elm04_45 |
+| FunctionAccumulatorFunctionLookupTest | testValue | 15 | 15 | agree | kc_Elm04_39 |
+| FunctionBasicTest | add1 | 5 | 5 | agree | kc_Elm04_40 |
+| FunctionBasicTest | double1 | 10 | 10 | agree | kc_Elm04_41 |
+| FunctionBasicTest | identity1 | 42 | 42 | agree | kc_Elm04_42 |
 | FunctionChainedPartialApplicationTest | testValue | <function> | <function> | agree |  |
-| FunctionCompappendWithStringTest | testValue | "helloworld" | "helloworld" | agree | kc_Elm04_46 |
-| FunctionMultiArgTest | three | 6 | 6 | agree | kc_Elm04_47 |
-| FunctionMultiArgTest | four | 10 | 10 | agree | kc_Elm04_48 |
-| FunctionMultiArgTest | five | 15 | 15 | agree | kc_Elm04_49 |
-| FunctionUnannotatedCompappendTest | testValue | 0 | 0 | agree | kc_Elm04_50 |
-| FunctionValueChoiceTest | chooseIf called | 12 | 12 | agree | kc_Elm04_51 |
-| FunctionValueChoiceTest | chooseIf folded | 6 | 6 | agree | kc_Elm04_52 |
-| FunctionValueChoiceTest | chooseElse called | -1 | -1 | agree | kc_Elm04_53 |
-| FunctionValueChoiceTest | chooseElse folded | 2 | 2 | agree | kc_Elm04_54 |
-| FunctionValueChoiceTest | chooseC then | 7 | 7 | agree | kc_Elm04_55 |
+| FunctionCompappendWithStringTest | testValue | "helloworld" | "helloworld" | agree | kc_Elm04_43 |
+| FunctionMultiArgTest | three | 6 | 6 | agree | kc_Elm04_44 |
+| FunctionMultiArgTest | four | 10 | 10 | agree | kc_Elm04_45 |
+| FunctionMultiArgTest | five | 15 | 15 | agree | kc_Elm04_46 |
+| FunctionUnannotatedCompappendTest | testValue | 0 | 0 | agree | kc_Elm04_47 |
+| FunctionValueChoiceTest | chooseIf called | 12 | 12 | agree | kc_Elm04_48 |
+| FunctionValueChoiceTest | chooseIf folded | 6 | 6 | agree | kc_Elm04_49 |
+| FunctionValueChoiceTest | chooseElse called | -1 | -1 | agree | kc_Elm04_50 |
+| FunctionValueChoiceTest | chooseElse folded | 2 | 2 | agree | kc_Elm04_51 |
+| FunctionValueChoiceTest | chooseC then | 7 | 7 | agree | kc_Elm04_52 |
 | FunctionValueChoiceTest | chooseC else | (4,3) | (4,3) | agree |  |
-| FunctionValueChoiceTest | chooseC sum | 17 | 17 | agree | kc_Elm04_56 |
-| HOParamApplyTwoTest | result | 1 | 1 | agree | kc_Elm04_57 |
+| FunctionValueChoiceTest | chooseC sum | 17 | 17 | agree | kc_Elm04_53 |
+| HOParamApplyTwoTest | result | 1 | 1 | agree | kc_Elm04_54 |
 | HeteroClosureIntFloatTest | hetero_true | 13 | 13 | agree |  |
 | HeteroClosureIntFloatTest | hetero_false | 10 | 10 | agree |  |
 | HigherOrderFilterLikeFunctionTest | testValue | [1] | [1] | agree |  |
-| HigherOrderFunctionChosenByIfTest | testValue | 2 | 2 | agree | kc_Elm04_58 |
+| HigherOrderFunctionChosenByIfTest | testValue | 2 | 2 | agree | kc_Elm04_55 |
+| HigherOrderFunctionFactoryTest | testValue | (5,2) | (5,2) | agree |  |
 
-Elm04: 40 programs, 99 checks, 99 agree.
+Elm04: 40 programs, 96 checks, 96 agree.
 
 ## Elm05
 
 | Program | Label | Expected (CHECK) | Definition | Status | Theorem |
 |---|---|---|---|---|---|
-| HigherOrderFunctionFactoryTest | testValue | (5,2) | (5,2) | agree |  |
 | HigherOrderReturnLambdaBasedOnConditionTest | testValue | 42 | 42 | agree | kc_Elm05_0 |
 | HigherOrderTest | apply1 | 10 | 10 | agree | kc_Elm05_1 |
 | HigherOrderTest | apply2 | 25 | 25 | agree | kc_Elm05_2 |
@@ -458,94 +457,94 @@ Elm04: 40 programs, 99 checks, 99 agree.
 | HigherOrderTripleNestedFunctionTest | testValue | [1,2,3] | [1,2,3] | agree |  |
 | HoleyAliasTwoParamsTest | pairInt | 42 | 42 | agree | kc_Elm05_4 |
 | HoleyAliasTwoParamsTest | pairStr | "hi" | "hi" | agree | kc_Elm05_5 |
-| HoleyAliasTwoParamsTest | recFloat | 2.5 | 2.5 | agree |  |
-| HoleyAliasTwoParamsTest | recInt | 7 | 7 | agree | kc_Elm05_6 |
+| HoleyAliasTwoParamsTest | recFloat | 2.5 | 2.5 | agree | kc_Elm05_6 |
+| HoleyAliasTwoParamsTest | recInt | 7 | 7 | agree | kc_Elm05_7 |
 | HoleyAliasTwoParamsTest | box | Box (42,"hi") | Box (42,"hi") | agree |  |
 | HoleyAliasTwoParamsTest | rbox | RBox { first = 7, second = 2.5 } | RBox { first = 7, second = 2.5 } | agree |  |
-| ImportOperatorItemTest | sum | 7 | 7 | agree | kc_Elm05_7 |
-| ImportOperatorItemTest | quotient | 3 | 3 | agree | kc_Elm05_8 |
+| ImportOperatorItemTest | sum | 7 | 7 | agree | kc_Elm05_8 |
+| ImportOperatorItemTest | quotient | 3 | 3 | agree | kc_Elm05_9 |
 | ImportResolutionQualifiedImportedFunctionTest | testValue | [-1,-2] | [-1,-2] | agree |  |
-| IndirectCallFloatTest | apply_double | 10 | 10 | agree |  |
-| IndirectCallFloatTest | apply_negate | -3 | -3 | agree |  |
-| IndirectCallFloatTest | apply_addTen | 15 | 15 | agree |  |
-| IndirectCallFloatTest | twice_double | 8 | 8 | agree |  |
-| IndirectCallFloatTest | twice_addTen | 20 | 20 | agree |  |
-| IndirectCallFloatTest | compose_result | 22 | 22 | agree |  |
-| InfixAssocLeftArithTest | sub sub | 5 | 5 | agree | kc_Elm05_9 |
-| InfixAssocLeftArithTest | fdiv fdiv | 5 | 5 | agree |  |
-| InfixAssocLeftArithTest | idiv idiv | 3 | 3 | agree | kc_Elm05_10 |
-| InfixAssocPipesTest | pipe right twice | 3 | 3 | agree | kc_Elm05_11 |
-| InfixAssocPipesTest | pipe left twice | -3 | -3 | agree | kc_Elm05_12 |
-| InfixAssocRightPowTest | pow pow | 512 | 512 | agree | kc_Elm05_13 |
-| InfixIfExtendsRightTest | if then chain | 10 | 10 | agree | kc_Elm05_14 |
-| InfixLastOperandAnyExprTest | if last | 3 | 3 | agree | kc_Elm05_15 |
-| InfixLastOperandAnyExprTest | lambda last | 10 | 10 | agree | kc_Elm05_16 |
-| InfixNegatedOperandTest | negated pow | 4 | 4 | agree | kc_Elm05_17 |
-| InfixNegatedOperandTest | sub negated | 5 | 5 | agree | kc_Elm05_18 |
-| InfixNonAssocSeparatedLegalTest | separated | True | True | agree | kc_Elm05_19 |
+| IndirectCallFloatTest | apply_double | 10 | 10 | agree | kc_Elm05_10 |
+| IndirectCallFloatTest | apply_negate | -3 | -3 | agree | kc_Elm05_11 |
+| IndirectCallFloatTest | apply_addTen | 15 | 15 | agree | kc_Elm05_12 |
+| IndirectCallFloatTest | twice_double | 8 | 8 | agree | kc_Elm05_13 |
+| IndirectCallFloatTest | twice_addTen | 20 | 20 | agree | kc_Elm05_14 |
+| IndirectCallFloatTest | compose_result | 22 | 22 | agree | kc_Elm05_15 |
+| InfixAssocLeftArithTest | sub sub | 5 | 5 | agree | kc_Elm05_16 |
+| InfixAssocLeftArithTest | fdiv fdiv | 5 | 5 | agree | kc_Elm05_17 |
+| InfixAssocLeftArithTest | idiv idiv | 3 | 3 | agree | kc_Elm05_18 |
+| InfixAssocPipesTest | pipe right twice | 3 | 3 | agree | kc_Elm05_19 |
+| InfixAssocPipesTest | pipe left twice | -3 | -3 | agree | kc_Elm05_20 |
+| InfixAssocRightPowTest | pow pow | 512 | 512 | agree |  |
+| InfixIfExtendsRightTest | if then chain | 10 | 10 | agree | kc_Elm05_21 |
+| InfixLastOperandAnyExprTest | if last | 3 | 3 | agree | kc_Elm05_22 |
+| InfixLastOperandAnyExprTest | lambda last | 10 | 10 | agree | kc_Elm05_23 |
+| InfixNegatedOperandTest | negated pow | 4 | 4 | agree |  |
+| InfixNegatedOperandTest | sub negated | 5 | 5 | agree |  |
+| InfixNonAssocSeparatedLegalTest | separated | True | True | agree | kc_Elm05_24 |
 | InfixPrecAddOverConsTest | add then cons | [2,5] | [2,5] | agree |  |
-| InfixPrecAndOverOrTest | or then and | True | True | agree | kc_Elm05_20 |
-| InfixPrecAppendOverEqTest | append then eq | True | True | agree | kc_Elm05_21 |
-| InfixPrecApplicationFirstTest | application then pow | 4 | 4 | agree | kc_Elm05_22 |
-| InfixPrecApplicationFirstTest | application then mul | 9 | 9 | agree | kc_Elm05_23 |
-| InfixPrecCompareOverAndTest | lt then and | True | True | agree | kc_Elm05_24 |
-| InfixPrecComposeOverPipeTest | compose then pipe | -3 | -3 | agree | kc_Elm05_25 |
-| InfixPrecMulOverAddTest | add then mul | 14 | 14 | agree | kc_Elm05_26 |
-| InfixPrecMulOverAddTest | mul then add | 10 | 10 | agree | kc_Elm05_27 |
-| InfixPrecOrOverPipeTest | or then pipe | False | False | agree | kc_Elm05_28 |
-| InfixPrecPowOverMulTest | pow then mul | 16 | 16 | agree | kc_Elm05_29 |
-| InlineDupLetNamesTest | InlineDupLetNamesTest | 6 | 6 | agree | kc_Elm05_30 |
-| JoinpointABI23Majority3FlatTest | testValue | 10 | 10 | agree | kc_Elm05_31 |
-| LambdaBoundaryCaptureTest | result | 105 | 105 | agree | kc_Elm05_32 |
-| LambdaCaseBoundaryTest | add | 7 | 7 | agree | kc_Elm05_33 |
-| LambdaCaseBoundaryTest | sub | 3 | 3 | agree | kc_Elm05_34 |
-| LambdaCaseBoundaryTest | mul | 20 | 20 | agree | kc_Elm05_35 |
-| LambdaCaseBoundaryTest | nested_add | 11 | 11 | agree | kc_Elm05_36 |
-| LambdaCaseBoundaryTest | nested_sub | 3 | 3 | agree | kc_Elm05_37 |
-| LambdaCaseBoundaryTest | partial_add | 15 | 15 | agree | kc_Elm05_38 |
-| LambdaLetBoundaryTest | basic | 15 | 15 | agree | kc_Elm05_39 |
-| LambdaLetBoundaryTest | capturing | 19 | 19 | agree | kc_Elm05_40 |
-| LambdaLetBoundaryTest | multi_let | 20 | 20 | agree | kc_Elm05_41 |
-| LambdaLetBoundaryTest | nested | 42 | 42 | agree | kc_Elm05_42 |
-| LambdaLetBoundaryTest | partial | 25 | 25 | agree | kc_Elm05_43 |
+| InfixPrecAndOverOrTest | or then and | True | True | agree | kc_Elm05_25 |
+| InfixPrecAppendOverEqTest | append then eq | True | True | agree | kc_Elm05_26 |
+| InfixPrecApplicationFirstTest | application then pow | 4 | 4 | agree |  |
+| InfixPrecApplicationFirstTest | application then mul | 9 | 9 | agree |  |
+| InfixPrecCompareOverAndTest | lt then and | True | True | agree | kc_Elm05_27 |
+| InfixPrecComposeOverPipeTest | compose then pipe | -3 | -3 | agree | kc_Elm05_28 |
+| InfixPrecMulOverAddTest | add then mul | 14 | 14 | agree | kc_Elm05_29 |
+| InfixPrecMulOverAddTest | mul then add | 10 | 10 | agree | kc_Elm05_30 |
+| InfixPrecOrOverPipeTest | or then pipe | False | False | agree | kc_Elm05_31 |
+| InfixPrecPowOverMulTest | pow then mul | 16 | 16 | agree |  |
+| InlineDupLetNamesTest | InlineDupLetNamesTest | 6 | 6 | agree | kc_Elm05_32 |
+| JoinpointABI23Majority3FlatTest | testValue | 10 | 10 | agree | kc_Elm05_33 |
+| LambdaBoundaryCaptureTest | result | 105 | 105 | agree | kc_Elm05_34 |
+| LambdaCaseBoundaryTest | add | 7 | 7 | agree | kc_Elm05_35 |
+| LambdaCaseBoundaryTest | sub | 3 | 3 | agree | kc_Elm05_36 |
+| LambdaCaseBoundaryTest | mul | 20 | 20 | agree | kc_Elm05_37 |
+| LambdaCaseBoundaryTest | nested_add | 11 | 11 | agree | kc_Elm05_38 |
+| LambdaCaseBoundaryTest | nested_sub | 3 | 3 | agree | kc_Elm05_39 |
+| LambdaCaseBoundaryTest | partial_add | 15 | 15 | agree | kc_Elm05_40 |
+| LambdaLetBoundaryTest | basic | 15 | 15 | agree | kc_Elm05_41 |
+| LambdaLetBoundaryTest | capturing | 19 | 19 | agree | kc_Elm05_42 |
+| LambdaLetBoundaryTest | multi_let | 20 | 20 | agree | kc_Elm05_43 |
+| LambdaLetBoundaryTest | nested | 42 | 42 | agree | kc_Elm05_44 |
+| LambdaLetBoundaryTest | partial | 25 | 25 | agree | kc_Elm05_45 |
 | LambdaPatternArgTest | swap | (2,1) | (2,1) | agree |  |
-| LambdaPatternArgTest | getX | 42 | 42 | agree | kc_Elm05_44 |
-| LambdaPatternArgTest | mixed | "b" | "b" | agree | kc_Elm05_45 |
-| LargeDispatchCaseTest | r1 | 3 | 3 | agree | kc_Elm05_46 |
-| LargeDispatchCaseTest | r2 | -1 | -1 | agree | kc_Elm05_47 |
-| LargeDispatchCaseTest | r3 | -5 | -5 | agree | kc_Elm05_48 |
-| LargeDispatchCaseTest | r4 | 42 | 42 | agree | kc_Elm05_49 |
-| LetBasicTest | result1 | 5 | 5 | agree | kc_Elm05_50 |
-| LetBasicTest | result2 | "hello world" | "hello world" | agree | kc_Elm05_51 |
-| LetBoundLambdaCallTest | result | 1 | 1 | agree | kc_Elm05_52 |
+| LambdaPatternArgTest | getX | 42 | 42 | agree | kc_Elm05_46 |
+| LambdaPatternArgTest | mixed | "b" | "b" | agree | kc_Elm05_47 |
+| LargeDispatchCaseTest | r1 | 3 | 3 | agree | kc_Elm05_48 |
+| LargeDispatchCaseTest | r2 | -1 | -1 | agree | kc_Elm05_49 |
+| LargeDispatchCaseTest | r3 | -5 | -5 | agree | kc_Elm05_50 |
+| LargeDispatchCaseTest | r4 | 42 | 42 | agree | kc_Elm05_51 |
+| LetBasicTest | result1 | 5 | 5 | agree | kc_Elm05_52 |
+| LetBasicTest | result2 | "hello world" | "hello world" | agree | kc_Elm05_53 |
+| LetBoundLambdaCallTest | result | 1 | 1 | agree | kc_Elm05_54 |
 | LetDestructAliasTest | pair | (1,2) | (1,2) | agree |  |
-| LetDestructAliasTest | first | 1 | 1 | agree | kc_Elm05_53 |
-| LetDestructFuncTupleTest | get | 10 | 10 | agree | kc_Elm05_54 |
-| LetDestructFuncTupleTest | set | 99 | 99 | agree | kc_Elm05_55 |
-| LetDestructNestedSingleConstructorNumberTest | testValue | 1.5 | 1.5 | agree |  |
-| LetDestructRecordTest | single | 42 | 42 | agree | kc_Elm05_56 |
-| LetDestructRecordTest | multi | 3 | 3 | agree | kc_Elm05_57 |
-| LetDestructRecordTest | partial | 4 | 4 | agree | kc_Elm05_58 |
-| LetDestructRecordTest | mixed | 3 | 3 | agree | kc_Elm05_59 |
-| LetDestructTupleNestedTest | basic | 3 | 3 | agree | kc_Elm05_60 |
-| LetDestructTupleNestedTest | nested | 8 | 8 | agree | kc_Elm05_61 |
-| LetDestructTupleNestedTest | chain | 6 | 6 | agree | kc_Elm05_62 |
-| LetDestructuringTest | first | 1 | 1 | agree | kc_Elm05_63 |
-| LetDestructuringTest | second | 2 | 2 | agree | kc_Elm05_64 |
-| LetDestructuringTest | head | 10 | 10 | agree | kc_Elm05_65 |
-| LetMultiFuncTest | r1 | 1 | 1 | agree | kc_Elm05_66 |
-| LetMultiFuncTest | r2 | 2 | 2 | agree | kc_Elm05_67 |
+| LetDestructAliasTest | first | 1 | 1 | agree | kc_Elm05_55 |
+| LetDestructFuncTupleTest | get | 10 | 10 | agree | kc_Elm05_56 |
+| LetDestructFuncTupleTest | set | 99 | 99 | agree | kc_Elm05_57 |
+| LetDestructNestedSingleConstructorNumberTest | testValue | 1.5 | 1.5 | agree | kc_Elm05_58 |
+| LetDestructRecordTest | single | 42 | 42 | agree | kc_Elm05_59 |
+| LetDestructRecordTest | multi | 3 | 3 | agree | kc_Elm05_60 |
+| LetDestructRecordTest | partial | 4 | 4 | agree | kc_Elm05_61 |
+| LetDestructRecordTest | mixed | 3 | 3 | agree | kc_Elm05_62 |
+| LetDestructTupleNestedTest | basic | 3 | 3 | agree | kc_Elm05_63 |
+| LetDestructTupleNestedTest | nested | 8 | 8 | agree | kc_Elm05_64 |
+| LetDestructTupleNestedTest | chain | 6 | 6 | agree | kc_Elm05_65 |
+| LetDestructuringTest | first | 1 | 1 | agree | kc_Elm05_66 |
+| LetDestructuringTest | second | 2 | 2 | agree | kc_Elm05_67 |
+| LetDestructuringTest | head | 10 | 10 | agree | kc_Elm05_68 |
+| LetMultiFuncTest | r1 | 1 | 1 | agree | kc_Elm05_69 |
+| LetMultiFuncTest | r2 | 2 | 2 | agree | kc_Elm05_70 |
+| LetMultipleTest | sum | 15 | 15 | agree | kc_Elm05_71 |
+| LetMultipleTest | product | 120 | 120 | agree | kc_Elm05_72 |
 
-Elm05: 40 programs, 85 checks, 85 agree.
+Elm05: 40 programs, 86 checks, 86 agree.
 
 ## Elm06
 
 | Program | Label | Expected (CHECK) | Definition | Status | Theorem |
 |---|---|---|---|---|---|
-| LetMultipleTest | sum | 15 | 15 | agree | kc_Elm06_0 |
-| LetMultipleTest | product | 120 | 120 | agree | kc_Elm06_1 |
-| LetMutualRecursionBetweenLocalsTest | testValue | 22 | 22 | agree | kc_Elm06_2 |
-| LetNestedTest | nested | 30 | 30 | agree | kc_Elm06_3 |
+| LetMutualRecursionBetweenLocalsTest | testValue | 22 | 22 | agree | kc_Elm06_0 |
+| LetNestedTest | nested | 30 | 30 | agree | kc_Elm06_1 |
 | LetNumberApplyToTest | applyTo | 45 | 45 | agree |  |
 | LetNumberCaseLetTest | caselet | 45 | 45 | agree |  |
 | LetNumberCaseTuple3Test | case-tuple3-int | 60 | 60 | agree |  |
@@ -577,6 +576,7 @@ Elm05: 40 programs, 85 checks, 85 agree.
 | LetNumberNestedCustomTest | nestcustom | 45 | 45 | agree |  |
 | LetNumberNestedLetTest | nestedlet | 45 | 45 | agree |  |
 | LetNumberNestedTupleTest | nesttup | 155 | 155 | agree |  |
+| LetNumberRecordDestructureTest | recdestr | 105 | 105 | agree |  |
 | LetNumberRecordMultiFieldTest | multi | 105 | 105 | agree |  |
 | LetNumberRecordToFnTest | rec2fn | 45 | 45 | agree |  |
 | LetNumberScaleFnTest | scale | 105 | 105 | agree |  |
@@ -585,20 +585,21 @@ Elm05: 40 programs, 85 checks, 85 agree.
 | LetNumberUnionBranchTest | union | 145 | 145 | agree |  |
 | LetNumberWildcardSlotTest | wildslot | 120 | 120 | agree |  |
 | LetRecClosureTest | LetRecClosureTest | [1,2,3] | [1,2,3] | agree |  |
-| LetRecMultiArgTest | result | 2 | 2 | agree | kc_Elm06_4 |
+| LetRecMultiArgTest | result | 2 | 2 | agree | kc_Elm06_2 |
+| LetSeparatedStagingTest | result | 18 | 18 | agree | kc_Elm06_3 |
 | ListConsCharTest | list | ['a','b','c'] | ['a','b','c'] | agree |  |
 | ListConsCharTest | head | Just 'a' | Just 'a' | agree |  |
 | ListConsCharTest | prepend | ['z','a','b','c'] | ['z','a','b','c'] | agree |  |
-| ListConsFloatTest | list | [1,2.5,3.75] | [1,2.5,3.75] | agree |  |
-| ListConsFloatTest | head | Just 1 | Just 1 | agree |  |
-| ListConsFloatTest | prepend | [0,1,2.5,3.75] | [0,1,2.5,3.75] | agree |  |
 
-Elm06: 40 programs, 50 checks, 50 agree.
+Elm06: 40 programs, 47 checks, 47 agree.
 
 ## Elm07
 
 | Program | Label | Expected (CHECK) | Definition | Status | Theorem |
 |---|---|---|---|---|---|
+| ListConsFloatTest | list | [1,2.5,3.75] | [1,2.5,3.75] | agree |  |
+| ListConsFloatTest | head | Just 1 | Just 1 | agree |  |
+| ListConsFloatTest | prepend | [0,1,2.5,3.75] | [0,1,2.5,3.75] | agree |  |
 | ListConsIntTest | list | [1,2,3] | [1,2,3] | agree |  |
 | ListConsIntTest | head | Just 1 | Just 1 | agree |  |
 | ListConsIntTest | prepend | [0,1,2,3] | [0,1,2,3] | agree |  |
@@ -610,112 +611,112 @@ Elm06: 40 programs, 50 checks, 50 agree.
 | ListLiteralTest | list2 | [1,2,3] | [1,2,3] | agree |  |
 | ListLiteralTest | list3 | [10,20,30,40,50] | [10,20,30,40,50] | agree |  |
 | LocalMultiNonTailRecTest | sumInt | 6 | 6 | agree | kc_Elm07_0 |
-| LocalMultiNonTailRecTest | sumFloat | 4 | 4 | agree |  |
-| LocalRecCaptureBoolTest | count_true | 3 | 3 | agree | kc_Elm07_1 |
-| LocalRecCaptureBoolTest | count_false | 4 | 4 | agree | kc_Elm07_2 |
+| LocalMultiNonTailRecTest | sumFloat | 4 | 4 | agree | kc_Elm07_1 |
+| LocalRecCaptureBoolTest | count_true | 3 | 3 | agree | kc_Elm07_2 |
+| LocalRecCaptureBoolTest | count_false | 4 | 4 | agree | kc_Elm07_3 |
 | LocalRecCaptureKindsTest | direct | 110 | 110 | agree |  |
 | LocalRecCaptureKindsTest | via_hof | [110,110] | [110,110] | agree |  |
-| LocalRecCaptureSplitParamTest | o2 | 9 | 9 | agree | kc_Elm07_3 |
-| LocalRecCaptureSplitParamTest | o3 | 9 | 9 | agree | kc_Elm07_4 |
-| LocalTailRecSimpleTest | result | 55 | 55 | agree | kc_Elm07_5 |
-| LssGapBodyTieAnnoAB | bodyTieAnn | 7 | 7 | agree | kc_Elm07_6 |
-| LssGapBodyTieAnnoAB | bodyTieInf | 7 | 7 | agree | kc_Elm07_7 |
-| LssGapCtorAsValue | ctorAsValue | 7 | 7 | agree | kc_Elm07_8 |
-| LssGapCtorInList | ctorInList | 7 | 7 | agree | kc_Elm07_9 |
-| LssGapCtorScale | ctorScale | 10 | 10 | agree | kc_Elm07_10 |
-| LssGapCustomTypeFn | customTypeFn | 14 | 14 | agree | kc_Elm07_11 |
-| LssGapNoDecls | noDecls | 14 | 14 | agree | kc_Elm07_12 |
-| LssGapRecordFnNoAlias | recordFnNoAlias | 14 | 14 | agree | kc_Elm07_13 |
-| LssGapTupleFn | tupleFn | 14 | 14 | agree | kc_Elm07_14 |
+| LocalRecCaptureSplitParamTest | o2 | 9 | 9 | agree | kc_Elm07_4 |
+| LocalRecCaptureSplitParamTest | o3 | 9 | 9 | agree | kc_Elm07_5 |
+| LocalTailRecSimpleTest | result | 55 | 55 | agree | kc_Elm07_6 |
+| LssGapBodyTieAnnoAB | bodyTieAnn | 7 | 7 | agree | kc_Elm07_7 |
+| LssGapBodyTieAnnoAB | bodyTieInf | 7 | 7 | agree | kc_Elm07_8 |
+| LssGapCtorAsValue | ctorAsValue | 7 | 7 | agree | kc_Elm07_9 |
+| LssGapCtorInList | ctorInList | 7 | 7 | agree | kc_Elm07_10 |
+| LssGapCtorScale | ctorScale | 10 | 10 | agree | kc_Elm07_11 |
+| LssGapCustomTypeFn | customTypeFn | 14 | 14 | agree | kc_Elm07_12 |
+| LssGapNoDecls | noDecls | 14 | 14 | agree | kc_Elm07_13 |
+| LssGapRecordFnNoAlias | recordFnNoAlias | 14 | 14 | agree | kc_Elm07_14 |
+| LssGapTupleFn | tupleFn | 14 | 14 | agree | kc_Elm07_15 |
 | MaybeJustTest | just1 | Just 42 | Just 42 | agree |  |
 | MaybeJustTest | just2 | Just "hello" | Just "hello" | agree |  |
 | MaybeJustTest | just3 | Just True | Just True | agree |  |
-| MaybeNothingTest | nothing | Nothing | Nothing | agree | kc_Elm07_15 |
-| MaybePatternMatchTest | match1 | 42 | 42 | agree | kc_Elm07_16 |
-| MaybePatternMatchTest | match2 | 0 | 0 | agree | kc_Elm07_17 |
-| MultiLocalTailRecTest | result | 15 | 15 | agree | kc_Elm07_18 |
-| MutualLetRecClosuresTest | evenResult | True | True | agree | kc_Elm07_19 |
-| MutualLetRecClosuresTest | oddResult | False | False | agree | kc_Elm07_20 |
-| MutualLetRecClosuresTest | callsEven | 4 | 4 | agree | kc_Elm07_21 |
-| MutualLetRecClosuresTest | callsOdd | 3 | 3 | agree | kc_Elm07_22 |
-| MutualLetRecManyCapturesTest | go 3 | 42 | 42 | agree | kc_Elm07_23 |
-| MutualLetRecManyCapturesTest | go 2 | 42 | 42 | agree | kc_Elm07_24 |
-| MutualLetRecManyCapturesTest | go 1 | 42 | 42 | agree | kc_Elm07_25 |
-| MutualLetRecManyCapturesTest | go 0 | 42 | 42 | agree | kc_Elm07_26 |
-| MutualLetRecNestedTest | run 3 | 42 | 42 | agree | kc_Elm07_27 |
-| MutualLetRecNestedTest | run 2 | 84 | 84 | agree | kc_Elm07_28 |
-| MutualLetRecNestedTest | run 1 | 42 | 42 | agree | kc_Elm07_29 |
-| MutualLetRecNestedTest | run 0 | 84 | 84 | agree | kc_Elm07_30 |
-| MutualRecursionTest | isEven0 | True | True | agree | kc_Elm07_31 |
-| MutualRecursionTest | isEven5 | False | False | agree | kc_Elm07_32 |
-| MutualRecursionTest | isOdd5 | True | True | agree | kc_Elm07_33 |
-| MutualRecursionThreeWayTest | a10 | 1 | 1 | agree | kc_Elm07_34 |
-| MutualRecursionThreeWayTest | a9 | 0 | 0 | agree | kc_Elm07_35 |
-| MutualRecursionThreeWayTest | a3 | 0 | 0 | agree | kc_Elm07_36 |
-| MutualRecursionThreeWayTest | a0 | 0 | 0 | agree | kc_Elm07_37 |
-| NestedCaseReturnTest | r1 | "integer" | "integer" | agree | kc_Elm07_38 |
-| NestedCaseReturnTest | r2 | "text" | "text" | agree | kc_Elm07_39 |
-| NestedCaseReturnTest | r3 | "custom List" | "custom List" | agree | kc_Elm07_40 |
-| NestedCaseReturnTest | r4 | "other" | "other" | agree | kc_Elm07_41 |
-| NestedCaseReturnTest | r5 | "empty" | "empty" | agree | kc_Elm07_42 |
-| NonAsciiIdentifierTest | NonAsciiIdentifierTest | 7 | 7 | agree | kc_Elm07_43 |
-| NonZeroArityRecursionTest | countDown | 0 | 0 | agree | kc_Elm07_44 |
-| NumberDestructFieldTest | tuple field | 2.5 | 2.5 | agree |  |
-| NumberDestructFieldTest | list field | 1.25 | 1.25 | agree |  |
-| NumberDestructFieldTest | record field | 4.5 | 4.5 | agree |  |
-| NumberDestructFieldTest | maybe field | 5.5 | 5.5 | agree |  |
+| MaybeNothingTest | nothing | Nothing | Nothing | agree | kc_Elm07_16 |
+| MaybePatternMatchTest | match1 | 42 | 42 | agree | kc_Elm07_17 |
+| MaybePatternMatchTest | match2 | 0 | 0 | agree | kc_Elm07_18 |
+| MultiLocalTailRecTest | result | 15 | 15 | agree | kc_Elm07_19 |
+| MutualLetRecClosuresTest | evenResult | True | True | agree | kc_Elm07_20 |
+| MutualLetRecClosuresTest | oddResult | False | False | agree | kc_Elm07_21 |
+| MutualLetRecClosuresTest | callsEven | 4 | 4 | agree | kc_Elm07_22 |
+| MutualLetRecClosuresTest | callsOdd | 3 | 3 | agree | kc_Elm07_23 |
+| MutualLetRecManyCapturesTest | go 3 | 42 | 42 | agree | kc_Elm07_24 |
+| MutualLetRecManyCapturesTest | go 2 | 42 | 42 | agree | kc_Elm07_25 |
+| MutualLetRecManyCapturesTest | go 1 | 42 | 42 | agree | kc_Elm07_26 |
+| MutualLetRecManyCapturesTest | go 0 | 42 | 42 | agree | kc_Elm07_27 |
+| MutualLetRecNestedTest | run 3 | 42 | 42 | agree | kc_Elm07_28 |
+| MutualLetRecNestedTest | run 2 | 84 | 84 | agree | kc_Elm07_29 |
+| MutualLetRecNestedTest | run 1 | 42 | 42 | agree | kc_Elm07_30 |
+| MutualLetRecNestedTest | run 0 | 84 | 84 | agree | kc_Elm07_31 |
+| MutualRecursionTest | isEven0 | True | True | agree | kc_Elm07_32 |
+| MutualRecursionTest | isEven5 | False | False | agree | kc_Elm07_33 |
+| MutualRecursionTest | isOdd5 | True | True | agree | kc_Elm07_34 |
+| MutualRecursionThreeWayTest | a10 | 1 | 1 | agree | kc_Elm07_35 |
+| MutualRecursionThreeWayTest | a9 | 0 | 0 | agree | kc_Elm07_36 |
+| MutualRecursionThreeWayTest | a3 | 0 | 0 | agree | kc_Elm07_37 |
+| MutualRecursionThreeWayTest | a0 | 0 | 0 | agree | kc_Elm07_38 |
+| NestedCaseReturnTest | r1 | "integer" | "integer" | agree | kc_Elm07_39 |
+| NestedCaseReturnTest | r2 | "text" | "text" | agree | kc_Elm07_40 |
+| NestedCaseReturnTest | r3 | "custom List" | "custom List" | agree | kc_Elm07_41 |
+| NestedCaseReturnTest | r4 | "other" | "other" | agree | kc_Elm07_42 |
+| NestedCaseReturnTest | r5 | "empty" | "empty" | agree | kc_Elm07_43 |
+| NonAsciiIdentifierTest | NonAsciiIdentifierTest | 7 | 7 | agree | kc_Elm07_44 |
+| NonZeroArityRecursionTest | countDown | 0 | 0 | agree | kc_Elm07_45 |
+| NumberDestructFieldTest | tuple field | 2.5 | 2.5 | agree | kc_Elm07_46 |
+| NumberDestructFieldTest | list field | 1.25 | 1.25 | agree | kc_Elm07_47 |
+| NumberDestructFieldTest | record field | 4.5 | 4.5 | agree | kc_Elm07_48 |
+| NumberDestructFieldTest | maybe field | 5.5 | 5.5 | agree | kc_Elm07_49 |
 | NumberDestructFieldTest | nested | (3.5,4) | (3.5,4) | agree |  |
 | NumberGenericAppCustom | numgenapp | 45 | 45 | agree |  |
 | PapEtaCtorProbe | final | { depth = 9, stats = { a = 2, b = 2, shape = 4 } } | { depth = 9, stats = { a = 2, b = 2, shape = 4 } } | agree |  |
-| ParenthesesTest | grouped | 9 | 9 | agree | kc_Elm07_45 |
-| ParenthesesTest | ungrouped | 7 | 7 | agree | kc_Elm07_46 |
-| ParenthesesTest | redundant | 5 | 5 | agree | kc_Elm07_47 |
+| ParenthesesTest | grouped | 9 | 9 | agree | kc_Elm07_50 |
+| ParenthesesTest | ungrouped | 7 | 7 | agree | kc_Elm07_51 |
+| ParenthesesTest | redundant | 5 | 5 | agree | kc_Elm07_52 |
 | ParenthesesTest | nested pattern | [3,0,-1] | [3,0,-1] | agree |  |
 | ParenthesesTest | parenthesised types | [2,4] | [2,4] | agree |  |
-| PartialAppCaptureTypesTest | float_cap | 1.5 | 1.5 | agree |  |
+| PartialAppCaptureTypesTest | float_cap | 1.5 | 1.5 | agree | kc_Elm07_53 |
 | PartialAppCaptureTypesTest | char_cap | 'x' | 'x' | agree |  |
-| PartialAppCaptureTypesTest | bool_cap | True | True | agree | kc_Elm07_48 |
-| PartialAppCaptureTypesTest | string_cap | "hello" | "hello" | agree | kc_Elm07_49 |
-| PartialAppCaptureTypesTest | combined | 3.5 | 3.5 | agree |  |
-| PartialAppChainTest | chain1 | 10 | 10 | agree | kc_Elm07_50 |
-| PartialAppChainTest | chain2 | 6 | 6 | agree | kc_Elm07_51 |
-| PartialApplicationTest | partial1 | 7 | 7 | agree | kc_Elm07_52 |
-| PartialApplicationTest | partial2 | 15 | 15 | agree | kc_Elm07_53 |
+| PartialAppCaptureTypesTest | bool_cap | True | True | agree | kc_Elm07_54 |
+| PartialAppCaptureTypesTest | string_cap | "hello" | "hello" | agree | kc_Elm07_55 |
+| PartialAppCaptureTypesTest | combined | 3.5 | 3.5 | agree | kc_Elm07_56 |
+| PartialAppChainTest | chain1 | 10 | 10 | agree | kc_Elm07_57 |
+| PartialAppChainTest | chain2 | 6 | 6 | agree | kc_Elm07_58 |
+| PartialApplicationTest | partial1 | 7 | 7 | agree | kc_Elm07_59 |
+| PartialApplicationTest | partial2 | 15 | 15 | agree | kc_Elm07_60 |
 | PartialApplicationTest | partial3 | [2,3,4] | [2,3,4] | agree |  |
-| PhantomTypeVarTest | result | 42 | 42 | agree | kc_Elm07_54 |
-| PolyApplyLambdaTest | applyIntId | 1 | 1 | agree | kc_Elm07_55 |
-| PolyApplyLambdaTest | applyStrId | "hi" | "hi" | agree | kc_Elm07_56 |
-| PolyApplyLambdaTest | applyLambda | 42 | 42 | agree | kc_Elm07_57 |
-| PolyChainCallTest | size | 2 | 2 | agree | kc_Elm07_58 |
-| PolyChainDictLikeInsertChained5TimesWithTupleKeysConcreteCallerTest | testValue | 1 | 1 | agree | kc_Elm07_59 |
+| PhantomTypeVarTest | result | 42 | 42 | agree | kc_Elm07_61 |
+| PolyApplyLambdaTest | applyIntId | 1 | 1 | agree | kc_Elm07_62 |
+| PolyApplyLambdaTest | applyStrId | "hi" | "hi" | agree | kc_Elm07_63 |
+| PolyApplyLambdaTest | applyLambda | 42 | 42 | agree | kc_Elm07_64 |
+| PolyChainCallTest | size | 2 | 2 | agree | kc_Elm07_65 |
 
-Elm07: 40 programs, 89 checks, 89 agree.
+Elm07: 40 programs, 91 checks, 91 agree.
 
 ## Elm08
 
 | Program | Label | Expected (CHECK) | Definition | Status | Theorem |
 |---|---|---|---|---|---|
-| PolyChainFoldlLikeCalled8TimesOverTupleKeyedStructureTest | testValue | 0 | 0 | agree | kc_Elm08_0 |
-| PolyEscapePolymorphicFunctionExtractedFromTupleTest | testValue | 42 | 42 | agree | kc_Elm08_1 |
-| PolyEscapeRecordTest | result | 42 | 42 | agree | kc_Elm08_2 |
-| PolyEscapeRecordTest | narrowed | 6 | 6 | agree | kc_Elm08_3 |
-| PolyLetConstTest | r1 | 1 | 1 | agree | kc_Elm08_4 |
-| PolyLetConstTest | r2 | "hi" | "hi" | agree | kc_Elm08_5 |
+| PolyChainDictLikeInsertChained5TimesWithTupleKeysConcreteCallerTest | testValue | 1 | 1 | agree | kc_Elm08_0 |
+| PolyChainFoldlLikeCalled8TimesOverTupleKeyedStructureTest | testValue | 0 | 0 | agree | kc_Elm08_1 |
+| PolyEscapePolymorphicFunctionExtractedFromTupleTest | testValue | 42 | 42 | agree | kc_Elm08_2 |
+| PolyEscapeRecordTest | result | 42 | 42 | agree | kc_Elm08_3 |
+| PolyEscapeRecordTest | narrowed | 6 | 6 | agree | kc_Elm08_4 |
+| PolyLetConstTest | r1 | 1 | 1 | agree | kc_Elm08_5 |
+| PolyLetConstTest | r2 | "hi" | "hi" | agree | kc_Elm08_6 |
 | PolyLetTailRecTwoTypesTest | r | (6,2) | (6,2) | agree |  |
-| PolySpecializeRecursiveTest | intLen | 3 | 3 | agree | kc_Elm08_6 |
-| PolySpecializeRecursiveTest | strLen | 2 | 2 | agree | kc_Elm08_7 |
+| PolySpecializeRecursiveTest | intLen | 3 | 3 | agree | kc_Elm08_7 |
+| PolySpecializeRecursiveTest | strLen | 2 | 2 | agree | kc_Elm08_8 |
 | PolySpecializeRecursiveTest | intMap | [2,4,6] | [2,4,6] | agree |  |
 | PolySpecializeRecursiveTest | strMap | ["aa","bb"] | ["aa","bb"] | agree |  |
-| PolyStepLoopFloatResultTest | result | 3.14 | 3.14 | agree |  |
-| PolyStepLoopFloatResultTest | state | 6 | 6 | agree | kc_Elm08_8 |
-| PolyStepLoopFoldMIntTest | sum | 15 | 15 | agree | kc_Elm08_9 |
-| PolyStepLoopFoldMIntTest | final | 104 | 104 | agree | kc_Elm08_10 |
+| PolyStepLoopFloatResultTest | result | 3.14 | 3.14 | agree | kc_Elm08_9 |
+| PolyStepLoopFloatResultTest | state | 6 | 6 | agree | kc_Elm08_10 |
+| PolyStepLoopFoldMIntTest | sum | 15 | 15 | agree | kc_Elm08_11 |
+| PolyStepLoopFoldMIntTest | final | 104 | 104 | agree | kc_Elm08_12 |
 | PolyTailRecReverseTest | intRev | [3,2,1] | [3,2,1] | agree |  |
 | PolyTailRecReverseTest | strRev | ["c","b","a"] | ["c","b","a"] | agree |  |
-| RecordAccessTest | x | 1 | 1 | agree | kc_Elm08_11 |
-| RecordAccessTest | y | 2 | 2 | agree | kc_Elm08_12 |
-| RecordAccessTest | name | "Alice" | "Alice" | agree | kc_Elm08_13 |
-| RecordAccessorFunctionCaseTest | testValue | 1 | 1 | agree | kc_Elm08_14 |
+| RecordAccessTest | x | 1 | 1 | agree | kc_Elm08_13 |
+| RecordAccessTest | y | 2 | 2 | agree | kc_Elm08_14 |
+| RecordAccessTest | name | "Alice" | "Alice" | agree | kc_Elm08_15 |
+| RecordAccessorFunctionCaseTest | testValue | 1 | 1 | agree | kc_Elm08_16 |
 | RecordAccessorFunctionTest | names | ["Alice","Bob"] | ["Alice","Bob"] | agree |  |
 | RecordAccessorFunctionTest | xs | [1,4] | [1,4] | agree |  |
 | RecordChainedUpdateTest | multi | { x = 100, y = 20, z = 300 } | { x = 100, y = 20, z = 300 } | agree |  |
@@ -723,196 +724,196 @@ Elm07: 40 programs, 89 checks, 89 agree.
 | RecordChainedUpdatesTest | testValue | { x = 10, y = 20 } | { x = 10, y = 20 } | agree |  |
 | RecordCreateTest | record1 | { x = 1, y = 2 } | { x = 1, y = 2 } | agree |  |
 | RecordCreateTest | record2 | { age = 30, name = "Alice" } | { age = 30, name = "Alice" } | agree |  |
-| RecordNestedAccessTest | deep | 42 | 42 | agree | kc_Elm08_15 |
-| RecordNestedAccessTest | chain | 99 | 99 | agree | kc_Elm08_16 |
-| RecordUpdatePolyFieldTest | f | 6 | 6 | agree | kc_Elm08_17 |
-| RecordUpdatePolyFieldTest | g | 0 | 0 | agree | kc_Elm08_18 |
+| RecordNestedAccessTest | deep | 42 | 42 | agree | kc_Elm08_17 |
+| RecordNestedAccessTest | chain | 99 | 99 | agree | kc_Elm08_18 |
+| RecordUpdatePolyFieldTest | f | 6 | 6 | agree | kc_Elm08_19 |
+| RecordUpdatePolyFieldTest | g | 0 | 0 | agree | kc_Elm08_20 |
 | RecordUpdateTest | updated | { x = 10, y = 2 } | { x = 10, y = 2 } | agree |  |
 | RecordUpdateTest | original | { x = 1, y = 2 } | { x = 1, y = 2 } | agree |  |
-| RecordWithFunctionsTest | apply1 | 11 | 11 | agree | kc_Elm08_19 |
-| RecordWithFunctionsTest | apply2 | 20 | 20 | agree | kc_Elm08_20 |
-| RecordWithFunctionsTest | composed | 22 | 22 | agree | kc_Elm08_21 |
-| RecordWithFunctionsTest | updated | 7 | 7 | agree | kc_Elm08_22 |
-| RecursiveFactorialTest | fact0 | 1 | 1 | agree | kc_Elm08_23 |
-| RecursiveFactorialTest | fact5 | 120 | 120 | agree | kc_Elm08_24 |
-| RecursiveFactorialTest | fact10 | 3628800 | 3628800 | agree | kc_Elm08_25 |
-| RecursiveFibonacciTest | fib0 | 0 | 0 | agree | kc_Elm08_26 |
-| RecursiveFibonacciTest | fib1 | 1 | 1 | agree | kc_Elm08_27 |
-| RecursiveFibonacciTest | fib10 | 55 | 55 | agree | kc_Elm08_28 |
-| RecursiveListLengthTest | len0 | 0 | 0 | agree | kc_Elm08_29 |
-| RecursiveListLengthTest | len3 | 3 | 3 | agree | kc_Elm08_30 |
-| RecursiveListLengthTest | len5 | 5 | 5 | agree | kc_Elm08_31 |
-| RecursiveMutualTypeTest | nodes | 4 | 4 | agree | kc_Elm08_32 |
-| RecursiveTopLevelLambdaTest | testValue | 4 | 4 | agree | kc_Elm08_33 |
-| RecursiveTreeTest | sum | 6 | 6 | agree | kc_Elm08_34 |
-| RecursiveTreeTest | depth | 3 | 3 | agree | kc_Elm08_35 |
-| RecursiveTypeInRecordTest | eval | 6 | 6 | agree | kc_Elm08_36 |
-| RowVariableAloneTest | x | 1 | 1 | agree | kc_Elm08_37 |
-| RowVariableAloneTest | rest z | "b" | "b" | agree | kc_Elm08_38 |
-| SingleCtorPairBoolCharTest | match_true | "yes" | "yes" | agree | kc_Elm08_39 |
-| SingleCtorPairBoolCharTest | match_false | "no" | "no" | agree | kc_Elm08_40 |
+| RecordWithFunctionsTest | apply1 | 11 | 11 | agree | kc_Elm08_21 |
+| RecordWithFunctionsTest | apply2 | 20 | 20 | agree | kc_Elm08_22 |
+| RecordWithFunctionsTest | composed | 22 | 22 | agree | kc_Elm08_23 |
+| RecordWithFunctionsTest | updated | 7 | 7 | agree | kc_Elm08_24 |
+| RecursiveFactorialTest | fact0 | 1 | 1 | agree | kc_Elm08_25 |
+| RecursiveFactorialTest | fact5 | 120 | 120 | agree | kc_Elm08_26 |
+| RecursiveFactorialTest | fact10 | 3628800 | 3628800 | agree | kc_Elm08_27 |
+| RecursiveFibonacciTest | fib0 | 0 | 0 | agree | kc_Elm08_28 |
+| RecursiveFibonacciTest | fib1 | 1 | 1 | agree | kc_Elm08_29 |
+| RecursiveFibonacciTest | fib10 | 55 | 55 | agree | kc_Elm08_30 |
+| RecursiveListLengthTest | len0 | 0 | 0 | agree | kc_Elm08_31 |
+| RecursiveListLengthTest | len3 | 3 | 3 | agree | kc_Elm08_32 |
+| RecursiveListLengthTest | len5 | 5 | 5 | agree | kc_Elm08_33 |
+| RecursiveMutualTypeTest | nodes | 4 | 4 | agree | kc_Elm08_34 |
+| RecursiveTopLevelLambdaTest | testValue | 4 | 4 | agree | kc_Elm08_35 |
+| RecursiveTreeTest | sum | 6 | 6 | agree | kc_Elm08_36 |
+| RecursiveTreeTest | depth | 3 | 3 | agree | kc_Elm08_37 |
+| RecursiveTypeInRecordTest | eval | 6 | 6 | agree | kc_Elm08_38 |
+| RowVariableAloneTest | x | 1 | 1 | agree | kc_Elm08_39 |
+| RowVariableAloneTest | rest z | "b" | "b" | agree | kc_Elm08_40 |
+| SingleCtorPairBoolCharTest | match_true | "yes" | "yes" | agree | kc_Elm08_41 |
+| SingleCtorPairBoolCharTest | match_false | "no" | "no" | agree | kc_Elm08_42 |
 | SingleCtorPairBoolCharTest | unwrap_char | 'x' | 'x' | agree |  |
-| SingleCtorPairBoolFloatTest | match_true | "yes" | "yes" | agree | kc_Elm08_41 |
-| SingleCtorPairBoolFloatTest | match_false | "no" | "no" | agree | kc_Elm08_42 |
-| SingleCtorPairBoolFloatTest | unwrap_float | 3.14 | 3.14 | agree |  |
-| SingleCtorPairBoolIntBidiTest | match_true | "yes" | "yes" | agree | kc_Elm08_43 |
-| SingleCtorPairBoolIntBidiTest | match_false | "no" | "no" | agree | kc_Elm08_44 |
-| SingleCtorPairBoolIntBidiTest | match_pos | "positive" | "positive" | agree | kc_Elm08_45 |
-| SingleCtorPairBoolIntBidiTest | match_neg | "non-positive" | "non-positive" | agree | kc_Elm08_46 |
-| SingleCtorPairBoolIntBidiTest | extract_bool | True | True | agree | kc_Elm08_47 |
-| SingleCtorPairBoolIntBidiTest | extract_int | 42 | 42 | agree | kc_Elm08_48 |
+| SingleCtorPairBoolFloatTest | match_true | "yes" | "yes" | agree | kc_Elm08_43 |
+| SingleCtorPairBoolFloatTest | match_false | "no" | "no" | agree | kc_Elm08_44 |
+| SingleCtorPairBoolFloatTest | unwrap_float | 3.14 | 3.14 | agree | kc_Elm08_45 |
+| SingleCtorPairBoolIntBidiTest | match_true | "yes" | "yes" | agree | kc_Elm08_46 |
+| SingleCtorPairBoolIntBidiTest | match_false | "no" | "no" | agree | kc_Elm08_47 |
+| SingleCtorPairBoolIntBidiTest | match_pos | "positive" | "positive" | agree | kc_Elm08_48 |
+| SingleCtorPairBoolIntBidiTest | match_neg | "non-positive" | "non-positive" | agree | kc_Elm08_49 |
+| SingleCtorPairBoolIntBidiTest | extract_bool | True | True | agree | kc_Elm08_50 |
+| SingleCtorPairBoolIntBidiTest | extract_int | 42 | 42 | agree | kc_Elm08_51 |
 | SingleCtorPairCharFloatTest | unwrap_char | 'Z' | 'Z' | agree |  |
-| SingleCtorPairCharFloatTest | unwrap_float | 1.5 | 1.5 | agree |  |
+| SingleCtorPairCharFloatTest | unwrap_float | 1.5 | 1.5 | agree | kc_Elm08_52 |
 | SingleCtorPairCharFloatTest | match_char | ("got",'Z') | ("got",'Z') | agree |  |
 | SingleCtorPairCharIntTest | unwrap_char | 'A' | 'A' | agree |  |
-| SingleCtorPairCharIntTest | unwrap_int | 256 | 256 | agree | kc_Elm08_49 |
+| SingleCtorPairCharIntTest | unwrap_int | 256 | 256 | agree | kc_Elm08_53 |
 | SingleCtorPairCharIntTest | match_char | ("got",'A') | ("got",'A') | agree |  |
-| SingleCtorPairFloatBoolTest | unwrap_float | 9.81 | 9.81 | agree |  |
-| SingleCtorPairFloatBoolTest | match_true | "yes" | "yes" | agree | kc_Elm08_50 |
-| SingleCtorPairFloatBoolTest | match_false | "no" | "no" | agree | kc_Elm08_51 |
-| SingleCtorPairFloatBoolTest | match_float | "big" | "big" | agree | kc_Elm08_52 |
-| SingleCtorPairIntFloatTest | unwrap_int | 42 | 42 | agree | kc_Elm08_53 |
-| SingleCtorPairIntFloatTest | unwrap_float | 2.718 | 2.718 | agree |  |
-| SingleCtorPairIntFloatTest | match_int_pos | "positive" | "positive" | agree | kc_Elm08_54 |
-| SingleCtorPairIntFloatTest | match_float_big | "big" | "big" | agree | kc_Elm08_55 |
-| SingleCtorPairStringBoolTest | unwrap_str | "world" | "world" | agree | kc_Elm08_56 |
-| SingleCtorPairStringBoolTest | match_true | "yes" | "yes" | agree | kc_Elm08_57 |
-| SingleCtorPairStringBoolTest | match_false | "no" | "no" | agree | kc_Elm08_58 |
-| SingleCtorPairStringIntTest | unwrap_str | "hello" | "hello" | agree | kc_Elm08_59 |
-| SingleCtorPairStringIntTest | unwrap_int | 99 | 99 | agree | kc_Elm08_60 |
-| SingleCtorPairStringIntTest | match_str | "found_hello" | "found_hello" | agree | kc_Elm08_61 |
+| SingleCtorPairFloatBoolTest | unwrap_float | 9.81 | 9.81 | agree | kc_Elm08_54 |
+| SingleCtorPairFloatBoolTest | match_true | "yes" | "yes" | agree | kc_Elm08_55 |
+| SingleCtorPairFloatBoolTest | match_false | "no" | "no" | agree | kc_Elm08_56 |
+| SingleCtorPairFloatBoolTest | match_float | "big" | "big" | agree | kc_Elm08_57 |
+| SingleCtorPairIntFloatTest | unwrap_int | 42 | 42 | agree | kc_Elm08_58 |
+| SingleCtorPairIntFloatTest | unwrap_float | 2.718 | 2.718 | agree | kc_Elm08_59 |
+| SingleCtorPairIntFloatTest | match_int_pos | "positive" | "positive" | agree | kc_Elm08_60 |
+| SingleCtorPairIntFloatTest | match_float_big | "big" | "big" | agree | kc_Elm08_61 |
+| SingleCtorPairStringBoolTest | unwrap_str | "world" | "world" | agree | kc_Elm08_62 |
+| SingleCtorPairStringBoolTest | match_true | "yes" | "yes" | agree | kc_Elm08_63 |
+| SingleCtorPairStringBoolTest | match_false | "no" | "no" | agree | kc_Elm08_64 |
+| SingleCtorPairStringIntTest | unwrap_str | "hello" | "hello" | agree | kc_Elm08_65 |
+| SingleCtorPairStringIntTest | unwrap_int | 99 | 99 | agree | kc_Elm08_66 |
+| SingleCtorPairStringIntTest | match_str | "found_hello" | "found_hello" | agree | kc_Elm08_67 |
 | SingleCtorPairUnitIntTest | unwrap_unit | () | () | agree |  |
-| SingleCtorPairUnitIntTest | unwrap_int | 77 | 77 | agree | kc_Elm08_62 |
-| SingleCtorPairUnitIntTest | match_unit | "got_unit" | "got_unit" | agree | kc_Elm08_63 |
-| StandardA93MutualNumberDefaultTest | f 3 | 0 | 0 | agree | kc_Elm08_64 |
+| SingleCtorPairUnitIntTest | unwrap_int | 77 | 77 | agree | kc_Elm08_68 |
+| SingleCtorPairUnitIntTest | match_unit | "got_unit" | "got_unit" | agree | kc_Elm08_69 |
+| StandardA93MutualNumberDefaultTest | f 3 | 1 | 1 | agree |  |
 | StandardApplicationStrictTest | before | () | () | agree |  |
 | StandardApplicationStrictTest | app strict | (no value) | (no value) | agree |  |
-| StandardCoreEvaluationExamplesTest | as-pattern | (1,[1,2]) | (1,[1,2]) | agree |  |
-| StandardCoreEvaluationExamplesTest | unit pattern | 5 | 5 | agree | kc_Elm08_65 |
-| StandardCoreEvaluationExamplesTest | operator value | 3 | 3 | agree | kc_Elm08_66 |
-| StandardCoreEvaluationExamplesTest | partial basic value | <function> | <function> | agree |  |
-| StandardCoreEvaluationExamplesTest | partial constructor | <function> | <function> | agree |  |
-| StandardCoreEvaluationExamplesTest | (&&) is strict | False | False | agree | kc_Elm08_67 |
-| StandardCoreEvaluationExamplesTest | pipe | 6 | 6 | agree | kc_Elm08_68 |
-| StandardCoreEvaluationExamplesTest | mrule-fail | 2 | 2 | agree | kc_Elm08_69 |
-| StandardCoreEvaluationExamplesTest | Just 1 | Just 1 | Just 1 | agree |  |
-| StandardCoreEvaluationExamplesTest | inc 0.5 | 1.5 | 1.5 | agree |  |
-| StandardCoreEvaluationExamplesTest | modBy 4 -5 | 3 | 3 | agree | kc_Elm08_70 |
-| StandardCoreEvaluationExamplesTest | remainderBy 4 -5 | -1 | -1 | agree | kc_Elm08_71 |
-| StandardCoreEvaluationExamplesTest | record field order | True | True | agree | kc_Elm08_72 |
-| StandardCoreEvaluationExamplesTest | compare strings | LT | LT | agree | kc_Elm08_73 |
-| StandardCoreEvaluationExamplesTest | accessor | 7 | 7 | agree | kc_Elm08_74 |
 
-Elm08: 40 programs, 107 checks, 107 agree.
+Elm08: 40 programs, 93 checks, 93 agree.
 
 ## Elm09
 
 | Program | Label | Expected (CHECK) | Definition | Status | Theorem |
 |---|---|---|---|---|---|
+| StandardCoreEvaluationExamplesTest | as-pattern | (1,[1,2]) | (1,[1,2]) | agree |  |
+| StandardCoreEvaluationExamplesTest | unit pattern | 5 | 5 | agree | kc_Elm09_0 |
+| StandardCoreEvaluationExamplesTest | operator value | 3 | 3 | agree | kc_Elm09_1 |
+| StandardCoreEvaluationExamplesTest | partial basic value | <function> | <function> | agree |  |
+| StandardCoreEvaluationExamplesTest | partial constructor | <function> | <function> | agree |  |
+| StandardCoreEvaluationExamplesTest | (&&) is strict | False | False | agree | kc_Elm09_2 |
+| StandardCoreEvaluationExamplesTest | pipe | 6 | 6 | agree | kc_Elm09_3 |
+| StandardCoreEvaluationExamplesTest | mrule-fail | 2 | 2 | agree | kc_Elm09_4 |
+| StandardCoreEvaluationExamplesTest | Just 1 | Just 1 | Just 1 | agree |  |
+| StandardCoreEvaluationExamplesTest | inc 0.5 | 1.5 | 1.5 | agree | kc_Elm09_5 |
+| StandardCoreEvaluationExamplesTest | modBy 4 -5 | 3 | 3 | agree | kc_Elm09_6 |
+| StandardCoreEvaluationExamplesTest | remainderBy 4 -5 | -1 | -1 | agree | kc_Elm09_7 |
+| StandardCoreEvaluationExamplesTest | record field order | True | True | agree | kc_Elm09_8 |
+| StandardCoreEvaluationExamplesTest | compare strings | LT | LT | agree | kc_Elm09_9 |
+| StandardCoreEvaluationExamplesTest | accessor | 7 | 7 | agree | kc_Elm09_10 |
 | StandardLetStrictTest | before | () | () | agree |  |
 | StandardLetStrictTest | let strict | (no value) | (no value) | agree |  |
-| StringCasePatternCommaTest | one_comma | "comma" | "comma" | agree | kc_Elm09_0 |
-| StringCasePatternCommaTest | one_a | "other" | "other" | agree | kc_Elm09_1 |
-| StringCasePatternCommaTest | two_a | "a" | "a" | agree | kc_Elm09_2 |
-| StringCasePatternCommaTest | two_b | "b" | "b" | agree | kc_Elm09_3 |
-| StringCasePatternCommaTest | two_comma | "other" | "other" | agree | kc_Elm09_4 |
-| StringCreationMatrixTest | Creation.eq | True | True | agree | kc_Elm09_5 |
-| StringCreationMatrixTest | Creation.case | True | True | agree | kc_Elm09_6 |
-| StringEscapeCrTest | cr | True | True | agree | kc_Elm09_7 |
-| StringEscapeCrTest | mixed | True | True | agree | kc_Elm09_8 |
-| StringEscapeCrTest | crlf | True | True | agree | kc_Elm09_9 |
-| StringEscapeCrTest | triple | True | True | agree | kc_Elm09_10 |
-| StringEscapeCrTest | pattern | "carriage return" | "carriage return" | agree | kc_Elm09_11 |
-| StringLiteralTest | str1 | "Hello" | "Hello" | agree | kc_Elm09_12 |
-| StringLiteralTest | str2 | "Hello, World!" | "Hello, World!" | agree | kc_Elm09_13 |
-| StringLiteralTest | str3 | "abc123" | "abc123" | agree | kc_Elm09_14 |
-| StringMagicPrefixTest | s1 | "__mlir_unknown_loc__" | "__mlir_unknown_loc__" | agree | kc_Elm09_15 |
-| StringMagicPrefixTest | s2 | "__mlir_loc__:foo:1:2" | "__mlir_loc__:foo:1:2" | agree | kc_Elm09_16 |
-| StringMagicPrefixTest | s3 | "__mlir_loc__:" | "__mlir_loc__:" | agree | kc_Elm09_17 |
-| StringMagicPrefixTest | s4 | "loc:unknown" | "loc:unknown" | agree | kc_Elm09_18 |
-| TailLoopMutualRecMutualRecursionInsideATailLoopTest | testValue | 2 | 2 | agree | kc_Elm09_19 |
-| TailRecBoolCarryTest | result1 | 10 | 10 | agree | kc_Elm09_20 |
-| TailRecBoolCarryTest | result2 | 0 | 0 | agree | kc_Elm09_21 |
-| TailRecBoolCarryTest | result3 | 42 | 42 | agree | kc_Elm09_22 |
-| TailRecCaseDestructTest | foldl | 15 | 15 | agree | kc_Elm09_23 |
-| TailRecCaseDestructTest | sum | 10 | 10 | agree | kc_Elm09_24 |
-| TailRecCaseDestructTest | count | 3 | 3 | agree | kc_Elm09_25 |
+| StringCasePatternCommaTest | one_comma | "comma" | "comma" | agree | kc_Elm09_11 |
+| StringCasePatternCommaTest | one_a | "other" | "other" | agree | kc_Elm09_12 |
+| StringCasePatternCommaTest | two_a | "a" | "a" | agree | kc_Elm09_13 |
+| StringCasePatternCommaTest | two_b | "b" | "b" | agree | kc_Elm09_14 |
+| StringCasePatternCommaTest | two_comma | "other" | "other" | agree | kc_Elm09_15 |
+| StringCreationMatrixTest | Creation.eq | True | True | agree | kc_Elm09_16 |
+| StringCreationMatrixTest | Creation.case | True | True | agree | kc_Elm09_17 |
+| StringEscapeCrTest | cr | True | True | agree | kc_Elm09_18 |
+| StringEscapeCrTest | mixed | True | True | agree | kc_Elm09_19 |
+| StringEscapeCrTest | crlf | True | True | agree | kc_Elm09_20 |
+| StringEscapeCrTest | triple | True | True | agree | kc_Elm09_21 |
+| StringEscapeCrTest | pattern | "carriage return" | "carriage return" | agree | kc_Elm09_22 |
+| StringLiteralTest | str1 | "Hello" | "Hello" | agree | kc_Elm09_23 |
+| StringLiteralTest | str2 | "Hello, World!" | "Hello, World!" | agree | kc_Elm09_24 |
+| StringLiteralTest | str3 | "abc123" | "abc123" | agree | kc_Elm09_25 |
+| StringMagicPrefixTest | s1 | "__mlir_unknown_loc__" | "__mlir_unknown_loc__" | agree | kc_Elm09_26 |
+| StringMagicPrefixTest | s2 | "__mlir_loc__:foo:1:2" | "__mlir_loc__:foo:1:2" | agree | kc_Elm09_27 |
+| StringMagicPrefixTest | s3 | "__mlir_loc__:" | "__mlir_loc__:" | agree | kc_Elm09_28 |
+| StringMagicPrefixTest | s4 | "loc:unknown" | "loc:unknown" | agree | kc_Elm09_29 |
+| TailLoopMutualRecMutualRecursionInsideATailLoopTest | testValue | 2 | 2 | agree | kc_Elm09_30 |
+| TailRecBoolCarryTest | result1 | 10 | 10 | agree | kc_Elm09_31 |
+| TailRecBoolCarryTest | result2 | 0 | 0 | agree | kc_Elm09_32 |
+| TailRecBoolCarryTest | result3 | 42 | 42 | agree | kc_Elm09_33 |
+| TailRecCaseDestructTest | foldl | 15 | 15 | agree | kc_Elm09_34 |
+| TailRecCaseDestructTest | sum | 10 | 10 | agree | kc_Elm09_35 |
+| TailRecCaseDestructTest | count | 3 | 3 | agree | kc_Elm09_36 |
 | TailRecCaseMultiBranchTypesTest | result | FoundLE 2 | FoundLE 2 | agree |  |
-| TailRecClosureAccTest | result | 15 | 15 | agree | kc_Elm09_26 |
-| TailRecCustomCaseTest | total | 10 | 10 | agree | kc_Elm09_27 |
-| TailRecDeciderSearchTest | found | 42 | 42 | agree | kc_Elm09_28 |
-| TailRecDecoderLoopTest | r1 | "decode_int" | "decode_int" | agree | kc_Elm09_29 |
-| TailRecDecoderLoopTest | r2 | "decode_string" | "decode_string" | agree | kc_Elm09_30 |
-| TailRecDecoderLoopTest | r3 | "decode_list(decode_int)" | "decode_list(decode_int)" | agree | kc_Elm09_31 |
-| TailRecDecoderLoopTest | r4 | "decode_custom(Foo)" | "decode_custom(Foo)" | agree | kc_Elm09_32 |
-| TailRecFoldlCaseTest | result | 6 | 6 | agree | kc_Elm09_33 |
-| TailRecManyBranchStringTest | result | "found-beta" | "found-beta" | agree | kc_Elm09_34 |
-| TailRecMultiCaseWhileTest | total | 8 | 8 | agree | kc_Elm09_35 |
-| TailRecMultiCaseWhileTest | special | 2 | 2 | agree | kc_Elm09_36 |
-| TailRecNestedCaseTest | find | True | True | agree | kc_Elm09_37 |
-| TailRecNestedCaseTest | nofind | False | False | agree | kc_Elm09_38 |
-| TailRecNestedCaseTest | last | 4 | 4 | agree | kc_Elm09_39 |
-| TailRecNestedStringCaseTest | result | 42 | 42 | agree | kc_Elm09_40 |
-| TailRecTypeTraversalTest | result | "integer" | "integer" | agree | kc_Elm09_41 |
-| TailRecursiveSumTest | sum1 | 15 | 15 | agree | kc_Elm09_42 |
-| TailRecursiveSumTest | sum2 | 55 | 55 | agree | kc_Elm09_43 |
-| TailRecursiveSumTest | sum3 | 5050 | 5050 | agree | kc_Elm09_44 |
-| TopLevelNameReplacesImportTest | own max | 3 | 3 | agree | kc_Elm09_45 |
-| TopLevelNameReplacesImportTest | Basics.max | 2 | 2 | agree | kc_Elm09_46 |
+| TailRecClosureAccTest | result | 15 | 15 | agree | kc_Elm09_37 |
+| TailRecCustomCaseTest | total | 10 | 10 | agree | kc_Elm09_38 |
+| TailRecDeciderSearchTest | found | 42 | 42 | agree | kc_Elm09_39 |
+| TailRecDecoderLoopTest | r1 | "decode_int" | "decode_int" | agree | kc_Elm09_40 |
+| TailRecDecoderLoopTest | r2 | "decode_string" | "decode_string" | agree | kc_Elm09_41 |
+| TailRecDecoderLoopTest | r3 | "decode_list(decode_int)" | "decode_list(decode_int)" | agree | kc_Elm09_42 |
+| TailRecDecoderLoopTest | r4 | "decode_custom(Foo)" | "decode_custom(Foo)" | agree | kc_Elm09_43 |
+| TailRecFoldlCaseTest | result | 6 | 6 | agree | kc_Elm09_44 |
+| TailRecManyBranchStringTest | result | "found-beta" | "found-beta" | agree | kc_Elm09_45 |
+| TailRecMultiCaseWhileTest | total | 8 | 8 | agree | kc_Elm09_46 |
+| TailRecMultiCaseWhileTest | special | 2 | 2 | agree | kc_Elm09_47 |
+| TailRecNestedCaseTest | find | True | True | agree | kc_Elm09_48 |
+| TailRecNestedCaseTest | nofind | False | False | agree | kc_Elm09_49 |
+| TailRecNestedCaseTest | last | 4 | 4 | agree | kc_Elm09_50 |
+| TailRecNestedStringCaseTest | result | 42 | 42 | agree | kc_Elm09_51 |
+| TailRecTypeTraversalTest | result | "integer" | "integer" | agree | kc_Elm09_52 |
+| TailRecursiveSumTest | sum1 | 15 | 15 | agree | kc_Elm09_53 |
+| TailRecursiveSumTest | sum2 | 55 | 55 | agree | kc_Elm09_54 |
+| TailRecursiveSumTest | sum3 | 5050 | 5050 | agree | kc_Elm09_55 |
+| TopLevelNameReplacesImportTest | own max | 3 | 3 | agree | kc_Elm09_56 |
+| TopLevelNameReplacesImportTest | Basics.max | 2 | 2 | agree | kc_Elm09_57 |
 | TupleCharFieldTest | pair | ('A',65) | ('A',65) | agree |  |
 | TuplePairTest | pair1 | (1,2) | (1,2) | agree |  |
 | TuplePairTest | pair2 | ("a","b") | ("a","b") | agree |  |
 | TuplePairTest | pair3 | (True,False) | (True,False) | agree |  |
 | TupleTripleTest | triple1 | (1,2,3) | (1,2,3) | agree |  |
 | TupleTripleTest | triple2 | ("a","b","c") | ("a","b","c") | agree |  |
-| TypeClassConstraintTest | absInt | 5 | 5 | agree | kc_Elm09_47 |
-| TypeClassConstraintTest | absFloat | 3.14 | 3.14 | agree |  |
-| TypeClassConstraintTest | minInt | 3 | 3 | agree | kc_Elm09_48 |
-| TypeClassConstraintTest | concatStr | "hello world" | "hello world" | agree | kc_Elm09_49 |
-| UnreachableModuleTest | ran | True | True | agree | kc_Elm09_50 |
-| UserBoolNamedCtorTest | pickTrue | 1 | 1 | agree | kc_Elm09_51 |
-| UserBoolNamedCtorTest | pickFalse | 2 | 2 | agree | kc_Elm09_52 |
-| UserBoolNamedCtorTest | pickUnknown | 3 | 3 | agree | kc_Elm09_53 |
+| TypeClassConstraintTest | absInt | 5 | 5 | agree | kc_Elm09_58 |
+| TypeClassConstraintTest | absFloat | 3.14 | 3.14 | agree | kc_Elm09_59 |
+| TypeClassConstraintTest | minInt | 3 | 3 | agree | kc_Elm09_60 |
+| TypeClassConstraintTest | concatStr | "hello world" | "hello world" | agree | kc_Elm09_61 |
+| UnreachableModuleTest | ran | True | True | agree | kc_Elm09_62 |
+| UserBoolNamedCtorTest | pickTrue | 1 | 1 | agree | kc_Elm09_63 |
+| UserBoolNamedCtorTest | pickFalse | 2 | 2 | agree | kc_Elm09_64 |
+| UserBoolNamedCtorTest | pickUnknown | 3 | 3 | agree | kc_Elm09_65 |
 | UserBoolNamedCtorTest | names | ["T","F","U"] | ["T","F","U"] | agree |  |
 | WideClosureSat26Test | res | [6208,6215] | [6208,6215] | agree |  |
-| WideCtorField24Test | field23 | 1023 | 1023 | agree | kc_Elm09_54 |
-| WideCtorField24Test | field24 | 1024 | 1024 | agree | kc_Elm09_55 |
-| WideCtorField24Test | field25 | 2.5 | 2.5 | agree |  |
+| WideCtorField24Test | field23 | 1023 | 1023 | agree | kc_Elm09_66 |
+| WideCtorField24Test | field24 | 1024 | 1024 | agree | kc_Elm09_67 |
+| WideCtorField24Test | field25 | 2.5 | 2.5 | agree | kc_Elm09_68 |
 | WideCtorField24Test | field26 | 'z' | 'z' | agree |  |
-| WideCtorField24Test | sum24 | 2048 | 2048 | agree | kc_Elm09_56 |
-| WideCtorMixedTest | field23 | "23s" | "23s" | agree | kc_Elm09_57 |
-| WideCtorMixedTest | field24 | True | True | agree | kc_Elm09_58 |
-| WideCtorMixedTest | field55 | 1055 | 1055 | agree | kc_Elm09_59 |
-| WideCtorMixedTest | field59 | False | False | agree | kc_Elm09_60 |
-| WideCtorMixedTest | eq self | True | True | agree | kc_Elm09_61 |
-| WideCtorMixedTest | eq other | False | False | agree | kc_Elm09_62 |
+| WideCtorField24Test | sum24 | 2048 | 2048 | agree | kc_Elm09_69 |
+| WideCtorMixedTest | field23 | "23s" | "23s" | agree | kc_Elm09_70 |
+| WideCtorMixedTest | field24 | True | True | agree | kc_Elm09_71 |
+| WideCtorMixedTest | field55 | 1055 | 1055 | agree | kc_Elm09_72 |
+| WideCtorMixedTest | field59 | False | False | agree | kc_Elm09_73 |
+| WideCtorMixedTest | eq self | True | True | agree | kc_Elm09_74 |
+| WideCtorMixedTest | eq other | False | False | agree | kc_Elm09_75 |
 | WideCtorMixedTest | show | W 1000 1.5 'c' "3s" True 1005 6.5 'h' "8s" False 1010 11.5 'm' "13s" True 1015 16.5 'r' "18s" False 1020 21.5 'w' "23s" True 1025 26.5 'b' "28s" False 1030 31.5 'g' "33s" True 1035 36.5 'l' "38s" False 1040 41.5 'q' "43s" True 1045 46.5 'v' "48s" False 1050 51.5 'a' "53s" True 1055 56.5 'f' "58s" False | W 1000 1.5 'c' "3s" True 1005 6.5 'h' "8s" False 1010 11.5 'm' "13s" True 1015 16.5 'r' "18s" False 1020 21.5 'w' "23s" True 1025 26.5 'b' "28s" False 1030 31.5 'g' "33s" True 1035 36.5 'l' "38s" False 1040 41.5 'q' "43s" True 1045 46.5 'v' "48s" False 1050 51.5 'a' "53s" True 1055 56.5 'f' "58s" False | agree |  |
-| WideRecord33Test | f0000 | 1000 | 1000 | agree | kc_Elm09_63 |
-| WideRecord33Test | f0031 | 31.5 | 31.5 | agree |  |
+| WideRecord33Test | f0000 | 1000 | 1000 | agree | kc_Elm09_76 |
+| WideRecord33Test | f0031 | 31.5 | 31.5 | agree | kc_Elm09_77 |
 | WideRecord33Test | f0032 | 'g' | 'g' | agree |  |
 | WideRecord33Test | pattern | (1000,'g') | (1000,'g') | agree |  |
 | WideRecord33Test | update | '!' | '!' | agree |  |
-| WideRecord33Test | eq self | True | True | agree | kc_Elm09_64 |
-| WideRecord33Test | eq updated | False | False | agree | kc_Elm09_65 |
+| WideRecord33Test | eq self | True | True | agree | kc_Elm09_78 |
+| WideRecord33Test | eq updated | False | False | agree | kc_Elm09_79 |
 | WideRecord33Test | show | { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = "3s", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = "8s", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = "13s", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = "18s", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = "23s", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = "28s", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g' } | { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = "3s", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = "8s", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = "13s", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = "18s", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = "23s", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = "28s", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g' } | agree |  |
-| WideRecord40Test | f0000 | 1000 | 1000 | agree | kc_Elm09_66 |
-| WideRecord40Test | f0031 | 31.5 | 31.5 | agree |  |
+| WideRecord40Test | f0000 | 1000 | 1000 | agree | kc_Elm09_80 |
+| WideRecord40Test | f0031 | 31.5 | 31.5 | agree | kc_Elm09_81 |
 | WideRecord40Test | f0032 | 'g' | 'g' | agree |  |
-| WideRecord40Test | f0039 | False | False | agree | kc_Elm09_67 |
+| WideRecord40Test | f0039 | False | False | agree | kc_Elm09_82 |
 | WideRecord40Test | pattern | (1000,False) | (1000,False) | agree |  |
-| WideRecord40Test | update | True | True | agree | kc_Elm09_68 |
-| WideRecord40Test | eq self | True | True | agree | kc_Elm09_69 |
-| WideRecord40Test | eq updated | False | False | agree | kc_Elm09_70 |
+| WideRecord40Test | update | True | True | agree | kc_Elm09_83 |
+| WideRecord40Test | eq self | True | True | agree | kc_Elm09_84 |
+| WideRecord40Test | eq updated | False | False | agree | kc_Elm09_85 |
 | WideRecord40Test | show | { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = "3s", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = "8s", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = "13s", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = "18s", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = "23s", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = "28s", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g', f0033 = "33s", f0034 = True, f0035 = 1035, f0036 = 36.5, f0037 = 'l', f0038 = "38s", f0039 = False } | { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = "3s", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = "8s", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = "13s", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = "18s", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = "23s", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = "28s", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g', f0033 = "33s", f0034 = True, f0035 = 1035, f0036 = 36.5, f0037 = 'l', f0038 = "38s", f0039 = False } | agree |  |
-| WideRecordPatternTest | access f27 | 1027 | 1027 | agree | kc_Elm09_71 |
-| WideRecordPatternTest | access f25 | 1025 | 1025 | agree | kc_Elm09_72 |
-| WideRecordPatternTest | pattern | 1028025 | 1028025 | agree | kc_Elm09_73 |
-| WideRecordPatternTest | update f27 | 1028 | 1028 | agree | kc_Elm09_74 |
-| WideRecordPatternTest | update f26 | 7 | 7 | agree | kc_Elm09_75 |
-| WideRecordPatternTest | update pattern | 1029025 | 1029025 | agree | kc_Elm09_76 |
-| WrapperUnionFieldTest | result | 7 | 7 | agree | kc_Elm09_77 |
+| WideRecordPatternTest | access f27 | 1027 | 1027 | agree | kc_Elm09_86 |
+| WideRecordPatternTest | access f25 | 1025 | 1025 | agree | kc_Elm09_87 |
+| WideRecordPatternTest | pattern | 1028025 | 1028025 | agree | kc_Elm09_88 |
+| WideRecordPatternTest | update f27 | 1028 | 1028 | agree | kc_Elm09_89 |
+| WideRecordPatternTest | update f26 | 7 | 7 | agree | kc_Elm09_90 |
+| WideRecordPatternTest | update pattern | 1029025 | 1029025 | agree | kc_Elm09_91 |
+| WrapperUnionFieldTest | result | 7 | 7 | agree | kc_Elm09_92 |
 
-Elm09: 35 programs, 102 checks, 102 agree.
+Elm09: 36 programs, 117 checks, 117 agree.
 
 ## ElmCore01
 
@@ -921,222 +922,222 @@ Elm09: 35 programs, 102 checks, 102 agree.
 | BasicsClampTest | clamp_low | 5 | 5 | agree | kc_ElmCore01_0 |
 | BasicsClampTest | clamp_mid | 7 | 7 | agree | kc_ElmCore01_1 |
 | BasicsClampTest | clamp_high | 10 | 10 | agree | kc_ElmCore01_2 |
-| BasicsClampTest | clamp_float | 3.5 | 3.5 | agree |  |
-| BasicsIdentityTest | identity_int | 42 | 42 | agree | kc_ElmCore01_3 |
-| BasicsIdentityTest | identity_string | "hello" | "hello" | agree | kc_ElmCore01_4 |
-| BasicsIdentityTest | always_result | 99 | 99 | agree | kc_ElmCore01_5 |
-| BasicsIsNaNTest | nan_check | True | True | agree | kc_ElmCore01_6 |
-| BasicsIsNaNTest | not_nan | False | False | agree | kc_ElmCore01_7 |
-| BasicsIsNaNTest | inf_check | True | True | agree | kc_ElmCore01_8 |
-| BasicsIsNaNTest | not_inf | False | False | agree | kc_ElmCore01_9 |
-| BasicsModByTest | mod_pos | 1 | 1 | agree | kc_ElmCore01_10 |
-| BasicsModByTest | mod_neg | 2 | 2 | agree | kc_ElmCore01_11 |
-| BasicsModByTest | mod_zero | 0 | 0 | agree | kc_ElmCore01_12 |
-| BoolNotTest | not1 | False | False | agree | kc_ElmCore01_13 |
-| BoolNotTest | not2 | True | True | agree | kc_ElmCore01_14 |
-| BoolXorTest | xor1 | False | False | agree | kc_ElmCore01_15 |
-| BoolXorTest | xor2 | True | True | agree | kc_ElmCore01_16 |
-| BoolXorTest | xor3 | True | True | agree | kc_ElmCore01_17 |
-| BoolXorTest | xor4 | False | False | agree | kc_ElmCore01_18 |
+| BasicsClampTest | clamp_float | 3.5 | 3.5 | agree | kc_ElmCore01_3 |
+| BasicsIdentityTest | identity_int | 42 | 42 | agree | kc_ElmCore01_4 |
+| BasicsIdentityTest | identity_string | "hello" | "hello" | agree | kc_ElmCore01_5 |
+| BasicsIdentityTest | always_result | 99 | 99 | agree | kc_ElmCore01_6 |
+| BasicsIsNaNTest | nan_check | True | True | agree | kc_ElmCore01_7 |
+| BasicsIsNaNTest | not_nan | False | False | agree | kc_ElmCore01_8 |
+| BasicsIsNaNTest | inf_check | True | True | agree | kc_ElmCore01_9 |
+| BasicsIsNaNTest | not_inf | False | False | agree | kc_ElmCore01_10 |
+| BasicsModByTest | mod_pos | 1 | 1 | agree | kc_ElmCore01_11 |
+| BasicsModByTest | mod_neg | 2 | 2 | agree | kc_ElmCore01_12 |
+| BasicsModByTest | mod_zero | 0 | 0 | agree | kc_ElmCore01_13 |
+| BoolNotTest | not1 | False | False | agree | kc_ElmCore01_14 |
+| BoolNotTest | not2 | True | True | agree | kc_ElmCore01_15 |
+| BoolXorTest | xor1 | False | False | agree | kc_ElmCore01_16 |
+| BoolXorTest | xor2 | True | True | agree | kc_ElmCore01_17 |
+| BoolXorTest | xor3 | True | True | agree | kc_ElmCore01_18 |
+| BoolXorTest | xor4 | False | False | agree | kc_ElmCore01_19 |
 | CeilingToIntTest | ceil1 | 3 | 3 | agree |  |
 | CeilingToIntTest | ceil2 | -2 | -2 | agree |  |
-| CharAstralCodeTest | bmp | 8364 | 8364 | agree | kc_ElmCore01_19 |
-| CharAstralCodeTest | emoji | 128512 | 128512 | agree | kc_ElmCore01_20 |
-| CharAstralCodeTest | clef | 119070 | 119070 | agree | kc_ElmCore01_21 |
-| CharAstralCodeTest | maxcp | 1114111 | 1114111 | agree | kc_ElmCore01_22 |
+| CharAstralCodeTest | bmp | 8364 | 8364 | agree | kc_ElmCore01_20 |
+| CharAstralCodeTest | emoji | 128512 | 128512 | agree | kc_ElmCore01_21 |
+| CharAstralCodeTest | clef | 119070 | 119070 | agree | kc_ElmCore01_22 |
+| CharAstralCodeTest | maxcp | 1114111 | 1114111 | agree | kc_ElmCore01_23 |
 | CharFromCodeTest | char1 | 'A' | 'A' | agree |  |
 | CharFromCodeTest | char2 | 'a' | 'a' | agree |  |
 | CharFromCodeTest | char3 | '0' | '0' | agree |  |
-| CharToCodeTest | code1 | 65 | 65 | agree | kc_ElmCore01_23 |
-| CharToCodeTest | code2 | 97 | 97 | agree | kc_ElmCore01_24 |
-| CharToCodeTest | code3 | 48 | 48 | agree | kc_ElmCore01_25 |
-| CharToCodeThroughFunctionTest | code | 65 | 65 | agree | kc_ElmCore01_26 |
-| ComparableMinMaxTest | minStr | "apple" | "apple" | agree | kc_ElmCore01_27 |
-| ComparableMinMaxTest | maxStr | "zebra" | "zebra" | agree | kc_ElmCore01_28 |
+| CharToCodeTest | code1 | 65 | 65 | agree | kc_ElmCore01_24 |
+| CharToCodeTest | code2 | 97 | 97 | agree | kc_ElmCore01_25 |
+| CharToCodeTest | code3 | 48 | 48 | agree | kc_ElmCore01_26 |
+| CharToCodeThroughFunctionTest | code | 65 | 65 | agree | kc_ElmCore01_27 |
+| ComparableMinMaxTest | minStr | "apple" | "apple" | agree | kc_ElmCore01_28 |
+| ComparableMinMaxTest | maxStr | "zebra" | "zebra" | agree | kc_ElmCore01_29 |
 | ComparableMinMaxTest | minChar | 'a' | 'a' | agree |  |
 | ComparableMinMaxTest | maxChar | 'z' | 'z' | agree |  |
 | CompareCharCaptureTest | sorted | ['a','b','c','d','e'] | ['a','b','c','d','e'] | agree |  |
 | CompareCharCaptureTest | reverse_sorted | ['e','d','c','b','a'] | ['e','d','c','b','a'] | agree |  |
-| CompareCharTest | cmp1 | LT | LT | agree | kc_ElmCore01_29 |
-| CompareCharTest | cmp2 | GT | GT | agree | kc_ElmCore01_30 |
-| CompareCharTest | cmp3 | EQ | EQ | agree | kc_ElmCore01_31 |
-| CompareCustomWithEmptyListFieldTest | cmp_ee | EQ | EQ | agree | kc_ElmCore01_32 |
-| CompareCustomWithEmptyListFieldTest | cmp_eA | LT | LT | agree | kc_ElmCore01_33 |
-| CompareCustomWithEmptyListFieldTest | cmp_Ae | GT | GT | agree | kc_ElmCore01_34 |
-| CompareCustomWithEmptyListFieldTest | eq_ee | True | True | agree | kc_ElmCore01_35 |
-| CompareCustomWithEmptyListFieldTest | eq_eA | False | False | agree | kc_ElmCore01_36 |
-| CompareCustomWithEmptyListFieldTest | eq_Ae | False | False | agree | kc_ElmCore01_37 |
-| CompareEmptyListTest | ee | EQ | EQ | agree | kc_ElmCore01_38 |
-| CompareEmptyListTest | ea | LT | LT | agree | kc_ElmCore01_39 |
-| CompareEmptyListTest | ae | GT | GT | agree | kc_ElmCore01_40 |
-| CompareEmptyListTest | eab | LT | LT | agree | kc_ElmCore01_41 |
-| CompareEmptyListTest | abe | GT | GT | agree | kc_ElmCore01_42 |
-| CompareEmptyListTest | aa | EQ | EQ | agree | kc_ElmCore01_43 |
-| CompareEmptyListTest | ab | LT | LT | agree | kc_ElmCore01_44 |
-| CompareEmptyListTest | ba | GT | GT | agree | kc_ElmCore01_45 |
-| CompareEmptyListTest | aba | GT | GT | agree | kc_ElmCore01_46 |
-| CompareEmptyStringTest | ee | EQ | EQ | agree | kc_ElmCore01_47 |
-| CompareEmptyStringTest | ea | LT | LT | agree | kc_ElmCore01_48 |
-| CompareEmptyStringTest | ae | GT | GT | agree | kc_ElmCore01_49 |
-| CompareEmptyStringTest | eab | LT | LT | agree | kc_ElmCore01_50 |
-| CompareEmptyStringTest | abe | GT | GT | agree | kc_ElmCore01_51 |
-| CompareEmptyStringTest | aa | EQ | EQ | agree | kc_ElmCore01_52 |
-| CompareEmptyStringTest | ab | LT | LT | agree | kc_ElmCore01_53 |
-| CompareEmptyStringTest | ba | GT | GT | agree | kc_ElmCore01_54 |
-| CompareEmptyStringTest | aba | GT | GT | agree | kc_ElmCore01_55 |
+| CompareCharTest | cmp1 | LT | LT | agree | kc_ElmCore01_30 |
+| CompareCharTest | cmp2 | GT | GT | agree | kc_ElmCore01_31 |
+| CompareCharTest | cmp3 | EQ | EQ | agree | kc_ElmCore01_32 |
+| CompareCustomWithEmptyListFieldTest | cmp_ee | EQ | EQ | agree | kc_ElmCore01_33 |
+| CompareCustomWithEmptyListFieldTest | cmp_eA | LT | LT | agree | kc_ElmCore01_34 |
+| CompareCustomWithEmptyListFieldTest | cmp_Ae | GT | GT | agree | kc_ElmCore01_35 |
+| CompareCustomWithEmptyListFieldTest | eq_ee | True | True | agree | kc_ElmCore01_36 |
+| CompareCustomWithEmptyListFieldTest | eq_eA | False | False | agree | kc_ElmCore01_37 |
+| CompareCustomWithEmptyListFieldTest | eq_Ae | False | False | agree | kc_ElmCore01_38 |
+| CompareEmptyListTest | ee | EQ | EQ | agree | kc_ElmCore01_39 |
+| CompareEmptyListTest | ea | LT | LT | agree | kc_ElmCore01_40 |
+| CompareEmptyListTest | ae | GT | GT | agree | kc_ElmCore01_41 |
+| CompareEmptyListTest | eab | LT | LT | agree | kc_ElmCore01_42 |
+| CompareEmptyListTest | abe | GT | GT | agree | kc_ElmCore01_43 |
+| CompareEmptyListTest | aa | EQ | EQ | agree | kc_ElmCore01_44 |
+| CompareEmptyListTest | ab | LT | LT | agree | kc_ElmCore01_45 |
+| CompareEmptyListTest | ba | GT | GT | agree | kc_ElmCore01_46 |
+| CompareEmptyListTest | aba | GT | GT | agree | kc_ElmCore01_47 |
+| CompareEmptyStringTest | ee | EQ | EQ | agree | kc_ElmCore01_48 |
+| CompareEmptyStringTest | ea | LT | LT | agree | kc_ElmCore01_49 |
+| CompareEmptyStringTest | ae | GT | GT | agree | kc_ElmCore01_50 |
+| CompareEmptyStringTest | eab | LT | LT | agree | kc_ElmCore01_51 |
+| CompareEmptyStringTest | abe | GT | GT | agree | kc_ElmCore01_52 |
+| CompareEmptyStringTest | aa | EQ | EQ | agree | kc_ElmCore01_53 |
+| CompareEmptyStringTest | ab | LT | LT | agree | kc_ElmCore01_54 |
+| CompareEmptyStringTest | ba | GT | GT | agree | kc_ElmCore01_55 |
+| CompareEmptyStringTest | aba | GT | GT | agree | kc_ElmCore01_56 |
 | CompareFloatCaptureTest | sorted | [1.5,2,2.75,3,4.25] | [1.5,2,2.75,3,4.25] | agree |  |
 | CompareFloatCaptureTest | reverse_sorted | [4.25,3,2.75,2,1.5] | [4.25,3,2.75,2,1.5] | agree |  |
-| CompareFloatTest | cmp1 | LT | LT | agree | kc_ElmCore01_56 |
-| CompareFloatTest | cmp2 | GT | GT | agree | kc_ElmCore01_57 |
-| CompareFloatTest | cmp3 | EQ | EQ | agree | kc_ElmCore01_58 |
+| CompareFloatTest | cmp1 | LT | LT | agree | kc_ElmCore01_57 |
+| CompareFloatTest | cmp2 | GT | GT | agree | kc_ElmCore01_58 |
+| CompareFloatTest | cmp3 | EQ | EQ | agree | kc_ElmCore01_59 |
 | CompareIntCaptureTest | sorted | [1,2,3,4,5] | [1,2,3,4,5] | agree |  |
 | CompareIntCaptureTest | reverse_sorted | [5,4,3,2,1] | [5,4,3,2,1] | agree |  |
-| CompareIntTest | cmp1 | LT | LT | agree | kc_ElmCore01_59 |
-| CompareIntTest | cmp2 | GT | GT | agree | kc_ElmCore01_60 |
-| CompareIntTest | cmp3 | EQ | EQ | agree | kc_ElmCore01_61 |
-| CompareNestedEmptyListTest | ee | EQ | EQ | agree | kc_ElmCore01_62 |
-| CompareNestedEmptyListTest | eA | LT | LT | agree | kc_ElmCore01_63 |
-| CompareNestedEmptyListTest | Ae | GT | GT | agree | kc_ElmCore01_64 |
-| CompareNestedEmptyListTest | midEmpty | LT | LT | agree | kc_ElmCore01_65 |
-| CompareNestedEmptyListTest | midNonEmpty | GT | GT | agree | kc_ElmCore01_66 |
-| CompareRecordWithEmptyListFieldTest | cmp_ee | EQ | EQ | agree | kc_ElmCore01_67 |
-| CompareRecordWithEmptyListFieldTest | cmp_eA | LT | LT | agree | kc_ElmCore01_68 |
-| CompareRecordWithEmptyListFieldTest | cmp_Ae | GT | GT | agree | kc_ElmCore01_69 |
-| CompareRecordWithEmptyListFieldTest | eq_ee | True | True | agree | kc_ElmCore01_70 |
-| CompareRecordWithEmptyListFieldTest | eq_eA | False | False | agree | kc_ElmCore01_71 |
-| CompareRecordWithEmptyListFieldTest | eq_Ae | False | False | agree | kc_ElmCore01_72 |
-| CompareStringTest | cmp1 | LT | LT | agree | kc_ElmCore01_73 |
-| CompareStringTest | cmp2 | GT | GT | agree | kc_ElmCore01_74 |
-| CompareStringTest | cmp3 | EQ | EQ | agree | kc_ElmCore01_75 |
-| CompareTupleWithEmptyListNestedTest | ee | EQ | EQ | agree | kc_ElmCore01_76 |
-| CompareTupleWithEmptyListNestedTest | eA | LT | LT | agree | kc_ElmCore01_77 |
-| CompareTupleWithEmptyListNestedTest | Ae | GT | GT | agree | kc_ElmCore01_78 |
-| CompareTupleWithEmptyListNestedTest | triple_eA | LT | LT | agree | kc_ElmCore01_79 |
-| CompareTupleWithEmptyListNestedTest | triple_Ae | GT | GT | agree | kc_ElmCore01_80 |
-| CompareTupleWithEmptyListTest | ee | EQ | EQ | agree | kc_ElmCore01_81 |
-| CompareTupleWithEmptyListTest | eA | LT | LT | agree | kc_ElmCore01_82 |
-| CompareTupleWithEmptyListTest | Ae | GT | GT | agree | kc_ElmCore01_83 |
-| CompareTupleWithEmptyListTest | eAB | LT | LT | agree | kc_ElmCore01_84 |
-| CompareTupleWithEmptyListTest | ABe | GT | GT | agree | kc_ElmCore01_85 |
-| CompareTupleWithEmptyListTest | f0_ee | LT | LT | agree | kc_ElmCore01_86 |
-| CompareTupleWithEmptyListTest | f0_Ae | GT | GT | agree | kc_ElmCore01_87 |
-| CompareTupleWithEmptyStringTest | ee | EQ | EQ | agree | kc_ElmCore01_88 |
-| CompareTupleWithEmptyStringTest | ea | LT | LT | agree | kc_ElmCore01_89 |
-| CompareTupleWithEmptyStringTest | ae | GT | GT | agree | kc_ElmCore01_90 |
-| CompareTupleWithEmptyStringTest | f0_ea | LT | LT | agree | kc_ElmCore01_91 |
-| CompareTupleWithEmptyStringTest | f0_ae | GT | GT | agree | kc_ElmCore01_92 |
-| CompilerIssue2362NanTupleEqualityTest | nan == nan | False | False | agree | kc_ElmCore01_93 |
-| CompilerIssue2362NanTupleEqualityTest | p == q | False | False | agree | kc_ElmCore01_94 |
-| CompilerIssue2362NanTupleEqualityTest | p == p | False | False | agree | kc_ElmCore01_95 |
-| CompositionTest | compose1 | 20 | 20 | agree | kc_ElmCore01_96 |
-| CompositionTest | compose2 | 11 | 11 | agree | kc_ElmCore01_97 |
-| CompositionTest | pipe1 | 20 | 20 | agree | kc_ElmCore01_98 |
-| ContainerCompareCharTest | pairLt | LT | LT | agree | kc_ElmCore01_99 |
-| ContainerCompareCharTest | pairGt | GT | GT | agree | kc_ElmCore01_100 |
-| ContainerCompareCharTest | pairEq | EQ | EQ | agree | kc_ElmCore01_101 |
-| ContainerCompareCharTest | pairSecondDecides | LT | LT | agree | kc_ElmCore01_102 |
-| ContainerCompareCharTest | pairUpperBeforeLower | LT | LT | agree | kc_ElmCore01_103 |
-| ContainerCompareCharTest | pairUnicode | LT | LT | agree | kc_ElmCore01_104 |
-| ContainerCompareCharTest | tripleFirstDecides | LT | LT | agree | kc_ElmCore01_105 |
-| ContainerCompareCharTest | tripleThirdDecides | GT | GT | agree | kc_ElmCore01_106 |
-| ContainerCompareCharTest | tripleEq | EQ | EQ | agree | kc_ElmCore01_107 |
-| ContainerCompareCharTest | tripleDigitsBeforeLetters | LT | LT | agree | kc_ElmCore01_108 |
-| ContainerCompareCharTest | listLt | LT | LT | agree | kc_ElmCore01_109 |
-| ContainerCompareCharTest | listShorterIsLess | LT | LT | agree | kc_ElmCore01_110 |
-| ContainerCompareCharTest | listEq | EQ | EQ | agree | kc_ElmCore01_111 |
-| ContainerCompareCharTest | listEmptyIsLeast | LT | LT | agree | kc_ElmCore01_112 |
-| ContainerCompareCharTest | listUnicodeCmp | LT | LT | agree | kc_ElmCore01_113 |
-| ContainerCompareCharTest | pairLtOp | True | True | agree | kc_ElmCore01_114 |
-| ContainerCompareCharTest | pairGeOp | True | True | agree | kc_ElmCore01_115 |
-| ContainerCompareCharTest | tripleLtOp | True | True | agree | kc_ElmCore01_116 |
-| ContainerCompareCharTest | listGtOp | True | True | agree | kc_ElmCore01_117 |
-| ContainerEqualityCharTest | pairEqual | True | True | agree | kc_ElmCore01_118 |
-| ContainerEqualityCharTest | pairFirstDiff | False | False | agree | kc_ElmCore01_119 |
-| ContainerEqualityCharTest | pairSecondDiff | False | False | agree | kc_ElmCore01_120 |
-| ContainerEqualityCharTest | pairCaseDiff | False | False | agree | kc_ElmCore01_121 |
-| ContainerEqualityCharTest | pairDigits | True | True | agree | kc_ElmCore01_122 |
-| ContainerEqualityCharTest | pairUnicode | True | True | agree | kc_ElmCore01_123 |
-| ContainerEqualityCharTest | pairUnicodeDiff | False | False | agree | kc_ElmCore01_124 |
-| ContainerEqualityCharTest | tripleEqual | True | True | agree | kc_ElmCore01_125 |
-| ContainerEqualityCharTest | tripleMidDiff | False | False | agree | kc_ElmCore01_126 |
-| ContainerEqualityCharTest | tripleMixedCase | True | True | agree | kc_ElmCore01_127 |
-| ContainerEqualityCharTest | tripleUnicode | True | True | agree | kc_ElmCore01_128 |
-| ContainerEqualityCharTest | listEqual | True | True | agree | kc_ElmCore01_129 |
-| ContainerEqualityCharTest | listLenDiff | False | False | agree | kc_ElmCore01_130 |
-| ContainerEqualityCharTest | listEmpty | True | True | agree | kc_ElmCore01_131 |
-| ContainerEqualityCharTest | listCaseDiff | False | False | agree | kc_ElmCore01_132 |
-| ContainerEqualityCharTest | listUnicode | True | True | agree | kc_ElmCore01_133 |
-| ContainerEqualityCustomFloatTest | ptEqual | True | True | agree | kc_ElmCore01_134 |
-| ContainerEqualityCustomFloatTest | ptXDiff | False | False | agree | kc_ElmCore01_135 |
-| ContainerEqualityCustomFloatTest | ptYDiff | False | False | agree | kc_ElmCore01_136 |
-| ContainerEqualityCustomFloatTest | ptNegZero | True | True | agree | kc_ElmCore01_137 |
-| ContainerEqualityCustomFloatTest | ptNaNFirst | False | False | agree | kc_ElmCore01_138 |
-| ContainerEqualityCustomFloatTest | ptNaNSecond | False | False | agree | kc_ElmCore01_139 |
-| ContainerEqualityCustomFloatTest | ptPosInf | True | True | agree | kc_ElmCore01_140 |
-| ContainerEqualityCustomFloatTest | ptInfSign | False | False | agree | kc_ElmCore01_141 |
-| ContainerEqualityCustomFloatTest | triEqual | True | True | agree | kc_ElmCore01_142 |
-| ContainerEqualityCustomFloatTest | triMidDiff | False | False | agree | kc_ElmCore01_143 |
-| ContainerEqualityCustomFloatTest | triAllNegZero | True | True | agree | kc_ElmCore01_144 |
-| ContainerEqualityCustomFloatTest | triNaNMid | False | False | agree | kc_ElmCore01_145 |
-| ContainerEqualityCustomFloatTest | triMixedInf | True | True | agree | kc_ElmCore01_146 |
-| ContainerEqualityCustomFloatTest | mixedCtorDiff | False | False | agree | kc_ElmCore01_147 |
-| ContainerEqualityRecordFloatTest | recEqual | True | True | agree | kc_ElmCore01_148 |
-| ContainerEqualityRecordFloatTest | recXDiff | False | False | agree | kc_ElmCore01_149 |
-| ContainerEqualityRecordFloatTest | recYDiff | False | False | agree | kc_ElmCore01_150 |
-| ContainerEqualityRecordFloatTest | recNegZero | True | True | agree | kc_ElmCore01_151 |
-| ContainerEqualityRecordFloatTest | recNaN | False | False | agree | kc_ElmCore01_152 |
-| ContainerEqualityRecordFloatTest | recPosInf | True | True | agree | kc_ElmCore01_153 |
-| ContainerEqualityRecordFloatTest | recInfSign | False | False | agree | kc_ElmCore01_154 |
-| ContainerEqualityRecordFloatTest | rec3Equal | True | True | agree | kc_ElmCore01_155 |
-| ContainerEqualityRecordFloatTest | rec3MidDiff | False | False | agree | kc_ElmCore01_156 |
-| ContainerEqualityRecordFloatTest | rec3AllNegZero | True | True | agree | kc_ElmCore01_157 |
-| ContainerEqualityRecordFloatTest | rec3NaNMid | False | False | agree | kc_ElmCore01_158 |
-| ContainerEqualityRecordFloatTest | rec3MixedInf | True | True | agree | kc_ElmCore01_159 |
-| ContainerEqualityStringTest | pairEqual | True | True | agree | kc_ElmCore01_160 |
-| ContainerEqualityStringTest | pairFirstDiff | False | False | agree | kc_ElmCore01_161 |
-| ContainerEqualityStringTest | pairSecondDiff | False | False | agree | kc_ElmCore01_162 |
-| ContainerEqualityStringTest | pairEmpty | True | True | agree | kc_ElmCore01_163 |
-| ContainerEqualityStringTest | pairCaseDiff | False | False | agree | kc_ElmCore01_164 |
-| ContainerEqualityStringTest | pairPrefixDiff | False | False | agree | kc_ElmCore01_165 |
-| ContainerEqualityStringTest | pairUnicode | True | True | agree | kc_ElmCore01_166 |
-| ContainerEqualityStringTest | tripleEqual | True | True | agree | kc_ElmCore01_167 |
-| ContainerEqualityStringTest | tripleMidDiff | False | False | agree | kc_ElmCore01_168 |
-| ContainerEqualityStringTest | tripleWithEmpty | True | True | agree | kc_ElmCore01_169 |
-| ContainerEqualityStringTest | tripleUnicode | True | True | agree | kc_ElmCore01_170 |
-| ContainerEqualityStringTest | listEqual | True | True | agree | kc_ElmCore01_171 |
-| ContainerEqualityStringTest | listLenDiff | False | False | agree | kc_ElmCore01_172 |
-| ContainerEqualityStringTest | listEmpty | True | True | agree | kc_ElmCore01_173 |
-| ContainerEqualityStringTest | listEmptyStrings | True | True | agree | kc_ElmCore01_174 |
-| ContainerEqualityStringTest | listCaseDiff | False | False | agree | kc_ElmCore01_175 |
-| ContainerEqualityStringTest | listUnicode | True | True | agree | kc_ElmCore01_176 |
-| ControlFlowBooleanWithNotTest | testValue | True | True | agree | kc_ElmCore01_177 |
-| CoreIssue1050NanGreaterThanNanTest | nan > nan | False | False | agree | kc_ElmCore01_178 |
-| CoreIssue1050NanGreaterThanNanTest | nan >= nan | False | False | agree | kc_ElmCore01_179 |
-| CoreIssue1080ClampNanTest | clamp nan | NaN | NaN | agree |  |
-| CoreIssue1115NanEqualsLiteralZeroTest | nan == 0 | False | False | agree | kc_ElmCore01_180 |
-| CoreIssue1115NanEqualsLiteralZeroTest | 0 == nan | False | False | agree | kc_ElmCore01_181 |
-| CoreIssue1115NanEqualsLiteralZeroTest | nan == zero | False | False | agree | kc_ElmCore01_182 |
-| CoreIssue988NanEqualityReferenceTest | same answer | True | True | agree | kc_ElmCore01_183 |
-| EqBoxedFastPathTest | strSame | True | True | agree | kc_ElmCore01_184 |
-| EqBoxedFastPathTest | strTwin | True | True | agree | kc_ElmCore01_185 |
-| EqBoxedFastPathTest | strDiff | False | False | agree | kc_ElmCore01_186 |
-| EqBoxedFastPathTest | strNe | True | True | agree | kc_ElmCore01_187 |
-| EqBoxedFastPathTest | listSame | True | True | agree | kc_ElmCore01_188 |
-| EqBoxedFastPathTest | listTwin | True | True | agree | kc_ElmCore01_189 |
-| EqBoxedFastPathTest | listDiff | False | False | agree | kc_ElmCore01_190 |
-| EqBoxedFastPathTest | tupleTwin | True | True | agree | kc_ElmCore01_191 |
-| EqBoxedFastPathTest | tupleDiff | False | False | agree | kc_ElmCore01_192 |
-| EqBoxedFastPathTest | recordTwin | True | True | agree | kc_ElmCore01_193 |
-| EqBoxedFastPathTest | recordDiff | False | False | agree | kc_ElmCore01_194 |
-| EqBoxedFastPathTest | customTwin | True | True | agree | kc_ElmCore01_195 |
-| EqBoxedFastPathTest | customDiff | False | False | agree | kc_ElmCore01_196 |
-| EqBoxedFastPathTest | unitEq | True | True | agree | kc_ElmCore01_197 |
-| EqBoxedFastPathTest | emptyStrEq | True | True | agree | kc_ElmCore01_198 |
-| EqBoxedFastPathTest | emptyListEq | True | True | agree | kc_ElmCore01_199 |
-| EqBoxedFastPathTest | boolTT | True | True | agree | kc_ElmCore01_200 |
-| EqBoxedFastPathTest | boolTF | False | False | agree | kc_ElmCore01_201 |
-| EqBoxedFastPathTest | boolNe | True | True | agree | kc_ElmCore01_202 |
-| EqBoxedFastPathTest | nestedTwin | True | True | agree | kc_ElmCore01_203 |
+| CompareIntTest | cmp1 | LT | LT | agree | kc_ElmCore01_60 |
+| CompareIntTest | cmp2 | GT | GT | agree | kc_ElmCore01_61 |
+| CompareIntTest | cmp3 | EQ | EQ | agree | kc_ElmCore01_62 |
+| CompareNestedEmptyListTest | ee | EQ | EQ | agree | kc_ElmCore01_63 |
+| CompareNestedEmptyListTest | eA | LT | LT | agree | kc_ElmCore01_64 |
+| CompareNestedEmptyListTest | Ae | GT | GT | agree | kc_ElmCore01_65 |
+| CompareNestedEmptyListTest | midEmpty | LT | LT | agree | kc_ElmCore01_66 |
+| CompareNestedEmptyListTest | midNonEmpty | GT | GT | agree | kc_ElmCore01_67 |
+| CompareRecordWithEmptyListFieldTest | cmp_ee | EQ | EQ | agree | kc_ElmCore01_68 |
+| CompareRecordWithEmptyListFieldTest | cmp_eA | LT | LT | agree | kc_ElmCore01_69 |
+| CompareRecordWithEmptyListFieldTest | cmp_Ae | GT | GT | agree | kc_ElmCore01_70 |
+| CompareRecordWithEmptyListFieldTest | eq_ee | True | True | agree | kc_ElmCore01_71 |
+| CompareRecordWithEmptyListFieldTest | eq_eA | False | False | agree | kc_ElmCore01_72 |
+| CompareRecordWithEmptyListFieldTest | eq_Ae | False | False | agree | kc_ElmCore01_73 |
+| CompareStringTest | cmp1 | LT | LT | agree | kc_ElmCore01_74 |
+| CompareStringTest | cmp2 | GT | GT | agree | kc_ElmCore01_75 |
+| CompareStringTest | cmp3 | EQ | EQ | agree | kc_ElmCore01_76 |
+| CompareTupleWithEmptyListNestedTest | ee | EQ | EQ | agree | kc_ElmCore01_77 |
+| CompareTupleWithEmptyListNestedTest | eA | LT | LT | agree | kc_ElmCore01_78 |
+| CompareTupleWithEmptyListNestedTest | Ae | GT | GT | agree | kc_ElmCore01_79 |
+| CompareTupleWithEmptyListNestedTest | triple_eA | LT | LT | agree | kc_ElmCore01_80 |
+| CompareTupleWithEmptyListNestedTest | triple_Ae | GT | GT | agree | kc_ElmCore01_81 |
+| CompareTupleWithEmptyListTest | ee | EQ | EQ | agree | kc_ElmCore01_82 |
+| CompareTupleWithEmptyListTest | eA | LT | LT | agree | kc_ElmCore01_83 |
+| CompareTupleWithEmptyListTest | Ae | GT | GT | agree | kc_ElmCore01_84 |
+| CompareTupleWithEmptyListTest | eAB | LT | LT | agree | kc_ElmCore01_85 |
+| CompareTupleWithEmptyListTest | ABe | GT | GT | agree | kc_ElmCore01_86 |
+| CompareTupleWithEmptyListTest | f0_ee | LT | LT | agree | kc_ElmCore01_87 |
+| CompareTupleWithEmptyListTest | f0_Ae | GT | GT | agree | kc_ElmCore01_88 |
+| CompareTupleWithEmptyStringTest | ee | EQ | EQ | agree | kc_ElmCore01_89 |
+| CompareTupleWithEmptyStringTest | ea | LT | LT | agree | kc_ElmCore01_90 |
+| CompareTupleWithEmptyStringTest | ae | GT | GT | agree | kc_ElmCore01_91 |
+| CompareTupleWithEmptyStringTest | f0_ea | LT | LT | agree | kc_ElmCore01_92 |
+| CompareTupleWithEmptyStringTest | f0_ae | GT | GT | agree | kc_ElmCore01_93 |
+| CompilerIssue2362NanTupleEqualityTest | nan == nan | False | False | agree | kc_ElmCore01_94 |
+| CompilerIssue2362NanTupleEqualityTest | p == q | False | False | agree | kc_ElmCore01_95 |
+| CompilerIssue2362NanTupleEqualityTest | p == p | False | False | agree | kc_ElmCore01_96 |
+| CompositionTest | compose1 | 20 | 20 | agree | kc_ElmCore01_97 |
+| CompositionTest | compose2 | 11 | 11 | agree | kc_ElmCore01_98 |
+| CompositionTest | pipe1 | 20 | 20 | agree | kc_ElmCore01_99 |
+| ContainerCompareCharTest | pairLt | LT | LT | agree | kc_ElmCore01_100 |
+| ContainerCompareCharTest | pairGt | GT | GT | agree | kc_ElmCore01_101 |
+| ContainerCompareCharTest | pairEq | EQ | EQ | agree | kc_ElmCore01_102 |
+| ContainerCompareCharTest | pairSecondDecides | LT | LT | agree | kc_ElmCore01_103 |
+| ContainerCompareCharTest | pairUpperBeforeLower | LT | LT | agree | kc_ElmCore01_104 |
+| ContainerCompareCharTest | pairUnicode | LT | LT | agree | kc_ElmCore01_105 |
+| ContainerCompareCharTest | tripleFirstDecides | LT | LT | agree | kc_ElmCore01_106 |
+| ContainerCompareCharTest | tripleThirdDecides | GT | GT | agree | kc_ElmCore01_107 |
+| ContainerCompareCharTest | tripleEq | EQ | EQ | agree | kc_ElmCore01_108 |
+| ContainerCompareCharTest | tripleDigitsBeforeLetters | LT | LT | agree | kc_ElmCore01_109 |
+| ContainerCompareCharTest | listLt | LT | LT | agree | kc_ElmCore01_110 |
+| ContainerCompareCharTest | listShorterIsLess | LT | LT | agree | kc_ElmCore01_111 |
+| ContainerCompareCharTest | listEq | EQ | EQ | agree | kc_ElmCore01_112 |
+| ContainerCompareCharTest | listEmptyIsLeast | LT | LT | agree | kc_ElmCore01_113 |
+| ContainerCompareCharTest | listUnicodeCmp | LT | LT | agree | kc_ElmCore01_114 |
+| ContainerCompareCharTest | pairLtOp | True | True | agree | kc_ElmCore01_115 |
+| ContainerCompareCharTest | pairGeOp | True | True | agree | kc_ElmCore01_116 |
+| ContainerCompareCharTest | tripleLtOp | True | True | agree | kc_ElmCore01_117 |
+| ContainerCompareCharTest | listGtOp | True | True | agree | kc_ElmCore01_118 |
+| ContainerEqualityCharTest | pairEqual | True | True | agree | kc_ElmCore01_119 |
+| ContainerEqualityCharTest | pairFirstDiff | False | False | agree | kc_ElmCore01_120 |
+| ContainerEqualityCharTest | pairSecondDiff | False | False | agree | kc_ElmCore01_121 |
+| ContainerEqualityCharTest | pairCaseDiff | False | False | agree | kc_ElmCore01_122 |
+| ContainerEqualityCharTest | pairDigits | True | True | agree | kc_ElmCore01_123 |
+| ContainerEqualityCharTest | pairUnicode | True | True | agree | kc_ElmCore01_124 |
+| ContainerEqualityCharTest | pairUnicodeDiff | False | False | agree | kc_ElmCore01_125 |
+| ContainerEqualityCharTest | tripleEqual | True | True | agree | kc_ElmCore01_126 |
+| ContainerEqualityCharTest | tripleMidDiff | False | False | agree | kc_ElmCore01_127 |
+| ContainerEqualityCharTest | tripleMixedCase | True | True | agree | kc_ElmCore01_128 |
+| ContainerEqualityCharTest | tripleUnicode | True | True | agree | kc_ElmCore01_129 |
+| ContainerEqualityCharTest | listEqual | True | True | agree | kc_ElmCore01_130 |
+| ContainerEqualityCharTest | listLenDiff | False | False | agree | kc_ElmCore01_131 |
+| ContainerEqualityCharTest | listEmpty | True | True | agree | kc_ElmCore01_132 |
+| ContainerEqualityCharTest | listCaseDiff | False | False | agree | kc_ElmCore01_133 |
+| ContainerEqualityCharTest | listUnicode | True | True | agree | kc_ElmCore01_134 |
+| ContainerEqualityCustomFloatTest | ptEqual | True | True | agree | kc_ElmCore01_135 |
+| ContainerEqualityCustomFloatTest | ptXDiff | False | False | agree | kc_ElmCore01_136 |
+| ContainerEqualityCustomFloatTest | ptYDiff | False | False | agree | kc_ElmCore01_137 |
+| ContainerEqualityCustomFloatTest | ptNegZero | True | True | agree | kc_ElmCore01_138 |
+| ContainerEqualityCustomFloatTest | ptNaNFirst | False | False | agree | kc_ElmCore01_139 |
+| ContainerEqualityCustomFloatTest | ptNaNSecond | False | False | agree | kc_ElmCore01_140 |
+| ContainerEqualityCustomFloatTest | ptPosInf | True | True | agree | kc_ElmCore01_141 |
+| ContainerEqualityCustomFloatTest | ptInfSign | False | False | agree | kc_ElmCore01_142 |
+| ContainerEqualityCustomFloatTest | triEqual | True | True | agree | kc_ElmCore01_143 |
+| ContainerEqualityCustomFloatTest | triMidDiff | False | False | agree | kc_ElmCore01_144 |
+| ContainerEqualityCustomFloatTest | triAllNegZero | True | True | agree | kc_ElmCore01_145 |
+| ContainerEqualityCustomFloatTest | triNaNMid | False | False | agree | kc_ElmCore01_146 |
+| ContainerEqualityCustomFloatTest | triMixedInf | True | True | agree | kc_ElmCore01_147 |
+| ContainerEqualityCustomFloatTest | mixedCtorDiff | False | False | agree | kc_ElmCore01_148 |
+| ContainerEqualityRecordFloatTest | recEqual | True | True | agree | kc_ElmCore01_149 |
+| ContainerEqualityRecordFloatTest | recXDiff | False | False | agree | kc_ElmCore01_150 |
+| ContainerEqualityRecordFloatTest | recYDiff | False | False | agree | kc_ElmCore01_151 |
+| ContainerEqualityRecordFloatTest | recNegZero | True | True | agree | kc_ElmCore01_152 |
+| ContainerEqualityRecordFloatTest | recNaN | False | False | agree | kc_ElmCore01_153 |
+| ContainerEqualityRecordFloatTest | recPosInf | True | True | agree | kc_ElmCore01_154 |
+| ContainerEqualityRecordFloatTest | recInfSign | False | False | agree | kc_ElmCore01_155 |
+| ContainerEqualityRecordFloatTest | rec3Equal | True | True | agree | kc_ElmCore01_156 |
+| ContainerEqualityRecordFloatTest | rec3MidDiff | False | False | agree | kc_ElmCore01_157 |
+| ContainerEqualityRecordFloatTest | rec3AllNegZero | True | True | agree | kc_ElmCore01_158 |
+| ContainerEqualityRecordFloatTest | rec3NaNMid | False | False | agree | kc_ElmCore01_159 |
+| ContainerEqualityRecordFloatTest | rec3MixedInf | True | True | agree | kc_ElmCore01_160 |
+| ContainerEqualityStringTest | pairEqual | True | True | agree | kc_ElmCore01_161 |
+| ContainerEqualityStringTest | pairFirstDiff | False | False | agree | kc_ElmCore01_162 |
+| ContainerEqualityStringTest | pairSecondDiff | False | False | agree | kc_ElmCore01_163 |
+| ContainerEqualityStringTest | pairEmpty | True | True | agree | kc_ElmCore01_164 |
+| ContainerEqualityStringTest | pairCaseDiff | False | False | agree | kc_ElmCore01_165 |
+| ContainerEqualityStringTest | pairPrefixDiff | False | False | agree | kc_ElmCore01_166 |
+| ContainerEqualityStringTest | pairUnicode | True | True | agree | kc_ElmCore01_167 |
+| ContainerEqualityStringTest | tripleEqual | True | True | agree | kc_ElmCore01_168 |
+| ContainerEqualityStringTest | tripleMidDiff | False | False | agree | kc_ElmCore01_169 |
+| ContainerEqualityStringTest | tripleWithEmpty | True | True | agree | kc_ElmCore01_170 |
+| ContainerEqualityStringTest | tripleUnicode | True | True | agree | kc_ElmCore01_171 |
+| ContainerEqualityStringTest | listEqual | True | True | agree | kc_ElmCore01_172 |
+| ContainerEqualityStringTest | listLenDiff | False | False | agree | kc_ElmCore01_173 |
+| ContainerEqualityStringTest | listEmpty | True | True | agree | kc_ElmCore01_174 |
+| ContainerEqualityStringTest | listEmptyStrings | True | True | agree | kc_ElmCore01_175 |
+| ContainerEqualityStringTest | listCaseDiff | False | False | agree | kc_ElmCore01_176 |
+| ContainerEqualityStringTest | listUnicode | True | True | agree | kc_ElmCore01_177 |
+| ControlFlowBooleanWithNotTest | testValue | True | True | agree | kc_ElmCore01_178 |
+| CoreIssue1050NanGreaterThanNanTest | nan > nan | False | False | agree | kc_ElmCore01_179 |
+| CoreIssue1050NanGreaterThanNanTest | nan >= nan | False | False | agree | kc_ElmCore01_180 |
+| CoreIssue1080ClampNanTest | clamp nan | NaN | NaN | agree | kc_ElmCore01_181 |
+| CoreIssue1115NanEqualsLiteralZeroTest | nan == 0 | False | False | agree | kc_ElmCore01_182 |
+| CoreIssue1115NanEqualsLiteralZeroTest | 0 == nan | False | False | agree | kc_ElmCore01_183 |
+| CoreIssue1115NanEqualsLiteralZeroTest | nan == zero | False | False | agree | kc_ElmCore01_184 |
+| CoreIssue988NanEqualityReferenceTest | same answer | True | True | agree | kc_ElmCore01_185 |
+| EqBoxedFastPathTest | strSame | True | True | agree | kc_ElmCore01_186 |
+| EqBoxedFastPathTest | strTwin | True | True | agree | kc_ElmCore01_187 |
+| EqBoxedFastPathTest | strDiff | False | False | agree | kc_ElmCore01_188 |
+| EqBoxedFastPathTest | strNe | True | True | agree | kc_ElmCore01_189 |
+| EqBoxedFastPathTest | listSame | True | True | agree | kc_ElmCore01_190 |
+| EqBoxedFastPathTest | listTwin | True | True | agree | kc_ElmCore01_191 |
+| EqBoxedFastPathTest | listDiff | False | False | agree | kc_ElmCore01_192 |
+| EqBoxedFastPathTest | tupleTwin | True | True | agree | kc_ElmCore01_193 |
+| EqBoxedFastPathTest | tupleDiff | False | False | agree | kc_ElmCore01_194 |
+| EqBoxedFastPathTest | recordTwin | True | True | agree | kc_ElmCore01_195 |
+| EqBoxedFastPathTest | recordDiff | False | False | agree | kc_ElmCore01_196 |
+| EqBoxedFastPathTest | customTwin | True | True | agree | kc_ElmCore01_197 |
+| EqBoxedFastPathTest | customDiff | False | False | agree | kc_ElmCore01_198 |
+| EqBoxedFastPathTest | unitEq | True | True | agree | kc_ElmCore01_199 |
+| EqBoxedFastPathTest | emptyStrEq | True | True | agree | kc_ElmCore01_200 |
+| EqBoxedFastPathTest | emptyListEq | True | True | agree | kc_ElmCore01_201 |
+| EqBoxedFastPathTest | boolTT | True | True | agree | kc_ElmCore01_202 |
+| EqBoxedFastPathTest | boolTF | False | False | agree | kc_ElmCore01_203 |
+| EqBoxedFastPathTest | boolNe | True | True | agree | kc_ElmCore01_204 |
+| EqBoxedFastPathTest | nestedTwin | True | True | agree | kc_ElmCore01_205 |
 
 ElmCore01: 40 programs, 219 checks, 219 agree.
 
@@ -1214,56 +1215,56 @@ ElmCore01: 40 programs, 219 checks, 219 agree.
 | EqualityTest | ne1 | True | True | agree | kc_ElmCore02_63 |
 | EqualityTest | ne2 | False | False | agree | kc_ElmCore02_64 |
 | EqualityTest | listEq | True | True | agree | kc_ElmCore02_65 |
-| FloatAbsTest | abs1 | 3.14 | 3.14 | agree |  |
-| FloatAbsTest | abs2 | 3.14 | 3.14 | agree |  |
-| FloatAbsTest | abs3 | 0 | 0 | agree |  |
-| FloatAddTest | add1 | 13 | 13 | agree |  |
-| FloatAddTest | add2 | 0 | 0 | agree |  |
-| FloatAddTest | add3 | -5 | -5 | agree |  |
+| FloatAbsTest | abs1 | 3.14 | 3.14 | agree | kc_ElmCore02_66 |
+| FloatAbsTest | abs2 | 3.14 | 3.14 | agree | kc_ElmCore02_67 |
+| FloatAbsTest | abs3 | 0 | 0 | agree | kc_ElmCore02_68 |
+| FloatAddTest | add1 | 13 | 13 | agree | kc_ElmCore02_69 |
+| FloatAddTest | add2 | 0 | 0 | agree | kc_ElmCore02_70 |
+| FloatAddTest | add3 | -5 | -5 | agree | kc_ElmCore02_71 |
 | FloatCeilingTest | ceil1 | 3 | 3 | agree |  |
 | FloatCeilingTest | ceil2 | 2 | 2 | agree |  |
 | FloatCeilingTest | ceil3 | -2 | -2 | agree |  |
 | FloatCeilingTest | ceil4 | -2 | -2 | agree |  |
-| FloatCompareTest | lt | True | True | agree | kc_ElmCore02_66 |
-| FloatCompareTest | gt | True | True | agree | kc_ElmCore02_67 |
-| FloatCompareTest | le | True | True | agree | kc_ElmCore02_68 |
-| FloatCompareTest | ge | True | True | agree | kc_ElmCore02_69 |
-| FloatCompareTest | eq | True | True | agree | kc_ElmCore02_70 |
-| FloatCompareTest | ne | True | True | agree | kc_ElmCore02_71 |
-| FloatDivTest | div1 | 2.5 | 2.5 | agree |  |
-| FloatDivTest | div2 | -2.5 | -2.5 | agree |  |
-| FloatDivTest | div3 | -2.5 | -2.5 | agree |  |
-| FloatDivTest | div4 | 2.5 | 2.5 | agree |  |
+| FloatCompareTest | lt | True | True | agree | kc_ElmCore02_72 |
+| FloatCompareTest | gt | True | True | agree | kc_ElmCore02_73 |
+| FloatCompareTest | le | True | True | agree | kc_ElmCore02_74 |
+| FloatCompareTest | ge | True | True | agree | kc_ElmCore02_75 |
+| FloatCompareTest | eq | True | True | agree | kc_ElmCore02_76 |
+| FloatCompareTest | ne | True | True | agree | kc_ElmCore02_77 |
+| FloatDivTest | div1 | 2.5 | 2.5 | agree | kc_ElmCore02_78 |
+| FloatDivTest | div2 | -2.5 | -2.5 | agree | kc_ElmCore02_79 |
+| FloatDivTest | div3 | -2.5 | -2.5 | agree | kc_ElmCore02_80 |
+| FloatDivTest | div4 | 2.5 | 2.5 | agree | kc_ElmCore02_81 |
 | FloatFloorTest | floor1 | 2 | 2 | agree |  |
 | FloatFloorTest | floor2 | 2 | 2 | agree |  |
 | FloatFloorTest | floor3 | -3 | -3 | agree |  |
 | FloatFloorTest | floor4 | -3 | -3 | agree |  |
-| FloatInfinityTest | isInf1 | True | True | agree | kc_ElmCore02_72 |
-| FloatInfinityTest | isInf2 | True | True | agree | kc_ElmCore02_73 |
-| FloatInfinityTest | isInf3 | False | False | agree | kc_ElmCore02_74 |
+| FloatInfinityTest | isInf1 | True | True | agree | kc_ElmCore02_82 |
+| FloatInfinityTest | isInf2 | True | True | agree | kc_ElmCore02_83 |
+| FloatInfinityTest | isInf3 | False | False | agree | kc_ElmCore02_84 |
 | FloatMathAcosTest | testValue | 0 | 0 | agree |  |
 | FloatMathAsinTest | testValue | 0 | 0 | agree |  |
 | FloatMathAtan2Test | testValue | 0.7853981633974483 | 0.7853981633974483 | agree |  |
 | FloatMathAtanTest | testValue | 0 | 0 | agree |  |
-| FloatMathBasicsETest | testValue | 2.718281828459045 | 2.718281828459045 | agree |  |
-| FloatMathFloatLessThanTest | testValue | True | True | agree | kc_ElmCore02_75 |
-| FloatMathIsNaNTest | testValue | True | True | agree | kc_ElmCore02_76 |
+| FloatMathBasicsETest | testValue | 2.718281828459045 | 2.718281828459045 | agree | kc_ElmCore02_85 |
+| FloatMathFloatLessThanTest | testValue | True | True | agree | kc_ElmCore02_86 |
+| FloatMathIsNaNTest | testValue | True | True | agree | kc_ElmCore02_87 |
 | FloatMathSin2PlusCos21Test | testValue | 1 | 1 | agree |  |
 | FloatMathTanTest | testValue | 0 | 0 | agree |  |
-| FloatMinMaxTest | min1 | 3.14 | 3.14 | agree |  |
-| FloatMinMaxTest | min2 | -5 | -5 | agree |  |
-| FloatMinMaxTest | max1 | 10 | 10 | agree |  |
-| FloatMinMaxTest | max2 | 5 | 5 | agree |  |
-| FloatMulTest | mul1 | 30 | 30 | agree |  |
-| FloatMulTest | mul2 | -15 | -15 | agree |  |
-| FloatMulTest | mul3 | 6 | 6 | agree |  |
-| FloatMulTest | mul4 | 0 | 0 | agree |  |
-| FloatNegateTest | neg1 | -3.14 | -3.14 | agree |  |
-| FloatNegateTest | neg2 | 3.14 | 3.14 | agree |  |
-| FloatNegateTest | neg3 | 0 | 0 | agree |  |
-| FloatNegativeZeroTest | eq | True | True | agree | kc_ElmCore02_77 |
-| FloatNegativeZeroTest | div1 | Infinity | Infinity | agree |  |
-| FloatNegativeZeroTest | div2 | -Infinity | -Infinity | agree |  |
+| FloatMinMaxTest | min1 | 3.14 | 3.14 | agree | kc_ElmCore02_88 |
+| FloatMinMaxTest | min2 | -5 | -5 | agree | kc_ElmCore02_89 |
+| FloatMinMaxTest | max1 | 10 | 10 | agree | kc_ElmCore02_90 |
+| FloatMinMaxTest | max2 | 5 | 5 | agree | kc_ElmCore02_91 |
+| FloatMulTest | mul1 | 30 | 30 | agree | kc_ElmCore02_92 |
+| FloatMulTest | mul2 | -15 | -15 | agree | kc_ElmCore02_93 |
+| FloatMulTest | mul3 | 6 | 6 | agree | kc_ElmCore02_94 |
+| FloatMulTest | mul4 | 0 | 0 | agree | kc_ElmCore02_95 |
+| FloatNegateTest | neg1 | -3.14 | -3.14 | agree | kc_ElmCore02_96 |
+| FloatNegateTest | neg2 | 3.14 | 3.14 | agree | kc_ElmCore02_97 |
+| FloatNegateTest | neg3 | 0 | 0 | agree | kc_ElmCore02_98 |
+| FloatNegativeZeroTest | eq | True | True | agree | kc_ElmCore02_99 |
+| FloatNegativeZeroTest | div1 | Infinity | Infinity | agree | kc_ElmCore02_100 |
+| FloatNegativeZeroTest | div2 | -Infinity | -Infinity | agree | kc_ElmCore02_101 |
 | FloatPowTest | pow1 | 8 | 8 | agree |  |
 | FloatPowTest | pow2 | 1 | 1 | agree |  |
 | FloatPowTest | pow3 | 1024 | 1024 | agree |  |
@@ -1273,34 +1274,34 @@ ElmCore01: 40 programs, 219 checks, 219 agree.
 | FloatRoundTest | round3 | -3 | -3 | agree |  |
 | FloatRoundTest | round4 | 3 | 3 | agree |  |
 | FloatRoundTest | round5 | 4 | 4 | agree |  |
-| FloatSqrtTest | sqrt1 | 2 | 2 | agree |  |
-| FloatSqrtTest | sqrt2 | 3 | 3 | agree |  |
-| FloatSqrtTest | sqrt3 | 0 | 0 | agree |  |
-| FloatSubTest | sub1 | 7 | 7 | agree |  |
-| FloatSubTest | sub2 | 10 | 10 | agree |  |
-| FloatSubTest | sub3 | 1 | 1 | agree |  |
+| FloatSqrtTest | sqrt1 | 2 | 2 | agree | kc_ElmCore02_102 |
+| FloatSqrtTest | sqrt2 | 3 | 3 | agree | kc_ElmCore02_103 |
+| FloatSqrtTest | sqrt3 | 0 | 0 | agree | kc_ElmCore02_104 |
+| FloatSubTest | sub1 | 7 | 7 | agree | kc_ElmCore02_105 |
+| FloatSubTest | sub2 | 10 | 10 | agree | kc_ElmCore02_106 |
+| FloatSubTest | sub3 | 1 | 1 | agree | kc_ElmCore02_107 |
 | FloatTruncateTest | trunc1 | 2 | 2 | agree |  |
 | FloatTruncateTest | trunc2 | 2 | 2 | agree |  |
 | FloatTruncateTest | trunc3 | -2 | -2 | agree |  |
 | FloatTruncateTest | trunc4 | -2 | -2 | agree |  |
 | FloorToIntTest | floor1 | 2 | 2 | agree |  |
 | FloorToIntTest | floor2 | -3 | -3 | agree |  |
-| IntAbsTest | abs1 | 5 | 5 | agree | kc_ElmCore02_78 |
-| IntAbsTest | abs2 | 5 | 5 | agree | kc_ElmCore02_79 |
-| IntAbsTest | abs3 | 0 | 0 | agree | kc_ElmCore02_80 |
-| IntAddTest | add1 | 13 | 13 | agree | kc_ElmCore02_81 |
-| IntAddTest | add2 | 0 | 0 | agree | kc_ElmCore02_82 |
-| IntAddTest | add3 | -5 | -5 | agree | kc_ElmCore02_83 |
-| IntCompareTest | lt | True | True | agree | kc_ElmCore02_84 |
-| IntCompareTest | gt | True | True | agree | kc_ElmCore02_85 |
-| IntCompareTest | le1 | True | True | agree | kc_ElmCore02_86 |
-| IntCompareTest | le2 | True | True | agree | kc_ElmCore02_87 |
-| IntCompareTest | ge1 | True | True | agree | kc_ElmCore02_88 |
-| IntCompareTest | ge2 | True | True | agree | kc_ElmCore02_89 |
-| IntCompareTest | eq | True | True | agree | kc_ElmCore02_90 |
-| IntCompareTest | ne | True | True | agree | kc_ElmCore02_91 |
-| IntDivByZeroTest | divZero1 | 0 | 0 | agree | kc_ElmCore02_92 |
-| IntDivByZeroTest | divZero2 | 0 | 0 | agree | kc_ElmCore02_93 |
+| IntAbsTest | abs1 | 5 | 5 | agree | kc_ElmCore02_108 |
+| IntAbsTest | abs2 | 5 | 5 | agree | kc_ElmCore02_109 |
+| IntAbsTest | abs3 | 0 | 0 | agree | kc_ElmCore02_110 |
+| IntAddTest | add1 | 13 | 13 | agree | kc_ElmCore02_111 |
+| IntAddTest | add2 | 0 | 0 | agree | kc_ElmCore02_112 |
+| IntAddTest | add3 | -5 | -5 | agree | kc_ElmCore02_113 |
+| IntCompareTest | lt | True | True | agree | kc_ElmCore02_114 |
+| IntCompareTest | gt | True | True | agree | kc_ElmCore02_115 |
+| IntCompareTest | le1 | True | True | agree | kc_ElmCore02_116 |
+| IntCompareTest | le2 | True | True | agree | kc_ElmCore02_117 |
+| IntCompareTest | ge1 | True | True | agree | kc_ElmCore02_118 |
+| IntCompareTest | ge2 | True | True | agree | kc_ElmCore02_119 |
+| IntCompareTest | eq | True | True | agree | kc_ElmCore02_120 |
+| IntCompareTest | ne | True | True | agree | kc_ElmCore02_121 |
+| IntDivByZeroTest | divZero1 | 0 | 0 | agree | kc_ElmCore02_122 |
+| IntDivByZeroTest | divZero2 | 0 | 0 | agree | kc_ElmCore02_123 |
 
 ElmCore02: 40 programs, 157 checks, 157 agree.
 
@@ -1328,154 +1329,154 @@ ElmCore02: 40 programs, 157 checks, 157 agree.
 | IntNegateTest | neg1 | -5 | -5 | agree | kc_ElmCore03_17 |
 | IntNegateTest | neg2 | 5 | 5 | agree | kc_ElmCore03_18 |
 | IntNegateTest | neg3 | 0 | 0 | agree | kc_ElmCore03_19 |
-| IntPowTest | pow1 | 8 | 8 | agree | kc_ElmCore03_20 |
-| IntPowTest | pow2 | 1 | 1 | agree | kc_ElmCore03_21 |
-| IntPowTest | pow3 | 1024 | 1024 | agree | kc_ElmCore03_22 |
-| IntPowTest | pow4 | -8 | -8 | agree | kc_ElmCore03_23 |
-| IntRemainderByTest | rem1 | 3 | 3 | agree | kc_ElmCore03_24 |
-| IntRemainderByTest | rem2 | -3 | -3 | agree | kc_ElmCore03_25 |
-| IntRemainderByTest | rem3 | 3 | 3 | agree | kc_ElmCore03_26 |
-| IntRemainderByTest | rem4 | -3 | -3 | agree | kc_ElmCore03_27 |
-| IntSubTest | sub1 | 7 | 7 | agree | kc_ElmCore03_28 |
-| IntSubTest | sub2 | 10 | 10 | agree | kc_ElmCore03_29 |
-| IntSubTest | sub3 | 1 | 1 | agree | kc_ElmCore03_30 |
+| IntPowTest | pow1 | 8 | 8 | agree |  |
+| IntPowTest | pow2 | 1 | 1 | agree |  |
+| IntPowTest | pow3 | 1024 | 1024 | agree |  |
+| IntPowTest | pow4 | -8 | -8 | agree |  |
+| IntRemainderByTest | rem1 | 3 | 3 | agree | kc_ElmCore03_20 |
+| IntRemainderByTest | rem2 | -3 | -3 | agree | kc_ElmCore03_21 |
+| IntRemainderByTest | rem3 | 3 | 3 | agree | kc_ElmCore03_22 |
+| IntRemainderByTest | rem4 | -3 | -3 | agree | kc_ElmCore03_23 |
+| IntSubTest | sub1 | 7 | 7 | agree | kc_ElmCore03_24 |
+| IntSubTest | sub2 | 10 | 10 | agree | kc_ElmCore03_25 |
+| IntSubTest | sub3 | 1 | 1 | agree | kc_ElmCore03_26 |
 | ListAppendTest | append1 | [1,2,3,4] | [1,2,3,4] | agree |  |
 | ListAppendTest | append_empty | [1,2] | [1,2] | agree |  |
 | ListAppendTest | concat_op | [1,2,3] | [1,2,3] | agree |  |
 | ListConcatTest | append | [1,2,3,4] | [1,2,3,4] | agree |  |
 | ListConcatTest | concat | [1,2,3,4,5,6] | [1,2,3,4,5,6] | agree |  |
 | ListConcatTest | empty | [1,2,3] | [1,2,3] | agree |  |
-| NotEqualBoolCaseTest | cTT | "no" | "no" | agree | kc_ElmCore03_31 |
-| NotEqualBoolCaseTest | cTF | "yes" | "yes" | agree | kc_ElmCore03_32 |
-| NotEqualBoolCaseTest | cFT | "yes" | "yes" | agree | kc_ElmCore03_33 |
-| NotEqualBoolCaseTest | cFF | "no" | "no" | agree | kc_ElmCore03_34 |
-| NotEqualBoolIfTest | ifTT | "no" | "no" | agree | kc_ElmCore03_35 |
-| NotEqualBoolIfTest | ifTF | "yes" | "yes" | agree | kc_ElmCore03_36 |
-| NotEqualBoolIfTest | ifFT | "yes" | "yes" | agree | kc_ElmCore03_37 |
-| NotEqualBoolIfTest | ifFF | "no" | "no" | agree | kc_ElmCore03_38 |
-| NotEqualBoolMaybeTest | jt_jt | False | False | agree | kc_ElmCore03_39 |
-| NotEqualBoolMaybeTest | jt_jf | True | True | agree | kc_ElmCore03_40 |
-| NotEqualBoolMaybeTest | jf_jt | True | True | agree | kc_ElmCore03_41 |
-| NotEqualBoolMaybeTest | jf_jf | False | False | agree | kc_ElmCore03_42 |
-| NotEqualBoolMaybeTest | n_jt | True | True | agree | kc_ElmCore03_43 |
-| NotEqualBoolMaybeTest | n_n | False | False | agree | kc_ElmCore03_44 |
-| NotEqualBoolMaybeTest | jt_n | True | True | agree | kc_ElmCore03_45 |
+| NotEqualBoolCaseTest | cTT | "no" | "no" | agree | kc_ElmCore03_27 |
+| NotEqualBoolCaseTest | cTF | "yes" | "yes" | agree | kc_ElmCore03_28 |
+| NotEqualBoolCaseTest | cFT | "yes" | "yes" | agree | kc_ElmCore03_29 |
+| NotEqualBoolCaseTest | cFF | "no" | "no" | agree | kc_ElmCore03_30 |
+| NotEqualBoolIfTest | ifTT | "no" | "no" | agree | kc_ElmCore03_31 |
+| NotEqualBoolIfTest | ifTF | "yes" | "yes" | agree | kc_ElmCore03_32 |
+| NotEqualBoolIfTest | ifFT | "yes" | "yes" | agree | kc_ElmCore03_33 |
+| NotEqualBoolIfTest | ifFF | "no" | "no" | agree | kc_ElmCore03_34 |
+| NotEqualBoolMaybeTest | jt_jt | False | False | agree | kc_ElmCore03_35 |
+| NotEqualBoolMaybeTest | jt_jf | True | True | agree | kc_ElmCore03_36 |
+| NotEqualBoolMaybeTest | jf_jt | True | True | agree | kc_ElmCore03_37 |
+| NotEqualBoolMaybeTest | jf_jf | False | False | agree | kc_ElmCore03_38 |
+| NotEqualBoolMaybeTest | n_jt | True | True | agree | kc_ElmCore03_39 |
+| NotEqualBoolMaybeTest | n_n | False | False | agree | kc_ElmCore03_40 |
+| NotEqualBoolMaybeTest | jt_n | True | True | agree | kc_ElmCore03_41 |
 | NotEqualBoolPapTest | isNotTrueList | [False,True,False,True] | [False,True,False,True] | agree |  |
 | NotEqualBoolPapTest | isNotFalseList | [True,False,True,False] | [True,False,True,False] | agree |  |
 | NotEqualBoolPapTest | filterNotTrue | [False,False] | [False,False] | agree |  |
 | NotEqualBoolPapTest | filterNotFalse | [True,True] | [True,True] | agree |  |
-| NotEqualBoolPapTest | anyNotTrue | True | True | agree | kc_ElmCore03_46 |
-| NotEqualBoolPapTest | anyNotFalse | True | True | agree | kc_ElmCore03_47 |
-| NotEqualBoolRecordTest | tt | False | False | agree | kc_ElmCore03_48 |
-| NotEqualBoolRecordTest | tf | True | True | agree | kc_ElmCore03_49 |
-| NotEqualBoolRecordTest | ft | True | True | agree | kc_ElmCore03_50 |
-| NotEqualBoolRecordTest | ff | False | False | agree | kc_ElmCore03_51 |
-| NotEqualBoolTest | ntt | False | False | agree | kc_ElmCore03_52 |
-| NotEqualBoolTest | ntf | True | True | agree | kc_ElmCore03_53 |
-| NotEqualBoolTest | nft | True | True | agree | kc_ElmCore03_54 |
-| NotEqualBoolTest | nff | False | False | agree | kc_ElmCore03_55 |
-| NotEqualBoolTest | bntt | True | True | agree | kc_ElmCore03_56 |
-| NotEqualBoolTest | bntf | False | False | agree | kc_ElmCore03_57 |
-| NotEqualBoolTest | bnft | False | False | agree | kc_ElmCore03_58 |
-| NotEqualBoolTest | bnff | True | True | agree | kc_ElmCore03_59 |
-| NotEqualBoolVarTest | vTT | False | False | agree | kc_ElmCore03_60 |
-| NotEqualBoolVarTest | vTF | True | True | agree | kc_ElmCore03_61 |
-| NotEqualBoolVarTest | vFT | True | True | agree | kc_ElmCore03_62 |
-| NotEqualBoolVarTest | vFF | False | False | agree | kc_ElmCore03_63 |
-| NotEqualBoolVarTest | hTT | False | False | agree | kc_ElmCore03_64 |
-| NotEqualBoolVarTest | hTF | True | True | agree | kc_ElmCore03_65 |
-| NotEqualBoolVarTest | hFT | True | True | agree | kc_ElmCore03_66 |
-| NotEqualBoolVarTest | hFF | False | False | agree | kc_ElmCore03_67 |
+| NotEqualBoolPapTest | anyNotTrue | True | True | agree | kc_ElmCore03_42 |
+| NotEqualBoolPapTest | anyNotFalse | True | True | agree | kc_ElmCore03_43 |
+| NotEqualBoolRecordTest | tt | False | False | agree | kc_ElmCore03_44 |
+| NotEqualBoolRecordTest | tf | True | True | agree | kc_ElmCore03_45 |
+| NotEqualBoolRecordTest | ft | True | True | agree | kc_ElmCore03_46 |
+| NotEqualBoolRecordTest | ff | False | False | agree | kc_ElmCore03_47 |
+| NotEqualBoolTest | ntt | False | False | agree | kc_ElmCore03_48 |
+| NotEqualBoolTest | ntf | True | True | agree | kc_ElmCore03_49 |
+| NotEqualBoolTest | nft | True | True | agree | kc_ElmCore03_50 |
+| NotEqualBoolTest | nff | False | False | agree | kc_ElmCore03_51 |
+| NotEqualBoolTest | bntt | True | True | agree | kc_ElmCore03_52 |
+| NotEqualBoolTest | bntf | False | False | agree | kc_ElmCore03_53 |
+| NotEqualBoolTest | bnft | False | False | agree | kc_ElmCore03_54 |
+| NotEqualBoolTest | bnff | True | True | agree | kc_ElmCore03_55 |
+| NotEqualBoolVarTest | vTT | False | False | agree | kc_ElmCore03_56 |
+| NotEqualBoolVarTest | vTF | True | True | agree | kc_ElmCore03_57 |
+| NotEqualBoolVarTest | vFT | True | True | agree | kc_ElmCore03_58 |
+| NotEqualBoolVarTest | vFF | False | False | agree | kc_ElmCore03_59 |
+| NotEqualBoolVarTest | hTT | False | False | agree | kc_ElmCore03_60 |
+| NotEqualBoolVarTest | hTF | True | True | agree | kc_ElmCore03_61 |
+| NotEqualBoolVarTest | hFT | True | True | agree | kc_ElmCore03_62 |
+| NotEqualBoolVarTest | hFF | False | False | agree | kc_ElmCore03_63 |
 | OrderingEmptyListPapTest | ltEmpty | [False,True,True] | [False,True,True] | agree |  |
 | OrderingEmptyListPapTest | leEmpty | [True,True,True] | [True,True,True] | agree |  |
 | OrderingEmptyListPapTest | gtEmpty | [False,False,False] | [False,False,False] | agree |  |
 | OrderingEmptyListPapTest | geEmpty | [True,False,False] | [True,False,False] | agree |  |
 | OrderingEmptyListPapTest | cmpEmpty | [EQ,LT,LT] | [EQ,LT,LT] | agree |  |
-| OrderingEmptyListTest | lt_ee | False | False | agree | kc_ElmCore03_68 |
-| OrderingEmptyListTest | lt_ea | True | True | agree | kc_ElmCore03_69 |
-| OrderingEmptyListTest | lt_ae | False | False | agree | kc_ElmCore03_70 |
-| OrderingEmptyListTest | le_ee | True | True | agree | kc_ElmCore03_71 |
-| OrderingEmptyListTest | le_ea | True | True | agree | kc_ElmCore03_72 |
-| OrderingEmptyListTest | le_ae | False | False | agree | kc_ElmCore03_73 |
-| OrderingEmptyListTest | gt_ee | False | False | agree | kc_ElmCore03_74 |
-| OrderingEmptyListTest | gt_ea | False | False | agree | kc_ElmCore03_75 |
-| OrderingEmptyListTest | gt_ae | True | True | agree | kc_ElmCore03_76 |
-| OrderingEmptyListTest | ge_ee | True | True | agree | kc_ElmCore03_77 |
-| OrderingEmptyListTest | ge_ea | False | False | agree | kc_ElmCore03_78 |
-| OrderingEmptyListTest | ge_ae | True | True | agree | kc_ElmCore03_79 |
-| OrderingEmptyListTest | lt_ab | True | True | agree | kc_ElmCore03_80 |
-| OrderingEmptyListTest | ge_ab | False | False | agree | kc_ElmCore03_81 |
+| OrderingEmptyListTest | lt_ee | False | False | agree | kc_ElmCore03_64 |
+| OrderingEmptyListTest | lt_ea | True | True | agree | kc_ElmCore03_65 |
+| OrderingEmptyListTest | lt_ae | False | False | agree | kc_ElmCore03_66 |
+| OrderingEmptyListTest | le_ee | True | True | agree | kc_ElmCore03_67 |
+| OrderingEmptyListTest | le_ea | True | True | agree | kc_ElmCore03_68 |
+| OrderingEmptyListTest | le_ae | False | False | agree | kc_ElmCore03_69 |
+| OrderingEmptyListTest | gt_ee | False | False | agree | kc_ElmCore03_70 |
+| OrderingEmptyListTest | gt_ea | False | False | agree | kc_ElmCore03_71 |
+| OrderingEmptyListTest | gt_ae | True | True | agree | kc_ElmCore03_72 |
+| OrderingEmptyListTest | ge_ee | True | True | agree | kc_ElmCore03_73 |
+| OrderingEmptyListTest | ge_ea | False | False | agree | kc_ElmCore03_74 |
+| OrderingEmptyListTest | ge_ae | True | True | agree | kc_ElmCore03_75 |
+| OrderingEmptyListTest | lt_ab | True | True | agree | kc_ElmCore03_76 |
+| OrderingEmptyListTest | ge_ab | False | False | agree | kc_ElmCore03_77 |
 | OrderingEmptyStringPapTest | ltEmpty | [False,True,True] | [False,True,True] | agree |  |
 | OrderingEmptyStringPapTest | leEmpty | [True,True,True] | [True,True,True] | agree |  |
 | OrderingEmptyStringPapTest | gtEmpty | [False,False,False] | [False,False,False] | agree |  |
 | OrderingEmptyStringPapTest | geEmpty | [True,False,False] | [True,False,False] | agree |  |
 | OrderingEmptyStringPapTest | cmpEmpty | [EQ,LT,LT] | [EQ,LT,LT] | agree |  |
-| OrderingEmptyStringTest | lt_ee | False | False | agree | kc_ElmCore03_82 |
-| OrderingEmptyStringTest | lt_ea | True | True | agree | kc_ElmCore03_83 |
-| OrderingEmptyStringTest | lt_ae | False | False | agree | kc_ElmCore03_84 |
-| OrderingEmptyStringTest | le_ee | True | True | agree | kc_ElmCore03_85 |
-| OrderingEmptyStringTest | le_ea | True | True | agree | kc_ElmCore03_86 |
-| OrderingEmptyStringTest | le_ae | False | False | agree | kc_ElmCore03_87 |
-| OrderingEmptyStringTest | gt_ee | False | False | agree | kc_ElmCore03_88 |
-| OrderingEmptyStringTest | gt_ea | False | False | agree | kc_ElmCore03_89 |
-| OrderingEmptyStringTest | gt_ae | True | True | agree | kc_ElmCore03_90 |
-| OrderingEmptyStringTest | ge_ee | True | True | agree | kc_ElmCore03_91 |
-| OrderingEmptyStringTest | ge_ea | False | False | agree | kc_ElmCore03_92 |
-| OrderingEmptyStringTest | ge_ae | True | True | agree | kc_ElmCore03_93 |
-| OrderingEmptyStringTest | lt_ab | True | True | agree | kc_ElmCore03_94 |
-| OrderingEmptyStringTest | ge_ab | False | False | agree | kc_ElmCore03_95 |
-| OrderingMixedCaptureTest | int_lt_count | 3 | 3 | agree | kc_ElmCore03_96 |
-| OrderingMixedCaptureTest | int_ge_count | 2 | 2 | agree | kc_ElmCore03_97 |
-| OrderingMixedCaptureTest | float_lt_count | 3 | 3 | agree | kc_ElmCore03_98 |
-| OrderingMixedCaptureTest | float_ge_count | 2 | 2 | agree | kc_ElmCore03_99 |
-| OrderingMixedCaptureTest | char_lt_count | 3 | 3 | agree | kc_ElmCore03_100 |
-| OrderingMixedCaptureTest | char_ge_count | 2 | 2 | agree | kc_ElmCore03_101 |
-| OrderingTupleWithEmptyListTest | lt_ee | False | False | agree | kc_ElmCore03_102 |
-| OrderingTupleWithEmptyListTest | lt_eA | True | True | agree | kc_ElmCore03_103 |
-| OrderingTupleWithEmptyListTest | lt_Ae | False | False | agree | kc_ElmCore03_104 |
-| OrderingTupleWithEmptyListTest | le_ee | True | True | agree | kc_ElmCore03_105 |
-| OrderingTupleWithEmptyListTest | le_eA | True | True | agree | kc_ElmCore03_106 |
-| OrderingTupleWithEmptyListTest | le_Ae | False | False | agree | kc_ElmCore03_107 |
-| OrderingTupleWithEmptyListTest | gt_ee | False | False | agree | kc_ElmCore03_108 |
-| OrderingTupleWithEmptyListTest | gt_eA | False | False | agree | kc_ElmCore03_109 |
-| OrderingTupleWithEmptyListTest | gt_Ae | True | True | agree | kc_ElmCore03_110 |
-| OrderingTupleWithEmptyListTest | ge_ee | True | True | agree | kc_ElmCore03_111 |
-| OrderingTupleWithEmptyListTest | ge_eA | False | False | agree | kc_ElmCore03_112 |
-| OrderingTupleWithEmptyListTest | ge_Ae | True | True | agree | kc_ElmCore03_113 |
-| OrderingTupleWithEmptyStringTest | lt_ee | False | False | agree | kc_ElmCore03_114 |
-| OrderingTupleWithEmptyStringTest | lt_eA | True | True | agree | kc_ElmCore03_115 |
-| OrderingTupleWithEmptyStringTest | lt_Ae | False | False | agree | kc_ElmCore03_116 |
-| OrderingTupleWithEmptyStringTest | le_ee | True | True | agree | kc_ElmCore03_117 |
-| OrderingTupleWithEmptyStringTest | le_eA | True | True | agree | kc_ElmCore03_118 |
-| OrderingTupleWithEmptyStringTest | le_Ae | False | False | agree | kc_ElmCore03_119 |
-| OrderingTupleWithEmptyStringTest | gt_ee | False | False | agree | kc_ElmCore03_120 |
-| OrderingTupleWithEmptyStringTest | gt_eA | False | False | agree | kc_ElmCore03_121 |
-| OrderingTupleWithEmptyStringTest | gt_Ae | True | True | agree | kc_ElmCore03_122 |
-| OrderingTupleWithEmptyStringTest | ge_ee | True | True | agree | kc_ElmCore03_123 |
-| OrderingTupleWithEmptyStringTest | ge_eA | False | False | agree | kc_ElmCore03_124 |
-| OrderingTupleWithEmptyStringTest | ge_Ae | True | True | agree | kc_ElmCore03_125 |
-| PipelineTest | pipe1 | 12 | 12 | agree | kc_ElmCore03_126 |
+| OrderingEmptyStringTest | lt_ee | False | False | agree | kc_ElmCore03_78 |
+| OrderingEmptyStringTest | lt_ea | True | True | agree | kc_ElmCore03_79 |
+| OrderingEmptyStringTest | lt_ae | False | False | agree | kc_ElmCore03_80 |
+| OrderingEmptyStringTest | le_ee | True | True | agree | kc_ElmCore03_81 |
+| OrderingEmptyStringTest | le_ea | True | True | agree | kc_ElmCore03_82 |
+| OrderingEmptyStringTest | le_ae | False | False | agree | kc_ElmCore03_83 |
+| OrderingEmptyStringTest | gt_ee | False | False | agree | kc_ElmCore03_84 |
+| OrderingEmptyStringTest | gt_ea | False | False | agree | kc_ElmCore03_85 |
+| OrderingEmptyStringTest | gt_ae | True | True | agree | kc_ElmCore03_86 |
+| OrderingEmptyStringTest | ge_ee | True | True | agree | kc_ElmCore03_87 |
+| OrderingEmptyStringTest | ge_ea | False | False | agree | kc_ElmCore03_88 |
+| OrderingEmptyStringTest | ge_ae | True | True | agree | kc_ElmCore03_89 |
+| OrderingEmptyStringTest | lt_ab | True | True | agree | kc_ElmCore03_90 |
+| OrderingEmptyStringTest | ge_ab | False | False | agree | kc_ElmCore03_91 |
+| OrderingMixedCaptureTest | int_lt_count | 3 | 3 | agree | kc_ElmCore03_92 |
+| OrderingMixedCaptureTest | int_ge_count | 2 | 2 | agree | kc_ElmCore03_93 |
+| OrderingMixedCaptureTest | float_lt_count | 3 | 3 | agree | kc_ElmCore03_94 |
+| OrderingMixedCaptureTest | float_ge_count | 2 | 2 | agree | kc_ElmCore03_95 |
+| OrderingMixedCaptureTest | char_lt_count | 3 | 3 | agree | kc_ElmCore03_96 |
+| OrderingMixedCaptureTest | char_ge_count | 2 | 2 | agree | kc_ElmCore03_97 |
+| OrderingTupleWithEmptyListTest | lt_ee | False | False | agree | kc_ElmCore03_98 |
+| OrderingTupleWithEmptyListTest | lt_eA | True | True | agree | kc_ElmCore03_99 |
+| OrderingTupleWithEmptyListTest | lt_Ae | False | False | agree | kc_ElmCore03_100 |
+| OrderingTupleWithEmptyListTest | le_ee | True | True | agree | kc_ElmCore03_101 |
+| OrderingTupleWithEmptyListTest | le_eA | True | True | agree | kc_ElmCore03_102 |
+| OrderingTupleWithEmptyListTest | le_Ae | False | False | agree | kc_ElmCore03_103 |
+| OrderingTupleWithEmptyListTest | gt_ee | False | False | agree | kc_ElmCore03_104 |
+| OrderingTupleWithEmptyListTest | gt_eA | False | False | agree | kc_ElmCore03_105 |
+| OrderingTupleWithEmptyListTest | gt_Ae | True | True | agree | kc_ElmCore03_106 |
+| OrderingTupleWithEmptyListTest | ge_ee | True | True | agree | kc_ElmCore03_107 |
+| OrderingTupleWithEmptyListTest | ge_eA | False | False | agree | kc_ElmCore03_108 |
+| OrderingTupleWithEmptyListTest | ge_Ae | True | True | agree | kc_ElmCore03_109 |
+| OrderingTupleWithEmptyStringTest | lt_ee | False | False | agree | kc_ElmCore03_110 |
+| OrderingTupleWithEmptyStringTest | lt_eA | True | True | agree | kc_ElmCore03_111 |
+| OrderingTupleWithEmptyStringTest | lt_Ae | False | False | agree | kc_ElmCore03_112 |
+| OrderingTupleWithEmptyStringTest | le_ee | True | True | agree | kc_ElmCore03_113 |
+| OrderingTupleWithEmptyStringTest | le_eA | True | True | agree | kc_ElmCore03_114 |
+| OrderingTupleWithEmptyStringTest | le_Ae | False | False | agree | kc_ElmCore03_115 |
+| OrderingTupleWithEmptyStringTest | gt_ee | False | False | agree | kc_ElmCore03_116 |
+| OrderingTupleWithEmptyStringTest | gt_eA | False | False | agree | kc_ElmCore03_117 |
+| OrderingTupleWithEmptyStringTest | gt_Ae | True | True | agree | kc_ElmCore03_118 |
+| OrderingTupleWithEmptyStringTest | ge_ee | True | True | agree | kc_ElmCore03_119 |
+| OrderingTupleWithEmptyStringTest | ge_eA | False | False | agree | kc_ElmCore03_120 |
+| OrderingTupleWithEmptyStringTest | ge_Ae | True | True | agree | kc_ElmCore03_121 |
+| PipelineTest | pipe1 | 12 | 12 | agree | kc_ElmCore03_122 |
 | PipelineTest | pipe2 | [2,4,6] | [2,4,6] | agree |  |
-| PipelineTest | backpipe | 10 | 10 | agree | kc_ElmCore03_127 |
+| PipelineTest | backpipe | 10 | 10 | agree | kc_ElmCore03_123 |
 | RoundToIntTest | round1 | 3 | 3 | agree |  |
 | RoundToIntTest | round2 | 2 | 2 | agree |  |
 | RoundToIntTest | round3 | -3 | -3 | agree |  |
-| StandardA40IntOverflowTest | big * big - big * big + 1 == 1 | True | True | agree | kc_ElmCore03_128 |
-| StandardA40IntOverflowTest | huge + huge - (huge + huge) + 1 == 1 | True | True | agree | kc_ElmCore03_129 |
-| StandardA41IntDivisionWideTest | 5000000000 // 1 == 5000000000 | True | True | agree | kc_ElmCore03_130 |
-| StandardA41IntDivisionWideTest | -5000000000 // 1 == -5000000000 | True | True | agree | kc_ElmCore03_131 |
-| StandardA42ModByZeroTest | modBy 0 7 + 1 == 1 | True | True | agree | kc_ElmCore03_132 |
-| StandardA42ModByZeroTest | modBy 0 -7 + 1 == 1 | True | True | agree | kc_ElmCore03_133 |
-| StandardA42RemainderByZeroTest | remainderBy 0 7 + 1 == 1 | True | True | agree | kc_ElmCore03_134 |
-| StandardA42RemainderByZeroTest | remainderBy 0 7 | 0 | 0 | agree | kc_ElmCore03_135 |
-| StandardA42ZeroDivisorTest | 3 // 0 | 0 | 0 | agree | kc_ElmCore03_136 |
-| StandardA42ZeroDivisorTest | modBy 0 3 | 0 | 0 | agree | kc_ElmCore03_137 |
-| StandardA42ZeroDivisorTest | remainderBy 0 3 | 0 | 0 | agree | kc_ElmCore03_138 |
-| StandardA43PowNegativeTest | 1 ^ -1 | 1 | 1 | agree | kc_ElmCore03_139 |
-| StandardA43PowNegativeTest | (-1) ^ -3 | -1 | -1 | agree | kc_ElmCore03_140 |
-| StandardA43PowNegativeTest | (-1) ^ -2 | 1 | 1 | agree | kc_ElmCore03_141 |
-| StandardA43PowNegativeTest | 2 ^ -1 + 1 == 1 | True | True | agree | kc_ElmCore03_142 |
-| StandardA43PowNegativeTest | 0 ^ -1 + 1 == 1 | True | True | agree | kc_ElmCore03_143 |
+| StandardA40IntOverflowTest | big * big - big * big + 1 == 1 | True | True | agree | kc_ElmCore03_124 |
+| StandardA40IntOverflowTest | huge + huge - (huge + huge) + 1 == 1 | True | True | agree | kc_ElmCore03_125 |
+| StandardA41IntDivisionWideTest | 5000000000 // 1 == 5000000000 | True | True | agree | kc_ElmCore03_126 |
+| StandardA41IntDivisionWideTest | -5000000000 // 1 == -5000000000 | True | True | agree | kc_ElmCore03_127 |
+| StandardA42ModByZeroTest | modBy 0 7 + 1 == 1 | True | True | agree | kc_ElmCore03_128 |
+| StandardA42ModByZeroTest | modBy 0 -7 + 1 == 1 | True | True | agree | kc_ElmCore03_129 |
+| StandardA42RemainderByZeroTest | remainderBy 0 7 + 1 == 1 | True | True | agree | kc_ElmCore03_130 |
+| StandardA42RemainderByZeroTest | remainderBy 0 7 | 0 | 0 | agree | kc_ElmCore03_131 |
+| StandardA42ZeroDivisorTest | 3 // 0 | 0 | 0 | agree | kc_ElmCore03_132 |
+| StandardA42ZeroDivisorTest | modBy 0 3 | 0 | 0 | agree | kc_ElmCore03_133 |
+| StandardA42ZeroDivisorTest | remainderBy 0 3 | 0 | 0 | agree | kc_ElmCore03_134 |
+| StandardA43PowNegativeTest | 1 ^ -1 | 1 | 1 | agree | kc_ElmCore03_135 |
+| StandardA43PowNegativeTest | (-1) ^ -3 | -1 | -1 | agree | kc_ElmCore03_136 |
+| StandardA43PowNegativeTest | (-1) ^ -2 | 1 | 1 | agree | kc_ElmCore03_137 |
+| StandardA43PowNegativeTest | 2 ^ -1 + 1 == 1 | True | True | agree | kc_ElmCore03_138 |
+| StandardA43PowNegativeTest | 0 ^ -1 + 1 == 1 | True | True | agree | kc_ElmCore03_139 |
 | StandardA44RoundNonFiniteTest | round nan + 1 == 1 | True | True | agree |  |
 | StandardA44RoundNonFiniteTest | floor nan + 1 == 1 | True | True | agree |  |
 | StandardA44RoundNonFiniteTest | ceiling nan + 1 == 1 | True | True | agree |  |
@@ -1490,30 +1491,30 @@ ElmCore02: 40 programs, 157 checks, 157 agree.
 | StandardA45IntNegativeZeroTest | remainderBy 4 -4 | True | True | agree |  |
 | StandardA45IntNegativeZeroTest | round -0.4 | True | True | agree |  |
 | StandardA45IntNegativeZeroTest | ceiling -0.5 | True | True | agree |  |
-| StandardA46CompareNanTest | compare 1 nan | LT | LT | agree | kc_ElmCore03_144 |
-| StandardA46CompareNanTest | compare nan nan | EQ | EQ | agree | kc_ElmCore03_145 |
-| StandardA46CompareNanTest | compare nan 1 | GT | GT | agree | kc_ElmCore03_146 |
-| StandardA48MinMaxNanTest | min nan 1 is NaN | True | True | agree | kc_ElmCore03_147 |
-| StandardA48MinMaxNanTest | min 1 nan is NaN | True | True | agree | kc_ElmCore03_148 |
-| StandardA48MinMaxNanTest | max nan 1 is NaN | True | True | agree | kc_ElmCore03_149 |
-| StandardA48MinMaxNanTest | max 1 nan is NaN | True | True | agree | kc_ElmCore03_150 |
-| StandardA48MinMaxNanTest | min 0 -0 is -0 | True | True | agree | kc_ElmCore03_151 |
-| StandardA48MinMaxNanTest | min -0 0 is -0 | True | True | agree | kc_ElmCore03_152 |
-| StandardA48MinMaxNanTest | max 0 -0 is +0 | True | True | agree | kc_ElmCore03_153 |
-| StandardA48MinMaxNanTest | max -0 0 is +0 | True | True | agree | kc_ElmCore03_154 |
-| StandardA49ClampTest | clamp 10 0 5 at Float is +0 | True | True | agree | kc_ElmCore03_155 |
-| StandardA49ClampTest | clamp nan 1 0.5 is NaN | True | True | agree | kc_ElmCore03_156 |
-| StandardA49ClampTest | clamp 0 1 -0 is +0 | True | True | agree | kc_ElmCore03_157 |
-| StandardA49ClampTest | clamp -1 -0 0 is -0 | True | True | agree | kc_ElmCore03_158 |
-| StandardA49ClampTest | clamp 10 0 5 at Int | 10 | 10 | agree | kc_ElmCore03_159 |
-| StandardA49ClampTest | clamp 10 0 20 at Int | 0 | 0 | agree | kc_ElmCore03_160 |
-| StandardA49ClampTest | clamp 0 10 -5 at Int | 0 | 0 | agree | kc_ElmCore03_161 |
-| StandardA49ClampTest | clamp 0 10 15 at Int | 10 | 10 | agree | kc_ElmCore03_162 |
-| StandardA49ClampTest | clamp 0 10 7 at Int | 7 | 7 | agree | kc_ElmCore03_163 |
-| StandardA51FunctionEqualityTest | compared | True | True | agree | kc_ElmCore03_164 |
-| StandardA53CharOrderTest | compare '😀' 'ﬀ' | GT | GT | agree | kc_ElmCore03_165 |
-| StandardA53CharOrderTest | '😀' > 'ﬀ' | True | True | agree | kc_ElmCore03_166 |
-| StandardA53CharOrderTest | toCode order agrees | True | True | agree | kc_ElmCore03_167 |
+| StandardA46CompareNanTest | compare 1 nan | LT | LT | agree | kc_ElmCore03_140 |
+| StandardA46CompareNanTest | compare nan nan | EQ | EQ | agree | kc_ElmCore03_141 |
+| StandardA46CompareNanTest | compare nan 1 | GT | GT | agree | kc_ElmCore03_142 |
+| StandardA48MinMaxNanTest | min nan 1 is NaN | True | True | agree | kc_ElmCore03_143 |
+| StandardA48MinMaxNanTest | min 1 nan is NaN | True | True | agree | kc_ElmCore03_144 |
+| StandardA48MinMaxNanTest | max nan 1 is NaN | True | True | agree | kc_ElmCore03_145 |
+| StandardA48MinMaxNanTest | max 1 nan is NaN | True | True | agree | kc_ElmCore03_146 |
+| StandardA48MinMaxNanTest | min 0 -0 is -0 | True | True | agree | kc_ElmCore03_147 |
+| StandardA48MinMaxNanTest | min -0 0 is -0 | True | True | agree | kc_ElmCore03_148 |
+| StandardA48MinMaxNanTest | max 0 -0 is +0 | True | True | agree | kc_ElmCore03_149 |
+| StandardA48MinMaxNanTest | max -0 0 is +0 | True | True | agree | kc_ElmCore03_150 |
+| StandardA49ClampTest | clamp 10 0 5 at Float is +0 | True | True | agree | kc_ElmCore03_151 |
+| StandardA49ClampTest | clamp nan 1 0.5 is NaN | True | True | agree | kc_ElmCore03_152 |
+| StandardA49ClampTest | clamp 0 1 -0 is +0 | True | True | agree | kc_ElmCore03_153 |
+| StandardA49ClampTest | clamp -1 -0 0 is -0 | True | True | agree | kc_ElmCore03_154 |
+| StandardA49ClampTest | clamp 10 0 5 at Int | 10 | 10 | agree | kc_ElmCore03_155 |
+| StandardA49ClampTest | clamp 10 0 20 at Int | 0 | 0 | agree | kc_ElmCore03_156 |
+| StandardA49ClampTest | clamp 0 10 -5 at Int | 0 | 0 | agree | kc_ElmCore03_157 |
+| StandardA49ClampTest | clamp 0 10 15 at Int | 10 | 10 | agree | kc_ElmCore03_158 |
+| StandardA49ClampTest | clamp 0 10 7 at Int | 7 | 7 | agree | kc_ElmCore03_159 |
+| StandardA51FunctionEqualityTest | compared | True | True | agree | kc_ElmCore03_160 |
+| StandardA53CharOrderTest | compare '😀' 'ﬀ' | GT | GT | agree | kc_ElmCore03_161 |
+| StandardA53CharOrderTest | '😀' > 'ﬀ' | True | True | agree | kc_ElmCore03_162 |
+| StandardA53CharOrderTest | toCode order agrees | True | True | agree | kc_ElmCore03_163 |
 
 ElmCore03: 40 programs, 206 checks, 206 agree.
 
@@ -1532,42 +1533,42 @@ ElmCore03: 40 programs, 206 checks, 206 agree.
 | StringConcatTest | concat1 | "HelloWorld" | "HelloWorld" | agree | kc_ElmCore04_4 |
 | StringConcatTest | concat2 | "Hello World" | "Hello World" | agree | kc_ElmCore04_5 |
 | StringConcatTest | append | "foobar" | "foobar" | agree | kc_ElmCore04_6 |
-| ToFloatTest | toFloat1 | 42 | 42 | agree |  |
-| ToFloatTest | toFloat2 | -10 | -10 | agree |  |
-| ToFloatTest | toFloat3 | 0 | 0 | agree |  |
+| ToFloatTest | toFloat1 | 42 | 42 | agree | kc_ElmCore04_7 |
+| ToFloatTest | toFloat2 | -10 | -10 | agree | kc_ElmCore04_8 |
+| ToFloatTest | toFloat3 | 0 | 0 | agree | kc_ElmCore04_9 |
 | TruncateToIntTest | trunc1 | 2 | 2 | agree |  |
 | TruncateToIntTest | trunc2 | -2 | -2 | agree |  |
-| UtilsEqualityCaptureCharTest | eq_count | 2 | 2 | agree | kc_ElmCore04_7 |
-| UtilsEqualityCaptureCharTest | ne_count | 3 | 3 | agree | kc_ElmCore04_8 |
+| UtilsEqualityCaptureCharTest | eq_count | 2 | 2 | agree | kc_ElmCore04_10 |
+| UtilsEqualityCaptureCharTest | ne_count | 3 | 3 | agree | kc_ElmCore04_11 |
 | UtilsEqualityCaptureCharTest | eq_filter | ['x','x'] | ['x','x'] | agree |  |
 | UtilsEqualityCaptureCharTest | ne_filter | ['a','b','c'] | ['a','b','c'] | agree |  |
-| UtilsEqualityCaptureFloatTest | eq_count | 2 | 2 | agree | kc_ElmCore04_9 |
-| UtilsEqualityCaptureFloatTest | ne_count | 3 | 3 | agree | kc_ElmCore04_10 |
+| UtilsEqualityCaptureFloatTest | eq_count | 2 | 2 | agree | kc_ElmCore04_12 |
+| UtilsEqualityCaptureFloatTest | ne_count | 3 | 3 | agree | kc_ElmCore04_13 |
 | UtilsEqualityCaptureFloatTest | eq_filter | [1.5,1.5] | [1.5,1.5] | agree |  |
 | UtilsEqualityCaptureFloatTest | ne_filter | [0,2,3] | [0,2,3] | agree |  |
-| UtilsEqualityCaptureIntTest | eq_count | 2 | 2 | agree | kc_ElmCore04_11 |
-| UtilsEqualityCaptureIntTest | ne_count | 3 | 3 | agree | kc_ElmCore04_12 |
+| UtilsEqualityCaptureIntTest | eq_count | 2 | 2 | agree | kc_ElmCore04_14 |
+| UtilsEqualityCaptureIntTest | ne_count | 3 | 3 | agree | kc_ElmCore04_15 |
 | UtilsEqualityCaptureIntTest | eq_filter | [5,5] | [5,5] | agree |  |
 | UtilsEqualityCaptureIntTest | ne_filter | [1,2,3] | [1,2,3] | agree |  |
 | UtilsOrderingCaptureCharTest | lt_filter | ['a','b'] | ['a','b'] | agree |  |
 | UtilsOrderingCaptureCharTest | le_filter | ['a','b','c'] | ['a','b','c'] | agree |  |
 | UtilsOrderingCaptureCharTest | gt_filter | ['d','e'] | ['d','e'] | agree |  |
 | UtilsOrderingCaptureCharTest | ge_filter | ['c','d','e'] | ['c','d','e'] | agree |  |
-| UtilsOrderingCaptureCharTest | count_lt | 2 | 2 | agree | kc_ElmCore04_13 |
-| UtilsOrderingCaptureCharTest | count_ge | 3 | 3 | agree | kc_ElmCore04_14 |
+| UtilsOrderingCaptureCharTest | count_lt | 2 | 2 | agree | kc_ElmCore04_16 |
+| UtilsOrderingCaptureCharTest | count_ge | 3 | 3 | agree | kc_ElmCore04_17 |
 | UtilsOrderingCaptureFloatTest | lt_filter | [1,2] | [1,2] | agree |  |
 | UtilsOrderingCaptureFloatTest | le_filter | [1,2,3] | [1,2,3] | agree |  |
 | UtilsOrderingCaptureFloatTest | gt_filter | [4,5] | [4,5] | agree |  |
 | UtilsOrderingCaptureFloatTest | ge_filter | [3,4,5] | [3,4,5] | agree |  |
-| UtilsOrderingCaptureFloatTest | count_lt | 2 | 2 | agree | kc_ElmCore04_15 |
-| UtilsOrderingCaptureFloatTest | count_ge | 3 | 3 | agree | kc_ElmCore04_16 |
+| UtilsOrderingCaptureFloatTest | count_lt | 2 | 2 | agree | kc_ElmCore04_18 |
+| UtilsOrderingCaptureFloatTest | count_ge | 3 | 3 | agree | kc_ElmCore04_19 |
 | UtilsOrderingCaptureIntTest | lt_filter | [1,2] | [1,2] | agree |  |
 | UtilsOrderingCaptureIntTest | le_filter | [1,2,3] | [1,2,3] | agree |  |
 | UtilsOrderingCaptureIntTest | gt_filter | [4,5] | [4,5] | agree |  |
 | UtilsOrderingCaptureIntTest | ge_filter | [3,4,5] | [3,4,5] | agree |  |
-| UtilsOrderingCaptureIntTest | count_lt | 2 | 2 | agree | kc_ElmCore04_17 |
-| UtilsOrderingCaptureIntTest | count_ge | 3 | 3 | agree | kc_ElmCore04_18 |
+| UtilsOrderingCaptureIntTest | count_lt | 2 | 2 | agree | kc_ElmCore04_20 |
+| UtilsOrderingCaptureIntTest | count_ge | 3 | 3 | agree | kc_ElmCore04_21 |
 
 ElmCore04: 12 programs, 46 checks, 46 agree.
 
-Total: 1477 checks, 1477 agree, 0 diverge (0 known); 1106 theorems by decide +kernel.
+Total: 1478 checks, 1478 agree, 0 diverge (0 known); 1157 theorems by decide +kernel.

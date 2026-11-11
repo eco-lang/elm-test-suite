@@ -5,7 +5,8 @@
 %   with Ty and TyRow removed by the reduced syntax); every object and
 %   operation defined before its first use (Val, Rec, FV, APPLY as a finite
 %   set); one place, the group "Application of Values", defining application.
-% - FAITHFUL: number specialisation and typed integer constants (A87, A27);
+% - FAITHFUL: number specialisation and typed integer constants (A87, A27),
+%   from the principal derivation (A95);
 %   no state and no exceptions (D2); total arithmetic through APPLY
 %   (D3, A40, A9); APPLY as a set for function equality (A51) and Debug.todo
 %   (A62), Debug.log returns its argument (A62); premise order carries no
@@ -51,11 +52,38 @@ its type is Float or a type variable of class $\knum$. The dynamic semantics
 of every level is therefore given for the elaborated program after
 \emph{number specialisation}, a translation of the whole program, which we
 define here, where the dynamic semantics begins. % A87
-Each declaration, of a \kw{let} or at the top level of a module, whose
-bindings have type schemes that quantify type variables of class $\knum$ is
+It starts from the principal derivation of the program
+(Section~\ref{sec:static-core-principal}), with the following default.
+
+\emph{Defaulting of number.} In the principal derivation, each type variable
+of class $\knum$ that is bound neither by a closure
+(rules~\ruleref{r:s-dec-group}, \ruleref{r:sm-topdec-value}
+and~\ruleref{r:sm-datbind}), nor by the quantifier $\forall U'$ of an annotated
+binding (rule~\ruleref{r:s-valbind-var}), nor as a parameter of a type
+declaration (rules~\ruleref{r:sm-datbind}, \ruleref{r:sm-typbind}
+and~\ruleref{r:sm-typbind-record}), is taken to be $\tFloat$: $\tFloat$ is
+substituted for it throughout the derivation, which remains a derivation for
+the program, since $\tFloat \in \Adm{\knum}$. Every constant of such a type is
+an integer constant, since a floating-point constant has the type $\tFloat$
+itself, and every integer constant may have the type $\tFloat$. % A27, A95
+A variable of class $\knum$ bound in any of these ways is not affected: one
+bound by a closure or an annotation is quantified in the type scheme of a value,
+and the copies below assign it; a parameter of a type declaration is bound by a
+type function, whose applications substitute for it.
+Since closure never generalises an explicit variable in scope
+(Section~\ref{sec:static-core-closure}), an explicit variable is bound by the
+annotation that introduces it, and so is never defaulted, even where a nested
+binding uses it: with \kw{f :\ number -> number} and
+\kw{f x = let g y = y + x in g 1}, the \kw{number} of \kw{x} is bound by the
+annotation of \kw{f}, not by the closure of \kw{g}. % A27 (2026-11-10)
+The default changes no type that the program forces, and so no type a program
+elaborates with: it decides only types the principal derivation leaves open.
+
+Then each declaration of values, of a \kw{let} or at the top level of a
+module, whose bindings have type schemes that quantify type variables of class $\knum$ is
 replaced by the following copies of it:
 \begin{itemize}
-\item the copy that assigns $\tInt$ to each of those variables, the
+\item the copy that assigns $\tFloat$ to each of those variables, the
   \emph{default copy}, which binds the variables of the declaration under
   their own names; and
 \item one copy for each other assignment of $\tInt$ or $\tFloat$ to those
@@ -67,8 +95,8 @@ copy for the instance at which that occurrence was elaborated. Every binding
 of a declaration quantifies all the variables of class $\knum$ of the
 declaration, those its own type does not mention included
 (Section~\ref{sec:static-core-closure}), so an instance assigns a type to each
-of them; a variable that nothing at the occurrence fixes is $\tInt$, as a
-variable left free in the program is below. % A93
+of them; a variable that nothing at the occurrence fixes is $\tFloat$, as a
+variable left free in the program is by the default above. % A93
 A declaration
 whose bindings quantify no type variable of class $\knum$ is not copied, and
 is its own default copy. Since the
@@ -82,7 +110,17 @@ $\pgDflt\sigma$ of the scheme $\sigma$ of \kw{main}. % A27
 Copies are made from the outside in, so that a variable of class $\knum$
 that a declaration does not quantify is already fixed by the copy of the
 declaration that encloses it, and a variable of class $\knum$ left free in
-the program is $\tInt$ (Section~\ref{sec:static-core-further}). % A27
+the program has been taken to be $\tFloat$ by the default above. % A27
+With \kw{check h = if h == 0 then h else
+Debug.todo "h"} and \kw{x = check (2 \textasciicircum{} -1)} used only as
+\kw{x // 2}, the copy of \kw{x} at $\tInt$, where \kw{2 \textasciicircum{} -1}
+is $0$ (Appendix~\ref{ch:appendix-dynamic-basis}), is $0$; but the default
+copy, at $\tFloat$, where it is $0.5$, has no value, so the program has none.
+A variable of class $\knum$ that
+the type of \kw{x} does not mention, such as that of \kw{2 \textasciicircum{}
+-1} in \kw{if 2 \textasciicircum{} -1 == 0 then 1 else 2}, is not a variable of
+the declaration: no closure generalises it, and it is $\tFloat$ in every copy.
+% A87, A43, A27
 After specialisation every integer constant has the type $\tInt$ or
 $\tFloat$. The specialisation is finite: $\Adm{\knum}$ contains only $\tInt$
 and $\tFloat$ (Section~\ref{sec:static-core-classes}), so a declaration with
@@ -386,9 +424,10 @@ type of its occurrence after number specialisation
 (Section~\ref{sec:dynamic-core-numbers}). Thus, with \kw{x :\ Float} defined
 by \kw{x = 2}, the constant denotes a floating-point number and
 \kw{x \textasciicircum{} -1} evaluates to \kw{0.5}; and with
-\kw{inc n = n + 1}, the application \kw{inc 0.5} uses the copy of \kw{inc} at
-$\tFloat$, in which \kw{1} denotes a floating-point number, and evaluates to
-\kw{1.5}. % A87
+\kw{inc n = n + 1}, the application \kw{inc 0.5} uses the default copy of
+\kw{inc}, at $\tFloat$, in which \kw{1} denotes a floating-point number, and
+evaluates to \kw{1.5}, while \kw{inc (7 // 2)} uses its copy at $\tInt$ and
+evaluates to the Int value $4$. % A87
 \rcomment{r:d-atexp-var} As in the static semantics, long variables are
 looked up in the environment. The identifier status of the static semantics
 plays no part.

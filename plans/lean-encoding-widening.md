@@ -30,7 +30,9 @@ use effects (Chapters 8 and 9, not encoded). The rest, by reason:
 | 3, 3, 1 | `construct:main-shape`, `parse`, `construct:large-type` | the test's shape; elm-syntax |
 
 Library functions (`Tuple`, `List`, `Maybe`, and `Result`'s functions but not its constructors) are not in the book's initial basis, so
-their tests stay out by design: they test elm/core, not the language.
+their tests stay out by design: they test elm/core, not the language. (A later proposal,
+[core-library.md](core-library.md), would specify elm/core against the book on the site and bring
+these tests in as library checks.)
 
 ## Steps, in order of tests gained
 

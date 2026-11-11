@@ -2,9 +2,9 @@ module Translate.Specialise exposing (CheckKind(..), Specialised, specialise)
 
 {-| Number specialisation (A Standard Definition of Elm?, sec:dynamic-core-numbers; rulings A87,
 A27, A93; plans/elm-to-lean-translator.md, B.8). Each declaration whose bindings quantify `number`
-variables is replaced by its default copy (every such variable Int, under its own names) and one
+variables is replaced by its default copy (every such variable Float, under its own names) and one
 copy for each other assignment of Int or Float at which the program uses it, under new names; each
-occurrence refers to the copy for its instance; a `number` variable nothing fixes is Int. Copies are
+occurrence refers to the copy for its instance; a `number` variable nothing fixes is Float. Copies are
 made from the outside in: each scope finds the copies its declarations need by a fixpoint over the
 copies already made and its body.
 -}
@@ -58,9 +58,17 @@ key a =
         |> String.join "$"
 
 
+{-| The type a `number` variable takes when nothing fixes it, and in a default copy: Float (ruling
+A27).
+-}
+defaultNum : Num
+defaultNum =
+    FloatN
+
+
 isDefault : Assignment -> Bool
 isDefault =
-    List.all (\( _, n ) -> n == IntN)
+    List.all (\( _, n ) -> n == defaultNum)
 
 
 copyName : String -> Assignment -> String
@@ -84,7 +92,7 @@ type alias Ctx =
 
 
 {-| A type read as Int or Float under the assignments of the enclosing copies; a `number` variable
-they do not fix is Int.
+they do not fix is Float.
 -}
 resolve : Ctx -> Type -> Result String Num
 resolve ctx t =
@@ -102,7 +110,7 @@ resolve ctx t =
 
                 Nothing ->
                     if Types.classOf ctx.inferred.subst v == Number then
-                        Ok IntN
+                        Ok defaultNum
 
                     else
                         Err ("a number of unknown type (variable " ++ String.fromInt v ++ ")")
@@ -143,7 +151,7 @@ occurrence ctx occ name =
 
                             else if Dict.isEmpty instance then
                                 -- inside the binder's own group: the same copy
-                                Ok (Dict.get g ctx.own |> Maybe.withDefault (List.map (\v -> ( v, IntN )) vars))
+                                Ok (Dict.get g ctx.own |> Maybe.withDefault (List.map (\v -> ( v, defaultNum )) vars))
 
                             else
                                 vars
@@ -154,7 +162,7 @@ occurrence ctx occ name =
                                                     resolve ctx t |> Result.map (\n -> ( v, n ))
 
                                                 Nothing ->
-                                                    Ok ( v, IntN )
+                                                    Ok ( v, defaultNum )
                                         )
                                     |> combine
                     in
@@ -162,15 +170,15 @@ occurrence ctx occ name =
                         |> Result.map (\a -> ( Local id (copyName x a), [ { group = g, assignment = a } ] ))
 
         Global m x ->
-            -- the Elm texts of the basis are specialised too: `abs` used at Float is its copy at Float
+            -- the Elm texts of the basis are specialised too: `abs` used at Int is its copy at Int
             if x == "abs" then
                 case Dict.get occ ctx.inferred.occurrences |> Maybe.andThen (.instance >> Dict.values >> List.head) of
                     Just t ->
                         resolve ctx t
                             |> Result.map
                                 (\n ->
-                                    if n == FloatN then
-                                        ( Global m "abs$Float", [] )
+                                    if n == IntN then
+                                        ( Global m "abs$Int", [] )
 
                                     else
                                         ( name, [] )
@@ -407,7 +415,7 @@ scope ctx decls body =
                             vars =
                                 g |> Maybe.andThen (\k -> Dict.get k ctx.inferred.groupVars) |> Maybe.withDefault []
                         in
-                        { cmp = cmp, group = g, gid = Maybe.withDefault (-(n + 1)) g, default = List.map (\v -> ( v, IntN )) vars }
+                        { cmp = cmp, group = g, gid = Maybe.withDefault (-(n + 1)) g, default = List.map (\v -> ( v, defaultNum )) vars }
                     )
 
         local =
@@ -549,7 +557,7 @@ kindOf ctx t =
 
         TVar v ->
             if Types.classOf ctx.inferred.subst v == Number then
-                KInt
+                KFloat
 
             else
                 KData

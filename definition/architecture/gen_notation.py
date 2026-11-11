@@ -109,6 +109,11 @@ OPS = [
  ("generalisation","sigma > sigma'","(plain \\succ)","",-1,"static-core","sigma generalises sigma'"),
  ("closure","Clos_C tau","\\Clos","\\mathrm{Clos}",0,"static-core","generalise over variables not free in C"),
  ("type function application","theta(tau1 ... tauk)","(plain)","",-1,"static-core","beta-reduce a type function"),
+ ("substitution","S = {tau^(k)/xi^(k)}, written tau{tau^(k)/xi^(k)} or S sigma","(plain)","",-1,"static-core","replace each xi_i by tau_i; respects classes when each tau_i is in Adm_kappa for kappa the class of xi_i; S ranges over substitutions (A95)"),
+ ("derivation","D, D'","(plain)","",-1,"static-core","a derivation of a sentence by the rules; D ranges over derivations for one phrase in one context (A95)"),
+ ("instance of a derivation","D' an instance of D","(plain)","",-1,"static-core","for some class-respecting S, each type of D' is S applied to the corresponding type of D, each scheme of D' is no more general than S applied to that of D, and S maps U of each context of D onto U of the corresponding context of D' (A95)"),
+ ("principal derivation","D principal","(plain)","",-1,"static-core","every derivation for the phrase in the context is an instance of D; legality is judged on it and evaluation follows it (A95, A96)"),
+ ("type-name renaming","rho","(plain)","",-1,"static-modules","a bijection from the type names one derivation for a module generates to those another generates; instances of module derivations are taken up to rho (A96)"),
  ("row join","{varrho | epsilon}","\\rec","\\{#1\\}",1,"static-core","closed record type {varrho}"),
  ("open record","{varrho | epsilon}","\\orec","\\{#1 \\mid #2\\}",2,"static-core","open record type"),
  ("constructor type","tau t","(plain)","",-1,"static-core","type construction"),
@@ -123,6 +128,7 @@ OPS = [
  ("decode","Dec_tau(j)","\\Dec","\\mathrm{Dec}_{#1}",1,"effects","JSON to value at a port; partial"),
  ("Int normalisation","norm(n)","\\norm","\\mathrm{norm}",0,"appendix-dynamic-basis","integer into the Int range (Appendix E)"),
  ("Int range","IntRange","\\IntRange","\\mathrm{IntRange}",0,"appendix-dynamic-basis","the implementation's set of Int values (Appendix E)"),
+ ("leaf-command sequence","L, c . L","(plain)","",-1,"programs","L ranges over finite sequences of leaf commands, the input of the dispatch sentences s, P, Q, H |- L => (P', Q', H')"),
  ("transition","K --ell--> K'","\\step","\\xrightarrow{#1}",1,"programs","program transition with label"),
  ("static operator table","OT_STAT(op)","\\OTstat","\\mathrm{OT}_{\\mathrm{STAT}}",0,"appendix-static-basis","Op ->fin TypeScheme x IdStatus: the scheme and status of each operator of the initial basis, fixed for every program (audit X1)"),
  ("dynamic operator table","OT_DYN(op)","\\OTdyn","\\mathrm{OT}_{\\mathrm{DYN}}",0,"appendix-dynamic-basis","Op ->fin Val: the value of each operator of the initial basis, fixed for every program (audit X1)"),
@@ -168,7 +174,7 @@ SPECIAL = [
 def tex_escape_md(s): return s.replace('|','\\|')
 md=[]
 md.append("# Notation Registry: A Standard Definition of Elm?\n")
-md.append("The single home of every name and symbol in the book. `macros.sty` is generated from this file (with `gen_notation.py`); chapters write registered notation only through its macro. Single-letter metavariables written as plain letters (C, E, T, U, B) are registered with macro \"(plain)\".\n")
+md.append("The single home of every name and symbol in the book. `macros.sty` is generated from this file (with `gen_notation.py`); chapters write registered notation only through its macro. Single-letter metavariables written as plain letters (C, E, T, U, B, D, S) are registered with macro \"(plain)\".\n")
 md.append("## Conventions\n")
 md.append("- Decorated metavariables (primes, subscripts) range over the same class as the undecorated one.")
 md.append("- A sequence x1 ... xk is written x^(k) in the exemplar's style (`x^{(k)}`).")

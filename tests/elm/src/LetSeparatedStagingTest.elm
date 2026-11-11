@@ -6,12 +6,12 @@ different groupings.
 
 `caseFunc : Int -> Int -> Int -> Int -> Int` takes `n` and `k`; for `n = 0` it
 returns `\a -> let y = a + k in \z -> y + z`, otherwise `\a z -> a + z`. `main`
-logs `caseFunc 0 10 5 3`, which is 18. The file has no CHECK line, so its output
-is not compared.
+logs `caseFunc 0 10 5 3`, which is 18.
 
 -}
 
 -- TAGS: elm-spec, s-valbind-var, d-exp-case, d-exp-lambda, d-atexp-let
+-- CHECK: result: 18
 
 import Html exposing (text)
 

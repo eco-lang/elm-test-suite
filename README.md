@@ -145,7 +145,7 @@ project depends on the latest release of each package it uses.
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 799 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
+| `elm` | 803 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
 | `elm-core` | 370 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
 | `elm-bytes` | 88 | elm/bytes encoders and decoders |
 | `elm-parser` | 51 | elm/parser |
@@ -165,11 +165,11 @@ with its own project. The results website shows the tests by project and by tag.
 
 | Tag | Tests | What they are |
 |---|---|---|
-| `elm-spec` | 941 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
-| `elm19-compile-error` | 221 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
-| `elm19-bug` | 157 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
+| `elm-spec` | 939 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
+| `elm19-compile-error` | 223 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
+| `elm19-bug` | 155 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
 | `elm19-bug-fix` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
-| `elm-unspecced` | 14 | tests whose expected outcome A Standard Definition of Elm? leaves open or puts outside the definition: what `Debug.log` prints, the value of an integer constant outside the Int range, the text of a crash, shader blocks; each says why in its comment |
+| `elm-unspecced` | 20 | tests whose expected outcome A Standard Definition of Elm? leaves open or puts outside the definition: what `Debug.log` prints, the value of an integer constant outside the Int range, the text of a crash, shader blocks; each says why in its comment |
 | `elm-spec-contradicts` | 6 | reported bugs whose expected outcome A Standard Definition of Elm? contradicts: the book decides the program the other way, so the report is not a bug against it; each is marked XFAIL and says why in its comment |
 | `error-message` | 17 | requests for a better error report: what a compiler's report says or how it is laid out, which A Standard Definition of Elm? does not define; named `ErrorMessages…` or `ErrorMessage…` after their issue, and kept in the project `elm-error-catalogue` |
 
@@ -431,7 +431,7 @@ The site also carries *A Standard Definition of Elm?*, a formal definition of th
 the initial basis (`/standard/basis/Basics/modBy`), the PDF, and the Lean proofs of its mechanisation
 (`/standard/proofs`, a page per theorem, read from `definition/mechanisation/` by
 `runner/mechanisation-data.js`). The examples of the mechanisation are the tests tagged `elm-spec`,
-translated into Lean by a program, `definition/tools/src/Translate.elm` (487 of the 941 today; the
+translated into Lean by a program, `definition/tools/src/Translate.elm` (488 of the 939 today; the
 others are listed with the reason they are not, from compile-error tests to library functions the
 encoding does not include). Every such test shows on its page its Lean translation, with the Lean
 evaluator's value for each check and the theorem that proves it, or why it is not translated; a

@@ -580,11 +580,39 @@ It is exposed and imported together with the alias
 (rule~\ruleref{r:sm-item-type}).
 \end{rulecomments}
 
+\section{Principal Derivations}\label{sec:static-modules-principal}
+
+Instances and principal derivations are defined for a module as for a Core
+phrase (Section~\ref{sec:static-core-principal}), with one addition: a module
+generates type names, which a derivation chooses freely outside $T \of B$
+(rules~\ruleref{r:sm-datbind} and~\ruleref{r:sm-topdec-types}). Let $D$ and
+$D'$ be derivations for a module in a basis $B$. Then $D'$ is an
+\emph{instance} of $D$ when, for some bijection $\rho$ from the type names that
+$D$ generates to those that $D'$ generates, $D'$ is an instance, in the sense of
+Section~\ref{sec:static-core-principal}, of the derivation obtained from $D$ by
+replacing each such type name $t$ by $\rho(t)$; the sets $T$ of corresponding
+contexts are then equal. A derivation for a module in $B$ is
+\emph{principal} when every derivation for the module in $B$ is an instance of
+it. % A96
+
+\begin{property}
+Every module that elaborates in a basis $B$ has a principal derivation in $B$,
+and any two of its principal derivations differ only by a renaming of type and
+row variables and of the type names they generate.
+\end{property}
+
+A derivation for a module combines derivations for its top-level declarations,
+whose contexts the rules determine from $B$ and the earlier declarations, up
+to the type names chosen; so the property follows from that of the Core. The
+proof is not given here. % A95
+
 \section{Further Restrictions}\label{sec:static-modules-further}
 
 The further restrictions of the Core (Section~\ref{sec:static-core-further})
-apply to the expressions and patterns of every top-level declaration. The
-following conditions concern a program rather than a module, and
+apply to the expressions and patterns of every top-level declaration, judged,
+as in the Core, on the principal derivation for the module
+(Section~\ref{sec:static-modules-principal}). % A96
+The following conditions concern a program rather than a module, and
 Chapter~\ref{ch:programs} imposes them: the type of \kw{main} in the main
 module, a \kw{main} in any other module being an ordinary value; % A32
 the distinctness of the names of the ports of a program from one another and

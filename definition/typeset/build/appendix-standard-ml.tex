@@ -71,8 +71,11 @@ Incomplete matches &
 Allowed; a match that fails raises \kw{Match}, a value binding that fails
 raises \kw{Bind}. &
 Not allowed: every match, lambda pattern and destructuring binding must be
-exhaustive, and every match rule must be needed. &
-Sec.~\ref{sec:static-core-further}\\ \hline
+exhaustive, and every match rule must be needed, at the types of the
+principal derivation. % A96
+&
+Sec.~\ref{sec:static-core-further};
+Sec.~\ref{sec:static-core-principal}\\ \hline
 State &
 References (\kw{ref}, \kw{:=}, \kw{!}), addresses and states; a state
 convention, under which the order of premises is the order of evaluation. &
@@ -112,10 +115,11 @@ as \kw{+} and \kw{<}, and overloaded special constants, resolved by context,
 with \kw{int} as default. &
 Part of the type system: type variables constrained to the classes
 $\knum$, $\kcomp$, $\kapp$ and $\kcapp$, generalised and instantiated
-like others. A $\knum$ variable left undetermined in a program is taken to be
-Int. % A27
+like others. A $\knum$ variable that the principal derivation leaves
+undetermined is taken to be Float before evaluation. % A27, A95
 & Sec.~\ref{sec:static-core-classes};
-Sec.~\ref{sec:static-core-further}\\ \hline
+Sec.~\ref{sec:static-core-principal};
+Sec.~\ref{sec:dynamic-core-numbers}\\ \hline
 Records &
 Record types are closed. The selector \kw{\#}\lab{} and the record pattern
 wildcard \kw{...} require the record type to be determined by the context.

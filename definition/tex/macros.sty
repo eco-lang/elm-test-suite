@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{macros}[2026/11/07 Notation for A Standard Definition of Elm?, generated from notation.md]
+\ProvidesPackage{macros}[2026/11/11 Notation for A Standard Definition of Elm?, generated from notation.md]
 \RequirePackage{defn}
 % ---- Syntactic classes
 \newcommand{\scon}{\mv{scon}} % SCon: special constants
@@ -236,7 +236,7 @@
 \newcommand{\pgDynamicBasis}{\cls{DynamicBasis}} % class DynamicBasis: the class Basis of the dynamic semantics of Modules (Chapter 7), ModEnv, renamed in Chapter 9 (programs)
 \newcommand{\pgBstat}{B_{\mathrm{STAT}}} % metavariable of StaticBasis: B_STAT; B or (B_STAT, B_DYN) ranges over Basis = StaticBasis x DynamicBasis (programs)
 \newcommand{\pgBdyn}{B_{\mathrm{DYN}}} % metavariable of DynamicBasis: B_DYN (programs)
-\newcommand{\pgDflt}{\mathrm{Dflt}\,} % operation Dflt sigma: the body of the type scheme sigma with Int for each bound type variable of class number (A27) (programs)
+\newcommand{\pgDflt}{\mathrm{Dflt}\,} % operation Dflt sigma: the body of the type scheme sigma with Float for each bound type variable of class number (A27) (programs)
 \newcommand{\pgTime}{\cls{Time}} % class Time = {x in R | x >= 0}, metavariables s (instants, milliseconds since the program started) and d (durations) (programs)
 \newcommand{\pgProc}{\cls{Proc}} % class Proc: (TaskVal x Time x (CmdVal u {spawned})) u {ended}; the state of a process (programs)
 \newcommand{\pgProcMap}{\cls{ProcMap}} % class ProcMap = ProcId ->fin Proc, metavariable P (plain): the processes started so far (programs)

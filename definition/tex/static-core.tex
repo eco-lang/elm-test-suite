@@ -8,7 +8,8 @@
 %   scoped over nested annotations (A21) and never escaping (A20); groups
 %   monomorphic within themselves (A24); no value restriction; Int constants of
 %   class number, Int patterns of type Int; unrestricted equality (A35);
-%   exhaustiveness, redundancy by value (A31), defaulting of number (A27).
+%   exhaustiveness, redundancy by value (A31), inhabitants possibly infinite
+%   (A97); principal derivations (A95), on which legality is judged (A96).
 % - TRACTABLE: the property that Adm is monotone in the class order and closed
 %   under substitutions that respect classes, so that instances compose.
 % - ILLUMINATING: comments on instantiation, the freedom of integer constants,
@@ -29,8 +30,9 @@ instantiation and closure. The rules infer sentences $\jdg{C}{\mathit{phrase}}{A
 in which $C$ is a context and $A$ is a type, a row, a value environment, or a
 value environment paired with a type. A Core phrase is legal when it satisfies
 the syntactic restrictions of Chapter~\ref{ch:syntax-core}, elaborates by the
-rules of Section~\ref{sec:static-core-rules}, and meets the further restrictions
-of Section~\ref{sec:static-core-further}.
+rules of Section~\ref{sec:static-core-rules}, and its principal derivation
+(Section~\ref{sec:static-core-principal}) meets the further restrictions of
+Section~\ref{sec:static-core-further}. % A96
 
 \section{Simple Objects}\label{sec:static-core-simple}
 
@@ -358,7 +360,9 @@ Section~\ref{sec:static-core-types}, if $\sigma \succ \sigma'$ and $\sigma' \suc
 
 Two type schemes are equal if they can be obtained from each other by renaming
 and reordering bound variables, and by deleting bound variables that do not
-occur in the body. In renaming, a type variable is replaced by a type variable
+occur in the body, other than the variables of class $\knum$ that closure adds
+to the scheme of a binding of a group (Section~\ref{sec:static-core-closure}),
+which are kept. % A93 In renaming, a type variable is replaced by a type variable
 of the same class and a row variable by a row variable. We consider a type
 $\tau$ to be a type scheme, identifying it with $\forall().\tau$. For a finite
 set $U$ of type and row variables, $\forall U.\tau$ means
@@ -426,7 +430,7 @@ bindings of the group that its own type does not mention. Since such a variable
 does not occur in the binding's type, it changes no instance of the scheme. It
 matters only to number specialisation
 (Section~\ref{sec:dynamic-core-numbers}): an occurrence of the binding gives it
-a type that nothing fixes, which is then $\tInt$. % A93
+a type that nothing fixes, which is then $\tFloat$. % A93
 
 \section{Inference Rules}\label{sec:static-core-rules}
 
@@ -483,9 +487,11 @@ them. The relation $\vdash$ is overloaded for all syntactic classes.
 \begin{rulecomments}
 \rcomment{r:s-atexp-scon} For an integer constant, $\tau$ may be any type in
 $\Adm{\knum}$: $\tInt$, $\tFloat$ or a type variable of class $\knum$. A
-floating point, character or string constant has exactly its type. Where a
-program leaves the type of an integer constant undetermined, restriction~3 of
-Section~\ref{sec:static-core-further} applies.
+floating point, character or string constant has exactly its type. The type
+that counts for evaluation is the one the principal derivation gives
+(Section~\ref{sec:static-core-principal}); where it is a variable that nothing
+binds, number specialisation takes it to be $\tFloat$
+(Section~\ref{sec:dynamic-core-numbers}).
 
 \rcomment{r:s-atexp-longvar} The instantiation of type schemes allows different
 occurrences of one $\longvar$ to take different types. The identifier status is
@@ -762,15 +768,98 @@ the program binds to \kw{List}.
 \rcomment{r:s-pat-as} The syntactic restrictions ensure $\var \notin \Dom\VE$.
 \end{rulecomments}
 
+\section{Principal Derivations}\label{sec:static-core-principal}
+
+A phrase may elaborate in more than one way. An integer constant may take any
+type in $\Adm{\knum}$ (rule~\ruleref{r:s-atexp-scon}), and an occurrence of a
+variable any instance of its type scheme (rule~\ruleref{r:s-atexp-longvar}),
+so two derivations for one phrase may give its integer constants and its
+occurrences different types. Whether a phrase elaborates does not depend on the
+choice, but evaluation does: \kw{2 \textasciicircum{} -1} is $0$ at $\tInt$
+and $0.5$ at $\tFloat$. The dynamic semantics is therefore given for one
+derivation, the \emph{principal} one, which gives no type that the phrase does
+not force; the further restrictions (Section~\ref{sec:static-core-further}) are
+judged on it too, although for them the choice makes no difference. % A95, A96
+
+In a derivation for a phrase, each node is a sentence about an occurrence of a
+phrase within it; the nodes of two derivations for the same phrase correspond
+when they are about the same occurrence. Let $D$ and $D'$ be derivations for
+the same phrase in the same context $C_0$, the type and row variables of $D$
+that are not free in $C_0$ having been renamed apart from those of $D'$. Then
+$D'$ is an \emph{instance} of $D$ when there is a substitution
+$S = \{\tau^{(k)}/\tyrowvar^{(k)}\}$ (Section~\ref{sec:static-core-types}) that
+respects classes, with no $\tyrowvar_i$ free in $C_0$, defined on every type of
+$D$, such that at each pair of corresponding nodes, with contexts $C$ in $D$ and
+$C'$ in $D'$,
+\begin{itemize}
+\item $S$ takes each variable in $U \of C$ to a variable, and $U \of C'$ is the
+  set of the variables so obtained;
+\item each type in the sentence of $D'$ is $S$ applied to the corresponding
+  type in the sentence of $D$; and
+\item each type scheme $\sigma'$ in the sentence of $D'$ is no more general
+  than $S\sigma$, for the corresponding type scheme $\sigma$ of $D$: every type
+  $\tau$ with $\sigma' \succ \tau$ has $S\sigma \succ \tau$.
+\end{itemize}
+Since $S$ is defined on every type of $D$, it never gives a record type a
+second field with a label it already has; no Core phrase generates type names,
+so $T \of C = T \of C'$. The third clause allows a derivation to give a binding
+a less general scheme than another derivation gives it, as when
+\kw{y = 2 \textasciicircum{} 64 * 4} is given the type $\tInt$ where another
+derivation gives it the scheme $\forall\alpha.\alpha$ with $\alpha$ of class
+$\knum$. A derivation $D$ for a phrase in a context is \emph{principal} when
+every derivation for the phrase in that context is an instance of $D$. Chapter
+\ref{ch:static-modules} extends the definition to modules
+(Section~\ref{sec:static-modules-principal}).
+
+\begin{property}
+Every Core phrase that elaborates in a context $C_0$ has a principal derivation
+in $C_0$, and any two of its principal derivations are instances of each other,
+so that they differ only by a renaming of type and row variables not free in
+$C_0$.
+\end{property}
+
+This is the principal type property of Damas and Milner, extended to classes,
+rows and annotations. Unification that respects classes has a most general
+solution whenever it has a solution, since two classes have a greatest common
+subclass or none: $\knum$ and $\kcomp$ give $\knum$, $\kapp$ and $\kcomp$ give
+$\kcapp$, and $\knum$ and $\kapp$ none (Section~\ref{sec:static-core-classes}).
+The labels of a row are distinct (Section~\ref{sec:static-core-types}), the
+explicit variables of an annotation are fixed throughout its scope
+(Section~\ref{sec:static-core-explicit}), and a group of value bindings is
+monomorphic within itself (rule~\ruleref{r:s-dec-group}), so the inference
+algorithm of Damas and Milner, extended in these ways, finds a principal
+derivation. The proof is not given here. % A23, A24
+% A95. Proof planned in Lean: plans/lean-full-definition.md, step 11
+% (complete inference).
+
+Only the variables of class $\knum$ of a principal derivation affect
+evaluation: the value of an integer constant, and the result of a number
+operation of the initial basis, depend on whether a type is $\tInt$ or
+$\tFloat$, while no value depends on how a variable of another class, or of
+none, is instantiated. Number specialisation
+(Section~\ref{sec:dynamic-core-numbers}) starts from the principal derivation
+and fixes its variables of class $\knum$.
+
 \section{Further Restrictions}\label{sec:static-core-further}
 
 There are a few restrictions on programs which are better expressed apart from
-the inference rules. A phrase that elaborates by the rules but breaks one of
-them is not legal; it is treated as a phrase that does not elaborate.
+the inference rules. They are judged on the principal derivation
+(Section~\ref{sec:static-core-principal}): the type $\tau$ with which the
+patterns of a match elaborate, and the type of a pattern, are those that
+derivation gives. A phrase that elaborates by the rules but whose principal
+derivation breaks one of them is not legal; it is treated as a phrase that does
+not elaborate. In fact every derivation for the phrase gives the same answer.
+A pattern that the principal derivation elaborates at a type variable, at the
+top of a match or within another pattern, is a wildcard, a variable, or one of
+these with \kw{as} or parentheses, since every other pattern (a special
+constant, a constructor, \kw{()}, a tuple, \kw{[\ ]}, \kw{::} or a record
+pattern) elaborates only at a type that is not a variable; and such a pattern
+covers every inhabitant. Another derivation may replace the variable by any
+type, which has inhabitants (below), and the same patterns cover them. % A96, A97
 
 The first two restrictions speak of the \emph{inhabitants} of a type, which are
-phrases built from constructors and special constants, and of the patterns
-that \emph{cover} them. The \emph{constructors} of a type name $t$ are those
+phrases, possibly infinite, built from constructors and special constants, and
+of the patterns that \emph{cover} them. The \emph{constructors} of a type name $t$ are those
 that the declaration of the custom type with type name $t$ binds with status
 $\isc$ (Chapter~\ref{ch:static-modules}), or, for a type name of the initial
 basis, those that Appendix~\ref{ch:appendix-static-basis} gives it; the
@@ -791,6 +880,22 @@ $\tau$ are given by the first of the following clauses that applies:
 \item otherwise (a function type, a record type, a type variable, or a type
   whose type name has no constructors), the single phrase \kw{\_}.
 \end{itemize}
+The clauses are read coinductively: an inhabitant may be infinite, provided
+each of its parts is given by a clause. So \kw{type V = V V} has the one
+inhabitant \kw{V (V (V \ldots))}, and \kw{Never}, whose one constructor
+\kw{JustOneMore} takes a \kw{Never}
+(Appendix~\ref{ch:appendix-static-basis}), has the one inhabitant
+\kw{JustOneMore (JustOneMore \ldots)}. Every type has an inhabitant, and so
+every constructor of a type gives inhabitants of it, at every instance.
+Inhabitants are not values: no value has type \kw{Never}. An inhabitant
+describes what a pattern may be asked to match, which depends only on the
+constructors of a type. Thus with \kw{r} of type \kw{Result Never Int}, the
+second rule of \kw{case r of Ok n -> n ; Err e -> never e} covers
+\kw{Err (JustOneMore \ldots)} and is not redundant, while with \kw{m} of type
+\kw{Maybe Never}, \kw{case m of Nothing -> 0} is not exhaustive. Where every
+type that a match involves has a finite inhabitant, the infinite inhabitants
+change neither restriction, since a pattern examines only a finite part of an
+inhabitant. % A97
 The wildcard \kw{\_}, a variable and a record pattern cover every inhabitant.
 A special constant covers each special constant that denotes the same
 character or string or, for integer constants, has the same value as an
@@ -819,15 +924,4 @@ what $\pat$ covers. The restrictions are:
   exhaustive by itself. In deciding exhaustiveness, no set of special
   constants covers every inhabitant of $\tInt$, $\tChar$ or $\tString$, whatever the range of $\tInt$
   (Appendix~\ref{ch:appendix-implementation}).
-
-\item\citelabel{res:core-number-default} \emph{Defaulting of number.} Where a derivation uses a type variable of
-  class $\knum$ that no closure generalises, that variable is taken to be
-  $\tInt$: the derivation is the one in which $\tInt$ is substituted for it.
-  % A27
-  A variable of class $\knum$ that a closure generalises is not affected; the
-  evaluation of the values whose type schemes have such variables is given in
-  Section~\ref{sec:dynamic-core-numbers}.
-  % Audit X8, V (X8 remainder): the clause on main is removed; Dflt
-  % (Chapter 9) and the specialisation default are the only other defaults
-  % to Int.
 \end{enumerate}

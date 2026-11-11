@@ -66,10 +66,10 @@ def E_K : Env := E0base.plus [("Basics", .mk [] VE_K)] VE_K
 /-- The texts of fig:dynamic-basis-elm in the fragment, after their derived
     forms. `composeL`, `composeR`, `apR` and `apL` are hidden variables. -/
 def elmTexts : List Def :=
-  [ .fn "abs" [pv "n"] (ifte (ap (v "lt") [v "n", i 0]) (.atexp (neg (vA "n"))) (v "n")),
-    -- abs quantifies a number variable, so number specialisation also makes its copy at Float
-    -- (sec:dynamic-core-numbers): the same text with its constant 0 at Float
-    .fn "abs$Float" [pv "n"] (ifte (ap (v "lt") [v "n", .atexp (.scon (.intF 0))]) (.atexp (neg (vA "n"))) (v "n")),
+  [ -- abs quantifies a number variable: its default copy is at Float (sec:dynamic-core-numbers,
+    -- A27), with its constant 0 a float, and number specialisation also makes its copy at Int
+    .fn "abs" [pv "n"] (ifte (ap (v "lt") [v "n", .atexp (.scon (.intF 0))]) (.atexp (neg (vA "n"))) (v "n")),
+    .fn "abs$Int" [pv "n"] (ifte (ap (v "lt") [v "n", i 0]) (.atexp (neg (vA "n"))) (v "n")),
     .fn "composeL" [pv "g", pv "f", pv "x"] (ap (v "g") [ap (v "f") [v "x"]]),
     .fn "composeR" [pv "f", pv "g", pv "x"] (ap (v "g") [ap (v "f") [v "x"]]),
     .fn "apR" [pv "x", pv "f"] (ap (v "f") [v "x"]),

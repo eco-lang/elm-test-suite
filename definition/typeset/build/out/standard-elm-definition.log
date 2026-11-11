@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Debian) (preloaded format=pdflatex 2026.5.27)  9 NOV 2026 23:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Debian) (preloaded format=pdflatex 2026.5.27)  11 NOV 2026 08:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -123,7 +123,7 @@ Package: array 2022/09/04 v2.5g Tabular extension package (FMi)
 )
 \c@defnrule=\count272
 ) (./macros.sty
-Package: macros 2026/11/07 Notation for A Standard Definition of Elm?, generate
+Package: macros 2026/11/11 Notation for A Standard Definition of Elm?, generate
 d from notation.md
 )
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/microtype.sty
@@ -382,7 +382,7 @@ on.toc
 
 ] [3] [4]
 LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 1
-16.
+18.
  (/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
 File: t1cmtt.fd 2022/07/10 v2.5l Standard LaTeX font definitions
 )
@@ -390,11 +390,11 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `cmtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-)
+ [5])
 \tf@toc=\write4
 \openout4 = `standard-elm-definition.toc'.
 
- [5]
+
 [6]
 \openout2 = `preface.aux'.
 
@@ -466,18 +466,22 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `cmtt' (encoding: OT1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
- [24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37]
-[38]) [39]
+ [24] [25] [26] [27] [28]
+Underfull \vbox (badness 3199) has occurred while \output is active []
+
+ [29]
+[30] [31] [32] [33] [34] [35] [36] [37] [38] [39] [40]) [41]
 \openout2 = `static-modules.aux'.
 
- (./static-modules.tex
+
+(./static-modules.tex
 Chapter 5.
-[40
+[42
 
 
 
 
-] [41]
+] [43]
 Overfull \hbox (5.34456pt too wide) detected at line 185
 []
  []
@@ -487,7 +491,7 @@ Overfull \hbox (4.4624pt too wide) detected at line 194
 []
  []
 
-[42]
+[44]
 Underfull \hbox (badness 10000) in paragraph at lines 280--280
 []|\T1/cmtt/m/n/10 Json.Encode.Value\T1/cmr/m/n/10 (+20) ,
  []
@@ -497,36 +501,33 @@ Underfull \hbox (badness 2245) in paragraph at lines 289--289
 []|\T1/cmr/m/n/10 (+20) type vari-ables, con-strained
  []
 
-[43] [44] [45] [46] [47] [48] [49] [50]) [51]
+[45] [46] [47] [48] [49] [50] [51] [52] [53]) [54]
 \openout2 = `dynamic-core.aux'.
 
  (./dynamic-core.tex
 Chapter 6.
-[52
+[55
 
 
 
 
-] [53] [54]
-Underfull \vbox (badness 1019) has occurred while \output is active []
-
- [55]
-[56] [57] [58] [59] [60] [61] [62] [63]) [64]
+] [56] [57] [58] [59] [60] [61] [62] [63] [64] [65] [66] [67]) [68]
 \openout2 = `dynamic-modules.aux'.
 
- (./dynamic-modules.tex
+
+(./dynamic-modules.tex
 Chapter 7.
-[65
+[69
 
 
 
 
-] [66] [67] [68] [69] [70] [71] [72]) [73]
+] [70] [71] [72] [73] [74] [75] [76]) [77]
 \openout2 = `effects.aux'.
 
  (./effects.tex
 Chapter 8.
-[74
+[78
 
 
 
@@ -534,45 +535,49 @@ Chapter 8.
 ]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [75]
-[76] [77] [78] [79] [80] [81] [82] [83] [84] [85] [86] [87]) [88]
+ [79]
+[80] [81] [82] [83] [84] [85] [86] [87] [88] [89] [90] [91]) [92]
 \openout2 = `programs.aux'.
 
 
 (./programs.tex
 Chapter 9.
-[89
+[93
 
 
 
 
-] [90] [91] [92] [93] [94] [95] [96] [97] [98] [99] [100]) [101] [102]
+] [94] [95]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [96]
+[97] [98] [99] [100] [101] [102] [103] [104] [105]) [106]
 \openout2 = `appendix-derived-forms.aux'.
 
 
 (./appendix-derived-forms.tex
 Appendix A.
-[103
+[107
 
 
 
 
-] [104] [105] [106] [107]) [108]
+] [108] [109] [110] [111]) [112]
 \openout2 = `appendix-full-grammar.aux'.
 
  (./appendix-full-grammar.tex
 Appendix B.
-[109
+[113
 
 
 
 
-]) [110] [111] [112] [113]
+]) [114] [115] [116] [117]
 \openout2 = `appendix-static-basis.aux'.
 
  (./appendix-static-basis.tex
 Appendix C.
-[114
+[118
 
 
 
@@ -580,12 +585,12 @@ Appendix C.
 ]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [115]
-[116] [117]
+ [119]
+[120] [121]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [118]
-[119] [120]) [121] [122]
+ [122]
+[123] [124]) [125] [126]
 \openout2 = `appendix-dynamic-basis.aux'.
 
  (./appendix-dynamic-basis.tex
@@ -593,29 +598,26 @@ Appendix D.
 
 Underfull \vbox (badness 1117) has occurred while \output is active []
 
- [123
+ [127
 
 
 
 
 ]
-[124]
+[128]
 Underfull \vbox (badness 1394) has occurred while \output is active []
 
- [125]
-[126] [127] [128] [129] [130] [131] [132]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [133]
+ [129]
+[130] [131] [132] [133] [134] [135] [136] [137]
 Overfull \hbox (1.39671pt too wide) detected at line 796
 []
  []
 
-[134]
+[138]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [135]
-[136] [137] [138]
+ [139]
+[140] [141] [142]
 Underfull \hbox (badness 1152) in paragraph at lines 1000--1003
 []\T1/cmr/m/n/10 (+20) Tuples $\OT1/cmr/m/n/10 (+20) (\OML/cmm/m/it/10 v[]; [] 
 ; v[]\OT1/cmr/m/n/10 (+20) )$ \T1/cmr/m/n/10 (+20) and $\OT1/cmr/m/n/10 (+20) (
@@ -627,69 +629,65 @@ mr/m/n/10 (+20) for the least $\OML/cmm/m/it/10 i$ \T1/cmr/m/n/10 (+20) with
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [139]
-[140] [141]) [142]
+ [143]
+[144] [145]) [146]
 \openout2 = `appendix-implementation.aux'.
 
  (./appendix-implementation.tex
 Appendix E.
-[143
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [147
 
 
 
 
-] [144] [145]
-Underfull \vbox (badness 2894) has occurred while \output is active []
-
- [146]
-Underfull \vbox (badness 1831) has occurred while \output is active []
-
- [147]
+]
 [148]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [149]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 1237) has occurred while \output is active []
 
  [150]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [151]
-Underfull \vbox (badness 3108) has occurred while \output is active []
-
- [152]
+[152]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [153]
-[154] [155]
+[154]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [156]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [157]
-[158]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [159]
-[160] [161]
+ [155]
+[156] [157] [158] [159] [160] [161]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [162]
+[163]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [163])
-[164]
+ [164]
+[165] [166]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [167]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [168])
+[169]
 \openout2 = `appendix-standard-ml.aux'.
 
  (./appendix-standard-ml.tex
 Appendix F.
-) [165
+) [170
 
 
 
 
-] [166] [167] [168] [169] [170] (out/standard-elm-definition.aux
+] [171] [172] [173] [174] [175] (out/standard-elm-definition.aux
 (out/preface.aux) (out/introduction.aux) (out/syntax-core.aux)
 (out/syntax-modules.aux) (out/static-core.aux) (out/static-modules.aux)
 (out/dynamic-core.aux) (out/dynamic-modules.aux) (out/effects.aux)
@@ -699,14 +697,14 @@ Appendix F.
 (out/appendix-standard-ml.aux))
 Package rerunfilecheck Info: File `standard-elm-definition.out' has not changed
 .
-(rerunfilecheck)             Checksum: EE7E5C05405622731C548D33EE58E900;23321.
+(rerunfilecheck)             Checksum: 793FA2EB3795B3F6246041FC58DCBF33;23821.
  ) 
 Here is how much of TeX's memory you used:
- 13778 strings out of 478051
- 218428 string characters out of 5840943
+ 13793 strings out of 478051
+ 218636 string characters out of 5840943
  1884330 words of memory out of 5000000
- 32378 multiletter control sequences out of 15000+600000
- 562832 words of font info for 354 fonts, out of 8000000 for 9000
+ 32383 multiletter control sequences out of 15000+600000
+ 562943 words of font info for 356 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  75i,21n,76p,1020b,591s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-t1.enc}{/usr/share/texmf/
@@ -747,10 +745,10 @@ blic/cm-super/sfti1000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti10
 exmf/fonts/type1/public/cm-super/sftt0900.pfb></usr/share/texmf/fonts/type1/pub
 lic/cm-super/sftt1000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt109
 5.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt1200.pfb>
-Output written on out/standard-elm-definition.pdf (182 pages, 1334480 bytes).
+Output written on out/standard-elm-definition.pdf (187 pages, 1355630 bytes).
 PDF statistics:
- 3245 PDF objects out of 3580 (max. 8388607)
- 2932 compressed objects within 30 object streams
- 779 named destinations out of 1000 (max. 500000)
- 87745 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 3321 PDF objects out of 3580 (max. 8388607)
+ 3002 compressed objects within 31 object streams
+ 785 named destinations out of 1000 (max. 500000)
+ 87769 words of extra memory for PDF output out of 89155 (max. 10000000)
 

@@ -8,9 +8,14 @@ The test references `NonEntryMainAux.main` twice in a list and logs the
 list's length, counted by a local `length`, so `auxMain` must appear once, before `uses: 2`. The CHECK-NOT
 rejects a second `auxMain` line, which the CHECK-NEXT pair alone would accept.
 
+Tagged `elm-unspecced`: A Standard Definition of Elm? evaluates a top-level value once, but an
+implementation may evaluate one again on use and still conform (ruling A59; Appendix E, Top-level
+Values), and what `Debug.log` prints is outside the definition (ruling A62). The test records
+what Elm 0.19.1 does.
+
 -}
 
--- TAGS: elm-spec, p-dyn-module, dm-topdec-val
+-- TAGS: elm-unspecced
 -- CHECK: auxMain: "abab"
 -- CHECK-NEXT: uses: 2
 -- CHECK-NOT: {{auxMain[^\n]*\n[^\n]*auxMain}}

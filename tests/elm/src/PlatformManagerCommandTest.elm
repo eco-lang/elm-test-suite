@@ -8,9 +8,12 @@ parameter of the platform (ruling A83); for Elm on JavaScript they include `Rand
 (Appendix C, Managers and Programs on a Platform). `Random.generate` with a constant generator
 gives the message `7` whatever the seed. <https://elm-test-suite.netlify.app/standard/rules/p-disp-plat>
 
+Tagged `elm-unspecced`: which managers a platform has, and what they give, is a parameter of the
+platform in A Standard Definition of Elm? (ruling A83). The test records what Elm 0.19.1 does.
+
 -}
 
--- TAGS: elm-spec, p-disp-plat, p-platform
+-- TAGS: elm-unspecced
 -- CHECK: generated: 7
 
 import Random

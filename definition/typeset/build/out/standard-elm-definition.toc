@@ -27,126 +27,129 @@
 \contentsline {section}{\numberline {4.5}Types and Type Functions}{28}{section.4.5}%
 \contentsline {section}{\numberline {4.6}Type Schemes}{28}{section.4.6}%
 \contentsline {section}{\numberline {4.7}Scope of Explicit Type Variables}{29}{section.4.7}%
-\contentsline {section}{\numberline {4.8}Closure}{29}{section.4.8}%
+\contentsline {section}{\numberline {4.8}Closure}{30}{section.4.8}%
 \contentsline {section}{\numberline {4.9}Inference Rules}{30}{section.4.9}%
-\contentsline {section}{\numberline {4.10}Further Restrictions}{38}{section.4.10}%
-\contentsline {chapter}{\numberline {5}Static Semantics for Modules}{40}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Semantic Objects}{40}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Interfaces}{41}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Provider Maps}{42}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Port Types}{43}{section.5.4}%
-\contentsline {section}{\numberline {5.5}Inference Rules}{44}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Further Restrictions}{51}{section.5.6}%
-\contentsline {chapter}{\numberline {6}Dynamic Semantics for the Core}{52}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Reduced Syntax}{52}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Number Specialisation}{52}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Simple Objects}{53}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Compound Objects}{54}{section.6.4}%
-\contentsline {section}{\numberline {6.5}Basic Values}{56}{section.6.5}%
-\contentsline {section}{\numberline {6.6}Function Closures}{56}{section.6.6}%
-\contentsline {section}{\numberline {6.7}Inference Rules}{57}{section.6.7}%
-\contentsline {chapter}{\numberline {7}Dynamic Semantics for Modules}{65}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Reduced Syntax}{65}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Compound Objects}{66}{section.7.2}%
-\contentsline {section}{\numberline {7.3}Merging Environments}{67}{section.7.3}%
-\contentsline {section}{\numberline {7.4}Record Constructors}{67}{section.7.4}%
-\contentsline {section}{\numberline {7.5}Top-level Value Groups}{68}{section.7.5}%
-\contentsline {section}{\numberline {7.6}Inference Rules}{68}{section.7.6}%
-\contentsline {chapter}{\numberline {8}Tasks, Commands, Subscriptions and Ports}{74}{chapter.8}%
-\contentsline {section}{\numberline {8.1}Simple Objects}{74}{section.8.1}%
-\contentsline {section}{\numberline {8.2}Compound Objects}{75}{section.8.2}%
-\contentsline {section}{\numberline {8.3}Inference Rules}{77}{section.8.3}%
-\contentsline {section}{\numberline {8.4}Tasks}{77}{section.8.4}%
-\contentsline {section}{\numberline {8.5}Commands and Subscriptions}{80}{section.8.5}%
-\contentsline {section}{\numberline {8.6}The Effect Values of the Basis}{81}{section.8.6}%
-\contentsline {section}{\numberline {8.7}Ports}{82}{section.8.7}%
-\contentsline {section}{\numberline {8.8}Messages}{88}{section.8.8}%
-\contentsline {chapter}{\numberline {9}Programs}{89}{chapter.9}%
-\contentsline {section}{\numberline {9.1}Syntax of Programs}{89}{section.9.1}%
-\contentsline {section}{\numberline {9.2}Elaboration of Programs}{90}{section.9.2}%
-\contentsline {section}{\numberline {9.3}Evaluation of Programs}{92}{section.9.3}%
-\contentsline {section}{\numberline {9.4}Execution}{94}{section.9.4}%
-\contentsline {subsection}{\numberline {9.4.1}Configurations and Events}{94}{subsection.9.4.1}%
-\contentsline {subsection}{\numberline {9.4.2}Dispatch and Start}{95}{subsection.9.4.2}%
-\contentsline {subsection}{\numberline {9.4.3}Transitions}{97}{subsection.9.4.3}%
-\contentsline {section}{\numberline {9.5}Observable Behaviour}{101}{section.9.5}%
-\contentsline {section}{\numberline {9.6}Views and Other Programs}{101}{section.9.6}%
-\contentsline {chapter}{\numberline {A}Derived Forms}{103}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Grouping the Definitions of a Let}{104}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Grouping the Declarations of a Module}{107}{section.A.2}%
-\contentsline {chapter}{\numberline {B}Full Grammar}{109}{appendix.B}%
-\contentsline {chapter}{\numberline {C}The Initial Static Basis}{114}{appendix.C}%
-\contentsline {section}{\numberline {C.1}Type Names}{114}{section.C.1}%
-\contentsline {section}{\numberline {C.2}The Module Environment}{116}{section.C.2}%
-\contentsline {section}{\numberline {C.3}Basics}{118}{section.C.3}%
-\contentsline {section}{\numberline {C.4}Further Data Types}{120}{section.C.4}%
-\contentsline {section}{\numberline {C.5}Debugging, Programs and Effects}{120}{section.C.5}%
-\contentsline {chapter}{\numberline {D}The Initial Dynamic Basis}{123}{appendix.D}%
-\contentsline {section}{\numberline {D.1}Special Values}{124}{section.D.1}%
-\contentsline {subsection}{\numberline {D.1.1}Int Values}{124}{subsection.D.1.1}%
-\contentsline {subsection}{\numberline {D.1.2}Floats}{124}{subsection.D.1.2}%
-\contentsline {subsection}{\numberline {D.1.3}Characters and Strings}{125}{subsection.D.1.3}%
-\contentsline {section}{\numberline {D.2}The Value Environments}{126}{section.D.2}%
-\contentsline {section}{\numberline {D.3}Values Written in Elm}{129}{section.D.3}%
-\contentsline {section}{\numberline {D.4}The Function APPLY}{131}{section.D.4}%
-\contentsline {subsection}{\numberline {D.4.1}Int Arithmetic}{132}{subsection.D.4.1}%
-\contentsline {subsection}{\numberline {D.4.2}Floating-Point Arithmetic}{133}{subsection.D.4.2}%
-\contentsline {subsection}{\numberline {D.4.3}Powers and Elementary Functions}{134}{subsection.D.4.3}%
-\contentsline {subsection}{\numberline {D.4.4}Conversions}{136}{subsection.D.4.4}%
-\contentsline {subsection}{\numberline {D.4.5}Equality}{136}{subsection.D.4.5}%
-\contentsline {subsection}{\numberline {D.4.6}Order}{137}{subsection.D.4.6}%
-\contentsline {subsection}{\numberline {D.4.7}Booleans, Appending and Functions}{141}{subsection.D.4.7}%
-\contentsline {subsection}{\numberline {D.4.8}Debugging}{141}{subsection.D.4.8}%
-\contentsline {subsection}{\numberline {D.4.9}Arrays}{141}{subsection.D.4.9}%
-\contentsline {subsection}{\numberline {D.4.10}Bytes}{142}{subsection.D.4.10}%
-\contentsline {subsection}{\numberline {D.4.11}Effect Values}{142}{subsection.D.4.11}%
-\contentsline {chapter}{\numberline {E}Implementation-Dependent Details}{143}{appendix.E}%
-\contentsline {section}{\numberline {E.1}The Int Range and Normalisation}{143}{section.E.1}%
-\contentsline {subsection}{\numberline {E.1.1}The Range and Normalisation}{144}{subsection.E.1.1}%
-\contentsline {subsection}{\numberline {E.1.2}Integer Division and Remainders}{144}{subsection.E.1.2}%
-\contentsline {subsection}{\numberline {E.1.3}Powers with a Negative Exponent}{145}{subsection.E.1.3}%
-\contentsline {subsection}{\numberline {E.1.4}Conversion from Float}{145}{subsection.E.1.4}%
-\contentsline {subsection}{\numberline {E.1.5}Negative Zero}{145}{subsection.E.1.5}%
-\contentsline {section}{\numberline {E.2}Characters and Strings}{145}{section.E.2}%
-\contentsline {subsection}{\numberline {E.2.1}What a Character Is}{146}{subsection.E.2.1}%
-\contentsline {subsection}{\numberline {E.2.2}The Order of Characters and Strings}{147}{subsection.E.2.2}%
-\contentsline {subsection}{\numberline {E.2.3}The Unicode Version of Identifiers}{147}{subsection.E.2.3}%
-\contentsline {subsection}{\numberline {E.2.4}Case Mapping}{147}{subsection.E.2.4}%
-\contentsline {section}{\numberline {E.3}Floating-Point Operations}{148}{section.E.3}%
-\contentsline {subsection}{\numberline {E.3.1}\textnormal {\texttt {compare}} with NaN}{148}{subsection.E.3.1}%
-\contentsline {subsection}{\numberline {E.3.2}The Order Operators}{149}{subsection.E.3.2}%
-\contentsline {subsection}{\numberline {E.3.3}\textnormal {\texttt {min}}, \textnormal {\texttt {max}} and \textnormal {\texttt {clamp}}}{149}{subsection.E.3.3}%
-\contentsline {subsection}{\numberline {E.3.4}Special Values and Accuracy}{150}{subsection.E.3.4}%
-\contentsline {section}{\numberline {E.4}Equality}{150}{section.E.4}%
-\contentsline {subsection}{\numberline {E.4.1}Identity}{150}{subsection.E.4.1}%
-\contentsline {subsection}{\numberline {E.4.2}Functions}{151}{subsection.E.4.2}%
-\contentsline {section}{\numberline {E.5}Bitwise Operations and String Conversion}{151}{section.E.5}%
-\contentsline {subsection}{\numberline {E.5.1}Bitwise Operations}{151}{subsection.E.5.1}%
-\contentsline {subsection}{\numberline {E.5.2}Conversion between Numbers and Strings}{152}{subsection.E.5.2}%
-\contentsline {section}{\numberline {E.6}Evaluation Order and Debug}{152}{section.E.6}%
-\contentsline {subsection}{\numberline {E.6.1}The Order of Evaluation within a Phrase}{153}{subsection.E.6.1}%
-\contentsline {subsection}{\numberline {E.6.2}Top-level Values}{153}{subsection.E.6.2}%
-\contentsline {subsection}{\numberline {E.6.3}Debug}{154}{subsection.E.6.3}%
-\contentsline {section}{\numberline {E.7}Resource Limits}{154}{section.E.7}%
-\contentsline {subsection}{\numberline {E.7.1}The Size of Phrases}{154}{subsection.E.7.1}%
-\contentsline {subsection}{\numberline {E.7.2}Stack and Memory}{155}{subsection.E.7.2}%
-\contentsline {section}{\numberline {E.8}Platform and Ports}{155}{section.E.8}%
-\contentsline {subsection}{\numberline {E.8.1}The Order of Commands}{156}{subsection.E.8.1}%
-\contentsline {subsection}{\numberline {E.8.2}Incoming Port Values}{157}{subsection.E.8.2}%
-\contentsline {subsection}{\numberline {E.8.3}Outgoing Port Values}{157}{subsection.E.8.3}%
-\contentsline {subsection}{\numberline {E.8.4}Values at the Boundary}{158}{subsection.E.8.4}%
-\contentsline {subsection}{\numberline {E.8.5}Bytes at the Boundary}{158}{subsection.E.8.5}%
-\contentsline {subsection}{\numberline {E.8.6}Flags}{159}{subsection.E.8.6}%
-\contentsline {subsection}{\numberline {E.8.7}Processes}{159}{subsection.E.8.7}%
-\contentsline {subsection}{\numberline {E.8.8}Managers and Programs on a Platform}{160}{subsection.E.8.8}%
-\contentsline {section}{\numberline {E.9}Extensions of eco}{160}{section.E.9}%
-\contentsline {section}{\numberline {E.10}Known Divergences}{160}{section.E.10}%
-\contentsline {subsection}{\numberline {E.10.1}Int Arithmetic}{161}{subsection.E.10.1}%
-\contentsline {subsection}{\numberline {E.10.2}Float, Order and Equality}{161}{subsection.E.10.2}%
-\contentsline {subsection}{\numberline {E.10.3}Characters and Strings}{162}{subsection.E.10.3}%
-\contentsline {subsection}{\numberline {E.10.4}Evaluation}{162}{subsection.E.10.4}%
-\contentsline {subsection}{\numberline {E.10.5}Programs and Ports}{163}{subsection.E.10.5}%
-\contentsline {subsection}{\numberline {E.10.6}Elaboration}{164}{subsection.E.10.6}%
-\contentsline {chapter}{\numberline {F}Elm and Standard ML}{165}{appendix.F}%
-\contentsline {section}{\numberline {F.1}What Is the Same}{165}{section.F.1}%
-\contentsline {section}{\numberline {F.2}Differences by Construct}{165}{section.F.2}%
+\contentsline {section}{\numberline {4.10}Principal Derivations}{38}{section.4.10}%
+\contentsline {section}{\numberline {4.11}Further Restrictions}{39}{section.4.11}%
+\contentsline {chapter}{\numberline {5}Static Semantics for Modules}{42}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Semantic Objects}{42}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Interfaces}{43}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Provider Maps}{44}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Port Types}{45}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Inference Rules}{46}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Principal Derivations}{53}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Further Restrictions}{54}{section.5.7}%
+\contentsline {chapter}{\numberline {6}Dynamic Semantics for the Core}{55}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Reduced Syntax}{55}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Number Specialisation}{55}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Simple Objects}{57}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Compound Objects}{58}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Basic Values}{59}{section.6.5}%
+\contentsline {section}{\numberline {6.6}Function Closures}{60}{section.6.6}%
+\contentsline {section}{\numberline {6.7}Inference Rules}{60}{section.6.7}%
+\contentsline {chapter}{\numberline {7}Dynamic Semantics for Modules}{69}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Reduced Syntax}{69}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Compound Objects}{70}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Merging Environments}{71}{section.7.3}%
+\contentsline {section}{\numberline {7.4}Record Constructors}{71}{section.7.4}%
+\contentsline {section}{\numberline {7.5}Top-level Value Groups}{72}{section.7.5}%
+\contentsline {section}{\numberline {7.6}Inference Rules}{72}{section.7.6}%
+\contentsline {chapter}{\numberline {8}Tasks, Commands, Subscriptions and Ports}{78}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Simple Objects}{78}{section.8.1}%
+\contentsline {section}{\numberline {8.2}Compound Objects}{79}{section.8.2}%
+\contentsline {section}{\numberline {8.3}Inference Rules}{81}{section.8.3}%
+\contentsline {section}{\numberline {8.4}Tasks}{81}{section.8.4}%
+\contentsline {section}{\numberline {8.5}Commands and Subscriptions}{84}{section.8.5}%
+\contentsline {section}{\numberline {8.6}The Effect Values of the Basis}{85}{section.8.6}%
+\contentsline {section}{\numberline {8.7}Ports}{86}{section.8.7}%
+\contentsline {section}{\numberline {8.8}Messages}{92}{section.8.8}%
+\contentsline {chapter}{\numberline {9}Programs}{93}{chapter.9}%
+\contentsline {section}{\numberline {9.1}Syntax of Programs}{93}{section.9.1}%
+\contentsline {section}{\numberline {9.2}Elaboration of Programs}{94}{section.9.2}%
+\contentsline {section}{\numberline {9.3}Evaluation of Programs}{97}{section.9.3}%
+\contentsline {section}{\numberline {9.4}Execution}{98}{section.9.4}%
+\contentsline {subsection}{\numberline {9.4.1}Configurations and Events}{98}{subsection.9.4.1}%
+\contentsline {subsection}{\numberline {9.4.2}Dispatch and Start}{100}{subsection.9.4.2}%
+\contentsline {subsection}{\numberline {9.4.3}Transitions}{101}{subsection.9.4.3}%
+\contentsline {section}{\numberline {9.5}Observable Behaviour}{105}{section.9.5}%
+\contentsline {section}{\numberline {9.6}Views and Other Programs}{105}{section.9.6}%
+\contentsline {chapter}{\numberline {A}Derived Forms}{107}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Grouping the Definitions of a Let}{108}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Grouping the Declarations of a Module}{111}{section.A.2}%
+\contentsline {chapter}{\numberline {B}Full Grammar}{113}{appendix.B}%
+\contentsline {chapter}{\numberline {C}The Initial Static Basis}{118}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Type Names}{118}{section.C.1}%
+\contentsline {section}{\numberline {C.2}The Module Environment}{120}{section.C.2}%
+\contentsline {section}{\numberline {C.3}Basics}{122}{section.C.3}%
+\contentsline {section}{\numberline {C.4}Further Data Types}{124}{section.C.4}%
+\contentsline {section}{\numberline {C.5}Debugging, Programs and Effects}{124}{section.C.5}%
+\contentsline {chapter}{\numberline {D}The Initial Dynamic Basis}{127}{appendix.D}%
+\contentsline {section}{\numberline {D.1}Special Values}{128}{section.D.1}%
+\contentsline {subsection}{\numberline {D.1.1}Int Values}{128}{subsection.D.1.1}%
+\contentsline {subsection}{\numberline {D.1.2}Floats}{128}{subsection.D.1.2}%
+\contentsline {subsection}{\numberline {D.1.3}Characters and Strings}{129}{subsection.D.1.3}%
+\contentsline {section}{\numberline {D.2}The Value Environments}{130}{section.D.2}%
+\contentsline {section}{\numberline {D.3}Values Written in Elm}{133}{section.D.3}%
+\contentsline {section}{\numberline {D.4}The Function APPLY}{135}{section.D.4}%
+\contentsline {subsection}{\numberline {D.4.1}Int Arithmetic}{136}{subsection.D.4.1}%
+\contentsline {subsection}{\numberline {D.4.2}Floating-Point Arithmetic}{137}{subsection.D.4.2}%
+\contentsline {subsection}{\numberline {D.4.3}Powers and Elementary Functions}{138}{subsection.D.4.3}%
+\contentsline {subsection}{\numberline {D.4.4}Conversions}{140}{subsection.D.4.4}%
+\contentsline {subsection}{\numberline {D.4.5}Equality}{140}{subsection.D.4.5}%
+\contentsline {subsection}{\numberline {D.4.6}Order}{141}{subsection.D.4.6}%
+\contentsline {subsection}{\numberline {D.4.7}Booleans, Appending and Functions}{145}{subsection.D.4.7}%
+\contentsline {subsection}{\numberline {D.4.8}Debugging}{145}{subsection.D.4.8}%
+\contentsline {subsection}{\numberline {D.4.9}Arrays}{145}{subsection.D.4.9}%
+\contentsline {subsection}{\numberline {D.4.10}Bytes}{146}{subsection.D.4.10}%
+\contentsline {subsection}{\numberline {D.4.11}Effect Values}{146}{subsection.D.4.11}%
+\contentsline {chapter}{\numberline {E}Implementation-Dependent Details}{147}{appendix.E}%
+\contentsline {section}{\numberline {E.1}The Int Range and Normalisation}{148}{section.E.1}%
+\contentsline {subsection}{\numberline {E.1.1}The Range and Normalisation}{148}{subsection.E.1.1}%
+\contentsline {subsection}{\numberline {E.1.2}Integer Division and Remainders}{149}{subsection.E.1.2}%
+\contentsline {subsection}{\numberline {E.1.3}Powers with a Negative Exponent}{149}{subsection.E.1.3}%
+\contentsline {subsection}{\numberline {E.1.4}Conversion from Float}{149}{subsection.E.1.4}%
+\contentsline {subsection}{\numberline {E.1.5}Negative Zero}{150}{subsection.E.1.5}%
+\contentsline {section}{\numberline {E.2}Characters and Strings}{150}{section.E.2}%
+\contentsline {subsection}{\numberline {E.2.1}What a Character Is}{151}{subsection.E.2.1}%
+\contentsline {subsection}{\numberline {E.2.2}The Order of Characters and Strings}{151}{subsection.E.2.2}%
+\contentsline {subsection}{\numberline {E.2.3}The Unicode Version of Identifiers}{152}{subsection.E.2.3}%
+\contentsline {subsection}{\numberline {E.2.4}Case Mapping}{152}{subsection.E.2.4}%
+\contentsline {section}{\numberline {E.3}Floating-Point Operations}{152}{section.E.3}%
+\contentsline {subsection}{\numberline {E.3.1}\textnormal {\texttt {compare}} with NaN}{153}{subsection.E.3.1}%
+\contentsline {subsection}{\numberline {E.3.2}The Order Operators}{153}{subsection.E.3.2}%
+\contentsline {subsection}{\numberline {E.3.3}\textnormal {\texttt {min}}, \textnormal {\texttt {max}} and \textnormal {\texttt {clamp}}}{154}{subsection.E.3.3}%
+\contentsline {subsection}{\numberline {E.3.4}Special Values and Accuracy}{154}{subsection.E.3.4}%
+\contentsline {section}{\numberline {E.4}Equality}{154}{section.E.4}%
+\contentsline {subsection}{\numberline {E.4.1}Identity}{155}{subsection.E.4.1}%
+\contentsline {subsection}{\numberline {E.4.2}Functions}{155}{subsection.E.4.2}%
+\contentsline {section}{\numberline {E.5}Bitwise Operations and String Conversion}{155}{section.E.5}%
+\contentsline {subsection}{\numberline {E.5.1}Bitwise Operations}{156}{subsection.E.5.1}%
+\contentsline {subsection}{\numberline {E.5.2}Conversion between Numbers and Strings}{156}{subsection.E.5.2}%
+\contentsline {section}{\numberline {E.6}Evaluation Order and Debug}{156}{section.E.6}%
+\contentsline {subsection}{\numberline {E.6.1}The Order of Evaluation within a Phrase}{157}{subsection.E.6.1}%
+\contentsline {subsection}{\numberline {E.6.2}Top-level Values}{157}{subsection.E.6.2}%
+\contentsline {subsection}{\numberline {E.6.3}Number Specialisation}{158}{subsection.E.6.3}%
+\contentsline {subsection}{\numberline {E.6.4}Debug}{159}{subsection.E.6.4}%
+\contentsline {section}{\numberline {E.7}Resource Limits}{159}{section.E.7}%
+\contentsline {subsection}{\numberline {E.7.1}The Size of Phrases}{160}{subsection.E.7.1}%
+\contentsline {subsection}{\numberline {E.7.2}Stack and Memory}{160}{subsection.E.7.2}%
+\contentsline {section}{\numberline {E.8}Platform and Ports}{160}{section.E.8}%
+\contentsline {subsection}{\numberline {E.8.1}The Order of Commands}{161}{subsection.E.8.1}%
+\contentsline {subsection}{\numberline {E.8.2}Incoming Port Values}{162}{subsection.E.8.2}%
+\contentsline {subsection}{\numberline {E.8.3}Outgoing Port Values}{162}{subsection.E.8.3}%
+\contentsline {subsection}{\numberline {E.8.4}Values at the Boundary}{163}{subsection.E.8.4}%
+\contentsline {subsection}{\numberline {E.8.5}Bytes at the Boundary}{163}{subsection.E.8.5}%
+\contentsline {subsection}{\numberline {E.8.6}Flags}{164}{subsection.E.8.6}%
+\contentsline {subsection}{\numberline {E.8.7}Processes}{164}{subsection.E.8.7}%
+\contentsline {subsection}{\numberline {E.8.8}Managers and Programs on a Platform}{165}{subsection.E.8.8}%
+\contentsline {section}{\numberline {E.9}Extensions of eco}{165}{section.E.9}%
+\contentsline {section}{\numberline {E.10}Known Divergences}{165}{section.E.10}%
+\contentsline {subsection}{\numberline {E.10.1}Int Arithmetic}{166}{subsection.E.10.1}%
+\contentsline {subsection}{\numberline {E.10.2}Float, Order and Equality}{166}{subsection.E.10.2}%
+\contentsline {subsection}{\numberline {E.10.3}Characters and Strings}{167}{subsection.E.10.3}%
+\contentsline {subsection}{\numberline {E.10.4}Evaluation}{167}{subsection.E.10.4}%
+\contentsline {subsection}{\numberline {E.10.5}Programs and Ports}{168}{subsection.E.10.5}%
+\contentsline {subsection}{\numberline {E.10.6}Elaboration}{169}{subsection.E.10.6}%
+\contentsline {chapter}{\numberline {F}Elm and Standard ML}{170}{appendix.F}%
+\contentsline {section}{\numberline {F.1}What Is the Same}{170}{section.F.1}%
+\contentsline {section}{\numberline {F.2}Differences by Construct}{170}{section.F.2}%

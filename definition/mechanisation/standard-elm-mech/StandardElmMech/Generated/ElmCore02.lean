@@ -171,11 +171,11 @@ def g_elm_core_EqualityTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "eq1" "True" .data (bin "==" (i 5) (i 5)),
-    ckk "eq2" "False" .data (bin "==" (i 5) (i 6)),
-    ckk "ne1" "True" .data (bin "/=" (i 5) (i 6)),
-    ckk "ne2" "False" .data (bin "/=" (i 5) (i 5)),
-    ckk "listEq" "True" .data (bin "==" (listE [i 1, i 2, i 3]) (listE [i 1, i 2, i 3])) ] }
+    ckk "eq1" "True" .data (bin "==" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))),
+    ckk "eq2" "False" .data (bin "==" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 6)))),
+    ckk "ne1" "True" .data (bin "/=" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 6)))),
+    ckk "ne2" "False" .data (bin "/=" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))),
+    ckk "listEq" "True" .data (bin "==" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])) ] }
 
 /-- tests/elm-core/src/FloatAbsTest.elm -/
 def g_elm_core_FloatAbsTest : Program := {
@@ -184,9 +184,9 @@ def g_elm_core_FloatAbsTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "abs1" "3.14" .float (ap (v "abs$Float") [.atexp (.scon (.float 314 (-2)))]),
-    ckk "abs2" "3.14" .float (ap (v "abs$Float") [.atexp (neg (.scon (.float 314 (-2))))]),
-    ckk "abs3" "0" .float (ap (v "abs$Float") [.atexp (.scon (.float 0 (-1)))]) ] }
+    ckk "abs1" "3.14" .float (ap (v "abs") [.atexp (.scon (.float 314 (-2)))]),
+    ckk "abs2" "3.14" .float (ap (v "abs") [.atexp (neg (.scon (.float 314 (-2))))]),
+    ckk "abs3" "0" .float (ap (v "abs") [.atexp (.scon (.float 0 (-1)))]) ] }
 
 /-- tests/elm-core/src/FloatAddTest.elm -/
 def g_elm_core_FloatAddTest : Program := {
@@ -476,9 +476,9 @@ def g_elm_core_IntAbsTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "abs1" "5" .int (ap (v "abs") [i 5]),
-    ckk "abs2" "5" .int (ap (v "abs") [.atexp (neg (A (i 5)))]),
-    ckk "abs3" "0" .int (ap (v "abs") [i 0]) ] }
+    ckk "abs1" "5" .float (ap (v "abs") [.atexp (.scon (.intF 5))]),
+    ckk "abs2" "5" .float (ap (v "abs") [.atexp (neg (.scon (.intF 5)))]),
+    ckk "abs3" "0" .float (ap (v "abs") [.atexp (.scon (.intF 0))]) ] }
 
 /-- tests/elm-core/src/IntAddTest.elm -/
 def g_elm_core_IntAddTest : Program := {
@@ -487,9 +487,9 @@ def g_elm_core_IntAddTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "add1" "13" .int (bin "+" (i 10) (i 3)),
-    ckk "add2" "0" .int (bin "+" (i 5) (.atexp (neg (A (i 5))))),
-    ckk "add3" "-5" .int (bin "+" (.atexp (neg (A (i 2)))) (.atexp (neg (A (i 3))))) ] }
+    ckk "add1" "13" .float (bin "+" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))),
+    ckk "add2" "0" .float (bin "+" (.atexp (.scon (.intF 5))) (.atexp (neg (.scon (.intF 5))))),
+    ckk "add3" "-5" .float (bin "+" (.atexp (neg (.scon (.intF 2)))) (.atexp (neg (.scon (.intF 3))))) ] }
 
 /-- tests/elm-core/src/IntCompareTest.elm -/
 def g_elm_core_IntCompareTest : Program := {
@@ -498,14 +498,14 @@ def g_elm_core_IntCompareTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "lt" "True" .data (bin "<" (i 3) (i 10)),
-    ckk "gt" "True" .data (bin ">" (i 10) (i 3)),
-    ckk "le1" "True" .data (bin "<=" (i 3) (i 10)),
-    ckk "le2" "True" .data (bin "<=" (i 5) (i 5)),
-    ckk "ge1" "True" .data (bin ">=" (i 10) (i 3)),
-    ckk "ge2" "True" .data (bin ">=" (i 5) (i 5)),
-    ckk "eq" "True" .data (bin "==" (i 5) (i 5)),
-    ckk "ne" "True" .data (bin "/=" (i 5) (i 3)) ] }
+    ckk "lt" "True" .data (bin "<" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 10)))),
+    ckk "gt" "True" .data (bin ">" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))),
+    ckk "le1" "True" .data (bin "<=" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 10)))),
+    ckk "le2" "True" .data (bin "<=" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))),
+    ckk "ge1" "True" .data (bin ">=" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))),
+    ckk "ge2" "True" .data (bin ">=" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))),
+    ckk "eq" "True" .data (bin "==" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))),
+    ckk "ne" "True" .data (bin "/=" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 3)))) ] }
 
 /-- tests/elm-core/src/IntDivByZeroTest.elm -/
 def g_elm_core_IntDivByZeroTest : Program := {

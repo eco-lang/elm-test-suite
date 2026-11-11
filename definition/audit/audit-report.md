@@ -52,6 +52,54 @@ Detailed findings with evidence are in `drafts/audit-x.md`, `drafts/audit-y.md` 
 | V4 | Minor | A7 (Terminology; design decision 7) | The heading "Effect Managers and Programs on a Platform" uses "effect manager", which decision 7 replaces by the registered "manager". | 05 (appendix-implementation) | fixed in round 2 |
 | V5 | Minor | O1 (source hygiene) | The DECIDED comment still says "Chapter 8's comment on r:e-enc-array, which calls Array.toList Elm text, needs aligning (reported)", which Y4's fix has made ... | 05 (appendix-dynamic-basis) | fixed in round 2 |
 
+## Round 3 (2026-11-10): rulings A27 revised, A93 to A97
+
+After the revision of A27 (a free `number` is Float), and rulings A93 to A97 (principal derivations,
+legality on the principal derivation, infinite inhabitants), two independent auditors read the book
+(part X: A1, A2, A5, A6 and the seams; part Y: A3, A4, A7), and three reviewers checked every
+`elm-spec` test that the Lean mechanisation does not translate against the book (309 compile-error
+tests, 148 runtime tests); the 488 translated tests are checked by the mechanisation. Detailed
+evidence: `drafts/round3-audit-x.md`, `drafts/round3-audit-y.md`, `drafts/round3-tests-*.md`.
+
+Mechanical checks: no LaTeX errors; no undefined or multiply defined references; rules 1 to 194,
+each once; no em dashes; 3 overfull boxes; Lean 1,477 checks agree.
+
+| ID | Severity | Check / Rule | Finding | Disposition |
+|----|----------|--------------|---------|-------------|
+| R3-X1 | Blocker | A2, A6 | An instance of a derivation allowed only a substitution of variables, but a module chooses the type names it generates freely, so no module declaring a type had a principal derivation. | fixed: static-modules sec:static-modules-principal (instance up to a bijection on generated type names); A96 note |
+| R3-X2 / Y4 | Blocker | A6, R5 | A program whose flags nothing fixes had no principal derivation (flags (), Int, ...), contradicting the property stated for programs. | fixed: the property is stated for Core phrases and modules only; Chapter 9's rules take each module premise from a principal derivation |
+| R3-X3 | Blocker | A6, A27 | Defaulting would replace a type-declaration parameter named `number`, leaving no derivation; copies covered type declarations. | fixed: dynamic-core exempts parameters of type declarations and r:sm-datbind closures; only declarations of values are copied (A27 note) |
+| R3-Y1 | Blocker | A4 (A27) | Appendix E: "the same meaning in every implementation" held only under the Int default. | fixed: hypothesis that no `number` variable is left to the default |
+| R3-Y3 | Major | A4 (A94) | Appendix E applied A94 to steps of a running program, where Chapter 9's traces require the step to end the handling of messages. | author decision: A94 covers programs with no meaning only; Appendix E intro narrowed; divergence rows for Elm/JS's lazy prefix `(&&)`/`(\|\|)` (A56) and `let` copies in `update` (A87) restored |
+| R3-Q2 | Major | A4 (A96) | Number flags: the book defaulted a flags variable of class `number` to Float and accepted it; Elm 0.19.1 reports BAD FLAGS. | author decision: reject like Elm; r:p-stat-main-program checks Port on the principal scheme before Dflt; test StandardA96NumberFlagsTest |
+| R3-X4 | Major | A6 | 4.9 said the further restrictions depend on the derivation; 4.11 that they do not. | fixed |
+| R3-X5 | Major | A2, O6 | "Respects rows" undefined; S applied as an object; U and T of contexts not covered. | fixed: S is a substitution defined on every type of D; U and T clauses added |
+| R3-Y2 / X9 | Major | A6 | Chapter 9's model-type example used the same `init` the new A96 paragraph refuses. | fixed: `init = \() -> ...` |
+| R3-X6, X7 | Minor | R1, S3 | 4.9 before the rules; module and program parts in the Core chapter; APPLY used. | fixed: 4.9 moved after the rules (now 4.10); module part in Chapter 5; APPLY replaced by words |
+| R3-X8 | Minor | A2 | "below" for the default above. | fixed |
+| R3-X10 | Minor | A6 | Undetermined number flags (see R3-Q2). | fixed with R3-Q2 |
+| R3-X11, Y11 | Minor | A1, seams | Dflt registry row and book plan said Int; stale headers; A27 "Affects". | fixed |
+| R3-X12, Y10 | Minor | HC2 | Ruling numbers printed in the text. | fixed (moved to comments or replaced by references) |
+| R3-X13 | Minor | wording | The every-derivation argument. | fixed |
+| R3-X14 | Minor | A6 | Scheme equality erased A93's extra closure variables. | fixed: kept by scheme equality |
+| R3-X15, Y7 | Minor | wording | "All three conform"; "differ only". | fixed |
+| R3-X16 | Minor | A1 | D, D', S not in the registry. | fixed (2026-11-11): substitution, derivation, instance, principal derivation and the type-name bijection rho registered as plain operations in `gen_notation.py`; the sequence of leaf commands in Chapter 9's dispatch rules, also written D, renamed L and registered |
+| R3-Y5, Y6 | Minor | A4 | Implementation-dependent `"0.5"`; examples not marked "at Int"; preface pairing. | fixed |
+| R3-Y8 | Minor | HC3 | Implementations described in dynamic-core. | fixed (sentence removed) |
+| R3-Y9 | Minor | HC1 | "might". | fixed |
+| R3-Y12 | Minor | HC4 | New examples in running text. | accepted as house style |
+| R3-Q2 (Y) | question | Terminology | "node" for a node of a derivation. | accepted: not a syntax node |
+| R3-Q3 (Y) | question | HC3 | Damas and Milner named in the body. | accepted: theory, not an implementation |
+
+Tests: compile-error 308 of 309 OK, 1 tag fixed (BadTupleATupleOfFourTest); runtime 139 of 148
+OK. Changes: CompilerIssue2182 becomes a compile-error test (A23 confirmed); LetSeparatedStagingTest
+gains its CHECK; CoreIssue1150 accepts a negative code; six tests of behaviour the book leaves open
+are tagged `elm-unspecced` (author decision): NonEntryMainEvaluatedOnceTest,
+StandardA87NumberDefaultCopyTest, CmdBatchOrderTest, ProcessKillRunnableTest,
+PlatformManagerCommandTest, PortEchoIntTest; four tests' comments or calls updated for the Float
+default; StandardA84DuplicatePortNameTest tags p-stat-main-program; new test
+StandardA96NumberFlagsTest.
+
 ## Carried From Mechanisation
 
 From `../mechanisation/mechanisation-report.md` (Lean 4; all 48 rules of Chapter 6 and APPLY for arithmetic, equality, order, Booleans and Debug; evaluator proved sound; 246 checks, 239 agree, 7 diverge).

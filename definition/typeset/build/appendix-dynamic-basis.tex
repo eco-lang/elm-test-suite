@@ -199,8 +199,8 @@ value of the same name, which has that arity; we write the basic values of
 Figures~\ref{fig:dynamic-basis-basics} to~\ref{fig:dynamic-basis-others} are
 all distinct. An identifier marked ``Elm'' is bound to the value of its
 elm/core text (Section~\ref{sec:appendix-dynamic-basis-elm}); for \kw{abs},
-to that of its default copy, the copy at $\tFloat$ being bound to a new
-variable (Section~\ref{sec:appendix-dynamic-basis-elm}). % A49
+to that of its default copy, at $\tFloat$, the copy at $\tInt$ being bound to
+a new variable (Section~\ref{sec:appendix-dynamic-basis-elm}). % A49
 The identifiers
 \kw{e} and \kw{pi} are bound to floats.
 
@@ -456,7 +456,7 @@ Appendix~\ref{ch:appendix-derived-forms} introduce into these texts (by
 \kw{if} and by prefix minus) denote the values \kw{True}, \kw{False} and
 \kw{negate} of Figure~\ref{fig:dynamic-basis-basics}; the texts are part of
 the definition, not of a program, so the rule that a module cannot qualify
-its own names (A38) does not apply to them.
+its own names does not apply to them. % A38
 % audit X18, V3; A38 governs programs only
 No text refers
 to a value that another text defines. The value bound to $\var$ in
@@ -527,17 +527,17 @@ Of the values of the basis written in Elm, only \kw{abs} has a type scheme
 that quantifies a variable of class $\knum$
 (Figure~\ref{fig:static-basis-basics-ve1}); the identifier \kw{abs} of
 Figure~\ref{fig:dynamic-basis-basics} is bound to its default copy, at
-$\tInt$. Besides this, the value environment of $\ME_0(\kw{Basics})$ binds
-the new variable of the copy of the declaration of \kw{abs} at $\tFloat$
+$\tFloat$. Besides this, the value environment of $\ME_0(\kw{Basics})$ binds
+the new variable of the copy of the declaration of \kw{abs} at $\tInt$
 that the specialisation makes, to the value of that copy, evaluated in
 $E_{\mathrm{K}}$ as the default copy is. An occurrence of \kw{abs} at
-$\tFloat$ thus finds its copy: qualified, through the qualifier
+$\tInt$ thus finds its copy: qualified, through the qualifier
 \kw{Basics}; unqualified, through the default import
 \kw{import Basics exposing (..)}, whose exposing list gives the whole of
 that value environment; and through an exposing item \kw{abs} of an
 import, which stands for the variable and the new variable of its copy
 (Section~\ref{sec:dynamic-modules-reduced}).
-So \kw{abs 1.5} is the float $1.5$. % A87; audit V1
+So \kw{abs -1.5} is the float $1.5$, and \kw{abs (3 // -1)} the Int value $3$. % A87; audit V1
 % A49: clamp, whose type scheme also quantifies a variable of class number,
 % is a basic value, so specialisation makes no copy of it; its APPLY
 % dispatches on its arguments, as that of add does.
@@ -623,8 +623,8 @@ For $n\neq 0$, $m-n\cdot\lfloor m/n\rfloor$ is $0$ or has the sign of $n$,
 $m-n\cdot\dbtrunc(m/n)$ is $0$ or has the sign of $m$, and both are less than
 $|n|$ in absolute value; hence both are members of $\IntRange$.
 \end{property}
-Thus \kw{3 // 0}, \kw{modBy 0 3} and \kw{remainderBy 0 3} are all $0$, and
-\kw{1 \textasciicircum{} -1} is $1$, \kw{(-1) \textasciicircum{} -3} is $-1$
+Thus \kw{3 // 0}, \kw{modBy 0 3} and \kw{remainderBy 0 3} are all $0$, and,
+at $\tInt$, \kw{1 \textasciicircum{} -1} is $1$, \kw{(-1) \textasciicircum{} -3} is $-1$
 and \kw{2 \textasciicircum{} -1} is $0$. % D3, A42, A43
 The quotient \kw{($\min\IntRange$) // -1} is $\norm(-\min\IntRange)$. % A41
 By the text of \kw{abs} (Figure~\ref{fig:dynamic-basis-elm}), \kw{abs n} is

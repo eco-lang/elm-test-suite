@@ -11,9 +11,9 @@ def g_elm_core_BasicsClampTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "clamp_low" "5" .int (ap (v "clamp") [i 5, i 10, i 3]),
-    ckk "clamp_mid" "7" .int (ap (v "clamp") [i 5, i 10, i 7]),
-    ckk "clamp_high" "10" .int (ap (v "clamp") [i 5, i 10, i 15]),
+    ckk "clamp_low" "5" .float (ap (v "clamp") [.atexp (.scon (.intF 5)), .atexp (.scon (.intF 10)), .atexp (.scon (.intF 3))]),
+    ckk "clamp_mid" "7" .float (ap (v "clamp") [.atexp (.scon (.intF 5)), .atexp (.scon (.intF 10)), .atexp (.scon (.intF 7))]),
+    ckk "clamp_high" "10" .float (ap (v "clamp") [.atexp (.scon (.intF 5)), .atexp (.scon (.intF 10)), .atexp (.scon (.intF 15))]),
     ckk "clamp_float" "3.5" .float (ap (v "clamp") [.atexp (.scon (.float 10 (-1))), .atexp (.scon (.float 50 (-1))), .atexp (.scon (.float 35 (-1)))]) ] }
 
 /-- tests/elm-core/src/BasicsIdentityTest.elm -/
@@ -23,9 +23,9 @@ def g_elm_core_BasicsIdentityTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "identity_int" "42" .int (ap (v "identity") [i 42]),
+    ckk "identity_int" "42" .float (ap (v "identity") [.atexp (.scon (.intF 42))]),
     ckk "identity_string" "\"hello\"" .string (ap (v "identity") [str "hello"]),
-    ckk "always_result" "99" .int (ap (v "always") [i 99, str "ignored"]) ] }
+    ckk "always_result" "99" .float (ap (v "always") [.atexp (.scon (.intF 99)), str "ignored"]) ] }
 
 /-- tests/elm-core/src/BasicsIsNaNTest.elm -/
 def g_elm_core_BasicsIsNaNTest : Program := {
@@ -194,10 +194,10 @@ def g_elm_core_CompareEmptyListTest : Program := {
     ckk "ae" "GT" .data (ap (v "compare") [listE [i 1], v "emptyL"]),
     ckk "eab" "LT" .data (ap (v "compare") [v "emptyL", listE [i 1, i 2]]),
     ckk "abe" "GT" .data (ap (v "compare") [listE [i 1, i 2], v "emptyL"]),
-    ckk "aa" "EQ" .data (ap (v "compare") [listE [i 1], listE [i 1]]),
-    ckk "ab" "LT" .data (ap (v "compare") [listE [i 1], listE [i 2]]),
-    ckk "ba" "GT" .data (ap (v "compare") [listE [i 2], listE [i 1]]),
-    ckk "aba" "GT" .data (ap (v "compare") [listE [i 1, i 2], listE [i 1]]) ] }
+    ckk "aa" "EQ" .data (ap (v "compare") [listE [.atexp (.scon (.intF 1))], listE [.atexp (.scon (.intF 1))]]),
+    ckk "ab" "LT" .data (ap (v "compare") [listE [.atexp (.scon (.intF 1))], listE [.atexp (.scon (.intF 2))]]),
+    ckk "ba" "GT" .data (ap (v "compare") [listE [.atexp (.scon (.intF 2))], listE [.atexp (.scon (.intF 1))]]),
+    ckk "aba" "GT" .data (ap (v "compare") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))], listE [.atexp (.scon (.intF 1))]]) ] }
 
 /-- tests/elm-core/src/CompareEmptyStringTest.elm -/
 def g_elm_core_CompareEmptyStringTest : Program := {
@@ -260,9 +260,9 @@ def g_elm_core_CompareIntTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "cmp1" "LT" .data (ap (v "compare") [i 1, i 2]),
-    ckk "cmp2" "GT" .data (ap (v "compare") [i 3, i 2]),
-    ckk "cmp3" "EQ" .data (ap (v "compare") [i 5, i 5]) ] }
+    ckk "cmp1" "LT" .data (ap (v "compare") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]),
+    ckk "cmp2" "GT" .data (ap (v "compare") [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 2))]),
+    ckk "cmp3" "EQ" .data (ap (v "compare") [.atexp (.scon (.intF 5)), .atexp (.scon (.intF 5))]) ] }
 
 /-- tests/elm-core/src/CompareNestedEmptyListTest.elm -/
 def g_elm_core_CompareNestedEmptyListTest : Program := {
@@ -315,11 +315,11 @@ def g_elm_core_CompareTupleWithEmptyListNestedTest : Program := {
   locals := [
     .fn "emptyL" [] (listE []) ],
   checks := [
-    ckk "ee" "EQ" .data (ap (v "compare") [tup2 (tup2 (i 0) (v "emptyL")) (i 1), tup2 (tup2 (i 0) (v "emptyL")) (i 1)]),
-    ckk "eA" "LT" .data (ap (v "compare") [tup2 (tup2 (i 0) (v "emptyL")) (i 1), tup2 (tup2 (i 0) (listE [i 1])) (i 1)]),
-    ckk "Ae" "GT" .data (ap (v "compare") [tup2 (tup2 (i 0) (listE [i 1])) (i 1), tup2 (tup2 (i 0) (v "emptyL")) (i 1)]),
-    ckk "triple_eA" "LT" .data (ap (v "compare") [tup3 (i 0) (v "emptyL") (str "x"), tup3 (i 0) (listE [i 1]) (str "x")]),
-    ckk "triple_Ae" "GT" .data (ap (v "compare") [tup3 (i 0) (listE [i 1]) (str "x"), tup3 (i 0) (v "emptyL") (str "x")]) ] }
+    ckk "ee" "EQ" .data (ap (v "compare") [tup2 (tup2 (.atexp (.scon (.intF 0))) (v "emptyL")) (.atexp (.scon (.intF 1))), tup2 (tup2 (.atexp (.scon (.intF 0))) (v "emptyL")) (.atexp (.scon (.intF 1)))]),
+    ckk "eA" "LT" .data (ap (v "compare") [tup2 (tup2 (.atexp (.scon (.intF 0))) (v "emptyL")) (.atexp (.scon (.intF 1))), tup2 (tup2 (.atexp (.scon (.intF 0))) (listE [i 1])) (.atexp (.scon (.intF 1)))]),
+    ckk "Ae" "GT" .data (ap (v "compare") [tup2 (tup2 (.atexp (.scon (.intF 0))) (listE [i 1])) (.atexp (.scon (.intF 1))), tup2 (tup2 (.atexp (.scon (.intF 0))) (v "emptyL")) (.atexp (.scon (.intF 1)))]),
+    ckk "triple_eA" "LT" .data (ap (v "compare") [tup3 (.atexp (.scon (.intF 0))) (v "emptyL") (str "x"), tup3 (.atexp (.scon (.intF 0))) (listE [i 1]) (str "x")]),
+    ckk "triple_Ae" "GT" .data (ap (v "compare") [tup3 (.atexp (.scon (.intF 0))) (listE [i 1]) (str "x"), tup3 (.atexp (.scon (.intF 0))) (v "emptyL") (str "x")]) ] }
 
 /-- tests/elm-core/src/CompareTupleWithEmptyListTest.elm -/
 def g_elm_core_CompareTupleWithEmptyListTest : Program := {
@@ -329,13 +329,13 @@ def g_elm_core_CompareTupleWithEmptyListTest : Program := {
   locals := [
     .fn "emptyL" [] (listE []) ],
   checks := [
-    ckk "ee" "EQ" .data (ap (v "compare") [tup2 (i 0) (v "emptyL"), tup2 (i 0) (v "emptyL")]),
-    ckk "eA" "LT" .data (ap (v "compare") [tup2 (i 0) (v "emptyL"), tup2 (i 0) (listE [i 1])]),
-    ckk "Ae" "GT" .data (ap (v "compare") [tup2 (i 0) (listE [i 1]), tup2 (i 0) (v "emptyL")]),
-    ckk "eAB" "LT" .data (ap (v "compare") [tup2 (i 0) (v "emptyL"), tup2 (i 0) (listE [i 1, i 2])]),
-    ckk "ABe" "GT" .data (ap (v "compare") [tup2 (i 0) (listE [i 1, i 2]), tup2 (i 0) (v "emptyL")]),
-    ckk "f0_ee" "LT" .data (ap (v "compare") [tup2 (v "emptyL") (i 0), tup2 (listE [i 1]) (i 0)]),
-    ckk "f0_Ae" "GT" .data (ap (v "compare") [tup2 (listE [i 1]) (i 0), tup2 (v "emptyL") (i 0)]) ] }
+    ckk "ee" "EQ" .data (ap (v "compare") [tup2 (.atexp (.scon (.intF 0))) (v "emptyL"), tup2 (.atexp (.scon (.intF 0))) (v "emptyL")]),
+    ckk "eA" "LT" .data (ap (v "compare") [tup2 (.atexp (.scon (.intF 0))) (v "emptyL"), tup2 (.atexp (.scon (.intF 0))) (listE [i 1])]),
+    ckk "Ae" "GT" .data (ap (v "compare") [tup2 (.atexp (.scon (.intF 0))) (listE [i 1]), tup2 (.atexp (.scon (.intF 0))) (v "emptyL")]),
+    ckk "eAB" "LT" .data (ap (v "compare") [tup2 (.atexp (.scon (.intF 0))) (v "emptyL"), tup2 (.atexp (.scon (.intF 0))) (listE [i 1, i 2])]),
+    ckk "ABe" "GT" .data (ap (v "compare") [tup2 (.atexp (.scon (.intF 0))) (listE [i 1, i 2]), tup2 (.atexp (.scon (.intF 0))) (v "emptyL")]),
+    ckk "f0_ee" "LT" .data (ap (v "compare") [tup2 (v "emptyL") (.atexp (.scon (.intF 0))), tup2 (listE [i 1]) (.atexp (.scon (.intF 0)))]),
+    ckk "f0_Ae" "GT" .data (ap (v "compare") [tup2 (listE [i 1]) (.atexp (.scon (.intF 0))), tup2 (v "emptyL") (.atexp (.scon (.intF 0)))]) ] }
 
 /-- tests/elm-core/src/CompareTupleWithEmptyStringTest.elm -/
 def g_elm_core_CompareTupleWithEmptyStringTest : Program := {
@@ -344,11 +344,11 @@ def g_elm_core_CompareTupleWithEmptyStringTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "ee" "EQ" .data (ap (v "compare") [tup2 (i 0) (str ""), tup2 (i 0) (str "")]),
-    ckk "ea" "LT" .data (ap (v "compare") [tup2 (i 0) (str ""), tup2 (i 0) (str "a")]),
-    ckk "ae" "GT" .data (ap (v "compare") [tup2 (i 0) (str "a"), tup2 (i 0) (str "")]),
-    ckk "f0_ea" "LT" .data (ap (v "compare") [tup2 (str "") (i 0), tup2 (str "a") (i 0)]),
-    ckk "f0_ae" "GT" .data (ap (v "compare") [tup2 (str "a") (i 0), tup2 (str "") (i 0)]) ] }
+    ckk "ee" "EQ" .data (ap (v "compare") [tup2 (.atexp (.scon (.intF 0))) (str ""), tup2 (.atexp (.scon (.intF 0))) (str "")]),
+    ckk "ea" "LT" .data (ap (v "compare") [tup2 (.atexp (.scon (.intF 0))) (str ""), tup2 (.atexp (.scon (.intF 0))) (str "a")]),
+    ckk "ae" "GT" .data (ap (v "compare") [tup2 (.atexp (.scon (.intF 0))) (str "a"), tup2 (.atexp (.scon (.intF 0))) (str "")]),
+    ckk "f0_ea" "LT" .data (ap (v "compare") [tup2 (str "") (.atexp (.scon (.intF 0))), tup2 (str "a") (.atexp (.scon (.intF 0)))]),
+    ckk "f0_ae" "GT" .data (ap (v "compare") [tup2 (str "a") (.atexp (.scon (.intF 0))), tup2 (str "") (.atexp (.scon (.intF 0)))]) ] }
 
 /-- tests/elm-core/src/CompilerIssue2362NanTupleEqualityTest.elm -/
 def g_elm_core_CompilerIssue2362NanTupleEqualityTest : Program := {
@@ -357,8 +357,8 @@ def g_elm_core_CompilerIssue2362NanTupleEqualityTest : Program := {
   defs := [ ],
   locals := [
     .fn "nan" [] (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))),
-    .fn "p" [] (tup2 (v "nan") (i 1)),
-    .fn "q" [] (tup2 (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))) (i 1)) ],
+    .fn "p" [] (tup2 (v "nan") (.atexp (.scon (.intF 1)))),
+    .fn "q" [] (tup2 (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))) (.atexp (.scon (.intF 1)))) ],
   checks := [
     ckk "nan == nan" "False" .data (bin "==" (v "nan") (v "nan")),
     ckk "p == q" "False" .data (bin "==" (v "p") (v "q")),
@@ -369,15 +369,15 @@ def g_elm_core_CompositionTest : Program := {
   name := "CompositionTest", source := "tests/elm-core/src",
   cons := [],
   defs := [
-    .fn "double" [pv "x"] (bin "*" (v "x") (i 2)),
-    .fn "addOne" [pv "x"] (bin "+" (v "x") (i 1)) ],
+    .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))),
+    .fn "addOne" [pv "x"] (bin "+" (v "x") (.atexp (.scon (.intF 1)))) ],
   locals := [
     .fn "addOneThenDouble" [] (bin ">>" (v "addOne") (v "double")),
     .fn "doubleThenAddOne" [] (bin "<<" (v "addOne") (v "double")) ],
   checks := [
-    ckk "compose1" "20" .int (ap (v "addOneThenDouble") [i 9]),
-    ckk "compose2" "11" .int (ap (v "doubleThenAddOne") [i 5]),
-    ckk "pipe1" "20" .int (bin "|>" (bin "|>" (i 9) (v "addOne")) (v "double")) ] }
+    ckk "compose1" "20" .float (ap (v "addOneThenDouble") [.atexp (.scon (.intF 9))]),
+    ckk "compose2" "11" .float (ap (v "doubleThenAddOne") [.atexp (.scon (.intF 5))]),
+    ckk "pipe1" "20" .float (bin "|>" (bin "|>" (.atexp (.scon (.intF 9))) (v "addOne")) (v "double")) ] }
 
 /-- tests/elm-core/src/ContainerCompareCharTest.elm -/
 def g_elm_core_ContainerCompareCharTest : Program := {
@@ -543,13 +543,12 @@ def g_elm_core_CoreIssue1115NanEqualsLiteralZeroTest : Program := {
   cons := [],
   defs := [ ],
   locals := [
-    .fn "zero" [] (i 0),
-    .fn "zero$Float" [] (.atexp (.scon (.intF 0))),
+    .fn "zero" [] (.atexp (.scon (.intF 0))),
     .fn "nan" [] (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))) ],
   checks := [
     ckk "nan == 0" "False" .data (bin "==" (v "nan") (.atexp (.scon (.intF 0)))),
     ckk "0 == nan" "False" .data (bin "==" (.atexp (.scon (.intF 0))) (v "nan")),
-    ckk "nan == zero" "False" .data (bin "==" (v "nan") (v "zero$Float")) ] }
+    ckk "nan == zero" "False" .data (bin "==" (v "nan") (v "zero")) ] }
 
 /-- tests/elm-core/src/CoreIssue988NanEqualityReferenceTest.elm -/
 def g_elm_core_CoreIssue988NanEqualityReferenceTest : Program := {
@@ -573,7 +572,7 @@ def g_elm_core_EqBoxedFastPathTest : Program := {
     .fn "upFrom" [pv "n"] (listE [v "n", bin "+" (v "n") (i 1), bin "+" (v "n") (i 2)]) ],
   locals := [
     .fn "s" [] (str "hello"),
-    .fn "l" [] (listE [i 1, i 2, i 3]) ],
+    .fn "l" [] (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) ],
   checks := [
     ckk "strSame" "True" .data (bin "==" (v "s") (v "s")),
     ckk "strTwin" "True" .data (bin "==" (v "twinA") (v "twinB")),
@@ -582,10 +581,10 @@ def g_elm_core_EqBoxedFastPathTest : Program := {
     ckk "listSame" "True" .data (bin "==" (v "l") (v "l")),
     ckk "listTwin" "True" .data (bin "==" (ap (v "upFrom") [i 1]) (listE [i 1, i 2, i 3])),
     ckk "listDiff" "False" .data (bin "==" (ap (v "upFrom") [i 1]) (listE [i 1, i 2])),
-    ckk "tupleTwin" "True" .data (bin "==" (tup2 (i 1) (str "a")) (tup2 (i 1) (str "a"))),
-    ckk "tupleDiff" "False" .data (bin "==" (tup2 (i 1) (str "a")) (tup2 (i 1) (str "b"))),
-    ckk "recordTwin" "True" .data (bin "==" (recE [("x", i 1), ("y", str "a")]) (recE [("x", i 1), ("y", str "a")])),
-    ckk "recordDiff" "False" .data (bin "==" (recE [("x", i 1), ("y", str "a")]) (recE [("x", i 2), ("y", str "a")])),
+    ckk "tupleTwin" "True" .data (bin "==" (tup2 (.atexp (.scon (.intF 1))) (str "a")) (tup2 (.atexp (.scon (.intF 1))) (str "a"))),
+    ckk "tupleDiff" "False" .data (bin "==" (tup2 (.atexp (.scon (.intF 1))) (str "a")) (tup2 (.atexp (.scon (.intF 1))) (str "b"))),
+    ckk "recordTwin" "True" .data (bin "==" (recE [("x", .atexp (.scon (.intF 1))), ("y", str "a")]) (recE [("x", .atexp (.scon (.intF 1))), ("y", str "a")])),
+    ckk "recordDiff" "False" .data (bin "==" (recE [("x", .atexp (.scon (.intF 1))), ("y", str "a")]) (recE [("x", .atexp (.scon (.intF 2))), ("y", str "a")])),
     ckk "customTwin" "True" .data (bin "==" (ap (c "Rect") [i 2, i 3]) (ap (c "Rect") [i 2, i 3])),
     ckk "customDiff" "False" .data (bin "==" (ap (c "Rect") [i 2, i 3]) (ap (c "Circle") [i 2])),
     ckk "unitEq" "True" .data (bin "==" (.atexp .unit) (.atexp .unit)),
@@ -594,7 +593,7 @@ def g_elm_core_EqBoxedFastPathTest : Program := {
     ckk "boolTT" "True" .data (bin "==" (c "True") (c "True")),
     ckk "boolTF" "False" .data (bin "==" (c "True") (c "False")),
     ckk "boolNe" "True" .data (bin "/=" (c "True") (c "False")),
-    ckk "nestedTwin" "True" .data (bin "==" (ap (c "Just") [listE [tup2 (i 1) (str "a")]]) (ap (c "Just") [listE [tup2 (i 1) (str "a")]])) ] }
+    ckk "nestedTwin" "True" .data (bin "==" (ap (c "Just") [listE [tup2 (.atexp (.scon (.intF 1))) (str "a")]]) (ap (c "Just") [listE [tup2 (.atexp (.scon (.intF 1))) (str "a")]])) ] }
 
 /-- The programs of this shard. -/
 def shard_ElmCore01 : List Program :=

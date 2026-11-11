@@ -13,9 +13,13 @@ The values include 0, -1, the 32-bit signed limits (2147483647 and
 -2147483648), and the largest and smallest integers a JavaScript number holds
 exactly (9007199254740991 and -9007199254740991).
 
+Tagged `elm-unspecced`: two of the values, 9007199254740991 and -9007199254740991, lie outside the
+Int range that A Standard Definition of Elm? guarantees, from -2^31 to 2^31 - 1 (ruling A40;
+Appendix E, Int).
+
 -}
 
--- TAGS: elm-spec, e-enc-int, e-dec-int, dm-topdec-port-out, dm-topdec-port-in
+-- TAGS: elm-unspecced
 -- CHECK: PortEchoIntTest got: 0
 -- CHECK: PortEchoIntTest got: -1
 -- CHECK: PortEchoIntTest got: 42

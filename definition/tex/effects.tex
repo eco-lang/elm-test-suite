@@ -371,7 +371,8 @@ requests to managers. A \emph{manager} $\effm$ is one of the following.
   whether they are commands or subscriptions, and the messages they give are
   defined by the platform. % A83
 \end{itemize}
-Since port names are distinct (A84), a port name $\effp$ determines the
+Since port names are distinct (rule~\ruleref{r:p-stat-module}), a port name
+$\effp$ determines the
 payload type $\tau$ of every manager $\effmin(\effp,\tau)$ of a program. A
 batch groups commands, and $\effmap(v,\cm)$ applies the function value $v$ to
 every message that $\cm$ gives.

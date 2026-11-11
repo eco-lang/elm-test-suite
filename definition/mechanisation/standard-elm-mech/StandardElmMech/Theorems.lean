@@ -62,16 +62,20 @@ inductive Expect where
   | int (n : Int)
   | con (name : String)
   | str (s : String)
+  /-- A float, as Elm prints it (`showFloat`, which the kernel computes). -/
+  | flt (s : String)
 
 def Expect.holds : Val → Expect → Prop
   | v, .int n => v = .sv (.int n)
   | v, .con k => ∃ c, v = .con c [] ∧ c.name = k
   | v, .str s => v = .sv (.str s)
+  | v, .flt s => ∃ x, v = .sv (.float x) ∧ showFloat x = s
 
 def kcheckVal : Val → Expect → Bool
   | .sv (.int m), .int n => m == n
   | .con c [], .con k => c.name == k
   | .sv (.str s), .str t => s == t
+  | .sv (.float x), .flt s => showFloat x == s
   | _, _ => false
 
 theorem kcheckVal_holds {v : Val} {x : Expect} : kcheckVal v x = true → x.holds v := by
@@ -113,8 +117,8 @@ def floatValued (p : Program) (_ck : Check) : Bool :=
 /-- The expectation the kernel checks for a check, if it can: none for a
     known divergence or a program that uses a value only the C library
     computes (`Program.native`); by the check's kind for a translated check (an Int, a
-    string, or a constructor without arguments; never a float, which may print
-    as `NaN` or `3`); by its expected value for a hand-written one. -/
+    string, a constructor without arguments, or a float, compared as printed); by its
+    expected value for a hand-written one. -/
 def kernelCheck? (p : Program) (ck : Check) : Option Expect :=
   if knownDiv.contains (p.name, ck.label) || p.native then none else
   match ck.kind with
@@ -128,6 +132,7 @@ def kernelCheck? (p : Program) (ck : Check) : Option Expect :=
   | .data => match expectOf ck.expected with
     | some (.con k) => some (.con k)
     | _ => none
+  | .float => if ck.expected == "(no value)" then none else some (.flt ck.expected)
   | _ => none
 
 open Lean Elab Command in
@@ -152,6 +157,7 @@ elab "#kernel_checks " ps:ident pre:str : command => do
           | .int n => s!"(Expect.int ({n}))"
           | .con s => s!"(Expect.con \"{s}\")"
           | .str s => s!"(Expect.str {repr s})"
+          | .flt s => s!"(Expect.flt {repr s})"
         let thm := s!"kc_{pfx}_{k}"
         let stx := s!"/-- {p.name}: {c.label} -/\ntheorem {thm} : ∃ v, EvalExp ({src}[{pi}]!).env (({src}[{pi}]!).phrase ({src}[{pi}]!).checks[{ci}]!) v ∧ {xs}.holds v := by\n  first\n  | exact kcheck_sound (ch := false) (by decide +kernel)\n  | exact kcheck_sound (ch := true) (by decide +kernel)"
         match Parser.runParserCategory (← getEnv) `command stx with

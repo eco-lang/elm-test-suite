@@ -31,7 +31,21 @@ boundary (Section~\ref{sec:appendix-implementation-bytes}). Each section states 
 requirement, with a reference to the body, and then gives a table with one row
 per implementation: its choice, and the consequences for programs. An
 implementation \emph{conforms} on a point when its choice meets the
-requirement. Section~\ref{sec:appendix-implementation-divergences} collects
+requirement. The requirements concern the programs to which the definition
+gives a value. Where a program elaborates and the definition gives it a value,
+a conforming implementation's result is one of its values; where the
+definition gives it none (the evaluation of its modules reaches
+\kw{Debug.todo}, or does not end), the program has no meaning, and the
+definition requires nothing of an implementation, which may stop, run for
+ever, or run the program to some result. So Elm/JS, for which
+\kw{(\&\&) False (Debug.todo "x")} is \kw{False} where the definition gives no
+value, conforms on a program whose modules evaluate it. % A94, A56
+A program that has a meaning is held to its traces
+(Section~\ref{sec:programs-behaviour}). Where a step of it has no result, as
+when an application of \kw{update} reaches \kw{Debug.todo}, no further message
+is handled (rule~\ruleref{r:p-update}), and an implementation that handles
+further messages does not conform. % A94
+Section~\ref{sec:appendix-implementation-divergences} collects
 every known point on which an implementation does not conform, with the
 ruling that settles it. The facts recorded here describe the versions named;
 they are not part of the definition.
@@ -118,13 +132,13 @@ Conforms.\\
 \hline
 Impl. & Choice & Consequences for programs\\
 \hline
-Elm/JS & The real power, held as an Int: \kw{2 \textasciicircum{} -1} is
-\kw{0.5} and \kw{0 \textasciicircum{} -1} is an infinity. &
+Elm/JS & The real power, held as an Int: at Int, \kw{2 \textasciicircum{} -1}
+is \kw{0.5} and \kw{0 \textasciicircum{} -1} is an infinity. &
 Does not conform: the result is not an integer.\\
 eco & $0$ for every base, \kw{1} and \kw{-1} included. For $e\geq 0$, the
 power reduced modulo $2^{64}$, as $\norm$. &
-Does not conform for the bases $1$ and $-1$: \kw{1 \textasciicircum{} -1} is
-$0$, not $1$.\\
+Does not conform for the bases $1$ and $-1$: at Int,
+\kw{1 \textasciicircum{} -1} is $0$, not $1$.\\
 \hline
 \end{tabular}
 \end{center}
@@ -169,10 +183,12 @@ eco & Int has one zero. & Conforms: \kw{1 / toFloat (negate 0)} is
 In Elm/JS a value of type \kw{Int} may thus be a fraction, NaN, an infinity or
 a negative zero, none of which is a member of any $\IntRange$; Elm/JS does not
 conform at the extremes of Int. A program whose exact Int results, quotients
-and conversions from Float all lie between $-2^{31}$ and $2^{31}-1$, and which
+and conversions from Float all lie between $-2^{31}$ and $2^{31}-1$, which
 applies neither \kw{modBy 0}, \kw{remainderBy 0} nor Int
-\kw{\textasciicircum} with a negative exponent, has the same meaning in every
-implementation listed here, apart from the sign of a zero seen through
+\kw{\textasciicircum} with a negative exponent, and which leaves no variable of
+class \kw{number} to the default of Float
+(Section~\ref{sec:appendix-implementation-numbers}), has the same meaning in
+every implementation listed here, apart from the sign of a zero seen through
 \kw{toFloat}.
 
 % ===========================================================================
@@ -440,8 +456,8 @@ Float on every path. &
 Does not conform for values containing NaN: by the code, \kw{p == p} as above
 is \kw{True}, while a separately built \kw{( nan, 1 )} is unequal to \kw{p}.
 Two of eco's tests of known Elm bugs expect \kw{False} for \kw{p == p} and for
-other containers compared with themselves, as the definition gives (A50), but
-eco's test harness does not run them.\\
+other containers compared with themselves, as the definition gives, but
+eco's test harness does not run them.\\ % A50
 % eco tests: elm-bugs CompilerIssue2362NanTupleEqualityTest:13-15 and
 % CoreIssue988NanContainerSelfEqualityTest:17-24, not run by the E2E harness
 % (survey, Equality and test suite status); code: Utils.cpp:503,
@@ -592,6 +608,79 @@ In both, a \kw{main} in a module other than the main module is evaluated once,
 and a top-level value needed while it is itself being evaluated, which has no
 value, ends the program: by exhausting the stack, or, in Elm/JS compiled for
 debugging, with a report of infinite recursion. % A25
+
+\subsection{Number Specialisation}\label{sec:appendix-implementation-numbers}
+% A27, A87, A93, A94
+The body requires the following
+(Section~\ref{sec:static-core-principal} and
+Section~\ref{sec:dynamic-core-numbers}).
+\begin{itemize}
+\item A type variable of class \kw{number} that nothing fixes is
+  \kw{Float}. An implementation that fixes the types of numbers before the
+  program runs meets this by closing each such variable to \kw{Float}; nothing
+  more need be evaluated. % A27, A93
+\item A declaration whose type scheme quantifies a variable of class
+  \kw{number} has its default copy, at \kw{Float}, and a copy for each other
+  type at which a phrase uses it, whether or not that phrase is evaluated.
+  Each copy of a top-level declaration is evaluated when its module is, and
+  each copy of a \kw{let} declaration when the \kw{let} is. % A87, A59
+\end{itemize}
+A copy that the program does not need, and that has no value, therefore
+leaves the program without one when it is evaluated with its module, and the
+definition then requires nothing of an implementation (the beginning of this
+appendix); evaluated in a step of a running program, such as an application
+of \kw{update}, it leaves that step without a result, which a conforming
+implementation must respect. % A94
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Impl. & Choice & Consequences for programs\\
+\hline
+Elm/JS & One representation for Int and Float, which behaves as Float. A
+value is evaluated once, with that representation. &
+Conforms, except in a step of a running program where a copy that is not
+needed has no value: Elm/JS carries on
+(Section~\ref{sec:appendix-implementation-divergences}). A computation with a
+\kw{number} that nothing fixes gives the value of the default copy.\\
+eco & Monomorphises: a definition is copied only for the types at which the
+program uses it, and a \kw{number} variable that nothing fixes is closed to
+\kw{Int}. A copy of a top-level value is evaluated on first use
+(Section~\ref{sec:appendix-implementation-order}); the copies of a \kw{let}
+declaration are bindings of the \kw{let}, evaluated when it is. &
+Does not conform for a \kw{number} that nothing fixes:
+\kw{2 \textasciicircum{} -1 == 0} is \kw{True}, where the definition gives
+\kw{False}.
+Closing such variables to \kw{Float} instead would conform. Conforms on
+copies.\\
+\hline
+\end{tabular}
+\end{center}
+On copies, the implementations differ only where a copy that the program
+does not need has no value. With \kw{check h = if h == 0 then Debug.todo "h" else h} and
+\kw{x = check (2 \textasciicircum{} -1)} used as \kw{x + 0.5} and, in a branch
+that is not taken, as \kw{x // 1}, the copy of \kw{x} at Int exists and has no
+value, since \kw{2 \textasciicircum{} -1} is $0$ there:
+\begin{center}\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.27\textwidth}@{}}
+\hline
+\kw{x} is & Definition & Elm/JS & eco\\
+\hline
+top-level & the copy at Int is evaluated with the module: no value, so no
+meaning & runs: \kw{x} is $0.5$ once, and \kw{x + 0.5} is $1$ & runs: the copy
+at Int is never used, so never evaluated\\
+bound by a \kw{let} evaluated with the module & the copy at Int is evaluated
+with the \kw{let}: no value, so no meaning & runs, as above & stops at the
+\kw{Debug.todo}, as the definition's evaluation would\\
+bound by a \kw{let} in \kw{update} & the copy at Int is evaluated with the
+\kw{let}: the step has no result, and no further message is handled & handles
+further messages: does not conform & stops handling messages: conforms\\
+\hline
+\end{tabular}
+\end{center}
+In the first two rows the program has no meaning, and both implementations
+conform. Where only the copy at Float is used, no copy at Int is
+made, and the program has a value in the definition and in both
+implementations.
 
 \subsection{Debug}
 % A62
@@ -1026,18 +1115,21 @@ ordered by \kw{toCode} & A53\\
 \hline
 Impl. & Construct & Implementation & Definition & Ruling\\
 \hline
-Elm/JS & \kw{(\&\&) a b}, \kw{(||) a b} applied in prefix form & second
-argument evaluated only when needed: \kw{(\&\&) False (Debug.todo "x")} is
-\kw{False} & ordinary strict functions: no value & A56\\
+Elm/JS & \kw{(\&\&) a b}, \kw{(||) a b} applied in prefix form, in a step of
+a running program & second argument evaluated only when needed:
+\kw{(\&\&) False (Debug.todo "x")} is \kw{False}, and further messages are
+handled & ordinary strict functions: the step has no result, and no further
+message is handled & A56, A94\\
 Elm/JS & lambdas made in a self tail-recursive function & share the
 function's changing parameters: three closures give \kw{[3,3,3]} & each holds
 the values of its own call: \kw{[3,2,1]} & A63\\
-both & a value whose scheme quantifies a \kw{number} variable, used only at
-Float, such as \kw{x = if 2 \textasciicircum{} -1 == 0 then Debug.todo "x"
-else 1} & Elm/JS evaluates it once, with its one kind of number; eco only at
-the instances used. Either way \kw{x} is $1$ and the program runs & the default
-copy, at Int, is also evaluated; there \kw{2 \textasciicircum{} -1} is $0$,
-so it has no value and the program has no meaning & A87\\
+Elm/JS & a \kw{let} declaration in \kw{update} whose copy at Int, not needed,
+has no value & evaluated once, as Float; further messages are handled & the
+copy at Int is evaluated: the step has no result, and no further message is
+handled & A87, A94\\
+eco & a \kw{number} variable that nothing fixes, such as that of
+\kw{2 \textasciicircum{} -1 == 0} & Int: \kw{True} & Float: \kw{False}, as
+Elm/JS gives & A27\\
 \hline
 \end{tabular}
 \end{center}

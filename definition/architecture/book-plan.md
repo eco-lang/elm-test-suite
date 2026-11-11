@@ -3,7 +3,7 @@
 Decisions at the two architecture checkpoints were made by the agent while
 running the whole pipeline without stopping; they are marked **provisional**
 where they go beyond the Author Directions (D1 to D11, `../survey/book-brief.md`)
-and the rulings (A1 to A86, `../survey/ambiguity-log.md`).
+and the rulings (A1 to A97, `../survey/ambiguity-log.md`).
 
 ## Grid
 
@@ -110,7 +110,7 @@ The bare language is chosen so the rules are as few as possible (ECONOMICAL) whi
 
 ### static-core: Static Semantics for the Core (Chapter 4)
 - Kind: static, Level: Core
-- Defines: simple objects (TyVar with class attribute, RowVar, TyName with arity, Lab, IdStatus {c, v}, Class); compound objects (Type, Row, RecType, FunType, ConsType, TypeFcn, TypeScheme, TyStr, TyEnv, ValEnv, QualEnv, Env, Context); projection, injection, modification; class order and admissible types (Adm_kappa: the "Which types satisfy each class" table of the survey, A19 prefix rule handled syntactically in elaboration of types); substitution respecting classes and rows with unique labels (A23); type functions and alias expansion; type schemes, instances, generalisation and Clos (no value restriction); scope of explicit (annotation) type variables (A21 nested annotations share variables; A20 escape is an error); rules for AtExp, ExpRow, Exp, Match, MRule, Dec, ValBind (annotated and unannotated members, recursive groups A24), AtPat, PatRow, Pat, Ty, TyRow; further restrictions: exhaustiveness of every match and of lambda and let patterns, redundancy (A31 literal values), unresolved `number` defaults to Int at top level (A27).
+- Defines: simple objects (TyVar with class attribute, RowVar, TyName with arity, Lab, IdStatus {c, v}, Class); compound objects (Type, Row, RecType, FunType, ConsType, TypeFcn, TypeScheme, TyStr, TyEnv, ValEnv, QualEnv, Env, Context); projection, injection, modification; class order and admissible types (Adm_kappa: the "Which types satisfy each class" table of the survey, A19 prefix rule handled syntactically in elaboration of types); substitution respecting classes and rows with unique labels (A23); type functions and alias expansion; type schemes, instances, generalisation and Clos (no value restriction); scope of explicit (annotation) type variables (A21 nested annotations share variables; A20 escape is an error); rules for AtExp, ExpRow, Exp, Match, MRule, Dec, ValBind (annotated and unannotated members, recursive groups A24), AtPat, PatRow, Pat, Ty, TyRow; further restrictions: exhaustiveness of every match and of lambda and let patterns, redundancy (A31 literal values), principal derivations (A95), on which the further restrictions are judged (A96); inhabitants possibly infinite (A97). The default of an unresolved `number`, now Float (A27), is applied by number specialisation in dynamic-core.
 - Depends on: syntax-core
 - Rulings: A19 to A31, A35, A36, A39, D5
 - Exemplar: "Static Semantics" rows
@@ -224,7 +224,7 @@ Chapters cross-reference these labels; every chapter defines the ones it owns ex
 | introduction | 05 | audited | - | states decorated-metavariable convention (static-core lacks it) |
 | syntax-core | 03 | audited | - | list patterns added to derived forms |
 | syntax-modules | 03 | audited | - | binding order `tycon tyvarseq`; `..` reserved symbol |
-| static-core | 04 | audited | 1-45 | requests: \tTuple, \tyrowvar, \names; A27 default applied to every undetermined number variable |
+| static-core | 04 | audited | 1-45 | requests: \tTuple, \tyrowvar, \names; principal derivations (A95, A96); the A27 default (Float) moved to dynamic-core |
 | static-modules | 04 | audited | 46-64 | provider maps for ambiguity; closed types keep constructors in TyStr but not in interface VE; uses \sbtCmd \sbtSub |
 | dynamic-core | 04 | audited | 65-112 | requests: \japp, \dcoreFV; lists are constructors [] and :: |
 | dynamic-modules | 04 | audited | 113-132 | top-level groups via thunk translation (Rec cannot re-tie closures inside data); dynamic Interface (RA, CE, VE) |

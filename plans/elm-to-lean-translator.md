@@ -552,6 +552,10 @@ failure gives `type:`.
 
 ## B.8 Number specialisation (`Translate/Specialise.elm`)
 
+> **Revised 2026-11-10.** Ruling A27 now makes a free `number` variable Float, and the default copy
+> is the copy at Float (`Specialise.defaultNum`); where this section says Int for the default, read
+> Float. `abs` at Int is now its copy `abs$Int`.
+
 The book's procedure (dynamic-core, sec:dynamic-core-numbers): each declaration whose bindings'
 schemes quantify `number` variables is replaced by its **default copy** (every such variable Int,
 under its own names) and **one copy per other assignment** of Int or Float at which the program uses

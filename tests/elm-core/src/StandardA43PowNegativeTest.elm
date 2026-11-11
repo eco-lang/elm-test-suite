@@ -7,6 +7,9 @@ A Standard Definition of Elm?, ruling A43: at Int, `b ^ e` with `e < 0` is the i
 exact power, so it is `0` except when `b` is `1` or `-1`, where the power is exact.
 <https://elm-test-suite.netlify.app/standard/basis/Basics/pow>
 
+The powers are taken through `ipow`, annotated at `Int`: an integer constant that nothing fixes is
+`Float` (ruling A27), at which `2 ^ -1` is `0.5`.
+
 Elm 0.19.1 computes `^` with JavaScript's `Math.pow`, so `2 ^ -1` is `0.5` and `0 ^ -1` is
 `Infinity`, neither of them an Int. (Those two are compared with `1` after adding `1`, so that a
 CHECK line cannot match the start of a longer number.)
@@ -24,21 +27,26 @@ CHECK line cannot match the start of a longer number.)
 import Html
 
 
+ipow : Int -> Int -> Int
+ipow b e =
+    b ^ e
+
+
 main =
     let
         _ =
-            Debug.log "1 ^ -1" (1 ^ -1)
+            Debug.log "1 ^ -1" (ipow 1 -1)
 
         _ =
-            Debug.log "(-1) ^ -3" ((-1) ^ -3)
+            Debug.log "(-1) ^ -3" (ipow -1 -3)
 
         _ =
-            Debug.log "(-1) ^ -2" ((-1) ^ -2)
+            Debug.log "(-1) ^ -2" (ipow -1 -2)
 
         _ =
-            Debug.log "2 ^ -1 + 1 == 1" (2 ^ -1 + 1 == 1)
+            Debug.log "2 ^ -1 + 1 == 1" (ipow 2 -1 + 1 == 1)
 
         _ =
-            Debug.log "0 ^ -1 + 1 == 1" (0 ^ -1 + 1 == 1)
+            Debug.log "0 ^ -1 + 1 == 1" (ipow 0 -1 + 1 == 1)
     in
     Html.text "done"

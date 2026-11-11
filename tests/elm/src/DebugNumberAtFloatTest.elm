@@ -5,9 +5,10 @@ module DebugNumberAtFloatTest exposing (main)
 in the same program.
 
 `showAll` applies `Debug.toString` to `n` and to `n + n`, and `bump` logs `n + 1`.
-The test calls `showAll 1.25`, `bump 2.5` and `showAll 2`, and checks that the
+The test calls `showAll 1.25`, `bump 2.5` and `showAll (2 // 1)`, and checks that the
 `Float` values print as `1.25`, `2.5` and `3.5` and the `Int` values as `2` and
-`4`.
+`4`. The argument `2 // 1` is an Int; a bare `2` would be a Float, since nothing else fixes its
+type (A Standard Definition of Elm?, ruling A27).
 
 -}
 
@@ -37,6 +38,6 @@ main =
             Debug.log "bumpResult" (bump 2.5)
 
         _ =
-            Debug.log "showAllInt" (showAll 2)
+            Debug.log "showAllInt" (showAll (2 // 1))
     in
     text "done"

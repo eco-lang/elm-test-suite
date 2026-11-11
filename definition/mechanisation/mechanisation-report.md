@@ -1,5 +1,19 @@
 # Mechanisation Report
 
+> **Update, 2026-11-10 (review round 3).** After the book's third review and the test changes it
+> led to (six tests retagged `elm-unspecced`, LetSeparatedStagingTest given its CHECK line, two tests
+> annotated to keep an Int use), 488 of 939 `elm-spec` tests translate. The run has 1,478 checks,
+> all agreeing with the book, and 1,157 theorems by `decide +kernel`. No book finding: the rulings
+> revised in the review (A27, A94, A96, A97) concern the static semantics and conformance, which the
+> encoding does not cover.
+
+> **Update, 2026-11-10 (number defaults to Float).** Ruling A27 is revised: a `number` variable that
+> nothing fixes is Float, and the default copy of number specialisation is the copy at Float (`abs`
+> is bound to its copy at Float, its copy at Int to `abs$Int`). The translator's default changes
+> with it. Checks of a Float value now have kernel theorems too, comparing the float as Elm prints
+> it (`Expect.flt`; `showFloat` is computed exactly with integers, which the kernel reduces). The
+> run has 1,477 checks, all agreeing, and 1,156 theorems by `decide +kernel` (from 1,106).
+
 > **Update, 2026-11-09 (widening the basis).** Following plans/lean-encoding-widening.md, the
 > encoding now has the conversions (`toFloat`, `round`, `floor`, `ceiling`, `truncate`, saturating,
 > NaN to 0), `sqrt`, Float `^`, the elementary functions with `e` and `pi`, `append` (`++`),
@@ -109,7 +123,7 @@ contribution to the environment (Chapter 7) is added to E0 by hand. Where an eco
 | APPLY: Task, Process, Platform, Cmd, Sub basic values, Task.command, port values | Effects, out of this pass's scope |
 | Eq: process identifiers, JSON values, effect values (clauses 3 and 4) | Their values are not in the encoded Val |
 | Float add, sub, mul, fdiv, negate | Encoded with Lean's `Float` (IEEE 754 binary64, round to nearest even), not line by line from fig:dynamic-basis-float; the figure was read against IEEE 754 and agrees with it |
-| Values written in Elm: logBase, degrees, radians, turns, fromPolar, toPolar, never; the Elm texts of Task, Cmd and Sub | Outside the fragment. abs, composeL, composeR, apR, apL, identity and always are encoded as closures made from their texts in E_K by r:d-dec-nonrec. abs is not a basic value: the book defines it by its elm/core text, so it is encoded that way and not as an APPLY case (only its default copy, at Int, is encoded). min, max (A48) and clamp (A49) are basic values, encoded as APPLY cases |
+| Values written in Elm: logBase, degrees, radians, turns, fromPolar, toPolar, never; the Elm texts of Task, Cmd and Sub | Outside the fragment. abs, composeL, composeR, apR, apL, identity and always are encoded as closures made from their texts in E_K by r:d-dec-nonrec. abs is not a basic value: the book defines it by its elm/core text, so it is encoded that way and not as an APPLY case (its default copy, at Float, and its copy at Int are both encoded). min, max (A48) and clamp (A49) are basic values, encoded as APPLY cases |
 
 ## Findings From Encoding
 

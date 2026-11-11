@@ -14,7 +14,7 @@ def g_elm_CombinatorIIdentityTest : Program := {
     .fn "i" [] (ap (v "s") [v "k", v "k"]) ],
   locals := [ ],
   checks := [
-    ckk "result" "42" .int (ap (v "i") [i 42]) ] }
+    ckk "result" "42" .float (ap (v "i") [.atexp (.scon (.intF 42))]) ] }
 
 /-- tests/elm/src/CombinatorListStringTest.elm -/
 def g_elm_CombinatorListStringTest : Program := {
@@ -30,19 +30,19 @@ def g_elm_CombinatorListStringTest : Program := {
     .fn "t" [] (ap (v "c") [v "i"]),
     .fn "w" [pv "bf", pv "x"] (ap (v "bf") [v "x", v "x"]),
     .fn "p" [pv "bf", pv "uf", pv "x", pv "y"] (ap (v "bf") [.atexp (.paren (ap (v "uf") [v "x"])), .atexp (.paren (ap (v "uf") [v "y"]))]),
-    .fn "sum" [pv "list"] (caseOf (v "list") [(P (listP []), i 0), (.cons (P (pv "x")) (P (pv "rest")), bin "+" (v "x") (ap (v "sum") [v "rest"]))]),
+    .fn "sum" [pv "list"] (caseOf (v "list") [(P (listP []), .atexp (.scon (.intF 0))), (.cons (P (pv "x")) (P (pv "rest")), bin "+" (v "x") (ap (v "sum") [v "rest"]))]),
     .fn "map" [pv "f", pv "list"] (caseOf (v "list") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]),
-    .fn "length" [pv "list"] (caseOf (v "list") [(P (listP []), i 0), (.cons (P pw) (P (pv "rest")), bin "+" (i 1) (ap (v "length") [v "rest"]))]),
+    .fn "length" [pv "list"] (caseOf (v "list") [(P (listP []), .atexp (.scon (.intF 0))), (.cons (P pw) (P (pv "rest")), bin "+" (.atexp (.scon (.intF 1))) (ap (v "length") [v "rest"]))]),
     .fn "bang" [pv "str"] (bin "++" (v "str") (str "!")) ],
   locals := [ ],
   checks := [
-    ckk "b_sum_map" "9" .int (ap (v "b") [v "sum", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "+")) [i 1]))])), listE [i 1, i 2, i 3]]),
-    ckk "sp_mul" "84" .int (ap (v "sp") [.atexp (.op "*"), .atexp (.paren (ap (.atexp (.op "+")) [i 1])), .atexp (.paren (ap (.atexp (.op "*")) [i 2])), i 6]),
+    ckk "b_sum_map" "9" .float (ap (v "b") [v "sum", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "+")) [.atexp (.scon (.intF 1))]))])), listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]]),
+    ckk "sp_mul" "84" .float (ap (v "sp") [.atexp (.op "*"), .atexp (.paren (ap (.atexp (.op "+")) [.atexp (.scon (.intF 1))])), .atexp (.paren (ap (.atexp (.op "*")) [.atexp (.scon (.intF 2))])), .atexp (.scon (.intF 6))]),
     ckk "w_concat" "\"hihi\"" .string (ap (v "w") [.atexp (.op "++"), str "hi"]),
-    ckk "c_cons" "[1,2,3]" .data (ap (v "c") [.atexp (.op "::"), listE [i 2, i 3], i 1]),
+    ckk "c_cons" "[1,2,3]" .data (ap (v "c") [.atexp (.op "::"), listE [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))], .atexp (.scon (.intF 1))]),
     ckk "s_palindrome" "\"strawstraw!\"" .string (ap (v "s") [.atexp (.op "++"), v "bang", str "straw"]),
-    ckk "t_pipe" "12" .int (ap (v "t") [listE [i 1, i 2, i 3], .atexp (.paren (ap (v "b") [v "sum", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "*")) [i 2]))]))]))]),
-    ckk "p_lengths" "5" .int (ap (v "p") [.atexp (.op "+"), v "length", listE [i 1, i 2, i 3], listE [i 4, i 5]]) ] }
+    ckk "t_pipe" "12" .float (ap (v "t") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))], .atexp (.paren (ap (v "b") [v "sum", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "*")) [.atexp (.scon (.intF 2))]))]))]))]),
+    ckk "p_lengths" "5" .float (ap (v "p") [.atexp (.op "+"), v "length", listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))], listE [.atexp (.scon (.intF 4)), .atexp (.scon (.intF 5))]]) ] }
 
 /-- tests/elm/src/CombinatorPLengthsTest.elm -/
 def g_elm_CombinatorPLengthsTest : Program := {
@@ -50,10 +50,10 @@ def g_elm_CombinatorPLengthsTest : Program := {
   cons := [],
   defs := [
     .fn "p" [pv "bf", pv "uf", pv "x", pv "y"] (ap (v "bf") [.atexp (.paren (ap (v "uf") [v "x"])), .atexp (.paren (ap (v "uf") [v "y"]))]),
-    .fn "length" [pv "list"] (caseOf (v "list") [(P (listP []), i 0), (.cons (P pw) (P (pv "rest")), bin "+" (i 1) (ap (v "length") [v "rest"]))]) ],
+    .fn "length" [pv "list"] (caseOf (v "list") [(P (listP []), .atexp (.scon (.intF 0))), (.cons (P pw) (P (pv "rest")), bin "+" (.atexp (.scon (.intF 1))) (ap (v "length") [v "rest"]))]) ],
   locals := [ ],
   checks := [
-    ckk "result" "5" .int (ap (v "p") [.atexp (.op "+"), v "length", listE [i 1, i 2, i 3], listE [i 4, i 5]]) ] }
+    ckk "result" "5" .float (ap (v "p") [.atexp (.op "+"), v "length", listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))], listE [.atexp (.scon (.intF 4)), .atexp (.scon (.intF 5))]]) ] }
 
 /-- tests/elm/src/CombinatorRefIdentityBugTest.elm -/
 def g_elm_CombinatorRefIdentityBugTest : Program := {
@@ -63,13 +63,13 @@ def g_elm_CombinatorRefIdentityBugTest : Program := {
     .fn "k" [pv "a", pw] (v "a"),
     .fn "s" [pv "bf", pv "uf", pv "x"] (ap (v "bf") [v "x", .atexp (.paren (ap (v "uf") [v "x"]))]),
     .fn "b" [pv "f", pv "g", pv "y"] (ap (v "s") [.atexp (.paren (ap (v "k") [v "s"])), v "k", v "f", v "g", v "y"]),
-    .fn "inc" [pv "x"] (bin "+" (v "x") (i 1)),
-    .fn "double" [pv "x"] (bin "*" (v "x") (i 2)),
+    .fn "inc" [pv "x"] (bin "+" (v "x") (.atexp (.scon (.intF 1)))),
+    .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))),
     .fn "square" [pv "x"] (bin "*" (v "x") (v "x")) ],
   locals := [ ],
   checks := [
-    ckk "b_compose" "25" .int (ap (v "b") [v "square", v "inc", i 4]),
-    ckk "s_feed" "15" .int (ap (v "s") [.atexp (.op "+"), v "double", i 5]) ] }
+    ckk "b_compose" "25" .float (ap (v "b") [v "square", v "inc", .atexp (.scon (.intF 4))]),
+    ckk "s_feed" "15" .float (ap (v "s") [.atexp (.op "+"), v "double", .atexp (.scon (.intF 5))]) ] }
 
 /-- tests/elm/src/CombinatorSFeedTest.elm -/
 def g_elm_CombinatorSFeedTest : Program := {
@@ -77,10 +77,10 @@ def g_elm_CombinatorSFeedTest : Program := {
   cons := [],
   defs := [
     .fn "s" [pv "bf", pv "uf", pv "x"] (ap (v "bf") [v "x", .atexp (.paren (ap (v "uf") [v "x"]))]),
-    .fn "double" [pv "x"] (bin "*" (v "x") (i 2)) ],
+    .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))) ],
   locals := [ ],
   checks := [
-    ckk "result" "15" .int (ap (v "s") [.atexp (.op "+"), v "double", i 5]) ] }
+    ckk "result" "15" .float (ap (v "s") [.atexp (.op "+"), v "double", .atexp (.scon (.intF 5))]) ] }
 
 /-- tests/elm/src/CombinatorSPalindromeTest.elm -/
 def g_elm_CombinatorSPalindromeTest : Program := {
@@ -99,12 +99,12 @@ def g_elm_CombinatorSpCombineTest : Program := {
   cons := [],
   defs := [
     .fn "sp" [pv "bf", pv "uf1", pv "uf2", pv "x"] (ap (v "bf") [.atexp (.paren (ap (v "uf1") [v "x"])), .atexp (.paren (ap (v "uf2") [v "x"]))]),
-    .fn "inc" [pv "x"] (bin "+" (v "x") (i 1)),
-    .fn "double" [pv "x"] (bin "*" (v "x") (i 2)),
+    .fn "inc" [pv "x"] (bin "+" (v "x") (.atexp (.scon (.intF 1)))),
+    .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))),
     .fn "mul" [pv "x", pv "y"] (bin "*" (v "x") (v "y")) ],
   locals := [ ],
   checks := [
-    ckk "result" "84" .int (ap (v "sp") [v "mul", v "inc", v "double", i 6]) ] }
+    ckk "result" "84" .float (ap (v "sp") [v "mul", v "inc", v "double", .atexp (.scon (.intF 6))]) ] }
 
 /-- tests/elm/src/CombinatorSpMulTest.elm -/
 def g_elm_CombinatorSpMulTest : Program := {
@@ -114,17 +114,17 @@ def g_elm_CombinatorSpMulTest : Program := {
     .fn "sp" [pv "bf", pv "uf1", pv "uf2", pv "x"] (ap (v "bf") [.atexp (.paren (ap (v "uf1") [v "x"])), .atexp (.paren (ap (v "uf2") [v "x"]))]) ],
   locals := [ ],
   checks := [
-    ckk "result" "84" .int (ap (v "sp") [.atexp (.op "*"), .atexp (.paren (ap (.atexp (.op "+")) [i 1])), .atexp (.paren (ap (.atexp (.op "*")) [i 2])), i 6]) ] }
+    ckk "result" "84" .float (ap (v "sp") [.atexp (.op "*"), .atexp (.paren (ap (.atexp (.op "+")) [.atexp (.scon (.intF 1))])), .atexp (.paren (ap (.atexp (.op "*")) [.atexp (.scon (.intF 2))])), .atexp (.scon (.intF 6))]) ] }
 
 /-- tests/elm/src/CombinatorStdlibTCombinatorPipeListIntoComposedOpsTest.elm -/
 def g_elm_CombinatorStdlibTCombinatorPipeListIntoComposedOpsTest : Program := {
   name := "CombinatorStdlibTCombinatorPipeListIntoComposedOpsTest", source := "tests/elm/src",
   cons := [],
   defs := [
-    .fn "testValue" [] (letDefs [.fn "k" [pv "a", pw] (v "a"), .fn "s" [pv "bf", pv "uf", pv "x"] (ap (v "bf") [v "x", .atexp (.paren (ap (v "uf") [v "x"]))]), .fn "b" [] (ap (v "s") [.atexp (.paren (ap (v "k") [v "s"])), v "k"]), .fn "c" [] (ap (v "s") [.atexp (.paren (ap (v "b") [v "b", v "s"])), .atexp (.paren (ap (v "k") [v "k"]))]), .fn "i" [] (ap (v "s") [v "k", v "k"]), .fn "t" [] (ap (v "c") [v "i"]), .fn "mySum" [pv "xs"] (caseOf (v "xs") [(P (listP []), i 0), (.cons (P (pv "a")) (P (pv "rest")), bin "+" (v "a") (ap (v "mySum") [v "rest"]))]), .fn "mapDouble" [pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (bin "*" (v "x") (i 2)) (ap (v "mapDouble") [v "rest"]))]), .fn "composed" [] (ap (v "b") [v "mySum", v "mapDouble"])] (ap (v "t") [listE [i 1, i 2, i 3], v "composed"])) ],
+    .fn "testValue" [] (letDefs [.fn "k" [pv "a", pw] (v "a"), .fn "s" [pv "bf", pv "uf", pv "x"] (ap (v "bf") [v "x", .atexp (.paren (ap (v "uf") [v "x"]))]), .fn "b" [] (ap (v "s") [.atexp (.paren (ap (v "k") [v "s"])), v "k"]), .fn "c" [] (ap (v "s") [.atexp (.paren (ap (v "b") [v "b", v "s"])), .atexp (.paren (ap (v "k") [v "k"]))]), .fn "i" [] (ap (v "s") [v "k", v "k"]), .fn "t" [] (ap (v "c") [v "i"]), .fn "mySum" [pv "xs"] (caseOf (v "xs") [(P (listP []), .atexp (.scon (.intF 0))), (.cons (P (pv "a")) (P (pv "rest")), bin "+" (v "a") (ap (v "mySum") [v "rest"]))]), .fn "mapDouble" [pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (bin "*" (v "x") (.atexp (.scon (.intF 2)))) (ap (v "mapDouble") [v "rest"]))]), .fn "composed" [] (ap (v "b") [v "mySum", v "mapDouble"])] (ap (v "t") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))], v "composed"])) ],
   locals := [ ],
   checks := [
-    ckk "testValue" "12" .int (v "testValue") ] }
+    ckk "testValue" "12" .float (v "testValue") ] }
 
 /-- tests/elm/src/CombinatorTPipeTest.elm -/
 def g_elm_CombinatorTPipeTest : Program := {
@@ -137,11 +137,11 @@ def g_elm_CombinatorTPipeTest : Program := {
     .fn "c" [] (ap (v "s") [.atexp (.paren (ap (v "b") [v "b", v "s"])), .atexp (.paren (ap (v "k") [v "k"]))]),
     .fn "i" [] (ap (v "s") [v "k", v "k"]),
     .fn "t" [] (ap (v "c") [v "i"]),
-    .fn "sum" [pv "list"] (caseOf (v "list") [(P (listP []), i 0), (.cons (P (pv "x")) (P (pv "rest")), bin "+" (v "x") (ap (v "sum") [v "rest"]))]),
+    .fn "sum" [pv "list"] (caseOf (v "list") [(P (listP []), .atexp (.scon (.intF 0))), (.cons (P (pv "x")) (P (pv "rest")), bin "+" (v "x") (ap (v "sum") [v "rest"]))]),
     .fn "map" [pv "f", pv "list"] (caseOf (v "list") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]) ],
   locals := [ ],
   checks := [
-    ckk "result" "12" .int (ap (v "t") [listE [i 1, i 2, i 3], .atexp (.paren (ap (v "b") [v "sum", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "*")) [i 2]))]))]))]) ] }
+    ckk "result" "12" .float (ap (v "t") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))], .atexp (.paren (ap (v "b") [v "sum", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "*")) [.atexp (.scon (.intF 2))]))]))]))]) ] }
 
 /-- tests/elm/src/CombinatorTThrushTest.elm -/
 def g_elm_CombinatorTThrushTest : Program := {
@@ -156,7 +156,7 @@ def g_elm_CombinatorTThrushTest : Program := {
     .fn "t" [] (ap (v "c") [v "i"]) ],
   locals := [ ],
   checks := [
-    ckk "result" "21" .int (ap (v "t") [i 7, .atexp (.paren (lams [pv "x"] (bin "*" (v "x") (i 3))))]) ] }
+    ckk "result" "21" .float (ap (v "t") [.atexp (.scon (.intF 7)), .atexp (.paren (lams [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 3))))))]) ] }
 
 /-- tests/elm/src/CombinatorTest.elm -/
 def g_elm_CombinatorTest : Program := {
@@ -171,20 +171,20 @@ def g_elm_CombinatorTest : Program := {
     .fn "i" [] (ap (v "s") [v "k", v "k"]),
     .fn "t" [] (ap (v "c") [v "i"]),
     .fn "w" [pv "bf", pv "x"] (ap (v "bf") [v "x", v "x"]),
-    .fn "inc" [pv "x"] (bin "+" (v "x") (i 1)),
-    .fn "double" [pv "x"] (bin "*" (v "x") (i 2)),
+    .fn "inc" [pv "x"] (bin "+" (v "x") (.atexp (.scon (.intF 1)))),
+    .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))),
     .fn "square" [pv "x"] (bin "*" (v "x") (v "x")),
     .fn "sub" [pv "x", pv "y"] (bin "-" (v "x") (v "y")),
     .fn "mul" [pv "x", pv "y"] (bin "*" (v "x") (v "y")) ],
   locals := [ ],
   checks := [
-    ckk "b_compose" "25" .int (ap (v "b") [v "square", v "inc", i 4]),
-    ckk "c_flip" "-7" .int (ap (v "c") [v "sub", i 10, i 3]),
-    ckk "s_feed" "15" .int (ap (v "s") [.atexp (.op "+"), v "double", i 5]),
-    ckk "sp_combine" "84" .int (ap (v "sp") [v "mul", v "inc", v "double", i 6]),
-    ckk "w_dup" "81" .int (ap (v "w") [v "mul", i 9]),
-    ckk "t_thrush" "21" .int (ap (v "t") [i 7, .atexp (.paren (lams [pv "x"] (bin "*" (v "x") (i 3))))]),
-    ckk "i_identity" "42" .int (ap (v "i") [i 42]) ] }
+    ckk "b_compose" "25" .float (ap (v "b") [v "square", v "inc", .atexp (.scon (.intF 4))]),
+    ckk "c_flip" "-7" .float (ap (v "c") [v "sub", .atexp (.scon (.intF 10)), .atexp (.scon (.intF 3))]),
+    ckk "s_feed" "15" .float (ap (v "s") [.atexp (.op "+"), v "double", .atexp (.scon (.intF 5))]),
+    ckk "sp_combine" "84" .float (ap (v "sp") [v "mul", v "inc", v "double", .atexp (.scon (.intF 6))]),
+    ckk "w_dup" "81" .float (ap (v "w") [v "mul", .atexp (.scon (.intF 9))]),
+    ckk "t_thrush" "21" .float (ap (v "t") [.atexp (.scon (.intF 7)), .atexp (.paren (lams [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 3))))))]),
+    ckk "i_identity" "42" .float (ap (v "i") [.atexp (.scon (.intF 42))]) ] }
 
 /-- tests/elm/src/CombinatorWConcatTest.elm -/
 def g_elm_CombinatorWConcatTest : Program := {
@@ -205,14 +205,14 @@ def g_elm_CombinatorWDupTest : Program := {
     .fn "mul" [pv "x", pv "y"] (bin "*" (v "x") (v "y")) ],
   locals := [ ],
   checks := [
-    ckk "result" "81" .int (ap (v "w") [v "mul", i 9]) ] }
+    ckk "result" "81" .float (ap (v "w") [v "mul", .atexp (.scon (.intF 9))]) ] }
 
 /-- tests/elm/src/CompilerIssue1766LetMutualRecursionMismatchTest.elm -/
 def g_elm_CompilerIssue1766LetMutualRecursionMismatchTest : Program := {
   name := "CompilerIssue1766LetMutualRecursionMismatchTest", source := "tests/elm/src",
   cons := [("Complete", 0), ("Goal", 0)],
   defs := [
-    .fn "iterativeSearch" [] (letDefs [.fn "iteration" [pv "count"] (ap (v "evaluate") [v "count", c "Goal"]), .fn "evaluate" [pv "count", pv "result"] (caseOf (v "result") [(P (pcA "Complete"), ap (v "iteration") [.atexp (.paren (bin "+" (v "count") (i 1)))]), (P (pcA "Goal"), c "Goal")])] (ap (v "iteration") [i 0])),
+    .fn "iterativeSearch" [] (letDefs [.fn "iteration" [pv "count"] (ap (v "evaluate") [v "count", c "Goal"]), .fn "evaluate" [pv "count", pv "result"] (caseOf (v "result") [(P (pcA "Complete"), ap (v "iteration") [.atexp (.paren (bin "+" (v "count") (.atexp (.scon (.intF 1)))))]), (P (pcA "Goal"), c "Goal")])] (ap (v "iteration") [.atexp (.scon (.intF 0))])),
     .fn "iterativeCostIncreasing" [] (v "iterativeSearch") ],
   locals := [ ],
   checks := [
@@ -223,10 +223,10 @@ def g_elm_CompilerIssue1793ComparableTupleLetCrashTest : Program := {
   name := "CompilerIssue1793ComparableTupleLetCrashTest", source := "tests/elm/src",
   cons := [],
   defs := [
-    .fn "f" [pv "x"] (letDefs [.fn "result" [] (bin "<" (tup2 (i 0) (v "x")) (tup2 (i 1) (v "x")))] (v "result")) ],
+    .fn "f" [pv "x"] (letDefs [.fn "result" [] (bin "<" (tup2 (.atexp (.scon (.intF 0))) (v "x")) (tup2 (.atexp (.scon (.intF 1))) (v "x")))] (v "result")) ],
   locals := [ ],
   checks := [
-    ckk "f 1" "True" .data (ap (v "f") [i 1]) ] }
+    ckk "f 1" "True" .data (ap (v "f") [.atexp (.scon (.intF 1))]) ] }
 
 /-- tests/elm/src/CompilerIssue1813TcoClosureCapturesMutatedArgTest.elm -/
 def g_elm_CompilerIssue1813TcoClosureCapturesMutatedArgTest : Program := {
@@ -302,7 +302,7 @@ def g_elm_CompilerIssue2057CallSiteChangesInferredTypeTest : Program := {
     .fn "sortBy" [pv "f", pv "list"] (letDefs [.fn "cmp" [pv "a", pv "b"] (c "LT")] (ap (v "sortWith") [v "cmp", v "list"])) ],
   locals := [ ],
   checks := [
-    ckk "sort" "[]" .data (ap (v "sort") [listE [i 3, i 1, i 2]]) ] }
+    ckk "sort" "[]" .data (ap (v "sort") [listE [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]]) ] }
 
 /-- tests/elm/src/CompilerIssue2221TcoContinuationTest.elm -/
 def g_elm_CompilerIssue2221TcoContinuationTest : Program := {
@@ -335,8 +335,8 @@ def g_elm_CompilerIssue2268TcoClosureCaptureTest : Program := {
     .fn "map" [pv "f", pv "list"] (caseOf (v "list") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]) ],
   locals := [ ],
   checks := [
-    ckk "plain" "[3,2,1]" .data (bin "|>" (ap (v "makeLazy") [listE [i 1, i 2, i 3], listE []]) (ap (v "map") [.atexp (.paren (lams [pv "f"] (ap (v "f") [.atexp .unit])))])),
-    ckk "tco" "[3,2,1]" .data (bin "|>" (ap (v "tcoMakeLazy") [listE [i 1, i 2, i 3], listE []]) (ap (v "map") [.atexp (.paren (lams [pv "f"] (ap (v "f") [.atexp .unit])))])) ] }
+    ckk "plain" "[3,2,1]" .data (bin "|>" (ap (v "makeLazy") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))], listE []]) (ap (v "map") [.atexp (.paren (lams [pv "f"] (ap (v "f") [.atexp .unit])))])),
+    ckk "tco" "[3,2,1]" .data (bin "|>" (ap (v "tcoMakeLazy") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))], listE []]) (ap (v "map") [.atexp (.paren (lams [pv "f"] (ap (v "f") [.atexp .unit])))])) ] }
 
 /-- tests/elm/src/CompilerIssue2298IdentityAliasResultTest.elm -/
 def g_elm_CompilerIssue2298IdentityAliasResultTest : Program := {
@@ -346,7 +346,7 @@ def g_elm_CompilerIssue2298IdentityAliasResultTest : Program := {
     .fn "make" [] (v "identity") ],
   locals := [ ],
   checks := [
-    ckk "make" "7" .int (ap (v "make") [i 7]) ] }
+    ckk "make" "7" .float (ap (v "make") [.atexp (.scon (.intF 7))]) ] }
 
 /-- tests/elm/src/CoreIssue988NanContainerSelfEqualityTest.elm -/
 def g_elm_CoreIssue988NanContainerSelfEqualityTest : Program := {
@@ -358,12 +358,12 @@ def g_elm_CoreIssue988NanContainerSelfEqualityTest : Program := {
     .fn "record" [] (recE [("x", v "nan")]),
     .fn "box" [] (ap (c "Box") [v "nan"]),
     .fn "maybe" [] (ap (c "Just") [v "nan"]),
-    .fn "inner" [] (tup2 (v "nan") (i 1)) ],
+    .fn "inner" [] (tup2 (v "nan") (.atexp (.scon (.intF 1)))) ],
   checks := [
     ckk "record" "False" .data (bin "==" (v "record") (v "record")),
     ckk "custom type" "False" .data (bin "==" (v "box") (v "box")),
     ckk "maybe" "False" .data (bin "==" (v "maybe") (v "maybe")),
-    ckk "shared inner tuple" "False" .data (bin "==" (tup2 (v "inner") (i 2)) (tup2 (v "inner") (i 2))),
+    ckk "shared inner tuple" "False" .data (bin "==" (tup2 (v "inner") (.atexp (.scon (.intF 2)))) (tup2 (v "inner") (.atexp (.scon (.intF 2))))),
     ckk "shared inner list" "False" .data (bin "==" (listE [v "inner"]) (listE [v "inner"])) ] }
 
 /-- tests/elm/src/CovLambdaBoundaryCaseBoundaryInARecursiveValueTest.elm -/
@@ -387,17 +387,6 @@ def g_elm_CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest : Program := {
   locals := [ ],
   checks := [
     ckk "testValue" "4" .int (v "testValue") ] }
-
-/-- tests/elm/src/CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.elm -/
-def g_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest : Program := {
-  name := "CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest", source := "tests/elm/src",
-  cons := [],
-  defs := [
-    .fn "applyAll" [pv "fs", pv "acc"] (caseOf (v "fs") [(P (listP []), v "acc"), (.cons (P (pv "fn")) (P (pv "rest")), ap (v "applyAll") [v "rest", .atexp (.paren (ap (v "fn") [v "acc"]))])]),
-    .fn "testValue" [] (letDefs [.pat (ptup2 (P (pv "f")) (P (pv "g"))) (tup2 (lams [pv "x"] (bin "+" (v "x") (i 1))) (lams [pv "x"] (bin "*" (v "x") (i 2)))), .pat (precord ["h"]) (recE [("h", lams [pv "x"] (bin "-" (v "x") (i 3)))]), .fn "fs" [] (listE [v "f", v "g", v "h"])] (ap (v "applyAll") [v "fs", i 5])) ],
-  locals := [ ],
-  checks := [
-    ckk "testValue" "9" .int (v "testValue") ] }
 
 /-- tests/elm/src/CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest.elm -/
 def g_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest : Program := {
@@ -514,6 +503,24 @@ def g_elm_DeepEqualityTest : Program := {
     ckk "nest 500 /=" "\"True\"" .string (ap (v "bool") [.atexp (.paren (bin "/=" (ap (v "nest") [i 500, i 1]) (ap (v "nest") [i 500, i 2])))]),
     ckk "record chain 300" "\"False\"" .string (ap (v "bool") [.atexp (.paren (bin "==" (ap (v "chain") [i 300, i 1]) (ap (v "chain") [i 300, i 2])))]) ] }
 
+/-- tests/elm/src/DeepNestStressTest.elm -/
+def g_elm_DeepNestStressTest : Program := {
+  name := "DeepNestStressTest", source := "tests/elm/src",
+  cons := [],
+  defs := [ ],
+  locals := [
+    .fn "nl" [] (listE [listE [listE [listE [.atexp (.scon (.intF 1))]]]]),
+    .fn "nlVal" [] (caseOf (v "nl") [(P (listP [P (listP [P (listP [P (listP [P (pv "x")])])])]), v "x"), (P pw, .atexp (.scon (.intF 0)))]),
+    .fn "nt" [] (tup2 (tup2 (tup2 (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 4)))) (.atexp (.scon (.intF 5)))),
+    .pat (ptup2 (P (ptup2 (P (ptup2 (P (ptup2 (P (pv "first")) (P pw))) (P pw))) (P pw))) (P pw)) (v "nt"),
+    .fn "nr" [] (recE [("n", recE [("n", recE [("n", recE [("v", .atexp (.scon (.intF 1)))])])])]),
+    .fn "a" [] (letDefs [.fn "b" [] (letDefs [.fn "c" [] (letDefs [.fn "d" [] (.atexp (.scon (.intF 10)))] (v "d"))] (v "c"))] (v "b")) ],
+  checks := [
+    ckk "nested_list" "1" .float (v "nlVal"),
+    ckk "nested_tuple" "1" .float (v "first"),
+    ckk "nested_record" "1" .float (.atexp (access (access (access (access (A (v "nr")) "n") "n") "n") "v")),
+    ckk "nested_let" "10" .float (v "a") ] }
+
 /-- The programs of this shard. -/
 def shard_Elm03 : List Program :=
   [g_elm_CombinatorIIdentityTest,
@@ -546,7 +553,6 @@ def shard_Elm03 : List Program :=
    g_elm_CoreIssue988NanContainerSelfEqualityTest,
    g_elm_CovLambdaBoundaryCaseBoundaryInARecursiveValueTest,
    g_elm_CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest,
-   g_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest,
    g_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest,
    g_elm_CovPatternSplitTupleAndConstructorParametersMatchedByCaseTest,
    g_elm_CovTailRecPairParameterPassedUnchangedLetBoundAndRebuiltTest,
@@ -555,6 +561,7 @@ def shard_Elm03 : List Program :=
    g_elm_CustomTypeFuncFieldTest,
    g_elm_CustomTypePatternTest,
    g_elm_DecisionTreeAdvancedDeepNestingWithFallbackTest,
-   g_elm_DeepEqualityTest]
+   g_elm_DeepEqualityTest,
+   g_elm_DeepNestStressTest]
 
 end StandardElm

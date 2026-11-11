@@ -25,8 +25,9 @@ def g_elm_CaseNestedRecordAccessTest : Program := {
     .fn "needsCheck" [.paren (pcon "At" [pw, pv "info"])] (caseOf (.atexp (access (A (v "info")) "node")) [(P (pcA "Circle"), c "True"), (P (pcA "Square"), c "True"), (P (pcA "Triangle"), c "True"), (P (pcA "Diamond"), c "False"), (P (pcA "Pentagon"), c "False"), (P (pcA "Hexagon"), c "False"), (P (pcA "Heptagon"), c "False"), (P (pcA "Octagon"), c "False"), (P (pcA "Star"), c "False"), (P (pcA "Cross"), c "False"), (P (pcA "Arrow"), c "False")]),
     .fn "isIrrelevantTo" [pv "selectedPath", .paren (pcon "Branch" [pw, pv "pathPatterns"])] (caseOf (ap (v "listLookup") [v "selectedPath", v "pathPatterns"]) [(P (pcA "Nothing"), c "True"), (pcon "Just" [pv "val"], ap (v "not") [.atexp (.paren (ap (v "needsCheck") [v "val"]))])]) ],
   locals := [
-    .fn "pos" [] (recE [("line", i 1), ("col", i 1)]),
-    .fn "pairs" [] (ap (c "Branch") [i 0, listE [tup2 (str "a") (ap (c "At") [v "pos", recE [("name", str "alpha"), ("node", c "Diamond"), ("size", i 10)]]), tup2 (str "b") (ap (c "At") [v "pos", recE [("name", str "beta"), ("node", c "Circle"), ("size", i 5)]])]]) ],
+    .fn "pos" [] (recE [("line", .atexp (.scon (.intF 1))), ("col", .atexp (.scon (.intF 1)))]),
+    .fn "pos$Int$Int" [] (recE [("line", i 1), ("col", i 1)]),
+    .fn "pairs" [] (ap (c "Branch") [i 0, listE [tup2 (str "a") (ap (c "At") [v "pos$Int$Int", recE [("name", str "alpha"), ("node", c "Diamond"), ("size", i 10)]]), tup2 (str "b") (ap (c "At") [v "pos$Int$Int", recE [("name", str "beta"), ("node", c "Circle"), ("size", i 5)]])]]) ],
   checks := [
     ckk "test1" "True" .data (ap (v "isIrrelevantTo") [str "missing", v "pairs"]),
     ckk "test2" "False" .data (ap (v "isIrrelevantTo") [str "b", v "pairs"]),
@@ -41,9 +42,9 @@ def g_elm_CaseNestedTest : Program := {
     .fn "describe" [pv "a", pv "b"] (caseOf (v "a") [(pcon "Just" [pw], caseOf (v "b") [(pcon "Just" [pw], str "both"), (P (pcA "Nothing"), str "first")]), (P (pcA "Nothing"), caseOf (v "b") [(pcon "Just" [pw], str "second"), (P (pcA "Nothing"), str "neither")])]) ],
   locals := [ ],
   checks := [
-    ckk "nested1" "\"both\"" .string (ap (v "describe") [.atexp (.paren (ap (c "Just") [i 1])), .atexp (.paren (ap (c "Just") [i 2]))]),
-    ckk "nested2" "\"first\"" .string (ap (v "describe") [.atexp (.paren (ap (c "Just") [i 1])), c "Nothing"]),
-    ckk "nested3" "\"second\"" .string (ap (v "describe") [c "Nothing", .atexp (.paren (ap (c "Just") [i 2]))]),
+    ckk "nested1" "\"both\"" .string (ap (v "describe") [.atexp (.paren (ap (c "Just") [.atexp (.scon (.intF 1))])), .atexp (.paren (ap (c "Just") [.atexp (.scon (.intF 2))]))]),
+    ckk "nested2" "\"first\"" .string (ap (v "describe") [.atexp (.paren (ap (c "Just") [.atexp (.scon (.intF 1))])), c "Nothing"]),
+    ckk "nested3" "\"second\"" .string (ap (v "describe") [c "Nothing", .atexp (.paren (ap (c "Just") [.atexp (.scon (.intF 2))]))]),
     ckk "nested4" "\"neither\"" .string (ap (v "describe") [c "Nothing", c "Nothing"]) ] }
 
 /-- tests/elm/src/CaseOrderTest.elm -/
@@ -54,9 +55,9 @@ def g_elm_CaseOrderTest : Program := {
     .fn "orderToStr" [pv "ord"] (caseOf (v "ord") [(P (pcA "LT"), str "less"), (P (pcA "EQ"), str "equal"), (P (pcA "GT"), str "greater")]) ],
   locals := [ ],
   checks := [
-    ckk "ord1" "\"less\"" .string (ap (v "orderToStr") [.atexp (.paren (ap (v "compare") [i 1, i 2]))]),
-    ckk "ord2" "\"equal\"" .string (ap (v "orderToStr") [.atexp (.paren (ap (v "compare") [i 5, i 5]))]),
-    ckk "ord3" "\"greater\"" .string (ap (v "orderToStr") [.atexp (.paren (ap (v "compare") [i 10, i 3]))]) ] }
+    ckk "ord1" "\"less\"" .string (ap (v "orderToStr") [.atexp (.paren (ap (v "compare") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]))]),
+    ckk "ord2" "\"equal\"" .string (ap (v "orderToStr") [.atexp (.paren (ap (v "compare") [.atexp (.scon (.intF 5)), .atexp (.scon (.intF 5))]))]),
+    ckk "ord3" "\"greater\"" .string (ap (v "orderToStr") [.atexp (.paren (ap (v "compare") [.atexp (.scon (.intF 10)), .atexp (.scon (.intF 3))]))]) ] }
 
 /-- tests/elm/src/CaseReturnFunctionTest.elm -/
 def g_elm_CaseReturnFunctionTest : Program := {
@@ -66,9 +67,9 @@ def g_elm_CaseReturnFunctionTest : Program := {
     .fn "getOp" [pv "op"] (caseOf (v "op") [(P (pcA "Add"), lams [pv "a", pv "b"] (bin "+" (v "a") (v "b"))), (P (pcA "Sub"), lams [pv "a", pv "b"] (bin "-" (v "a") (v "b"))), (P (pcA "Mul"), lams [pv "a", pv "b"] (bin "*" (v "a") (v "b")))]) ],
   locals := [ ],
   checks := [
-    ckk "op1" "7" .int (ap (.atexp (.paren (ap (v "getOp") [c "Add"]))) [i 3, i 4]),
-    ckk "op2" "3" .int (ap (.atexp (.paren (ap (v "getOp") [c "Sub"]))) [i 5, i 2]),
-    ckk "op3" "10" .int (ap (.atexp (.paren (ap (v "getOp") [c "Mul"]))) [i 2, i 5]) ] }
+    ckk "op1" "7" .float (ap (.atexp (.paren (ap (v "getOp") [c "Add"]))) [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))]),
+    ckk "op2" "3" .float (ap (.atexp (.paren (ap (v "getOp") [c "Sub"]))) [.atexp (.scon (.intF 5)), .atexp (.scon (.intF 2))]),
+    ckk "op3" "10" .float (ap (.atexp (.paren (ap (v "getOp") [c "Mul"]))) [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 5))]) ] }
 
 /-- tests/elm/src/CaseReturningLambdaTest.elm -/
 def g_elm_CaseReturningLambdaTest : Program := {
@@ -175,24 +176,24 @@ def g_elm_CaseStringTest : Program := {
   name := "CaseStringTest", source := "tests/elm/src",
   cons := [],
   defs := [
-    .fn "strToNum" [pv "s"] (caseOf (v "s") [(P (.scon (.str "one")), i 1), (P (.scon (.str "two")), i 2), (P pw, i 0)]) ],
+    .fn "strToNum" [pv "s"] (caseOf (v "s") [(P (.scon (.str "one")), .atexp (.scon (.intF 1))), (P (.scon (.str "two")), .atexp (.scon (.intF 2))), (P pw, .atexp (.scon (.intF 0)))]) ],
   locals := [ ],
   checks := [
-    ckk "case1" "1" .int (ap (v "strToNum") [str "one"]),
-    ckk "case2" "2" .int (ap (v "strToNum") [str "two"]),
-    ckk "case3" "0" .int (ap (v "strToNum") [str "other"]) ] }
+    ckk "case1" "1" .float (ap (v "strToNum") [str "one"]),
+    ckk "case2" "2" .float (ap (v "strToNum") [str "two"]),
+    ckk "case3" "0" .float (ap (v "strToNum") [str "other"]) ] }
 
 /-- tests/elm/src/CaseTreeTest.elm -/
 def g_elm_CaseTreeTest : Program := {
   name := "CaseTreeTest", source := "tests/elm/src",
   cons := [("Leaf", 0), ("Node", 3)],
   defs := [
-    .fn "countNodes" [pv "tree"] (caseOf (v "tree") [(P (pcA "Leaf"), i 0), (pcon "Node" [pv "left", pw, pv "right"], bin "+" (bin "+" (i 1) (ap (v "countNodes") [v "left"])) (ap (v "countNodes") [v "right"]))]) ],
+    .fn "countNodes" [pv "tree"] (caseOf (v "tree") [(P (pcA "Leaf"), .atexp (.scon (.intF 0))), (pcon "Node" [pv "left", pw, pv "right"], bin "+" (bin "+" (.atexp (.scon (.intF 1))) (ap (v "countNodes") [v "left"])) (ap (v "countNodes") [v "right"]))]) ],
   locals := [ ],
   checks := [
-    ckk "tree1" "0" .int (ap (v "countNodes") [c "Leaf"]),
-    ckk "tree2" "1" .int (ap (v "countNodes") [.atexp (.paren (ap (c "Node") [c "Leaf", i 1, c "Leaf"]))]),
-    ckk "tree3" "3" .int (ap (v "countNodes") [.atexp (.paren (ap (c "Node") [.atexp (.paren (ap (c "Node") [c "Leaf", i 2, c "Leaf"])), i 1, .atexp (.paren (ap (c "Node") [c "Leaf", i 3, c "Leaf"]))]))]) ] }
+    ckk "tree1" "0" .float (ap (v "countNodes") [c "Leaf"]),
+    ckk "tree2" "1" .float (ap (v "countNodes") [.atexp (.paren (ap (c "Node") [c "Leaf", i 1, c "Leaf"]))]),
+    ckk "tree3" "3" .float (ap (v "countNodes") [.atexp (.paren (ap (c "Node") [.atexp (.paren (ap (c "Node") [c "Leaf", i 2, c "Leaf"])), i 1, .atexp (.paren (ap (c "Node") [c "Leaf", i 3, c "Leaf"]))]))]) ] }
 
 /-- tests/elm/src/CaseTripleTest.elm -/
 def g_elm_CaseTripleTest : Program := {
@@ -303,7 +304,7 @@ def g_elm_CharAstralTupleTest : Program := {
     .fn "secondCode" [ptup2 (P pw) (P (pv "c"))] (ap (qv "Char" "toCode") [v "c"]) ],
   locals := [
     .fn "t2" [] (ap (v "pair") [i 1, .atexp (chA '😀')]),
-    .fn "t3" [] (tup3 (.atexp (chA 'a')) (.atexp (chA '𝄞')) (i 2)),
+    .fn "t3" [] (tup3 (.atexp (chA 'a')) (.atexp (chA '𝄞')) (.atexp (.scon (.intF 2)))),
     .pat (ptup3 (P pw) (P (pv "c3")) (P pw)) (v "t3") ],
   checks := [
     ckk "tup2_code" "128512" .int (ap (v "secondCode") [v "t2"]),
@@ -330,7 +331,7 @@ def g_elm_CharLiteralPatternMatchMinimalTest : Program := {
   defs := [ ],
   locals := [
     .fn "m1" [] (caseOf (.atexp (chA '"')) [(P (pchar '"'), str "y"), (P pw, str "n")]),
-    .fn "m2" [] (caseOf (tup2 (.atexp (chA '"')) (i 0)) [(P (ptup2 (P (pchar '"')) (P pw)), str "y"), (P pw, str "n")]),
+    .fn "m2" [] (caseOf (tup2 (.atexp (chA '"')) (.atexp (.scon (.intF 0)))) [(P (ptup2 (P (pchar '"')) (P pw)), str "y"), (P pw, str "n")]),
     .fn "m3" [] (caseOf (ap (c "Just") [.atexp (chA '"')]) [(pcon "Just" [pchar '"'], str "y"), (P pw, str "n")]),
     .fn "m4" [] (caseOf (ap (c "Just") [tup2 (.atexp (chA '"')) (str "x")]) [(pcon "Just" [ptup2 (P (pchar '"')) (P pw)], str "y"), (P pw, str "n")]) ],
   checks := [
@@ -499,11 +500,11 @@ def g_elm_CombinatorBComposeTest : Program := {
     .fn "k" [pv "a", pw] (v "a"),
     .fn "s" [pv "bf", pv "uf", pv "x"] (ap (v "bf") [v "x", .atexp (.paren (ap (v "uf") [v "x"]))]),
     .fn "b" [] (ap (v "s") [.atexp (.paren (ap (v "k") [v "s"])), v "k"]),
-    .fn "inc" [pv "x"] (bin "+" (v "x") (i 1)),
+    .fn "inc" [pv "x"] (bin "+" (v "x") (.atexp (.scon (.intF 1)))),
     .fn "square" [pv "x"] (bin "*" (v "x") (v "x")) ],
   locals := [ ],
   checks := [
-    ckk "result" "25" .int (ap (v "b") [v "square", v "inc", i 4]) ] }
+    ckk "result" "25" .float (ap (v "b") [v "square", v "inc", .atexp (.scon (.intF 4))]) ] }
 
 /-- tests/elm/src/CombinatorBSumMapTest.elm -/
 def g_elm_CombinatorBSumMapTest : Program := {
@@ -513,11 +514,11 @@ def g_elm_CombinatorBSumMapTest : Program := {
     .fn "k" [pv "a", pw] (v "a"),
     .fn "s" [pv "bf", pv "uf", pv "x"] (ap (v "bf") [v "x", .atexp (.paren (ap (v "uf") [v "x"]))]),
     .fn "b" [] (ap (v "s") [.atexp (.paren (ap (v "k") [v "s"])), v "k"]),
-    .fn "sum" [pv "list"] (caseOf (v "list") [(P (listP []), i 0), (.cons (P (pv "x")) (P (pv "rest")), bin "+" (v "x") (ap (v "sum") [v "rest"]))]),
+    .fn "sum" [pv "list"] (caseOf (v "list") [(P (listP []), .atexp (.scon (.intF 0))), (.cons (P (pv "x")) (P (pv "rest")), bin "+" (v "x") (ap (v "sum") [v "rest"]))]),
     .fn "map" [pv "f", pv "list"] (caseOf (v "list") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]) ],
   locals := [ ],
   checks := [
-    ckk "result" "9" .int (ap (v "b") [v "sum", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "+")) [i 1]))])), listE [i 1, i 2, i 3]]) ] }
+    ckk "result" "9" .float (ap (v "b") [v "sum", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "+")) [.atexp (.scon (.intF 1))]))])), listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]]) ] }
 
 /-- tests/elm/src/CombinatorCConsTest.elm -/
 def g_elm_CombinatorCConsTest : Program := {
@@ -530,7 +531,7 @@ def g_elm_CombinatorCConsTest : Program := {
     .fn "c" [] (ap (v "s") [.atexp (.paren (ap (v "b") [v "b", v "s"])), .atexp (.paren (ap (v "k") [v "k"]))]) ],
   locals := [ ],
   checks := [
-    ckk "result" "[1,2,3]" .data (ap (v "c") [.atexp (.op "::"), listE [i 2, i 3], i 1]) ] }
+    ckk "result" "[1,2,3]" .data (ap (v "c") [.atexp (.op "::"), listE [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))], .atexp (.scon (.intF 1))]) ] }
 
 /-- tests/elm/src/CombinatorCFlipTest.elm -/
 def g_elm_CombinatorCFlipTest : Program := {
@@ -544,7 +545,7 @@ def g_elm_CombinatorCFlipTest : Program := {
     .fn "sub" [pv "x", pv "y"] (bin "-" (v "x") (v "y")) ],
   locals := [ ],
   checks := [
-    ckk "result" "-7" .int (ap (v "c") [v "sub", i 10, i 3]) ] }
+    ckk "result" "-7" .float (ap (v "c") [v "sub", .atexp (.scon (.intF 10)), .atexp (.scon (.intF 3))]) ] }
 
 /-- The programs of this shard. -/
 def shard_Elm02 : List Program :=

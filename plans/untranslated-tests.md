@@ -90,12 +90,14 @@ LetNumberFoldrTest, LetNumberIndirectFoldlTest, LetNumberMap2Test.
 
 These functions are library, outside the book. But nearly all the tests are about the language,
 mostly number specialisation (`LetNumber*`, `NumberGeneric*`) and record narrowing, and they use
-the library only incidentally. All these functions are plain Elm in elm/core 1.0.5, `List.foldr`
-included (its helper is Elm). So the translator could add the elm/core text of each function a
+the library only incidentally. All these functions but `List.map2` are plain Elm in elm/core 1.0.5,
+`List.foldr` included (its helper is Elm); `List.map2` is `Elm.Kernel.List.map2`. So the translator could add the elm/core text of each function a
 test uses as a top-level definition of the program, under its qualified name, and specialise it
 like the program's own code. `List.sum : List number -> number` then gets its copy at Float, which
 is what these tests exercise. The decision: whether the mechanisation may check a test against
 the book plus elm/core's Elm text. That text would be marked as library on the test's page.
+[core-library.md](core-library.md) proposes this, with a Core Library section of the site that
+specifies elm/core against the book.
 
 ## E. Debug.log as observable output (10)
 
@@ -111,6 +113,9 @@ turn every CHECK, CHECK-NEXT and CHECK-NOT line into a statement about that sequ
 most valuable of the mid-sized steps: these tests are about evaluation order and sharing, which
 the current checks cannot see. Where the book leaves an order of evaluation open,
 the statement would have to allow each order it permits.
+NonEntryMainEvaluatedOnceTest also needs `String.repeat` (in its helper NonEntryMainAux), a
+library function, so it waits for [core-library.md](core-library.md) as well. The plan for this
+group is step 3 of [lean-full-definition.md](lean-full-definition.md).
 
 ## F. Implementation-dependent checks (2)
 
@@ -132,7 +137,8 @@ ImportExposingItemsTest), `import:CompilerIssue2119View`, `import:CompilerIssue2
    of these tests are about.
 2. Chapter 7's dynamic semantics (module environments, `QE`, exposing) is encoded in Lean and the
    programs are translated as module sequences. This is the real step, and it also brings in
-   record alias constructors properly (group C).
+   record alias constructors properly (group C). This is the way chosen: step 1 of
+   [lean-full-definition.md](lean-full-definition.md).
 
 ## H. Library modules (5): stay out
 
@@ -153,7 +159,8 @@ large cost in build time and memory, and they say little about the semantics.
 
 ## J. Effects and programs (60)
 
-`effects` (54): 37 port modules (16 of them with Json encoders and decoders), 21 tests using
+`effects` (54): 37 port modules (16 of them import Json modules, but only PortEchoJsonValueTest
+calls a Json function), 21 tests using
 Task or Process (some of them port modules too), Platform.worker programs, Random (1). In addition: `checks:check-not`
 (PortIncomingRejectTest, ProcessKillRunnableTest, StandardA81SleepBeyond32BitsTest,
 TaskOnErrorSucceedTest), CHECK-NEXT StandardA88PortNonFiniteTest, and NoImportsTest
@@ -161,8 +168,11 @@ TaskOnErrorSucceedTest), CHECK-NEXT StandardA88PortNonFiniteTest, and NoImportsT
 
 Needed: Chapters 8 and 9 in Lean (programs, the effect managers, the scheduler and its
 nondeterminism, ports as input and output) and a model of the test harness's flags and incoming
-port values. For the Json port tests, also the Json values of the basis. Possible, but a project
-the size of the current mechanisation.
+port values. PortEchoJsonValueTest also needs `Json.Encode.encode`, a library function outside
+elm/core. Possible, but a project the size of the current mechanisation.
+[lean-full-definition.md](lean-full-definition.md) (Part I) plans it. Two of the `CHECK-NOT` tests,
+ProcessKillRunnableTest and StandardA81SleepBeyond32BitsTest, check more than the book requires:
+the book allows the line they forbid (that plan, "Findings of Part I").
 
 ## K. Compile errors (308)
 
@@ -187,10 +197,11 @@ A translation would state that *no* derivation exists, which is harder than the 
 3. **Modules** (50): the static semantics of Chapter 7 on top of 2.
 
 The static semantics is also what would let the mechanisation check the translator's own type
-inference, which number specialisation now trusts.
+inference, which number specialisation now trusts. Part II of
+[lean-full-definition.md](lean-full-definition.md) plans both.
 
 ## Suggested order
 
 A and B first (15 tests with checks, little work), then C (9), E (12, and the most informative), D after a
 decision on library text, G by inlining if the tests' import rules can wait, then the large
-steps J and K as separate plans.
+steps G, J and K, which [lean-full-definition.md](lean-full-definition.md) plans.

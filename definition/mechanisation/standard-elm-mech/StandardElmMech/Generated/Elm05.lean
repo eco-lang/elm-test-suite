@@ -4,25 +4,15 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
-/-- tests/elm/src/HigherOrderFunctionFactoryTest.elm -/
-def g_elm_HigherOrderFunctionFactoryTest : Program := {
-  name := "HigherOrderFunctionFactoryTest", source := "tests/elm/src",
-  cons := [],
-  defs := [
-    .fn "testValue" [] (letDefs [.fn "makeTransform" [pv "factor"] (lams [pv "x"] (tup2 (v "x") (v "factor"))), .fn "double" [] (ap (v "makeTransform") [i 2])] (ap (v "double") [i 5])) ],
-  locals := [ ],
-  checks := [
-    ckk "testValue" "(5,2)" .data (v "testValue") ] }
-
 /-- tests/elm/src/HigherOrderReturnLambdaBasedOnConditionTest.elm -/
 def g_elm_HigherOrderReturnLambdaBasedOnConditionTest : Program := {
   name := "HigherOrderReturnLambdaBasedOnConditionTest", source := "tests/elm/src",
   cons := [],
   defs := [
-    .fn "testValue" [] (letDefs [.fn "choose" [pv "flag"] (ifte (v "flag") (lams [pv "x"] (v "x")) (lams [pw] (i 0)))] (ap (v "choose") [.atexp (.con ⟨some "Basics", "True"⟩), i 42])) ],
+    .fn "testValue" [] (letDefs [.fn "choose" [pv "flag"] (ifte (v "flag") (lams [pv "x"] (v "x")) (lams [pw] (.atexp (.scon (.intF 0)))))] (ap (v "choose") [.atexp (.con ⟨some "Basics", "True"⟩), .atexp (.scon (.intF 42))])) ],
   locals := [ ],
   checks := [
-    ckk "testValue" "42" .int (v "testValue") ] }
+    ckk "testValue" "42" .float (v "testValue") ] }
 
 /-- tests/elm/src/HigherOrderTest.elm -/
 def g_elm_HigherOrderTest : Program := {
@@ -31,20 +21,20 @@ def g_elm_HigherOrderTest : Program := {
   defs := [
     .fn "apply" [pv "f", pv "x"] (ap (v "f") [v "x"]),
     .fn "twice" [pv "f", pv "x"] (ap (v "f") [.atexp (.paren (ap (v "f") [v "x"]))]),
-    .fn "double" [pv "x"] (bin "*" (v "x") (i 2)),
+    .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))),
     .fn "square" [pv "x"] (bin "*" (v "x") (v "x")) ],
   locals := [ ],
   checks := [
-    ckk "apply1" "10" .int (ap (v "apply") [v "double", i 5]),
-    ckk "apply2" "25" .int (ap (v "apply") [v "square", i 5]),
-    ckk "twice1" "20" .int (ap (v "twice") [v "double", i 5]) ] }
+    ckk "apply1" "10" .float (ap (v "apply") [v "double", .atexp (.scon (.intF 5))]),
+    ckk "apply2" "25" .float (ap (v "apply") [v "square", .atexp (.scon (.intF 5))]),
+    ckk "twice1" "20" .float (ap (v "twice") [v "double", .atexp (.scon (.intF 5))]) ] }
 
 /-- tests/elm/src/HigherOrderTripleNestedFunctionTest.elm -/
 def g_elm_HigherOrderTripleNestedFunctionTest : Program := {
   name := "HigherOrderTripleNestedFunctionTest", source := "tests/elm/src",
   cons := [],
   defs := [
-    .fn "testValue" [] (letDefs [.fn "triple" [pv "a"] (lams [pv "b"] (lams [pv "c"] (listE [v "a", v "b", v "c"])))] (ap (v "triple") [i 1, i 2, i 3])) ],
+    .fn "testValue" [] (letDefs [.fn "triple" [pv "a"] (lams [pv "b"] (lams [pv "c"] (listE [v "a", v "b", v "c"])))] (ap (v "triple") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])) ],
   locals := [ ],
   checks := [
     ckk "testValue" "[1,2,3]" .data (v "testValue") ] }
@@ -75,7 +65,7 @@ def g_elm_ImportOperatorItemTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "sum" "7" .int (bin "+" (i 3) (i 4)),
+    ckk "sum" "7" .float (bin "+" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 4)))),
     ckk "quotient" "3" .int (bin "//" (i 7) (i 2)) ] }
 
 /-- tests/elm/src/ImportResolutionQualifiedImportedFunctionTest.elm -/
@@ -83,7 +73,7 @@ def g_elm_ImportResolutionQualifiedImportedFunctionTest : Program := {
   name := "ImportResolutionQualifiedImportedFunctionTest", source := "tests/elm/src",
   cons := [],
   defs := [
-    .fn "xs" [] (listE [ap (qv "Basics" "negate") [i 1], ap (qv "Basics" "negate") [i 2]]),
+    .fn "xs" [] (listE [ap (qv "Basics" "negate") [.atexp (.scon (.intF 1))], ap (qv "Basics" "negate") [.atexp (.scon (.intF 2))]]),
     .fn "testValue" [] (v "xs") ],
   locals := [ ],
   checks := [
@@ -116,7 +106,7 @@ def g_elm_InfixAssocLeftArithTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "sub sub" "5" .int (bin "-" (bin "-" (i 10) (i 3)) (i 2)),
+    ckk "sub sub" "5" .float (bin "-" (bin "-" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 2)))),
     ckk "fdiv fdiv" "5" .float (bin "/" (bin "/" (.atexp (.scon (.intF 100))) (.atexp (.scon (.intF 10)))) (.atexp (.scon (.intF 2)))),
     ckk "idiv idiv" "3" .int (bin "//" (bin "//" (i 100) (i 10)) (i 3)) ] }
 
@@ -127,17 +117,17 @@ def g_elm_InfixAssocPipesTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "pipe right twice" "3" .int (bin "|>" (bin "|>" (i 3) (v "negate")) (v "abs")),
-    ckk "pipe left twice" "-3" .int (bin "<|" (v "negate") (bin "<|" (v "abs") (.atexp (neg (A (i 3)))))) ] }
+    ckk "pipe right twice" "3" .float (bin "|>" (bin "|>" (.atexp (.scon (.intF 3))) (v "negate")) (v "abs")),
+    ckk "pipe left twice" "-3" .float (bin "<|" (v "negate") (bin "<|" (v "abs") (.atexp (neg (.scon (.intF 3)))))) ] }
 
 /-- tests/elm/src/InfixAssocRightPowTest.elm -/
 def g_elm_InfixAssocRightPowTest : Program := {
-  name := "InfixAssocRightPowTest", source := "tests/elm/src",
+  name := "InfixAssocRightPowTest", source := "tests/elm/src", native := true,
   cons := [],
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "pow pow" "512" .int (bin "^" (i 2) (bin "^" (i 3) (i 2))) ] }
+    ckk "pow pow" "512" .float (bin "^" (.atexp (.scon (.intF 2))) (bin "^" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 2))))) ] }
 
 /-- tests/elm/src/InfixIfExtendsRightTest.elm -/
 def g_elm_InfixIfExtendsRightTest : Program := {
@@ -146,7 +136,7 @@ def g_elm_InfixIfExtendsRightTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "if then chain" "10" .int (ifte (c "True") (i 10) (bin "*" (i 2) (i 3))) ] }
+    ckk "if then chain" "10" .float (ifte (c "True") (.atexp (.scon (.intF 10))) (bin "*" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3))))) ] }
 
 /-- tests/elm/src/InfixLastOperandAnyExprTest.elm -/
 def g_elm_InfixLastOperandAnyExprTest : Program := {
@@ -155,18 +145,18 @@ def g_elm_InfixLastOperandAnyExprTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "if last" "3" .int (bin "+" (i 1) (ifte (c "True") (i 2) (i 3))),
-    ckk "lambda last" "10" .int (bin "|>" (i 5) (lams [pv "n"] (bin "*" (v "n") (i 2)))) ] }
+    ckk "if last" "3" .float (bin "+" (.atexp (.scon (.intF 1))) (ifte (c "True") (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3))))),
+    ckk "lambda last" "10" .float (bin "|>" (.atexp (.scon (.intF 5))) (lams [pv "n"] (bin "*" (v "n") (.atexp (.scon (.intF 2)))))) ] }
 
 /-- tests/elm/src/InfixNegatedOperandTest.elm -/
 def g_elm_InfixNegatedOperandTest : Program := {
-  name := "InfixNegatedOperandTest", source := "tests/elm/src",
+  name := "InfixNegatedOperandTest", source := "tests/elm/src", native := true,
   cons := [],
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "negated pow" "4" .int (bin "^" (.atexp (neg (A (i 2)))) (i 2)),
-    ckk "sub negated" "5" .int (bin "-" (i 3) (.atexp (neg (A (i 2))))) ] }
+    ckk "negated pow" "4" .float (bin "^" (.atexp (neg (.scon (.intF 2)))) (.atexp (.scon (.intF 2)))),
+    ckk "sub negated" "5" .float (bin "-" (.atexp (.scon (.intF 3))) (.atexp (neg (.scon (.intF 2))))) ] }
 
 /-- tests/elm/src/InfixNonAssocSeparatedLegalTest.elm -/
 def g_elm_InfixNonAssocSeparatedLegalTest : Program := {
@@ -175,7 +165,7 @@ def g_elm_InfixNonAssocSeparatedLegalTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "separated" "True" .data (andalso (bin "<" (i 1) (i 2)) (bin "==" (i 2) (i 2))) ] }
+    ckk "separated" "True" .data (andalso (bin "<" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (bin "==" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 2))))) ] }
 
 /-- tests/elm/src/InfixPrecAddOverConsTest.elm -/
 def g_elm_InfixPrecAddOverConsTest : Program := {
@@ -184,7 +174,7 @@ def g_elm_InfixPrecAddOverConsTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "add then cons" "[2,5]" .data (bin "::" (bin "+" (i 1) (i 1)) (listE [i 5])) ] }
+    ckk "add then cons" "[2,5]" .data (bin "::" (bin "+" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 1)))) (listE [.atexp (.scon (.intF 5))])) ] }
 
 /-- tests/elm/src/InfixPrecAndOverOrTest.elm -/
 def g_elm_InfixPrecAndOverOrTest : Program := {
@@ -202,17 +192,17 @@ def g_elm_InfixPrecAppendOverEqTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "append then eq" "True" .data (bin "==" (bin "++" (listE [i 1]) (listE [i 2])) (listE [i 1, i 2])) ] }
+    ckk "append then eq" "True" .data (bin "==" (bin "++" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2))])) (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))])) ] }
 
 /-- tests/elm/src/InfixPrecApplicationFirstTest.elm -/
 def g_elm_InfixPrecApplicationFirstTest : Program := {
-  name := "InfixPrecApplicationFirstTest", source := "tests/elm/src",
+  name := "InfixPrecApplicationFirstTest", source := "tests/elm/src", native := true,
   cons := [],
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "application then pow" "4" .int (bin "^" (ap (v "negate") [i 2]) (i 2)),
-    ckk "application then mul" "9" .int (bin "*" (ap (.atexp (.op "+")) [i 1, i 2]) (i 3)) ] }
+    ckk "application then pow" "4" .float (bin "^" (ap (v "negate") [.atexp (.scon (.intF 2))]) (.atexp (.scon (.intF 2)))),
+    ckk "application then mul" "9" .float (bin "*" (ap (.atexp (.op "+")) [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (.atexp (.scon (.intF 3)))) ] }
 
 /-- tests/elm/src/InfixPrecCompareOverAndTest.elm -/
 def g_elm_InfixPrecCompareOverAndTest : Program := {
@@ -221,7 +211,7 @@ def g_elm_InfixPrecCompareOverAndTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "lt then and" "True" .data (andalso (bin "<" (i 1) (i 2)) (bin "<" (i 3) (i 4))) ] }
+    ckk "lt then and" "True" .data (andalso (bin "<" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (bin "<" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 4))))) ] }
 
 /-- tests/elm/src/InfixPrecComposeOverPipeTest.elm -/
 def g_elm_InfixPrecComposeOverPipeTest : Program := {
@@ -231,7 +221,7 @@ def g_elm_InfixPrecComposeOverPipeTest : Program := {
     .fn "x" [] (.atexp (neg (A (i 3)))) ],
   locals := [ ],
   checks := [
-    ckk "compose then pipe" "-3" .int (bin "|>" (v "x") (bin "<<" (v "negate") (v "abs"))) ] }
+    ckk "compose then pipe" "-3" .int (bin "|>" (v "x") (bin "<<" (v "negate") (v "abs$Int"))) ] }
 
 /-- tests/elm/src/InfixPrecMulOverAddTest.elm -/
 def g_elm_InfixPrecMulOverAddTest : Program := {
@@ -240,8 +230,8 @@ def g_elm_InfixPrecMulOverAddTest : Program := {
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "add then mul" "14" .int (bin "+" (i 2) (bin "*" (i 3) (i 4))),
-    ckk "mul then add" "10" .int (bin "+" (bin "*" (i 2) (i 3)) (i 4)) ] }
+    ckk "add then mul" "14" .float (bin "+" (.atexp (.scon (.intF 2))) (bin "*" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 4))))),
+    ckk "mul then add" "10" .float (bin "+" (bin "*" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 4)))) ] }
 
 /-- tests/elm/src/InfixPrecOrOverPipeTest.elm -/
 def g_elm_InfixPrecOrOverPipeTest : Program := {
@@ -254,12 +244,12 @@ def g_elm_InfixPrecOrOverPipeTest : Program := {
 
 /-- tests/elm/src/InfixPrecPowOverMulTest.elm -/
 def g_elm_InfixPrecPowOverMulTest : Program := {
-  name := "InfixPrecPowOverMulTest", source := "tests/elm/src",
+  name := "InfixPrecPowOverMulTest", source := "tests/elm/src", native := true,
   cons := [],
   defs := [ ],
   locals := [ ],
   checks := [
-    ckk "pow then mul" "16" .int (bin "*" (bin "^" (i 2) (i 3)) (i 2)) ] }
+    ckk "pow then mul" "16" .float (bin "*" (bin "^" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 2)))) ] }
 
 /-- tests/elm/src/InlineDupLetNamesTest.elm -/
 def g_elm_InlineDupLetNamesTest : Program := {
@@ -339,16 +329,16 @@ def g_elm_LambdaPatternArgTest : Program := {
     .fn "getX" [] (lams [precord ["x"]] (v "x")),
     .fn "mixed" [] (lams [pv "a", ptup2 (P (pv "b")) (P (pv "c")), pw] (v "b")) ],
   checks := [
-    ckk "swap" "(2,1)" .data (ap (v "swap") [tup2 (i 1) (i 2)]),
-    ckk "getX" "42" .int (ap (v "getX") [recE [("x", i 42)]]),
-    ckk "mixed" "\"b\"" .string (ap (v "mixed") [i 1, tup2 (str "b") (i 2), i 3]) ] }
+    ckk "swap" "(2,1)" .data (ap (v "swap") [tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))]),
+    ckk "getX" "42" .float (ap (v "getX") [recE [("x", .atexp (.scon (.intF 42)))]]),
+    ckk "mixed" "\"b\"" .string (ap (v "mixed") [.atexp (.scon (.intF 1)), tup2 (str "b") (.atexp (.scon (.intF 2))), .atexp (.scon (.intF 3))]) ] }
 
 /-- tests/elm/src/LargeDispatchCaseTest.elm -/
 def g_elm_LargeDispatchCaseTest : Program := {
   name := "LargeDispatchCaseTest", source := "tests/elm/src",
   cons := [("VInt", 1), ("VStr", 1), ("VNone", 0)],
   defs := [
-    .fn "dispatch" [pv "args", pv "name"] (caseOf (v "args") [(P (listP [pcon "VInt" [pv "a"]]), caseOf (v "name") [(P (.scon (.str "negate")), ap (v "negate") [v "a"]), (P (.scon (.str "abs")), ap (v "abs") [v "a"]), (P pw, i 0)]), (P (listP [pcon "VInt" [pv "a"], pcon "VInt" [pv "b"]]), caseOf (v "name") [(P (.scon (.str "add")), bin "+" (v "a") (v "b")), (P (.scon (.str "sub")), bin "-" (v "a") (v "b")), (P (.scon (.str "mul")), bin "*" (v "a") (v "b")), (P (.scon (.str "max")), ap (v "max") [v "a", v "b"]), (P pw, i 0)]), (P pw, i 42)]) ],
+    .fn "dispatch" [pv "args", pv "name"] (caseOf (v "args") [(P (listP [pcon "VInt" [pv "a"]]), caseOf (v "name") [(P (.scon (.str "negate")), ap (v "negate") [v "a"]), (P (.scon (.str "abs")), ap (v "abs$Int") [v "a"]), (P pw, i 0)]), (P (listP [pcon "VInt" [pv "a"], pcon "VInt" [pv "b"]]), caseOf (v "name") [(P (.scon (.str "add")), bin "+" (v "a") (v "b")), (P (.scon (.str "sub")), bin "-" (v "a") (v "b")), (P (.scon (.str "mul")), bin "*" (v "a") (v "b")), (P (.scon (.str "max")), ap (v "max") [v "a", v "b"]), (P pw, i 0)]), (P pw, i 42)]) ],
   locals := [ ],
   checks := [
     ckk "r1" "3" .int (ap (v "dispatch") [listE [ap (c "VInt") [i 1], ap (c "VInt") [i 2]], str "add"]),
@@ -362,14 +352,14 @@ def g_elm_LetBasicTest : Program := {
   cons := [],
   defs := [ ],
   locals := [
-    .fn "x" [] (i 2),
-    .fn "y" [] (i 3),
+    .fn "x" [] (.atexp (.scon (.intF 2))),
+    .fn "y" [] (.atexp (.scon (.intF 3))),
     .fn "result1" [] (bin "+" (v "x") (v "y")),
     .fn "greeting" [] (str "hello"),
     .fn "name" [] (str "world"),
     .fn "result2" [] (bin "++" (v "greeting") (bin "++" (str " ") (v "name"))) ],
   checks := [
-    ckk "result1" "5" .int (v "result1"),
+    ckk "result1" "5" .float (v "result1"),
     ckk "result2" "\"hello world\"" .string (v "result2") ] }
 
 /-- tests/elm/src/LetBoundLambdaCallTest.elm -/
@@ -379,9 +369,9 @@ def g_elm_LetBoundLambdaCallTest : Program := {
   defs := [ ],
   locals := [
     .fn "f" [] (lams [pv "x", pv "y"] (v "x")),
-    .fn "result" [] (ap (v "f") [i 1, i 2]) ],
+    .fn "result" [] (ap (v "f") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) ],
   checks := [
-    ckk "result" "1" .int (v "result") ] }
+    ckk "result" "1" .float (v "result") ] }
 
 /-- tests/elm/src/LetDestructAliasTest.elm -/
 def g_elm_LetDestructAliasTest : Program := {
@@ -389,10 +379,10 @@ def g_elm_LetDestructAliasTest : Program := {
   cons := [],
   defs := [ ],
   locals := [
-    .pat (.paren (.as (P (.paren (P (ptup2 (P (pv "a")) (P (pv "b")))))) "pair")) (tup2 (i 1) (i 2)) ],
+    .pat (.paren (.as (P (.paren (P (ptup2 (P (pv "a")) (P (pv "b")))))) "pair")) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) ],
   checks := [
     ckk "pair" "(1,2)" .data (v "pair"),
-    ckk "first" "1" .int (v "a") ] }
+    ckk "first" "1" .float (v "a") ] }
 
 /-- tests/elm/src/LetDestructFuncTupleTest.elm -/
 def g_elm_LetDestructFuncTupleTest : Program := {
@@ -411,7 +401,7 @@ def g_elm_LetDestructNestedSingleConstructorNumberTest : Program := {
   name := "LetDestructNestedSingleConstructorNumberTest", source := "tests/elm/src",
   cons := [("Two", 2), ("Inner", 1), ("Outer", 1)],
   defs := [
-    .fn "testValue" [] (letDefs [.fn "o" [] (ap (c "Two") [.atexp (.paren (ap (c "Inner") [i 1])), i 3]), .fn "o$Float" [] (ap (c "Two") [.atexp (.paren (ap (c "Inner") [.atexp (.scon (.intF 1))])), i 3]), .pat (.paren (pcon "Two" [.paren (pcon "Inner" [pv "y"]), pw])) (v "o"), .pat (.paren (pcon "Two" [.paren (pcon "Inner" [pv "y$Float"]), pw])) (v "o$Float")] (bin "+" (v "y$Float") (.atexp (.scon (.float 5 (-1)))))) ],
+    .fn "testValue" [] (letDefs [.fn "o" [] (ap (c "Two") [.atexp (.paren (ap (c "Inner") [.atexp (.scon (.intF 1))])), i 3]), .pat (.paren (pcon "Two" [.paren (pcon "Inner" [pv "y"]), pw])) (v "o")] (bin "+" (v "y") (.atexp (.scon (.float 5 (-1)))))) ],
   locals := [ ],
   checks := [
     ckk "testValue" "1.5" .float (v "testValue") ] }
@@ -422,15 +412,15 @@ def g_elm_LetDestructRecordTest : Program := {
   cons := [],
   defs := [ ],
   locals := [
-    .pat (precord ["x"]) (recE [("x", i 42)]),
-    .pat (precord ["a", "b"]) (recE [("a", i 1), ("b", i 2)]),
-    .pat (precord ["p", "r"]) (recE [("p", i 1), ("q", i 2), ("r", i 3)]),
-    .pat (ptup2 (P (precord ["s"])) (P (pv "t"))) (tup2 (recE [("s", i 1)]) (i 2)) ],
+    .pat (precord ["x"]) (recE [("x", .atexp (.scon (.intF 42)))]),
+    .pat (precord ["a", "b"]) (recE [("a", .atexp (.scon (.intF 1))), ("b", .atexp (.scon (.intF 2)))]),
+    .pat (precord ["p", "r"]) (recE [("p", .atexp (.scon (.intF 1))), ("q", .atexp (.scon (.intF 2))), ("r", .atexp (.scon (.intF 3)))]),
+    .pat (ptup2 (P (precord ["s"])) (P (pv "t"))) (tup2 (recE [("s", .atexp (.scon (.intF 1)))]) (.atexp (.scon (.intF 2)))) ],
   checks := [
-    ckk "single" "42" .int (v "x"),
-    ckk "multi" "3" .int (bin "+" (v "a") (v "b")),
-    ckk "partial" "4" .int (bin "+" (v "p") (v "r")),
-    ckk "mixed" "3" .int (bin "+" (v "s") (v "t")) ] }
+    ckk "single" "42" .float (v "x"),
+    ckk "multi" "3" .float (bin "+" (v "a") (v "b")),
+    ckk "partial" "4" .float (bin "+" (v "p") (v "r")),
+    ckk "mixed" "3" .float (bin "+" (v "s") (v "t")) ] }
 
 /-- tests/elm/src/LetDestructTupleNestedTest.elm -/
 def g_elm_LetDestructTupleNestedTest : Program := {
@@ -438,14 +428,14 @@ def g_elm_LetDestructTupleNestedTest : Program := {
   cons := [],
   defs := [ ],
   locals := [
-    .pat (ptup2 (P (pv "a")) (P (pv "b"))) (tup2 (i 1) (i 2)),
-    .pat (ptup2 (P (ptup2 (P (pv "c")) (P (pv "d")))) (P (ptup2 (P (pv "e")) (P (pv "f"))))) (tup2 (tup2 (i 3) (i 4)) (tup2 (i 5) (i 6))),
-    .pat (ptup2 (P (pv "g")) (P (pv "rest"))) (tup2 (i 1) (tup2 (i 2) (i 3))),
+    .pat (ptup2 (P (pv "a")) (P (pv "b"))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))),
+    .pat (ptup2 (P (ptup2 (P (pv "c")) (P (pv "d")))) (P (ptup2 (P (pv "e")) (P (pv "f"))))) (tup2 (tup2 (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 4)))) (tup2 (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 6))))),
+    .pat (ptup2 (P (pv "g")) (P (pv "rest"))) (tup2 (.atexp (.scon (.intF 1))) (tup2 (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3))))),
     .pat (ptup2 (P (pv "h")) (P (pv "i"))) (v "rest") ],
   checks := [
-    ckk "basic" "3" .int (bin "+" (v "a") (v "b")),
-    ckk "nested" "8" .int (bin "+" (bin "-" (bin "+" (bin "+" (v "c") (v "d")) (v "e")) (v "f")) (i 2)),
-    ckk "chain" "6" .int (bin "+" (bin "+" (v "g") (v "h")) (v "i")) ] }
+    ckk "basic" "3" .float (bin "+" (v "a") (v "b")),
+    ckk "nested" "8" .float (bin "+" (bin "-" (bin "+" (bin "+" (v "c") (v "d")) (v "e")) (v "f")) (.atexp (.scon (.intF 2)))),
+    ckk "chain" "6" .float (bin "+" (bin "+" (v "g") (v "h")) (v "i")) ] }
 
 /-- tests/elm/src/LetDestructuringTest.elm -/
 def g_elm_LetDestructuringTest : Program := {
@@ -453,12 +443,12 @@ def g_elm_LetDestructuringTest : Program := {
   cons := [],
   defs := [ ],
   locals := [
-    .pat (ptup2 (P (pv "first")) (P (pv "second"))) (tup2 (i 1) (i 2)),
-    .pat (ptup3 (P (pv "a")) (P (pv "b")) (P (pv "c"))) (tup3 (i 10) (i 20) (i 30)) ],
+    .pat (ptup2 (P (pv "first")) (P (pv "second"))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))),
+    .pat (ptup3 (P (pv "a")) (P (pv "b")) (P (pv "c"))) (tup3 (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 20))) (.atexp (.scon (.intF 30)))) ],
   checks := [
-    ckk "first" "1" .int (v "first"),
-    ckk "second" "2" .int (v "second"),
-    ckk "head" "10" .int (v "a") ] }
+    ckk "first" "1" .float (v "first"),
+    ckk "second" "2" .float (v "second"),
+    ckk "head" "10" .float (v "a") ] }
 
 /-- tests/elm/src/LetMultiFuncTest.elm -/
 def g_elm_LetMultiFuncTest : Program := {
@@ -468,16 +458,32 @@ def g_elm_LetMultiFuncTest : Program := {
   locals := [
     .fn "identity" [pv "x"] (v "x"),
     .fn "const" [pv "x", pv "y"] (v "x"),
-    .fn "r1" [] (ap (v "identity") [i 1]),
-    .fn "r2" [] (ap (v "const") [i 2, i 3]) ],
+    .fn "r1" [] (ap (v "identity") [.atexp (.scon (.intF 1))]),
+    .fn "r2" [] (ap (v "const") [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) ],
   checks := [
-    ckk "r1" "1" .int (v "r1"),
-    ckk "r2" "2" .int (v "r2") ] }
+    ckk "r1" "1" .float (v "r1"),
+    ckk "r2" "2" .float (v "r2") ] }
+
+/-- tests/elm/src/LetMultipleTest.elm -/
+def g_elm_LetMultipleTest : Program := {
+  name := "LetMultipleTest", source := "tests/elm/src",
+  cons := [],
+  defs := [ ],
+  locals := [
+    .fn "a" [] (.atexp (.scon (.intF 1))),
+    .fn "b" [] (.atexp (.scon (.intF 2))),
+    .fn "c" [] (.atexp (.scon (.intF 3))),
+    .fn "d" [] (.atexp (.scon (.intF 4))),
+    .fn "e" [] (.atexp (.scon (.intF 5))),
+    .fn "sum" [] (bin "+" (bin "+" (bin "+" (bin "+" (v "a") (v "b")) (v "c")) (v "d")) (v "e")),
+    .fn "product" [] (bin "*" (bin "*" (bin "*" (bin "*" (v "a") (v "b")) (v "c")) (v "d")) (v "e")) ],
+  checks := [
+    ckk "sum" "15" .float (v "sum"),
+    ckk "product" "120" .float (v "product") ] }
 
 /-- The programs of this shard. -/
 def shard_Elm05 : List Program :=
-  [g_elm_HigherOrderFunctionFactoryTest,
-   g_elm_HigherOrderReturnLambdaBasedOnConditionTest,
+  [g_elm_HigherOrderReturnLambdaBasedOnConditionTest,
    g_elm_HigherOrderTest,
    g_elm_HigherOrderTripleNestedFunctionTest,
    g_elm_HoleyAliasTwoParamsTest,
@@ -515,6 +521,7 @@ def shard_Elm05 : List Program :=
    g_elm_LetDestructRecordTest,
    g_elm_LetDestructTupleNestedTest,
    g_elm_LetDestructuringTest,
-   g_elm_LetMultiFuncTest]
+   g_elm_LetMultiFuncTest,
+   g_elm_LetMultipleTest]
 
 end StandardElm
