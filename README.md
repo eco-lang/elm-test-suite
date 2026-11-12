@@ -431,7 +431,7 @@ The site also carries *A Standard Definition of Elm?*, a formal definition of th
 the initial basis (`/standard/basis/Basics/modBy`), the PDF, and the Lean proofs of its mechanisation
 (`/standard/proofs`, a page per theorem, read from `definition/mechanisation/` by
 `runner/mechanisation-data.js`). The examples of the mechanisation are the tests tagged `elm-spec`,
-translated into Lean by a program, `definition/tools/src/Translate.elm` (491 of the 939 today; the
+translated into Lean by a program, `definition/tools/src/Translate.elm` (498 of the 939 today; the
 others are listed with the reason they are not, from compile-error tests to library functions the
 encoding does not include). Every such test shows on its page its Lean translation, with the Lean
 evaluator's value for each check and the theorem that proves it, or why it is not translated; a

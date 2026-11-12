@@ -8,6 +8,7 @@
   and an order in which every component follows those it refers to.
 -/
 import StandardElmMech.Objects
+import StandardElmMech.Src.Grouping
 
 namespace StandardElm.D
 open StandardElm
@@ -194,39 +195,9 @@ def refers (ds : List Def) (i j : Nat) : Bool :=
   let fv := fvExp (ds[i]!).rhs
   (ds[j]!).bound.any (fun x => fv.contains x)
 
-/-- Reachability by zero or more steps of "refers to". -/
-def reach (ds : List Def) : Nat → Nat → Bool := Id.run do
-  let n := ds.length
-  let mut m : Array (Array Bool) :=
-    Array.ofFn (n := n) fun a => Array.ofFn (n := n) fun b => a.val == b.val || refers ds a.val b.val
-  for k in List.range n do
-    for a in List.range n do
-      for b in List.range n do
-        if m[a]![k]! && m[k]![b]! then
-          m := m.set! a (m[a]!.set! b true)
-  return fun a b => m[a]![b]!
-
-/-- The components, each as its member indices in increasing order, in an
-    order in which a component comes after every component it refers to;
-    among the components ready to be placed the one with the least member
-    comes first. -/
-def components (ds : List Def) : List (List Nat) := Id.run do
-  let n := ds.length
-  let r := reach ds
-  let comps : List (List Nat) :=
-    (List.range n).foldl (fun acc a =>
-      if acc.any (fun cmp => cmp.contains a) then acc
-      else acc ++ [(List.range n).filter (fun b => r a b && r b a)]) []
-  let mut placed : List (List Nat) := []
-  let mut todo := comps
-  for _ in List.range (n + 1) do
-    match todo.find? (fun cmp => cmp.all (fun a => (List.range n).all (fun b =>
-            !(refers ds a b) || cmp.contains b || placed.any (fun p => p.contains b)))) with
-    | some cmp =>
-      placed := placed ++ [cmp]
-      todo := todo.filter (fun x => x != cmp)
-    | none => pure ()
-  return placed
+/-- The components of the definitions by "refers to", in the canonical order
+    (Src/Grouping.lean, `Grouping.components`, plan step 8). -/
+def components (ds : List Def) : List (List Nat) := Src.Grouping.components ds.length (refers ds)
 
 /-- The value binding `valbind_i1 and ... and valbind_ip` of a component.
     Row "var atpat1 ... atpatn = exp" gives `var = \atpat1 ... atpatn -> exp`. -/

@@ -1,13 +1,25 @@
 module Translate.Ir exposing
-    ( Check
+    ( CheckLine
     , Decl(..)
+    , ExportTable
+    , ExposingIr(..)
     , Expr(..)
     , FloatLit
+    , ImportIr
+    , ItemIr(..)
+    , LineKind(..)
+    , ModuleIr
     , Name(..)
+    , Payload(..)
     , Pattern(..)
     , TestProgram
+    , anyDeclExpr
     , anyExpr
+    , children
     , declBinders
+    , globalOf
+    , lineLabel
+    , mainModule
     , patternBinders
     )
 
@@ -21,15 +33,24 @@ import Elm.Syntax.Node exposing (Node)
 import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation)
 
 
-{-| A resolved name. `Local id name`: bound in the program (a pattern variable, a `let` or
+{-| A resolved name. `Local id name`: bound in the module (a pattern variable, a `let` or
 top-level declaration) by the binding with that id. `Global module name`: bound in E0, written
-qualified by the module in the source, or unqualified when the module is "". `UserCon`: a
-constructor of a custom type of the program.
+qualified by the module in the source, or unqualified when the module is "" (Basics).
+`Exposed module name`: bound in E0 by `module`, written unqualified because an import's exposing
+list brings it in (`text` after `import Html exposing (text)`); the reduced syntax keeps it as
+written, and the module's imports resolve it (r:dm-import). `UserCon key`: a
+constructor of a custom type or record alias of the module, by its key (its name, prefixed by
+`M.` in a helper module `M`). `Foreign`: a value of another module of the program, by the id of
+its binding there, as written (qualified or not). `ForeignCon`: a constructor of another module,
+by its key, as written. Binding ids are unique across the program.
 -}
 type Name
     = Local Int String
     | Global String String
+    | Exposed String String
     | UserCon String
+    | Foreign { binder : Int, qual : Maybe String, name : String }
+    | ForeignCon { key : String, qual : Maybe String, name : String }
 
 
 type alias FloatLit =
@@ -91,24 +112,151 @@ type Decl
     | DPat Pattern Expr
 
 
-type alias Check =
-    { label : String
-    , expected : String
-    , expr : Expr
+{-| The directive of a CHECK line: CHECK and CHECK-DAG (read as CHECK, decision D9), CHECK-NEXT,
+CHECK-SAME, CHECK-NOT (only in a test that stops with EXIT 1).
+-}
+type LineKind
+    = LCheck
+    | LNext
+    | LSame
+    | LNot
+
+
+{-| A CHECK line of a test, as written.
+-}
+type alias CheckLine =
+    { kind : LineKind
+    , text : String
     }
 
 
-{-| A test program: its custom types' constructors with their arities, its top-level declarations
-other than `main`, and `main`'s `let`: the other declarations (`locals`) and the checks.
+{-| The module ("" for Basics written unqualified) and the name of a value or constructor of E0,
+however the source writes it.
 -}
-type alias TestProgram =
-    { cons : List ( String, Int )
+globalOf : Name -> Maybe ( String, String )
+globalOf name =
+    case name of
+        Global m x ->
+            Just ( m, x )
+
+        Exposed m x ->
+            Just ( m, x )
+
+        _ ->
+            Nothing
+
+
+{-| The label a CHECK line names: the text before its first `": "`, or the whole text; `Nothing`
+for a line with a regular expression (`{{...}}`), which names no label, and for a CHECK-NOT.
+-}
+lineLabel : CheckLine -> Maybe String
+lineLabel line =
+    if String.contains "{{" line.text || line.kind == LNot then
+        Nothing
+
+    else
+        case String.indexes ": " line.text of
+            at :: _ ->
+                Just (String.left at line.text)
+
+            [] ->
+                Just line.text
+
+
+{-| An exposing list: `(..)`, or its items.
+-}
+type ExposingIr
+    = ExposeAll
+    | ExposeItems (List ItemIr)
+
+
+{-| An exposing item: a value, an operator, a type by name, a type with its constructors.
+-}
+type ItemIr
+    = IVar String
+    | IOp String
+    | IType String
+    | IOpen String
+
+
+{-| An import as written: `import M [as Q] [exposing ...]`.
+-}
+type alias ImportIr =
+    { modid : String, alias : Maybe String, exposes : Maybe ExposingIr }
+
+
+{-| What a module of the program exposes, for the modules that import it: its exposed values by
+binding id, its exposed constructors (of types exposed with `(..)`, and of exposed record aliases)
+by key, its exposed types by their canonical names, and its exposed aliases.
+-}
+type alias ExportTable =
+    { values : Dict String Int
+    , constructors : Dict String String
+    , typeCons : Dict String (List String)
+    , types : Dict String String
+    , aliases : Dict String { params : List String, annotation : Node TypeAnnotation }
+    }
+
+
+{-| A module of a test program: its name and file, its header's exposing list and its written
+imports; its custom types' constructors with their arities, its custom types and aliases, and its
+top-level declarations in the order written. `prefix` is "" for the main module and `M.` for a
+helper `M`: the canonical names of its types and the keys of its constructors begin with it. The
+types and aliases its imports bring in are `importedTypes` (a visible name, qualified or not, to a
+canonical type name) and `importedAliases` (a visible name to the alias).
+-}
+type alias ModuleIr =
+    { name : String
+    , path : String
+    , isPort : Bool
+    , exposes : ExposingIr
+    , imports : List ImportIr
+    , prefix : String
+    , cons : List ( String, Int )
     , types : Dict String { params : List String, constructors : List ( String, List (Node TypeAnnotation) ) }
     , aliases : Dict String { params : List String, annotation : Node TypeAnnotation }
+    , importedTypes : Dict String String
+    , importedAliases : Dict String { params : List String, annotation : Node TypeAnnotation }
+    , ports : List { name : String, binder : Int, annotation : Node TypeAnnotation }
     , defs : List Decl
-    , locals : List Decl
-    , checks : List Check
     }
+
+
+{-| A port's payload type (static-modules.tex, sec:static-modules-ports), after alias expansion: a
+record's fields sorted by label.
+-}
+type Payload
+    = TyInt
+    | TyFloat
+    | TyBool
+    | TyString
+    | TyBytes
+    | TyUnit
+    | TyValue
+    | TyList Payload
+    | TyMaybe Payload
+    | TyArray Payload
+    | TyTuple2 Payload Payload
+    | TyTuple3 Payload Payload Payload
+    | TyRecord (List ( String, Payload ))
+
+
+{-| A test program: its modules in program order (each after the modules it imports), the main
+module last; its CHECK lines; and whether it is expected to have a meaning (`False` for a test
+that stops with EXIT 1).
+-}
+type alias TestProgram =
+    { modules : List ModuleIr
+    , checks : List CheckLine
+    , meaning : Bool
+    }
+
+
+{-| The main module of a program (the last).
+-}
+mainModule : TestProgram -> Maybe ModuleIr
+mainModule p =
+    List.head (List.reverse p.modules)
 
 
 patternBinders : Pattern -> List ( String, Int )
@@ -213,3 +361,60 @@ anyDeclExpr test d =
 
         DPat _ x ->
             anyExpr test x
+
+
+{-| The expressions immediately within an expression, the bodies of its declarations included.
+-}
+children : Expr -> List Expr
+children e =
+    let
+        declExprs d =
+            case d of
+                DFn f ->
+                    [ f.body ]
+
+                DPat _ x ->
+                    [ x ]
+    in
+    case e of
+        EApp f args ->
+            f :: args
+
+        EBinop _ _ a b ->
+            [ a, b ]
+
+        EIf arms final ->
+            List.concatMap (\( c, t ) -> [ c, t ]) arms ++ [ final ]
+
+        ENeg x ->
+            [ x ]
+
+        ETuple xs ->
+            xs
+
+        EParen x ->
+            [ x ]
+
+        ELet decls body ->
+            List.concatMap declExprs decls ++ [ body ]
+
+        ECase x arms ->
+            x :: List.map Tuple.second arms
+
+        ELam _ body ->
+            [ body ]
+
+        ERecord fields ->
+            List.map Tuple.second fields
+
+        EList xs ->
+            xs
+
+        EAccess x _ ->
+            [ x ]
+
+        EUpdate _ _ fields ->
+            List.map Tuple.second fields
+
+        _ ->
+            []

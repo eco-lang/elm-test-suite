@@ -8,9 +8,13 @@ import StandardElmMech.Objects
 
 namespace StandardElm
 
+/-- A string as Elm/JS's Debug.toString prints it (`_Debug_addSlashes`): a quote, backslash,
+    newline, tab, carriage return, vertical tab and NUL escaped. -/
 def showStr (s : String) : String :=
   "\"" ++ String.join (s.toList.map fun ch =>
-    if ch == '"' then "\\\"" else if ch == '\\' then "\\\\" else ch.toString) ++ "\""
+    if ch == '"' then "\\\"" else if ch == '\\' then "\\\\" else if ch == '\n' then "\\n"
+    else if ch == '\t' then "\\t" else if ch == '\r' then "\\r" else if ch == '\x0b' then "\\v"
+    else if ch == '\x00' then "\\0" else ch.toString) ++ "\""
 
 /-! ## Floats as Elm prints them
 
@@ -106,6 +110,27 @@ def showFloat (x : Float) : String :=
   else if x < 0 then "-" ++ showPositive (-x)
   else showPositive x
 
+mutual
+  /-- A boundary value as JSON text: keys in canonical order, an integral number as the integer,
+      any other by `showFloat` of its nearest float, a byte sequence as `<k bytes>` (A62: the
+      printing of an effect value is implementation-dependent; this is Elm/JS's). -/
+  def showBV : Eff.BVal → String
+    | .null => "null"
+    | .tru => "true"
+    | .fls => "false"
+    | .num q => if q.den == 1 then toString q.num else showFloat (Eff.ratToFloat q)
+    | .str s => showStr s
+    | .bytes os => "<" ++ toString os.length ++ " bytes>"
+    | .arr js => "[" ++ ",".intercalate (showBArr js) ++ "]"
+    | .obj kvs => "{" ++ ",".intercalate (showBObj kvs) ++ "}"
+  def showBArr : Eff.BArr → List String
+    | .nil => []
+    | .cons j rest => showBV j :: showBArr rest
+  def showBObj : Eff.BObj → List String
+    | .nil => []
+    | .cons k j rest => (showStr k ++ ":" ++ showBV j) :: showBObj rest
+end
+
 def isAtomicShow : Val → Bool
   | .con c args => args.isEmpty || c == conCons || c == conNil
   | _ => true
@@ -121,6 +146,18 @@ mutual
     | .closure .. => "<function>"
     | .con c args =>
       if args.length < c.arity then "<function>"
+      else if c == conBin then
+        match args with
+        | [l] => match listElems l with
+          | some es => "<" ++ toString es.length ++ " bytes>"
+          | none => "<ill-formed bytes>"
+        | _ => "<ill-formed bytes>"
+      else if c == conArr then
+        match args with
+        | [l] => match listElems l with
+          | some es => "Array.fromList [" ++ ",".intercalate es ++ "]"
+          | none => "<ill-formed array>"
+        | _ => "<ill-formed array>"
       else if c == conNil || c == conCons then
         match listElems (.con c args) with
         | some es => "[" ++ ",".intercalate es ++ "]"
@@ -132,6 +169,13 @@ mutual
       else "{ " ++ ", ".intercalate (showFields r) ++ " }"
     | .tuple a b none => "(" ++ showVal a ++ "," ++ showVal b ++ ")"
     | .tuple a b (some d) => "(" ++ showVal a ++ "," ++ showVal b ++ "," ++ showVal d ++ ")"
+    -- effect values: what Elm/JS's Debug.toString prints for them
+    | .batch _ => "<internals>"
+    | .mapE _ _ => "<internals>"
+    | .prog _ => "<internals>"
+    | .succeed _ | .fail _ | .andThen _ _ | .onError _ _ | .prim _ _ | .pid _ | .leaf _ _ =>
+      "<internals>"
+    | .bv j => showBV j
   def showArgs : List Val → List String
     | [] => []
     | a :: rest =>

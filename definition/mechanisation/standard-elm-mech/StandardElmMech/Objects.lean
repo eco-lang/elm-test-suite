@@ -12,11 +12,15 @@
   * A constructor name carries its arity (`Con`), which the book says
     elaboration determines ("arity(con) always means the arity of con in the
     custom type of the value at hand").
-  * Effect values (EffVal) are omitted: they belong to Chapter 8.
+  * Effect values (EffVal, effects.tex fig:effects-compound) are constructors of `Val` (plan
+    decision D5): tasks, process identifiers, commands and subscriptions (leaves, batches, maps),
+    programs, and JSON values (`bv`).
   * Floats are Lean's `Float` (IEEE 754 binary64); characters are Lean's
     `Char` with code = Unicode scalar value; strings are Lean's `String`.
 -/
 import StandardElmMech.Syntax
+import StandardElmMech.Eff.PTy
+import StandardElmMech.Eff.Boundary
 
 namespace StandardElm
 
@@ -38,7 +42,7 @@ inductive SVal where
   | float (x : Float)
   | char (c : Char)
   | str (s : String)
-  deriving Repr, Inhabited
+  deriving Repr, Inhabited, DecidableEq
 
 /-- BasVal: the basic values of the fragment (Appendix D,
     fig:dynamic-basis-basics, fig:dynamic-basis-operators,
@@ -55,6 +59,22 @@ inductive BasVal where
   | sqrt | sin | cos | tan | asin | acos | atan | atan2
   | append | charToCode | charFromCode
   | debugLog | debugTodo | debugToString
+  /-- Elm.Kernel.Basics.log, used by the text of logBase (fig:dynamic-basis-elem) -/
+  | kernelLog
+  /-- record(l1 ... ln), n ≥ 1: the constructor of a record alias (sec:dynamic-modules-record) -/
+  | record (ls : List String)
+  /-- the values of ports (sec:effects-ports); APPLY is step 4's -/
+  | outport (p : String) (τ : Eff.PTy)
+  | inport (p : String) (τ : Eff.PTy)
+  /-- Platform.Cmd.batch, Platform.Cmd.map, Platform.Sub.batch, Platform.Sub.map, Platform.worker
+      (fig:effects-apply) -/
+  | cmdBatch | cmdMap | subBatch | subMap | platformWorker
+  /-- Task.succeed, Task.fail, Task.andThen, Task.onError, Task.command, Process.sleep,
+      Process.spawn, Process.kill (fig:effects-apply); Array.fromList, Array.toList
+      (sec:appendix-dynamic-basis-arrays) -/
+  | taskSucceed | taskFail | taskAndThen | taskOnError | taskCommand
+  | processSleep | processSpawn | processKill
+  | arrayFromList | arrayToList
   deriving Repr, DecidableEq, Inhabited
 
 /-- arity(b), from the figures of Appendix D. -/
@@ -63,6 +83,10 @@ def BasVal.arity : BasVal → Nat
   | .toFloat | .round | .floor | .ceiling | .truncate => 1
   | .sqrt | .sin | .cos | .tan | .asin | .acos | .atan => 1
   | .charToCode | .charFromCode | .debugToString => 1
+  | .kernelLog | .outport .. | .inport .. | .cmdBatch | .subBatch | .platformWorker => 1
+  | .taskSucceed | .taskFail | .taskCommand | .processSleep | .processSpawn | .processKill => 1
+  | .arrayFromList | .arrayToList => 1
+  | .record ls => ls.length
   | .clamp => 3
   | _ => 2
 
@@ -83,6 +107,42 @@ def conEQ : Con := ⟨"EQ", 0⟩
 def conGT : Con := ⟨"GT", 0⟩
 def conJust : Con := ⟨"Just", 1⟩
 def conNothing : Con := ⟨"Nothing", 0⟩
+def conOk : Con := ⟨"Ok", 1⟩
+def conErr : Con := ⟨"Err", 1⟩
+/-- The hidden constructor of Never (appendix-static-basis.tex, the hidden identifiers). -/
+def conJustOneMore : Con := ⟨"JustOneMore", 1⟩
+/-- The harness's Html node (plan decision D2): `Html.text` is bound to it. No identifier spells
+    `node#`, so it adds no kind of value and no APPLY case. -/
+def conNode : Con := ⟨"node#", 1⟩
+/-- arr#: the constructor of arrays (sec:appendix-dynamic-basis-arrays). -/
+def conArr : Con := ⟨"arr#", 1⟩
+/-- bin#: the constructor of byte sequences (sec:appendix-dynamic-basis-bytes). -/
+def conBin : Con := ⟨"bin#", 1⟩
+/-- The hidden constructor Perform of Task's MyCmd (sec:effects-apply). Spelt with a dot so that
+    no constructor of a program has the same name (constructor names are compared by spelling). -/
+def conPerform : Con := ⟨"Task.Perform", 1⟩
+
+/-! ## Primitives and managers (fig:effects-compound) -/
+
+/-- Prim: the primitives of Process (sec:effects-simple). Prim_plat is empty ([params]). -/
+inductive Prim where
+  | sleep | spawn | kill
+  deriving Repr, DecidableEq, Inhabited
+
+def Prim.arity : Prim → Nat := fun _ => 1
+
+/-- Prim_plat: the primitives of the platform; the empty platform ([params]). -/
+def platPrims : List Prim := []
+
+/-- Mgr: the task manager, outgoing and incoming ports. Mgr_plat is empty ([params]). -/
+inductive Mgr where
+  | task
+  | out (p : String)
+  | inn (p : String) (τ : Eff.PTy)
+  deriving Repr, DecidableEq, Inhabited
+
+/-- Mgr_plat: the managers of the platform; the empty platform ([params]). -/
+def platMgrs : List Mgr := []
 
 /-! ## Compound objects (fig:dynamic-core-compound) -/
 
@@ -97,6 +157,29 @@ mutual
     | record (r : List (String × Val))                -- Lab -fin-> Val
     | tuple (v1 v2 : Val) (v3 : Option Val)           -- (v1, v2 [, v3])
     | closure (p : AtPat) (e : Exp) (E : Env) (VE : List (String × Val))  -- (atpat, exp, E, VE)
+    /-- batch(c1 ... cn), a command or subscription (effects.tex, fig:effects-compound); `none` is
+        batch(), in CmdVal and in SubVal alike, so one constructor serves both -/
+    | batch (cs : List Val)
+    /-- map(v, c) -/
+    | mapE (f : Val) (c : Val)
+    /-- prog r, a program value (ProgVal), r the record Platform.worker is applied to -/
+    | prog (r : List (String × Val))
+    /-- succeed v -/
+    | succeed (v : Val)
+    /-- fail v -/
+    | fail (v : Val)
+    /-- andThen(v, tk) -/
+    | andThen (f t : Val)
+    /-- onError(v, tk) -/
+    | onError (f t : Val)
+    /-- prim(π, v1 ... vk), k the arity of π -/
+    | prim (π : Prim) (args : List Val)
+    /-- a process identifier (ProcId = Nat) -/
+    | pid (n : Nat)
+    /-- leaf(m, v); for m = out p, v is `.bv j` with j any boundary value -/
+    | leaf (m : Mgr) (v : Val)
+    /-- a JSON value; or, as the argument of an out leaf, a boundary value (`Val.WF`) -/
+    | bv (j : Eff.BVal)
   /-- (All three finite maps are written `List (String × _)` because the
       kernel's nested-inductive translation needs syntactically equal
       occurrences; Lab, Ident and ModId are all `String`.)
@@ -111,6 +194,10 @@ instance : Inhabited Env := ⟨.mk [] []⟩
 
 abbrev ValEnv := List (Ident × Val)
 abbrev Record := List (Lab × Val)
+
+/-- A log: the entries `(label, value)` of the applications of Debug.log in a derivation of a
+    logged relation, in the order the logged rules fix (plan decision D4, RulesL.lean). -/
+abbrev Log := List (String × Val)
 
 def Env.QE : Env → List (ModId × Env) | .mk q _ => q
 def Env.VE : Env → ValEnv | .mk _ v => v
@@ -129,6 +216,9 @@ def fmPlus {α β} [BEq α] (f g : List (α × β)) : List (α × β) :=
 
 /-- E + VE means E + (empty, VE). -/
 def Env.plusVE (E : Env) (VE : ValEnv) : Env := .mk E.QE (fmPlus E.VE VE)
+
+/-- E + E': both components modified. -/
+def Env.plusEnv (E E' : Env) : Env := .mk (fmPlus E.QE E'.QE) (fmPlus E.VE E'.VE)
 
 /-- E(id) and E(modid.id): lookup of a long identifier
     (sec:dynamic-core-compound). -/
@@ -171,12 +261,28 @@ inductive VF where
 /-! ## Helpers on values -/
 
 abbrev Val.int (n : Int) : Val := .sv (.int n)
+
+/-- An outcome of a task: succeed v or fail v (fig:effects-compound). -/
+def Val.isOutcome : Val → Bool
+  | .succeed _ | .fail _ => true
+  | _ => false
+
+/-- A task: succeed, fail, andThen, onError, prim (TaskVal, fig:effects-compound). -/
+def Val.isTask : Val → Bool
+  | .succeed _ | .fail _ | .andThen _ _ | .onError _ _ | .prim _ _ => true
+  | _ => false
 def Val.bool (b : Bool) : Val := .con (if b then conTrue else conFalse) []
 abbrev Val.nil : Val := .con conNil []
 abbrev Val.cons (v vs : Val) : Val := .con conCons [v, vs]
 def Val.ofList : List Val → Val
   | [] => .nil
   | v :: vs => .cons v (Val.ofList vs)
+
+/-- The elements of a list value `v1 :: ... :: vn :: []`. -/
+def Val.toList? : Val → Option (List Val)
+  | .con c [] => if c = conNil then some [] else none
+  | .con c [h, t] => if c = conCons then (Val.toList? t).map (h :: ·) else none
+  | _ => none
 
 /-! ## Free variables (sec:appendix-derived-forms-let)
 

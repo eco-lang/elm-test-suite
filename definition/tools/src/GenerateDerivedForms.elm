@@ -31,6 +31,11 @@ leanPath =
     "definition/mechanisation/standard-elm-mech/StandardElmMech/Derived.lean"
 
 
+barePath : String
+barePath =
+    "definition/mechanisation/standard-elm-mech/StandardElmMech/Src/DerivedRows.lean"
+
+
 blocks : List Block
 blocks =
     [ Expressions, AtomicExpressions, AtomicPatterns, ValueBindings, Declarations, TopLevelDeclarations ]
@@ -71,6 +76,20 @@ lean source =
             )
 
 
+bare : String -> Result String String
+bare source =
+    ToLean.bareDefinitions Table.rows
+        |> Result.andThen
+            (\defs ->
+                Regions.replace
+                    { begin = "-- BEGIN GENERATED derived forms"
+                    , end = "-- END GENERATED derived forms"
+                    }
+                    defs
+                    source
+            )
+
+
 write : String -> (String -> Result String String) -> BackendTask FatalError ()
 write path transform =
     BackendTask.File.rawFile path
@@ -97,4 +116,5 @@ run =
     Script.withoutCliOptions
         (write texPath latex
             |> BackendTask.andThen (\_ -> write leanPath lean)
+            |> BackendTask.andThen (\_ -> write barePath bare)
         )

@@ -1,10 +1,13 @@
-module Translate.ToLean exposing (programDef)
+module Translate.ToLean exposing (programDef, workerDef)
 
 {-| Prints a specialised program as a Lean `TestProgram` in the helper notation of `Derived.lean`
 (plans/elm-to-lean-translator.md, B.9). Every printer returns the text and the class of what it
 printed; a coercion is inserted where the position needs another class.
 -}
 
+import Dict
+import Elm.Syntax.Node as Node exposing (Node(..))
+import Elm.Syntax.TypeAnnotation as TA
 import Translate.Ir exposing (..)
 import Translate.Literal as Literal
 import Translate.Specialise exposing (CheckKind(..))
@@ -109,17 +112,11 @@ expr e =
             ( Exp, varName name )
 
         ECon name ->
-            case name of
-                UserCon k ->
-                    ( Exp, "c " ++ str k )
-
-                Global "" k ->
-                    ( Exp, "c " ++ str k )
-
-                Global m k ->
+            case written name of
+                ( Just m, k ) ->
                     ( AtExp, ".con " ++ qualifiedCon m k )
 
-                Local _ k ->
+                ( Nothing, k ) ->
                     ( Exp, "c " ++ str k )
 
         EIf [ ( c, t ) ] final ->
@@ -204,33 +201,56 @@ expr e =
             )
 
 
-plainName : Name -> String
-plainName name =
+{-| A name as the source writes it: its qualifier, if any, and its last part. A constructor of
+the module is written unqualified (its key's `M.` is the translator's).
+-}
+written : Name -> ( Maybe String, String )
+written name =
     case name of
         Local _ x ->
-            x
+            ( Nothing, x )
 
-        Global _ x ->
-            x
+        Global "" x ->
+            ( Nothing, x )
+
+        Global m x ->
+            ( Just m, x )
+
+        Exposed _ x ->
+            ( Nothing, x )
 
         UserCon k ->
-            k
+            ( Nothing, String.split "." k |> List.reverse |> List.head |> Maybe.withDefault k )
+
+        Foreign f ->
+            ( f.qual, f.name )
+
+        ForeignCon f ->
+            ( f.qual, f.name )
+
+
+plainName : Name -> String
+plainName name =
+    Tuple.second (written name)
 
 
 varName : Name -> String
 varName name =
-    case name of
-        Local _ x ->
-            "v " ++ str x
-
-        Global "" x ->
-            "v " ++ str x
-
-        Global m x ->
-            "qv " ++ str m ++ " " ++ str x
-
-        UserCon k ->
+    case ( name, written name ) of
+        ( UserCon _, ( _, k ) ) ->
             "c " ++ str k
+
+        ( ForeignCon _, ( Nothing, k ) ) ->
+            "c " ++ str k
+
+        ( ForeignCon _, ( Just m, k ) ) ->
+            "(.atexp (.con " ++ qualifiedCon m k ++ "))"
+
+        ( _, ( Nothing, x ) ) ->
+            "v " ++ str x
+
+        ( _, ( Just m, x ) ) ->
+            "qv " ++ str m ++ " " ++ str x
 
 
 {-| An operator of OT_dyn: `^@Float` is `^` at Float, marked by number specialisation.
@@ -284,28 +304,20 @@ pattern p =
             ( AtPat, "pv " ++ str x )
 
         PCon name [] ->
-            case name of
-                Global m k ->
-                    if m == "" then
-                        ( AtPat, "pcA " ++ str k )
+            case written name of
+                ( Just m, k ) ->
+                    ( AtPat, ".con " ++ qualifiedCon m k )
 
-                    else
-                        ( AtPat, ".con " ++ qualifiedCon m k )
-
-                _ ->
-                    ( AtPat, "pcA " ++ str (plainName name) )
+                ( Nothing, k ) ->
+                    ( AtPat, "pcA " ++ str k )
 
         PCon name args ->
-            case name of
-                Global m k ->
-                    if m == "" then
-                        ( Pat, "pcon " ++ str k ++ " " ++ listOf (List.map (pattern >> as_ AtPat) args) )
+            case written name of
+                ( Just m, k ) ->
+                    ( Pat, ".con " ++ qualifiedCon m k ++ " " ++ listOf (List.map (pattern >> as_ AtPat) args) )
 
-                    else
-                        ( Pat, ".con " ++ qualifiedCon m k ++ " " ++ listOf (List.map (pattern >> as_ AtPat) args) )
-
-                _ ->
-                    ( Pat, "pcon " ++ str (plainName name) ++ " " ++ listOf (List.map (pattern >> as_ AtPat) args) )
+                ( Nothing, k ) ->
+                    ( Pat, "pcon " ++ str k ++ " " ++ listOf (List.map (pattern >> as_ AtPat) args) )
 
         PAs q x _ ->
             ( Pat, ".as " ++ paren (as_ Pat (pattern q)) ++ " " ++ str x )
@@ -349,34 +361,271 @@ kindName k =
 {-| The Lean definition of a test program, `def <defName> : TestProgram := { ... }`, with a doc comment
 naming its source.
 -}
-programDef : { defName : String, name : String, project : String } -> TestProgram -> List CheckKind -> Bool -> String
-programDef info program kinds native =
+programDef : { defName : String, name : String, project : String } -> TestProgram -> List CheckKind -> Dict.Dict Int ( Bool, Payload ) -> Bool -> String
+programDef info program kinds ports native =
     let
         indent =
             "\n    "
+
+        ( helpers, main ) =
+            case List.reverse program.modules of
+                m :: rest ->
+                    ( List.reverse rest, Just m )
+
+                [] ->
+                    ( [], Nothing )
+
+        paths =
+            List.map .path program.modules
     in
-    "/-- tests/"
-        ++ info.project
-        ++ "/src/"
-        ++ info.name
-        ++ ".elm -/\ndef "
+    "/-- "
+        ++ String.join ", " (List.reverse paths |> List.take 1 |> (\t -> t ++ List.filter (\p -> not (List.member p t)) paths))
+        ++ " -/\ndef "
         ++ info.defName
         ++ " : Program := {\n  name := "
         ++ str info.name
         ++ ", source := "
         ++ str ("tests/" ++ info.project ++ "/src")
         ++ (if native then ", native := true" else "")
-        ++ ",\n  cons := "
-        ++ listOf (List.map (\( k, n ) -> "(" ++ str k ++ ", " ++ String.fromInt n ++ ")") program.cons)
-        ++ ",\n  defs := ["
-        ++ String.join "," (List.map (\d -> indent ++ decl d) program.defs)
-        ++ " ],\n  locals := ["
-        ++ String.join "," (List.map (\d -> indent ++ decl d) program.locals)
-        ++ " ],\n  checks := ["
+        ++ (case main of
+                Just m ->
+                    moduleFields ports "\n  " indent m
+
+                Nothing ->
+                    ""
+           )
+        ++ (if List.isEmpty helpers then
+                ""
+
+            else
+                ",\n  helpers := ["
+                    ++ String.join ","
+                        (List.map
+                            (\h ->
+                                "\n   { name := "
+                                    ++ str h.name
+                                    ++ ", path := "
+                                    ++ str h.path
+                                    ++ moduleFields ports "\n     " (indent ++ "  ") h
+                                    ++ " }"
+                            )
+                            helpers
+                        )
+                    ++ " ]"
+           )
+        ++ ",\n  checks := ["
         ++ String.join ","
             (List.map2
-                (\c k -> indent ++ "ckk " ++ str c.label ++ " " ++ str c.expected ++ " " ++ kindName k ++ " " ++ paren (as_ Exp (expr c.expr)))
+                (\c k -> indent ++ "chk " ++ lineKindName c.kind ++ " " ++ str c.text ++ " " ++ kindName k)
                 program.checks
                 kinds
             )
-        ++ " ] }"
+        ++ " ]"
+        ++ (if program.meaning then "" else ",\n  meaning := false")
+        ++ " }"
+
+
+{-| A module's fields: its header's exposing list, its written imports, its custom types, aliases
+and definitions.
+-}
+moduleFields : Dict.Dict Int ( Bool, Payload ) -> String -> String -> ModuleIr -> String
+moduleFields ports sep indent m =
+    ","
+        ++ sep
+        ++ "exposing := "
+        ++ exposingLean m.exposes
+        ++ ", imports := "
+        ++ listOf (List.map importLean m.imports)
+        ++ ","
+        ++ sep
+        ++ "types := "
+        ++ listOf
+            (List.map
+                (\( t, d ) ->
+                    "("
+                        ++ str t
+                        ++ ", "
+                        ++ listOf (List.map (\( k, args ) -> "(" ++ str k ++ ", " ++ String.fromInt (List.length args) ++ ")") d.constructors)
+                        ++ ")"
+                )
+                (Dict.toList m.types)
+            )
+        ++ ","
+        ++ sep
+        ++ "aliases := "
+        ++ listOf
+            (List.map
+                (\( t, a ) ->
+                    case Node.value a.annotation of
+                        TA.Record fields ->
+                            "(" ++ str t ++ ", some " ++ listOf (List.map (\(Node _ ( Node _ l, _ )) -> str l) fields) ++ ")"
+
+                        _ ->
+                            "(" ++ str t ++ ", none)"
+                )
+                (Dict.toList m.aliases)
+            )
+        ++ (if List.isEmpty m.ports then
+                ""
+
+            else
+                ","
+                    ++ sep
+                    ++ "ports := "
+                    ++ listOf
+                        (List.map
+                            (\pd ->
+                                case Dict.get pd.binder ports of
+                                    Just ( out, payload ) ->
+                                        "(" ++ str pd.name ++ ", " ++ (if out then ".out" else ".inn") ++ ", " ++ payloadLean payload ++ ")"
+
+                                    Nothing ->
+                                        "(" ++ str pd.name ++ ", .out, .unit)"
+                            )
+                            m.ports
+                        )
+           )
+        ++ ","
+        ++ sep
+        ++ "defs := ["
+        ++ String.join "," (List.map (\d -> indent ++ decl d) m.defs)
+        ++ " ]"
+
+
+{-| A payload type as a `PTy` term (Eff/PTy.lean).
+-}
+payloadLean : Payload -> String
+payloadLean p =
+    case p of
+        TyInt ->
+            ".int"
+
+        TyFloat ->
+            ".float"
+
+        TyBool ->
+            ".bool"
+
+        TyString ->
+            ".string"
+
+        TyBytes ->
+            ".bytes"
+
+        TyUnit ->
+            ".unit"
+
+        TyValue ->
+            ".value"
+
+        TyList a ->
+            "(.list " ++ payloadLean a ++ ")"
+
+        TyMaybe a ->
+            "(.maybe " ++ payloadLean a ++ ")"
+
+        TyArray a ->
+            "(.array " ++ payloadLean a ++ ")"
+
+        TyTuple2 a b ->
+            "(.tuple2 " ++ payloadLean a ++ " " ++ payloadLean b ++ ")"
+
+        TyTuple3 a b c ->
+            "(.tuple3 " ++ payloadLean a ++ " " ++ payloadLean b ++ " " ++ payloadLean c ++ ")"
+
+        TyRecord fields ->
+            "(.record " ++ List.foldr (\( l, t ) rest -> "(.cons " ++ str l ++ " " ++ payloadLean t ++ " " ++ rest ++ ")") ".nil" fields ++ ")"
+
+
+exposingLean : ExposingIr -> String
+exposingLean x =
+    case x of
+        ExposeAll ->
+            ".all"
+
+        ExposeItems items ->
+            "(.items "
+                ++ listOf
+                    (List.map
+                        (\item ->
+                            case item of
+                                IVar v ->
+                                    ".var " ++ str v
+
+                                IOp o ->
+                                    ".op " ++ str o
+
+                                IType t ->
+                                    ".tycon " ++ str t
+
+                                IOpen t ->
+                                    ".opened " ++ str t
+                        )
+                        items
+                    )
+                ++ ")"
+
+
+{-| `import M [as Q] [exposing ...]`, read `import M as M` when there is no `as`.
+-}
+importLean : ImportIr -> String
+importLean imp =
+    "⟨"
+        ++ str imp.modid
+        ++ ", "
+        ++ str (Maybe.withDefault imp.modid imp.alias)
+        ++ ", "
+        ++ (case imp.exposes of
+                Just x ->
+                    "some " ++ exposingLean x
+
+                Nothing ->
+                    "none"
+           )
+        ++ "⟩"
+
+
+lineKindName : LineKind -> String
+lineKindName k =
+    case k of
+        LCheck ->
+            ".check"
+
+        LNext ->
+            ".next"
+
+        LSame ->
+            ".same"
+
+        LNot ->
+            ".not_"
+
+
+{-| The worker test of a program whose `main` is a worker: its flags type and flags (absent flags
+are null, A72) and its host; the checks are filled in by `#worker_theorems`.
+-}
+workerDef : { defName : String, name : String, project : String } -> Payload -> String -> Maybe ( String, String ) -> List String -> String
+workerDef info flagsType flags host checkNots =
+    "/-- The worker test of " ++ info.name ++ ". -/\ndef w"
+        ++ String.dropLeft 1 info.defName
+        ++ " : Prog.WorkerTest := {\n  prog := "
+        ++ info.defName
+        ++ ",\n  flagsType := "
+        ++ payloadLean flagsType
+        ++ ",\n  flags := "
+        ++ flags
+        ++ ",\n  host := "
+        ++ (case host of
+                Just ( o, i ) ->
+                    ".echo " ++ str o ++ " " ++ str i
+
+                Nothing ->
+                    ".none"
+           )
+        ++ (if List.isEmpty checkNots then
+                ""
+
+            else
+                ",\n  checkNots := [" ++ String.join ", " (List.map str checkNots) ++ "]"
+           )
+        ++ ",\n  checks := [] }"

@@ -6,6 +6,22 @@ Rebuilt on 2026-11-10 after ruling A27 was revised: a `number` variable that not
 
 Rebuilt on 2026-11-11 after a notation change: the notation registry records substitutions, derivations, instances, principal derivations and the bijection of generated type names (audit R3-X16), and the sequence of leaf commands in Chapter 9's dispatch rules, written D like a derivation, is renamed L. 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
 
+Rebuilt on 2026-11-11 after the preface's count of translated test programs was corrected from 487 to 491. 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
+Rebuilt on 2026-11-11 after the preface's account of the mechanisation said the evaluator is proved sound and complete (plan step 1). 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
+Rebuilt on 2026-11-11 after the preface's count of translated test programs rose to 498 (plan step 2). 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
+Rebuilt on 2026-11-11 after the preface's account of the mechanisation said that it encodes the dynamic semantics of modules and programs too (Chapters 7 and 9), and that each of the 541 test programs it checks is translated as the program of modules it is (plan step 3). 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
+Rebuilt on 2026-11-11 after the preface's account of the mechanisation said that it encodes the rules of effects (Chapter 8) and the transitions of programs (Chapter 9), with a scheduler proved sound, and checks 576 test programs (plan step 5). 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
+Rebuilt on 2026-11-11 after the preface's count of checked test programs rose to 579 (plan step 6). 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
+Rebuilt on 2026-11-12 after the preface's account of the mechanisation said that it encodes the static semantics too (Chapters 4 and 5, the static rules of Chapter 9, the derived forms, the syntactic restrictions decidable on a syntax tree, Appendix C), with a checker of derivations proved sound, by which 622 test programs are shown legal and 68 not legal (plan steps 8 and 9). 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
+Rebuilt on 2026-11-12 after the preface's account of the mechanisation said that, for each of the 579 translated test programs, Lean computes from its source the program the translator writes (plan step 10). 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
 ## Status
 
 | Field | Value |

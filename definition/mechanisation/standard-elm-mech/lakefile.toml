@@ -12,3 +12,19 @@ root = "Main"
 [[lean_exe]]
 name = "dump-phrases"
 root = "DumpPhrases"
+
+[[lean_exe]]
+name = "syn-report"
+root = "SynReport"
+
+[[lean_exe]]
+name = "compare-derived"
+root = "CompareDerived"
+
+[[lean_exe]]
+name = "certify"
+root = "Certify"
+
+[[lean_exe]]
+name = "compare-e2e"
+root = "CompareE2E"

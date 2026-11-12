@@ -1,0 +1,15 @@
+{
+  "about": "What the translator cannot see, for runner/part1-inventory.js (step 0 of plans/lean-full-definition.md).",
+  "annotations": [
+    { "name": "TaskAttemptErrorTest", "needs": ["Ok/Err through the text of Task.attempt (D3)"] },
+    { "name": "TaskOnErrorCascadeTest", "needs": ["Ok/Err through the text of Task.attempt (D3)"] },
+    { "name": "CoreIssue1123NestedCmdBatchStackOverflowTest", "out": "size: Cmd.batch nested 100000 deep (finding T2)" },
+    { "name": "StandardA81SleepBeyond32BitsTest", "partial": "positive check only (finding T1)" },
+    { "name": "PortEchoArrayStringTest", "library": "Array.fromList, Array.empty" },
+    { "name": "PortEchoJsonValueTest", "library": "Json.Encode.encode" },
+    { "name": "StandardA92BytesPortTest", "library": "Bytes.Encode, Bytes.Decode, List.map, Maybe.withDefault" },
+    { "name": "PortIncomingRejectTest", "checkNot": "supported by the book, with the echo host" },
+    { "name": "TaskOnErrorSucceedTest", "checkNot": "supported by the book, under any host" },
+    { "name": "StandardA88PortNonFiniteTest", "checkNot": "supported by the book, with the echo host" }
+  ]
+}

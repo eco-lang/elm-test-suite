@@ -27,8 +27,10 @@ const MECH = path.join(ROOT, 'definition', 'mechanisation');
 const PROJECT = path.join(MECH, 'standard-elm-mech');
 
 // A theorem's address: its Lean name, with a prime spelled out.
+// A theorem's page slug: Lean names may contain ' and ?, which a URL path cannot carry as they are
+// (`?` starts a query).
 function slugOf(name) {
-    return name.replace(/'/g, '-prime');
+    return name.replace(/'/g, '-prime').replace(/\?/g, '-q');
 }
 
 function escapeRe(s) {
@@ -117,6 +119,18 @@ function exampleRun() {
 }
 
 // The translator's manifest: every elm-spec test, translated or refused with its reason.
+// The per-test theorems of the static semantics and of the end-to-end pipeline (plan steps 9 and
+// 10), as `lake exe certify` lists them in ../static-report.json.
+let staticReport = null;
+function staticOf(key) {
+    if (staticReport === null) {
+        const file = path.join(MECH, 'static-report.json');
+        staticReport = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
+    }
+    const per = (staticReport.tests || {})[key];
+    return per ? { legal: per.legal || null, refuse: per.refuse || null, spec: per.spec || null, mean: per.mean || null, native: !!per.native } : null;
+}
+
 function manifest() {
     const file = path.join(MECH, 'translation-manifest.json');
     return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')).tests : [];
@@ -186,8 +200,14 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
 
     const rulesOf = (t) => {
         const found = new Set();
-        for (const m of [t.source, t.doc, ...macrosOf(t).map((mc) => mc.source)].join(' ').matchAll(/\br_d_([a-z_]+)|\br:(d-[a-z-]+)/g)) {
-            const slug = m[1] ? 'd-' + m[1].replace(/_/g, '-') : m[2];
+        // Chapter 6's rules (r_d_*), Chapter 7's (r_dm_*), Chapter 8's (r_e_*), Chapter 9's
+        // rules (r_p_*, r_p_stat_*), and the static rules of Chapters 4 (r_s_*) and 5 (r_sm_*)
+        for (const m of [t.source, t.doc, ...macrosOf(t).map((mc) => mc.source)].join(' ').matchAll(/\br_(d|dm|p|e|sm|s)_([a-z_]+)|\br:((?:d|dm|p|e|sm|s)-[a-z-]+)/g)) {
+            // a logged constructor (RulesL.lean, plan decision D4) is the rule's twin: r_d_exp_app_l
+            let slug = m[2] ? m[1].replace(/_/g, '-') + '-' + m[2].replace(/_/g, '-') : m[3];
+            if (m[2] && !ruleSlugs.has(slug) && slug.endsWith('-l') && ruleSlugs.has(slug.slice(0, -2))) slug = slug.slice(0, -2);
+            // r_sm_topdec_seq_types is a second constructor for r:sm-topdec-seq (Stat/Modules.lean)
+            if (slug === 'sm-topdec-seq-types') slug = 'sm-topdec-seq';
             if (ruleSlugs.has(slug)) found.add(slug);
             else problems.push(`${t.name} (${t.file}:${t.line}) names the rule ${slug}, which the book does not have`);
         }
@@ -204,15 +224,23 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
     const tests = manifest();
     const kernelSource = (() => {
         const lines = fs.readFileSync(path.join(PROJECT, 'StandardElmMech/Theorems.lean'), 'utf8').split('\n');
-        const from = lines.findIndex((l) => l.startsWith('/-- The expectation the kernel checks'));
-        const to = lines.findIndex((l) => l.includes('logInfo m!"#kernel_checks'));
+        const from = lines.findIndex((l) => l.startsWith('/-- Programs whose theorem is moved to `native_decide`'));
+        const to = lines.findIndex((l) => l.includes('logInfo m!"#mod_program_theorems'));
         return from >= 0 && to > from ? { file: 'StandardElmMech/Theorems.lean', line: from + 1, text: lines.slice(from, to + 1).join('\n') } : null;
     })();
-    if (!kernelSource) problems.push('Theorems.lean: the command #kernel_checks was not found');
+    if (!kernelSource) problems.push('Theorems.lean: the command #mod_program_theorems was not found');
     if (!run.total) problems.push('definition/mechanisation/example-run.json is missing: run `lake exe run-examples`');
 
     const toolchain = fs.readFileSync(path.join(PROJECT, 'lean-toolchain'), 'utf8').trim();
-    const ruleCount = (fs.readFileSync(path.join(PROJECT, 'StandardElmMech/Rules.lean'), 'utf8').match(/^\s*\|\s*r_d_\w+/gm) || []).length;
+    // the book's rules encoded as constructors: Chapters 6, 7 (with Chapter 9's dynamic rules), 8,
+    // Chapter 9's dispatch, start and transitions, and the static rules of Chapters 4, 5 and 9
+    const ruleFiles = ['StandardElmMech/Rules.lean', 'StandardElmMech/Mod/Rules.lean', 'StandardElmMech/Eff/EncDec.lean',
+        'StandardElmMech/Eff/Task.lean', 'StandardElmMech/Eff/Messages.lean', 'StandardElmMech/Prog/Dispatch.lean',
+        'StandardElmMech/Prog/Rules.lean', 'StandardElmMech/Stat/Rules.lean', 'StandardElmMech/Stat/Modules.lean',
+        'StandardElmMech/Stat/Program.lean'];
+    const ruleCount = ruleFiles
+        .map((f) => (fs.readFileSync(path.join(PROJECT, f), 'utf8').match(/^\s*\|\s*r_(d|dm|p|e|sm|s)_\w+(?<!_l)\s*[(:]/gm) || []).length)
+        .reduce((a, b) => a + b, 0);
     const summary = (t) => ({
         name: t.name,
         slug: slugOf(t.name),
@@ -283,7 +311,9 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
         count: generated.length,
         source: kernelSource,
         groups,
-        skipped: { divergence: skipped('divergence'), native: skipped('native'), float: skipped('float'), value: skipped('value') },
+        // since plan step 1 every check is a conjunct of its program's theorem; `native` counts the
+        // checks proved by native_decide, `value` those whose CHECK value could not be stated
+        skipped: { divergence: 0, native: run.rows.filter((c) => c.proof === 'native').length, float: 0, value: skipped('unparsed') },
         checks: generated.map((c) => ({
             name: c.theorem,
             program: c.program,
@@ -301,8 +331,10 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
     let outOfDate = 0;
     for (const t of tests) {
         const key = t.project + '/' + t.name;
-        const file = path.join(ROOT, 'tests', t.project, 'src', t.name + '.elm');
-        const current = fs.existsSync(file) && sha256(file) === t.sha256;
+        // a translation is current when every module of its program is as it was translated (plan
+        // step 3: the manifest lists each module's file and hash, the test last)
+        const sources = t.sources && t.sources.length ? t.sources : [{ path: 'tests/' + t.project + '/src/' + t.name + '.elm', sha256: t.sha256 }];
+        const current = sources.every((s) => fs.existsSync(path.join(ROOT, s.path)) && sha256(path.join(ROOT, s.path)) === s.sha256);
         const rows = run.rows.filter((r) => r.program === t.name && (r.project === t.project || r.shard === 'Hand'));
         const isHand = t.status !== 'translated' && hand.has(t.name) && rows.length > 0;
         const lines = checkLines(t.project, t.name);
@@ -327,13 +359,50 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
             file: isHand ? hand.get(t.name).file : t.shard ? 'StandardElmMech/Generated/' + t.shard + '.lean' : '',
             shard: isHand ? 'Hand' : t.shard || '',
             source: isHand ? hand.get(t.name).source : t.lean || '',
+            sources: sources.map((s) => s.path),
             current,
             checks,
+            kind: t.kind || 'view',
+            host: t.host || null,
+            flags: t.flags || null,
+            native: !!t.native,
+            dropped: t.dropped || [],
+            // plan steps 9 and 10 (lake exe certify, ../static-report.json): the test's static
+            // theorems and, for a translated test, its end-to-end theorems
+            statics: staticOf(t.project + '/' + t.name),
         });
     }
     writeJson(path.join(dir, 'translations', 'index.json'), written);
+
+    // The restrictions decided on the syntax tree (plan step 8): each restriction page names its
+    // Lean Prop (Src/Restrictions.lean, whose doc comment starts with the label) and how many
+    // written programs break it (syntactic-report.json).
+    const restrictionsFile = path.join(PROJECT, 'StandardElmMech/Src/Restrictions.lean');
+    if (fs.existsSync(restrictionsFile)) {
+        const lines = fs.readFileSync(restrictionsFile, 'utf8').split('\n');
+        const synReportPath = path.join(ROOT, 'definition/mechanisation/syntactic-report.json');
+        const synReport = fs.existsSync(synReportPath) ? JSON.parse(fs.readFileSync(synReportPath, 'utf8')) : { programs: [] };
+        const restrictions = {};
+        lines.forEach((line, i) => {
+            const m = line.match(/^\/-- (res:[a-z-]+)/);
+            if (!m) return;
+            let j = i;
+            while (j < lines.length && !/^def /.test(lines[j])) j++;
+            const d = j < lines.length ? lines[j].match(/^def (\w+)/) : null;
+            if (!d) return;
+            const label = m[1];
+            restrictions[label.replace(/^res:/, '')] = {
+                label,
+                prop: 'Src.' + d[1],
+                file: 'StandardElmMech/Src/Restrictions.lean',
+                line: j + 1,
+                broken: synReport.programs.filter((p) => (p.breaks || []).includes(label)).map((p) => p.name),
+            };
+        });
+        writeJson(path.join(dir, 'restrictions.json'), restrictions);
+    }
     if (outOfDate) console.warn(`  warning: ${outOfDate} Lean translations were made from an older version of their test; run the translator and the mechanisation stage`);
-    console.log(`  Lean mechanisation: ${theorems.length} theorems in ${files.filter((f) => theorems.some((t) => t.file === f)).length} files, ${generated.length} generated by #kernel_checks, ${tests.filter((t) => t.status === 'translated').length} of ${tests.length} elm-spec tests translated`);
+    console.log(`  Lean mechanisation: ${theorems.length} theorems in ${files.filter((f) => theorems.some((t) => t.file === f)).length} files, ${generated.length} checks in the generated program theorems, ${tests.filter((t) => t.status === 'translated').length} of ${tests.length} elm-spec tests translated`);
     return problems;
 }
 

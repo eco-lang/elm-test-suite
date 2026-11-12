@@ -1,5 +1,207 @@
 # Mechanisation Report
 
+> **Update, 2026-11-12 (plan step 10, end to end, done except `ident_`).** Lean computes each
+> translated test's reduced program from its source: step 8's derived forms, step 9's inference and
+> proved checker, number specialisation (`Stat/Specialise.lean`: copies from the outside in, the
+> default copy always made, A93's vacuous variables Float) and type erasure. It agrees with the
+> translator on all 579 translated tests (`lake exe compare-e2e`), after two translator changes: it
+> keeps identifiers as written (`text`, not `Html.text`, in 431 tests), and orders a group's
+> `number` variables by first occurrence (LetNumberFracRecordTest's copy `r$Float$Int`). 579 `spec_`
+> theorems (4 by `native_decide`) say so per test, and retire `[elab]` for those tests; 577 `mean_`
+> theorems give each program a meaning by r:p-program with both premises, under D11 (two tests stop
+> at Debug.todo). The 15 rulings on small programs (A27, A87, A93, polymorphic recursion, copy names,
+> exposing items, payload types, kinds of `main`) are theorems, none against the book. Findings:
+> (1) as specified, an occurrence outside its group could take a `number` variable from an enclosing
+> copy, so two principal derivations gave different reduced programs; fixed in Lean and the
+> translator (such a variable is Float), no test changed, the counterexample kept as `ce_equal`;
+> (2) for a module whose custom type mentions a local alias spelt like an imported type (finding
+> B6), a split derivation of its type declaration is principal too and gives a different
+> constructor type, so "the specialisation of the program" is not unique and `ident_` is false as
+> the definitions stand (`Stat/SplitCounterexample.lean`); the invariance lemma is proved up to the
+> step across bases (about 4,400 lines), and the rest waits for a decision on how step 9 should
+> treat such modules. `IsPrincipalMod` now ranges over derivations without free `bnd` variables.
+> 8,800 theorems, 0 axiom problems; run-examples unchanged (1,708 checks, 579 programs).
+
+> **Update, 2026-11-12 (plan step 9, the static semantics, done).** Chapters 4 and 5 and the static
+> half of Chapter 9 are in Lean: 45 + 20 + 3 rule constructors, one per rule label of the book
+> (`#check_static_rules`), the objects, substitutions, schemes and closure (A93), Appendix C and the
+> test basis (`Btest_agrees`, `default_imports_test`), and `LegalProgram` (a program as written meets
+> the syntactic restrictions and elaborates with each module's principal derivation meeting the
+> further restrictions). Derivations are annotated phrases decided by a structurally recursive
+> checker, proved sound (`checkModule_sound`); the pattern decider is proved correct (`inhabited`,
+> A97; `useful_spec`). An inference written in Lean and not proved proposes the derivations. 622
+> compile-success tests are legal under D11 (`legal_`, the inference's derivation is principal):
+> the kernel runs the inference and the checks, except for 9 large programs (`staticBudgetNative` in `Certify.lean`) whose
+> kernel check takes 7 GB to more than 40 GB, proved by `native_decide` (`[native]`); the session
+> that first built them died when that build filled the machine's memory, and the certificate
+> shards now import one another so that a build checks one at a time (16 shards in 11 minutes,
+> at most 4.6 GB). 68 compile-error tests are refused (`refuse_`), each for every derivation and
+> with no hypothesis about principality: 31 by step 8's restrictions, 6 by scope, constructor arity
+> and imports, 13 by type expressions and ports (for every choice of generated type names, splits
+> of a type declaration and sorts of explicit variables), 8 by the type of `main`, 9 by
+> exhaustiveness or irredundancy (at every type a derivation can give the patterns). Not proved as
+> the specification states them: the adequacy of the checker (`checkExp_adequate`), stability under
+> substitution (`check_subst`), `canon_eq_iff`, `gen_trans`, the `iff` forms of the deterministic
+> functions and of the further decider, and `elab_basis_mono`; the positive theorems run the
+> inference in the kernel instead of reading a written certificate, so `mainTransfer` and
+> `CertProgram` are not needed. Step 7's provisional classes hold: every test it classed `further`
+> or `static-deterministic` is refused as classed, and every compile-success test it classed with
+> basis B0, harness, library or helper is legal. 6,679 theorems, 0 axiom problems; run-examples
+> unchanged (1,708 checks, 579 programs). Memory on a clean build (`scripts/measure-build.sh`, now
+> run in a copy that can read the book's sources, and robust to processes ending while sampled):
+> at most 4.6 GB for one `lean` process, at most 11.7 GB summed over concurrent ones, 13 minutes.
+> The site's theorem pages for names with `?` (`find?_cons`) now have slugs a URL can carry (`-q`).
+
+> **Update, 2026-11-12 (plan step 8, source syntax, derived forms, syntactic restrictions, done).**
+> Every program elm-syntax parses is written in a source syntax in Lean (916 of 939; 21 do not
+> parse, 2 hold lone surrogates). The derived forms of Appendix A are a function from it to a bare
+> syntax, generated from the same table as the reduced syntax's, and the book's relational form
+> is stated: the canonical grouping is one the book allows (`components_valid`), and so is the
+> canonical order of aliases (`aliasOrder_valid`), so the function is one of the book's choices
+> (`derive_derivesTo`). On the 579 translated programs the derived forms of the source agree with
+> the translator, module by module (`compare-derived`, 0 differ). The 27 restrictions decidable on
+> a syntax tree are `Prop`s as the book states them, decided by the kernel: 882 programs meet them
+> and 34 do not (the 31 tests classed `syntactic`, and three compile-success tests that import
+> modules outside the definition), each refusal proved for every order of the program's modules.
+> Findings: 197 tests are modules without `main`, which the book does not accept as programs
+> (their statements are about the module); two "recursive main" tests meet `res:program-main` as
+> the book states it, and two other tests are refused on the tree. 4,215 theorems, 0 axiom
+> problems.
+
+> **Update, 2026-11-11 (plan step 7, measure, classify, extract Appendix C, done).** Appendix C and
+> the default imports are extracted into `static-basis.json` by a strict reader of the book's LaTeX
+> (`ExtractStaticBasis.elm`): 22 type names, 19 modules, 20 operators, 3 hidden identifiers, 11
+> default imports, every row of every figure parsed and validated. The translator's hand-written
+> schemes agree with it: 70 compared, 0 differ. Every `elm-spec` test is classified for the static
+> semantics (`static-classification.json`): of the 311 compile-error tests, 18 do not parse, 8
+> parse although they break a rule left to the parser, 31 break a restriction decidable on a syntax
+> tree (step 8), 9 exhaustiveness or irredundancy (step 9), 1 depends on operator grouping, 28 are
+> refused without inference (step 9) and 216 need complete inference (step 11); of the 628 that
+> compile, 39 need nothing beyond B0, 540 only the harness's `Html.text`, 34 library values, 9
+> helper modules, 3 modules outside the definition, and 3 do not parse. "Parses it as Elm does" is
+> kept as the `[parse]` trust, not checked.
+
+> **Update, 2026-11-11 (plan step 6, statements about every execution, done).** The three CHECK-NOT
+> lines the book supports are theorems about every execution the book allows, with every
+> derivation of its steps (`WorkerTest.HoldsNot`): TaskOnErrorSucceedTest never logs `handler
+> called`, under every host; PortIncomingRejectTest never logs `received: null` and
+> StandardA88PortNonFiniteTest never logs `Just`, under the test runner's echo host (another host
+> may send a value whose log has the pattern). Each is proved by an invariant on configurations
+> and host states, using the uniqueness of what the evaluator computes when it reads no choice
+> (D1) for every application, task step and message. Each test's generated theorem is the
+> conjunction of its positive checks and its CHECK-NOT. Finding T1 is a theorem: the book allows
+> an execution of StandardA81SleepBeyond32BitsTest that logs `the long sleep ended`
+> (`t1_a81_long_sleep_may_end`, by the scheduler with one override, a wait of 3e9 ms). The printer
+> of values is defined by well-founded recursion, which the kernel does not unfold, so the fact
+> that a printed log entry does not contain the pattern is decided by `native_decide`, and the
+> three theorems are tagged `[native]`. 579 of 939 tests; 1,708 checks, all agreeing; 2,751
+> theorems, 0 axiom problems.
+
+> **Update, 2026-11-11 (plan step 4 completed).** The round trip of encoding and decoding is a
+> theorem (`roundtrip`): a value of a canonical payload type that encodes to j decodes from j to
+> itself, records sorted, except where A88 says otherwise (NaN, the infinities, -0, a `Just` whose
+> argument encodes as null, an Int outside IntRange, and, an exception the specification did not
+> list, a record with a repeated label). It assumes one fact about Lean's floats,
+> `FloatRoundTrip` (a finite float other than -0 is the float nearest its own value), as a named
+> hypothesis: Lean's Float is opaque to the kernel and no lemma relates a float to its bits. A76
+> is complete (`a76_mkObj_perm`, `a76_dec_extra_key`), payload types normalise to canonical ones,
+> every port of every translated program is checked canonical (`ports_canon_<Shard>`), and
+> well-formed values are defined. 2,493 theorems, 0 axiom problems.
+
+> **Update, 2026-11-11 (plan step 5, Chapter 9, done).** Programs are in Lean: the objects of
+> execution, dispatch (4 rules), the start (r:p-init, with A72 and A77), the 12 transitions,
+> hosts (the book's, none, and the test runner's echo), executions with their logs (D9), traces
+> and `Tr` (closed under prefixes), a default scheduler proved sound (`run_sound`), and worker
+> tests: `WorkerTest.Holds` states that some execution the book allows, under the test's host,
+> has a log that meets every check, proved by `holds_of_run` from a run. The 35 worker tests of
+> the plan are theorems (30 by the kernel; ProcessSpawnKillHalfTest, ProcessSpawnRecursiveTest,
+> ProcessYieldThrashingTest, TaskOnErrorCascadeTest and TimerEffectTest by `native_decide`, as
+> they use Debug.toString); no override of the scheduler was needed (`worker-choices.json` is
+> `{}`). The guarantees of A86 (`a86_step`, `a86_out_fifo`), the rulings A62, A72, A77, A79, A80
+> and A81, and `a66_batch_order_open` (one program, two executions delivering a batch in either
+> order) are theorems. StandardA81SleepBeyond32BitsTest's CHECK-NOT is not stated (finding T1);
+> CoreIssue1123NestedCmdBatchStackOverflowTest is refused for its size
+> (`construct:large-computation`, finding T2); no test is refused `effects`. Two harness bugs were
+> found and fixed: printed strings now escape a newline, tab, carriage return, vertical tab and
+> NUL as Elm/JS's Debug.toString does, and a CHECK line's string reads those escapes back
+> (PortEchoStringTest); `BVal.mkObj` sorts by insertion, since the kernel cannot reduce
+> `mergeSort` (FlagsRecordTest). 576 of 939 tests; 1,701 checks, all agreeing; 1,493 by the
+> kernel and 206 native, in 576 program theorems; 2,354 theorems, 0 axiom problems; the build's
+> largest process 3.2 GB (ChecksWorker01 2.3 GB), all together 10.4 GB. No finding about the
+> book.
+
+> **Update, 2026-11-11 (plan step 4, Chapter 8, nearly done).** Tasks, commands, subscriptions and
+> ports are in Lean: boundary values with exact JSON numbers, the effect values, APPLY of Task,
+> Process, the ports and the arrays, the 39 rules of task reduction, encoding, decoding and
+> messages, flattening, and the elm/core texts of Task with ME0(Task) and ME0(Process). The book's
+> encoding and decoding relations are proved equal to structural functions and to be partial
+> functions; the property of task reduction is proved; the executable task step and reception are
+> sound and complete; every value of a payload type has a canonical encoding; the rulings A74,
+> A76, A88 and A92 are theorems (three about particular floats by `native_decide`, Lean's Float
+> being opaque to the kernel). The round trip of encoding and decoding remains. No test is gained
+> (every test that needs Chapter 8 is a worker, step 5); 1,585 checks unchanged; 2,129 theorems,
+> 0 axiom problems.
+
+> **Update, 2026-11-11 (plan step 2 completed).** The property of interfaces is proved: the
+> interfaces of the test basis have it, and every interface a module's derivation puts in the basis
+> has it when the module's bound names are distinct (`Mod/Good.lean`). Ruling A25 is proved: the
+> module `x = let f _ = x in f ()` has no meaning, nor has any program that begins with it, because
+> forcing x's thunk loops (`Mod/A25.lean`). 1,673 theorems, 0 axiom problems.
+
+> **Update, 2026-11-11 (plan step 3, the module form, done).** Every translated test is now stated
+> as the program it is: its modules (the helper modules it imports from its project's sources,
+> then the test) in the reduced syntax of Chapter 7, evaluated by the rules of Chapters 7 and 9 in
+> the test basis, and its CHECK lines, as written, as statements about the log of that evaluation
+> (`ViewChecks`): an entry with a label and value, an entry with a label, consecutive entries
+> (CHECK-NEXT), or a regular expression the printed log matches. The two tests that stop at
+> Debug.todo are theorems that their programs have no meaning (`NoMeaning`). The let form's
+> theorems (`LetChecks`, `#program_theorems`) are retired. 43 tests more translate: user modules,
+> record alias constructors, port modules, views whose `main` is not `text "literal"`, log checks
+> inside functions and pipes, and regular-expression checks (the plan's 42, and
+> CompilerIssue2019AliasOfTypeVariableTest, which was refused only because `main` logs a label no
+> CHECK line names). 541 of 939 tests; 1,585 checks, all agreeing; 1,411 by the kernel and 172
+> native, in 541 program theorems; the comparison with the let form's run
+> (`runner/compare-example-run.js`) differs only where the plan allows (the strict tests' checks
+> now read "no meaning"). The kernel's reduction of a program that logs many values nests more
+> deeply than the default limit, so the generated theorems set `maxRecDepth` to 2048 (1024
+> suffices). 1,576 theorems, 0 axiom problems; the build's largest process 3.1 GB, all together
+> 10.4 GB. No finding about the book.
+
+> **Update, 2026-11-11 (plan step 2, Chapter 7, in progress).** Chapter 7 is in Lean: its reduced
+> syntax, interfaces and the merge, the thunk translation of value groups, the 20 rules and the
+> two dynamic rules of Chapter 9 for a program's modules, logged twins, an evaluator proved sound
+> and complete, with `noMeaning_of_stuck` and uniqueness for programs, the dynamic ME0 of the
+> default-imported modules (with `Ok`, `Err`, `logBase`, `never` and the effect values of
+> `Cmd.none` and `Platform.worker`), the harness Html and the test basis, the frame lemmas, and the
+> rulings A82, A38 and A28 on programs written by hand. The let form's E0 is now the environment the
+> default imports give in that ME0. Seven more tests translate: 498 of 939; 1,500 checks, all
+> agreeing; 1,334 by the kernel, 166 native. 1,529 theorems, 0 axiom problems; the build's largest
+> process 3.1 GB, all together 9.1 GB. Still open in this step: A25 and the property of interfaces.
+
+> **Update, 2026-11-11 (plan step 1, the Core's foundations).** Done as
+> plans/lean-full-definition/step-01-core-foundations.md specifies, with the differences its "Done"
+> section records. The evaluator now reads an oracle (a sequence of Booleans, one per choice of
+> APPLY) and returns its outcome, its log and the index of the next choice; it is proved sound and
+> complete for the rules, and `noValue_of_stuck` and `evExp_unique` turn a run that reads no choice
+> into statements about every derivation. Each of the 17 relations has a logged twin, tied to it by
+> `forget` and `lift`, and a build-time check keeps the twins in step with the rules. The checks of
+> the translated tests are now one theorem per program (491), stating each value structurally
+> (`Expect`): 1,487 checks, all agreeing; 1,322 proved by the kernel (1,162 before: the data,
+> character and function values and the two checks that expect no value are now stated), 165 by
+> `native_decide`, of which 19 are the checks of AppendTypeSplitTest and DeepEqualityTest, moved
+> there by the memory budget (14.7 GB and 9.4 GB in the kernel through the logged evaluator). The
+> clean build's largest Lean process now needs 3.3 GB and all of them together 7.8 GB. 1,251
+> theorems, 77 of them native, all with the expected axioms. No finding about the book.
+
+> **Update, 2026-11-11 (plan step 0, the baseline).** The plan to encode the rest of the definition
+> (plans/lean-full-definition.md) is under way. Its step 0 adds the translator option
+> `--report-all-refusals` (every refusal of every test, each lifted in turn), the inventory script
+> `runner/part1-inventory.js`, and `standard-elm-mech/scripts/measure-build.sh`. Baseline: 491 of 939
+> `elm-spec` tests translated; 1,487 checks, all agreeing; 1,162 theorems by `decide +kernel`; the
+> largest single Lean process 6.28 GB (shard Elm01, nearly all of it AppendTypeSplitTest) and a peak
+> of 10.97 GB summed over the concurrent processes of a clean build. Part I of the plan can bring in
+> 87 more tests.
+
 > **Update, 2026-11-11 (CHECK lines tightened).** CustomTypeMultiFieldTest, CustomTypeNestedTest and
 > FloatNaNTest had CHECK lines naming only a label, which the translator cannot compare; with their
 > values written out they translate, and FloatNaNTest now checks `isNaN (nan + 1.0)`; FloatEdgeTest

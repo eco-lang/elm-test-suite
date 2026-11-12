@@ -1,4 +1,4 @@
-module DerivedForms.ToLean exposing (definitions, orderedRows, plain)
+module DerivedForms.ToLean exposing (bareDefinitions, definitions, orderedRows, plain)
 
 {-| Prints the generated rows of Appendix A as Lean definitions over the bare syntax of
 `Syntax.lean`, with the names and parameters `Derived.lean` has always used.
@@ -540,6 +540,38 @@ definitions all =
         |> List.map (definition rows)
         |> combine
         |> Result.map (String.join "\n\n")
+
+
+{-| The same definitions over the bare syntax (Src/Bare.lean, plan step 8): the bodies use only
+constructor names, which the two syntaxes share, so only the types in the signatures change.
+-}
+bareDefinitions : List Row -> Result String String
+bareDefinitions all =
+    let
+        bareTypes line =
+            case Regex.fromString "\\b(Exp|AtExp|Pat|AtPat)\\b" of
+                Just re ->
+                    Regex.replace re (\m -> "B" ++ m.match) line
+
+                Nothing ->
+                    line
+
+        isSignature line =
+            String.startsWith "def " line || String.startsWith "  go : " line
+    in
+    definitions all
+        |> Result.map
+            (String.lines
+                >> List.map
+                    (\line ->
+                        if isSignature line then
+                            bareTypes line
+
+                        else
+                            line
+                    )
+                >> String.join "\n"
+            )
 
 
 {-| LaTeX of a row reduced to plain text, for doc comments.

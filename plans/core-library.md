@@ -132,6 +132,14 @@ The first is faithful to both implementations; the second is simpler but specifi
 
 ## Mechanisation
 
+> **Superseded in part (2026-11-11).** Decision D2 of [lean-full-definition.md](lean-full-definition.md)
+> replaces the top-level-definition device below once programs are translated in module form
+> (that plan's step 3): the library values become entries of the test basis, extending the
+> interfaces `B0` already has for `List`, `Tuple`, `String`, `Maybe` and `Array`, with the copy
+> at `Int` of any text whose scheme quantifies a `number` variable bound under a new variable, as
+> `ME0(Basics)` does for `abs`. In module form a qualified name resolves through an import's
+> qualifier, so a top-level definition under a qualified name would not be found.
+
 - **Translator.** A library prelude. For a test, the translator collects the library values the
   test names, and those their texts name, transitively. It adds each value's Elm text or model text
   to the program as a top-level definition under its qualified name, and specialises it like the

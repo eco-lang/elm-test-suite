@@ -29,6 +29,12 @@ type alias Specialised =
     { program : TestProgram
     , kinds : List CheckKind
 
+    -- each port's direction (outgoing or not) and payload, by binding id
+    , ports : Dict Int ( Bool, Payload )
+
+    -- a worker's flags type as a payload type; Nothing for a view
+    , flags : Maybe Payload
+
     -- whether the program uses a value the Lean kernel cannot compute (`nativeValues`)
     , native : Bool
     }
@@ -136,62 +142,93 @@ occurrence : Ctx -> Int -> Name -> Result String ( Name, List Request )
 occurrence ctx occ name =
     case name of
         Local id x ->
-            case groupOf ctx id of
-                Nothing ->
-                    Ok ( name, [] )
+            declared ctx occ name id x (\n -> Local id n)
 
-                Just ( g, vars ) ->
-                    let
-                        instance =
-                            Dict.get occ ctx.inferred.occurrences |> Maybe.map .instance |> Maybe.withDefault Dict.empty
-
-                        assignment =
-                            if List.isEmpty vars then
-                                Ok []
-
-                            else if Dict.isEmpty instance then
-                                -- inside the binder's own group: the same copy
-                                Ok (Dict.get g ctx.own |> Maybe.withDefault (List.map (\v -> ( v, defaultNum )) vars))
-
-                            else
-                                vars
-                                    |> List.map
-                                        (\v ->
-                                            case Dict.get v instance of
-                                                Just t ->
-                                                    resolve ctx t |> Result.map (\n -> ( v, n ))
-
-                                                Nothing ->
-                                                    Ok ( v, defaultNum )
-                                        )
-                                    |> combine
-                    in
-                    assignment
-                        |> Result.map (\a -> ( Local id (copyName x a), [ { group = g, assignment = a } ] ))
-
+        Foreign f ->
+            -- a value of another module: renamed to its copy as a local one is, its qualifier kept
+            declared ctx occ name f.binder f.name (\n -> Foreign { f | name = n })
         Global m x ->
-            -- the Elm texts of the basis are specialised too: `abs` used at Int is its copy at Int
-            if x == "abs" then
-                case Dict.get occ ctx.inferred.occurrences |> Maybe.andThen (.instance >> Dict.values >> List.head) of
-                    Just t ->
-                        resolve ctx t
-                            |> Result.map
-                                (\n ->
-                                    if n == IntN then
-                                        ( Global m "abs$Int", [] )
+            basisOccurrence ctx occ name x (Global m)
 
-                                    else
-                                        ( name, [] )
-                                )
-
-                    Nothing ->
-                        Ok ( name, [] )
-
-            else
-                Ok ( name, [] )
+        Exposed m x ->
+            basisOccurrence ctx occ name x (Exposed m)
 
         _ ->
             Ok ( name, [] )
+
+
+{-| An occurrence of a value of the basis: the Elm texts of the basis are specialised too, `abs`
+used at Int is its copy at Int (written as the source writes `abs`).
+-}
+basisOccurrence : Ctx -> Int -> Name -> String -> (String -> Name) -> Result String ( Name, List Request )
+basisOccurrence ctx occ name x rename =
+    if x == "abs" then
+        case Dict.get occ ctx.inferred.occurrences |> Maybe.andThen (.instance >> Dict.values >> List.head) of
+            Just t ->
+                resolve ctx t
+                    |> Result.map
+                        (\n ->
+                            if n == IntN then
+                                ( rename "abs$Int", [] )
+
+                            else
+                                ( name, [] )
+                        )
+
+            Nothing ->
+                Ok ( name, [] )
+
+    else
+        Ok ( name, [] )
+
+
+{-| An occurrence of the variable `x` declared by binding `id`: the copy it refers to (`rename`
+builds the occurrence's name from the copy's), and the request for that copy.
+-}
+declared : Ctx -> Int -> Name -> Int -> String -> (String -> Name) -> Result String ( Name, List Request )
+declared ctx occ name id x rename =
+    case groupOf ctx id of
+        Nothing ->
+            Ok ( name, [] )
+
+        Just ( g, vars ) ->
+            let
+                instance =
+                    Dict.get occ ctx.inferred.occurrences |> Maybe.map .instance |> Maybe.withDefault Dict.empty
+
+                assignment =
+                    if List.isEmpty vars then
+                        Ok []
+
+                    else if Dict.isEmpty instance then
+                        -- inside the binder's own group: the same copy
+                        Ok (Dict.get g ctx.own |> Maybe.withDefault (List.map (\v -> ( v, defaultNum )) vars))
+
+                    else
+                        vars
+                            |> List.map
+                                (\v ->
+                                    case Dict.get v instance of
+                                        Just t ->
+                                            resolve ctx t |> Result.map (\n -> ( v, n ))
+
+                                        Nothing ->
+                                            if Dict.member g ctx.own then
+                                                -- inside its group, a variable the scheme seen here
+                                                -- does not bind (an annotated member's U' only):
+                                                -- the enclosing copy's (step 10, Choices, item 5)
+                                                Ok ( v, Dict.get v ctx.rho |> Maybe.withDefault defaultNum )
+
+                                            else
+                                                -- outside its group nothing at the occurrence fixes
+                                                -- it: Float (sec:dynamic-core-numbers; the Lean
+                                                -- side's Member.bOutAll, finding of 2026-11-12)
+                                                Ok ( v, defaultNum )
+                                )
+                            |> combine
+            in
+            assignment
+                |> Result.map (\a -> ( rename (copyName x a), [ { group = g, assignment = a } ] ))
 
 
 {-| An operator, renamed `^@Float` when it is `^` at Float: the same operator of OT_dyn, marked
@@ -233,15 +270,20 @@ nativeValues =
     Set.fromList
         (( "Debug", "toString" )
             :: List.concatMap (\x -> [ ( "", x ), ( "Basics", x ) ])
-                [ "round", "floor", "ceiling", "truncate", "sin", "cos", "tan", "asin", "acos", "atan", "atan2" ]
+                [ "round", "floor", "ceiling", "truncate", "sin", "cos", "tan", "asin", "acos", "atan", "atan2", "logBase", "fromPolar", "toPolar" ]
         )
 
 
 isNative : Expr -> Bool
 isNative e =
     case e of
-        EVar _ (Global m x) ->
-            Set.member ( m, x ) nativeValues
+        EVar _ name ->
+            case globalOf name of
+                Just mx ->
+                    Set.member mx nativeValues
+
+                Nothing ->
+                    False
 
         EBinop _ op _ _ ->
             op == floatPow
@@ -572,22 +614,125 @@ specialise program inferred =
         ctx =
             { inferred = inferred, rho = Dict.empty, own = Dict.empty }
 
-        checksOf c =
-            list (List.map (\ch -> expr c ch.expr |> Result.map (Tuple.mapFirst (\x -> { ch | expr = x }))) program.checks)
+        -- the kind of a line's value: the type at which its label is logged (the `a` of
+        -- `Debug.log : String -> a -> a`), when every occurrence of the label agrees
+        logged t =
+            case Types.apply inferred.subst t of
+                TFun _ (TFun a _) ->
+                    Just a
 
-        mainScope c =
-            scope c program.locals checksOf
+                _ ->
+                    Nothing
+
+        kindOfLine line =
+            case lineLabel line of
+                Just label ->
+                    case Dict.get label inferred.logTypes |> Maybe.withDefault [] |> List.filterMap logged |> List.map (kindOf ctx) of
+                        k :: ks ->
+                            if List.all ((==) k) ks then
+                                k
+
+                            else
+                                KData
+
+                        [] ->
+                            KData
+
+                Nothing ->
+                    KData
     in
-    scope ctx program.defs mainScope
+    -- the modules as nested scopes, in program order: a use in a later module of an earlier
+    -- module's declaration requests its copy, which is placed in the earlier module
+    (case inferred.flagsType of
+        Just t ->
+            case Infer.payloadOf (Types.apply inferred.subst t) of
+                Ok p ->
+                    Ok (Just p)
+
+                Err _ ->
+                    Err "construct:flags-type"
+
+        Nothing ->
+            Ok Nothing
+    )
+        |> Result.andThen (\flags -> scopes ctx program.modules |> Result.map (\r -> ( r, flags )))
         |> Result.map
-            (\( ( defs, ( locals, checks ) ), _ ) ->
-                { program = { program | defs = defs, locals = locals, checks = checks }
-                , kinds = List.map (kindOf ctx) inferred.checkTypes
-                , native =
-                    List.any (anyExpr isNative)
-                        (List.concatMap declExprs (defs ++ locals) ++ List.map .expr checks)
+            (\( ( defsByModule, _ ), flags ) ->
+                let
+                    modules =
+                        List.map2 (\m defs -> { m | defs = defs }) program.modules defsByModule
+
+                    copiesOf =
+                        Dict.fromList (List.map (\m -> ( m.name, List.concatMap declNames m.defs )) modules)
+
+                    -- an exposing item stands for its copies (dynamic-modules.tex, lines 74 to 79)
+                    withCopies names x =
+                        case x of
+                            ExposeAll ->
+                                ExposeAll
+
+                            ExposeItems items ->
+                                ExposeItems
+                                    (List.concatMap
+                                        (\item ->
+                                            case item of
+                                                IVar v ->
+                                                    IVar v :: List.map IVar (List.filter (String.startsWith (v ++ "$")) names)
+
+                                                _ ->
+                                                    [ item ]
+                                        )
+                                        items
+                                    )
+
+                    exposed =
+                        List.map
+                            (\m ->
+                                { m
+                                    | exposes = withCopies (List.concatMap declNames m.defs) m.exposes
+                                    , imports =
+                                        List.map
+                                            (\imp ->
+                                                case Dict.get imp.modid copiesOf of
+                                                    Just names ->
+                                                        { imp | exposes = Maybe.map (withCopies names) imp.exposes }
+
+                                                    Nothing ->
+                                                        imp
+                                            )
+                                            m.imports
+                                }
+                            )
+                            modules
+
+                    allDefs =
+                        List.concatMap .defs modules
+                in
+                { program = { program | modules = exposed }
+                , kinds = List.map kindOfLine program.checks
+                , ports = inferred.ports
+                , flags = flags
+                , native = List.any (anyExpr isNative) (List.concatMap declExprs allDefs)
                 }
             )
+
+
+{-| The modules' declarations, each module a scope around the modules after it.
+-}
+scopes : Ctx -> List ModuleIr -> Out (List (List Decl))
+scopes ctx modules =
+    case modules of
+        [] ->
+            Ok ( [], [] )
+
+        m :: rest ->
+            scope ctx m.defs (\c -> scopes c rest)
+                |> Result.map (\( ( defs, inner ), requests ) -> ( defs :: inner, requests ))
+
+
+declNames : Decl -> List String
+declNames d =
+    List.map Tuple.first (declBinders d)
 
 
 declExprs : Decl -> List Expr

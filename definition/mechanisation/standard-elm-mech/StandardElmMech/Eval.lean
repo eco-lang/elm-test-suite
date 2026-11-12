@@ -1,37 +1,52 @@
 /-
   A Standard Definition of Elm? Mechanisation, part 5.
-  An executable, fuel-bounded evaluator for the relations of Rules.lean.
-  `none` means "no result within the fuel" or "no rule applies".
+  An executable, fuel-bounded evaluator for the logged relations of RulesL.lean (plan decision D1).
 
-  APPLY gives a finite set; the evaluator is parameterised by a Boolean
-  `ch` that chooses a member: `false` takes the first member of
-  `applySet`, `true` the last. For function equality, where the set is
-  {True, False}, the two choices give the two results of rule
-  r:d-app-basic-apply.
+  APPLY gives a finite set: one member, except function equality, which gives {True, False}, and
+  Debug.todo, which gives none. The evaluator reads an oracle, a sequence of Booleans `o : Nat → Bool`,
+  at an index it threads through: at the k-th member choice it reads `o k` (true: the last member,
+  false: the first) and passes `k + 1` on. It returns a `Res`: the outcome (`value`, `stuck` when no
+  rule applies, `outOfFuel`), the log so far (also on `stuck` and `outOfFuel`), and the index of the
+  next unread choice.
 
-  Soundness (`Sound.lean`): whatever the fuel and choice, a result of the
-  evaluator is a result of the relation.
+  Soundness (Sound.lean): a value of the evaluator is a value of the logged relation, with its log,
+  whatever the fuel and the oracle. Completeness (Complete.lean): every derivation is found by some
+  oracle and fuel. Together they make "this phrase has no value" provable (`noValue_of_stuck`).
 
-  Each function is written with explicit `match` on the results of its
-  recursive calls, following the premises of the rule it implements.
+  Each function follows the premises of its rule in the order the rule writes them, with an explicit
+  `match` on each recursive result, and builds the log in the syntactic shape of the logged
+  constructor's conclusion, as the soundness proof needs.
 -/
-import StandardElmMech.Rules
+import StandardElmMech.RulesL
 
 namespace StandardElm
 
-/-- Choose a member of a finite set given as a list. -/
-def pick (ch : Bool) (l : List Val) : Option Val := if ch then l.getLast? else l.head?
+/-- An oracle: the Boolean for the i-th member choice of APPLY in an evaluation (D1). -/
+abbrev Oracle := Nat → Bool
 
-/-- Decides v = val(scon) for the constants allowed in patterns (no floats). -/
-def sconTest (v : Val) (sc : SCon) : Option Bool :=
-  match sc, v with
-  | .int n, .sv (.int m) => some (m == norm n)
-  | .int _, _ => some false
-  | .char c, .sv (.char c') => some (c' == c)
-  | .char _, _ => some false
-  | .str s, .sv (.str s') => some (s' == s)
-  | .str _, _ => some false
-  | _, _ => none
+def Oracle.const (b : Bool) : Oracle := fun _ => b
+/-- The plan's "list of Booleans consumed one per choice": entry i, then false. -/
+def Oracle.ofList (L : List Bool) : Oracle := fun i => L.getD i false
+
+inductive Outcome (α : Type) where
+  | value (a : α)
+  /-- no rule applies (Debug.todo, a failed match of a lambda's pattern, a value of the wrong form) -/
+  | stuck
+  | outOfFuel
+  deriving Repr, Inhabited
+
+/-- A result: the outcome, the log so far, and the index of the next unread choice. -/
+structure Res (α : Type) where
+  out : Outcome α
+  log : Log
+  next : Nat
+  deriving Inhabited
+
+/-- Decides v = val(scon), for every special constant. -/
+def sconTest (v : Val) (sc : SCon) : Bool :=
+  match valof sc, v with
+  | .sv s, .sv s' => decide (s' = s)
+  | _, _ => false
 
 /-- Decides v = con for a constructor value with no arguments. -/
 def conIs (v : Val) (c : Con) : Bool :=
@@ -47,259 +62,352 @@ def conArgs (v : Val) (c : Con) (n : Nat) : Option (List Val) :=
 
 mutual
 
-def evAtExp (ch : Bool) : Nat → Env → AtExp → Option Val
-  | 0, _, _ => none
-  | n+1, E, a =>
+def evAtExp (o : Oracle) : Nat → Env → AtExp → Nat → Res Val
+  | 0, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, E, a, k =>
     match a with
-    | .scon sc => some (valof sc)
-    | .var lv => E.lookup lv
-    | .con lc => E.lookup lc
-    | .op o => OTdyn o
-    | .unit => some .unit
+    | .scon sc => ⟨.value (valof sc), [], k⟩
+    | .var lv =>
+      match E.lookup lv with
+      | some v => ⟨.value v, [], k⟩
+      | none => ⟨.stuck, [], k⟩
+    | .con lc =>
+      match E.lookup lc with
+      | some v => ⟨.value v, [], k⟩
+      | none => ⟨.stuck, [], k⟩
+    | .op op =>
+      match OTdyn op with
+      | some v => ⟨.value v, [], k⟩
+      | none => ⟨.stuck, [], k⟩
+    | .unit => ⟨.value .unit, [], k⟩
     | .tuple e1 e2 e3 =>
-      match evExp ch n E e1 with
-      | some v1 =>
-        match evExp ch n E e2 with
-        | some v2 =>
-          match evExpOpt ch n E e3 with
-          | some v3 => some (.tuple v1 v2 v3)
-          | none => none
-        | none => none
-      | none => none
-    | .nil => some Val.nil
+      match evExp o n E e1 k with
+      | ⟨.value v1, l1, k1⟩ =>
+        match evExp o n E e2 k1 with
+        | ⟨.value v2, l2, k2⟩ =>
+          match evExpOpt o n E e3 k2 with
+          | ⟨.value v3, l3, k3⟩ => ⟨.value (.tuple v1 v2 v3), l1 ++ l2 ++ l3, k3⟩
+          | ⟨.stuck, l3, k3⟩ => ⟨.stuck, l1 ++ l2 ++ l3, k3⟩
+          | ⟨.outOfFuel, l3, k3⟩ => ⟨.outOfFuel, l1 ++ l2 ++ l3, k3⟩
+        | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+        | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+    | .nil => ⟨.value Val.nil, [], k⟩
     | .record row =>
-      match evExpRowOpt ch n E row with
-      | some r => some (.record (fmPlus [] r))
-      | none => none
+      match evExpRowOpt o n E row k with
+      | ⟨.value r, l1, k1⟩ => ⟨.value (.record (fmPlus [] r)), l1, k1⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
     | .update x row =>
       match E.lookup ⟨none, x⟩ with
       | some (.record r) =>
-        match evExpRow ch n E row with
-        | some r' => some (.record (fmPlus r r'))
-        | none => none
-      | _ => none
-    | .paren e => evExp ch n E e
+        match evExpRow o n E row k with
+        | ⟨.value r', l1, k1⟩ => ⟨.value (.record (fmPlus r r')), l1, k1⟩
+        | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+        | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+      | _ => ⟨.stuck, [], k⟩
+    | .paren e => evExp o n E e k
     | .letE d e =>
-      match evDec ch n E d with
-      | some VE => evExp ch n (E.plusVE VE) e
-      | none => none
+      match evDec o n E d k with
+      | ⟨.value VE, l1, k1⟩ =>
+        match evExp o n (E.plusVE VE) e k1 with
+        | ⟨.value x, l2, k2⟩ => ⟨.value x, l1 ++ l2, k2⟩
+        | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+        | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def evExpOpt (ch : Bool) : Nat → Env → Option Exp → Option (Option Val)
-  | 0, _, _ => none
-  | _+1, _, none => some none
-  | n+1, E, some e =>
-    match evExp ch n E e with
-    | some v => some (some v)
-    | none => none
+def evExpOpt (o : Oracle) : Nat → Env → Option Exp → Nat → Res (Option Val)
+  | 0, _, _, k => ⟨.outOfFuel, [], k⟩
+  | _+1, _, none, k => ⟨.value none, [], k⟩
+  | n+1, E, some e, k =>
+    match evExp o n E e k with
+    | ⟨.value v, l1, k1⟩ => ⟨.value (some v), l1, k1⟩
+    | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+    | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def evExpRow (ch : Bool) : Nat → Env → ExpRow → Option Record
-  | 0, _, _ => none
-  | n+1, E, .field l e rest =>
-    match evExp ch n E e with
-    | some v =>
-      match evExpRowOpt ch n E rest with
-      | some r => some (fmPlus [(l, v)] r)
-      | none => none
-    | none => none
+def evExpRow (o : Oracle) : Nat → Env → ExpRow → Nat → Res Record
+  | 0, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, E, .field l e rest, k =>
+    match evExp o n E e k with
+    | ⟨.value v, l1, k1⟩ =>
+      match evExpRowOpt o n E rest k1 with
+      | ⟨.value r, l2, k2⟩ => ⟨.value (fmPlus [(l, v)] r), l1 ++ l2, k2⟩
+      | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+      | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+    | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+    | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def evExpRowOpt (ch : Bool) : Nat → Env → Option ExpRow → Option Record
-  | 0, _, _ => none
-  | _+1, _, none => some []
-  | n+1, E, some row => evExpRow ch n E row
+def evExpRowOpt (o : Oracle) : Nat → Env → Option ExpRow → Nat → Res Record
+  | 0, _, _, k => ⟨.outOfFuel, [], k⟩
+  | _+1, _, none, k => ⟨.value [], [], k⟩
+  | n+1, E, some row, k =>
+    match evExpRow o n E row k with
+    | ⟨.value x, l1, k1⟩ => ⟨.value x, l1, k1⟩
+    | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+    | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def evExp (ch : Bool) : Nat → Env → Exp → Option Val
-  | 0, _, _ => none
-  | n+1, E, e =>
+def evExp (o : Oracle) : Nat → Env → Exp → Nat → Res Val
+  | 0, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, E, e, k =>
     match e with
-    | .atexp a => evAtExp ch n E a
+    | .atexp a =>
+      match evAtExp o n E a k with
+      | ⟨.value x, l1, k1⟩ => ⟨.value x, l1, k1⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
     | .app e a =>
-      match evExp ch n E e with
-      | some v1 =>
-        match evAtExp ch n E a with
-        | some v2 => appVal ch n v1 v2
-        | none => none
-      | none => none
-    | .lam p e => some (.closure p e E [])
+      match evExp o n E e k with
+      | ⟨.value v1, l1, k1⟩ =>
+        match evAtExp o n E a k1 with
+        | ⟨.value v2, l2, k2⟩ =>
+          match appVal o n v1 v2 k2 with
+          | ⟨.value x, l3, k3⟩ => ⟨.value x, l1 ++ l2 ++ l3, k3⟩
+          | ⟨.stuck, l3, k3⟩ => ⟨.stuck, l1 ++ l2 ++ l3, k3⟩
+          | ⟨.outOfFuel, l3, k3⟩ => ⟨.outOfFuel, l1 ++ l2 ++ l3, k3⟩
+        | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+        | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+    | .lam p e => ⟨.value (.closure p e E []), [], k⟩
     | .caseE e m =>
-      match evExp ch n E e with
-      | some v =>
-        match evMatch ch n E v m with
-        | some (.ok v') => some v'
-        | _ => none
-      | none => none
+      match evExp o n E e k with
+      | ⟨.value v, l1, k1⟩ =>
+        match evMatch o n E v m k1 with
+        | ⟨.value (.ok v'), l2, k2⟩ => ⟨.value v', l1 ++ l2, k2⟩
+        | ⟨.value .fail, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+        | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+        | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def appVal (ch : Bool) : Nat → Val → Val → Option Val
-  | 0, _, _ => none
-  | n+1, f, v =>
+def appVal (o : Oracle) : Nat → Val → Val → Nat → Res Val
+  | 0, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, f, v, k =>
     match f with
     | .closure p e E VE =>
-      match matchAtPat ch n (E.plusVE (recVE VE)) v p with
-      | some (.ok VE') => evExp ch n ((E.plusVE (recVE VE)).plusVE VE') e
-      | _ => none
-    | .con c vs => some (.con c (vs ++ [v]))
+      match matchAtPat o n (E.plusVE (recVE VE)) v p k with
+      | ⟨.value (.ok VE'), l1, k1⟩ =>
+        match evExp o n ((E.plusVE (recVE VE)).plusVE VE') e k1 with
+        | ⟨.value x, l2, k2⟩ => ⟨.value x, l1 ++ l2, k2⟩
+        | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+        | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+      | ⟨.value .fail, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+    | .con c vs => ⟨.value (.con c (vs ++ [v])), [], k⟩
     | .basApp b vs =>
-      if vs.length + 1 < b.arity then some (.basApp b (vs ++ [v]))
-      else if vs.length + 1 = b.arity then pick ch (applySet b (vs ++ [v]))
-      else none
-    | _ => none
+      if vs.length + 1 < b.arity then ⟨.value (.basApp b (vs ++ [v])), [], k⟩
+      else if vs.length + 1 = b.arity then
+        match applySet b (vs ++ [v]) with
+        | [] => ⟨.stuck, [], k⟩
+        | [w] => ⟨.value w, logEntry b (vs ++ [v]), k⟩
+        | w :: w' :: _ => ⟨.value (if o k then w' else w), logEntry b (vs ++ [v]), k + 1⟩
+      else ⟨.stuck, [], k⟩
+    | _ => ⟨.stuck, [], k⟩
 
-def evMatch (ch : Bool) : Nat → Env → Val → Match → Option VF
-  | 0, _, _, _ => none
-  | n+1, E, v, .mk mr rest =>
-    match evMRule ch n E v mr with
-    | some (.ok v') => some (.ok v')
-    | some .fail =>
+def evMatch (o : Oracle) : Nat → Env → Val → Match → Nat → Res VF
+  | 0, _, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, E, v, .mk mr rest, k =>
+    match evMRule o n E v mr k with
+    | ⟨.value (.ok v'), l1, k1⟩ => ⟨.value (.ok v'), l1, k1⟩
+    | ⟨.value .fail, l1, k1⟩ =>
       match rest with
-      | none => some .fail
-      | some m => evMatch ch n E v m
-    | none => none
+      | none => ⟨.value .fail, l1, k1⟩
+      | some m =>
+        match evMatch o n E v m k1 with
+        | ⟨.value x, l2, k2⟩ => ⟨.value x, l1 ++ l2, k2⟩
+        | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+        | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+    | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+    | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def evMRule (ch : Bool) : Nat → Env → Val → MRule → Option VF
-  | 0, _, _, _ => none
-  | n+1, E, v, .mk p e =>
-    match matchPat ch n E v p with
-    | some (.ok VE) =>
-      match evExp ch n (E.plusVE VE) e with
-      | some v' => some (.ok v')
-      | none => none
-    | some .fail => some .fail
-    | none => none
+def evMRule (o : Oracle) : Nat → Env → Val → MRule → Nat → Res VF
+  | 0, _, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, E, v, .mk p e, k =>
+    match matchPat o n E v p k with
+    | ⟨.value (.ok VE), l1, k1⟩ =>
+      match evExp o n (E.plusVE VE) e k1 with
+      | ⟨.value v', l2, k2⟩ => ⟨.value (.ok v'), l1 ++ l2, k2⟩
+      | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+      | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+    | ⟨.value .fail, l1, k1⟩ => ⟨.value .fail, l1, k1⟩
+    | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+    | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def evDec (ch : Bool) : Nat → Env → Dec → Option ValEnv
-  | 0, _, _ => none
-  | n+1, E, .val vb =>
-    match evValBind ch n E vb with
-    | some VE => if isRecursive VE vb then some (recVE VE) else some VE
-    | none => none
+def evDec (o : Oracle) : Nat → Env → Dec → Nat → Res ValEnv
+  | 0, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, E, .val vb, k =>
+    match evValBind o n E vb k with
+    | ⟨.value VE, l1, k1⟩ =>
+      if isRecursive VE vb then ⟨.value (recVE VE), l1, k1⟩ else ⟨.value VE, l1, k1⟩
+    | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+    | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def evValBind (ch : Bool) : Nat → Env → ValBind → Option ValEnv
-  | 0, _, _ => none
-  | n+1, E, vb =>
+def evValBind (o : Oracle) : Nat → Env → ValBind → Nat → Res ValEnv
+  | 0, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, E, vb, k =>
     match vb with
     | .var x e rest =>
-      match evExp ch n E e with
-      | some v =>
-        match evValBindOpt ch n E rest with
-        | some VE => some (fmPlus [(x, v)] VE)
-        | none => none
-      | none => none
+      match evExp o n E e k with
+      | ⟨.value v, l1, k1⟩ =>
+        match evValBindOpt o n E rest k1 with
+        | ⟨.value VE, l2, k2⟩ => ⟨.value (fmPlus [(x, v)] VE), l1 ++ l2, k2⟩
+        | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+        | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
     | .pat p e =>
-      match evExp ch n E e with
-      | some v =>
-        match matchAtPat ch n E v p with
-        | some (.ok VE) => some VE
-        | _ => none
-      | none => none
+      match evExp o n E e k with
+      | ⟨.value v, l1, k1⟩ =>
+        match matchAtPat o n E v p k1 with
+        | ⟨.value (.ok VE), l2, k2⟩ => ⟨.value VE, l1 ++ l2, k2⟩
+        | ⟨.value .fail, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+        | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+        | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def evValBindOpt (ch : Bool) : Nat → Env → Option ValBind → Option ValEnv
-  | 0, _, _ => none
-  | _+1, _, none => some []
-  | n+1, E, some vb => evValBind ch n E vb
+def evValBindOpt (o : Oracle) : Nat → Env → Option ValBind → Nat → Res ValEnv
+  | 0, _, _, k => ⟨.outOfFuel, [], k⟩
+  | _+1, _, none, k => ⟨.value [], [], k⟩
+  | n+1, E, some vb, k =>
+    match evValBind o n E vb k with
+    | ⟨.value x, l1, k1⟩ => ⟨.value x, l1, k1⟩
+    | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+    | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def matchAtPat (ch : Bool) : Nat → Env → Val → AtPat → Option VEF
-  | 0, _, _, _ => none
-  | n+1, E, v, a =>
+def matchAtPat (o : Oracle) : Nat → Env → Val → AtPat → Nat → Res VEF
+  | 0, _, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, E, v, a, k =>
     match a with
-    | .wild => some (.ok [])
-    | .scon sc =>
-      match sconTest v sc with
-      | some true => some (.ok [])
-      | some false => some .fail
-      | none => none
-    | .var x => some (.ok [(x, v)])
+    | .wild => ⟨.value (.ok []), [], k⟩
+    | .scon sc => if sconTest v sc then ⟨.value (.ok []), [], k⟩ else ⟨.value .fail, [], k⟩
+    | .var x => ⟨.value (.ok [(x, v)]), [], k⟩
     | .con lc =>
       match E.lookup lc with
-      | some (.con c []) => if conIs v c then some (.ok []) else some .fail
-      | _ => none
+      | some (.con c []) => if conIs v c then ⟨.value (.ok []), [], k⟩ else ⟨.value .fail, [], k⟩
+      | _ => ⟨.stuck, [], k⟩
     | .unit =>
       match v with
-      | .unit => some (.ok [])
-      | _ => none
+      | .unit => ⟨.value (.ok []), [], k⟩
+      | _ => ⟨.stuck, [], k⟩
     | .tuple p1 p2 p3 =>
       match v with
       | .tuple v1 v2 v3 =>
-        match matchPat ch n E v1 p1 with
-        | some r1 =>
-          match matchPat ch n E v2 p2 with
-          | some r2 =>
-            match matchPatOpt ch n E v3 p3 with
-            | some r3 => some ((r1.plus r2).plus r3)
-            | none => none
-          | none => none
-        | none => none
-      | _ => none
-    | .nil => if conIs v conNil then some (.ok []) else some .fail
+        match matchPat o n E v1 p1 k with
+        | ⟨.value r1, l1, k1⟩ =>
+          match matchPat o n E v2 p2 k1 with
+          | ⟨.value r2, l2, k2⟩ =>
+            match matchPatOpt o n E v3 p3 k2 with
+            | ⟨.value r3, l3, k3⟩ => ⟨.value ((r1.plus r2).plus r3), l1 ++ l2 ++ l3, k3⟩
+            | ⟨.stuck, l3, k3⟩ => ⟨.stuck, l1 ++ l2 ++ l3, k3⟩
+            | ⟨.outOfFuel, l3, k3⟩ => ⟨.outOfFuel, l1 ++ l2 ++ l3, k3⟩
+          | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+          | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+        | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+        | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+      | _ => ⟨.stuck, [], k⟩
+    | .nil => if conIs v conNil then ⟨.value (.ok []), [], k⟩ else ⟨.value .fail, [], k⟩
     | .record row =>
       match v with
       | .record r =>
-        match matchPatRowOpt ch n E r row with
-        | some VE => some (.ok (fmPlus [] VE))
-        | none => none
-      | _ => none
-    | .paren p => matchPat ch n E v p
+        match matchPatRowOpt o n E r row k with
+        | ⟨.value VE, l1, k1⟩ => ⟨.value (.ok (fmPlus [] VE)), l1, k1⟩
+        | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+        | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+      | _ => ⟨.stuck, [], k⟩
+    | .paren p =>
+      match matchPat o n E v p k with
+      | ⟨.value x, l1, k1⟩ => ⟨.value x, l1, k1⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def matchPatOpt (ch : Bool) : Nat → Env → Option Val → Option Pat → Option VEF
-  | 0, _, _, _ => none
-  | _+1, _, none, none => some (.ok [])
-  | n+1, E, some v, some p => matchPat ch n E v p
-  | _+1, _, _, _ => none
+def matchPatOpt (o : Oracle) : Nat → Env → Option Val → Option Pat → Nat → Res VEF
+  | 0, _, _, _, k => ⟨.outOfFuel, [], k⟩
+  | _+1, _, none, none, k => ⟨.value (.ok []), [], k⟩
+  | n+1, E, some v, some p, k =>
+    match matchPat o n E v p k with
+    | ⟨.value x, l1, k1⟩ => ⟨.value x, l1, k1⟩
+    | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+    | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+  | _+1, _, _, _, k => ⟨.stuck, [], k⟩
 
-def matchPatRow (ch : Bool) : Nat → Env → Record → PatRow → Option ValEnv
-  | 0, _, _, _ => none
-  | n+1, E, r, .field l rest =>
+def matchPatRow (o : Oracle) : Nat → Env → Record → PatRow → Nat → Res ValEnv
+  | 0, _, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, E, r, .field l rest, k =>
     match fmLookup r l with
     | some v =>
-      match matchPatRowOpt ch n E r rest with
-      | some VE => some (fmPlus [(l, v)] VE)
-      | none => none
-    | none => none
+      match matchPatRowOpt o n E r rest k with
+      | ⟨.value VE, l1, k1⟩ => ⟨.value (fmPlus [(l, v)] VE), l1, k1⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+    | none => ⟨.stuck, [], k⟩
 
-def matchPatRowOpt (ch : Bool) : Nat → Env → Record → Option PatRow → Option ValEnv
-  | 0, _, _, _ => none
-  | _+1, _, _, none => some []
-  | n+1, E, r, some row => matchPatRow ch n E r row
+def matchPatRowOpt (o : Oracle) : Nat → Env → Record → Option PatRow → Nat → Res ValEnv
+  | 0, _, _, _, k => ⟨.outOfFuel, [], k⟩
+  | _+1, _, _, none, k => ⟨.value [], [], k⟩
+  | n+1, E, r, some row, k =>
+    match matchPatRow o n E r row k with
+    | ⟨.value x, l1, k1⟩ => ⟨.value x, l1, k1⟩
+    | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+    | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def matchPat (ch : Bool) : Nat → Env → Val → Pat → Option VEF
-  | 0, _, _, _ => none
-  | n+1, E, v, p =>
+def matchPat (o : Oracle) : Nat → Env → Val → Pat → Nat → Res VEF
+  | 0, _, _, _, k => ⟨.outOfFuel, [], k⟩
+  | n+1, E, v, p, k =>
     match p with
-    | .atpat a => matchAtPat ch n E v a
+    | .atpat a =>
+      match matchAtPat o n E v a k with
+      | ⟨.value x, l1, k1⟩ => ⟨.value x, l1, k1⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
     | .con lc args =>
       match E.lookup lc with
       | some (.con c []) =>
         match conArgs v c args.length with
-        | some vs => matchAtPats ch n E vs args
-        | none => some .fail
-      | _ => none
+        | some vs =>
+          match matchAtPats o n E vs args k with
+          | ⟨.value x, l1, k1⟩ => ⟨.value x, l1, k1⟩
+          | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+          | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+        | none => ⟨.value .fail, [], k⟩
+      | _ => ⟨.stuck, [], k⟩
     | .cons p1 p2 =>
       match v with
       | .con c [v1, v2] =>
         if c = conCons then
-          match matchPat ch n E v1 p1 with
-          | some r1 =>
-            match matchPat ch n E v2 p2 with
-            | some r2 => some (r1.plus r2)
-            | none => none
-          | none => none
-        else none
-      | .con c [] => if c = conNil then some .fail else none
-      | _ => none
+          match matchPat o n E v1 p1 k with
+          | ⟨.value r1, l1, k1⟩ =>
+            match matchPat o n E v2 p2 k1 with
+            | ⟨.value r2, l2, k2⟩ => ⟨.value (r1.plus r2), l1 ++ l2, k2⟩
+            | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+            | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+          | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+          | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+        else ⟨.stuck, [], k⟩
+      | .con c [] => if c = conNil then ⟨.value .fail, [], k⟩ else ⟨.stuck, [], k⟩
+      | _ => ⟨.stuck, [], k⟩
     | .as p x =>
-      match matchPat ch n E v p with
-      | some r => some (r.plus (.ok [(x, v)]))
-      | none => none
+      match matchPat o n E v p k with
+      | ⟨.value r, l1, k1⟩ => ⟨.value (r.plus (.ok [(x, v)])), l1, k1⟩
+      | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+      | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
 
-def matchAtPats (ch : Bool) : Nat → Env → List Val → List AtPat → Option VEF
-  | 0, _, _, _ => none
-  | _+1, _, [], [] => some (.ok [])
-  | n+1, E, v :: vs, a :: as =>
-    match matchAtPat ch n E v a with
-    | some r =>
-      match matchAtPats ch n E vs as with
-      | some rs => some (r.plus rs)
-      | none => none
-    | none => none
-  | _+1, _, _, _ => none
+def matchAtPats (o : Oracle) : Nat → Env → List Val → List AtPat → Nat → Res VEF
+  | 0, _, _, _, k => ⟨.outOfFuel, [], k⟩
+  | _+1, _, [], [], k => ⟨.value (.ok []), [], k⟩
+  | n+1, E, v :: vs, a :: as, k =>
+    match matchAtPat o n E v a k with
+    | ⟨.value r, l1, k1⟩ =>
+      match matchAtPats o n E vs as k1 with
+      | ⟨.value rs, l2, k2⟩ => ⟨.value (r.plus rs), l1 ++ l2, k2⟩
+      | ⟨.stuck, l2, k2⟩ => ⟨.stuck, l1 ++ l2, k2⟩
+      | ⟨.outOfFuel, l2, k2⟩ => ⟨.outOfFuel, l1 ++ l2, k2⟩
+    | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
+    | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
+  | _+1, _, _, _, k => ⟨.stuck, [], k⟩
 
 end
 

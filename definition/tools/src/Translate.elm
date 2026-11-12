@@ -5,12 +5,15 @@ Definition of Elm? (plans/elm-to-lean-translator.md). Run from the repository's 
 
     site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm            -- write
     site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check    -- compare only
+    site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --report-all-refusals FILE
 
 It writes, under `definition/mechanisation/standard-elm-mech/StandardElmMech/Generated/`, one Lean
 file of programs per shard (at most 40 tests), `All.lean`, and one file of theorems per shard; the
 list of those modules in `StandardElmMech.lean`; and `definition/mechanisation/translation-manifest.json`,
 with every `elm-spec` test, translated or refused with its reason. With `--check` it writes nothing:
-it prints the files that would change, and exits 0 either way.
+it prints the files that would change, and exits 0 either way. With `--report-all-refusals FILE` it
+writes only FILE: for every `elm-spec` test, every refusal met when each is lifted in turn (step 0
+of plans/lean-full-definition.md).
 
 -}
 
@@ -21,14 +24,23 @@ import BackendTask.Glob as Glob
 import Cli.Option as Option
 import Cli.OptionsParser as OptionsParser
 import Cli.Program as Program
-import Dict
+import Dict exposing (Dict)
+import Elm.Parser
+import Elm.Syntax.Node as Node
 import FatalError exposing (FatalError)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Pages.Script as Script exposing (Script)
 import Regions
+import Set exposing (Set)
+import StaticBasis.Json as SB
+import Translate.Choices as Choices exposing (Choices)
+import Translate.Classify as Classify
+import Translate.ClassifyOverrides as ClassifyOverrides
+import Translate.Convert as Convert
 import Translate.Directives as Directives
 import Translate.Pipeline as Pipeline exposing (Outcome(..))
+import Translate.Source as Source
 
 
 mech : String
@@ -56,15 +68,54 @@ type alias Test =
 
 
 type alias Entry =
-    { test : Test, sha : String, outcome : Outcome, defName : String }
+    { test : Test, sha : String, outcome : Outcome, defName : String, source : String, sources : List { path : String, sha : String } }
 
 
-config : Program.Config Bool
+{-| Every source of every project, by project and module name, so that a test's imports of its
+project's modules can be read (plan step 3).
+-}
+type alias Sources =
+    Dict String (Dict String { path : String, source : String })
+
+
+readSources : List Test -> BackendTask FatalError Sources
+readSources ts =
+    ts
+        |> List.map
+            (\t ->
+                BackendTask.File.rawFile t.path
+                    |> BackendTask.allowFatal
+                    |> BackendTask.map (\src -> ( t, src ))
+            )
+        |> BackendTask.sequence
+        |> BackendTask.map
+            (List.foldl
+                (\( t, src ) d ->
+                    Dict.update t.project
+                        (\m -> Just (Dict.insert t.name { path = t.path, source = src } (Maybe.withDefault Dict.empty m)))
+                        d
+                )
+                Dict.empty
+            )
+
+
+lookupIn : Sources -> String -> Pipeline.Lookup
+lookupIn sources project name =
+    Dict.get project sources |> Maybe.andThen (Dict.get name)
+
+
+type alias Options =
+    { check : Bool, reportAll : Maybe String, classifyStatic : Bool }
+
+
+config : Program.Config Options
 config =
     Program.config
         |> Program.add
-            (OptionsParser.build identity
+            (OptionsParser.build Options
                 |> OptionsParser.with (Option.flag "check")
+                |> OptionsParser.with (Option.optionalKeywordArg "report-all-refusals")
+                |> OptionsParser.with (Option.flag "classify-static")
             )
 
 
@@ -97,8 +148,8 @@ defNameOf t =
     "g_" ++ String.replace "-" "_" t.project ++ "_" ++ t.name
 
 
-entry : Test -> BackendTask FatalError (Maybe Entry)
-entry t =
+entry : Choices -> Sources -> Test -> BackendTask FatalError (Maybe Entry)
+entry choices sources t =
     BackendTask.File.rawFile t.path
         |> BackendTask.allowFatal
         |> BackendTask.andThen
@@ -108,14 +159,40 @@ entry t =
                         Directives.read source
                 in
                 if List.member "elm-spec" directives.tags && not directives.helper then
-                    sha256 t.path
+                    let
+                        outcome =
+                            case Pipeline.translateWith (lookupIn sources t.project) { project = t.project, name = t.name, defName = defNameOf t } source directives of
+                                Translated tr ->
+                                    case ( tr.kind, Dict.get (t.project ++ "/" ++ t.name) choices ) of
+                                        ( "worker", Just fields ) ->
+                                            Translated { tr | lean = Choices.apply fields tr.lean }
+
+                                        _ ->
+                                            Translated tr
+
+                                refused ->
+                                    refused
+
+                        paths =
+                            case outcome of
+                                Translated tr ->
+                                    tr.sources
+
+                                Refused _ ->
+                                    [ t.path ]
+                    in
+                    paths
+                        |> List.map (\path -> sha256 path |> BackendTask.map (\sha -> { path = path, sha = sha }))
+                        |> BackendTask.sequence
                         |> BackendTask.map
-                            (\sha ->
+                            (\hashed ->
                                 Just
                                     { test = t
-                                    , sha = sha
-                                    , outcome = Pipeline.translate { project = t.project, name = t.name, defName = defNameOf t } source directives
+                                    , sha = hashed |> List.filter (\h -> h.path == t.path) |> List.head |> Maybe.map .sha |> Maybe.withDefault ""
+                                    , outcome = outcome
                                     , defName = defNameOf t
+                                    , source = source
+                                    , sources = hashed
                                     }
                             )
 
@@ -125,23 +202,46 @@ entry t =
 
 
 type alias Shard =
-    { name : String, entries : List ( Entry, String ) }
+    { name : String, entries : List ( Entry, String ), worker : Bool }
 
 
+{-| The translated entries of one kind (`view` or `worker`), with their Lean text.
+-}
+translatedOf : String -> List Entry -> List ( Entry, String )
+translatedOf kind =
+    List.filterMap
+        (\e ->
+            case e.outcome of
+                Translated t ->
+                    if t.kind == kind then
+                        Just ( e, t.lean )
+
+                    else
+                        Nothing
+
+                Refused _ ->
+                    Nothing
+        )
+
+
+{-| The shards of the translated tests: the view programs by project, then the worker tests
+(Prog/Worker.lean), whose theorems are statements about executions, in shards `WorkerNN`.
+-}
 shards : List Entry -> List Shard
 shards entries =
+    viewShards entries
+        ++ (translatedOf "worker" entries
+                |> chunks shardSize
+                |> List.indexedMap
+                    (\i chunk -> { name = "Worker" ++ String.padLeft 2 '0' (String.fromInt (i + 1)), entries = chunk, worker = True })
+           )
+
+
+viewShards : List Entry -> List Shard
+viewShards entries =
     let
         translated =
-            List.filterMap
-                (\e ->
-                    case e.outcome of
-                        Translated t ->
-                            Just ( e, t.lean )
-
-                        Refused _ ->
-                            Nothing
-                )
-                entries
+            translatedOf "view" entries
 
         projects =
             translated |> List.map (\( e, _ ) -> e.test.project) |> unique
@@ -154,7 +254,7 @@ shards entries =
                     |> chunks shardSize
                     |> List.indexedMap
                         (\i chunk ->
-                            { name = upperCamel project ++ String.padLeft 2 '0' (String.fromInt (i + 1)), entries = chunk }
+                            { name = upperCamel project ++ String.padLeft 2 '0' (String.fromInt (i + 1)), entries = chunk, worker = False }
                         )
             )
 
@@ -188,41 +288,104 @@ header =
 
 shardFile : Shard -> String
 shardFile shard =
-    header
-        ++ "import StandardElmMech.Examples\n\nnamespace StandardElm\nopen StandardElm.D\n\n"
-        ++ String.join "\n\n" (List.map Tuple.second shard.entries)
-        ++ "\n\n/-- The programs of this shard. -/\ndef shard_"
-        ++ shard.name
-        ++ " : List Program :=\n  ["
-        ++ String.join ",\n   " (List.map (\( e, _ ) -> e.defName) shard.entries)
-        ++ "]\n\nend StandardElm\n"
+    if shard.worker then
+        header
+            ++ "import StandardElmMech.Examples\nimport StandardElmMech.Prog.Worker\n\nnamespace StandardElm\nopen StandardElm.D\n\n"
+            ++ String.join "\n\n" (List.map Tuple.second shard.entries)
+            ++ "\n\n/-- The worker tests of this shard. -/\ndef shard_"
+            ++ shard.name
+            ++ " : List Prog.WorkerTest :=\n  ["
+            ++ String.join ",\n   " (List.map (\( e, _ ) -> workerName e) shard.entries)
+            ++ "]\n\nend StandardElm\n"
+
+    else
+        header
+            ++ "import StandardElmMech.Examples\n\nnamespace StandardElm\nopen StandardElm.D\n\n"
+            ++ String.join "\n\n" (List.map Tuple.second shard.entries)
+            ++ "\n\n/-- The programs of this shard. -/\ndef shard_"
+            ++ shard.name
+            ++ " : List Program :=\n  ["
+            ++ String.join ",\n   " (List.map (\( e, _ ) -> e.defName) shard.entries)
+            ++ "]\n\nend StandardElm\n"
+
+
+{-| The tests of a shard whose CHECK-NOT lines are proved by hand (`Prog/Inv/<Test>.lean`).
+-}
+handCheckNots : Shard -> List String
+handCheckNots shard =
+    shard.entries
+        |> List.filterMap
+            (\( e, _ ) ->
+                case e.outcome of
+                    Translated t ->
+                        if List.isEmpty t.checkNots then
+                            Nothing
+
+                        else
+                            Just e.test.name
+
+                    Refused _ ->
+                        Nothing
+            )
+
+
+{-| The worker test's name: `w_<project>_<Name>` for the program `g_<project>_<Name>`.
+-}
+workerName : Entry -> String
+workerName e =
+    "w" ++ String.dropLeft 1 e.defName
 
 
 allFile : List Shard -> String
 allFile all =
+    let
+        ( workers, views ) =
+            List.partition .worker all
+    in
     header
         ++ String.concat (List.map (\s -> "import StandardElmMech.Generated." ++ s.name ++ "\n") all)
         ++ "\nnamespace StandardElm\n\n/-- Every shard of generated programs, by name. -/\ndef generatedShards : List (String × List Program) :=\n  ["
-        ++ String.join ",\n   " (List.map (\s -> "(\"" ++ s.name ++ "\", shard_" ++ s.name ++ ")") all)
-        ++ "]\n\n/-- Every generated program. -/\ndef generatedPrograms : List Program :=\n  generatedShards.foldr (fun s acc => s.2 ++ acc) []\n\nend StandardElm\n"
+        ++ String.join ",\n   " (List.map (\s -> "(\"" ++ s.name ++ "\", shard_" ++ s.name ++ ")") views)
+        ++ "]\n\n/-- Every generated program. -/\ndef generatedPrograms : List Program :=\n  generatedShards.foldr (fun s acc => s.2 ++ acc) []\n\n/-- Every shard of generated worker tests, by name. -/\ndef generatedWorkerShards : List (String × List Prog.WorkerTest) :=\n  ["
+        ++ String.join ",\n   " (List.map (\s -> "(\"" ++ s.name ++ "\", shard_" ++ s.name ++ ")") workers)
+        ++ "]\n\n/-- Every generated worker test. -/\ndef generatedWorkers : List Prog.WorkerTest :=\n  generatedWorkerShards.foldr (fun s acc => s.2 ++ acc) []\n\nend StandardElm\n"
 
 
 checksFile : Shard -> String
 checksFile shard =
-    header
-        ++ "import StandardElmMech.Generated."
-        ++ shard.name
-        ++ "\nimport StandardElmMech.Theorems\n\nnamespace StandardElm\nopen StandardElm.D\n\n#kernel_checks shard_"
-        ++ shard.name
-        ++ " \""
-        ++ shard.name
-        ++ "\"\n\n/-- Every check of this shard that expects a value, and is not a known divergence, is\n    derivable by the rules with the value its test expects. -/\ntheorem derivable_"
-        ++ shard.name
-        ++ " : ∀ p ∈ shard_"
-        ++ shard.name
-        ++ ", ∀ ck ∈ p.checks, ck.expected ≠ \"(no value)\" →\n    ¬ knownDiv.contains (p.name, ck.label) = true →\n      ∃ v, EvalExp p.env (p.phrase ck) v ∧ showElm v = ck.expected :=\n  derivableOf shard_"
-        ++ shard.name
-        ++ " (by native_decide)\n\nend StandardElm\n"
+    if shard.worker then
+        header
+            ++ "import StandardElmMech.Generated."
+            ++ shard.name
+            ++ "\nimport StandardElmMech.WorkerTheorems\nimport StandardElmMech.Eff.Normalise\n"
+            ++ String.concat (List.map (\n -> "import StandardElmMech.Prog.Inv." ++ n ++ "\n") (handCheckNots shard))
+            ++ "\nnamespace StandardElm\nopen StandardElm.D\n\n/-! One theorem per worker test of this shard (`t_<project>_<Test>`), generated by\n    `#worker_theorems` (WorkerTheorems.lean): some execution the book allows, under the test's\n    host, has a log that meets every check (`Prog.WorkerTest.Holds`). -/\n#worker_theorems"
+            ++ String.concat (List.map (\( e, _ ) -> "\n  " ++ workerName e) shard.entries)
+            ++ "\n\n"
+            ++ portsCanon shard.name ("(shard_" ++ shard.name ++ ".map (·.prog))")
+            ++ "\nend StandardElm\n"
+
+    else
+        header
+            ++ "import StandardElmMech.Generated."
+            ++ shard.name
+            ++ "\nimport StandardElmMech.Theorems\nimport StandardElmMech.Eff.Normalise\n\nnamespace StandardElm\nopen StandardElm.D\n\n/-! One theorem per program of this shard (`t_<project>_<Test>`), generated by\n    `#mod_program_theorems` (Theorems.lean): the program in module form, and every check as a\n    statement about the log of its evaluation (`ViewChecks`), or `NoMeaning`. -/\n#mod_program_theorems"
+            ++ String.concat (List.map (\( e, _ ) -> "\n  " ++ e.defName) shard.entries)
+            ++ "\n\n"
+            ++ portsCanon shard.name ("shard_" ++ shard.name)
+            ++ "\nend StandardElm\n"
+
+
+{-| The theorem that every port of every program of a shard has a canonical payload type (the
+fields of every record type strictly increasing by label, D7), checked by the kernel.
+-}
+portsCanon : String -> String -> String
+portsCanon name programs =
+    "/-- Every port of every program of this shard, its helper modules' included, has a canonical\n    payload type (D7). -/\ntheorem ports_canon_"
+        ++ name
+        ++ " : "
+        ++ programs
+        ++ ".all (fun g => (g.ports ++ g.helpers.flatMap (·.ports)).all (fun p => p.2.2.canonB)) = true := by\n  decide +kernel\n"
 
 
 rootRegion : List Shard -> String
@@ -230,26 +393,52 @@ rootRegion all =
     String.join "\n"
         ("import StandardElmMech.Generated.All"
             :: List.map (\s -> "import StandardElmMech.Generated.Checks" ++ s.name) all
+            ++ [ "import StandardElmMech.Generated.SrcAll", "import StandardElmMech.Generated.SynAll" ]
         )
 
 
-manifest : String -> List Entry -> String
-manifest toolsSha entries =
+manifest : String -> Dict String Encode.Value -> List Entry -> String
+manifest toolsSha srcByTest entries =
     let
         encodeEntry e shardOf =
             Encode.object
                 ([ ( "project", Encode.string e.test.project )
                  , ( "name", Encode.string e.test.name )
                  , ( "sha256", Encode.string e.sha )
+                 , ( "sources", Encode.list (\h -> Encode.object [ ( "path", Encode.string h.path ), ( "sha256", Encode.string h.sha ) ]) e.sources )
                  ]
+                    ++ (Dict.get (e.test.project ++ "/" ++ e.test.name) srcByTest |> Maybe.map (\x -> [ ( "src", x ) ]) |> Maybe.withDefault [])
                     ++ (case e.outcome of
                             Translated t ->
                                 [ ( "status", Encode.string "translated" )
                                 , ( "shard", Encode.string (Maybe.withDefault "" shardOf) )
                                 , ( "def", Encode.string e.defName )
                                 , ( "checks", Encode.int t.checks )
-                                , ( "lean", Encode.string t.lean )
+                                , ( "kind", Encode.string t.kind )
+                                , ( "native", Encode.bool t.native )
                                 ]
+                                    ++ (case t.host of
+                                            Just h ->
+                                                [ ( "host", Encode.string h )
+                                                , ( "flags", t.flags |> Maybe.map Encode.string |> Maybe.withDefault Encode.null )
+                                                ]
+
+                                            Nothing ->
+                                                []
+                                       )
+                                    ++ (if List.isEmpty t.checkNots then
+                                            []
+
+                                        else
+                                            [ ( "checkNots", Encode.list Encode.string t.checkNots ) ]
+                                       )
+                                    ++ (if List.isEmpty t.dropped then
+                                            []
+
+                                        else
+                                            [ ( "dropped", Encode.list Encode.string t.dropped ) ]
+                                       )
+                                    ++ [ ( "lean", Encode.string t.lean ) ]
 
                             Refused r ->
                                 [ ( "status", Encode.string "refused" )
@@ -282,8 +471,8 @@ type alias Output =
 {-| Every file the translator writes, with its new text. The root module's text is the old one
 with its region replaced.
 -}
-outputs : String -> List Entry -> String -> Result String (List Output)
-outputs toolsSha entries rootSource =
+outputs : String -> Dict String Encode.Value -> List Entry -> String -> Result String (List Output)
+outputs toolsSha srcByTest entries rootSource =
     let
         all =
             shards entries
@@ -295,7 +484,7 @@ outputs toolsSha entries rootSource =
                     ++ List.map (\s -> { path = generatedDir ++ "Checks" ++ s.name ++ ".lean", body = checksFile s }) all
                     ++ [ { path = generatedDir ++ "All.lean", body = allFile all }
                        , { path = mech ++ "StandardElmMech.lean", body = root }
-                       , { path = manifestPath, body = manifest toolsSha entries }
+                       , { path = manifestPath, body = manifest toolsSha srcByTest entries }
                        ]
             )
 
@@ -344,34 +533,575 @@ reasonClass reason =
 run : Script
 run =
     Script.withCliOptions config
-        (\check ->
+        (\options ->
+            let
+                check =
+                    options.check
+            in
             tests
-                |> BackendTask.andThen (\ts -> BackendTask.sequence (List.map entry ts))
-                |> BackendTask.map (List.filterMap identity)
                 |> BackendTask.andThen
-                    (\entries ->
+                    (\ts ->
                         BackendTask.map2 Tuple.pair
-                            (BackendTask.File.rawFile (mech ++ "StandardElmMech.lean") |> BackendTask.allowFatal)
-                            (BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/src") Decode.string |> BackendTask.allowFatal)
+                            (BackendTask.File.jsonFile Choices.decoder Choices.path |> BackendTask.allowFatal)
+                            (readSources ts)
                             |> BackendTask.andThen
-                                (\( rootSource, toolsSha ) ->
-                                    case outputs toolsSha entries rootSource of
-                                        Err problem ->
-                                            BackendTask.fail (FatalError.fromString ("StandardElmMech.lean: " ++ problem))
-
-                                        Ok files ->
-                                            Script.log (summary entries)
-                                                |> BackendTask.andThen
-                                                    (\_ ->
-                                                        if check then
-                                                            compareAll files
-
-                                                        else
-                                                            writeAll files
-                                                    )
+                                (\( choices, sources ) ->
+                                    BackendTask.sequence (List.map (entry choices sources) ts)
+                                        |> BackendTask.map (\es -> ( ( ts, sources ), List.filterMap identity es ))
                                 )
                     )
-        )
+                |> BackendTask.andThen
+                    (\( ( allTests, sources ), entries ) ->
+                      case options.reportAll of
+                        Just path ->
+                            BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/src") Decode.string
+                                |> BackendTask.allowFatal
+                                |> BackendTask.andThen
+                                    (\toolsSha ->
+                                        Script.log (summary entries)
+                                            |> BackendTask.andThen
+                                                (\_ ->
+                                                    let
+                                                        body =
+                                                            refusalReport toolsSha sources allTests entries
+                                                    in
+                                                    Script.log ("report: " ++ String.fromInt (String.length body) ++ " characters")
+                                                        |> BackendTask.andThen (\_ -> Script.writeFile { path = path, body = body } |> BackendTask.allowFatal)
+                                                )
+                                            |> BackendTask.andThen (\_ -> Script.log ("written: " ++ path))
+                                    )
+
+                        Nothing ->
+                            BackendTask.map5 (\a b c d e -> ( ( a, b ), ( c, d ), e ))
+                                (BackendTask.File.rawFile (mech ++ "StandardElmMech.lean") |> BackendTask.allowFatal)
+                                (BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/src") Decode.string |> BackendTask.allowFatal)
+                                bookLabelsTask
+                                (BackendTask.map2 Tuple.pair
+                                    (BackendTask.File.jsonFile SB.basisDecoder staticBasisPath |> BackendTask.allowFatal)
+                                    (sha256 staticBasisPath)
+                                )
+                                libraryTask
+                                |> BackendTask.andThen
+                                    (\( ( rootSource, toolsSha ), ( labels, ( basis, basisSha ) ), libs ) ->
+                                        let
+                                            cls =
+                                                classification labels basis basisSha allTests sources
+
+                                            src =
+                                                sourceSyntax allTests sources
+                                        in
+                                        if options.classifyStatic then
+                                            Script.log (cls.summary ++ "\n" ++ cls.lists)
+
+                                        else
+                                            case Result.map2 Tuple.pair (outputs toolsSha src.byTest entries rootSource |> Result.mapError (\p -> "StandardElmMech.lean: " ++ p)) (staticLibrary libs) of
+                                                Err problem ->
+                                                    BackendTask.fail (FatalError.fromString problem)
+
+                                                Ok ( files0, libFile ) ->
+                                                    let
+                                                        files =
+                                                            files0
+                                                                ++ [ { path = classificationPath, body = cls.body } ]
+                                                                ++ src.files
+                                                                ++ [ libFile ]
+                                                    in
+                                                    Script.log (summary entries ++ "\n" ++ src.summary)
+                                                        |> BackendTask.andThen
+                                                            (\_ ->
+                                                                if check then
+                                                                    compareAll files
+
+                                                                else
+                                                                    writeAll files
+                                                            )
+                                    )
+                        )
+            )
+
+
+{-| The library values of the test basis (decision D2 (b)): module, vendored file, values. The
+values are those the compile-success tests use (step 7's `library:` needs).
+-}
+libraryValues : List ( String, String, List String )
+libraryValues =
+    [ ( "Array", "definition/library/elm-core-1.0.5/src/Array.elm", [ "append", "empty", "fromList", "initialize", "map", "push", "toList" ] )
+    , ( "Json.Encode", "definition/library/elm-json-1.1.3/src/Json/Encode.elm", [ "bool", "encode", "float", "int", "list", "null", "object", "string" ] )
+    , ( "List", "definition/library/elm-core-1.0.5/src/List.elm", [ "foldl", "foldr", "head", "length", "map", "map2", "range", "sum" ] )
+    , ( "Maybe", "definition/library/elm-core-1.0.5/src/Maybe.elm", [ "andThen", "map", "withDefault" ] )
+    , ( "Result", "definition/library/elm-core-1.0.5/src/Result.elm", [ "map" ] )
+    , ( "String", "definition/library/elm-core-1.0.5/src/String.elm", [ "length" ] )
+    , ( "Tuple", "definition/library/elm-core-1.0.5/src/Tuple.elm", [ "first", "second" ] )
+    ]
+
+
+libraryTask : BackendTask FatalError (List ( ( String, String, List String ), String ))
+libraryTask =
+    libraryValues
+        |> List.map (\(( _, path, _ ) as lv) -> BackendTask.File.rawFile path |> BackendTask.allowFatal |> BackendTask.map (\src -> ( lv, src )))
+        |> BackendTask.sequence
+
+
+{-| Generated/StaticLibrary.lean: the annotations of the library values, as source syntax. -}
+staticLibrary : List ( ( String, String, List String ), String ) -> Result String Output
+staticLibrary libs =
+    let
+        defName m =
+            "lib_" ++ String.replace "." "_" m
+
+        one ( ( m, path, names ), src ) =
+            case Elm.Parser.parseToFile src of
+                Err _ ->
+                    Err (path ++ ": does not parse")
+
+                Ok file ->
+                    case Source.annotations { path = path, source = src } file names of
+                        Err problem ->
+                            Err (problem.at ++ ": " ++ problem.reason)
+
+                        Ok text ->
+                            Ok ("/-- From " ++ path ++ ". -/\ndef " ++ defName m ++ " : ModId × List (Var × Src.STy) :=\n  (\"" ++ m ++ "\", " ++ text ++ ")")
+    in
+    libs
+        |> List.map one
+        |> List.foldr (Result.map2 (::)) (Ok [])
+        |> Result.map
+            (\defs ->
+                { path = generatedDir ++ "StaticLibrary.lean"
+                , body =
+                    header
+                        ++ "import StandardElmMech.Src.Notation\n\nnamespace StandardElm.Stat\nopen StandardElm (Var ModId)\n\n"
+                        ++ String.join "\n\n" defs
+                        ++ "\n\n/-- The library values of the test basis (D2 (b)), by module. -/\ndef libModules : List (ModId × List (Var × Src.STy)) :=\n  ["
+                        ++ String.join ", " (List.map (\( ( m, _, _ ), _ ) -> defName m) libs)
+                        ++ "]\n\nend StandardElm.Stat\n"
+                }
+            )
+
+
+staticBasisPath : String
+staticBasisPath =
+    "definition/mechanisation/static-basis.json"
+
+
+classificationPath : String
+classificationPath =
+    "definition/mechanisation/static-classification.json"
+
+
+{-| The labels of the book (`\label`, `\citelabel`, `\citealso`, `\defnrule`), from every chapter.
+-}
+bookLabelsTask : BackendTask FatalError (Set String)
+bookLabelsTask =
+    Glob.succeed identity
+        |> Glob.captureFilePath
+        |> Glob.match (Glob.literal "definition/tex/")
+        |> Glob.match Glob.wildcard
+        |> Glob.match (Glob.literal ".tex")
+        |> Glob.toBackendTask
+        |> BackendTask.andThen
+            (\paths ->
+                paths
+                    |> List.map (\p -> BackendTask.File.rawFile p |> BackendTask.allowFatal)
+                    |> BackendTask.combine
+                    |> BackendTask.map (String.join "\n" >> Classify.bookLabels)
+            )
+
+
+{-| The modules of a test's program: the test, then every module it imports, transitively, that
+is a file of its project's sources (a visited set follows a cycle once).
+-}
+programModules : Sources -> Test -> String -> List Classify.ModuleParse
+programModules sources t source =
+    let
+        parse name path text =
+            { path = path, name = name, file = Elm.Parser.parseToFile text |> Result.toMaybe }
+
+        importsOf m =
+            m.file
+                |> Maybe.map (\f -> List.map (\(Node.Node _ i) -> String.join "." (nodeValue i.moduleName)) f.imports)
+                |> Maybe.withDefault []
+
+        go queue visited acc =
+            case queue of
+                [] ->
+                    acc
+
+                name :: rest ->
+                    if Set.member name visited then
+                        go rest visited acc
+
+                    else
+                        case Dict.get t.project sources |> Maybe.andThen (Dict.get name) of
+                            Just s ->
+                                let
+                                    m =
+                                        parse name s.path s.source
+                                in
+                                go (rest ++ importsOf m) (Set.insert name visited) (acc ++ [ m ])
+
+                            Nothing ->
+                                go rest (Set.insert name visited) acc
+
+        first =
+            parse t.name t.path source
+    in
+    go (importsOf first) (Set.singleton t.name) [ first ]
+
+
+nodeValue : Node.Node (List String) -> List String
+nodeValue (Node.Node _ v) =
+    v
+
+
+{-| The static classification of every `elm-spec` test (plans/lean-full-definition/step-07-classify.md):
+the JSON, the summary, and the tests of each class.
+-}
+classification : Set String -> SB.Basis -> String -> List Test -> Sources -> { body : String, summary : String, lists : String }
+classification labels basis basisSha allTests sources =
+    let
+        selected =
+            allTests
+                |> List.filterMap
+                    (\t ->
+                        Dict.get t.project sources
+                            |> Maybe.andThen (Dict.get t.name)
+                            |> Maybe.andThen
+                                (\s ->
+                                    let
+                                        d =
+                                            Directives.read s.source
+                                    in
+                                    if List.member "elm-spec" d.tags && not d.helper then
+                                        Just ( t, s.source, d )
+
+                                    else
+                                        Nothing
+                                )
+                    )
+
+        helperSet project =
+            Dict.get project sources |> Maybe.map (Dict.keys >> Set.fromList) |> Maybe.withDefault Set.empty
+
+        titleOf d =
+            d.lines
+                |> List.head
+                |> Maybe.andThen
+                    (\l ->
+                        if String.startsWith "-- " l.text && String.endsWith " -" l.text then
+                            Just (l.text |> String.dropLeft 3 |> String.dropRight 2 |> String.trim)
+
+                        else
+                            Nothing
+                    )
+
+        errors =
+            selected
+                |> List.filter (\( _, _, d ) -> List.member "compile-error" d.refusals)
+                |> List.map
+                    (\( t, source, d ) ->
+                        Classify.classifyError { labels = labels, overrides = ClassifyOverrides.overrides }
+                            { project = t.project, name = t.name, tags = d.tags, title = titleOf d, modules = programModules sources t source }
+                    )
+
+        successes =
+            selected
+                |> List.filter (\( _, _, d ) -> not (List.member "compile-error" d.refusals))
+                |> List.map
+                    (\( t, source, _ ) ->
+                        let
+                            mods =
+                                programModules sources t source
+                        in
+                        Classify.classifySuccess basis
+                            { project = t.project, name = t.name, modules = mods, helpers = Set.remove t.name (helperSet t.project) }
+                    )
+
+        countBy key xs order =
+            order |> List.map (\k -> ( k, List.length (List.filter (\x -> key x == k) xs) ))
+
+        errorOrder =
+            [ "parse-fail", "lexical-accepted", "syntactic", "further", "fixity-inference", "static-deterministic", "inference" ]
+
+        successOrder =
+            [ "B0", "harness", "library", "helper", "outside", "parse-fail" ]
+
+        errorCounts =
+            countBy .class errors errorOrder
+
+        successCounts =
+            countBy .basis successes successOrder
+
+        showCounts cs =
+            cs |> List.map (\( k, n ) -> k ++ " " ++ String.fromInt n) |> String.join ", "
+
+        encodeModules ms =
+            Encode.list (\( p, ok ) -> Encode.object [ ( "path", Encode.string p ), ( "parse", Encode.string (okStr ok) ) ]) ms
+
+        okStr ok =
+            if ok then
+                "ok"
+
+            else
+                "fail"
+
+        maybeStr m =
+            m |> Maybe.map Encode.string |> Maybe.withDefault Encode.null
+
+        body =
+            Encode.encode 2
+                (Encode.object
+                    [ ( "generatedBy", Encode.string "definition/tools/src/Translate.elm" )
+                    , ( "staticBasisSha256", Encode.string basisSha )
+                    , ( "counts"
+                      , Encode.object
+                            [ ( "compileError", Encode.object (List.map (\( k, n ) -> ( k, Encode.int n )) errorCounts) )
+                            , ( "compileSuccess", Encode.object (List.map (\( k, n ) -> ( k, Encode.int n )) successCounts) )
+                            ]
+                      )
+                    , ( "compileError"
+                      , Encode.list
+                            (\e ->
+                                Encode.object
+                                    [ ( "project", Encode.string e.project )
+                                    , ( "name", Encode.string e.name )
+                                    , ( "modules", encodeModules e.modules )
+                                    , ( "parse", Encode.string (okStr e.parse) )
+                                    , ( "rules", Encode.list Encode.string e.rules )
+                                    , ( "rule", maybeStr e.rule )
+                                    , ( "class", Encode.string e.class )
+                                    , ( "subclass", maybeStr e.subclass )
+                                    , ( "step", e.step |> Maybe.map Encode.int |> Maybe.withDefault Encode.null )
+                                    , ( "trust", Encode.list Encode.string e.trust )
+                                    , ( "title", maybeStr e.title )
+                                    , ( "override", maybeStr e.override )
+                                    ]
+                            )
+                            errors
+                      )
+                    , ( "compileSuccess"
+                      , Encode.list
+                            (\c ->
+                                Encode.object
+                                    [ ( "project", Encode.string c.project )
+                                    , ( "name", Encode.string c.name )
+                                    , ( "modules", encodeModules c.modules )
+                                    , ( "parse", Encode.string (okStr c.parse) )
+                                    , ( "basis", Encode.string c.basis )
+                                    , ( "needs", Encode.list Encode.string c.needs )
+                                    , ( "main", Encode.string c.main )
+                                    , ( "mainAnnotated", Encode.bool c.mainAnnotated )
+                                    ]
+                            )
+                            successes
+                      )
+                    ]
+                )
+                ++ "\n"
+
+        lists =
+            (errorOrder
+                |> List.map (\k -> "compile-error " ++ k ++ ": " ++ String.join ", " (errors |> List.filter (\e -> e.class == k) |> List.map .name))
+            )
+                ++ (successOrder
+                        |> List.map (\k -> "compile-success " ++ k ++ ": " ++ String.join ", " (successes |> List.filter (\c -> c.basis == k && k /= "harness") |> List.map .name))
+                   )
+                |> String.join "\n"
+    in
+    { body = body
+    , summary =
+        "static classification: "
+            ++ String.fromInt (List.length selected)
+            ++ " elm-spec tests\n  compile-error "
+            ++ String.fromInt (List.length errors)
+            ++ ": "
+            ++ showCounts errorCounts
+            ++ "\n  compile-success "
+            ++ String.fromInt (List.length successes)
+            ++ ": "
+            ++ showCounts successCounts
+    , lists = lists
+    }
+
+
+{-| The source syntax of every `elm-spec` test whose program parses (plan step 8): the shards
+`Generated/Src<Project><nn>.lean`, `Generated/SrcAll.lean`, each test's outcome for the manifest,
+and the summary line.
+-}
+sourceSyntax : List Test -> Sources -> { files : List Output, byTest : Dict String Encode.Value, summary : String }
+sourceSyntax allTests sources =
+    let
+        selected =
+            allTests
+                |> List.filterMap
+                    (\t ->
+                        Dict.get t.project sources
+                            |> Maybe.andThen (Dict.get t.name)
+                            |> Maybe.andThen
+                                (\s ->
+                                    let
+                                        d =
+                                            Directives.read s.source
+                                    in
+                                    if List.member "elm-spec" d.tags && not d.helper then
+                                        Just ( t, s.source )
+
+                                    else
+                                        Nothing
+                                )
+                    )
+
+        defOf t =
+            "s_" ++ String.replace "-" "_" t.project ++ "_" ++ t.name
+
+        outcome ( t, source ) =
+            let
+                mods =
+                    programModules sources t source
+
+                sourceOf m =
+                    Dict.get t.project sources |> Maybe.andThen (Dict.get m.name) |> Maybe.map .source |> Maybe.withDefault source
+            in
+            case List.filter (\m -> m.file == Nothing) mods of
+                bad :: _ ->
+                    ( t, Err { reason = "parse", at = bad.path }, mods )
+
+                [] ->
+                    let
+                        ordered =
+                            List.drop 1 mods ++ List.take 1 mods
+                    in
+                    ( t
+                    , Source.program { project = t.project, name = t.name, defName = defOf t }
+                        (List.filterMap (\m -> m.file |> Maybe.map (\f -> { path = m.path, source = sourceOf m, file = f })) ordered)
+                    , mods
+                    )
+
+        results =
+            List.map outcome selected
+
+        written =
+            results |> List.filterMap (\( t, r, mods ) -> Result.toMaybe r |> Maybe.map (\lean -> ( t, lean, mods )))
+
+        projects =
+            written |> List.map (\( t, _, _ ) -> t.project) |> unique
+
+        srcShards =
+            projects
+                |> List.concatMap
+                    (\project ->
+                        written
+                            |> List.filter (\( t, _, _ ) -> t.project == project)
+                            |> chunks shardSize
+                            |> List.indexedMap (\i chunk -> ( "Src" ++ upperCamel project ++ String.padLeft 2 '0' (String.fromInt (i + 1)), chunk ))
+                    )
+
+        shardOf =
+            srcShards |> List.concatMap (\( n, chunk ) -> List.map (\( t, _, _ ) -> ( t.project ++ "/" ++ t.name, n )) chunk) |> Dict.fromList
+
+        shardFileText ( n, chunk ) =
+            { path = generatedDir ++ n ++ ".lean"
+            , body =
+                header
+                    ++ "import StandardElmMech.Src.Notation\n\nnamespace StandardElm\nset_option maxRecDepth 100000\n\n"
+                    ++ String.join "\n\n" (List.map (\( _, lean, _ ) -> lean) chunk)
+                    ++ "\n\n/-- The programs of this shard, by test name. -/\ndef srcShard_"
+                    ++ n
+                    ++ " : List (String × Src.SProgram) :=\n  ["
+                    ++ String.join ",\n   " (List.map (\( t, _, _ ) -> "(" ++ "\"" ++ t.name ++ "\", " ++ defOf t ++ ")") chunk)
+                    ++ "]\n\nend StandardElm\n"
+            }
+
+        allText =
+            { path = generatedDir ++ "SrcAll.lean"
+            , body =
+                header
+                    ++ String.concat (List.map (\( n, _ ) -> "import StandardElmMech.Generated." ++ n ++ "\n") srcShards)
+                    ++ "\nnamespace StandardElm\n\n/-- Every shard of source programs, by name: test name and program. -/\ndef srcShards : List (String × List (String × Src.SProgram)) :=\n  ["
+                    ++ String.join ",\n   " (List.map (\( n, _ ) -> "(\"" ++ n ++ "\", srcShard_" ++ n ++ ")") srcShards)
+                    ++ "]\n\nend StandardElm\n"
+            }
+
+        -- the theorems of the restrictions, a file per four source shards (one file for all needs
+        -- more than the memory budget, 2026-11-12: 6.5 GB)
+        synGroups =
+            srcShards
+                |> chunks 4
+                |> List.indexedMap (\i g -> ( "Syn" ++ String.padLeft 2 '0' (String.fromInt (i + 1)), List.map Tuple.first g ))
+
+        synFile ( g, names ) =
+            { path = generatedDir ++ g ++ ".lean"
+            , body =
+                header
+                    ++ String.concat (List.map (\n -> "import StandardElmMech.Generated." ++ n ++ "\n") names)
+                    ++ "import StandardElmMech.Src.SynCommand\n\nnamespace StandardElm\n\n/-- The programs of this file's source shards. -/\ndef synShards_"
+                    ++ g
+                    ++ " : List (String × List (String × Src.SProgram)) :=\n  ["
+                    ++ String.join ",\n   " (List.map (\n -> "(\"" ++ n ++ "\", srcShard_" ++ n ++ ")") names)
+                    ++ "]\n\n/-! One theorem per written program (plan step 8): it meets the AST-decidable restrictions\n    (`syn_<project>_<Test>`), or it does not, with one theorem for each restriction it breaks\n    (`nosyn_...`). Generated by `#syn_theorems` (Src/SynCommand.lean). -/\n#syn_theorems synShards_"
+                    ++ g
+                    ++ "\n\nend StandardElm\n"
+            }
+
+        byTest =
+            results
+                |> List.map
+                    (\( t, r, mods ) ->
+                        ( t.project ++ "/" ++ t.name
+                        , case r of
+                            Ok _ ->
+                                Encode.object
+                                    [ ( "status", Encode.string "written" )
+                                    , ( "shard", Encode.string (Dict.get (t.project ++ "/" ++ t.name) shardOf |> Maybe.withDefault "") )
+                                    , ( "def", Encode.string (defOf t) )
+                                    , ( "modules", Encode.list (\m -> Encode.string m.path) mods )
+                                    ]
+
+                            Err problem ->
+                                Encode.object
+                                    [ ( "status", Encode.string "refused" )
+                                    , ( "reason", Encode.string problem.reason )
+                                    , ( "at", Encode.string problem.at )
+                                    ]
+                        )
+                    )
+                |> Dict.fromList
+
+        refusedReasons =
+            results
+                |> List.filterMap (\( _, r, _ ) -> case r of
+                    Err problem ->
+                        Just problem.reason
+
+                    Ok _ ->
+                        Nothing)
+
+        reasonCounts =
+            refusedReasons
+                |> List.foldl (\x d -> Dict.update x (\c -> Just (Maybe.withDefault 0 c + 1)) d) Dict.empty
+                |> Dict.toList
+                |> List.map (\( k, n ) -> k ++ " " ++ String.fromInt n)
+    in
+    { files =
+        List.map shardFileText srcShards
+            ++ [ allText
+               , { path = generatedDir ++ "SynAll.lean"
+                 , body =
+                    header
+                        ++ String.concat (List.map (\( g, _ ) -> "import StandardElmMech.Generated." ++ g ++ "\n") synGroups)
+                 }
+               ]
+            ++ List.map synFile synGroups
+    , byTest = byTest
+    , summary =
+        "source syntax: "
+            ++ String.fromInt (List.length written)
+            ++ " written, "
+            ++ String.fromInt (List.length refusedReasons)
+            ++ " refused ("
+            ++ String.join ", " reasonCounts
+            ++ ")"
+    }
 
 
 writeAll : List Output -> BackendTask FatalError ()
@@ -417,3 +1147,73 @@ compareAll files =
                     cs ->
                         Script.log (String.join "\n" cs ++ "\n" ++ String.fromInt (List.length cs) ++ " file(s) differ from what the translator would write; run it, then the mechanisation stage.")
             )
+
+
+{-| The report of every refusal of every `elm-spec` test (step 0 of plans/lean-full-definition.md),
+with the facts the inventory script needs: the modules a test uses beyond the default imports, its
+imports that name a module among its project's sources, and whether it is a worker or a port module.
+-}
+refusalReport : String -> Sources -> List Test -> List Entry -> String
+refusalReport toolsSha sources allTests entries =
+    let
+        encodeFound f =
+            Encode.object
+                ([ ( "stage", Encode.string (Pipeline.stageName f.stage) )
+                 , ( "reason", Encode.string f.reason )
+                 ]
+                    ++ (f.at |> Maybe.map (\a -> [ ( "at", Encode.string a ) ]) |> Maybe.withDefault [])
+                    ++ (f.detail |> Maybe.map (\d -> [ ( "detail", Encode.string d ) ]) |> Maybe.withDefault [])
+                )
+
+        encodeEntry e =
+            let
+                found =
+                    Pipeline.translateAllWith (lookupIn sources e.test.project) { project = e.test.project, name = e.test.name, defName = e.defName } e.source (Directives.read e.source)
+
+                factFields =
+                    case Elm.Parser.parseToFile e.source of
+                        Ok file ->
+                            let
+                                f =
+                                    Convert.facts e.source file
+
+                                local =
+                                    f.imports
+                                        |> List.filter
+                                            (\m -> List.any (\t -> t.project == e.test.project && t.name == m) allTests)
+                            in
+                            [ ( "uses", Encode.list Encode.string f.uses )
+                            , ( "localModules", Encode.list Encode.string local )
+                            , ( "worker", Encode.bool f.worker )
+                            , ( "ports", Encode.bool f.ports )
+                            ]
+
+                        Err _ ->
+                            []
+            in
+            Encode.object
+                ([ ( "project", Encode.string e.test.project )
+                 , ( "name", Encode.string e.test.name )
+                 , ( "status"
+                   , Encode.string
+                        (case e.outcome of
+                            Translated _ ->
+                                "translated"
+
+                            Refused _ ->
+                                "refused"
+                        )
+                   )
+                 , ( "refusals", Encode.list encodeFound found )
+                 ]
+                    ++ factFields
+                )
+    in
+    Encode.encode 2
+        (Encode.object
+            [ ( "generatedBy", Encode.string "definition/tools/src/Translate.elm --report-all-refusals" )
+            , ( "toolsSha256", Encode.string toolsSha )
+            , ( "tests", Encode.list encodeEntry entries )
+            ]
+        )
+        ++ "\n"

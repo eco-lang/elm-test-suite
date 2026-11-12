@@ -1,4 +1,4 @@
-module Translate.Basis exposing (constructor, operator, value)
+module Translate.Basis exposing (constructor, effectValue, operator, value, valueNames)
 
 {-| The type schemes of the names the Lean environment E0 binds (Basis.lean, InitialBasis.lean),
 as Appendix C of A Standard Definition of Elm? gives them (appendix-static-basis.tex): checked by
@@ -6,6 +6,7 @@ hand against that appendix on 2026-11-09 (plans/elm-to-lean-translator.md, B.6).
 quantified variables are numbered -1, -2, ... within the scheme.
 -}
 
+import Dict
 import Translate.Types exposing (Class(..), Scheme, Type(..))
 
 
@@ -96,6 +97,174 @@ value m x =
         ( "Debug", _ ) ->
             Nothing
 
+        -- the effect modules (Appendix C, Figures fig:static-basis-platform, fig:static-basis-task and
+        -- fig:static-basis-effects; checked by hand against the appendix on 2026-11-11)
+        _ ->
+            if isEffectModule m then
+                effectValue m x
+
+            else
+                value0 m x
+
+
+{-| Whether a qualifier names one of the effect modules (as written, or the default imports'
+`Cmd` and `Sub`).
+-}
+isEffectModule : String -> Bool
+isEffectModule m =
+    List.member m [ "Platform", "Platform.Cmd", "Platform.Sub", "Cmd", "Sub", "Task", "Process" ]
+
+
+cmd : Type -> Type
+cmd t =
+    TCon "Cmd" [ t ]
+
+
+sub : Type -> Type
+sub t =
+    TCon "Sub" [ t ]
+
+
+task : Type -> Type -> Type
+task x a =
+    TCon "Task" [ x, a ]
+
+
+unitT : Type
+unitT =
+    TTuple []
+
+
+{-| A value of an effect module. -}
+effectValue : String -> String -> Maybe Scheme
+effectValue m x =
+    let
+        module_ =
+            if m == "Cmd" then
+                "Platform.Cmd"
+
+            else if m == "Sub" then
+                "Platform.Sub"
+
+            else
+                m
+    in
+    case ( module_, x ) of
+        ( "Platform", "worker" ) ->
+            -- flags 1, model 2, msg 3
+            Just
+                (anyScheme 3
+                    (fn
+                        [ TRecord
+                            (Dict.fromList
+                                [ ( "init", fn [ v 1 ] (TTuple [ v 2, cmd (v 3) ]) )
+                                , ( "update", fn [ v 3, v 2 ] (TTuple [ v 2, cmd (v 3) ]) )
+                                , ( "subscriptions", fn [ v 2 ] (sub (v 3)) )
+                                ]
+                            )
+                            Nothing
+                        ]
+                        (TCon "Program" [ v 1, v 2, v 3 ])
+                    )
+                )
+
+        ( "Platform.Cmd", "none" ) ->
+            Just (anyScheme 1 (cmd (v 1)))
+
+        ( "Platform.Cmd", "batch" ) ->
+            Just (anyScheme 1 (fn [ TCon "List" [ cmd (v 1) ] ] (cmd (v 1))))
+
+        ( "Platform.Cmd", "map" ) ->
+            Just (anyScheme 2 (fn [ fn [ v 1 ] (v 2), cmd (v 1) ] (cmd (v 2))))
+
+        ( "Platform.Sub", "none" ) ->
+            Just (anyScheme 1 (sub (v 1)))
+
+        ( "Platform.Sub", "batch" ) ->
+            Just (anyScheme 1 (fn [ TCon "List" [ sub (v 1) ] ] (sub (v 1))))
+
+        ( "Platform.Sub", "map" ) ->
+            Just (anyScheme 2 (fn [ fn [ v 1 ] (v 2), sub (v 1) ] (sub (v 2))))
+
+        -- Task: x 1, a 2, then b c d e r
+        ( "Task", "succeed" ) ->
+            Just (anyScheme 2 (fn [ v 2 ] (task (v 1) (v 2))))
+
+        ( "Task", "fail" ) ->
+            Just (anyScheme 2 (fn [ v 1 ] (task (v 1) (v 2))))
+
+        ( "Task", "map" ) ->
+            Just (anyScheme 3 (fn [ fn [ v 2 ] (v 3), task (v 1) (v 2) ] (task (v 1) (v 3))))
+
+        ( "Task", "map2" ) ->
+            Just (anyScheme 4 (fn [ fn [ v 2, v 3 ] (v 4), task (v 1) (v 2), task (v 1) (v 3) ] (task (v 1) (v 4))))
+
+        ( "Task", "map3" ) ->
+            Just (anyScheme 5 (fn [ fn [ v 2, v 3, v 4 ] (v 5), task (v 1) (v 2), task (v 1) (v 3), task (v 1) (v 4) ] (task (v 1) (v 5))))
+
+        ( "Task", "map4" ) ->
+            Just
+                (anyScheme 6
+                    (fn [ fn [ v 2, v 3, v 4, v 5 ] (v 6), task (v 1) (v 2), task (v 1) (v 3), task (v 1) (v 4), task (v 1) (v 5) ]
+                        (task (v 1) (v 6))
+                    )
+                )
+
+        ( "Task", "map5" ) ->
+            Just
+                (anyScheme 7
+                    (fn
+                        [ fn [ v 2, v 3, v 4, v 5, v 6 ] (v 7), task (v 1) (v 2), task (v 1) (v 3), task (v 1) (v 4), task (v 1) (v 5), task (v 1) (v 6) ]
+                        (task (v 1) (v 7))
+                    )
+                )
+
+        ( "Task", "sequence" ) ->
+            Just (anyScheme 2 (fn [ TCon "List" [ task (v 1) (v 2) ] ] (task (v 1) (TCon "List" [ v 2 ]))))
+
+        ( "Task", "andThen" ) ->
+            Just (anyScheme 3 (fn [ fn [ v 2 ] (task (v 1) (v 3)), task (v 1) (v 2) ] (task (v 1) (v 3))))
+
+        -- onError: x 1, y 2, a 3
+        ( "Task", "onError" ) ->
+            Just (anyScheme 3 (fn [ fn [ v 1 ] (task (v 2) (v 3)), task (v 1) (v 3) ] (task (v 2) (v 3))))
+
+        ( "Task", "mapError" ) ->
+            Just (anyScheme 3 (fn [ fn [ v 1 ] (v 2), task (v 1) (v 3) ] (task (v 2) (v 3))))
+
+        -- perform: a 1, msg 2
+        ( "Task", "perform" ) ->
+            Just (anyScheme 2 (fn [ fn [ v 1 ] (v 2), task (TCon "Never" []) (v 1) ] (cmd (v 2))))
+
+        -- attempt: x 1, a 2, msg 3
+        ( "Task", "attempt" ) ->
+            Just (anyScheme 3 (fn [ fn [ TCon "Result" [ v 1, v 2 ] ] (v 3), task (v 1) (v 2) ] (cmd (v 3))))
+
+        -- spawn: x 1, y 2, a 3
+        ( "Process", "spawn" ) ->
+            Just (anyScheme 3 (fn [ task (v 1) (v 3) ] (task (v 2) (TCon "ProcessId" []))))
+
+        ( "Process", "sleep" ) ->
+            Just (anyScheme 1 (fn [ float ] (task (v 1) unitT)))
+
+        ( "Process", "kill" ) ->
+            Just (anyScheme 1 (fn [ TCon "ProcessId" [] ] (task (v 1) unitT)))
+
+        _ ->
+            Nothing
+
+
+{-| A value of E0 other than those of the effect modules. -}
+value0 : String -> String -> Maybe Scheme
+value0 m x =
+    case ( m, x ) of
+        -- the harness Html of the test basis (decision D2): text : String -> Html msg
+        ( "Html", "text" ) ->
+            Just (anyScheme 1 (fn [ string ] (TCon "Node" [ v 1 ])))
+
+        ( "Html", _ ) ->
+            Nothing
+
         ( "Char", "toCode" ) ->
             Just (mono (fn [ char ] int))
 
@@ -176,9 +345,6 @@ value m x =
                 "pi" ->
                     Just (mono float)
 
-                "append" ->
-                    Just appendScheme
-
                 "modBy" ->
                     Just (mono (fn [ int, int ] int))
 
@@ -196,6 +362,27 @@ value m x =
 
                 "always" ->
                     Just (anyScheme 2 (fn [ v 1, v 2 ] (v 1)))
+
+                "logBase" ->
+                    Just (mono (fn [ float, float ] float))
+
+                "degrees" ->
+                    Just (mono (fn [ float ] float))
+
+                "radians" ->
+                    Just (mono (fn [ float ] float))
+
+                "turns" ->
+                    Just (mono (fn [ float ] float))
+
+                "fromPolar" ->
+                    Just (mono (fn [ TTuple [ float, float ] ] (TTuple [ float, float ])))
+
+                "toPolar" ->
+                    Just (mono (fn [ TTuple [ float, float ] ] (TTuple [ float, float ])))
+
+                "never" ->
+                    Just (anyScheme 1 (fn [ TCon "Never" [] ] (v 1)))
 
                 _ ->
                     Nothing
@@ -226,6 +413,12 @@ constructor k =
 
         "Nothing" ->
             Just (anyScheme 1 (TCon "Maybe" [ v 1 ]))
+
+        "Ok" ->
+            Just (anyScheme 2 (fn [ v 2 ] (TCon "Result" [ v 1, v 2 ])))
+
+        "Err" ->
+            Just (anyScheme 2 (fn [ v 1 ] (TCon "Result" [ v 1, v 2 ])))
 
         _ ->
             Nothing
@@ -273,3 +466,46 @@ operator op =
 
     else
         Nothing
+
+{-| The names `value` answers unqualified (and as `Basics.`), for the check against Appendix C
+(plans/lean-full-definition/step-07-classify.md, section 6).
+-}
+valueNames : List String
+valueNames =
+    [ "compare"
+    , "min"
+    , "max"
+    , "clamp"
+    , "not"
+    , "xor"
+    , "isNaN"
+    , "isInfinite"
+    , "toFloat"
+    , "round"
+    , "floor"
+    , "ceiling"
+    , "truncate"
+    , "sqrt"
+    , "sin"
+    , "cos"
+    , "tan"
+    , "asin"
+    , "acos"
+    , "atan"
+    , "atan2"
+    , "e"
+    , "pi"
+    , "modBy"
+    , "remainderBy"
+    , "negate"
+    , "abs"
+    , "identity"
+    , "always"
+    , "logBase"
+    , "degrees"
+    , "radians"
+    , "turns"
+    , "fromPolar"
+    , "toPolar"
+    , "never"
+    ]

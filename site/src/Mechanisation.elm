@@ -118,7 +118,9 @@ type alias Generated =
 {-| An `elm-spec` test as the mechanisation sees it: `status` is "translated" (by the translator,
 in the shard `shard`), "hand" (refused by the translator, but translated in part by hand) or
 "refused" (with its `reason`). `current` is false when the test has changed since its translation
-was made.
+was made. A worker test (`kind` "worker", plan step 5) has a `host` ("none" or "echo") and its
+FLAGS text (`Nothing`: absent, so null); `dropped` lists the CHECK-NOT lines its theorem does not
+state, with the reason.
 -}
 type alias Translation =
     { name : String
@@ -130,8 +132,29 @@ type alias Translation =
     , file : String
     , shard : String
     , source : String
+    , sources : List String
     , current : Bool
     , checks : List TranslatedCheck
+    , kind : String
+    , host : Maybe String
+    , flags : Maybe String
+    , native : Bool
+    , dropped : List String
+    , statics : Maybe Statics
+    }
+
+
+{-| The test's theorems of the static semantics (plan step 9: `legal_`, under D11, or `refuse_`) and
+of the end-to-end pipeline (plan step 10: `spec_`, Lean's reduced program is the translator's, and
+`mean_`, the program's meaning by r:p-program); `native` when one of them is proved by
+native_decide.
+-}
+type alias Statics =
+    { legal : Maybe String
+    , refuse : Maybe String
+    , spec : Maybe String
+    , mean : Maybe String
+    , native : Bool
     }
 
 
@@ -393,6 +416,7 @@ translationDecoder =
         |> andMap (Decode.field "file" Decode.string)
         |> andMap (Decode.field "shard" Decode.string)
         |> andMap (Decode.field "source" Decode.string)
+        |> andMap (Decode.oneOf [ Decode.field "sources" (Decode.list Decode.string), Decode.succeed [] ])
         |> andMap (Decode.field "current" Decode.bool)
         |> andMap
             (Decode.field "checks"
@@ -407,4 +431,24 @@ translationDecoder =
                         |> andMap (Decode.field "skipped" (Decode.nullable Decode.string))
                     )
                 )
+            )
+        |> andMap (Decode.oneOf [ Decode.field "kind" Decode.string, Decode.succeed "view" ])
+        |> andMap (Decode.oneOf [ Decode.field "host" (Decode.nullable Decode.string), Decode.succeed Nothing ])
+        |> andMap (Decode.oneOf [ Decode.field "flags" (Decode.nullable Decode.string), Decode.succeed Nothing ])
+        |> andMap (Decode.oneOf [ Decode.field "native" Decode.bool, Decode.succeed False ])
+        |> andMap (Decode.oneOf [ Decode.field "dropped" (Decode.list Decode.string), Decode.succeed [] ])
+        |> andMap
+            (Decode.oneOf
+                [ Decode.field "statics"
+                    (Decode.nullable
+                        (Decode.succeed Statics
+                            |> andMap (Decode.field "legal" (Decode.nullable Decode.string))
+                            |> andMap (Decode.field "refuse" (Decode.nullable Decode.string))
+                            |> andMap (Decode.field "spec" (Decode.nullable Decode.string))
+                            |> andMap (Decode.field "mean" (Decode.nullable Decode.string))
+                            |> andMap (Decode.field "native" Decode.bool)
+                        )
+                    )
+                , Decode.succeed Nothing
+                ]
             )

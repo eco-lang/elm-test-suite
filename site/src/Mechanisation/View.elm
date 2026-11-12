@@ -84,13 +84,19 @@ listPage idx mech =
         [ crumbs idx True
         , Html.h1 [ Attr.class "sd-chapter-title" ] [ Html.text title ]
         , Html.p [ Attr.class "sd-lede" ]
-            [ Html.text ("The dynamic semantics of the Core, all " ++ String.fromInt mech.rules ++ " rules of ")
+            [ Html.text ("The dynamic semantics, " ++ String.fromInt mech.rules ++ " rules in all, of the Core (")
             , Html.a [ Attr.href (Render.chapterHref "dynamic-core" "") ] [ Html.text "Chapter 6" ]
-            , Html.text ", and the arithmetic, equality, order and Boolean part of "
+            , Html.text "), of modules ("
+            , Html.a [ Attr.href (Render.chapterHref "dynamic-modules" "") ] [ Html.text "Chapter 7" ]
+            , Html.text "), of tasks, commands, subscriptions and ports ("
+            , Html.a [ Attr.href (Render.chapterHref "effects" "") ] [ Html.text "Chapter 8" ]
+            , Html.text ") and of the modules of a program ("
+            , Html.a [ Attr.href (Render.chapterHref "programs" "") ] [ Html.text "Chapter 9" ]
+            , Html.text "), and the arithmetic, equality, order, Boolean, conversion, append and character part of "
             , Html.em [] [ Html.text "APPLY" ]
-            , Html.text (" are encoded in the proof assistant Lean 4 (" ++ mech.lean ++ "), one inductive relation per judgement and one constructor per rule. An evaluator for the same fragment is proved sound: whatever value it computes, the rules derive (")
+            , Html.text (" are encoded in the proof assistant Lean 4 (" ++ mech.lean ++ "), one inductive relation per judgement and one constructor per rule. An evaluator for the same fragment is proved sound and complete: whatever value it computes, the rules derive (")
             , Html.a [ Attr.href (proofHref "evExp_sound") ] [ Html.code [] [ Html.text "evExp_sound" ] ]
-            , Html.text "). Every theorem below is checked by Lean each time the project is built, and each has a page with its statement and proof."
+            , Html.text "), and every derivation is found by it. Every theorem below is checked by Lean each time the project is built, and each has a page with its statement and proof."
             ]
         , Html.p [ Attr.class "sd-p" ]
             [ Html.text ("The evaluator is run on the test programs of this suite, translated into Lean by a program from their Elm source: " ++ String.fromInt (translatedCount mech) ++ " of the " ++ String.fromInt mech.coverage.total ++ " tests tagged elm-spec")
@@ -666,6 +672,82 @@ generatedRow c =
 -- A TEST'S TRANSLATION
 
 
+{-| The section's paragraphs, then the paragraph on the test's static and end-to-end theorems. -}
+staticsAfter : Translation -> List (Html msg) -> List (Html msg)
+staticsAfter t paras =
+    paras ++ staticsParas t
+
+
+{-| What plans steps 9 and 10 prove about the test: its static theorem (`legal_`, under D11, or
+`refuse_`, for every derivation) and, for a translated test, its end-to-end theorems, which retire
+the trust in the translator's elaboration ([elab]) for that test. The theorems are in
+`StandardElmMech/Certs/`, written by `lake exe certify`.
+-}
+staticsParas : Translation -> List (Html msg)
+staticsParas t =
+    let
+        code text =
+            Html.code [] [ Html.text text ]
+
+        nativeNote =
+            case t.statics of
+                Just s ->
+                    if s.native then
+                        " One of these theorems is proved by native_decide ([native])."
+
+                    else
+                        ""
+
+                Nothing ->
+                    ""
+    in
+    case t.statics of
+        Nothing ->
+            []
+
+        Just s ->
+            [ Html.p [ Attr.class "ts-small" ]
+                (List.concat
+                    [ case s.legal of
+                        Just n ->
+                            [ Html.text "Static semantics (Chapters 4, 5 and 9): "
+                            , code n
+                            , Html.text " states that the program as written is legal, if the derivation Lean's inference finds is principal ([principal]): it meets the syntactic restrictions, and each module elaborates by a derivation the proved checker accepts, meeting the further restrictions, with a type of main Chapter 9 allows. "
+                            ]
+
+                        Nothing ->
+                            []
+                    , case s.refuse of
+                        Just n ->
+                            [ Html.text "Static semantics (Chapters 4, 5 and 9, and the syntactic restrictions): "
+                            , code n
+                            , Html.text " states that the program is not legal, for every derivation, with no hypothesis about principality. "
+                            ]
+
+                        Nothing ->
+                            []
+                    , case s.spec of
+                        Just n ->
+                            [ Html.text "End to end: "
+                            , code n
+                            , Html.text " states that Lean computes the reduced program above from the source (derived forms, inference, the proved checker, number specialisation, type erasure), so the theorems about it do not trust the translator's elaboration ([elab]); "
+                            ]
+                                ++ (case s.mean of
+                                        Just m ->
+                                            [ code m, Html.text " states that the program has a meaning by r:p-program, with both premises, if the inferred derivation is principal ([principal])." ]
+
+                                        Nothing ->
+                                            [ Html.text "the program has no meaning (it stops at Debug.todo)." ]
+                                   )
+
+                        Nothing ->
+                            []
+                    , [ Html.text nativeNote ]
+                    ]
+                )
+            ]
+
+
 {-| The section of an `elm-spec` test's page about its Lean translation: the translation with what
 became of each check, or why the test is not translated.
 -}
@@ -679,7 +761,8 @@ translationSection t =
             List.filter (\c -> c.checkLine /= Just c.expected) t.checks
     in
     Html.section [ Attr.class "ts-section", Attr.id "lean" ]
-        (Html.h2 [ Attr.class "ts-h2" ] [ Html.text "Lean translation" ]
+        (staticsAfter t <|
+            Html.h2 [ Attr.class "ts-h2" ] [ Html.text "Lean translation" ]
             :: (case t.status of
                     "refused" ->
                         [ Html.p [ Attr.class "ts-small" ]
@@ -703,15 +786,66 @@ translationSection t =
                                 , Html.text "."
                                 ]
 
+                             else if t.kind == "worker" then
+                                [ Html.text "This worker program is translated into Lean by the translator of the "
+                                , Html.a [ Attr.href listHref ] [ Html.text "Lean mechanisation" ]
+                                , Html.text " of "
+                                , Html.em [] [ Html.text "A Standard Definition of Elm?" ]
+                                , Html.text (" (" ++ t.def ++ ", in " ++ t.file ++ "). Lean evaluates its modules by the rules of Chapter 7, starts it by r:p-init with ")
+                                , case t.flags of
+                                    Just f ->
+                                        Html.span [] [ Html.text "the flags ", code f ]
+
+                                    Nothing ->
+                                        Html.text "no flags (null, A72)"
+                                , Html.text
+                                    (", and runs it by the transitions of Chapter 9 under "
+                                        ++ (if t.host == Just "echo" then
+                                                "the test runner's echo host, which sends every value delivered on echoOut back on echoIn, in order"
+
+                                            else
+                                                "a host that sends nothing"
+                                           )
+                                        ++ ". Its checks become one "
+                                    )
+                                , Html.a [ Attr.href (proofHref Mechanisation.generatedSlug) ] [ Html.text "generated theorem" ]
+                                , Html.text
+                                    (": some execution the book allows, under that host, has a log (the modules', then the start's, then each step's) that meets every check. The theorem trusts the parser and the translator's elaboration ([parse] [elab]), the test basis ([harness]) and the parameters of the basis ([params])"
+                                        ++ (if t.native then
+                                                ", and is proved by native_decide ([native])."
+
+                                            else
+                                                ", and is proved by the kernel."
+                                           )
+                                    )
+                                ]
+                                    ++ List.concatMap
+                                        (\d ->
+                                            [ Html.text " Not stated: ", code d, Html.text "." ]
+                                        )
+                                        t.dropped
+
                              else
                                 [ Html.text "This program is translated into Lean by the translator of the "
                                 , Html.a [ Attr.href listHref ] [ Html.text "Lean mechanisation" ]
                                 , Html.text " of "
                                 , Html.em [] [ Html.text "A Standard Definition of Elm?" ]
-                                , Html.text (": a Lean syntax tree of the bare Core, with every integer constant at Int or Float by number specialisation, and the expected values copied from its CHECK lines (" ++ t.def ++ ", in " ++ t.file ++ "). Lean's evaluator runs the translation, and each check whose value the kernel can compare becomes a ")
+                                , Html.text (": the program it is, its modules in the reduced syntax of Chapter 7 with every integer constant at Int or Float by number specialisation, and its CHECK lines as written (" ++ t.def ++ ", in " ++ t.file ++ "). Lean's evaluator runs the program by the rules of Chapters 7 and 9, and its "
+                                    ++ (if List.length t.sources > 1 then "modules' " else "")
+                                    ++ "checks become one "
+                                  )
                                 , Html.a [ Attr.href (proofHref Mechanisation.generatedSlug) ] [ Html.text "generated theorem" ]
-                                , Html.text " that the book's rules derive that value."
+                                , Html.text ": some derivation of the program has a log that meets every check, or, for a test that stops at Debug.todo, the program has no meaning."
                                 ]
+                                    ++ (if List.length t.sources > 1 then
+                                            [ Html.text " Its modules, in program order: "
+                                            , Html.text (String.join ", " t.sources)
+                                            , Html.text "."
+                                            ]
+
+                                        else
+                                            []
+                                       )
                             )
                         , if t.current && List.isEmpty drifted then
                             Html.text ""
@@ -719,7 +853,7 @@ translationSection t =
                           else
                             Html.p [ Attr.class "ts-small sd-lean-drift" ]
                                 [ Html.strong [] [ Html.text "Out of date. " ]
-                                , Html.text "The test has changed since this translation was made; the translation, and so its theorems, describe the test as it was until the mechanisation is rebuilt."
+                                , Html.text "The test, or a module it imports, has changed since this translation was made; the translation, and so its theorems, describe the program as it was until the mechanisation is rebuilt."
                                 ]
                         , Html.div [ Attr.class "sd-table-wrap" ]
                             [ Html.table [ Attr.class "ts-table" ]

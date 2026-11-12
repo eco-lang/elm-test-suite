@@ -35,12 +35,14 @@ def E0base : Env := .mk [] VE0
 def Env.plus (E : Env) (QE : List (String × Env)) (VE : ValEnv) : Env :=
   .mk (fmPlus E.QE QE) (fmPlus E.VE VE)
 
-/-- The hidden variables the operators stand for (fig:dynamic-basis-operators). -/
+/-- The hidden variables the operators stand for (fig:dynamic-basis-operators), `append` (of `++`)
+    included: Basics declares them but does not expose them (appendix-static-basis.tex, the hidden
+    identifiers). -/
 def hiddenOpVars : ValEnv :=
   [ ("add", bas .add), ("sub", bas .sub), ("mul", bas .mul), ("fdiv", bas .fdiv),
     ("idiv", bas .idiv), ("pow", bas .pow), ("eq", bas .eq), ("neq", bas .neq),
     ("lt", bas .lt), ("gt", bas .gt), ("le", bas .le), ("ge", bas .ge),
-    ("and", bas .and), ("or", bas .or) ]
+    ("and", bas .and), ("or", bas .or), ("append", bas .append) ]
 
 /-- The basic values and constructors of Basics in the fragment
     (fig:dynamic-basis-basics); min, max (A48) and clamp (A49) are basic
@@ -56,15 +58,19 @@ def VE_BasicsKernel : ValEnv :=
     ("ceiling", bas .ceiling), ("truncate", bas .truncate),
     ("sqrt", bas .sqrt), ("sin", bas .sin), ("cos", bas .cos), ("tan", bas .tan),
     ("asin", bas .asin), ("acos", bas .acos), ("atan", bas .atan), ("atan2", bas .atan2),
-    ("e", .sv (.float fE)), ("pi", .sv (.float fPi)),
-    ("append", bas .append) ]
+    ("e", .sv (.float fE)), ("pi", .sv (.float fPi)) ]
 
-def VE_K : ValEnv := VE_BasicsKernel ++ hiddenOpVars
+/-- The environment of the texts of Basics: its basic values, the hidden variables of the operators
+    and the hidden constructor JustOneMore of Never, unqualified and under the qualifier Basics, and
+    the kernel module Elm.Kernel.Basics, which the text of logBase uses (appendix-dynamic-basis.tex,
+    sec:appendix-dynamic-basis-elm). -/
+def VE_K : ValEnv := VE_BasicsKernel ++ hiddenOpVars ++ [("JustOneMore", conv conJustOneMore)]
 
-def E_K : Env := E0base.plus [("Basics", .mk [] VE_K)] VE_K
+def E_K : Env :=
+  E0base.plus [("Elm.Kernel.Basics", .mk [] [("log", bas .kernelLog)]), ("Basics", .mk [] VE_K)] VE_K
 
-/-- The texts of fig:dynamic-basis-elm in the fragment, after their derived
-    forms. `composeL`, `composeR`, `apR` and `apL` are hidden variables. -/
+/-- The texts of fig:dynamic-basis-elm that are not recursive, after their derived forms and number
+    specialisation. `composeL`, `composeR`, `apR` and `apL` are hidden variables. -/
 def elmTexts : List Def :=
   [ -- abs quantifies a number variable: its default copy is at Float (sec:dynamic-core-numbers,
     -- A27), with its constant 0 a float, and number specialisation also makes its copy at Int
@@ -75,7 +81,29 @@ def elmTexts : List Def :=
     .fn "apR" [pv "x", pv "f"] (ap (v "f") [v "x"]),
     .fn "apL" [pv "f", pv "x"] (ap (v "f") [v "x"]),
     .fn "identity" [pv "x"] (v "x"),
-    .fn "always" [pv "a", pw] (v "a") ]
+    .fn "always" [pv "a", pw] (v "a"),
+    .fn "logBase" [pv "base", pv "number"]
+      (ap (v "fdiv") [ap (qv "Elm.Kernel.Basics" "log") [v "number"],
+                      ap (qv "Elm.Kernel.Basics" "log") [v "base"]]),
+    .fn "radians" [pv "angleInRadians"] (v "angleInRadians"),
+    -- the constants 180 and 2 of degrees and turns are at Float (sec:appendix-dynamic-basis-elm)
+    .fn "degrees" [pv "angleInDegrees"]
+      (ap (v "fdiv") [ap (v "mul") [v "angleInDegrees", v "pi"], .atexp (.scon (.intF 180))]),
+    .fn "turns" [pv "angleInTurns"]
+      (ap (v "mul") [ap (v "mul") [.atexp (.scon (.intF 2)), v "pi"], v "angleInTurns"]),
+    .fn "fromPolar" [ptup2 (P (pv "radius")) (P (pv "theta"))]
+      (tup2 (ap (v "mul") [v "radius", ap (v "cos") [v "theta"]])
+            (ap (v "mul") [v "radius", ap (v "sin") [v "theta"]])),
+    .fn "toPolar" [ptup2 (P (pv "x")) (P (pv "y"))]
+      (tup2 (ap (v "sqrt") [ap (v "add") [ap (v "mul") [v "x", v "x"], ap (v "mul") [v "y", v "y"]]])
+            (ap (v "atan2") [v "y", v "x"])) ]
+
+/-- The text of `never`: `never (JustOneMore nvr) = never nvr`, recursive. -/
+def neverPat : AtPat := PA (pcon "JustOneMore" [pv "nvr"])
+def neverBody : Exp := ap (v "never") [v "nvr"]
+
+/-- Its value in E_K, by r:d-dec-rec: Rec of the closure. -/
+def neverValue : Val := .closure neverPat neverBody E_K [("never", .closure neverPat neverBody E_K [])]
 
 /-- The value a text `var atpat1 ... atpatn = exp` (n >= 1) has in E_K:
     the closure (atpat1, \atpat2 ... atpatn -> exp, E_K, ∅). -/
@@ -83,7 +111,7 @@ def elmTextValue : Def → Option (Var × Val)
   | .fn x (p :: ps) e => some (x, .closure p (lams ps e) E_K [])
   | _ => none
 
-def VE_elm : ValEnv := elmTexts.filterMap elmTextValue
+def VE_elm : ValEnv := elmTexts.filterMap elmTextValue ++ [("never", neverValue)]
 
 /-- OT_dyn: each operator of the fragment to the value of the identifier it
     stands for (fig:dynamic-basis-operators). `++` is `append`, which Basics
@@ -97,7 +125,7 @@ def OTdyn (o : Op) : Option Val :=
   | "/" => fmLookup hiddenOpVars "fdiv"
   | "//" => fmLookup hiddenOpVars "idiv"
   | "^" => fmLookup hiddenOpVars "pow"
-  | "++" => fmLookup VE_BasicsKernel "append"
+  | "++" => fmLookup hiddenOpVars "append"
   | "==" => fmLookup hiddenOpVars "eq"
   | "/=" => fmLookup hiddenOpVars "neq"
   | "<" => fmLookup hiddenOpVars "lt"

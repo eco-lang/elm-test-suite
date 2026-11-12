@@ -1,0 +1,4247 @@
+{
+  "generatedBy": "definition/tools/src/ExtractStaticBasis.elm",
+  "sources": [
+    {
+      "path": "definition/tex/appendix-static-basis.tex",
+      "sha256": "09c213128b897d23e2f5c1fa47ea81d7394366b97ea48f77e132ff5a1f239bcf"
+    },
+    {
+      "path": "definition/tex/syntax-modules.tex",
+      "sha256": "bdb7318aa4cd90e4d9b3bfe73a52a27ac182767f0f0764c37892361cc5293608"
+    }
+  ],
+  "typeNames": [
+    {
+      "key": "Int",
+      "macro": "\\tInt",
+      "arity": 0,
+      "boundTo": [
+        "Basics.Int"
+      ],
+      "kind": "builtin"
+    },
+    {
+      "key": "Float",
+      "macro": "\\tFloat",
+      "arity": 0,
+      "boundTo": [
+        "Basics.Float"
+      ],
+      "kind": "builtin"
+    },
+    {
+      "key": "Char",
+      "macro": "\\tChar",
+      "arity": 0,
+      "boundTo": [
+        "Char.Char"
+      ],
+      "kind": "builtin"
+    },
+    {
+      "key": "String",
+      "macro": "\\tString",
+      "arity": 0,
+      "boundTo": [
+        "String.String"
+      ],
+      "kind": "builtin"
+    },
+    {
+      "key": "Unit",
+      "macro": "\\tunit",
+      "arity": 0,
+      "boundTo": [],
+      "kind": "builtin"
+    },
+    {
+      "key": "List",
+      "macro": "\\tList",
+      "arity": 1,
+      "boundTo": [
+        "List"
+      ],
+      "kind": "builtin"
+    },
+    {
+      "key": "Tuple2",
+      "macro": "\\tTuple{2}",
+      "arity": 2,
+      "boundTo": [],
+      "kind": "builtin"
+    },
+    {
+      "key": "Tuple3",
+      "macro": "\\tTuple{3}",
+      "arity": 3,
+      "boundTo": [],
+      "kind": "builtin"
+    },
+    {
+      "key": "Bool",
+      "macro": "\\tBool",
+      "arity": 0,
+      "boundTo": [
+        "Basics.Bool"
+      ],
+      "kind": "custom"
+    },
+    {
+      "key": "Order",
+      "macro": "\\sbtOrder",
+      "arity": 0,
+      "boundTo": [
+        "Basics.Order"
+      ],
+      "kind": "custom"
+    },
+    {
+      "key": "Never",
+      "macro": "\\sbtNever",
+      "arity": 0,
+      "boundTo": [
+        "Basics.Never"
+      ],
+      "kind": "custom-closed"
+    },
+    {
+      "key": "Maybe",
+      "macro": "\\tMaybe",
+      "arity": 1,
+      "boundTo": [
+        "Maybe.Maybe"
+      ],
+      "kind": "custom"
+    },
+    {
+      "key": "Result",
+      "macro": "\\sbtResult",
+      "arity": 2,
+      "boundTo": [
+        "Result.Result"
+      ],
+      "kind": "custom"
+    },
+    {
+      "key": "Array",
+      "macro": "\\tArray",
+      "arity": 1,
+      "boundTo": [
+        "Array.Array"
+      ],
+      "kind": "abstract"
+    },
+    {
+      "key": "Bytes",
+      "macro": "\\tBytes",
+      "arity": 0,
+      "boundTo": [
+        "Bytes.Bytes"
+      ],
+      "kind": "abstract"
+    },
+    {
+      "key": "Value",
+      "macro": "\\tValue",
+      "arity": 0,
+      "boundTo": [
+        "Json.Encode.Value",
+        "Json.Decode.Value"
+      ],
+      "kind": "abstract"
+    },
+    {
+      "key": "Cmd",
+      "macro": "\\sbtCmd",
+      "arity": 1,
+      "boundTo": [
+        "Platform.Cmd.Cmd"
+      ],
+      "kind": "abstract"
+    },
+    {
+      "key": "Sub",
+      "macro": "\\sbtSub",
+      "arity": 1,
+      "boundTo": [
+        "Platform.Sub.Sub"
+      ],
+      "kind": "abstract"
+    },
+    {
+      "key": "Task",
+      "macro": "\\sbtTask",
+      "arity": 2,
+      "boundTo": [
+        "Platform.Task",
+        "Task.Task"
+      ],
+      "kind": "abstract"
+    },
+    {
+      "key": "ProcessId",
+      "macro": "\\sbtProcessId",
+      "arity": 0,
+      "boundTo": [
+        "Platform.ProcessId",
+        "Process.Id"
+      ],
+      "kind": "abstract"
+    },
+    {
+      "key": "Program",
+      "macro": "\\sbtProgram",
+      "arity": 3,
+      "boundTo": [
+        "Platform.Program"
+      ],
+      "kind": "abstract"
+    },
+    {
+      "key": "Node",
+      "macro": "\\sbtNode",
+      "arity": 1,
+      "boundTo": [
+        "VirtualDom.Node",
+        "Html.Html"
+      ],
+      "kind": "abstract"
+    }
+  ],
+  "E0": {
+    "TE": [
+      {
+        "tycon": "List",
+        "label": "b:List",
+        "fcn": {
+          "params": [
+            "a1"
+          ],
+          "body": {
+            "con": "List",
+            "args": [
+              {
+                "var": "a1"
+              }
+            ]
+          }
+        },
+        "VE": [
+          {
+            "name": "[]",
+            "label": "b:List",
+            "scheme": {
+              "forall": [
+                "a"
+              ],
+              "body": {
+                "con": "List",
+                "args": [
+                  {
+                    "var": "a"
+                  }
+                ]
+              }
+            },
+            "status": "c"
+          },
+          {
+            "name": "::",
+            "label": "b:List",
+            "scheme": {
+              "forall": [
+                "a"
+              ],
+              "body": {
+                "fn": [
+                  {
+                    "var": "a"
+                  },
+                  {
+                    "fn": [
+                      {
+                        "con": "List",
+                        "args": [
+                          {
+                            "var": "a"
+                          }
+                        ]
+                      },
+                      {
+                        "con": "List",
+                        "args": [
+                          {
+                            "var": "a"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "status": "c"
+          }
+        ]
+      }
+    ],
+    "VE": [
+      {
+        "name": "[]",
+        "label": "b:List",
+        "scheme": {
+          "forall": [
+            "a"
+          ],
+          "body": {
+            "con": "List",
+            "args": [
+              {
+                "var": "a"
+              }
+            ]
+          }
+        },
+        "status": "c"
+      },
+      {
+        "name": "::",
+        "label": "b:List",
+        "scheme": {
+          "forall": [
+            "a"
+          ],
+          "body": {
+            "fn": [
+              {
+                "var": "a"
+              },
+              {
+                "fn": [
+                  {
+                    "con": "List",
+                    "args": [
+                      {
+                        "var": "a"
+                      }
+                    ]
+                  },
+                  {
+                    "con": "List",
+                    "args": [
+                      {
+                        "var": "a"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "status": "c"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "module": "Basics",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "Int",
+          "label": "b:Basics.Int",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "Int",
+              "args": []
+            }
+          },
+          "VE": []
+        },
+        {
+          "tycon": "Float",
+          "label": "b:Basics.Float",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "Float",
+              "args": []
+            }
+          },
+          "VE": []
+        },
+        {
+          "tycon": "Bool",
+          "label": "b:Basics.Bool",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "Bool",
+              "args": []
+            }
+          },
+          "VE": [
+            {
+              "name": "True",
+              "label": null,
+              "scheme": {
+                "forall": [],
+                "body": {
+                  "con": "Bool",
+                  "args": []
+                }
+              },
+              "status": "c"
+            },
+            {
+              "name": "False",
+              "label": null,
+              "scheme": {
+                "forall": [],
+                "body": {
+                  "con": "Bool",
+                  "args": []
+                }
+              },
+              "status": "c"
+            }
+          ]
+        },
+        {
+          "tycon": "Order",
+          "label": "b:Basics.Order",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "Order",
+              "args": []
+            }
+          },
+          "VE": [
+            {
+              "name": "LT",
+              "label": null,
+              "scheme": {
+                "forall": [],
+                "body": {
+                  "con": "Order",
+                  "args": []
+                }
+              },
+              "status": "c"
+            },
+            {
+              "name": "EQ",
+              "label": null,
+              "scheme": {
+                "forall": [],
+                "body": {
+                  "con": "Order",
+                  "args": []
+                }
+              },
+              "status": "c"
+            },
+            {
+              "name": "GT",
+              "label": null,
+              "scheme": {
+                "forall": [],
+                "body": {
+                  "con": "Order",
+                  "args": []
+                }
+              },
+              "status": "c"
+            }
+          ]
+        },
+        {
+          "tycon": "Never",
+          "label": "b:Basics.Never",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "Never",
+              "args": []
+            }
+          },
+          "VE": [
+            {
+              "name": "JustOneMore",
+              "label": null,
+              "scheme": {
+                "forall": [],
+                "body": {
+                  "fn": [
+                    {
+                      "con": "Never",
+                      "args": []
+                    },
+                    {
+                      "con": "Never",
+                      "args": []
+                    }
+                  ]
+                }
+              },
+              "status": "c"
+            }
+          ]
+        }
+      ],
+      "VE": [
+        {
+          "name": "True",
+          "label": "b:Basics.Bool",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "con": "Bool",
+              "args": []
+            }
+          },
+          "status": "c"
+        },
+        {
+          "name": "False",
+          "label": "b:Basics.Bool",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "con": "Bool",
+              "args": []
+            }
+          },
+          "status": "c"
+        },
+        {
+          "name": "LT",
+          "label": "b:Basics.Order",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "con": "Order",
+              "args": []
+            }
+          },
+          "status": "c"
+        },
+        {
+          "name": "EQ",
+          "label": "b:Basics.Order",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "con": "Order",
+              "args": []
+            }
+          },
+          "status": "c"
+        },
+        {
+          "name": "GT",
+          "label": "b:Basics.Order",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "con": "Order",
+              "args": []
+            }
+          },
+          "status": "c"
+        },
+        {
+          "name": "toFloat",
+          "label": "b:Basics.toFloat",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Int",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "round",
+          "label": "b:Basics.round",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Int",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "floor",
+          "label": "b:Basics.floor",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Int",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "ceiling",
+          "label": "b:Basics.ceiling",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Int",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "truncate",
+          "label": "b:Basics.truncate",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Int",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "max",
+          "label": "b:Basics.max",
+          "scheme": {
+            "forall": [
+              "comparable"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "comparable"
+                },
+                {
+                  "fn": [
+                    {
+                      "var": "comparable"
+                    },
+                    {
+                      "var": "comparable"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "min",
+          "label": "b:Basics.min",
+          "scheme": {
+            "forall": [
+              "comparable"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "comparable"
+                },
+                {
+                  "fn": [
+                    {
+                      "var": "comparable"
+                    },
+                    {
+                      "var": "comparable"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "compare",
+          "label": "b:Basics.compare",
+          "scheme": {
+            "forall": [
+              "comparable"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "comparable"
+                },
+                {
+                  "fn": [
+                    {
+                      "var": "comparable"
+                    },
+                    {
+                      "con": "Order",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "not",
+          "label": "b:Basics.not",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Bool",
+                  "args": []
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "xor",
+          "label": "b:Basics.xor",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Bool",
+                  "args": []
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Bool",
+                      "args": []
+                    },
+                    {
+                      "con": "Bool",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "modBy",
+          "label": "b:Basics.modBy",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Int",
+                  "args": []
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Int",
+                      "args": []
+                    },
+                    {
+                      "con": "Int",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "remainderBy",
+          "label": "b:Basics.remainderBy",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Int",
+                  "args": []
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Int",
+                      "args": []
+                    },
+                    {
+                      "con": "Int",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "negate",
+          "label": "b:Basics.negate",
+          "scheme": {
+            "forall": [
+              "number"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "number"
+                },
+                {
+                  "var": "number"
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "abs",
+          "label": "b:Basics.abs",
+          "scheme": {
+            "forall": [
+              "number"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "number"
+                },
+                {
+                  "var": "number"
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "clamp",
+          "label": "b:Basics.clamp",
+          "scheme": {
+            "forall": [
+              "number"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "number"
+                },
+                {
+                  "fn": [
+                    {
+                      "var": "number"
+                    },
+                    {
+                      "fn": [
+                        {
+                          "var": "number"
+                        },
+                        {
+                          "var": "number"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "sqrt",
+          "label": "b:Basics.sqrt",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "logBase",
+          "label": "b:Basics.logBase",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Float",
+                      "args": []
+                    },
+                    {
+                      "con": "Float",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "e",
+          "label": "b:Basics.e",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "con": "Float",
+              "args": []
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "pi",
+          "label": "b:Basics.pi",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "con": "Float",
+              "args": []
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "degrees",
+          "label": "b:Basics.degrees",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "radians",
+          "label": "b:Basics.radians",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "turns",
+          "label": "b:Basics.turns",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "cos",
+          "label": "b:Basics.cos",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "sin",
+          "label": "b:Basics.sin",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "tan",
+          "label": "b:Basics.tan",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "acos",
+          "label": "b:Basics.acos",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "asin",
+          "label": "b:Basics.asin",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "atan",
+          "label": "b:Basics.atan",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "atan2",
+          "label": "b:Basics.atan2",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Float",
+                      "args": []
+                    },
+                    {
+                      "con": "Float",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "toPolar",
+          "label": "b:Basics.toPolar",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Tuple2",
+                  "args": [
+                    {
+                      "con": "Float",
+                      "args": []
+                    },
+                    {
+                      "con": "Float",
+                      "args": []
+                    }
+                  ]
+                },
+                {
+                  "con": "Tuple2",
+                  "args": [
+                    {
+                      "con": "Float",
+                      "args": []
+                    },
+                    {
+                      "con": "Float",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "fromPolar",
+          "label": "b:Basics.fromPolar",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Tuple2",
+                  "args": [
+                    {
+                      "con": "Float",
+                      "args": []
+                    },
+                    {
+                      "con": "Float",
+                      "args": []
+                    }
+                  ]
+                },
+                {
+                  "con": "Tuple2",
+                  "args": [
+                    {
+                      "con": "Float",
+                      "args": []
+                    },
+                    {
+                      "con": "Float",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "isNaN",
+          "label": "b:Basics.isNaN",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "isInfinite",
+          "label": "b:Basics.isInfinite",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "identity",
+          "label": "b:Basics.identity",
+          "scheme": {
+            "forall": [
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "var": "a"
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "always",
+          "label": "b:Basics.always",
+          "scheme": {
+            "forall": [
+              "a",
+              "b"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "fn": [
+                    {
+                      "var": "b"
+                    },
+                    {
+                      "var": "a"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "never",
+          "label": "b:Basics.never",
+          "scheme": {
+            "forall": [
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "con": "Never",
+                  "args": []
+                },
+                {
+                  "var": "a"
+                }
+              ]
+            }
+          },
+          "status": "v"
+        }
+      ],
+      "ops": [
+        "<<",
+        ">>",
+        "^",
+        "*",
+        "/",
+        "//",
+        "+",
+        "-",
+        "++",
+        "==",
+        "/=",
+        "<",
+        ">",
+        "<=",
+        ">=",
+        "&&",
+        "||",
+        "|>",
+        "<|"
+      ]
+    },
+    {
+      "module": "List",
+      "library": "elm/core",
+      "TE": [],
+      "VE": [],
+      "ops": [
+        "::"
+      ]
+    },
+    {
+      "module": "Maybe",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "Maybe",
+          "label": "b:Maybe.Maybe",
+          "fcn": {
+            "params": [
+              "a1"
+            ],
+            "body": {
+              "con": "Maybe",
+              "args": [
+                {
+                  "var": "a1"
+                }
+              ]
+            }
+          },
+          "VE": [
+            {
+              "name": "Just",
+              "label": null,
+              "scheme": {
+                "forall": [
+                  "a"
+                ],
+                "body": {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "con": "Maybe",
+                      "args": [
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "status": "c"
+            },
+            {
+              "name": "Nothing",
+              "label": null,
+              "scheme": {
+                "forall": [
+                  "a"
+                ],
+                "body": {
+                  "con": "Maybe",
+                  "args": [
+                    {
+                      "var": "a"
+                    }
+                  ]
+                }
+              },
+              "status": "c"
+            }
+          ]
+        }
+      ],
+      "VE": [
+        {
+          "name": "Just",
+          "label": "b:Maybe.Maybe",
+          "scheme": {
+            "forall": [
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "con": "Maybe",
+                  "args": [
+                    {
+                      "var": "a"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "c"
+        },
+        {
+          "name": "Nothing",
+          "label": "b:Maybe.Maybe",
+          "scheme": {
+            "forall": [
+              "a"
+            ],
+            "body": {
+              "con": "Maybe",
+              "args": [
+                {
+                  "var": "a"
+                }
+              ]
+            }
+          },
+          "status": "c"
+        }
+      ],
+      "ops": []
+    },
+    {
+      "module": "Result",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "Result",
+          "label": "b:Result.Result",
+          "fcn": {
+            "params": [
+              "a1",
+              "a2"
+            ],
+            "body": {
+              "con": "Result",
+              "args": [
+                {
+                  "var": "a1"
+                },
+                {
+                  "var": "a2"
+                }
+              ]
+            }
+          },
+          "VE": [
+            {
+              "name": "Ok",
+              "label": null,
+              "scheme": {
+                "forall": [
+                  "x",
+                  "a"
+                ],
+                "body": {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "con": "Result",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "status": "c"
+            },
+            {
+              "name": "Err",
+              "label": null,
+              "scheme": {
+                "forall": [
+                  "x",
+                  "a"
+                ],
+                "body": {
+                  "fn": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "con": "Result",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "status": "c"
+            }
+          ]
+        }
+      ],
+      "VE": [
+        {
+          "name": "Ok",
+          "label": "b:Result.Result",
+          "scheme": {
+            "forall": [
+              "x",
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "con": "Result",
+                  "args": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "var": "a"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "c"
+        },
+        {
+          "name": "Err",
+          "label": "b:Result.Result",
+          "scheme": {
+            "forall": [
+              "x",
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "x"
+                },
+                {
+                  "con": "Result",
+                  "args": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "var": "a"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "c"
+        }
+      ],
+      "ops": []
+    },
+    {
+      "module": "String",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "String",
+          "label": "b:String.String",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "String",
+              "args": []
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [],
+      "ops": []
+    },
+    {
+      "module": "Char",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "Char",
+          "label": "b:Char.Char",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "Char",
+              "args": []
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [
+        {
+          "name": "toCode",
+          "label": "b:Char.toCode",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Char",
+                  "args": []
+                },
+                {
+                  "con": "Int",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "fromCode",
+          "label": "b:Char.fromCode",
+          "scheme": {
+            "forall": [],
+            "body": {
+              "fn": [
+                {
+                  "con": "Int",
+                  "args": []
+                },
+                {
+                  "con": "Char",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        }
+      ],
+      "ops": []
+    },
+    {
+      "module": "Tuple",
+      "library": "elm/core",
+      "TE": [],
+      "VE": [],
+      "ops": []
+    },
+    {
+      "module": "Array",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "Array",
+          "label": "b:Array.Array",
+          "fcn": {
+            "params": [
+              "a1"
+            ],
+            "body": {
+              "con": "Array",
+              "args": [
+                {
+                  "var": "a1"
+                }
+              ]
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [],
+      "ops": []
+    },
+    {
+      "module": "Bytes",
+      "library": "elm/bytes",
+      "TE": [
+        {
+          "tycon": "Bytes",
+          "label": "b:Bytes.Bytes",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "Bytes",
+              "args": []
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [],
+      "ops": []
+    },
+    {
+      "module": "Debug",
+      "library": "elm/core",
+      "TE": [],
+      "VE": [
+        {
+          "name": "log",
+          "label": "b:Debug.log",
+          "scheme": {
+            "forall": [
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "con": "String",
+                  "args": []
+                },
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "var": "a"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "todo",
+          "label": "b:Debug.todo",
+          "scheme": {
+            "forall": [
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "con": "String",
+                  "args": []
+                },
+                {
+                  "var": "a"
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "toString",
+          "label": "b:Debug.toString",
+          "scheme": {
+            "forall": [
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "con": "String",
+                  "args": []
+                }
+              ]
+            }
+          },
+          "status": "v"
+        }
+      ],
+      "ops": []
+    },
+    {
+      "module": "Platform",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "Program",
+          "label": "b:Platform.Program",
+          "fcn": {
+            "params": [
+              "a1",
+              "a2",
+              "a3"
+            ],
+            "body": {
+              "con": "Program",
+              "args": [
+                {
+                  "var": "a1"
+                },
+                {
+                  "var": "a2"
+                },
+                {
+                  "var": "a3"
+                }
+              ]
+            }
+          },
+          "VE": []
+        },
+        {
+          "tycon": "Task",
+          "label": "b:Platform.Task",
+          "fcn": {
+            "params": [
+              "a1",
+              "a2"
+            ],
+            "body": {
+              "con": "Task",
+              "args": [
+                {
+                  "var": "a1"
+                },
+                {
+                  "var": "a2"
+                }
+              ]
+            }
+          },
+          "VE": []
+        },
+        {
+          "tycon": "ProcessId",
+          "label": "b:Platform.ProcessId",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "ProcessId",
+              "args": []
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [
+        {
+          "name": "worker",
+          "label": "b:Platform.worker",
+          "scheme": {
+            "forall": [
+              "flags",
+              "model",
+              "msg"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "record": [
+                    [
+                      "init",
+                      {
+                        "fn": [
+                          {
+                            "var": "flags"
+                          },
+                          {
+                            "con": "Tuple2",
+                            "args": [
+                              {
+                                "var": "model"
+                              },
+                              {
+                                "con": "Cmd",
+                                "args": [
+                                  {
+                                    "var": "msg"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      "update",
+                      {
+                        "fn": [
+                          {
+                            "var": "msg"
+                          },
+                          {
+                            "fn": [
+                              {
+                                "var": "model"
+                              },
+                              {
+                                "con": "Tuple2",
+                                "args": [
+                                  {
+                                    "var": "model"
+                                  },
+                                  {
+                                    "con": "Cmd",
+                                    "args": [
+                                      {
+                                        "var": "msg"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      "subscriptions",
+                      {
+                        "fn": [
+                          {
+                            "var": "model"
+                          },
+                          {
+                            "con": "Sub",
+                            "args": [
+                              {
+                                "var": "msg"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  ],
+                  "tail": null
+                },
+                {
+                  "con": "Program",
+                  "args": [
+                    {
+                      "var": "flags"
+                    },
+                    {
+                      "var": "model"
+                    },
+                    {
+                      "var": "msg"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        }
+      ],
+      "ops": []
+    },
+    {
+      "module": "Platform.Cmd",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "Cmd",
+          "label": "b:Platform.Cmd.Cmd",
+          "fcn": {
+            "params": [
+              "a1"
+            ],
+            "body": {
+              "con": "Cmd",
+              "args": [
+                {
+                  "var": "a1"
+                }
+              ]
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [
+        {
+          "name": "none",
+          "label": "b:Platform.Cmd.none",
+          "scheme": {
+            "forall": [
+              "msg"
+            ],
+            "body": {
+              "con": "Cmd",
+              "args": [
+                {
+                  "var": "msg"
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "batch",
+          "label": "b:Platform.Cmd.batch",
+          "scheme": {
+            "forall": [
+              "msg"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "con": "List",
+                  "args": [
+                    {
+                      "con": "Cmd",
+                      "args": [
+                        {
+                          "var": "msg"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "con": "Cmd",
+                  "args": [
+                    {
+                      "var": "msg"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "map",
+          "label": "b:Platform.Cmd.map",
+          "scheme": {
+            "forall": [
+              "a",
+              "msg"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "var": "msg"
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Cmd",
+                      "args": [
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "con": "Cmd",
+                      "args": [
+                        {
+                          "var": "msg"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        }
+      ],
+      "ops": []
+    },
+    {
+      "module": "Platform.Sub",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "Sub",
+          "label": "b:Platform.Sub.Sub",
+          "fcn": {
+            "params": [
+              "a1"
+            ],
+            "body": {
+              "con": "Sub",
+              "args": [
+                {
+                  "var": "a1"
+                }
+              ]
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [
+        {
+          "name": "none",
+          "label": "b:Platform.Sub.none",
+          "scheme": {
+            "forall": [
+              "msg"
+            ],
+            "body": {
+              "con": "Sub",
+              "args": [
+                {
+                  "var": "msg"
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "batch",
+          "label": "b:Platform.Sub.batch",
+          "scheme": {
+            "forall": [
+              "msg"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "con": "List",
+                  "args": [
+                    {
+                      "con": "Sub",
+                      "args": [
+                        {
+                          "var": "msg"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "con": "Sub",
+                  "args": [
+                    {
+                      "var": "msg"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "map",
+          "label": "b:Platform.Sub.map",
+          "scheme": {
+            "forall": [
+              "a",
+              "msg"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "var": "msg"
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Sub",
+                      "args": [
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "con": "Sub",
+                      "args": [
+                        {
+                          "var": "msg"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        }
+      ],
+      "ops": []
+    },
+    {
+      "module": "Task",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "Task",
+          "label": "b:Task.Task",
+          "fcn": {
+            "params": [
+              "a1",
+              "a2"
+            ],
+            "body": {
+              "con": "Task",
+              "args": [
+                {
+                  "var": "a1"
+                },
+                {
+                  "var": "a2"
+                }
+              ]
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [
+        {
+          "name": "succeed",
+          "label": "b:Task.succeed",
+          "scheme": {
+            "forall": [
+              "x",
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "con": "Task",
+                  "args": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "var": "a"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "fail",
+          "label": "b:Task.fail",
+          "scheme": {
+            "forall": [
+              "x",
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "var": "x"
+                },
+                {
+                  "con": "Task",
+                  "args": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "var": "a"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "map",
+          "label": "b:Task.map",
+          "scheme": {
+            "forall": [
+              "x",
+              "a",
+              "b"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "var": "b"
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "b"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "map2",
+          "label": "b:Task.map2",
+          "scheme": {
+            "forall": [
+              "x",
+              "a",
+              "b",
+              "r"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "fn": [
+                        {
+                          "var": "b"
+                        },
+                        {
+                          "var": "r"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "fn": [
+                        {
+                          "con": "Task",
+                          "args": [
+                            {
+                              "var": "x"
+                            },
+                            {
+                              "var": "b"
+                            }
+                          ]
+                        },
+                        {
+                          "con": "Task",
+                          "args": [
+                            {
+                              "var": "x"
+                            },
+                            {
+                              "var": "r"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "map3",
+          "label": "b:Task.map3",
+          "scheme": {
+            "forall": [
+              "x",
+              "a",
+              "b",
+              "c",
+              "r"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "fn": [
+                        {
+                          "var": "b"
+                        },
+                        {
+                          "fn": [
+                            {
+                              "var": "c"
+                            },
+                            {
+                              "var": "r"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "fn": [
+                        {
+                          "con": "Task",
+                          "args": [
+                            {
+                              "var": "x"
+                            },
+                            {
+                              "var": "b"
+                            }
+                          ]
+                        },
+                        {
+                          "fn": [
+                            {
+                              "con": "Task",
+                              "args": [
+                                {
+                                  "var": "x"
+                                },
+                                {
+                                  "var": "c"
+                                }
+                              ]
+                            },
+                            {
+                              "con": "Task",
+                              "args": [
+                                {
+                                  "var": "x"
+                                },
+                                {
+                                  "var": "r"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "map4",
+          "label": "b:Task.map4",
+          "scheme": {
+            "forall": [
+              "x",
+              "a",
+              "b",
+              "c",
+              "d",
+              "r"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "fn": [
+                        {
+                          "var": "b"
+                        },
+                        {
+                          "fn": [
+                            {
+                              "var": "c"
+                            },
+                            {
+                              "fn": [
+                                {
+                                  "var": "d"
+                                },
+                                {
+                                  "var": "r"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "fn": [
+                        {
+                          "con": "Task",
+                          "args": [
+                            {
+                              "var": "x"
+                            },
+                            {
+                              "var": "b"
+                            }
+                          ]
+                        },
+                        {
+                          "fn": [
+                            {
+                              "con": "Task",
+                              "args": [
+                                {
+                                  "var": "x"
+                                },
+                                {
+                                  "var": "c"
+                                }
+                              ]
+                            },
+                            {
+                              "fn": [
+                                {
+                                  "con": "Task",
+                                  "args": [
+                                    {
+                                      "var": "x"
+                                    },
+                                    {
+                                      "var": "d"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "con": "Task",
+                                  "args": [
+                                    {
+                                      "var": "x"
+                                    },
+                                    {
+                                      "var": "r"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "map5",
+          "label": "b:Task.map5",
+          "scheme": {
+            "forall": [
+              "x",
+              "a",
+              "b",
+              "c",
+              "d",
+              "e",
+              "r"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "fn": [
+                        {
+                          "var": "b"
+                        },
+                        {
+                          "fn": [
+                            {
+                              "var": "c"
+                            },
+                            {
+                              "fn": [
+                                {
+                                  "var": "d"
+                                },
+                                {
+                                  "fn": [
+                                    {
+                                      "var": "e"
+                                    },
+                                    {
+                                      "var": "r"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "fn": [
+                        {
+                          "con": "Task",
+                          "args": [
+                            {
+                              "var": "x"
+                            },
+                            {
+                              "var": "b"
+                            }
+                          ]
+                        },
+                        {
+                          "fn": [
+                            {
+                              "con": "Task",
+                              "args": [
+                                {
+                                  "var": "x"
+                                },
+                                {
+                                  "var": "c"
+                                }
+                              ]
+                            },
+                            {
+                              "fn": [
+                                {
+                                  "con": "Task",
+                                  "args": [
+                                    {
+                                      "var": "x"
+                                    },
+                                    {
+                                      "var": "d"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "fn": [
+                                    {
+                                      "con": "Task",
+                                      "args": [
+                                        {
+                                          "var": "x"
+                                        },
+                                        {
+                                          "var": "e"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "con": "Task",
+                                      "args": [
+                                        {
+                                          "var": "x"
+                                        },
+                                        {
+                                          "var": "r"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "sequence",
+          "label": "b:Task.sequence",
+          "scheme": {
+            "forall": [
+              "x",
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "con": "List",
+                  "args": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "con": "Task",
+                  "args": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "con": "List",
+                      "args": [
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "andThen",
+          "label": "b:Task.andThen",
+          "scheme": {
+            "forall": [
+              "x",
+              "a",
+              "b"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "b"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "b"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "onError",
+          "label": "b:Task.onError",
+          "scheme": {
+            "forall": [
+              "x",
+              "y",
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "y"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "y"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "mapError",
+          "label": "b:Task.mapError",
+          "scheme": {
+            "forall": [
+              "x",
+              "y",
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "var": "y"
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "y"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "perform",
+          "label": "b:Task.perform",
+          "scheme": {
+            "forall": [
+              "a",
+              "msg"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "var": "msg"
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "con": "Never",
+                          "args": []
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "con": "Cmd",
+                      "args": [
+                        {
+                          "var": "msg"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "attempt",
+          "label": "b:Task.attempt",
+          "scheme": {
+            "forall": [
+              "x",
+              "a",
+              "msg"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "con": "Result",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "var": "msg"
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "con": "Task",
+                      "args": [
+                        {
+                          "var": "x"
+                        },
+                        {
+                          "var": "a"
+                        }
+                      ]
+                    },
+                    {
+                      "con": "Cmd",
+                      "args": [
+                        {
+                          "var": "msg"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        }
+      ],
+      "ops": []
+    },
+    {
+      "module": "Process",
+      "library": "elm/core",
+      "TE": [
+        {
+          "tycon": "Id",
+          "label": "b:Process.Id",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "ProcessId",
+              "args": []
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [
+        {
+          "name": "spawn",
+          "label": "b:Process.spawn",
+          "scheme": {
+            "forall": [
+              "x",
+              "y",
+              "a"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "con": "Task",
+                  "args": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "var": "a"
+                    }
+                  ]
+                },
+                {
+                  "con": "Task",
+                  "args": [
+                    {
+                      "var": "y"
+                    },
+                    {
+                      "con": "ProcessId",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "sleep",
+          "label": "b:Process.sleep",
+          "scheme": {
+            "forall": [
+              "x"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Task",
+                  "args": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "con": "Unit",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        },
+        {
+          "name": "kill",
+          "label": "b:Process.kill",
+          "scheme": {
+            "forall": [
+              "x"
+            ],
+            "body": {
+              "fn": [
+                {
+                  "con": "ProcessId",
+                  "args": []
+                },
+                {
+                  "con": "Task",
+                  "args": [
+                    {
+                      "var": "x"
+                    },
+                    {
+                      "con": "Unit",
+                      "args": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "status": "v"
+        }
+      ],
+      "ops": []
+    },
+    {
+      "module": "Json.Encode",
+      "library": "elm/json",
+      "TE": [
+        {
+          "tycon": "Value",
+          "label": "b:Json.Encode.Value",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "Value",
+              "args": []
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [],
+      "ops": []
+    },
+    {
+      "module": "Json.Decode",
+      "library": "elm/json",
+      "TE": [
+        {
+          "tycon": "Value",
+          "label": "b:Json.Encode.Value",
+          "fcn": {
+            "params": [],
+            "body": {
+              "con": "Value",
+              "args": []
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [],
+      "ops": []
+    },
+    {
+      "module": "VirtualDom",
+      "library": "elm/virtual-dom",
+      "TE": [
+        {
+          "tycon": "Node",
+          "label": "b:VirtualDom.Node",
+          "fcn": {
+            "params": [
+              "a1"
+            ],
+            "body": {
+              "con": "Node",
+              "args": [
+                {
+                  "var": "a1"
+                }
+              ]
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [],
+      "ops": []
+    },
+    {
+      "module": "Html",
+      "library": "elm/html",
+      "TE": [
+        {
+          "tycon": "Html",
+          "label": "b:Html.Html",
+          "fcn": {
+            "params": [
+              "a1"
+            ],
+            "body": {
+              "con": "Node",
+              "args": [
+                {
+                  "var": "a1"
+                }
+              ]
+            }
+          },
+          "VE": []
+        }
+      ],
+      "VE": [],
+      "ops": []
+    }
+  ],
+  "operators": [
+    {
+      "op": "<<",
+      "rank": 1,
+      "standsFor": "composeL",
+      "declaredBy": "Basics",
+      "label": "b:Basics.composeL",
+      "scheme": {
+        "forall": [
+          "a",
+          "b",
+          "c"
+        ],
+        "body": {
+          "fn": [
+            {
+              "fn": [
+                {
+                  "var": "b"
+                },
+                {
+                  "var": "c"
+                }
+              ]
+            },
+            {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "var": "b"
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "var": "c"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": ">>",
+      "rank": 2,
+      "standsFor": "composeR",
+      "declaredBy": "Basics",
+      "label": "b:Basics.composeR",
+      "scheme": {
+        "forall": [
+          "a",
+          "b",
+          "c"
+        ],
+        "body": {
+          "fn": [
+            {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "var": "b"
+                }
+              ]
+            },
+            {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "b"
+                    },
+                    {
+                      "var": "c"
+                    }
+                  ]
+                },
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "var": "c"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "^",
+      "rank": 3,
+      "standsFor": "pow",
+      "declaredBy": "Basics",
+      "label": "b:Basics.pow",
+      "scheme": {
+        "forall": [
+          "number"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "number"
+            },
+            {
+              "fn": [
+                {
+                  "var": "number"
+                },
+                {
+                  "var": "number"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "*",
+      "rank": 4,
+      "standsFor": "mul",
+      "declaredBy": "Basics",
+      "label": "b:Basics.mul",
+      "scheme": {
+        "forall": [
+          "number"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "number"
+            },
+            {
+              "fn": [
+                {
+                  "var": "number"
+                },
+                {
+                  "var": "number"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "/",
+      "rank": 5,
+      "standsFor": "fdiv",
+      "declaredBy": "Basics",
+      "label": "b:Basics.fdiv",
+      "scheme": {
+        "forall": [],
+        "body": {
+          "fn": [
+            {
+              "con": "Float",
+              "args": []
+            },
+            {
+              "fn": [
+                {
+                  "con": "Float",
+                  "args": []
+                },
+                {
+                  "con": "Float",
+                  "args": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "//",
+      "rank": 6,
+      "standsFor": "idiv",
+      "declaredBy": "Basics",
+      "label": "b:Basics.idiv",
+      "scheme": {
+        "forall": [],
+        "body": {
+          "fn": [
+            {
+              "con": "Int",
+              "args": []
+            },
+            {
+              "fn": [
+                {
+                  "con": "Int",
+                  "args": []
+                },
+                {
+                  "con": "Int",
+                  "args": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "+",
+      "rank": 7,
+      "standsFor": "add",
+      "declaredBy": "Basics",
+      "label": "b:Basics.add",
+      "scheme": {
+        "forall": [
+          "number"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "number"
+            },
+            {
+              "fn": [
+                {
+                  "var": "number"
+                },
+                {
+                  "var": "number"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "-",
+      "rank": 8,
+      "standsFor": "sub",
+      "declaredBy": "Basics",
+      "label": "b:Basics.sub",
+      "scheme": {
+        "forall": [
+          "number"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "number"
+            },
+            {
+              "fn": [
+                {
+                  "var": "number"
+                },
+                {
+                  "var": "number"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "++",
+      "rank": 9,
+      "standsFor": "append",
+      "declaredBy": "Basics",
+      "label": "b:Basics.append",
+      "scheme": {
+        "forall": [
+          "appendable"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "appendable"
+            },
+            {
+              "fn": [
+                {
+                  "var": "appendable"
+                },
+                {
+                  "var": "appendable"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "::",
+      "rank": 10,
+      "standsFor": "::",
+      "declaredBy": "List",
+      "label": "b:List",
+      "scheme": {
+        "forall": [
+          "a"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "a"
+            },
+            {
+              "fn": [
+                {
+                  "con": "List",
+                  "args": [
+                    {
+                      "var": "a"
+                    }
+                  ]
+                },
+                {
+                  "con": "List",
+                  "args": [
+                    {
+                      "var": "a"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "c"
+    },
+    {
+      "op": "==",
+      "rank": 11,
+      "standsFor": "eq",
+      "declaredBy": "Basics",
+      "label": "b:Basics.eq",
+      "scheme": {
+        "forall": [
+          "a"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "a"
+            },
+            {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "/=",
+      "rank": 12,
+      "standsFor": "neq",
+      "declaredBy": "Basics",
+      "label": "b:Basics.neq",
+      "scheme": {
+        "forall": [
+          "a"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "a"
+            },
+            {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "<",
+      "rank": 13,
+      "standsFor": "lt",
+      "declaredBy": "Basics",
+      "label": "b:Basics.lt",
+      "scheme": {
+        "forall": [
+          "comparable"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "comparable"
+            },
+            {
+              "fn": [
+                {
+                  "var": "comparable"
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": ">",
+      "rank": 14,
+      "standsFor": "gt",
+      "declaredBy": "Basics",
+      "label": "b:Basics.gt",
+      "scheme": {
+        "forall": [
+          "comparable"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "comparable"
+            },
+            {
+              "fn": [
+                {
+                  "var": "comparable"
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "<=",
+      "rank": 15,
+      "standsFor": "le",
+      "declaredBy": "Basics",
+      "label": "b:Basics.le",
+      "scheme": {
+        "forall": [
+          "comparable"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "comparable"
+            },
+            {
+              "fn": [
+                {
+                  "var": "comparable"
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": ">=",
+      "rank": 16,
+      "standsFor": "ge",
+      "declaredBy": "Basics",
+      "label": "b:Basics.ge",
+      "scheme": {
+        "forall": [
+          "comparable"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "comparable"
+            },
+            {
+              "fn": [
+                {
+                  "var": "comparable"
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "&&",
+      "rank": 17,
+      "standsFor": "and",
+      "declaredBy": "Basics",
+      "label": "b:Basics.and",
+      "scheme": {
+        "forall": [],
+        "body": {
+          "fn": [
+            {
+              "con": "Bool",
+              "args": []
+            },
+            {
+              "fn": [
+                {
+                  "con": "Bool",
+                  "args": []
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "||",
+      "rank": 18,
+      "standsFor": "or",
+      "declaredBy": "Basics",
+      "label": "b:Basics.or",
+      "scheme": {
+        "forall": [],
+        "body": {
+          "fn": [
+            {
+              "con": "Bool",
+              "args": []
+            },
+            {
+              "fn": [
+                {
+                  "con": "Bool",
+                  "args": []
+                },
+                {
+                  "con": "Bool",
+                  "args": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "|>",
+      "rank": 19,
+      "standsFor": "apR",
+      "declaredBy": "Basics",
+      "label": "b:Basics.apR",
+      "scheme": {
+        "forall": [
+          "a",
+          "b"
+        ],
+        "body": {
+          "fn": [
+            {
+              "var": "a"
+            },
+            {
+              "fn": [
+                {
+                  "fn": [
+                    {
+                      "var": "a"
+                    },
+                    {
+                      "var": "b"
+                    }
+                  ]
+                },
+                {
+                  "var": "b"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    },
+    {
+      "op": "<|",
+      "rank": 20,
+      "standsFor": "apL",
+      "declaredBy": "Basics",
+      "label": "b:Basics.apL",
+      "scheme": {
+        "forall": [
+          "a",
+          "b"
+        ],
+        "body": {
+          "fn": [
+            {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "var": "b"
+                }
+              ]
+            },
+            {
+              "fn": [
+                {
+                  "var": "a"
+                },
+                {
+                  "var": "b"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "status": "v"
+    }
+  ],
+  "hidden": [
+    {
+      "module": "Basics",
+      "name": "JustOneMore",
+      "kind": "constructor",
+      "typeName": "Never"
+    },
+    {
+      "module": "Task",
+      "name": "Perform",
+      "kind": "constructor",
+      "typeName": null,
+      "note": "type MyCmd msg = Perform (Task Never msg); MyCmd is not in T0"
+    },
+    {
+      "module": "Task",
+      "name": "command",
+      "kind": "value"
+    }
+  ],
+  "PE0": [],
+  "defaultImports": [
+    {
+      "module": "Basics",
+      "as": null,
+      "exposing": {
+        "all": true
+      }
+    },
+    {
+      "module": "Debug",
+      "as": null,
+      "exposing": null
+    },
+    {
+      "module": "List",
+      "as": null,
+      "exposing": {
+        "items": [
+          {
+            "op": "::"
+          }
+        ]
+      }
+    },
+    {
+      "module": "Maybe",
+      "as": null,
+      "exposing": {
+        "items": [
+          {
+            "typeAll": "Maybe"
+          }
+        ]
+      }
+    },
+    {
+      "module": "Result",
+      "as": null,
+      "exposing": {
+        "items": [
+          {
+            "typeAll": "Result"
+          }
+        ]
+      }
+    },
+    {
+      "module": "String",
+      "as": null,
+      "exposing": {
+        "items": [
+          {
+            "type": "String"
+          }
+        ]
+      }
+    },
+    {
+      "module": "Char",
+      "as": null,
+      "exposing": {
+        "items": [
+          {
+            "type": "Char"
+          }
+        ]
+      }
+    },
+    {
+      "module": "Tuple",
+      "as": null,
+      "exposing": null
+    },
+    {
+      "module": "Platform",
+      "as": null,
+      "exposing": {
+        "items": [
+          {
+            "type": "Program"
+          }
+        ]
+      }
+    },
+    {
+      "module": "Platform.Cmd",
+      "as": "Cmd",
+      "exposing": {
+        "items": [
+          {
+            "type": "Cmd"
+          }
+        ]
+      }
+    },
+    {
+      "module": "Platform.Sub",
+      "as": "Sub",
+      "exposing": {
+        "items": [
+          {
+            "type": "Sub"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,13 +1,14 @@
 /-
   A Standard Definition of Elm? Mechanisation, part 8.
-  The environment E0 in which an example program's expressions are
-  evaluated: E0 = (∅, VE0) of Appendix D with what the default imports
-  `import Basics exposing (..)`, `import Debug`, `import Maybe exposing
-  (Maybe(..))` add (Chapter 7 is out of this pass's scope, so the imports are
-  applied by hand). The qualifier Basics gives the interface of Basics, which
-  holds no hidden variable: operators are reached through OT_dyn only.
+  The environment E0 in which an example program's expressions are evaluated in the let form of the
+  translated tests: E0 = (∅, VE0) of Appendix D modified by the environment that the default imports
+  give in ME0 (Mod/ME0.lean), as rule r:dm-module evaluates a module's top-level declarations
+  (plan step 2: one ME0 for the let form and the module form). The qualifier Basics gives the
+  interface of Basics, which holds no hidden variable: operators are reached through OT_dyn only.
+  The value environments below are kept for the hand-written examples that name them.
 -/
 import StandardElmMech.InitialBasis
+import StandardElmMech.Mod.ME0
 
 namespace StandardElm
 open StandardElm.D
@@ -30,12 +31,14 @@ def VE_Char : ValEnv := [("toCode", bas .charToCode), ("fromCode", bas .charFrom
 /-- Maybe: Just and Nothing. -/
 def VE_Maybe : ValEnv := [("Just", conv conJust), ("Nothing", conv conNothing)]
 
-/-- E0: the environment of the examples, before the program's own
-    constructors are added. -/
-def E0 : Env :=
-  E0base.plus [("Basics", .mk [] VE_Basics), ("Char", .mk [] VE_Char), ("Debug", .mk [] VE_Debug),
-    ("Maybe", .mk [] VE_Maybe)]
-    (fmPlus VE_Basics VE_Maybe)
+/-- Result: Ok and Err (the default import `import Result exposing (Result(..))`). -/
+def VE_Result : ValEnv := [("Ok", conv conOk), ("Err", conv conErr)]
+
+/-- E0: the environment of the examples, before the program's own constructors are added: E0 of
+    Appendix D (which binds [] and ::) modified by the environment the default imports give in ME0
+    (Mod/ME0.lean, `E_default`, derived by the rules: `E_default_eval`), as rule r:dm-module
+    evaluates a module's declarations. -/
+def E0 : Env := E0base.plusEnv Mod.E_default
 
 /-- E0 extended with the constructors of a program's custom types, given as
     (name, arity). Their binding is the business of Chapter 7. -/

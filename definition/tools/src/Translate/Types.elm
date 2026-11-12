@@ -10,6 +10,7 @@ module Translate.Types exposing
     , ftv
     , merge
     , show
+    , tyVarsSeq
     , unify
     , walk
     )
@@ -172,6 +173,30 @@ ftv s t =
 
         TRecord fields row ->
             Dict.foldl (\_ a acc -> Set.union acc (ftv s a)) (row |> Maybe.map Set.singleton |> Maybe.withDefault Set.empty) fields
+
+
+{-| The type variables of a type in order of first occurrence, duplicates kept (step 10, Choices,
+item 2; Lean's `Ty.tyVarsSeq`): the arguments of a constructed type and the components of a tuple
+in order, the domain before the range, the fields of a record in label order (`Dict`'s order). The
+row variable of an open record is not a type variable and is not listed.
+-}
+tyVarsSeq : Subst -> Type -> List Int
+tyVarsSeq s t =
+    case apply s t of
+        TVar v ->
+            [ v ]
+
+        TCon _ args ->
+            List.concatMap (tyVarsSeq s) args
+
+        TFun a b ->
+            tyVarsSeq s a ++ tyVarsSeq s b
+
+        TTuple ts ->
+            List.concatMap (tyVarsSeq s) ts
+
+        TRecord fields _ ->
+            Dict.values fields |> List.concatMap (tyVarsSeq s)
 
 
 occurs : Subst -> Int -> Type -> Bool

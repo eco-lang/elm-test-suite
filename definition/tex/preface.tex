@@ -199,13 +199,25 @@ each fact with a citation to the code or test that establishes it; it
 proposed a ruling, with its reasons, wherever the implementations disagree
 or are silent; it drafted the chapters and appendices; it audited the
 drafts, in independent passes, for consistency between chapters; and it
-encoded the dynamic semantics of the Core in the proof assistant Lean~4,
-namely every rule of Chapter~\ref{ch:dynamic-core} and the arithmetic,
-equality, order, Boolean, conversion, elementary-function, append and
-character part of $\APPLY$, with an evaluator proved sound
-with respect to those rules and checked against the expected results of
-487 of the test programs that accompany this book, which a program translates
-into the encoding from their source. The author set the directions the
+encoded the dynamic semantics of the Core, of modules, of effects and of
+programs in the proof assistant Lean~4, namely every rule of
+Chapters~\ref{ch:dynamic-core}, \ref{ch:dynamic-modules} and~\ref{ch:effects},
+the dynamic rules and the transitions of programs of
+Chapter~\ref{ch:programs}, and the arithmetic, equality, order, Boolean,
+conversion, elementary-function, append and character part of $\APPLY$,
+with an evaluator proved sound and complete, and a scheduler proved sound,
+with respect to those rules, and checked against the expected results of 579 of the test programs that
+accompany this book, which a program translates into the encoding from their
+source, each as the program of modules it is; it also encoded the static
+semantics, every rule of Chapters~\ref{ch:static-core} and~\ref{ch:static-modules}
+and the static rules of Chapter~\ref{ch:programs}, with the derived forms of
+Appendix~\ref{ch:appendix-derived-forms}, the syntactic restrictions that can be
+stated on a syntax tree, and Appendix~\ref{ch:appendix-static-basis}, with a checker
+of derivations proved sound, by which 622 of the test programs are shown legal
+(given that the derivation an unproved inference finds for each is principal)
+and 68 that must be refused are shown not legal; and for each of the 579
+translated programs, Lean computes from its source, through that checker,
+number specialisation and type erasure, the program the translator writes. The author set the directions the
 definition follows, reviewed every ruling, and is responsible for the
 whole; the AI system is not an author. The survey, the record of rulings,
 the audit reports and the mechanisation are kept with the sources of this

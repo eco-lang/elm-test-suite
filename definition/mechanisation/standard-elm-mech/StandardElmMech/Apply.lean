@@ -19,6 +19,7 @@
 -/
 import StandardElmMech.Objects
 import StandardElmMech.Show
+import StandardElmMech.Eff.EncFn
 
 set_option linter.unusedSimpArgs false
 
@@ -68,6 +69,20 @@ mutual
           then eqList args args' else BoolSet.just false
       | .record r, .record r' =>                                            -- clause 4: records, Dom r = Dom r'
           if recDomEq r r' then eqRec r r' else BoolSet.just false
+      | .batch cs, .batch cs' =>                                            -- clause 4: effect values of one form
+          if cs.length == cs'.length then eqList cs cs' else BoolSet.just false
+      | .mapE f c, .mapE f' c' => (eqSet f f').conj (eqSet c c')
+      | .prog r, .prog r' => if recDomEq r r' then eqRec r r' else BoolSet.just false
+      | .pid m, .pid n => BoolSet.just (m == n)                             -- clause 3: process identifiers
+      | .bv j, .bv j' => BoolSet.just (j == j')                             -- clauses 3 and 4: boundary values,
+                                                                            -- canonical (D7), so equal as terms
+      | .succeed a, .succeed b => eqSet a b                                 -- clause 4: tasks of one form
+      | .fail a, .fail b => eqSet a b
+      | .andThen f t, .andThen f' t' => (eqSet f f').conj (eqSet t t')
+      | .onError f t, .onError f' t' => (eqSet f f').conj (eqSet t t')
+      | .prim π vs, .prim π' vs' =>
+          if π == π' && vs.length == vs'.length then eqList vs vs' else BoolSet.just false
+      | .leaf m v, .leaf m' v' => if m == m' then eqSet v v' else BoolSet.just false
       | _, _ => BoolSet.just false                                          -- clause 5
   def eqList : List Val → List Val → BoolSet
     | [], [] => BoolSet.just true
@@ -286,6 +301,20 @@ def otherChar (_n : Int) : Char := Char.ofNat 0xFFFD
 
 def charFromCode (n : Int) : Char := if isScalar n then Char.ofNat n.toNat else otherChar n
 
+/-- APPLY(Elm.Kernel.Basics.log, x), fig:dynamic-basis-elem, the first applicable line; the last,
+    fl(ln x), is the C library's rounding. -/
+def fLog (x : Float) : Float :=
+  if x.isNaN then fNaN else if x == 0 then -fInf else if x < 0 then fNaN
+  else if x == fInf then fInf else x.log
+
+/-- The effect values Cmd.batch, Cmd.map, Sub.batch and Sub.map accept, of the kinds step 2 has
+    (step 4 adds leaves). -/
+def isCmdSub : Val → Bool
+  | .batch _ => true
+  | .mapE _ _ => true
+  | .leaf _ _ => true
+  | _ => false
+
 /-- `pickFirst b v v'` is v if b, else v'. A definition, not an `if`, so that
     the proof of `applySet_sound` does not split on it. -/
 def pickFirst (b : Bool) (v v' : Val) : Val := if b then v else v'
@@ -396,14 +425,42 @@ inductive Apply : BasVal → List Val → Val → Prop where
   | toString_ (v : Val) : Apply .debugToString [v] (.sv (.str (showElm v)))
   -- sec:appendix-dynamic-basis-debug; Debug.todo has no constructor: APPLY is empty
   | debugLog (s : String) (v : Val) : Apply .debugLog [.sv (.str s), v] v
+  -- fig:dynamic-basis-elem: Elm.Kernel.Basics.log
+  | kernelLog_ (x : Float) : Apply .kernelLog [.sv (.float x)] (.sv (.float (fLog x)))
+  -- sec:dynamic-modules-record: the constructor of a record alias
+  | record_ (ls : List String) (vs : List Val) :
+      vs.length = ls.length → Apply (.record ls) vs (.record (ls.zip vs))
+  -- effects.tex, fig:effects-apply
+  | cmdBatch_ (v : Val) (cs : List Val) :
+      v.toList? = some cs → cs.all isCmdSub = true → Apply .cmdBatch [v] (.batch cs)
+  | subBatch_ (v : Val) (cs : List Val) :
+      v.toList? = some cs → cs.all isCmdSub = true → Apply .subBatch [v] (.batch cs)
+  | cmdMap_ (f c : Val) : isCmdSub c = true → Apply .cmdMap [f, c] (.mapE f c)
+  | subMap_ (f c : Val) : isCmdSub c = true → Apply .subMap [f, c] (.mapE f c)
+  | worker_ (r : List (String × Val)) : Apply .platformWorker [.record r] (.prog r)
+  -- fig:effects-apply; sec:appendix-dynamic-basis-arrays; sec:effects-ports
+  | taskSucceed_ (v : Val) : Apply .taskSucceed [v] (.succeed v)
+  | taskFail_ (v : Val) : Apply .taskFail [v] (.fail v)
+  | taskAndThen_ (f t : Val) : t.isTask = true → Apply .taskAndThen [f, t] (.andThen f t)
+  | taskOnError_ (f t : Val) : t.isTask = true → Apply .taskOnError [f, t] (.onError f t)
+  | taskCommand_ (t : Val) : t.isTask = true → Apply .taskCommand [.con conPerform [t]] (.leaf .task t)
+  | processSleep_ (v : Val) : Apply .processSleep [v] (.prim .sleep [v])
+  | processSpawn_ (t : Val) : t.isTask = true → Apply .processSpawn [t] (.prim .spawn [t])
+  | processKill_ (n : Nat) : Apply .processKill [.pid n] (.prim .kill [.pid n])
+  | arrayFromList_ (v : Val) : Apply .arrayFromList [v] (.con conArr [v])
+  | arrayToList_ (v : Val) : Apply .arrayToList [.con conArr [v]] v
+  /-- APPLY(outport(p, τ), v) = {leaf(out p, j) | Enc_τ(v) = j}, through `enc` (D8) -/
+  | outport_ (p : String) (τ : Eff.PTy) (v : Val) (j : Eff.BVal) :
+      Eff.enc τ v = some j → Apply (.outport p τ) [v] (.leaf (.out p) (.bv j))
+  | inport_ (p : String) (τ : Eff.PTy) (f : Val) : Apply (.inport p τ) [f] (.leaf (.inn p τ) f)
 
 /-! ## The executable set -/
 
 def boolSetList (s : BoolSet) : List Val :=
   (if s.t then [Val.bool true] else []) ++ (if s.f then [Val.bool false] else [])
 
-/-- The members of APPLY(b, vs), as a list. -/
-def applySet : BasVal → List Val → List Val
+/-- The members of APPLY(b, vs) for the basic values of Chapter 6 and Appendix D, as a list. -/
+def applySetCore : BasVal → List Val → List Val
   | .add, [.sv (.int m), .sv (.int n)] => [.int (norm (m + n))]
   | .sub, [.sv (.int m), .sv (.int n)] => [.int (norm (m - n))]
   | .mul, [.sv (.int m), .sv (.int n)] => [.int (norm (m * n))]
@@ -482,11 +539,66 @@ def applySet : BasVal → List Val → List Val
   | .debugLog, [.sv (.str _), v] => [v]
   | _, _ => []
 
-/-- Every member of `applySet b vs` is in APPLY(b, vs). -/
-theorem applySet_sound {b : BasVal} {vs : List Val} {v : Val} :
-    v ∈ applySet b vs → Apply b vs v := by
+/-- The members of APPLY(b, vs) for the basic values of Chapters 7 and 8 and the kernel log
+    (plan step 2), kept apart from `applySetCore` so that its pattern match stays small. -/
+def applySetNew : BasVal → List Val → List Val
+  | .kernelLog, [.sv (.float x)] => [.sv (.float (fLog x))]
+  | .record ls, vs => if vs.length = ls.length then [.record (ls.zip vs)] else []
+  | .cmdBatch, [v] =>
+      match v.toList? with
+      | some cs => if cs.all isCmdSub then [.batch cs] else []
+      | none => []
+  | .subBatch, [v] =>
+      match v.toList? with
+      | some cs => if cs.all isCmdSub then [.batch cs] else []
+      | none => []
+  | .cmdMap, [f, c] => if isCmdSub c then [.mapE f c] else []
+  | .subMap, [f, c] => if isCmdSub c then [.mapE f c] else []
+  | .platformWorker, [.record r] => [.prog r]
+  | _, _ => []
+
+/-- Whether a basic value is one of `applySetNew`'s. -/
+def BasVal.isNew : BasVal → Bool
+  | .kernelLog | .record _ | .cmdBatch | .cmdMap | .subBatch | .subMap
+  | .platformWorker => true
+  | _ => false
+
+/-- The members of APPLY(b, vs) for the effect values of Chapter 8, the ports and the arrays
+    (plan step 4), kept apart as `applySetNew` is. -/
+def applySetEff : BasVal → List Val → List Val
+  | .taskSucceed, [v] => [.succeed v]
+  | .taskFail, [v] => [.fail v]
+  | .taskAndThen, [f, t] => if t.isTask then [.andThen f t] else []
+  | .taskOnError, [f, t] => if t.isTask then [.onError f t] else []
+  | .taskCommand, [.con c [t]] => if c == conPerform && t.isTask then [.leaf .task t] else []
+  | .processSleep, [v] => [.prim .sleep [v]]
+  | .processSpawn, [t] => if t.isTask then [.prim .spawn [t]] else []
+  | .processKill, [.pid n] => [.prim .kill [.pid n]]
+  | .arrayFromList, [v] => [.con conArr [v]]
+  | .arrayToList, [.con c [v]] => if c == conArr then [v] else []
+  | .outport p τ, [v] =>
+    match Eff.enc τ v with
+    | some j => [.leaf (.out p) (.bv j)]
+    | none => []
+  | .inport p τ, [f] => [.leaf (.inn p τ) f]
+  | _, _ => []
+
+/-- Whether a basic value is one of `applySetEff`'s: the twelve effect values of Chapter 8 and
+    the two of arrays. -/
+def BasVal.isEffect : BasVal → Bool
+  | .taskSucceed | .taskFail | .taskAndThen | .taskOnError | .taskCommand
+  | .processSleep | .processSpawn | .processKill | .arrayFromList | .arrayToList
+  | .outport .. | .inport .. => true
+  | _ => false
+
+/-- The members of APPLY(b, vs), as a list. -/
+def applySet (b : BasVal) (vs : List Val) : List Val :=
+  if b.isEffect then applySetEff b vs else if b.isNew then applySetNew b vs else applySetCore b vs
+
+theorem applySetCore_sound {b : BasVal} {vs : List Val} {v : Val} :
+    v ∈ applySetCore b vs → Apply b vs v := by
   intro h
-  unfold applySet at h
+  unfold applySetCore at h
   split at h
   all_goals (try simp only [boolSetList] at h)
   all_goals (repeat' (first | (split at h) | (rw [List.mem_append] at h; rcases h with h | h)))
@@ -497,5 +609,94 @@ theorem applySet_sound {b : BasVal} {vs : List Val} {v : Val} :
   all_goals (first
     | (constructor <;> first | assumption | (simp only [BoolSet.mem, ite_true, ite_false, Bool.false_eq_true]; assumption) | omega)
     | skip)
+
+theorem applySetNew_sound {b : BasVal} {vs : List Val} {v : Val} :
+    v ∈ applySetNew b vs → Apply b vs v := by
+  intro h
+  unfold applySetNew at h
+  split at h
+  all_goals (repeat' (split at h))
+  all_goals (try simp only [List.mem_cons, List.not_mem_nil, or_false, false_or] at h)
+  all_goals (try subst h)
+  all_goals (try subst_vars)
+  all_goals first
+    | (constructor <;> first | assumption | (simp_all; done) | omega)
+    | (simp at h)
+    | skip
+
+theorem applySetEff_sound {b : BasVal} {vs : List Val} {v : Val} :
+    v ∈ applySetEff b vs → Apply b vs v := by
+  intro h
+  unfold applySetEff at h
+  split at h
+  all_goals (repeat' (split at h))
+  all_goals (try simp only [List.mem_cons, List.not_mem_nil, or_false, false_or] at h)
+  all_goals (try subst h)
+  all_goals (try subst_vars)
+  all_goals first
+    | (constructor <;> first | assumption | (simp_all; done))
+    | (simp at h)
+    | (rename_i hc; simp only [Bool.and_eq_true, beq_iff_eq] at hc; obtain ⟨rfl, ht⟩ := hc
+       exact .taskCommand_ _ ht)
+    | (rename_i hc; simp only [beq_iff_eq] at hc; subst hc; exact .arrayToList_ _)
+    | skip
+
+/-- Every member of `applySet b vs` is in APPLY(b, vs). -/
+theorem applySet_sound {b : BasVal} {vs : List Val} {v : Val} :
+    v ∈ applySet b vs → Apply b vs v := by
+  unfold applySet; split
+  · exact applySetEff_sound
+  · split
+    · exact applySetNew_sound
+    · exact applySetCore_sound
+
+theorem applySetEff_complete {b : BasVal} {vs : List Val} {v : Val} :
+    Apply b vs v → b.isEffect = true → v ∈ applySetEff b vs := by
+  intro h he
+  cases h
+  all_goals simp only [BasVal.isEffect, Bool.false_eq_true] at he
+  all_goals simp only [applySetEff]
+  all_goals simp_all
+
+/-- Every member of APPLY(b, vs) is in `applySet b vs` (completeness of the executable set). -/
+theorem applySet_complete {b : BasVal} {vs : List Val} {v : Val} :
+    Apply b vs v → v ∈ applySet b vs := by
+  intro h
+  by_cases he : b.isEffect = true
+  · simp only [applySet, he, ite_true]; exact applySetEff_complete h he
+  cases h
+  all_goals simp only [BasVal.isEffect, not_true_eq_false] at he
+  all_goals simp only [applySet, BasVal.isEffect, BasVal.isNew, ite_true, ite_false, Bool.false_eq_true]
+  all_goals first
+    | (simp_all [applySetCore, applySetNew, boolSetList, BoolSet.mem, isFloat]; done)
+    | (rename_i b _; cases b <;> simp_all [applySetCore, boolSetList, BoolSet.mem]; done)
+    | (simp only [applySetCore]; split <;> simp_all [isFloat]; done)
+    | (simp only [applySetCore]; repeat' split
+       all_goals simp_all [isFloat]
+       all_goals omega)
+
+/-- APPLY of an effect value has at most one member ("each set has exactly one member",
+    sec:effects-apply, where it is defined). -/
+theorem applySetEff_length (b : BasVal) (vs : List Val) : (applySetEff b vs).length ≤ 1 := by
+  unfold applySetEff
+  split
+  all_goals first
+    | (simp only [List.length_cons, List.length_nil]; omega)
+    | (split <;> simp only [List.length_cons, List.length_nil] <;> omega)
+
+/-- APPLY has at most two members: only function equality has two. -/
+theorem applySet_length_le_two (b : BasVal) (vs : List Val) : (applySet b vs).length ≤ 2 := by
+  unfold applySet; split
+  · exact Nat.le_trans (applySetEff_length b vs) (by omega)
+  · split
+    · unfold applySetNew; split <;> (repeat' split) <;> simp
+    · unfold applySetCore
+      split <;> (try simp only [boolSetList]) <;> (repeat' split) <;> simp
+
+/-- The log entry of an application of a basic value: Debug.log adds `(s, v)`, every other basic
+    value nothing. Used only by the logged rule r_d_app_basic_apply_l (RulesL.lean, D4). -/
+def logEntry : BasVal → List Val → Log
+  | .debugLog, [.sv (.str s), v] => [(s, v)]
+  | _, _ => []
 
 end StandardElm

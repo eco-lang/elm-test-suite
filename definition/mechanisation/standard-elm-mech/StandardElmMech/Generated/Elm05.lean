@@ -4,483 +4,658 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/ErasedListSpecializationTest.elm -/
+def g_elm_ErasedListSpecializationTest : Program := {
+  name := "ErasedListSpecializationTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "count" [pv "xs"] (caseOf (v "xs") [(P (listP []), i 0), (.cons (P pw) (P (pv "rest")), bin "+" (i 1) (ap (v "count") [v "rest"]))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "n", .atexp (.paren (bin "+" (ap (v "count") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]]) (ap (v "count") [listE []])))]), .pat pw (ap (qv "Debug" "log") [str "m", .atexp (.paren (bin "+" (bin "+" (ap (v "count") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]]) (ap (v "count") [listE []])) (ap (v "count") [listE []])))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "n: 2" .int,
+    chk .check "m: 3" .int ] }
+
+/-- tests/elm/src/EscapeCustomCaseScrutineeTest.elm -/
+def g_elm_EscapeCustomCaseScrutineeTest : Program := {
+  name := "EscapeCustomCaseScrutineeTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("Maybe2", [("Just2", 1), ("Nothing2", 0)])],
+  aliases := [],
+  defs := [
+    .fn "unwrap" [pv "m"] (caseOf (v "m") [(pcon "Just2" [pv "x"], v "x"), (P (pcA "Nothing2"), i 0)]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "just", .atexp (.paren (ap (v "unwrap") [.atexp (.paren (ap (c "Just2") [i 7]))]))]), .pat pw (ap (qv "Debug" "log") [str "nothing", .atexp (.paren (ap (v "unwrap") [c "Nothing2"]))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "just: 7" .int,
+    chk .check "nothing: 0" .int ] }
+
+/-- tests/elm/src/EscapeTopLevelTupleTest.elm -/
+def g_elm_EscapeTopLevelTupleTest : Program := {
+  name := "EscapeTopLevelTupleTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "globalPair" [] (tup2 (i 11) (i 22)),
+    .fn "main" [] (letDefs [.pat (ptup2 (P (pv "a")) (P (pv "b"))) (v "globalPair"), .pat pw (ap (qv "Debug" "log") [str "a", v "a"]), .pat pw (ap (qv "Debug" "log") [str "b", v "b"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "a: 11" .int,
+    chk .check "b: 22" .int ] }
+
+/-- tests/elm/src/EtaExpandStateFunctionSequenceTest.elm -/
+def g_elm_EtaExpandStateFunctionSequenceTest : Program := {
+  name := "EtaExpandStateFunctionSequenceTest", source := "tests/elm/src",
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"Html", "Html", some (.items [.var "text"])⟩, ⟨"Maybe", "Maybe", some .all⟩],
+  types := [],
+  aliases := [("St", none)],
+  defs := [
+    .fn "andThen" [pv "f", pv "ma", pv "s0"] (ap (v "f") [.atexp (.paren (ap (v "ma") [v "s0"])), v "s0"]),
+    .fn "pure" [pv "x", pv "s"] (v "x"),
+    .fn "tick" [pv "s"] (v "s"),
+    .fn "plus" [pv "a", pv "b"] (v "a"),
+    .fn "expensive" [pv "n"] (ap (v "plus") [.atexp (.paren (ap (v "plus") [v "n", v "n"])), v "n"]),
+    .fn "sequence" [pv "actions"] (caseOf (v "actions") [(P (listP [P (pv "one")]), ap (v "pure") [listE []]), (P (listP [P (pv "one"), P (pv "two")]), ap (v "andThen") [.atexp (.paren (lams [pv "x"] (ap (v "sequence") [listE [v "two"]]))), v "one"]), (P pw, ap (v "andThen") [.atexp (.paren (lams [pv "x"] (ap (v "pure") [listE []]))), v "tick"])]),
+    .fn "length" [pv "xs"] (caseOf (v "xs") [(P (listP []), i 0), (.cons (P pw) (P (pv "rest")), bin "+" (i 1) (ap (v "length") [v "rest"]))]),
+    .fn "testValue" [] (ap (v "length") [.atexp (.paren (ap (v "sequence") [listE [], i 0]))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 0" .int ] }
+
+/-- tests/elm/src/EtaExpandStateTest.elm -/
+def g_elm_EtaExpandStateTest : Program := {
+  name := "EtaExpandStateTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [("St", none)],
+  defs := [
+    .fn "andThen" [pv "f", pv "ma", pv "s0"] (letDefs [.pat (ptup2 (P (pv "s1")) (P (pv "a"))) (ap (v "ma") [v "s0"])] (ap (v "f") [v "a", v "s1"])),
+    .fn "pure" [pv "x", pv "s"] (tup2 (v "s") (v "x")),
+    .fn "tick" [pv "s"] (tup2 (bin "+" (v "s") (i 1)) (v "s")),
+    .fn "tick2" [pv "s"] (tup2 (bin "+" (v "s") (i 2)) (bin "*" (v "s") (i 10))),
+    .fn "sequence" [pv "actions"] (caseOf (v "actions") [(P (listP []), ap (v "pure") [listE []]), (.cons (P (pv "m")) (P (pv "rest")), bin "|>" (v "m") (ap (v "andThen") [.atexp (.paren (lams [pv "x"] (bin "|>" (ap (v "sequence") [v "rest"]) (ap (v "andThen") [.atexp (.paren (lams [pv "xs"] (ap (v "pure") [.atexp (.paren (bin "::" (v "x") (v "xs")))])))]))))]))]),
+    .fn "sum" [pv "xs"] (caseOf (v "xs") [(P (listP []), i 0), (.cons (P (pv "x")) (P (pv "rest")), bin "+" (v "x") (ap (v "sum") [v "rest"]))]),
+    .fn "run" [pv "n"] (letDefs [.pat (ptup2 (P pw) (P (pv "xs"))) (ap (v "sequence") [listE [v "tick", v "tick2", ap (v "pure") [i 5], v "tick"], v "n"])] (ap (v "sum") [v "xs"])),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "r", listE [ap (v "run") [i 1], ap (v "run") [i 2], ap (v "run") [i 3]]])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "r: [30,42,54]" .data ] }
+
+/-- tests/elm/src/File.elm -/
+def g_elm_File : Program := {
+  name := "File", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "compiled", c "True"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "compiled: True" .data ] }
+
+/-- tests/elm/src/FlipFunctionTest.elm -/
+def g_elm_FlipFunctionTest : Program := {
+  name := "FlipFunctionTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "flip" [pv "f", pv "y", pv "x"] (ap (v "f") [v "x", v "y"]),
+    .fn "main" [] (letDefs [.fn "result" [] (ap (v "flip") [.atexp (.paren (lams [pv "a", pv "b"] (.atexp (.scon (.float 314 (-2)))))), str "world", .atexp (.scon (.intF 7))]), .pat pw (ap (qv "Debug" "log") [str "result", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "result: 3.14" .float ] }
+
+/-- tests/elm/src/FloatEdgeTest.elm -/
+def g_elm_FloatEdgeTest : Program := {
+  name := "FloatEdgeTest", source := "tests/elm/src", native := true,
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "nan" [] (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))),
+    .fn "inf" [] (bin "/" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 0)))),
+    .fn "show" [] (qv "Debug" "toString"),
+    .fn "foldl" [pv "f", pv "acc", pv "xs"] (caseOf (v "xs") [(P (listP []), v "acc"), (.cons (P (pv "x")) (P (pv "rest")), ap (v "foldl") [v "f", .atexp (.paren (ap (v "f") [v "x", v "acc"])), v "rest"])]),
+    .fn "orderName" [pv "a", pv "b"] (caseOf (ap (v "compare") [v "a", v "b"]) [(P (pcA "LT"), str "LT"), (P (pcA "EQ"), str "EQ"), (P (pcA "GT"), str "GT")]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "round 2.5", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "round") [.atexp (.scon (.float 25 (-1)))]))]))]), .pat pw (ap (qv "Debug" "log") [str "round -2.5", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "round") [.atexp (neg (.scon (.float 25 (-1))))]))]))]), .pat pw (ap (qv "Debug" "log") [str "round 0.5", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "round") [.atexp (.scon (.float 5 (-1)))]))]))]), .pat pw (ap (qv "Debug" "log") [str "round -0.5", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "round") [.atexp (neg (.scon (.float 5 (-1))))]))]))]), .pat pw (ap (qv "Debug" "log") [str "round 1.5", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "round") [.atexp (.scon (.float 15 (-1)))]))]))]), .pat pw (ap (qv "Debug" "log") [str "round -1.5", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "round") [.atexp (neg (.scon (.float 15 (-1))))]))]))]), .pat pw (ap (qv "Debug" "log") [str "nan == nan", .atexp (.paren (ap (v "show") [.atexp (.paren (bin "==" (v "nan") (v "nan")))]))]), .pat pw (ap (qv "Debug" "log") [str "nan /= nan", .atexp (.paren (ap (v "show") [.atexp (.paren (bin "/=" (v "nan") (v "nan")))]))]), .pat pw (ap (qv "Debug" "log") [str "1 /= nan", .atexp (.paren (ap (v "show") [.atexp (.paren (bin "/=" (.atexp (.scon (.intF 1))) (v "nan")))]))]), .pat pw (ap (qv "Debug" "log") [str "min 1 nan is NaN", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "isNaN") [.atexp (.paren (ap (v "min") [.atexp (.scon (.intF 1)), v "nan"]))]))]))]), .pat pw (ap (qv "Debug" "log") [str "min 1 nan", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "min") [.atexp (.scon (.intF 1)), v "nan"]))]))]), .pat pw (ap (qv "Debug" "log") [str "compare nan 1", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "compare") [v "nan", .atexp (.scon (.intF 1))]))]))]), .pat pw (ap (qv "Debug" "log") [str "foldl min is NaN", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "isNaN") [.atexp (.paren (ap (v "foldl") [v "min", v "nan", listE [.atexp (.scon (.intF 1))]]))]))]))]), .pat pw (ap (qv "Debug" "log") [str "foldl min", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "foldl") [v "min", v "nan", listE [.atexp (.scon (.intF 1))]]))]))]), .pat pw (ap (qv "Debug" "log") [str "map round", .atexp (.paren (ap (v "show") [listE [ap (v "round") [.atexp (neg (.scon (.float 25 (-1))))], ap (v "round") [.atexp (neg (.scon (.float 5 (-1))))], ap (v "round") [.atexp (.scon (.float 25 (-1)))]]]))]), .pat pw (ap (qv "Debug" "log") [str "case compare nan 1", .atexp (.paren (ap (v "orderName") [v "nan", .atexp (.scon (.intF 1))]))]), .pat pw (ap (qv "Debug" "log") [str "case compare 1 2", .atexp (.paren (ap (v "orderName") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]))]), .pat pw (ap (qv "Debug" "log") [str "case compare 2 2", .atexp (.paren (ap (v "orderName") [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 2))]))]), .pat pw (ap (qv "Debug" "log") [str "compare tuple nan", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "compare") [tup2 (v "nan") (.atexp (.scon (.intF 1))), tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 1)))]))]))]), .pat pw (ap (qv "Debug" "log") [str "compare list nan", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "compare") [listE [v "nan"], listE [.atexp (.scon (.intF 1))]]))]))]), .pat pw (ap (qv "Debug" "log") [str "just nan == just nan", .atexp (.paren (ap (v "show") [.atexp (.paren (bin "==" (ap (c "Just") [v "nan"]) (ap (c "Just") [v "nan"])))]))]), .pat pw (ap (qv "Debug" "log") [str "list nan /= list nan", .atexp (.paren (ap (v "show") [.atexp (.paren (bin "/=" (listE [v "nan"]) (listE [v "nan"])))]))]), .pat pw (ap (qv "Debug" "log") [str "truncate nan", .atexp (.paren (ap (v "show") [.atexp (.paren (ap (v "truncate") [v "nan"]))]))]), .pat pw (ap (qv "Debug" "log") [str "pow 3 33", .atexp (.paren (ap (v "show") [.atexp (.paren (bin "^" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 33)))))]))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "round 2.5: \"3\"" .string,
+    chk .check "round -2.5: \"-2\"" .string,
+    chk .check "round 0.5: \"1\"" .string,
+    chk .check "round -0.5: \"0\"" .string,
+    chk .check "round 1.5: \"2\"" .string,
+    chk .check "round -1.5: \"-1\"" .string,
+    chk .check "nan == nan: \"False\"" .string,
+    chk .check "nan /= nan: \"True\"" .string,
+    chk .check "1 /= nan: \"True\"" .string,
+    chk .check "min 1 nan is NaN: \"True\"" .string,
+    chk .check "min 1 nan: \"NaN\"" .string,
+    chk .check "compare nan 1: \"GT\"" .string,
+    chk .check "foldl min is NaN: \"True\"" .string,
+    chk .check "foldl min: \"NaN\"" .string,
+    chk .check "map round: \"[-2,0,3]\"" .string,
+    chk .check "case compare nan 1: \"GT\"" .string,
+    chk .check "case compare 1 2: \"LT\"" .string,
+    chk .check "case compare 2 2: \"EQ\"" .string,
+    chk .check "compare tuple nan: \"GT\"" .string,
+    chk .check "compare list nan: \"GT\"" .string,
+    chk .check "just nan == just nan: \"False\"" .string,
+    chk .check "list nan /= list nan: \"True\"" .string,
+    chk .check "truncate nan: \"0\"" .string,
+    chk .check "pow 3 33: \"5559060566555523\"" .string ] }
+
+/-- tests/elm/src/FunctionAccumulatorFunctionLookupTest.elm -/
+def g_elm_FunctionAccumulatorFunctionLookupTest : Program := {
+  name := "FunctionAccumulatorFunctionLookupTest", source := "tests/elm/src",
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"Char", "Char", some (.items [.tycon "Char"])⟩, ⟨"List", "List", some (.items [.op "::"])⟩, ⟨"Maybe", "Maybe", some (.items [.opened "Maybe"])⟩, ⟨"Platform.Cmd", "Cmd", some (.items [.tycon "Cmd"])⟩, ⟨"Platform.Sub", "Sub", some (.items [.tycon "Sub"])⟩, ⟨"String", "String", some (.items [.tycon "String"])⟩, ⟨"Tuple", "Tuple", none⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "lookup" [pv "k", pv "entries"] (caseOf (v "entries") [(P (listP []), v "identity"), (.cons (P (ptup2 (P (pv "key")) (P (pv "f")))) (P (pv "rest")), ifte (bin "==" (v "key") (v "k")) (v "f") (ap (v "lookup") [v "k", v "rest"]))]),
+    .fn "table" [] (listE [tup2 (i 1) (lams [pv "x"] (bin "+" (v "x") (i 1))), tup2 (i 2) (lams [pv "x"] (bin "*" (v "x") (i 2))), tup2 (i 3) (ap (v "max") [i 4])]),
+    .fn "testValue" [] (bin "+" (bin "+" (ap (v "lookup") [i 2, v "table", i 5]) (ap (v "lookup") [i 9, v "table", i 1])) (ap (v "lookup") [i 3, v "table", i 0])),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 15" .int ] }
+
+/-- tests/elm/src/FunctionBasicTest.elm -/
+def g_elm_FunctionBasicTest : Program := {
+  name := "FunctionBasicTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "add" [pv "a", pv "b"] (bin "+" (v "a") (v "b")),
+    .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))),
+    .fn "identity" [pv "x"] (v "x"),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "add1", .atexp (.paren (ap (v "add") [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]))]), .pat pw (ap (qv "Debug" "log") [str "double1", .atexp (.paren (ap (v "double") [.atexp (.scon (.intF 5))]))]), .pat pw (ap (qv "Debug" "log") [str "identity1", .atexp (.paren (ap (v "identity") [.atexp (.scon (.intF 42))]))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "add1: 5" .float,
+    chk .check "double1: 10" .float,
+    chk .check "identity1: 42" .float ] }
+
+/-- tests/elm/src/FunctionChainedPartialApplicationTest.elm -/
+def g_elm_FunctionChainedPartialApplicationTest : Program := {
+  name := "FunctionChainedPartialApplicationTest", source := "tests/elm/src",
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"List", "List", some .all⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.fn "f" [] (lams [pv "a", pv "b", pv "c"] (v "a")), .fn "p1" [] (ap (v "f") [.atexp (.scon (.intF 1))])] (ap (v "p1") [.atexp (.scon (.intF 2))])),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: <function>" .function ] }
+
+/-- tests/elm/src/FunctionCompappendWithStringTest.elm -/
+def g_elm_FunctionCompappendWithStringTest : Program := {
+  name := "FunctionCompappendWithStringTest", source := "tests/elm/src",
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"Char", "Char", some .all⟩, ⟨"List", "List", some .all⟩, ⟨"Maybe", "Maybe", some .all⟩, ⟨"String", "String", some .all⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "zsortConcat" [pv "a", pv "b"] (ifte (bin "<" (v "a") (v "b")) (bin "++" (v "a") (v "b")) (bin "++" (v "b") (v "a"))),
+    .fn "testValue" [] (ap (v "zsortConcat") [str "hello", str "world"]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: \"helloworld\"" .string ] }
+
+/-- tests/elm/src/FunctionMultiArgTest.elm -/
+def g_elm_FunctionMultiArgTest : Program := {
+  name := "FunctionMultiArgTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "addThree" [pv "a", pv "b", pv "c"] (bin "+" (bin "+" (v "a") (v "b")) (v "c")),
+    .fn "addFour" [pv "a", pv "b", pv "c", pv "d"] (bin "+" (bin "+" (bin "+" (v "a") (v "b")) (v "c")) (v "d")),
+    .fn "addFive" [pv "a", pv "b", pv "c", pv "d", pv "e"] (bin "+" (bin "+" (bin "+" (bin "+" (v "a") (v "b")) (v "c")) (v "d")) (v "e")),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "three", .atexp (.paren (ap (v "addThree") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]))]), .pat pw (ap (qv "Debug" "log") [str "four", .atexp (.paren (ap (v "addFour") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))]))]), .pat pw (ap (qv "Debug" "log") [str "five", .atexp (.paren (ap (v "addFive") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3)), .atexp (.scon (.intF 4)), .atexp (.scon (.intF 5))]))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "three: 6" .float,
+    chk .check "four: 10" .float,
+    chk .check "five: 15" .float ] }
+
+/-- tests/elm/src/FunctionUnannotatedCompappendTest.elm -/
+def g_elm_FunctionUnannotatedCompappendTest : Program := {
+  name := "FunctionUnannotatedCompappendTest", source := "tests/elm/src",
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"List", "List", some .all⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "zsortcat" [pv "x", pv "y"] (ifte (bin "<" (v "x") (v "y")) (bin "++" (v "x") (v "y")) (bin "++" (v "y") (v "x"))),
+    .fn "testValue" [] (.atexp (.scon (.intF 0))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 0" .float ] }
+
+/-- tests/elm/src/FunctionValueChoiceTest.elm -/
+def g_elm_FunctionValueChoiceTest : Program := {
+  name := "FunctionValueChoiceTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "sumTo" [pv "n"] (ifte (bin "<=" (v "n") (i 0)) (i 0) (bin "+" (v "n") (ap (v "sumTo") [.atexp (.paren (bin "-" (v "n") (i 1)))]))),
+    .fn "chooseIf" [] (ifte (bin ">" (ap (v "sumTo") [i 10]) (i 20)) (lams [pv "a", pv "b"] (bin "*" (v "a") (v "b"))) (lams [pv "a", pv "b"] (bin "-" (v "a") (v "b")))),
+    .fn "chooseElse" [] (ifte (bin ">" (ap (v "sumTo") [i 3]) (i 20)) (lams [pv "a", pv "b"] (bin "*" (v "a") (v "b"))) (lams [pv "a", pv "b"] (bin "-" (v "a") (v "b")))),
+    .fn "foldl" [pv "f", pv "acc", pv "xs"] (caseOf (v "xs") [(P (listP []), v "acc"), (.cons (P (pv "x")) (P (pv "rest")), ap (v "foldl") [v "f", .atexp (.paren (ap (v "f") [v "x", v "acc"])), v "rest"])]),
+    .fn "chooseC" [pv "n", pv "f", pv "g"] (ifte (bin ">" (v "n") (i 0)) (tup2 (v "f") (v "g")) (tup2 (v "g") (v "f"))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "chooseIf called", .atexp (.paren (ap (v "chooseIf") [i 3, i 4]))]), .pat pw (ap (qv "Debug" "log") [str "chooseIf folded", .atexp (.paren (ap (v "foldl") [v "chooseIf", i 1, listE [i 1, i 2, i 3]]))]), .pat pw (ap (qv "Debug" "log") [str "chooseElse called", .atexp (.paren (ap (v "chooseElse") [i 3, i 4]))]), .pat pw (ap (qv "Debug" "log") [str "chooseElse folded", .atexp (.paren (ap (v "foldl") [v "chooseElse", i 0, listE [i 1, i 2, i 3]]))]), .pat (ptup2 (P (pv "p")) (P (pv "q"))) (ap (v "chooseC") [i 1, i 3, i 4]), .pat pw (ap (qv "Debug" "log") [str "chooseC then", .atexp (.paren (bin "+" (v "p") (v "q")))]), .pat pw (ap (qv "Debug" "log") [str "chooseC else", .atexp (.paren (ap (v "chooseC") [i 0, i 3, i 4]))]), .pat (ptup2 (P (pv "r")) (P (pv "t"))) (ap (v "chooseC") [.atexp (neg (A (i 1))), i 7, i 10]), .pat pw (ap (qv "Debug" "log") [str "chooseC sum", .atexp (.paren (bin "+" (v "r") (v "t")))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "chooseIf called: 12" .int,
+    chk .check "chooseIf folded: 6" .int,
+    chk .check "chooseElse called: -1" .int,
+    chk .check "chooseElse folded: 2" .int,
+    chk .check "chooseC then: 7" .int,
+    chk .check "chooseC else: (4,3)" .data,
+    chk .check "chooseC sum: 17" .int ] }
+
+/-- tests/elm/src/HOParamApplyTwoTest.elm -/
+def g_elm_HOParamApplyTwoTest : Program := {
+  name := "HOParamApplyTwoTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "applyTwo" [pv "f", pv "a", pv "b"] (ap (v "f") [v "a", v "b"]), .fn "result" [] (ap (v "applyTwo") [.atexp (.paren (lams [pv "x", pv "y"] (v "x"))), .atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]), .pat pw (ap (qv "Debug" "log") [str "result", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "result: 1" .float ] }
+
+/-- tests/elm/src/HelloTest.elm -/
+def g_elm_HelloTest : Program := {
+  name := "HelloTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "msg" [] (str "hello"), .pat pw (ap (qv "Debug" "log") [str "HelloTest", v "msg"])] (ap (v "text") [v "msg"])) ],
+  checks := [
+    chk .check "HelloTest: \"hello\"" .string ] }
+
+/-- tests/elm/src/HeteroClosureIntFloatTest.elm -/
+def g_elm_HeteroClosureIntFloatTest : Program := {
+  name := "HeteroClosureIntFloatTest", source := "tests/elm/src", native := true,
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "addN" [pv "n", pv "x"] (bin "+" (v "n") (v "x")),
+    .fn "mulF" [pv "f", pv "x"] (ap (v "truncate") [.atexp (.paren (bin "*" (v "f") (ap (v "toFloat") [v "x"])))]),
+    .fn "main" [] (letDefs [.fn "f" [] (ifte (c "True") (ap (v "addN") [i 10]) (ap (v "mulF") [.atexp (.scon (.float 25 (-1)))])), .pat pw (ap (qv "Debug" "log") [str "hetero_true", .atexp (.paren (ap (v "f") [i 3]))]), .fn "g" [] (ifte (c "False") (ap (v "addN") [i 10]) (ap (v "mulF") [.atexp (.scon (.float 25 (-1)))])), .pat pw (ap (qv "Debug" "log") [str "hetero_false", .atexp (.paren (ap (v "g") [i 4]))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "hetero_true: 13" .int,
+    chk .check "hetero_false: 10" .int ] }
+
+/-- tests/elm/src/HigherOrderFilterLikeFunctionTest.elm -/
+def g_elm_HigherOrderFilterLikeFunctionTest : Program := {
+  name := "HigherOrderFilterLikeFunctionTest", source := "tests/elm/src",
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"List", "List", some .all⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.fn "myFilter" [pv "pred", pv "list"] (caseOf (v "list") [(P (listP []), listE []), (.cons (P (pv "h")) (P (pv "t")), ifte (ap (v "pred") [v "h"]) (listE [v "h"]) (listE []))])] (ap (v "myFilter") [.atexp (.paren (lams [pw] (.atexp (.con ⟨some "Basics", "True"⟩)))), listE [.atexp (.scon (.intF 1))]])),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: [1]" .data ] }
+
 /-- tests/elm/src/HigherOrderFunctionChosenByIfTest.elm -/
 def g_elm_HigherOrderFunctionChosenByIfTest : Program := {
   name := "HigherOrderFunctionChosenByIfTest", source := "tests/elm/src",
-  cons := [],
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"Char", "Char", some .all⟩, ⟨"Html", "Html", some (.items [.var "text"])⟩, ⟨"List", "List", some .all⟩, ⟨"Maybe", "Maybe", some .all⟩, ⟨"String", "String", some .all⟩],
+  types := [],
+  aliases := [],
   defs := [
     .fn "useH" [pv "b", pv "hof1", pv "hof2", pv "k"] (letDefs [.fn "h" [] (ifte (v "b") (v "hof1") (v "hof2"))] (ap (v "h") [v "k"])),
-    .fn "testValue" [] (ap (v "useH") [.atexp (.con ⟨some "Basics", "True"⟩), .atexp (.paren (lams [pv "f"] (ap (v "f") [i 1]))), .atexp (.paren (lams [pv "g"] (ap (v "g") [i 2]))), .atexp (.paren (lams [pv "x"] (bin "*" (v "x") (i 2))))]) ],
-  locals := [ ],
+    .fn "testValue" [] (ap (v "useH") [.atexp (.con ⟨some "Basics", "True"⟩), .atexp (.paren (lams [pv "f"] (ap (v "f") [i 1]))), .atexp (.paren (lams [pv "g"] (ap (v "g") [i 2]))), .atexp (.paren (lams [pv "x"] (bin "*" (v "x") (i 2))))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "testValue" "2" .int (v "testValue") ] }
+    chk .check "testValue: 2" .int ] }
 
 /-- tests/elm/src/HigherOrderFunctionFactoryTest.elm -/
 def g_elm_HigherOrderFunctionFactoryTest : Program := {
   name := "HigherOrderFunctionFactoryTest", source := "tests/elm/src",
-  cons := [],
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"List", "List", some .all⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "testValue" [] (letDefs [.fn "makeTransform" [pv "factor"] (lams [pv "x"] (tup2 (v "x") (v "factor"))), .fn "double" [] (ap (v "makeTransform") [.atexp (.scon (.intF 2))])] (ap (v "double") [.atexp (.scon (.intF 5))])) ],
-  locals := [ ],
+    .fn "testValue" [] (letDefs [.fn "makeTransform" [pv "factor"] (lams [pv "x"] (tup2 (v "x") (v "factor"))), .fn "double" [] (ap (v "makeTransform") [.atexp (.scon (.intF 2))])] (ap (v "double") [.atexp (.scon (.intF 5))])),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "testValue" "(5,2)" .data (v "testValue") ] }
+    chk .check "testValue: (5,2)" .data ] }
 
 /-- tests/elm/src/HigherOrderReturnLambdaBasedOnConditionTest.elm -/
 def g_elm_HigherOrderReturnLambdaBasedOnConditionTest : Program := {
   name := "HigherOrderReturnLambdaBasedOnConditionTest", source := "tests/elm/src",
-  cons := [],
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"List", "List", some .all⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "testValue" [] (letDefs [.fn "choose" [pv "flag"] (ifte (v "flag") (lams [pv "x"] (v "x")) (lams [pw] (.atexp (.scon (.intF 0)))))] (ap (v "choose") [.atexp (.con ⟨some "Basics", "True"⟩), .atexp (.scon (.intF 42))])) ],
-  locals := [ ],
+    .fn "testValue" [] (letDefs [.fn "choose" [pv "flag"] (ifte (v "flag") (lams [pv "x"] (v "x")) (lams [pw] (.atexp (.scon (.intF 0)))))] (ap (v "choose") [.atexp (.con ⟨some "Basics", "True"⟩), .atexp (.scon (.intF 42))])),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "testValue" "42" .float (v "testValue") ] }
+    chk .check "testValue: 42" .float ] }
 
 /-- tests/elm/src/HigherOrderTest.elm -/
 def g_elm_HigherOrderTest : Program := {
   name := "HigherOrderTest", source := "tests/elm/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
   defs := [
     .fn "apply" [pv "f", pv "x"] (ap (v "f") [v "x"]),
     .fn "twice" [pv "f", pv "x"] (ap (v "f") [.atexp (.paren (ap (v "f") [v "x"]))]),
     .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))),
-    .fn "square" [pv "x"] (bin "*" (v "x") (v "x")) ],
-  locals := [ ],
+    .fn "square" [pv "x"] (bin "*" (v "x") (v "x")),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "apply1", .atexp (.paren (ap (v "apply") [v "double", .atexp (.scon (.intF 5))]))]), .pat pw (ap (qv "Debug" "log") [str "apply2", .atexp (.paren (ap (v "apply") [v "square", .atexp (.scon (.intF 5))]))]), .pat pw (ap (qv "Debug" "log") [str "twice1", .atexp (.paren (ap (v "twice") [v "double", .atexp (.scon (.intF 5))]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "apply1" "10" .float (ap (v "apply") [v "double", .atexp (.scon (.intF 5))]),
-    ckk "apply2" "25" .float (ap (v "apply") [v "square", .atexp (.scon (.intF 5))]),
-    ckk "twice1" "20" .float (ap (v "twice") [v "double", .atexp (.scon (.intF 5))]) ] }
+    chk .check "apply1: 10" .float,
+    chk .check "apply2: 25" .float,
+    chk .check "twice1: 20" .float ] }
 
 /-- tests/elm/src/HigherOrderTripleNestedFunctionTest.elm -/
 def g_elm_HigherOrderTripleNestedFunctionTest : Program := {
   name := "HigherOrderTripleNestedFunctionTest", source := "tests/elm/src",
-  cons := [],
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"List", "List", some .all⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "testValue" [] (letDefs [.fn "triple" [pv "a"] (lams [pv "b"] (lams [pv "c"] (listE [v "a", v "b", v "c"])))] (ap (v "triple") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])) ],
-  locals := [ ],
+    .fn "testValue" [] (letDefs [.fn "triple" [pv "a"] (lams [pv "b"] (lams [pv "c"] (listE [v "a", v "b", v "c"])))] (ap (v "triple") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "testValue" "[1,2,3]" .data (v "testValue") ] }
+    chk .check "testValue: [1,2,3]" .data ] }
 
 /-- tests/elm/src/HoleyAliasTwoParamsTest.elm -/
 def g_elm_HoleyAliasTwoParamsTest : Program := {
   name := "HoleyAliasTwoParamsTest", source := "tests/elm/src",
-  cons := [("Box", 1), ("RBox", 1), ("GBox", 2)],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("Box", [("Box", 1)]), ("GBox", [("GBox", 2)]), ("RBox", [("RBox", 1)])],
+  aliases := [("Pair", none), ("Rec", some ["first", "second"])],
   defs := [
     .fn "unbox" [.paren (pcon "Box" [ptup2 (P (pv "n")) (P (pv "s"))])] (tup2 (bin "+" (v "n") (i 0)) (bin "++" (v "s") (str ""))),
     .fn "runbox" [.paren (pcon "RBox" [pv "r"])] (tup2 (bin "*" (.atexp (access (A (v "r")) "second")) (.atexp (.scon (.float 10 (-1))))) (bin "*" (.atexp (access (A (v "r")) "first")) (i 1))),
-    .fn "gfirst" [.paren (pcon "GBox" [ptup2 (P (pv "a")) (P pw), pw])] (bin "+" (v "a") (i 0)) ],
-  locals := [
-    .pat (ptup2 (P (pv "n")) (P (pv "s"))) (ap (v "unbox") [.atexp (.paren (ap (c "Box") [tup2 (i 42) (str "hi")]))]),
-    .pat (ptup2 (P (pv "f")) (P (pv "i"))) (ap (v "runbox") [.atexp (.paren (ap (c "RBox") [recE [("first", i 7), ("second", .atexp (.scon (.float 25 (-1))))]]))]) ],
+    .fn "gfirst" [.paren (pcon "GBox" [ptup2 (P (pv "a")) (P pw), pw])] (bin "+" (v "a") (i 0)),
+    .fn "main" [] (letDefs [.pat (ptup2 (P (pv "n")) (P (pv "s"))) (ap (v "unbox") [.atexp (.paren (ap (c "Box") [tup2 (i 42) (str "hi")]))]), .pat (ptup2 (P (pv "f")) (P (pv "i"))) (ap (v "runbox") [.atexp (.paren (ap (c "RBox") [recE [("first", i 7), ("second", .atexp (.scon (.float 25 (-1))))]]))]), .pat pw (ap (qv "Debug" "log") [str "pairInt", v "n"]), .pat pw (ap (qv "Debug" "log") [str "pairStr", v "s"]), .pat pw (ap (qv "Debug" "log") [str "recFloat", v "f"]), .pat pw (ap (qv "Debug" "log") [str "recInt", .atexp (.paren (bin "+" (v "i") (ap (v "gfirst") [.atexp (.paren (ap (c "GBox") [tup2 (i 0) (.atexp (.scon (.float 15 (-1)))), recE [("first", .atexp (.scon (.float 15 (-1)))), ("second", i 0)]]))])))]), .pat pw (ap (qv "Debug" "log") [str "box", .atexp (.paren (ap (c "Box") [tup2 (i 42) (str "hi")]))]), .pat pw (ap (qv "Debug" "log") [str "rbox", .atexp (.paren (ap (c "RBox") [recE [("first", i 7), ("second", .atexp (.scon (.float 25 (-1))))]]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "pairInt" "42" .int (v "n"),
-    ckk "pairStr" "\"hi\"" .string (v "s"),
-    ckk "recFloat" "2.5" .float (v "f"),
-    ckk "recInt" "7" .int (bin "+" (v "i") (ap (v "gfirst") [.atexp (.paren (ap (c "GBox") [tup2 (i 0) (.atexp (.scon (.float 15 (-1)))), recE [("first", .atexp (.scon (.float 15 (-1)))), ("second", i 0)]]))])),
-    ckk "box" "Box (42,\"hi\")" .data (ap (c "Box") [tup2 (i 42) (str "hi")]),
-    ckk "rbox" "RBox { first = 7, second = 2.5 }" .data (ap (c "RBox") [recE [("first", i 7), ("second", .atexp (.scon (.float 25 (-1))))]]) ] }
+    chk .check "pairInt: 42" .int,
+    chk .check "pairStr: \"hi\"" .string,
+    chk .check "recFloat: 2.5" .float,
+    chk .check "recInt: 7" .int,
+    chk .check "box: Box (42,\"hi\")" .data,
+    chk .check "rbox: RBox { first = 7, second = 2.5 }" .data ] }
+
+/-- tests/elm/src/ImportClosedTypeOpenItemTest.elm, tests/elm/src/ModuleExposingHelper.elm -/
+def g_elm_ImportClosedTypeOpenItemTest : Program := {
+  name := "ImportClosedTypeOpenItemTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩, ⟨"ModuleExposingHelper", "ModuleExposingHelper", some (.items [.opened "Closed"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "roundTrip" [pv "n"] (ap (qv "ModuleExposingHelper" "makeClosed") [v "n"]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "closed", .atexp (.paren (ap (qv "ModuleExposingHelper" "unwrapClosed") [.atexp (.paren (ap (v "roundTrip") [i 9]))]))])] (ap (qv "Html" "text") [str "done"])) ],
+  helpers := [
+   { name := "ModuleExposingHelper", path := "tests/elm/src/ModuleExposingHelper.elm",
+     exposing := (.items [.tycon "Closed", .opened "Open", .tycon "Point", .tycon "Shape", .var "double", .var "exposedCount", .var "makeClosed", .var "makeShape", .var "unwrapClosed", .var "unwrapShape"]), imports := [],
+     types := [("Closed", [("Closed", 1)]), ("Open", [("One", 0), ("Two", 1)]), ("Shape", [("Shape", 1)])],
+     aliases := [("Point", some ["x", "y"])],
+     defs := [
+      .fn "hidden" [] (i 100),
+      .fn "double" [pv "n"] (bin "*" (i 2) (v "n")),
+      .fn "exposedCount" [] (bin "+" (v "hidden") (i 1)),
+      .fn "makeClosed" [pv "n"] (ap (c "Closed") [v "n"]),
+      .fn "unwrapClosed" [.paren (pcon "Closed" [pv "n"])] (v "n"),
+      .fn "makeShape" [pv "n"] (ap (c "Shape") [v "n"]),
+      .fn "unwrapShape" [.paren (pcon "Shape" [pv "n"])] (v "n") ] } ],
+  checks := [
+    chk .check "closed: 9" .int ] }
+
+/-- tests/elm/src/ImportExposingAllTest.elm, tests/elm/src/ModuleExposingHelper.elm -/
+def g_elm_ImportExposingAllTest : Program := {
+  name := "ImportExposingAllTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩, ⟨"ModuleExposingHelper", "ModuleExposingHelper", some .all⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "two" [] (caseOf (ap (c "Two") [i 7]) [(pcon "Two" [pv "n"], v "n"), (P (pcA "One"), i 0)]), .fn "point" [] (ap (c "Point") [i 1, i 2])] (letDefs [.pat pw (ap (qv "Debug" "log") [str "all", listE [ap (v "double") [i 21], v "exposedCount", v "two", bin "+" (.atexp (access (A (v "point")) "x")) (.atexp (access (A (v "point")) "y"))]])] (ap (qv "Html" "text") [str "done"]))) ],
+  helpers := [
+   { name := "ModuleExposingHelper", path := "tests/elm/src/ModuleExposingHelper.elm",
+     exposing := (.items [.tycon "Closed", .opened "Open", .tycon "Point", .tycon "Shape", .var "double", .var "exposedCount", .var "makeClosed", .var "makeShape", .var "unwrapClosed", .var "unwrapShape"]), imports := [],
+     types := [("Closed", [("Closed", 1)]), ("Open", [("One", 0), ("Two", 1)]), ("Shape", [("Shape", 1)])],
+     aliases := [("Point", some ["x", "y"])],
+     defs := [
+      .fn "hidden" [] (i 100),
+      .fn "double" [pv "n"] (bin "*" (i 2) (v "n")),
+      .fn "exposedCount" [] (bin "+" (v "hidden") (i 1)),
+      .fn "makeClosed" [pv "n"] (ap (c "Closed") [v "n"]),
+      .fn "unwrapClosed" [.paren (pcon "Closed" [pv "n"])] (v "n"),
+      .fn "makeShape" [pv "n"] (ap (c "Shape") [v "n"]),
+      .fn "unwrapShape" [.paren (pcon "Shape" [pv "n"])] (v "n") ] } ],
+  checks := [
+    chk .check "all: [42,101,7,3]" .data ] }
+
+/-- tests/elm/src/ImportExposingItemsTest.elm, tests/elm/src/ModuleExposingHelper.elm -/
+def g_elm_ImportExposingItemsTest : Program := {
+  name := "ImportExposingItemsTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩, ⟨"ModuleExposingHelper", "ModuleExposingHelper", some (.items [.tycon "Closed", .opened "Open", .tycon "Point", .var "double"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "openValue" [pv "o"] (caseOf (v "o") [(P (pcA "One"), i 0), (pcon "Two" [pv "n"], v "n")]),
+    .fn "pointSum" [pv "p"] (bin "+" (.atexp (access (A (v "p")) "x")) (.atexp (access (A (v "p")) "y"))),
+    .fn "closedValue" [pv "c"] (ap (qv "ModuleExposingHelper" "unwrapClosed") [v "c"]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "double", .atexp (.paren (ap (v "double") [i 21]))]), .pat pw (ap (qv "Debug" "log") [str "open", listE [ap (v "openValue") [c "One"], ap (v "openValue") [.atexp (.paren (ap (c "Two") [i 7]))]]]), .pat pw (ap (qv "Debug" "log") [str "point", .atexp (.paren (ap (v "pointSum") [.atexp (.paren (ap (c "Point") [i 1, i 2]))]))]), .pat pw (ap (qv "Debug" "log") [str "closed", .atexp (.paren (ap (v "closedValue") [.atexp (.paren (ap (qv "ModuleExposingHelper" "makeClosed") [i 5]))]))]), .pat pw (ap (qv "Debug" "log") [str "qualified", qv "ModuleExposingHelper" "exposedCount"])] (ap (qv "Html" "text") [str "done"])) ],
+  helpers := [
+   { name := "ModuleExposingHelper", path := "tests/elm/src/ModuleExposingHelper.elm",
+     exposing := (.items [.tycon "Closed", .opened "Open", .tycon "Point", .tycon "Shape", .var "double", .var "exposedCount", .var "makeClosed", .var "makeShape", .var "unwrapClosed", .var "unwrapShape"]), imports := [],
+     types := [("Closed", [("Closed", 1)]), ("Open", [("One", 0), ("Two", 1)]), ("Shape", [("Shape", 1)])],
+     aliases := [("Point", some ["x", "y"])],
+     defs := [
+      .fn "hidden" [] (i 100),
+      .fn "double" [pv "n"] (bin "*" (i 2) (v "n")),
+      .fn "exposedCount" [] (bin "+" (v "hidden") (i 1)),
+      .fn "makeClosed" [pv "n"] (ap (c "Closed") [v "n"]),
+      .fn "unwrapClosed" [.paren (pcon "Closed" [pv "n"])] (v "n"),
+      .fn "makeShape" [pv "n"] (ap (c "Shape") [v "n"]),
+      .fn "unwrapShape" [.paren (pcon "Shape" [pv "n"])] (v "n") ] } ],
+  checks := [
+    chk .check "double: 42" .int,
+    chk .check "open: [0,7]" .data,
+    chk .check "point: 3" .int,
+    chk .check "closed: 5" .int,
+    chk .check "qualified: 101" .int ] }
 
 /-- tests/elm/src/ImportOperatorItemTest.elm -/
 def g_elm_ImportOperatorItemTest : Program := {
   name := "ImportOperatorItemTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Basics", "Basics", some (.items [.op "+", .op "//"])⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "sum", .atexp (.paren (bin "+" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 4)))))]), .pat pw (ap (qv "Debug" "log") [str "quotient", .atexp (.paren (bin "//" (i 7) (i 2)))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "sum" "7" .float (bin "+" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 4)))),
-    ckk "quotient" "3" .int (bin "//" (i 7) (i 2)) ] }
+    chk .check "sum: 7" .float,
+    chk .check "quotient: 3" .int ] }
 
 /-- tests/elm/src/ImportResolutionQualifiedImportedFunctionTest.elm -/
 def g_elm_ImportResolutionQualifiedImportedFunctionTest : Program := {
   name := "ImportResolutionQualifiedImportedFunctionTest", source := "tests/elm/src",
-  cons := [],
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
     .fn "xs" [] (listE [ap (qv "Basics" "negate") [.atexp (.scon (.intF 1))], ap (qv "Basics" "negate") [.atexp (.scon (.intF 2))]]),
-    .fn "testValue" [] (v "xs") ],
-  locals := [ ],
+    .fn "testValue" [] (v "xs"),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "testValue" "[-1,-2]" .data (v "testValue") ] }
+    chk .check "testValue: [-1,-2]" .data ] }
+
+/-- tests/elm/src/ImportTypeByNameLaterReplacesTest.elm, tests/elm/src/ImportTypeByNameFirstHelper.elm, tests/elm/src/ImportTypeByNameSecondHelper.elm -/
+def g_elm_ImportTypeByNameLaterReplacesTest : Program := {
+  name := "ImportTypeByNameLaterReplacesTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩, ⟨"ImportTypeByNameFirstHelper", "ImportTypeByNameFirstHelper", some (.items [.tycon "Thing"])⟩, ⟨"ImportTypeByNameSecondHelper", "ImportTypeByNameSecondHelper", some (.items [.tycon "Thing"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "x" [] (ap (.atexp (.con ⟨some "ImportTypeByNameSecondHelper", "Second"⟩)) [i 7]),
+    .fn "main" [] (letDefs [.fn "n" [] (caseOf (v "x") [(.con ⟨some "ImportTypeByNameSecondHelper", "Second"⟩ [pv "k"], v "k")]), .pat pw (ap (qv "Debug" "log") [str "x", v "n"])] (ap (qv "Html" "text") [str "done"])) ],
+  helpers := [
+   { name := "ImportTypeByNameFirstHelper", path := "tests/elm/src/ImportTypeByNameFirstHelper.elm",
+     exposing := (.items [.opened "Thing"]), imports := [],
+     types := [("Thing", [("First", 1)])],
+     aliases := [],
+     defs := [ ] },
+   { name := "ImportTypeByNameSecondHelper", path := "tests/elm/src/ImportTypeByNameSecondHelper.elm",
+     exposing := (.items [.opened "Thing"]), imports := [],
+     types := [("Thing", [("Second", 1)])],
+     aliases := [],
+     defs := [ ] } ],
+  checks := [
+    chk .check "x: 7" .int ] }
 
 /-- tests/elm/src/IndirectCallFloatTest.elm -/
 def g_elm_IndirectCallFloatTest : Program := {
   name := "IndirectCallFloatTest", source := "tests/elm/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
   defs := [
     .fn "applyFloat" [pv "f", pv "x"] (ap (v "f") [v "x"]),
     .fn "twiceFloat" [pv "f", pv "x"] (ap (v "f") [.atexp (.paren (ap (v "f") [v "x"]))]),
     .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.float 20 (-1))))),
     .fn "negate" [pv "x"] (bin "-" (.atexp (.scon (.float 0 (-1)))) (v "x")),
-    .fn "addTen" [pv "x"] (bin "+" (v "x") (.atexp (.scon (.float 100 (-1))))) ],
-  locals := [
-    .fn "doubleThenAddTen" [] (bin ">>" (v "double") (v "addTen")) ],
+    .fn "addTen" [pv "x"] (bin "+" (v "x") (.atexp (.scon (.float 100 (-1))))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "apply_double", .atexp (.paren (ap (v "applyFloat") [v "double", .atexp (.scon (.float 50 (-1)))]))]), .pat pw (ap (qv "Debug" "log") [str "apply_negate", .atexp (.paren (ap (v "applyFloat") [v "negate", .atexp (.scon (.float 30 (-1)))]))]), .pat pw (ap (qv "Debug" "log") [str "apply_addTen", .atexp (.paren (ap (v "applyFloat") [v "addTen", .atexp (.scon (.float 50 (-1)))]))]), .pat pw (ap (qv "Debug" "log") [str "twice_double", .atexp (.paren (ap (v "twiceFloat") [v "double", .atexp (.scon (.float 20 (-1)))]))]), .pat pw (ap (qv "Debug" "log") [str "twice_addTen", .atexp (.paren (ap (v "twiceFloat") [v "addTen", .atexp (.scon (.float 0 (-1)))]))]), .fn "doubleThenAddTen" [] (bin ">>" (v "double") (v "addTen")), .pat pw (ap (qv "Debug" "log") [str "compose_result", .atexp (.paren (ap (v "applyFloat") [v "doubleThenAddTen", .atexp (.scon (.float 60 (-1)))]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "apply_double" "10" .float (ap (v "applyFloat") [v "double", .atexp (.scon (.float 50 (-1)))]),
-    ckk "apply_negate" "-3" .float (ap (v "applyFloat") [v "negate", .atexp (.scon (.float 30 (-1)))]),
-    ckk "apply_addTen" "15" .float (ap (v "applyFloat") [v "addTen", .atexp (.scon (.float 50 (-1)))]),
-    ckk "twice_double" "8" .float (ap (v "twiceFloat") [v "double", .atexp (.scon (.float 20 (-1)))]),
-    ckk "twice_addTen" "20" .float (ap (v "twiceFloat") [v "addTen", .atexp (.scon (.float 0 (-1)))]),
-    ckk "compose_result" "22" .float (ap (v "applyFloat") [v "doubleThenAddTen", .atexp (.scon (.float 60 (-1)))]) ] }
+    chk .check "apply_double: 10" .float,
+    chk .check "apply_negate: -3" .float,
+    chk .check "apply_addTen: 15" .float,
+    chk .check "twice_double: 8" .float,
+    chk .check "twice_addTen: 20" .float,
+    chk .check "compose_result: 22" .float ] }
 
 /-- tests/elm/src/InfixAssocLeftArithTest.elm -/
 def g_elm_InfixAssocLeftArithTest : Program := {
   name := "InfixAssocLeftArithTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "sub sub", .atexp (.paren (bin "-" (bin "-" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 2)))))]), .pat pw (ap (qv "Debug" "log") [str "fdiv fdiv", .atexp (.paren (bin "/" (bin "/" (.atexp (.scon (.intF 100))) (.atexp (.scon (.intF 10)))) (.atexp (.scon (.intF 2)))))]), .pat pw (ap (qv "Debug" "log") [str "idiv idiv", .atexp (.paren (bin "//" (bin "//" (i 100) (i 10)) (i 3)))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "sub sub" "5" .float (bin "-" (bin "-" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 2)))),
-    ckk "fdiv fdiv" "5" .float (bin "/" (bin "/" (.atexp (.scon (.intF 100))) (.atexp (.scon (.intF 10)))) (.atexp (.scon (.intF 2)))),
-    ckk "idiv idiv" "3" .int (bin "//" (bin "//" (i 100) (i 10)) (i 3)) ] }
+    chk .check "sub sub: 5" .float,
+    chk .check "fdiv fdiv: 5" .float,
+    chk .check "idiv idiv: 3" .int ] }
 
 /-- tests/elm/src/InfixAssocPipesTest.elm -/
 def g_elm_InfixAssocPipesTest : Program := {
   name := "InfixAssocPipesTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "pipe right twice", .atexp (.paren (bin "|>" (bin "|>" (.atexp (.scon (.intF 3))) (v "negate")) (v "abs")))]), .pat pw (ap (qv "Debug" "log") [str "pipe left twice", .atexp (.paren (bin "<|" (v "negate") (bin "<|" (v "abs") (.atexp (neg (.scon (.intF 3)))))))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "pipe right twice" "3" .float (bin "|>" (bin "|>" (.atexp (.scon (.intF 3))) (v "negate")) (v "abs")),
-    ckk "pipe left twice" "-3" .float (bin "<|" (v "negate") (bin "<|" (v "abs") (.atexp (neg (.scon (.intF 3)))))) ] }
+    chk .check "pipe right twice: 3" .float,
+    chk .check "pipe left twice: -3" .float ] }
 
 /-- tests/elm/src/InfixAssocRightPowTest.elm -/
 def g_elm_InfixAssocRightPowTest : Program := {
   name := "InfixAssocRightPowTest", source := "tests/elm/src", native := true,
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "pow pow", .atexp (.paren (bin "^" (.atexp (.scon (.intF 2))) (bin "^" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 2))))))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "pow pow" "512" .float (bin "^" (.atexp (.scon (.intF 2))) (bin "^" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 2))))) ] }
+    chk .check "pow pow: 512" .float ] }
 
 /-- tests/elm/src/InfixIfExtendsRightTest.elm -/
 def g_elm_InfixIfExtendsRightTest : Program := {
   name := "InfixIfExtendsRightTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "if then chain", .atexp (.paren (ifte (c "True") (.atexp (.scon (.intF 10))) (bin "*" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3))))))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "if then chain" "10" .float (ifte (c "True") (.atexp (.scon (.intF 10))) (bin "*" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3))))) ] }
+    chk .check "if then chain: 10" .float ] }
 
 /-- tests/elm/src/InfixLastOperandAnyExprTest.elm -/
 def g_elm_InfixLastOperandAnyExprTest : Program := {
   name := "InfixLastOperandAnyExprTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "if last", .atexp (.paren (bin "+" (.atexp (.scon (.intF 1))) (ifte (c "True") (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3))))))]), .pat pw (ap (qv "Debug" "log") [str "lambda last", .atexp (.paren (bin "|>" (.atexp (.scon (.intF 5))) (lams [pv "n"] (bin "*" (v "n") (.atexp (.scon (.intF 2)))))))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "if last" "3" .float (bin "+" (.atexp (.scon (.intF 1))) (ifte (c "True") (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3))))),
-    ckk "lambda last" "10" .float (bin "|>" (.atexp (.scon (.intF 5))) (lams [pv "n"] (bin "*" (v "n") (.atexp (.scon (.intF 2)))))) ] }
+    chk .check "if last: 3" .float,
+    chk .check "lambda last: 10" .float ] }
 
 /-- tests/elm/src/InfixNegatedOperandTest.elm -/
 def g_elm_InfixNegatedOperandTest : Program := {
   name := "InfixNegatedOperandTest", source := "tests/elm/src", native := true,
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "negated pow", .atexp (.paren (bin "^" (.atexp (neg (.scon (.intF 2)))) (.atexp (.scon (.intF 2)))))]), .pat pw (ap (qv "Debug" "log") [str "sub negated", .atexp (.paren (bin "-" (.atexp (.scon (.intF 3))) (.atexp (neg (.scon (.intF 2))))))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "negated pow" "4" .float (bin "^" (.atexp (neg (.scon (.intF 2)))) (.atexp (.scon (.intF 2)))),
-    ckk "sub negated" "5" .float (bin "-" (.atexp (.scon (.intF 3))) (.atexp (neg (.scon (.intF 2))))) ] }
+    chk .check "negated pow: 4" .float,
+    chk .check "sub negated: 5" .float ] }
 
 /-- tests/elm/src/InfixNonAssocSeparatedLegalTest.elm -/
 def g_elm_InfixNonAssocSeparatedLegalTest : Program := {
   name := "InfixNonAssocSeparatedLegalTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "separated", .atexp (.paren (andalso (bin "<" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (bin "==" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 2))))))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "separated" "True" .data (andalso (bin "<" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (bin "==" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 2))))) ] }
+    chk .check "separated: True" .data ] }
 
 /-- tests/elm/src/InfixPrecAddOverConsTest.elm -/
 def g_elm_InfixPrecAddOverConsTest : Program := {
   name := "InfixPrecAddOverConsTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "add then cons" "[2,5]" .data (bin "::" (bin "+" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 1)))) (listE [.atexp (.scon (.intF 5))])) ] }
-
-/-- tests/elm/src/InfixPrecAndOverOrTest.elm -/
-def g_elm_InfixPrecAndOverOrTest : Program := {
-  name := "InfixPrecAndOverOrTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "or then and" "True" .data (orelse (c "True") (andalso (c "False") (c "False"))) ] }
-
-/-- tests/elm/src/InfixPrecAppendOverEqTest.elm -/
-def g_elm_InfixPrecAppendOverEqTest : Program := {
-  name := "InfixPrecAppendOverEqTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "append then eq" "True" .data (bin "==" (bin "++" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2))])) (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))])) ] }
-
-/-- tests/elm/src/InfixPrecApplicationFirstTest.elm -/
-def g_elm_InfixPrecApplicationFirstTest : Program := {
-  name := "InfixPrecApplicationFirstTest", source := "tests/elm/src", native := true,
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "application then pow" "4" .float (bin "^" (ap (v "negate") [.atexp (.scon (.intF 2))]) (.atexp (.scon (.intF 2)))),
-    ckk "application then mul" "9" .float (bin "*" (ap (.atexp (.op "+")) [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (.atexp (.scon (.intF 3)))) ] }
-
-/-- tests/elm/src/InfixPrecCompareOverAndTest.elm -/
-def g_elm_InfixPrecCompareOverAndTest : Program := {
-  name := "InfixPrecCompareOverAndTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "lt then and" "True" .data (andalso (bin "<" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (bin "<" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 4))))) ] }
-
-/-- tests/elm/src/InfixPrecComposeOverPipeTest.elm -/
-def g_elm_InfixPrecComposeOverPipeTest : Program := {
-  name := "InfixPrecComposeOverPipeTest", source := "tests/elm/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "x" [] (.atexp (neg (A (i 3)))) ],
-  locals := [ ],
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "add then cons", .atexp (.paren (bin "::" (bin "+" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 1)))) (listE [.atexp (.scon (.intF 5))])))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "compose then pipe" "-3" .int (bin "|>" (v "x") (bin "<<" (v "negate") (v "abs$Int"))) ] }
-
-/-- tests/elm/src/InfixPrecMulOverAddTest.elm -/
-def g_elm_InfixPrecMulOverAddTest : Program := {
-  name := "InfixPrecMulOverAddTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "add then mul" "14" .float (bin "+" (.atexp (.scon (.intF 2))) (bin "*" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 4))))),
-    ckk "mul then add" "10" .float (bin "+" (bin "*" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 4)))) ] }
-
-/-- tests/elm/src/InfixPrecOrOverPipeTest.elm -/
-def g_elm_InfixPrecOrOverPipeTest : Program := {
-  name := "InfixPrecOrOverPipeTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "or then pipe" "False" .data (bin "|>" (orelse (c "True") (c "False")) (v "not")) ] }
-
-/-- tests/elm/src/InfixPrecPowOverMulTest.elm -/
-def g_elm_InfixPrecPowOverMulTest : Program := {
-  name := "InfixPrecPowOverMulTest", source := "tests/elm/src", native := true,
-  cons := [],
-  defs := [ ],
-  locals := [ ],
-  checks := [
-    ckk "pow then mul" "16" .float (bin "*" (bin "^" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))) (.atexp (.scon (.intF 2)))) ] }
-
-/-- tests/elm/src/InlineDupLetNamesTest.elm -/
-def g_elm_InlineDupLetNamesTest : Program := {
-  name := "InlineDupLetNamesTest", source := "tests/elm/src",
-  cons := [],
-  defs := [
-    .fn "helper" [pv "a", pv "b"] (caseOf (tup2 (v "a") (v "b")) [(P (ptup2 (P (pint 0)) (P (pint 0))), i 1), (P (ptup2 (P (pv "x")) (P (pv "y"))), bin "+" (v "x") (v "y"))]) ],
-  locals := [ ],
-  checks := [
-    ckk "InlineDupLetNamesTest" "6" .int (ap (v "helper") [.atexp (.paren (ap (v "helper") [i 1, i 2])), i 3]) ] }
-
-/-- tests/elm/src/JoinpointABI23Majority3FlatTest.elm -/
-def g_elm_JoinpointABI23Majority3FlatTest : Program := {
-  name := "JoinpointABI23Majority3FlatTest", source := "tests/elm/src",
-  cons := [],
-  defs := [
-    .fn "caseFunc" [pv "x"] (caseOf (v "x") [(P (pint 0), lams [pv "a", pv "b", pv "c"] (bin "+" (bin "+" (v "a") (v "b")) (v "c"))), (P (pint 1), lams [pv "a", pv "b", pv "c"] (bin "-" (bin "-" (v "a") (v "b")) (v "c"))), (P (pint 2), lams [pv "a", pv "b", pv "c"] (bin "*" (bin "*" (v "a") (v "b")) (v "c"))), (P pw, lams [pv "a"] (lams [pv "b"] (lams [pv "c"] (bin "-" (bin "+" (v "a") (v "b")) (v "c")))))]),
-    .fn "testValue" [] (ap (v "caseFunc") [i 0, i 5, i 3, i 2]) ],
-  locals := [ ],
-  checks := [
-    ckk "testValue" "10" .int (v "testValue") ] }
-
-/-- tests/elm/src/LambdaBoundaryCaptureTest.elm -/
-def g_elm_LambdaBoundaryCaptureTest : Program := {
-  name := "LambdaBoundaryCaptureTest", source := "tests/elm/src",
-  cons := [],
-  defs := [
-    .fn "apply" [pv "g", pv "n"] (ap (v "g") [v "n", i 100]),
-    .fn "f" [pv "s", pv "t"] (caseOf (v "s") [(P (pcA "True"), lams [pv "a"] (v "a")), (P (pcA "False"), lams [pv "b"] (ap (v "apply") [.atexp (.paren (lams [pv "y"] (caseOf (v "t") [(P (pcA "True"), lams [pv "a"] (bin "+" (v "a") (v "b"))), (P (pcA "False"), lams [pv "a"] (v "a"))]))), i 1]))]) ],
-  locals := [ ],
-  checks := [
-    ckk "result" "105" .int (ap (v "f") [c "False", c "True", i 5]) ] }
-
-/-- tests/elm/src/LambdaCaseBoundaryTest.elm -/
-def g_elm_LambdaCaseBoundaryTest : Program := {
-  name := "LambdaCaseBoundaryTest", source := "tests/elm/src",
-  cons := [("Add", 0), ("Sub", 0), ("Mul", 0)],
-  defs := [
-    .fn "getOp" [pv "op"] (caseOf (v "op") [(P (pcA "Add"), lams [pv "a", pv "b"] (bin "+" (v "a") (v "b"))), (P (pcA "Sub"), lams [pv "a", pv "b"] (bin "-" (v "a") (v "b"))), (P (pcA "Mul"), lams [pv "a", pv "b"] (bin "*" (v "a") (v "b")))]),
-    .fn "nestedCaseOp" [pv "x"] (caseOf (v "x") [(P (pint 0), lams [pv "a", pv "b"] (caseOf (v "a") [(P (pint 0), v "b"), (P pw, bin "+" (v "a") (v "b"))])), (P pw, lams [pv "a", pv "b"] (bin "-" (v "a") (v "b")))]),
-    .fn "applyPartial" [pv "f", pv "x"] (ap (v "f") [v "x", i 10]) ],
-  locals := [
-    .fn "addFive" [] (ap (v "getOp") [c "Add", i 5]) ],
-  checks := [
-    ckk "add" "7" .int (ap (v "getOp") [c "Add", i 3, i 4]),
-    ckk "sub" "3" .int (ap (v "getOp") [c "Sub", i 5, i 2]),
-    ckk "mul" "20" .int (ap (v "getOp") [c "Mul", i 4, i 5]),
-    ckk "nested_add" "11" .int (ap (v "nestedCaseOp") [i 0, i 1, i 10]),
-    ckk "nested_sub" "3" .int (ap (v "nestedCaseOp") [i 1, i 5, i 2]),
-    ckk "partial_add" "15" .int (ap (v "addFive") [i 10]) ] }
-
-/-- tests/elm/src/LambdaLetBoundaryTest.elm -/
-def g_elm_LambdaLetBoundaryTest : Program := {
-  name := "LambdaLetBoundaryTest", source := "tests/elm/src",
-  cons := [],
-  defs := [
-    .fn "letSeparated" [pv "a"] (letDefs [.fn "y" [] (bin "+" (v "a") (i 5))] (lams [pv "z"] (bin "+" (v "y") (v "z")))),
-    .fn "letCapturing" [pv "a"] (letDefs [.fn "y" [] (bin "*" (v "a") (i 2))] (lams [pv "z"] (bin "+" (bin "+" (v "y") (v "z")) (v "a")))),
-    .fn "multiLet" [pv "a"] (letDefs [.fn "x" [] (bin "+" (v "a") (i 1)), .fn "y" [] (bin "*" (v "x") (i 2))] (lams [pv "z"] (bin "+" (bin "+" (v "x") (v "y")) (v "z")))),
-    .fn "nestedLet" [pv "a"] (letDefs [.fn "x" [] (bin "+" (v "a") (i 1))] (lams [pv "b"] (letDefs [.fn "y" [] (bin "+" (v "b") (v "x"))] (lams [pv "c"] (bin "+" (bin "+" (v "x") (v "y")) (v "c")))))) ],
-  locals := [
-    .fn "partial" [] (ap (v "letSeparated") [i 10]) ],
-  checks := [
-    ckk "basic" "15" .int (ap (v "letSeparated") [i 5, i 5]),
-    ckk "capturing" "19" .int (ap (v "letCapturing") [i 3, i 10]),
-    ckk "multi_let" "20" .int (ap (v "multiLet") [i 4, i 5]),
-    ckk "nested" "42" .int (ap (v "nestedLet") [i 10, i 15, i 5]),
-    ckk "partial" "25" .int (ap (v "partial") [i 10]) ] }
-
-/-- tests/elm/src/LambdaPatternArgTest.elm -/
-def g_elm_LambdaPatternArgTest : Program := {
-  name := "LambdaPatternArgTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "swap" [] (lams [ptup2 (P (pv "x")) (P (pv "y"))] (tup2 (v "y") (v "x"))),
-    .fn "getX" [] (lams [precord ["x"]] (v "x")),
-    .fn "mixed" [] (lams [pv "a", ptup2 (P (pv "b")) (P (pv "c")), pw] (v "b")) ],
-  checks := [
-    ckk "swap" "(2,1)" .data (ap (v "swap") [tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))]),
-    ckk "getX" "42" .float (ap (v "getX") [recE [("x", .atexp (.scon (.intF 42)))]]),
-    ckk "mixed" "\"b\"" .string (ap (v "mixed") [.atexp (.scon (.intF 1)), tup2 (str "b") (.atexp (.scon (.intF 2))), .atexp (.scon (.intF 3))]) ] }
-
-/-- tests/elm/src/LargeDispatchCaseTest.elm -/
-def g_elm_LargeDispatchCaseTest : Program := {
-  name := "LargeDispatchCaseTest", source := "tests/elm/src",
-  cons := [("VInt", 1), ("VStr", 1), ("VNone", 0)],
-  defs := [
-    .fn "dispatch" [pv "args", pv "name"] (caseOf (v "args") [(P (listP [pcon "VInt" [pv "a"]]), caseOf (v "name") [(P (.scon (.str "negate")), ap (v "negate") [v "a"]), (P (.scon (.str "abs")), ap (v "abs$Int") [v "a"]), (P pw, i 0)]), (P (listP [pcon "VInt" [pv "a"], pcon "VInt" [pv "b"]]), caseOf (v "name") [(P (.scon (.str "add")), bin "+" (v "a") (v "b")), (P (.scon (.str "sub")), bin "-" (v "a") (v "b")), (P (.scon (.str "mul")), bin "*" (v "a") (v "b")), (P (.scon (.str "max")), ap (v "max") [v "a", v "b"]), (P pw, i 0)]), (P pw, i 42)]) ],
-  locals := [ ],
-  checks := [
-    ckk "r1" "3" .int (ap (v "dispatch") [listE [ap (c "VInt") [i 1], ap (c "VInt") [i 2]], str "add"]),
-    ckk "r2" "-1" .int (ap (v "dispatch") [listE [ap (c "VInt") [i 1], ap (c "VInt") [i 2]], str "sub"]),
-    ckk "r3" "-5" .int (ap (v "dispatch") [listE [ap (c "VInt") [i 5]], str "negate"]),
-    ckk "r4" "42" .int (ap (v "dispatch") [listE [], str "whatever"]) ] }
-
-/-- tests/elm/src/LetBasicTest.elm -/
-def g_elm_LetBasicTest : Program := {
-  name := "LetBasicTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "x" [] (.atexp (.scon (.intF 2))),
-    .fn "y" [] (.atexp (.scon (.intF 3))),
-    .fn "result1" [] (bin "+" (v "x") (v "y")),
-    .fn "greeting" [] (str "hello"),
-    .fn "name" [] (str "world"),
-    .fn "result2" [] (bin "++" (v "greeting") (bin "++" (str " ") (v "name"))) ],
-  checks := [
-    ckk "result1" "5" .float (v "result1"),
-    ckk "result2" "\"hello world\"" .string (v "result2") ] }
-
-/-- tests/elm/src/LetBoundLambdaCallTest.elm -/
-def g_elm_LetBoundLambdaCallTest : Program := {
-  name := "LetBoundLambdaCallTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "f" [] (lams [pv "x", pv "y"] (v "x")),
-    .fn "result" [] (ap (v "f") [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) ],
-  checks := [
-    ckk "result" "1" .float (v "result") ] }
-
-/-- tests/elm/src/LetDestructAliasTest.elm -/
-def g_elm_LetDestructAliasTest : Program := {
-  name := "LetDestructAliasTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .pat (.paren (.as (P (.paren (P (ptup2 (P (pv "a")) (P (pv "b")))))) "pair")) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) ],
-  checks := [
-    ckk "pair" "(1,2)" .data (v "pair"),
-    ckk "first" "1" .float (v "a") ] }
-
-/-- tests/elm/src/LetDestructFuncTupleTest.elm -/
-def g_elm_LetDestructFuncTupleTest : Program := {
-  name := "LetDestructFuncTupleTest", source := "tests/elm/src",
-  cons := [("First", 0), ("Second", 0)],
-  defs := [
-    .fn "choose" [pv "loc", pv "rec"] (letDefs [.pat (ptup2 (P (pv "getter")) (P (pv "setter"))) (caseOf (v "loc") [(P (pcA "First"), tup2 (.atexp (accessor "a")) (lams [pv "x", pv "m"] (updE "m" [("a", v "x")]))), (P (pcA "Second"), tup2 (.atexp (accessor "b")) (lams [pv "x", pv "m"] (updE "m" [("b", v "x")])))])] (tup2 (ap (v "getter") [v "rec"]) (ap (v "setter") [i 99, v "rec"]))) ],
-  locals := [
-    .pat (ptup2 (P (pv "v")) (P (pv "r"))) (ap (v "choose") [c "First", recE [("a", i 10), ("b", i 20)]]) ],
-  checks := [
-    ckk "get" "10" .int (v "v"),
-    ckk "set" "99" .int (.atexp (access (A (v "r")) "a")) ] }
-
-/-- tests/elm/src/LetDestructNestedSingleConstructorNumberTest.elm -/
-def g_elm_LetDestructNestedSingleConstructorNumberTest : Program := {
-  name := "LetDestructNestedSingleConstructorNumberTest", source := "tests/elm/src",
-  cons := [("Two", 2), ("Inner", 1), ("Outer", 1)],
-  defs := [
-    .fn "testValue" [] (letDefs [.fn "o" [] (ap (c "Two") [.atexp (.paren (ap (c "Inner") [.atexp (.scon (.intF 1))])), i 3]), .pat (.paren (pcon "Two" [.paren (pcon "Inner" [pv "y"]), pw])) (v "o")] (bin "+" (v "y") (.atexp (.scon (.float 5 (-1)))))) ],
-  locals := [ ],
-  checks := [
-    ckk "testValue" "1.5" .float (v "testValue") ] }
-
-/-- tests/elm/src/LetDestructRecordTest.elm -/
-def g_elm_LetDestructRecordTest : Program := {
-  name := "LetDestructRecordTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .pat (precord ["x"]) (recE [("x", .atexp (.scon (.intF 42)))]),
-    .pat (precord ["a", "b"]) (recE [("a", .atexp (.scon (.intF 1))), ("b", .atexp (.scon (.intF 2)))]),
-    .pat (precord ["p", "r"]) (recE [("p", .atexp (.scon (.intF 1))), ("q", .atexp (.scon (.intF 2))), ("r", .atexp (.scon (.intF 3)))]),
-    .pat (ptup2 (P (precord ["s"])) (P (pv "t"))) (tup2 (recE [("s", .atexp (.scon (.intF 1)))]) (.atexp (.scon (.intF 2)))) ],
-  checks := [
-    ckk "single" "42" .float (v "x"),
-    ckk "multi" "3" .float (bin "+" (v "a") (v "b")),
-    ckk "partial" "4" .float (bin "+" (v "p") (v "r")),
-    ckk "mixed" "3" .float (bin "+" (v "s") (v "t")) ] }
-
-/-- tests/elm/src/LetDestructTupleNestedTest.elm -/
-def g_elm_LetDestructTupleNestedTest : Program := {
-  name := "LetDestructTupleNestedTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .pat (ptup2 (P (pv "a")) (P (pv "b"))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))),
-    .pat (ptup2 (P (ptup2 (P (pv "c")) (P (pv "d")))) (P (ptup2 (P (pv "e")) (P (pv "f"))))) (tup2 (tup2 (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 4)))) (tup2 (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 6))))),
-    .pat (ptup2 (P (pv "g")) (P (pv "rest"))) (tup2 (.atexp (.scon (.intF 1))) (tup2 (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3))))),
-    .pat (ptup2 (P (pv "h")) (P (pv "i"))) (v "rest") ],
-  checks := [
-    ckk "basic" "3" .float (bin "+" (v "a") (v "b")),
-    ckk "nested" "8" .float (bin "+" (bin "-" (bin "+" (bin "+" (v "c") (v "d")) (v "e")) (v "f")) (.atexp (.scon (.intF 2)))),
-    ckk "chain" "6" .float (bin "+" (bin "+" (v "g") (v "h")) (v "i")) ] }
-
-/-- tests/elm/src/LetDestructuringTest.elm -/
-def g_elm_LetDestructuringTest : Program := {
-  name := "LetDestructuringTest", source := "tests/elm/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .pat (ptup2 (P (pv "first")) (P (pv "second"))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))),
-    .pat (ptup3 (P (pv "a")) (P (pv "b")) (P (pv "c"))) (tup3 (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 20))) (.atexp (.scon (.intF 30)))) ],
-  checks := [
-    ckk "first" "1" .float (v "first"),
-    ckk "second" "2" .float (v "second"),
-    ckk "head" "10" .float (v "a") ] }
+    chk .check "add then cons: [2,5]" .data ] }
 
 /-- The programs of this shard. -/
 def shard_Elm05 : List Program :=
-  [g_elm_HigherOrderFunctionChosenByIfTest,
+  [g_elm_ErasedListSpecializationTest,
+   g_elm_EscapeCustomCaseScrutineeTest,
+   g_elm_EscapeTopLevelTupleTest,
+   g_elm_EtaExpandStateFunctionSequenceTest,
+   g_elm_EtaExpandStateTest,
+   g_elm_File,
+   g_elm_FlipFunctionTest,
+   g_elm_FloatEdgeTest,
+   g_elm_FunctionAccumulatorFunctionLookupTest,
+   g_elm_FunctionBasicTest,
+   g_elm_FunctionChainedPartialApplicationTest,
+   g_elm_FunctionCompappendWithStringTest,
+   g_elm_FunctionMultiArgTest,
+   g_elm_FunctionUnannotatedCompappendTest,
+   g_elm_FunctionValueChoiceTest,
+   g_elm_HOParamApplyTwoTest,
+   g_elm_HelloTest,
+   g_elm_HeteroClosureIntFloatTest,
+   g_elm_HigherOrderFilterLikeFunctionTest,
+   g_elm_HigherOrderFunctionChosenByIfTest,
    g_elm_HigherOrderFunctionFactoryTest,
    g_elm_HigherOrderReturnLambdaBasedOnConditionTest,
    g_elm_HigherOrderTest,
    g_elm_HigherOrderTripleNestedFunctionTest,
    g_elm_HoleyAliasTwoParamsTest,
+   g_elm_ImportClosedTypeOpenItemTest,
+   g_elm_ImportExposingAllTest,
+   g_elm_ImportExposingItemsTest,
    g_elm_ImportOperatorItemTest,
    g_elm_ImportResolutionQualifiedImportedFunctionTest,
+   g_elm_ImportTypeByNameLaterReplacesTest,
    g_elm_IndirectCallFloatTest,
    g_elm_InfixAssocLeftArithTest,
    g_elm_InfixAssocPipesTest,
@@ -489,29 +664,6 @@ def shard_Elm05 : List Program :=
    g_elm_InfixLastOperandAnyExprTest,
    g_elm_InfixNegatedOperandTest,
    g_elm_InfixNonAssocSeparatedLegalTest,
-   g_elm_InfixPrecAddOverConsTest,
-   g_elm_InfixPrecAndOverOrTest,
-   g_elm_InfixPrecAppendOverEqTest,
-   g_elm_InfixPrecApplicationFirstTest,
-   g_elm_InfixPrecCompareOverAndTest,
-   g_elm_InfixPrecComposeOverPipeTest,
-   g_elm_InfixPrecMulOverAddTest,
-   g_elm_InfixPrecOrOverPipeTest,
-   g_elm_InfixPrecPowOverMulTest,
-   g_elm_InlineDupLetNamesTest,
-   g_elm_JoinpointABI23Majority3FlatTest,
-   g_elm_LambdaBoundaryCaptureTest,
-   g_elm_LambdaCaseBoundaryTest,
-   g_elm_LambdaLetBoundaryTest,
-   g_elm_LambdaPatternArgTest,
-   g_elm_LargeDispatchCaseTest,
-   g_elm_LetBasicTest,
-   g_elm_LetBoundLambdaCallTest,
-   g_elm_LetDestructAliasTest,
-   g_elm_LetDestructFuncTupleTest,
-   g_elm_LetDestructNestedSingleConstructorNumberTest,
-   g_elm_LetDestructRecordTest,
-   g_elm_LetDestructTupleNestedTest,
-   g_elm_LetDestructuringTest]
+   g_elm_InfixPrecAddOverConsTest]
 
 end StandardElm

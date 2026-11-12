@@ -8,10 +8,13 @@ import StandardElmMech.Generated.Elm06
 import StandardElmMech.Generated.Elm07
 import StandardElmMech.Generated.Elm08
 import StandardElmMech.Generated.Elm09
+import StandardElmMech.Generated.Elm10
+import StandardElmMech.Generated.Elm11
 import StandardElmMech.Generated.ElmCore01
 import StandardElmMech.Generated.ElmCore02
 import StandardElmMech.Generated.ElmCore03
 import StandardElmMech.Generated.ElmCore04
+import StandardElmMech.Generated.Worker01
 
 namespace StandardElm
 
@@ -26,6 +29,8 @@ def generatedShards : List (String × List Program) :=
    ("Elm07", shard_Elm07),
    ("Elm08", shard_Elm08),
    ("Elm09", shard_Elm09),
+   ("Elm10", shard_Elm10),
+   ("Elm11", shard_Elm11),
    ("ElmCore01", shard_ElmCore01),
    ("ElmCore02", shard_ElmCore02),
    ("ElmCore03", shard_ElmCore03),
@@ -34,5 +39,13 @@ def generatedShards : List (String × List Program) :=
 /-- Every generated program. -/
 def generatedPrograms : List Program :=
   generatedShards.foldr (fun s acc => s.2 ++ acc) []
+
+/-- Every shard of generated worker tests, by name. -/
+def generatedWorkerShards : List (String × List Prog.WorkerTest) :=
+  [("Worker01", shard_Worker01)]
+
+/-- Every generated worker test. -/
+def generatedWorkers : List Prog.WorkerTest :=
+  generatedWorkerShards.foldr (fun s acc => s.2 ++ acc) []
 
 end StandardElm

@@ -1,4 +1,4 @@
-module Translate.Convert exposing (Problem, convert)
+module Translate.Convert exposing (Facts, ModuleSource, Problem, convertProgram, facts)
 
 {-| From elm-syntax's tree of a test to the translator's representation (`Translate.Ir`): name
 resolution against the program, its imports and E0, the exact text of literals, the extraction of
@@ -18,8 +18,10 @@ import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Pattern as P
 import Elm.Syntax.Range exposing (Range)
 import Elm.Syntax.TypeAnnotation as T
+import Regex
 import Set exposing (Set)
-import Translate.Directives as Directives exposing (Directives, Expectation(..))
+import Translate.Basis as Basis
+import Translate.Directives exposing (Directives)
 import Translate.Ir exposing (..)
 import Translate.Literal as Literal
 
@@ -69,9 +71,14 @@ problem rank code at st =
     { st | problems = { rank = rank, code = code, at = at } :: st.problems }
 
 
+{-| A module's imports: qualifiers to modules, values exposed unqualified (to their module),
+constructors exposed unqualified from the program's modules (to their module), and the modules
+exposed whole (`exposing (..)`).
+-}
 type alias Imports =
     { alias : Dict String String
     , exposed : Dict String String
+    , exposedCons : Dict String String
     , open : List String
     }
 
@@ -83,6 +90,8 @@ type alias Env =
     , cons : Set String
     , recordAliases : Set String
     , imports : Imports
+    , exports : Dict String ExportTable
+    , prefix : String
     }
 
 
@@ -90,12 +99,15 @@ type alias Env =
 -}
 allowedImports : Set String
 allowedImports =
-    Set.fromList [ "Html", "Basics", "List", "Maybe", "Debug", "Char", "String", "Tuple", "Result", "Platform", "Platform.Cmd", "Platform.Sub" ]
+    Set.fromList [ "Html", "Basics", "List", "Maybe", "Debug", "Char", "String", "Tuple", "Result", "Platform", "Platform.Cmd", "Platform.Sub", "Task", "Process", "Array", "Bytes", "Json.Encode", "Json.Decode", "VirtualDom" ]
 
 
+{-| The modules of effects outside the book's basis. Json.Encode and Json.Decode are library
+modules (core-library.md): their values are refused as `basis:*`, like any library value.
+-}
 effectModules : Set String
 effectModules =
-    Set.fromList [ "Platform", "Platform.Cmd", "Platform.Sub", "Cmd", "Sub", "Task", "Process", "Browser", "Html.Events", "Json.Decode", "Json.Encode", "Time", "Http", "Random" ]
+    Set.fromList [ "Platform", "Platform.Cmd", "Platform.Sub", "Cmd", "Sub", "Task", "Process", "Browser", "Html.Events", "Time", "Http", "Random" ]
 
 
 {-| The values E0 binds unqualified, and as `Basics.` (B.6).
@@ -105,7 +117,7 @@ basicsValues =
     Set.fromList [ "compare", "not", "xor", "modBy", "remainderBy", "negate", "min", "max", "clamp", "abs", "identity", "always", "isNaN", "isInfinite"
         , "toFloat", "round", "floor", "ceiling", "truncate"
         , "sqrt", "sin", "cos", "tan", "asin", "acos", "atan", "atan2", "e", "pi"
-        , "append"
+        , "logBase", "degrees", "radians", "turns", "fromPolar", "toPolar", "never"
         ]
 
 
@@ -135,16 +147,19 @@ moduleName =
     String.join "."
 
 
-readImports : List (Node Import) -> St -> ( Imports, St )
-readImports imports st0 =
+readImports : Dict String ExportTable -> List (Node Import) -> St -> ( Imports, St )
+readImports exports imports st0 =
     List.foldl
         (\(Node range imp) ( acc, st ) ->
             let
                 name =
                     moduleName (Node.value imp.moduleName)
 
+                user =
+                    Dict.get name exports
+
                 st1 =
-                    if Set.member name allowedImports then
+                    if Set.member name allowedImports || user /= Nothing then
                         st
 
                     else if Set.member name effectModules then
@@ -161,42 +176,57 @@ readImports imports st0 =
                         Nothing ->
                             acc.alias
 
-                ( exposed, open ) =
+                ( ( exposed, exposedCons ), open ) =
                     case Maybe.map Node.value imp.exposingList of
                         Just (X.All _) ->
-                            ( acc.exposed, acc.open ++ [ name ] )
+                            ( ( acc.exposed, acc.exposedCons ), acc.open ++ [ name ] )
 
                         Just (X.Explicit items) ->
                             ( List.foldl
-                                (\(Node _ item) d ->
+                                (\(Node _ item) ( d, dc ) ->
                                     case item of
                                         X.FunctionExpose f ->
-                                            Dict.insert f name d
+                                            ( Dict.insert f name d, dc )
 
                                         X.InfixExpose _ ->
-                                            d
+                                            ( d, dc )
 
-                                        X.TypeOrAliasExpose _ ->
-                                            d
+                                        X.TypeOrAliasExpose t ->
+                                            -- an exposed record alias brings its constructor
+                                            case user |> Maybe.andThen (\u -> Dict.get t u.constructors) of
+                                                Just _ ->
+                                                    ( d, Dict.insert t name dc )
+
+                                                Nothing ->
+                                                    ( d, dc )
 
                                         X.TypeExpose t ->
                                             if t.open /= Nothing then
-                                                Dict.insert ("type:" ++ t.name) name d
+                                                case user of
+                                                    Just u ->
+                                                        ( d
+                                                        , List.foldl (\k dc2 -> Dict.insert k name dc2)
+                                                            dc
+                                                            (Dict.get t.name u.typeCons |> Maybe.withDefault [])
+                                                        )
+
+                                                    Nothing ->
+                                                        ( Dict.insert ("type:" ++ t.name) name d, dc )
 
                                             else
-                                                d
+                                                ( d, dc )
                                 )
-                                acc.exposed
+                                ( acc.exposed, acc.exposedCons )
                                 items
                             , acc.open
                             )
 
                         Nothing ->
-                            ( acc.exposed, acc.open )
+                            ( ( acc.exposed, acc.exposedCons ), acc.open )
             in
-            ( { alias = withAlias, exposed = exposed, open = open }, st1 )
+            ( { alias = withAlias, exposed = exposed, exposedCons = exposedCons, open = open }, st1 )
         )
-        ( { alias = Dict.empty, exposed = Dict.empty, open = [] }, st0 )
+        ( { alias = Dict.empty, exposed = Dict.empty, exposedCons = Dict.empty, open = [] }, st0 )
         imports
 
 
@@ -204,7 +234,11 @@ readImports imports st0 =
 -}
 qualifiedValue : String -> String -> Range -> St -> ( Name, St )
 qualifiedValue m x range st =
-    if Set.member m effectModules then
+    if Basis.effectValue m x /= Nothing then
+        -- a value of Platform, Cmd, Sub, Task or Process (plan step 5)
+        ( Global m x, st )
+
+    else if Set.member m effectModules then
         ( Global m x, problem rankEffects "effects" range st )
 
     else if m == "Basics" && Set.member x basicsValues then
@@ -216,8 +250,26 @@ qualifiedValue m x range st =
     else if m == "Char" && (x == "toCode" || x == "fromCode") then
         ( Global "Char" x, st )
 
+    else if m == "Html" && x == "text" then
+        -- the harness Html (decision D2)
+        ( Global "Html" "text", st )
+
     else
         ( Global m x, problem rankBasis ("basis:" ++ m ++ "." ++ x) range st )
+
+
+{-| An unqualified reference to `x` that an import of `m` exposes (by its exposing list, explicit
+or `(..)`): the value `m.x`, kept unqualified as the source writes it (the module's imports resolve
+it, r:dm-import).
+-}
+unqualifiedValue : String -> String -> Range -> St -> ( Name, St )
+unqualifiedValue m x range st =
+    case qualifiedValue m x range st of
+        ( Global m2 x2, st2 ) ->
+            ( Exposed m2 x2, st2 )
+
+        other ->
+            other
 
 
 qualifiedConstructor : String -> String -> Range -> St -> ( Name, St )
@@ -230,6 +282,9 @@ qualifiedConstructor m k range st =
 
     else if m == "Maybe" && (k == "Just" || k == "Nothing") then
         ( Global "Maybe" k, st )
+
+    else if m == "Result" && (k == "Ok" || k == "Err") then
+        ( Global "Result" k, st )
 
     else
         ( Global m k, problem rankBasis ("basis:" ++ m ++ "." ++ k) range st )
@@ -244,10 +299,31 @@ expandAlias env m =
     Dict.get name env.imports.alias |> Maybe.withDefault name
 
 
+{-| A value of another module of the program, `m.x` (as written: qualified by `qual` or not).
+-}
+foreignValue : Env -> String -> Maybe String -> String -> Range -> St -> Maybe ( Name, St )
+foreignValue env m qual x range st =
+    Dict.get m env.exports
+        |> Maybe.map
+            (\t ->
+                case Dict.get x t.values of
+                    Just binder ->
+                        ( Foreign { binder = binder, qual = qual, name = x }, st )
+
+                    Nothing ->
+                        ( Global m x, problem rankImport ("import:" ++ m ++ "." ++ x) range st )
+            )
+
+
 resolveValue : Env -> List String -> String -> Range -> St -> ( Name, St )
 resolveValue env qual x range st =
     if not (List.isEmpty qual) then
-        qualifiedValue (expandAlias env qual) x range st
+        case foreignValue env (expandAlias env qual) (Just (moduleName qual)) x range st of
+            Just r ->
+                r
+
+            Nothing ->
+                qualifiedValue (expandAlias env qual) x range st
 
     else
         case Dict.get x env.locals of
@@ -266,29 +342,76 @@ resolveValue env qual x range st =
                         else
                             case Dict.get x env.imports.exposed of
                                 Just m ->
-                                    qualifiedValue m x range st
+                                    foreignValue env m Nothing x range st
+                                        |> Maybe.withDefault (unqualifiedValue m x range st)
 
                                 Nothing ->
-                                    case List.filter ((/=) "Basics") env.imports.open of
+                                    let
+                                        -- a module of the program exposed whole that exposes x
+                                        userOpen =
+                                            env.imports.open
+                                                |> List.filter (\m -> Dict.get m env.exports |> Maybe.map (.values >> Dict.member x) |> Maybe.withDefault False)
+                                    in
+                                    case userOpen of
                                         m :: _ ->
-                                            qualifiedValue m x range st
+                                            foreignValue env m Nothing x range st
+                                                |> Maybe.withDefault (unqualifiedValue m x range st)
 
                                         [] ->
-                                            qualifiedValue "Basics" x range st
+                                            case List.filter (\m -> m /= "Basics" && not (Dict.member m env.exports)) env.imports.open of
+                                                m :: _ ->
+                                                    unqualifiedValue m x range st
+
+                                                [] ->
+                                                    unqualifiedValue "Basics" x range st
+
+
+{-| A constructor of another module of the program, as written.
+-}
+foreignConstructor : Env -> String -> Maybe String -> String -> Range -> St -> Maybe ( Name, St )
+foreignConstructor env m qual k range st =
+    Dict.get m env.exports
+        |> Maybe.map
+            (\t ->
+                case Dict.get k t.constructors of
+                    Just key ->
+                        ( ForeignCon { key = key, qual = qual, name = k }, st )
+
+                    Nothing ->
+                        ( Global m k, problem rankImport ("import:" ++ m ++ "." ++ k) range st )
+            )
 
 
 resolveConstructor : Env -> List String -> String -> Range -> St -> ( Name, St )
 resolveConstructor env qual k range st =
     if not (List.isEmpty qual) then
-        qualifiedConstructor (expandAlias env qual) k range st
+        case foreignConstructor env (expandAlias env qual) (Just (moduleName qual)) k range st of
+            Just r ->
+                r
+
+            Nothing ->
+                qualifiedConstructor (expandAlias env qual) k range st
 
     else if Set.member k env.cons then
-        ( UserCon k, st )
+        ( UserCon (env.prefix ++ k), st )
 
     else if Set.member k env.recordAliases then
-        ( UserCon k, problem rankConstruct "construct:record-alias-constructor" range st )
+        -- the constructor of a record alias (r:dm-typbind), bound in the module
+        ( UserCon (env.prefix ++ k), st )
 
-    else if Set.member k basicsConstructors || k == "Just" || k == "Nothing" then
+    else if Dict.member k env.imports.exposedCons then
+        Dict.get k env.imports.exposedCons
+            |> Maybe.andThen (\m -> foreignConstructor env m Nothing k range st)
+            |> Maybe.withDefault ( UserCon k, st )
+
+    else if List.any (\m -> Dict.get m env.exports |> Maybe.map (.constructors >> Dict.member k) |> Maybe.withDefault False) env.imports.open then
+        env.imports.open
+            |> List.filter (\m -> Dict.get m env.exports |> Maybe.map (.constructors >> Dict.member k) |> Maybe.withDefault False)
+            |> List.head
+            |> Maybe.andThen (\m -> foreignConstructor env m Nothing k range st)
+            |> Maybe.withDefault ( UserCon k, st )
+
+    else if Set.member k basicsConstructors || k == "Just" || k == "Nothing" || k == "Ok" || k == "Err" then
         ( Global "" k, st )
 
     else
@@ -808,78 +931,210 @@ declOf env h st =
 -- THE MODULE AND MAIN
 
 
-isHtmlText : Env -> Node E.Expression -> Bool
-isHtmlText env (Node _ e) =
-    case e of
-        E.Application [ Node _ (E.FunctionOrValue qual "text"), Node _ (E.Literal _) ] ->
-            if List.isEmpty qual then
-                Dict.get "text" env.imports.exposed == Just "Html" || List.member "Html" env.imports.open
-
-            else
-                expandAlias env qual == "Html"
-
-        _ ->
-            False
-
-
-{-| A declaration of `main`'s `let` that logs a check: `_ = Debug.log "label" arg`.
+{-| The literal labels of the `Debug.log` applications in a declaration (in any position, pipes
+included: `x |> Debug.log "label"` applies `Debug.log` to its label).
 -}
-checkOf : Node E.LetDeclaration -> Maybe ( String, Node E.Expression, Range )
-checkOf (Node range d) =
-    case d of
-        E.LetDestructuring (Node _ P.AllPattern) (Node _ (E.Application [ Node _ (E.FunctionOrValue [ "Debug" ] "log"), Node _ (E.Literal label), arg ])) ->
-            case arg of
-                Node _ (E.ParenthesizedExpression inner) ->
-                    Just ( label, inner, range )
+loggedLabels : Decl -> List String
+loggedLabels d =
+    let
+        labelsIn e =
+            case e of
+                EApp (EVar _ f) ((EStr label) :: _) ->
+                    if globalOf f == Just ( "Debug", "log" ) then
+                        [ label ]
+
+                    else
+                        []
 
                 _ ->
-                    Just ( label, arg, range )
+                    []
 
-        _ ->
-            Nothing
-
-
-{-| Logging in another form, which the translator does not take as a check.
--}
-otherLogging : Node E.LetDeclaration -> Bool
-otherLogging (Node _ d) =
+        collect e =
+            labelsIn e ++ List.concatMap collect (children e)
+    in
     case d of
-        E.LetDestructuring (Node _ P.AllPattern) (Node _ (E.OperatorApplication op _ l r)) ->
-            (op == "|>" || op == "<|") && (mentionsLog l || mentionsLog r)
+        DFn f ->
+            collect f.body
 
-        _ ->
-            False
+        DPat _ x ->
+            collect x
 
 
-mentionsLog : Node E.Expression -> Bool
-mentionsLog (Node _ e) =
-    case e of
-        E.FunctionOrValue [ "Debug" ] "log" ->
+{-| A module of a test program, as read: its name, its file, its text and its tree.
+-}
+type alias ModuleSource =
+    { name : String, path : String, source : String, file : File }
+
+
+{-| The program of a test whose modules are `sources` in program order (the test, its main module,
+last), whatever its problems, with every problem, sorted by rank, then position: the first, if
+any, is the refusal reported. Binding ids are unique across the program; each module is converted
+with the export tables of the modules before it.
+-}
+convertProgram : Directives -> List ModuleSource -> ( TestProgram, List Problem )
+convertProgram directives sources =
+    let
+        count =
+            List.length sources
+
+        ( modules, stEnd ) =
+            List.foldl
+                (\( i, ms ) ( acc, exports, st ) ->
+                    let
+                        ( m, table, st1 ) =
+                            convertModule exports (i == count - 1) ms st
+                    in
+                    ( acc ++ [ m ], Dict.insert ms.name table exports, st1 )
+                )
+                ( [], Dict.empty, { next = 1, problems = [] } )
+                (List.indexedMap Tuple.pair sources)
+                |> (\( ms, _, st ) -> ( ms, st ))
+
+        mainRange =
+            sources
+                |> List.reverse
+                |> List.head
+                |> Maybe.map (\ms -> Node.range ms.file.moduleDefinition)
+                |> Maybe.withDefault { start = { row = 0, column = 0 }, end = { row = 0, column = 0 } }
+
+        -- the labels some Debug.log of the program writes as its literal first argument
+        logged =
+            modules
+                |> List.concatMap (\m -> List.concatMap loggedLabels m.defs)
+                |> Set.fromList
+
+        stChecked =
+            List.foldl
+                (\line st ->
+                    case lineLabel line of
+                        Just label ->
+                            if Set.member label logged then
+                                st
+
+                            else
+                                problem rankChecks ("checks:unmatched:" ++ label) mainRange st
+
+                        Nothing ->
+                            st
+                )
+                stEnd
+                directives.lines
+    in
+    ( { modules = modules, checks = directives.lines, meaning = directives.meaning }
+    , stChecked.problems |> List.sortBy (\p -> ( p.rank, p.at.start.row, p.at.start.column ))
+    )
+
+
+exposingOf : X.Exposing -> ExposingIr
+exposingOf x =
+    case x of
+        X.All _ ->
+            ExposeAll
+
+        X.Explicit items ->
+            ExposeItems
+                (List.map
+                    (\(Node _ item) ->
+                        case item of
+                            X.FunctionExpose f ->
+                                IVar f
+
+                            X.InfixExpose op ->
+                                IOp op
+
+                            X.TypeOrAliasExpose t ->
+                                IType t
+
+                            X.TypeExpose t ->
+                                if t.open /= Nothing then
+                                    IOpen t.name
+
+                                else
+                                    IType t.name
+                    )
+                    items
+                )
+
+
+{-| Whether an exposing list exposes a value, a type by name, a type with its constructors.
+-}
+exposesValue : ExposingIr -> String -> Bool
+exposesValue x name =
+    case x of
+        ExposeAll ->
             True
 
-        E.Application xs ->
-            List.any mentionsLog xs
-
-        E.ParenthesizedExpression x ->
-            mentionsLog x
-
-        _ ->
-            False
+        ExposeItems items ->
+            List.member (IVar name) items
 
 
-convert : String -> Directives -> File -> Result Problem TestProgram
-convert source directives file =
+exposesType : ExposingIr -> String -> Bool
+exposesType x name =
+    case x of
+        ExposeAll ->
+            True
+
+        ExposeItems items ->
+            List.member (IType name) items || List.member (IOpen name) items
+
+
+exposesConstructors : ExposingIr -> String -> Bool
+exposesConstructors x name =
+    case x of
+        ExposeAll ->
+            True
+
+        ExposeItems items ->
+            List.member (IOpen name) items
+
+
+{-| One module: its representation, its export table, and the state after it.
+-}
+convertModule : Dict String ExportTable -> Bool -> ModuleSource -> St -> ( ModuleIr, ExportTable, St )
+convertModule exports isMain ms st0 =
     let
-        st0 =
-            { next = 1, problems = [] }
+        source =
+            ms.source
+
+        file =
+            ms.file
+
+        prefix =
+            if isMain then
+                ""
+
+            else
+                ms.name ++ "."
 
         moduleRange =
             Node.range file.moduleDefinition
 
+        headerExposing =
+            case Node.value file.moduleDefinition of
+                M.NormalModule d ->
+                    exposingOf (Node.value d.exposingList)
+
+                M.PortModule d ->
+                    exposingOf (Node.value d.exposingList)
+
+                M.EffectModule d ->
+                    exposingOf (Node.value d.exposingList)
+
+        writtenImports =
+            List.map
+                (\(Node _ imp) ->
+                    { modid = moduleName (Node.value imp.moduleName)
+                    , alias = Maybe.map (Node.value >> moduleName) imp.moduleAlias
+                    , exposes = Maybe.map (Node.value >> exposingOf) imp.exposingList
+                    }
+                )
+                file.imports
+
         st1 =
             case Node.value file.moduleDefinition of
                 M.PortModule _ ->
-                    problem rankEffects "effects" moduleRange st0
+                    -- a port module: its ports are declarations of the module (plan step 3)
+                    st0
 
                 M.EffectModule _ ->
                     problem rankEffects "effects" moduleRange st0
@@ -888,7 +1143,7 @@ convert source directives file =
                     st0
 
         ( imports, st2 ) =
-            readImports file.imports st1
+            readImports exports file.imports st1
 
         declarations =
             List.map (\(Node r d) -> ( r, d )) file.declarations
@@ -949,7 +1204,7 @@ convert source directives file =
                 (\( r, d ) s ->
                     case d of
                         D.PortDeclaration _ ->
-                            problem rankEffects "effects" r s
+                            s
 
                         D.InfixDeclaration _ ->
                             problem rankConstruct "construct:infix-declaration" r s
@@ -991,14 +1246,15 @@ convert source directives file =
                 )
                 declarations
 
-        isMain ( _, f ) =
+        isMainDecl ( _, f ) =
             Node.value (Node.value f.declaration).name == "main"
 
         mainDecl =
-            List.filter isMain functions |> List.head
+            List.filter isMainDecl functions |> List.head
 
+        -- main is a top-level definition like any other (the module form, plan step 3)
         otherFunctions =
-            List.filter (not << isMain) functions
+            functions
 
         destructurings =
             List.filterMap
@@ -1019,6 +1275,8 @@ convert source directives file =
             , cons = Set.fromList (List.map Tuple.first cons)
             , recordAliases = recordAliases
             , imports = imports
+            , exports = exports
+            , prefix = prefix
             }
 
         -- top-level binders
@@ -1049,11 +1307,30 @@ convert source directives file =
         allTopHeads =
             topHeads ++ topPatHeads
 
+        -- the ports, each with a binding id: a port binds its name in the module
+        ( portDecls, st5b ) =
+            List.foldl
+                (\( _, d ) ( acc, s ) ->
+                    case d of
+                        D.PortDeclaration sig ->
+                            let
+                                ( id, s1 ) =
+                                    fresh s
+                            in
+                            ( acc ++ [ { name = Node.value sig.name, binder = id, annotation = sig.typeAnnotation } ], s1 )
+
+                        _ ->
+                            ( acc, s )
+                )
+                ( [], st5 )
+                declarations
+
         env =
             { envBase
                 | top =
                     Dict.fromList
-                        (List.concatMap
+                        (List.map (\pd -> ( pd.name, pd.binder )) portDecls
+                            ++ List.concatMap
                             (\h ->
                                 case h of
                                     FnHead f id ->
@@ -1075,153 +1352,218 @@ convert source directives file =
                     in
                     ( acc ++ [ d ], s1 )
                 )
-                ( [], st5 )
+                ( [], st5b )
                 allTopHeads
 
-        ( localsAndChecks, st7 ) =
+        -- main: a value (no arguments); whether it is a view, Infer decides from its type
+        st7 =
             case mainDecl of
                 Nothing ->
-                    ( ( [], [] ), problem rankConstruct "construct:main-shape" moduleRange st6 )
+                    if isMain then
+                        problem rankConstruct "construct:main-shape" moduleRange st6
+
+                    else
+                        st6
 
                 Just ( r, f ) ->
-                    let
-                        impl =
-                            Node.value f.declaration
-                    in
-                    case ( impl.arguments, impl.expression ) of
-                        ( [], Node _ (E.LetExpression block) ) ->
-                            let
-                                st6a =
-                                    if isHtmlText env block.expression then
-                                        st6
+                    if List.isEmpty (Node.value f.declaration).arguments then
+                        st6
+
+                    else
+                        problem rankConstruct "construct:main-shape" r st6
+
+        -- what the module exposes to the modules that import it
+        ownTypes =
+            List.map (\t -> ( Node.value t.name, List.map (\(Node _ c) -> Node.value c.name) t.constructors )) customTypes
+
+        exportTable =
+            { values =
+                (portDecls
+                    |> List.filter (\pd -> exposesValue headerExposing pd.name)
+                    |> List.map (\pd -> ( pd.name, pd.binder ))
+                )
+                    ++ (topHeads
+                    |> List.filterMap
+                        (\h ->
+                            case h of
+                                FnHead f id ->
+                                    let
+                                        x =
+                                            Node.value (Node.value f.declaration).name
+                                    in
+                                    if exposesValue headerExposing x then
+                                        Just ( x, id )
 
                                     else
-                                        problem rankConstruct "construct:main-shape" (Node.range block.expression) st6
+                                        Nothing
 
-                                ( checkDecls, localDecls ) =
-                                    List.partition (\d -> checkOf d /= Nothing) block.declarations
+                                PatHead _ _ _ ->
+                                    Nothing
+                        )
+                       )
+                    |> Dict.fromList
+            , constructors =
+                (ownTypes
+                    |> List.filter (\( t, _ ) -> exposesConstructors headerExposing t)
+                    |> List.concatMap (\( _, ks ) -> List.map (\k -> ( k, prefix ++ k )) ks)
+                )
+                    ++ (Set.toList recordAliases
+                            |> List.filter (exposesType headerExposing)
+                            |> List.map (\a -> ( a, prefix ++ a ))
+                       )
+                    |> Dict.fromList
+            , typeCons =
+                ownTypes
+                    |> List.filter (\( t, _ ) -> exposesConstructors headerExposing t)
+                    |> Dict.fromList
+            , types =
+                ownTypes
+                    |> List.filter (\( t, _ ) -> exposesType headerExposing t)
+                    |> List.map (\( t, _ ) -> ( t, prefix ++ t ))
+                    |> Dict.fromList
+            , aliases =
+                aliasDecls
+                    |> List.filter (\a -> exposesType headerExposing (Node.value a.name))
+                    |> List.map (\a -> ( Node.value a.name, { params = List.map Node.value a.generics, annotation = a.typeAnnotation } ))
+                    |> Dict.fromList
+            }
 
-                                st6b =
-                                    List.foldl
-                                        (\d s ->
-                                            if otherLogging d then
-                                                problem rankConstruct "construct:check-shape" (Node.range d) s
+        -- the types and aliases the module's imports of the program's modules bring in, a later
+        -- import's replacing an earlier one's of the same name (sm-item-type)
+        ( importedTypes, importedAliases ) =
+            List.foldl
+                (\imp ( ts, als ) ->
+                    case Dict.get imp.modid exports of
+                        Just t ->
+                            let
+                                q =
+                                    Maybe.withDefault imp.modid imp.alias
 
-                                            else
-                                                s
-                                        )
-                                        st6a
-                                        localDecls
+                                qualified =
+                                    ( Dict.foldl (\n c d -> Dict.insert (q ++ "." ++ n) c d) ts t.types
+                                    , Dict.foldl (\n a d -> Dict.insert (q ++ "." ++ n) a d) als t.aliases
+                                    )
 
-                                ( locals, inner, st6c ) =
-                                    letDecls env localDecls st6b
+                                unqualified ( ts1, als1 ) =
+                                    case imp.exposes of
+                                        Just ExposeAll ->
+                                            ( Dict.union t.types ts1, Dict.union t.aliases als1 )
 
-                                ( checksFound, st6d ) =
-                                    List.foldl
-                                        (\d ( acc, s ) ->
-                                            case checkOf d of
-                                                Just ( label, arg, _ ) ->
-                                                    let
-                                                        ( ex, s1 ) =
-                                                            expr inner arg s
-                                                    in
-                                                    ( acc ++ [ ( label, ex, Node.range d ) ], s1 )
+                                        Just (ExposeItems items) ->
+                                            List.foldl
+                                                (\item ( d, da ) ->
+                                                    case item of
+                                                        IType n ->
+                                                            ( Dict.get n t.types |> Maybe.map (\c -> Dict.insert n c d) |> Maybe.withDefault d
+                                                            , Dict.get n t.aliases |> Maybe.map (\a -> Dict.insert n a da) |> Maybe.withDefault da
+                                                            )
 
-                                                Nothing ->
-                                                    ( acc, s )
-                                        )
-                                        ( [], st6c )
-                                        checkDecls
+                                                        IOpen n ->
+                                                            ( Dict.get n t.types |> Maybe.map (\c -> Dict.insert n c d) |> Maybe.withDefault d, da )
+
+                                                        _ ->
+                                                            ( d, da )
+                                                )
+                                                ( ts1, als1 )
+                                                items
+
+                                        Nothing ->
+                                            ( ts1, als1 )
                             in
-                            ( ( locals, checksFound ), st6d )
+                            unqualified qualified
 
-                        _ ->
-                            ( ( [], [] ), problem rankConstruct "construct:main-shape" r st6 )
-
-        ( locals0, rawChecks ) =
-            localsAndChecks
-
-        -- checks against the CHECK lines, one to one
-        labels =
-            List.map (\( l, _, _ ) -> l) rawChecks
-
-        st8 =
-            List.foldl
-                (\( label, _, r ) s ->
-                    if List.length (List.filter ((==) label) labels) > 1 then
-                        problem rankChecks ("checks:unmatched:" ++ label) r s
-
-                    else if Dict.member label directives.expected then
-                        s
-
-                    else
-                        problem rankChecks ("checks:unmatched:" ++ label) r s
+                        Nothing ->
+                            ( ts, als )
                 )
-                st7
-                rawChecks
-
-        st9 =
-            List.foldl
-                (\label s ->
-                    if List.member label labels then
-                        s
-
-                    else
-                        problem rankChecks ("checks:unmatched:" ++ label) moduleRange s
-                )
-                st8
-                directives.labelsInOrder
-
-        checks =
-            List.map
-                (\( label, ex, _ ) ->
-                    { label = label
-                    , expected =
-                        case Dict.get label directives.expected of
-                            Just (Value v) ->
-                                v
-
-                            Just NoValue ->
-                                "(no value)"
-
-                            Nothing ->
-                                ""
-                    , expr = ex
-                    }
-                )
-                rawChecks
-
-        best =
-            st9.problems
-                |> List.sortBy (\p -> ( p.rank, p.at.start.row, p.at.start.column ))
-                |> List.head
+                ( Dict.empty, Dict.empty )
+                writtenImports
     in
-    case best of
-        Just p ->
-            Err p
+    ( { name = ms.name
+      , path = ms.path
+      , isPort =
+            case Node.value file.moduleDefinition of
+                M.PortModule _ ->
+                    True
 
-        Nothing ->
-            Ok
-                { cons = cons
-                , types =
-                    Dict.fromList
-                        (List.map
-                            (\t ->
-                                ( Node.value t.name
-                                , { params = List.map Node.value t.generics
-                                  , constructors = List.map (\(Node _ c) -> ( Node.value c.name, c.arguments )) t.constructors
-                                  }
-                                )
-                            )
-                            customTypes
+                _ ->
+                    False
+      , exposes = headerExposing
+      , imports = writtenImports
+      , prefix = prefix
+      , cons = cons
+      , types =
+            Dict.fromList
+                (List.map
+                    (\t ->
+                        ( Node.value t.name
+                        , { params = List.map Node.value t.generics
+                          , constructors = List.map (\(Node _ c) -> ( Node.value c.name, c.arguments )) t.constructors
+                          }
                         )
-                , aliases =
-                    Dict.fromList
-                        (List.map
-                            (\a -> ( Node.value a.name, { params = List.map Node.value a.generics, annotation = a.typeAnnotation } ))
-                            aliasDecls
-                        )
-                , defs = defs
-                , locals = locals0
-                , checks = checks
-                }
+                    )
+                    customTypes
+                )
+      , aliases =
+            Dict.fromList
+                (List.map
+                    (\a -> ( Node.value a.name, { params = List.map Node.value a.generics, annotation = a.typeAnnotation } ))
+                    aliasDecls
+                )
+      , importedTypes = importedTypes
+      , importedAliases = importedAliases
+      , ports = portDecls
+      , defs = defs
+      }
+    , exportTable
+    , st7
+    )
+
+
+{-| Facts about a test that the report of all refusals records (step 0 of
+plans/lean-full-definition.md): the modules it uses beyond the default imports and `Html`, from
+its imports and its qualified references; whether `main` applies `Platform.worker`; whether it
+is a port module.
+-}
+type alias Facts =
+    { uses : List String, imports : List String, worker : Bool, ports : Bool }
+
+
+facts : String -> File -> Facts
+facts source file =
+    let
+        imports =
+            file.imports |> List.map (\(Node _ i) -> moduleName (Node.value i.moduleName))
+
+        qualified =
+            Regex.find qualifiedRef source |> List.filterMap (\m -> List.head m.submatches |> Maybe.andThen identity)
+
+        notDefault m =
+            not (List.member m [ "Basics", "List", "Maybe", "Result", "String", "Char", "Tuple", "Debug", "Platform", "Platform.Cmd", "Platform.Sub", "Cmd", "Sub", "Html" ])
+
+        uses =
+            (imports ++ qualified) |> List.filter notDefault |> Set.fromList |> Set.toList
+
+        ports =
+            case Node.value file.moduleDefinition of
+                M.PortModule _ ->
+                    True
+
+                _ ->
+                    False
+    in
+    { uses = uses
+    , imports = imports
+    , worker = String.contains "Platform.worker" source || Regex.contains workerRef source
+    , ports = ports
+    }
+
+
+qualifiedRef : Regex.Regex
+qualifiedRef =
+    Regex.fromString "\\b((?:[A-Z][A-Za-z0-9_]*\\.)*[A-Z][A-Za-z0-9_]*)\\.[a-z][A-Za-z0-9_]*"
+        |> Maybe.withDefault Regex.never
+
+
+workerRef : Regex.Regex
+workerRef =
+    Regex.fromString "=\\s*worker\\b" |> Maybe.withDefault Regex.never

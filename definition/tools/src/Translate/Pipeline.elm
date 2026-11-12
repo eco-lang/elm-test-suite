@@ -1,13 +1,19 @@
-module Translate.Pipeline exposing (Outcome(..), Refusal, translate)
+module Translate.Pipeline exposing (Found, Lookup, Outcome(..), Refusal, Stage(..), stageName, translate, translateAll, translateAllWith, translateWith)
 
 {-| One test, from source to Lean or to the reason it is not translated: directives, parsing,
 conversion (names, fragment, checks), inference, number specialisation, printing.
 -}
 
+import Dict
 import Elm.Parser
-import Translate.Convert as Convert
+import Elm.Syntax.File exposing (File)
+import Elm.Syntax.Node as Node
+import Set exposing (Set)
+import Translate.Convert as Convert exposing (ModuleSource)
 import Translate.Directives as Directives exposing (Directives)
 import Translate.Infer as Infer
+import Translate.Ir as Ir exposing (Decl(..), Expr(..), Name(..), TestProgram, anyExpr)
+import Translate.Json as Json
 import Translate.Specialise as Specialise
 import Translate.ToLean as ToLean
 
@@ -17,8 +23,90 @@ type alias Refusal =
 
 
 type Outcome
-    = Translated { lean : String, checks : Int }
+    = Translated
+        { lean : String
+        , checks : Int
+        , sources : List String
+
+        -- "view" or "worker"
+        , kind : String
+
+        -- whether the theorem is proved by `native_decide`
+        , native : Bool
+
+        -- a worker's host ("none" or "echo") and its FLAGS text (`Nothing`: absent, null)
+        , host : Maybe String
+        , flags : Maybe String
+
+        -- the CHECK-NOT lines dropped (`Directives.checkNotsNotRequired`), with the reason
+        , dropped : List String
+
+        -- the patterns of the CHECK-NOT lines proved by hand (plan step 6)
+        , checkNots : List String
+        }
     | Refused Refusal
+
+
+{-| The modules of a test's project, by name: the path and text of `tests/<project>/src/<M>.elm`.
+-}
+type alias Lookup =
+    String -> Maybe { path : String, source : String }
+
+
+{-| The modules of the basis (plan step 3): an import of one of them is never read from the
+project's sources.
+-}
+basisModules : Set String
+basisModules =
+    Set.fromList [ "Basics", "List", "Maybe", "Result", "String", "Char", "Tuple", "Debug", "Platform", "Platform.Cmd", "Platform.Sub", "Array", "Bytes", "Json.Encode", "Json.Decode", "VirtualDom", "Html" ]
+
+
+{-| The modules of a program in program order: depth-first post-order from the test, following
+each module's imports in the order written, a module after the modules it imports and once, the
+test last (res:program-import-order). An import of a module that is not among the project's
+sources is left to the converter, which refuses it (`import:M`). An import cycle is refused.
+-}
+resolve : Lookup -> ModuleSource -> Result String (List ModuleSource)
+resolve lookup main =
+    visit lookup [ main.name ] [] main
+
+
+visit : Lookup -> List String -> List ModuleSource -> ModuleSource -> Result String (List ModuleSource)
+visit lookup stack acc ms =
+    let
+        imported =
+            ms.file.imports
+                |> List.map (\(Node.Node _ imp) -> String.join "." (Node.value imp.moduleName))
+                |> List.filter (\m -> not (Set.member m basisModules))
+    in
+    List.foldl
+        (\name result ->
+            result
+                |> Result.andThen
+                    (\done ->
+                        if List.any (\d -> d.name == name) done then
+                            Ok done
+
+                        else if List.member name stack then
+                            Err "import:cycle"
+
+                        else
+                            case lookup name of
+                                Nothing ->
+                                    Ok done
+
+                                Just helper ->
+                                    case Elm.Parser.parseToFile helper.source of
+                                        Err _ ->
+                                            Err "parse"
+
+                                        Ok file ->
+                                            visit lookup (name :: stack) done { name = name, path = helper.path, source = helper.source, file = file }
+                    )
+        )
+        (Ok acc)
+        imported
+        |> Result.map (\done -> done ++ [ ms ])
 
 
 refuse : String -> Outcome
@@ -27,7 +115,16 @@ refuse reason =
 
 
 translate : { project : String, name : String, defName : String } -> String -> Directives -> Outcome
-translate info source directives =
+translate =
+    translateWith (\_ -> Nothing)
+
+
+translateWith : Lookup -> { project : String, name : String, defName : String } -> String -> Directives -> Outcome
+translateWith lookup info source directives0 =
+    let
+        directives =
+            Directives.dropCheckNots info.name directives0
+    in
     case directives.refusal of
         Just reason ->
             refuse reason
@@ -42,7 +139,15 @@ translate info source directives =
                 refuse "construct:large-computation"
 
             else
-                parseAndTranslate info source directives
+                parseAndTranslate lookup info source directives
+
+
+{-| A message of inference that is a reason of its own: `main` is not a view
+(`construct:main-type`, `construct:main-shape`) or is a worker (`effects:worker`).
+-}
+isReason : String -> Bool
+isReason message =
+    String.startsWith "construct:" message || String.startsWith "effects" message
 
 
 {-| The size, in characters, beyond which a test is taken as a test of a compiler's limits.
@@ -60,40 +165,305 @@ largeComputations : List String
 largeComputations =
     [ -- lists of 50000 and 150000 elements built while a wide record is live (a test of the GC)
       "WideRecordGcBitmapTest"
+
+    -- a command nested 100000 deep in Cmd.batch (elm/core#1123)
+    , "CoreIssue1123NestedCmdBatchStackOverflowTest"
     ]
 
 
-parseAndTranslate : { project : String, name : String, defName : String } -> String -> Directives -> Outcome
-parseAndTranslate info source directives =
-            case Elm.Parser.parseToFile source of
-                Err _ ->
-                    refuse "parse"
+{-| Tests whose theorems the kernel cannot check within the memory budget (6.5 GB per process),
+proved by `native_decide` only; each entry is dated with its measured peak. None so far.
+-}
+kernelTooLarge : List String
+kernelTooLarge =
+    []
 
-                Ok file ->
-                    case Convert.convert source directives file of
-                        Err p ->
+
+parseAndTranslate : Lookup -> { project : String, name : String, defName : String } -> String -> Directives -> Outcome
+parseAndTranslate lookup info source directives =
+    case Elm.Parser.parseToFile source of
+        Err _ ->
+            refuse "parse"
+
+        Ok file ->
+            case resolve lookup (mainSource info source file) of
+                Err reason ->
+                    refuse reason
+
+                Ok sources ->
+                    case Convert.convertProgram directives sources of
+                        ( _, p :: _ ) ->
                             Refused
                                 { reason = p.code
                                 , at = Just (String.fromInt p.at.start.row ++ ":" ++ String.fromInt p.at.start.column)
                                 , detail = Nothing
                                 }
 
-                        Ok program ->
+                        ( program, [] ) ->
                             case Infer.infer program of
                                 Err message ->
-                                    Refused { reason = "type", at = Nothing, detail = Just message }
+                                    if isReason message then
+                                        Refused { reason = message, at = Nothing, detail = Nothing }
+
+                                    else
+                                        Refused { reason = "type", at = Nothing, detail = Just message }
 
                                 Ok inferred ->
                                     case Specialise.specialise program inferred of
                                         Err message ->
-                                            if String.startsWith "basis:" message then
+                                            if String.startsWith "basis:" message || String.startsWith "construct:" message then
                                                 Refused { reason = message, at = Nothing, detail = Nothing }
 
                                             else
                                                 Refused { reason = "number", at = Nothing, detail = Just message }
 
                                         Ok specialised ->
+                                            let
+                                                native =
+                                                    specialised.native || List.member info.name kernelTooLarge
+
+                                                programText =
+                                                    ToLean.programDef info specialised.program specialised.kinds specialised.ports native
+
+                                                host =
+                                                    echoHost specialised.program specialised.ports
+                                            in
                                             Translated
-                                                { lean = ToLean.programDef info specialised.program specialised.kinds specialised.native
+                                                { lean =
+                                                    case specialised.flags of
+                                                        Just flagsType ->
+                                                            programText
+                                                                ++ "\n\n"
+                                                                ++ ToLean.workerDef info
+                                                                    flagsType
+                                                                    (directives.flags |> Maybe.map Json.toLean |> Maybe.withDefault ".null")
+                                                                    host
+                                                                    directives.checkNots
+
+                                                        Nothing ->
+                                                            programText
                                                 , checks = List.length specialised.program.checks
+                                                , sources = List.map .path sources
+                                                , kind =
+                                                    if specialised.flags == Nothing then
+                                                        "view"
+
+                                                    else
+                                                        "worker"
+                                                , native = native
+                                                , host =
+                                                    specialised.flags
+                                                        |> Maybe.map
+                                                            (\_ ->
+                                                                if host == Nothing then
+                                                                    "none"
+
+                                                                else
+                                                                    "echo"
+                                                            )
+                                                , flags = directives.flagsText
+                                                , dropped = directives.dropped
+                                                , checkNots = directives.checkNots
                                                 }
+
+
+{-| The test runner's echo host (runner/run.js, `launcher`): installed when the program has an
+outgoing port `echoOut` and an incoming port `echoIn` and refers to both outside their declarations
+(Elm/JS leaves an unreferenced port out of `app.ports`).
+-}
+echoHost : TestProgram -> Dict.Dict Int ( Bool, Ir.Payload ) -> Maybe ( String, String )
+echoHost program ports =
+    let
+        allPorts =
+            List.concatMap .ports program.modules
+
+        defs =
+            List.concatMap .defs program.modules
+
+        referenced binder =
+            List.any
+                (\d ->
+                    case d of
+                        DFn f ->
+                            anyExpr (refersTo binder) f.body
+
+                        DPat _ x ->
+                            anyExpr (refersTo binder) x
+                )
+                defs
+
+        portIs name out =
+            allPorts
+                |> List.any
+                    (\pd ->
+                        pd.name == name && (Dict.get pd.binder ports |> Maybe.map Tuple.first) == Just out && referenced pd.binder
+                    )
+    in
+    if portIs "echoOut" True && portIs "echoIn" False then
+        Just ( "echoOut", "echoIn" )
+
+    else
+        Nothing
+
+
+refersTo : Int -> Expr -> Bool
+refersTo binder e =
+    case e of
+        EVar _ (Local id _) ->
+            id == binder
+
+        EVar _ (Foreign f) ->
+            f.binder == binder
+
+        _ ->
+            False
+
+
+mainSource : { project : String, name : String, defName : String } -> String -> File -> ModuleSource
+mainSource info source file =
+    { name = info.name, path = "tests/" ++ info.project ++ "/src/" ++ info.name ++ ".elm", source = source, file = file }
+
+
+{-| A stage of the pipeline, for the report of all refusals (step 0 of
+plans/lean-full-definition.md).
+-}
+type Stage
+    = StDirectives
+    | StSize
+    | StParse
+    | StConvert
+    | StInfer
+    | StSpecialise
+
+
+stageName : Stage -> String
+stageName stage =
+    case stage of
+        StDirectives ->
+            "directives"
+
+        StSize ->
+            "size"
+
+        StParse ->
+            "parse"
+
+        StConvert ->
+            "convert"
+
+        StInfer ->
+            "infer"
+
+        StSpecialise ->
+            "specialise"
+
+
+type alias Found =
+    { stage : Stage, reason : String, at : Maybe String, detail : Maybe String }
+
+
+found : Stage -> String -> Found
+found stage reason =
+    { stage = stage, reason = reason, at = Nothing, detail = Nothing }
+
+
+{-| Every refusal met when each is lifted in turn, in pipeline order; [] for a test that
+translates. The first element, if any, is the refusal `translate` reports. A compile-error test
+reports only its directive; parsing and inference stop the report (there is no tree, and
+inference stops at its first error).
+-}
+translateAll : { project : String, name : String, defName : String } -> String -> Directives -> List Found
+translateAll =
+    translateAllWith (\_ -> Nothing)
+
+
+translateAllWith : Lookup -> { project : String, name : String, defName : String } -> String -> Directives -> List Found
+translateAllWith lookup info source directives =
+    let
+        fromDirectives =
+            List.map (found StDirectives) directives.refusals
+
+        size =
+            (if String.length source > largeProgram then
+                [ found StSize "construct:large-program" ]
+
+             else
+                []
+            )
+                ++ (if List.member info.name largeComputations then
+                        [ found StSize "construct:large-computation" ]
+
+                    else
+                        []
+                   )
+    in
+    if List.member "compile-error" directives.refusals then
+        fromDirectives
+
+    else if not (List.isEmpty size) then
+        -- a test of a compiler's limits: its tree is too large for the converter's and the
+        -- inference's recursion, so the report stops here, as translate does
+        fromDirectives ++ size
+
+    else
+        fromDirectives
+            ++ size
+            ++ (case Elm.Parser.parseToFile source of
+                    Err _ ->
+                        [ found StParse "parse" ]
+
+                    Ok file0 ->
+                        case resolve lookup (mainSource info source file0) of
+                            Err reason ->
+                                [ found StConvert reason ]
+
+                            Ok sources ->
+                                afterResolution directives sources
+               )
+
+
+{-| The refusals from conversion on, for a program whose modules are resolved.
+-}
+afterResolution : Directives -> List ModuleSource -> List Found
+afterResolution directives sources =
+    let
+        ( program, problems ) =
+            Convert.convertProgram directives sources
+
+        fromConvert =
+            List.map
+                (\p ->
+                    { stage = StConvert
+                    , reason = p.code
+                    , at = Just (String.fromInt p.at.start.row ++ ":" ++ String.fromInt p.at.start.column)
+                    , detail = Nothing
+                    }
+                )
+                problems
+    in
+    if List.any (\p -> String.startsWith "construct:large" p.code) problems then
+        -- too large for inference's recursion, as for size above
+        fromConvert
+
+    else
+        fromConvert
+            ++ (case Infer.infer program of
+                    Err message ->
+                        if String.startsWith "unknown-type:" message || isReason message then
+                            [ found StInfer message ]
+
+                        else
+                            [ { stage = StInfer, reason = "type", at = Nothing, detail = Just message } ]
+
+                    Ok inferred ->
+                        case Specialise.specialise program inferred of
+                            Err message ->
+                                if String.startsWith "basis:" message then
+                                    [ found StSpecialise message ]
+
+                                else
+                                    [ { stage = StSpecialise, reason = "number", at = Nothing, detail = Just message } ]
+
+                            Ok _ ->
+                                []
+               )

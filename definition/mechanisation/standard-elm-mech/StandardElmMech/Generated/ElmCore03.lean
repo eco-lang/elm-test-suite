@@ -4,584 +4,638 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm-core/src/IntAddTest.elm -/
+def g_elm_core_IntAddTest : Program := {
+  name := "IntAddTest", source := "tests/elm-core/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "add1", .atexp (.paren (bin "+" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))))]), .pat pw (ap (qv "Debug" "log") [str "add2", .atexp (.paren (bin "+" (.atexp (.scon (.intF 5))) (.atexp (neg (.scon (.intF 5))))))]), .pat pw (ap (qv "Debug" "log") [str "add3", .atexp (.paren (bin "+" (.atexp (neg (.scon (.intF 2)))) (.atexp (neg (.scon (.intF 3))))))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "add1: 13" .float,
+    chk .check "add2: 0" .float,
+    chk .check "add3: -5" .float ] }
+
+/-- tests/elm-core/src/IntCompareTest.elm -/
+def g_elm_core_IntCompareTest : Program := {
+  name := "IntCompareTest", source := "tests/elm-core/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "lt", .atexp (.paren (bin "<" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 10)))))]), .pat pw (ap (qv "Debug" "log") [str "gt", .atexp (.paren (bin ">" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))))]), .pat pw (ap (qv "Debug" "log") [str "le1", .atexp (.paren (bin "<=" (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 10)))))]), .pat pw (ap (qv "Debug" "log") [str "le2", .atexp (.paren (bin "<=" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))))]), .pat pw (ap (qv "Debug" "log") [str "ge1", .atexp (.paren (bin ">=" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))))]), .pat pw (ap (qv "Debug" "log") [str "ge2", .atexp (.paren (bin ">=" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))))]), .pat pw (ap (qv "Debug" "log") [str "eq", .atexp (.paren (bin "==" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))))]), .pat pw (ap (qv "Debug" "log") [str "ne", .atexp (.paren (bin "/=" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 3)))))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "lt: True" .data,
+    chk .check "gt: True" .data,
+    chk .check "le1: True" .data,
+    chk .check "le2: True" .data,
+    chk .check "ge1: True" .data,
+    chk .check "ge2: True" .data,
+    chk .check "eq: True" .data,
+    chk .check "ne: True" .data ] }
+
 /-- tests/elm-core/src/IntDivByZeroTest.elm -/
 def g_elm_core_IntDivByZeroTest : Program := {
   name := "IntDivByZeroTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "divZero1", .atexp (.paren (bin "//" (i 10) (i 0)))]), .pat pw (ap (qv "Debug" "log") [str "divZero2", .atexp (.paren (bin "//" (.atexp (neg (A (i 5)))) (i 0)))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "divZero1" "0" .int (bin "//" (i 10) (i 0)),
-    ckk "divZero2" "0" .int (bin "//" (.atexp (neg (A (i 5)))) (i 0)) ] }
+    chk .check "divZero1: 0" .int,
+    chk .check "divZero2: 0" .int ] }
 
 /-- tests/elm-core/src/IntDivTest.elm -/
 def g_elm_core_IntDivTest : Program := {
   name := "IntDivTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "div1", .atexp (.paren (bin "//" (i 10) (i 3)))]), .pat pw (ap (qv "Debug" "log") [str "div2", .atexp (.paren (bin "//" (.atexp (neg (A (i 10)))) (i 3)))]), .pat pw (ap (qv "Debug" "log") [str "div3", .atexp (.paren (bin "//" (i 10) (.atexp (neg (A (i 3))))))]), .pat pw (ap (qv "Debug" "log") [str "div4", .atexp (.paren (bin "//" (.atexp (neg (A (i 10)))) (.atexp (neg (A (i 3))))))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "div1" "3" .int (bin "//" (i 10) (i 3)),
-    ckk "div2" "-3" .int (bin "//" (.atexp (neg (A (i 10)))) (i 3)),
-    ckk "div3" "-3" .int (bin "//" (i 10) (.atexp (neg (A (i 3))))),
-    ckk "div4" "3" .int (bin "//" (.atexp (neg (A (i 10)))) (.atexp (neg (A (i 3))))) ] }
+    chk .check "div1: 3" .int,
+    chk .check "div2: -3" .int,
+    chk .check "div3: -3" .int,
+    chk .check "div4: 3" .int ] }
 
 /-- tests/elm-core/src/IntMinMaxTest.elm -/
 def g_elm_core_IntMinMaxTest : Program := {
   name := "IntMinMaxTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "min1", .atexp (.paren (ap (v "min") [.atexp (.scon (.intF 10)), .atexp (.scon (.intF 3))]))]), .pat pw (ap (qv "Debug" "log") [str "min2", .atexp (.paren (ap (v "min") [.atexp (neg (.scon (.intF 5))), .atexp (.scon (.intF 5))]))]), .pat pw (ap (qv "Debug" "log") [str "max1", .atexp (.paren (ap (v "max") [.atexp (.scon (.intF 10)), .atexp (.scon (.intF 3))]))]), .pat pw (ap (qv "Debug" "log") [str "max2", .atexp (.paren (ap (v "max") [.atexp (neg (.scon (.intF 5))), .atexp (.scon (.intF 5))]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "min1" "3" .float (ap (v "min") [.atexp (.scon (.intF 10)), .atexp (.scon (.intF 3))]),
-    ckk "min2" "-5" .float (ap (v "min") [.atexp (neg (.scon (.intF 5))), .atexp (.scon (.intF 5))]),
-    ckk "max1" "10" .float (ap (v "max") [.atexp (.scon (.intF 10)), .atexp (.scon (.intF 3))]),
-    ckk "max2" "5" .float (ap (v "max") [.atexp (neg (.scon (.intF 5))), .atexp (.scon (.intF 5))]) ] }
+    chk .check "min1: 3" .float,
+    chk .check "min2: -5" .float,
+    chk .check "max1: 10" .float,
+    chk .check "max2: 5" .float ] }
 
 /-- tests/elm-core/src/IntModByTest.elm -/
 def g_elm_core_IntModByTest : Program := {
   name := "IntModByTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "mod1", .atexp (.paren (ap (v "modBy") [i 4, i 7]))]), .pat pw (ap (qv "Debug" "log") [str "mod2", .atexp (.paren (ap (v "modBy") [i 4, .atexp (neg (A (i 7)))]))]), .pat pw (ap (qv "Debug" "log") [str "mod3", .atexp (.paren (ap (v "modBy") [i 4, i 7]))]), .pat pw (ap (qv "Debug" "log") [str "mod4", .atexp (.paren (ap (v "modBy") [i 4, .atexp (neg (A (i 7)))]))]), .pat pw (ap (qv "Debug" "log") [str "mod5", .atexp (.paren (ap (v "modBy") [i 5, i 0]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "mod1" "3" .int (ap (v "modBy") [i 4, i 7]),
-    ckk "mod2" "1" .int (ap (v "modBy") [i 4, .atexp (neg (A (i 7)))]),
-    ckk "mod3" "3" .int (ap (v "modBy") [i 4, i 7]),
-    ckk "mod4" "1" .int (ap (v "modBy") [i 4, .atexp (neg (A (i 7)))]),
-    ckk "mod5" "0" .int (ap (v "modBy") [i 5, i 0]) ] }
+    chk .check "mod1: 3" .int,
+    chk .check "mod2: 1" .int,
+    chk .check "mod3: 3" .int,
+    chk .check "mod4: 1" .int,
+    chk .check "mod5: 0" .int ] }
 
 /-- tests/elm-core/src/IntMulTest.elm -/
 def g_elm_core_IntMulTest : Program := {
   name := "IntMulTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "mul1", .atexp (.paren (bin "*" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))))]), .pat pw (ap (qv "Debug" "log") [str "mul2", .atexp (.paren (bin "*" (.atexp (.scon (.intF 5))) (.atexp (neg (.scon (.intF 3))))))]), .pat pw (ap (qv "Debug" "log") [str "mul3", .atexp (.paren (bin "*" (.atexp (neg (.scon (.intF 2)))) (.atexp (neg (.scon (.intF 3))))))]), .pat pw (ap (qv "Debug" "log") [str "mul4", .atexp (.paren (bin "*" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 100)))))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "mul1" "30" .float (bin "*" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))),
-    ckk "mul2" "-15" .float (bin "*" (.atexp (.scon (.intF 5))) (.atexp (neg (.scon (.intF 3))))),
-    ckk "mul3" "6" .float (bin "*" (.atexp (neg (.scon (.intF 2)))) (.atexp (neg (.scon (.intF 3))))),
-    ckk "mul4" "0" .float (bin "*" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 100)))) ] }
+    chk .check "mul1: 30" .float,
+    chk .check "mul2: -15" .float,
+    chk .check "mul3: 6" .float,
+    chk .check "mul4: 0" .float ] }
 
 /-- tests/elm-core/src/IntNegateTest.elm -/
 def g_elm_core_IntNegateTest : Program := {
   name := "IntNegateTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "neg1", .atexp (.paren (ap (v "negate") [.atexp (.scon (.intF 5))]))]), .pat pw (ap (qv "Debug" "log") [str "neg2", .atexp (.paren (ap (v "negate") [.atexp (neg (.scon (.intF 5)))]))]), .pat pw (ap (qv "Debug" "log") [str "neg3", .atexp (.paren (ap (v "negate") [.atexp (.scon (.intF 0))]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "neg1" "-5" .float (ap (v "negate") [.atexp (.scon (.intF 5))]),
-    ckk "neg2" "5" .float (ap (v "negate") [.atexp (neg (.scon (.intF 5)))]),
-    ckk "neg3" "0" .float (ap (v "negate") [.atexp (.scon (.intF 0))]) ] }
+    chk .check "neg1: -5" .float,
+    chk .check "neg2: 5" .float,
+    chk .check "neg3: 0" .float ] }
 
 /-- tests/elm-core/src/IntPowTest.elm -/
 def g_elm_core_IntPowTest : Program := {
   name := "IntPowTest", source := "tests/elm-core/src", native := true,
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "pow1", .atexp (.paren (bin "^" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))))]), .pat pw (ap (qv "Debug" "log") [str "pow2", .atexp (.paren (bin "^" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 0)))))]), .pat pw (ap (qv "Debug" "log") [str "pow3", .atexp (.paren (bin "^" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 10)))))]), .pat pw (ap (qv "Debug" "log") [str "pow4", .atexp (.paren (bin "^" (.atexp (.paren (.atexp (neg (.scon (.intF 2)))))) (.atexp (.scon (.intF 3)))))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "pow1" "8" .float (bin "^" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))),
-    ckk "pow2" "1" .float (bin "^" (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 0)))),
-    ckk "pow3" "1024" .float (bin "^" (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 10)))),
-    ckk "pow4" "-8" .float (bin "^" (.atexp (.paren (.atexp (neg (.scon (.intF 2)))))) (.atexp (.scon (.intF 3)))) ] }
+    chk .check "pow1: 8" .float,
+    chk .check "pow2: 1" .float,
+    chk .check "pow3: 1024" .float,
+    chk .check "pow4: -8" .float ] }
 
 /-- tests/elm-core/src/IntRemainderByTest.elm -/
 def g_elm_core_IntRemainderByTest : Program := {
   name := "IntRemainderByTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "rem1", .atexp (.paren (ap (v "remainderBy") [i 4, i 7]))]), .pat pw (ap (qv "Debug" "log") [str "rem2", .atexp (.paren (ap (v "remainderBy") [i 4, .atexp (neg (A (i 7)))]))]), .pat pw (ap (qv "Debug" "log") [str "rem3", .atexp (.paren (ap (v "remainderBy") [.atexp (neg (A (i 4))), i 7]))]), .pat pw (ap (qv "Debug" "log") [str "rem4", .atexp (.paren (ap (v "remainderBy") [.atexp (neg (A (i 4))), .atexp (neg (A (i 7)))]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "rem1" "3" .int (ap (v "remainderBy") [i 4, i 7]),
-    ckk "rem2" "-3" .int (ap (v "remainderBy") [i 4, .atexp (neg (A (i 7)))]),
-    ckk "rem3" "3" .int (ap (v "remainderBy") [.atexp (neg (A (i 4))), i 7]),
-    ckk "rem4" "-3" .int (ap (v "remainderBy") [.atexp (neg (A (i 4))), .atexp (neg (A (i 7)))]) ] }
+    chk .check "rem1: 3" .int,
+    chk .check "rem2: -3" .int,
+    chk .check "rem3: 3" .int,
+    chk .check "rem4: -3" .int ] }
 
 /-- tests/elm-core/src/IntSubTest.elm -/
 def g_elm_core_IntSubTest : Program := {
   name := "IntSubTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "sub1", .atexp (.paren (bin "-" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))))]), .pat pw (ap (qv "Debug" "log") [str "sub2", .atexp (.paren (bin "-" (.atexp (.scon (.intF 5))) (.atexp (neg (.scon (.intF 5))))))]), .pat pw (ap (qv "Debug" "log") [str "sub3", .atexp (.paren (bin "-" (.atexp (neg (.scon (.intF 2)))) (.atexp (neg (.scon (.intF 3))))))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "sub1" "7" .float (bin "-" (.atexp (.scon (.intF 10))) (.atexp (.scon (.intF 3)))),
-    ckk "sub2" "10" .float (bin "-" (.atexp (.scon (.intF 5))) (.atexp (neg (.scon (.intF 5))))),
-    ckk "sub3" "1" .float (bin "-" (.atexp (neg (.scon (.intF 2)))) (.atexp (neg (.scon (.intF 3))))) ] }
+    chk .check "sub1: 7" .float,
+    chk .check "sub2: 10" .float,
+    chk .check "sub3: 1" .float ] }
 
 /-- tests/elm-core/src/ListAppendTest.elm -/
 def g_elm_core_ListAppendTest : Program := {
   name := "ListAppendTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "append1", .atexp (.paren (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (listE [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))])))]), .pat pw (ap (qv "Debug" "log") [str "append_empty", .atexp (.paren (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (listE [])))]), .pat pw (ap (qv "Debug" "log") [str "concat_op", .atexp (.paren (bin "++" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "append1" "[1,2,3,4]" .data (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (listE [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))])),
-    ckk "append_empty" "[1,2]" .data (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (listE [])),
-    ckk "concat_op" "[1,2,3]" .data (bin "++" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])) ] }
+    chk .check "append1: [1,2,3,4]" .data,
+    chk .check "append_empty: [1,2]" .data,
+    chk .check "concat_op: [1,2,3]" .data ] }
 
 /-- tests/elm-core/src/ListConcatTest.elm -/
 def g_elm_core_ListConcatTest : Program := {
   name := "ListConcatTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "append", .atexp (.paren (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (listE [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))])))]), .pat pw (ap (qv "Debug" "log") [str "concat", .atexp (.paren (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (bin "++" (listE [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))]) (listE [.atexp (.scon (.intF 5)), .atexp (.scon (.intF 6))]))))]), .pat pw (ap (qv "Debug" "log") [str "empty", .atexp (.paren (bin "++" (listE []) (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "append" "[1,2,3,4]" .data (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (listE [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))])),
-    ckk "concat" "[1,2,3,4,5,6]" .data (bin "++" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (bin "++" (listE [.atexp (.scon (.intF 3)), .atexp (.scon (.intF 4))]) (listE [.atexp (.scon (.intF 5)), .atexp (.scon (.intF 6))]))),
-    ckk "empty" "[1,2,3]" .data (bin "++" (listE []) (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])) ] }
+    chk .check "append: [1,2,3,4]" .data,
+    chk .check "concat: [1,2,3,4,5,6]" .data,
+    chk .check "empty: [1,2,3]" .data ] }
 
 /-- tests/elm-core/src/NotEqualBoolCaseTest.elm -/
 def g_elm_core_NotEqualBoolCaseTest : Program := {
   name := "NotEqualBoolCaseTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "classify" [pv "b"] (caseOf (v "b") [(P (pcA "True"), str "yes"), (P (pcA "False"), str "no")]) ],
-  locals := [ ],
+    .fn "classify" [pv "b"] (caseOf (v "b") [(P (pcA "True"), str "yes"), (P (pcA "False"), str "no")]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "cTT", .atexp (.paren (ap (v "classify") [.atexp (.paren (bin "/=" (c "True") (c "True")))]))]), .pat pw (ap (qv "Debug" "log") [str "cTF", .atexp (.paren (ap (v "classify") [.atexp (.paren (bin "/=" (c "True") (c "False")))]))]), .pat pw (ap (qv "Debug" "log") [str "cFT", .atexp (.paren (ap (v "classify") [.atexp (.paren (bin "/=" (c "False") (c "True")))]))]), .pat pw (ap (qv "Debug" "log") [str "cFF", .atexp (.paren (ap (v "classify") [.atexp (.paren (bin "/=" (c "False") (c "False")))]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "cTT" "\"no\"" .string (ap (v "classify") [.atexp (.paren (bin "/=" (c "True") (c "True")))]),
-    ckk "cTF" "\"yes\"" .string (ap (v "classify") [.atexp (.paren (bin "/=" (c "True") (c "False")))]),
-    ckk "cFT" "\"yes\"" .string (ap (v "classify") [.atexp (.paren (bin "/=" (c "False") (c "True")))]),
-    ckk "cFF" "\"no\"" .string (ap (v "classify") [.atexp (.paren (bin "/=" (c "False") (c "False")))]) ] }
+    chk .check "cTT: \"no\"" .string,
+    chk .check "cTF: \"yes\"" .string,
+    chk .check "cFT: \"yes\"" .string,
+    chk .check "cFF: \"no\"" .string ] }
 
 /-- tests/elm-core/src/NotEqualBoolIfTest.elm -/
 def g_elm_core_NotEqualBoolIfTest : Program := {
   name := "NotEqualBoolIfTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "ifTT", .atexp (.paren (ifte (bin "/=" (c "True") (c "True")) (str "yes") (str "no")))]), .pat pw (ap (qv "Debug" "log") [str "ifTF", .atexp (.paren (ifte (bin "/=" (c "True") (c "False")) (str "yes") (str "no")))]), .pat pw (ap (qv "Debug" "log") [str "ifFT", .atexp (.paren (ifte (bin "/=" (c "False") (c "True")) (str "yes") (str "no")))]), .pat pw (ap (qv "Debug" "log") [str "ifFF", .atexp (.paren (ifte (bin "/=" (c "False") (c "False")) (str "yes") (str "no")))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "ifTT" "\"no\"" .string (ifte (bin "/=" (c "True") (c "True")) (str "yes") (str "no")),
-    ckk "ifTF" "\"yes\"" .string (ifte (bin "/=" (c "True") (c "False")) (str "yes") (str "no")),
-    ckk "ifFT" "\"yes\"" .string (ifte (bin "/=" (c "False") (c "True")) (str "yes") (str "no")),
-    ckk "ifFF" "\"no\"" .string (ifte (bin "/=" (c "False") (c "False")) (str "yes") (str "no")) ] }
+    chk .check "ifTT: \"no\"" .string,
+    chk .check "ifTF: \"yes\"" .string,
+    chk .check "ifFT: \"yes\"" .string,
+    chk .check "ifFF: \"no\"" .string ] }
 
 /-- tests/elm-core/src/NotEqualBoolMaybeTest.elm -/
 def g_elm_core_NotEqualBoolMaybeTest : Program := {
   name := "NotEqualBoolMaybeTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "jt" [] (ap (c "Just") [c "True"]),
-    .fn "jf" [] (ap (c "Just") [c "False"]),
-    .fn "n" [] (c "Nothing") ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "jt" [] (ap (c "Just") [c "True"]), .fn "jf" [] (ap (c "Just") [c "False"]), .fn "n" [] (c "Nothing"), .pat pw (ap (qv "Debug" "log") [str "jt_jt", .atexp (.paren (bin "/=" (v "jt") (v "jt")))]), .pat pw (ap (qv "Debug" "log") [str "jt_jf", .atexp (.paren (bin "/=" (v "jt") (v "jf")))]), .pat pw (ap (qv "Debug" "log") [str "jf_jt", .atexp (.paren (bin "/=" (v "jf") (v "jt")))]), .pat pw (ap (qv "Debug" "log") [str "jf_jf", .atexp (.paren (bin "/=" (v "jf") (v "jf")))]), .pat pw (ap (qv "Debug" "log") [str "n_jt", .atexp (.paren (bin "/=" (v "n") (v "jt")))]), .pat pw (ap (qv "Debug" "log") [str "n_n", .atexp (.paren (bin "/=" (v "n") (v "n")))]), .pat pw (ap (qv "Debug" "log") [str "jt_n", .atexp (.paren (bin "/=" (v "jt") (v "n")))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "jt_jt" "False" .data (bin "/=" (v "jt") (v "jt")),
-    ckk "jt_jf" "True" .data (bin "/=" (v "jt") (v "jf")),
-    ckk "jf_jt" "True" .data (bin "/=" (v "jf") (v "jt")),
-    ckk "jf_jf" "False" .data (bin "/=" (v "jf") (v "jf")),
-    ckk "n_jt" "True" .data (bin "/=" (v "n") (v "jt")),
-    ckk "n_n" "False" .data (bin "/=" (v "n") (v "n")),
-    ckk "jt_n" "True" .data (bin "/=" (v "jt") (v "n")) ] }
+    chk .check "jt_jt: False" .data,
+    chk .check "jt_jf: True" .data,
+    chk .check "jf_jt: True" .data,
+    chk .check "jf_jf: False" .data,
+    chk .check "n_jt: True" .data,
+    chk .check "n_n: False" .data,
+    chk .check "jt_n: True" .data ] }
 
 /-- tests/elm-core/src/NotEqualBoolPapTest.elm -/
 def g_elm_core_NotEqualBoolPapTest : Program := {
   name := "NotEqualBoolPapTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
   defs := [
     .fn "map" [pv "f", pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]),
     .fn "filter" [pv "keep", pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), ifte (ap (v "keep") [v "x"]) (bin "::" (v "x") (ap (v "filter") [v "keep", v "rest"])) (ap (v "filter") [v "keep", v "rest"]))]),
-    .fn "any" [pv "p", pv "xs"] (caseOf (v "xs") [(P (listP []), c "False"), (.cons (P (pv "x")) (P (pv "rest")), orelse (ap (v "p") [v "x"]) (ap (v "any") [v "p", v "rest"]))]) ],
-  locals := [
-    .fn "isNotTrue" [] (ap (.atexp (.op "/=")) [c "True"]),
-    .fn "isNotFalse" [] (ap (.atexp (.op "/=")) [c "False"]),
-    .fn "bs" [] (listE [c "True", c "False", c "True", c "False"]) ],
+    .fn "any" [pv "p", pv "xs"] (caseOf (v "xs") [(P (listP []), c "False"), (.cons (P (pv "x")) (P (pv "rest")), orelse (ap (v "p") [v "x"]) (ap (v "any") [v "p", v "rest"]))]),
+    .fn "main" [] (letDefs [.fn "isNotTrue" [] (ap (.atexp (.op "/=")) [c "True"]), .fn "isNotFalse" [] (ap (.atexp (.op "/=")) [c "False"]), .fn "bs" [] (listE [c "True", c "False", c "True", c "False"]), .pat pw (ap (qv "Debug" "log") [str "isNotTrueList", .atexp (.paren (ap (v "map") [v "isNotTrue", v "bs"]))]), .pat pw (ap (qv "Debug" "log") [str "isNotFalseList", .atexp (.paren (ap (v "map") [v "isNotFalse", v "bs"]))]), .pat pw (ap (qv "Debug" "log") [str "filterNotTrue", .atexp (.paren (ap (v "filter") [v "isNotTrue", v "bs"]))]), .pat pw (ap (qv "Debug" "log") [str "filterNotFalse", .atexp (.paren (ap (v "filter") [v "isNotFalse", v "bs"]))]), .pat pw (ap (qv "Debug" "log") [str "anyNotTrue", .atexp (.paren (ap (v "any") [v "isNotTrue", v "bs"]))]), .pat pw (ap (qv "Debug" "log") [str "anyNotFalse", .atexp (.paren (ap (v "any") [v "isNotFalse", v "bs"]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "isNotTrueList" "[False,True,False,True]" .data (ap (v "map") [v "isNotTrue", v "bs"]),
-    ckk "isNotFalseList" "[True,False,True,False]" .data (ap (v "map") [v "isNotFalse", v "bs"]),
-    ckk "filterNotTrue" "[False,False]" .data (ap (v "filter") [v "isNotTrue", v "bs"]),
-    ckk "filterNotFalse" "[True,True]" .data (ap (v "filter") [v "isNotFalse", v "bs"]),
-    ckk "anyNotTrue" "True" .data (ap (v "any") [v "isNotTrue", v "bs"]),
-    ckk "anyNotFalse" "True" .data (ap (v "any") [v "isNotFalse", v "bs"]) ] }
+    chk .check "isNotTrueList: [False,True,False,True]" .data,
+    chk .check "isNotFalseList: [True,False,True,False]" .data,
+    chk .check "filterNotTrue: [False,False]" .data,
+    chk .check "filterNotFalse: [True,True]" .data,
+    chk .check "anyNotTrue: True" .data,
+    chk .check "anyNotFalse: True" .data ] }
 
 /-- tests/elm-core/src/NotEqualBoolRecordTest.elm -/
 def g_elm_core_NotEqualBoolRecordTest : Program := {
   name := "NotEqualBoolRecordTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "rt" [] (recE [("flag", c "True")]),
-    .fn "rf" [] (recE [("flag", c "False")]) ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [("Flag", some ["flag"])],
+  defs := [
+    .fn "main" [] (letDefs [.fn "rt" [] (recE [("flag", c "True")]), .fn "rf" [] (recE [("flag", c "False")]), .pat pw (ap (qv "Debug" "log") [str "tt", .atexp (.paren (bin "/=" (v "rt") (v "rt")))]), .pat pw (ap (qv "Debug" "log") [str "tf", .atexp (.paren (bin "/=" (v "rt") (v "rf")))]), .pat pw (ap (qv "Debug" "log") [str "ft", .atexp (.paren (bin "/=" (v "rf") (v "rt")))]), .pat pw (ap (qv "Debug" "log") [str "ff", .atexp (.paren (bin "/=" (v "rf") (v "rf")))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "tt" "False" .data (bin "/=" (v "rt") (v "rt")),
-    ckk "tf" "True" .data (bin "/=" (v "rt") (v "rf")),
-    ckk "ft" "True" .data (bin "/=" (v "rf") (v "rt")),
-    ckk "ff" "False" .data (bin "/=" (v "rf") (v "rf")) ] }
+    chk .check "tt: False" .data,
+    chk .check "tf: True" .data,
+    chk .check "ft: True" .data,
+    chk .check "ff: False" .data ] }
 
 /-- tests/elm-core/src/NotEqualBoolTest.elm -/
 def g_elm_core_NotEqualBoolTest : Program := {
   name := "NotEqualBoolTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "ntt", .atexp (.paren (bin "/=" (c "True") (c "True")))]), .pat pw (ap (qv "Debug" "log") [str "ntf", .atexp (.paren (bin "/=" (c "True") (c "False")))]), .pat pw (ap (qv "Debug" "log") [str "nft", .atexp (.paren (bin "/=" (c "False") (c "True")))]), .pat pw (ap (qv "Debug" "log") [str "nff", .atexp (.paren (bin "/=" (c "False") (c "False")))]), .pat pw (ap (qv "Debug" "log") [str "bntt", .atexp (.paren (ap (v "not") [.atexp (.paren (bin "/=" (c "True") (c "True")))]))]), .pat pw (ap (qv "Debug" "log") [str "bntf", .atexp (.paren (ap (v "not") [.atexp (.paren (bin "/=" (c "True") (c "False")))]))]), .pat pw (ap (qv "Debug" "log") [str "bnft", .atexp (.paren (ap (v "not") [.atexp (.paren (bin "/=" (c "False") (c "True")))]))]), .pat pw (ap (qv "Debug" "log") [str "bnff", .atexp (.paren (ap (v "not") [.atexp (.paren (bin "/=" (c "False") (c "False")))]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "ntt" "False" .data (bin "/=" (c "True") (c "True")),
-    ckk "ntf" "True" .data (bin "/=" (c "True") (c "False")),
-    ckk "nft" "True" .data (bin "/=" (c "False") (c "True")),
-    ckk "nff" "False" .data (bin "/=" (c "False") (c "False")),
-    ckk "bntt" "True" .data (ap (v "not") [.atexp (.paren (bin "/=" (c "True") (c "True")))]),
-    ckk "bntf" "False" .data (ap (v "not") [.atexp (.paren (bin "/=" (c "True") (c "False")))]),
-    ckk "bnft" "False" .data (ap (v "not") [.atexp (.paren (bin "/=" (c "False") (c "True")))]),
-    ckk "bnff" "True" .data (ap (v "not") [.atexp (.paren (bin "/=" (c "False") (c "False")))]) ] }
+    chk .check "ntt: False" .data,
+    chk .check "ntf: True" .data,
+    chk .check "nft: True" .data,
+    chk .check "nff: False" .data,
+    chk .check "bntt: True" .data,
+    chk .check "bntf: False" .data,
+    chk .check "bnft: False" .data,
+    chk .check "bnff: True" .data ] }
 
 /-- tests/elm-core/src/NotEqualBoolVarTest.elm -/
 def g_elm_core_NotEqualBoolVarTest : Program := {
   name := "NotEqualBoolVarTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "neqBool" [pv "a", pv "b"] (bin "/=" (v "a") (v "b")) ],
-  locals := [
-    .fn "t" [] (c "True"),
-    .fn "f" [] (c "False") ],
+    .fn "neqBool" [pv "a", pv "b"] (bin "/=" (v "a") (v "b")),
+    .fn "main" [] (letDefs [.fn "t" [] (c "True"), .fn "f" [] (c "False"), .pat pw (ap (qv "Debug" "log") [str "vTT", .atexp (.paren (bin "/=" (v "t") (v "t")))]), .pat pw (ap (qv "Debug" "log") [str "vTF", .atexp (.paren (bin "/=" (v "t") (v "f")))]), .pat pw (ap (qv "Debug" "log") [str "vFT", .atexp (.paren (bin "/=" (v "f") (v "t")))]), .pat pw (ap (qv "Debug" "log") [str "vFF", .atexp (.paren (bin "/=" (v "f") (v "f")))]), .pat pw (ap (qv "Debug" "log") [str "hTT", .atexp (.paren (ap (v "neqBool") [c "True", c "True"]))]), .pat pw (ap (qv "Debug" "log") [str "hTF", .atexp (.paren (ap (v "neqBool") [c "True", c "False"]))]), .pat pw (ap (qv "Debug" "log") [str "hFT", .atexp (.paren (ap (v "neqBool") [c "False", c "True"]))]), .pat pw (ap (qv "Debug" "log") [str "hFF", .atexp (.paren (ap (v "neqBool") [c "False", c "False"]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "vTT" "False" .data (bin "/=" (v "t") (v "t")),
-    ckk "vTF" "True" .data (bin "/=" (v "t") (v "f")),
-    ckk "vFT" "True" .data (bin "/=" (v "f") (v "t")),
-    ckk "vFF" "False" .data (bin "/=" (v "f") (v "f")),
-    ckk "hTT" "False" .data (ap (v "neqBool") [c "True", c "True"]),
-    ckk "hTF" "True" .data (ap (v "neqBool") [c "True", c "False"]),
-    ckk "hFT" "True" .data (ap (v "neqBool") [c "False", c "True"]),
-    ckk "hFF" "False" .data (ap (v "neqBool") [c "False", c "False"]) ] }
+    chk .check "vTT: False" .data,
+    chk .check "vTF: True" .data,
+    chk .check "vFT: True" .data,
+    chk .check "vFF: False" .data,
+    chk .check "hTT: False" .data,
+    chk .check "hTF: True" .data,
+    chk .check "hFT: True" .data,
+    chk .check "hFF: False" .data ] }
 
 /-- tests/elm-core/src/OrderingEmptyListPapTest.elm -/
 def g_elm_core_OrderingEmptyListPapTest : Program := {
   name := "OrderingEmptyListPapTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "map" [pv "f", pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]) ],
-  locals := [
-    .fn "emptyL" [] (listE []),
-    .fn "xs" [] (listE [v "emptyL", listE [i 1], listE [i 1, i 2]]) ],
+    .fn "map" [pv "f", pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]),
+    .fn "main" [] (letDefs [.fn "emptyL" [] (listE []), .fn "xs" [] (listE [v "emptyL", listE [i 1], listE [i 1, i 2]]), .pat pw (ap (qv "Debug" "log") [str "ltEmpty", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "<")) [v "emptyL"])), v "xs"]))]), .pat pw (ap (qv "Debug" "log") [str "leEmpty", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "<=")) [v "emptyL"])), v "xs"]))]), .pat pw (ap (qv "Debug" "log") [str "gtEmpty", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op ">")) [v "emptyL"])), v "xs"]))]), .pat pw (ap (qv "Debug" "log") [str "geEmpty", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op ">=")) [v "emptyL"])), v "xs"]))]), .pat pw (ap (qv "Debug" "log") [str "cmpEmpty", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (v "compare") [v "emptyL"])), v "xs"]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "ltEmpty" "[False,True,True]" .data (ap (v "map") [.atexp (.paren (ap (.atexp (.op "<")) [v "emptyL"])), v "xs"]),
-    ckk "leEmpty" "[True,True,True]" .data (ap (v "map") [.atexp (.paren (ap (.atexp (.op "<=")) [v "emptyL"])), v "xs"]),
-    ckk "gtEmpty" "[False,False,False]" .data (ap (v "map") [.atexp (.paren (ap (.atexp (.op ">")) [v "emptyL"])), v "xs"]),
-    ckk "geEmpty" "[True,False,False]" .data (ap (v "map") [.atexp (.paren (ap (.atexp (.op ">=")) [v "emptyL"])), v "xs"]),
-    ckk "cmpEmpty" "[EQ,LT,LT]" .data (ap (v "map") [.atexp (.paren (ap (v "compare") [v "emptyL"])), v "xs"]) ] }
+    chk .check "ltEmpty: [False,True,True]" .data,
+    chk .check "leEmpty: [True,True,True]" .data,
+    chk .check "gtEmpty: [False,False,False]" .data,
+    chk .check "geEmpty: [True,False,False]" .data,
+    chk .check "cmpEmpty: [EQ,LT,LT]" .data ] }
 
 /-- tests/elm-core/src/OrderingEmptyListTest.elm -/
 def g_elm_core_OrderingEmptyListTest : Program := {
   name := "OrderingEmptyListTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "emptyL" [] (listE []) ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "emptyL" [] (listE []), .pat pw (ap (qv "Debug" "log") [str "lt_ee", .atexp (.paren (bin "<" (v "emptyL") (v "emptyL")))]), .pat pw (ap (qv "Debug" "log") [str "lt_ea", .atexp (.paren (bin "<" (v "emptyL") (listE [i 1])))]), .pat pw (ap (qv "Debug" "log") [str "lt_ae", .atexp (.paren (bin "<" (listE [i 1]) (v "emptyL")))]), .pat pw (ap (qv "Debug" "log") [str "le_ee", .atexp (.paren (bin "<=" (v "emptyL") (v "emptyL")))]), .pat pw (ap (qv "Debug" "log") [str "le_ea", .atexp (.paren (bin "<=" (v "emptyL") (listE [i 1])))]), .pat pw (ap (qv "Debug" "log") [str "le_ae", .atexp (.paren (bin "<=" (listE [i 1]) (v "emptyL")))]), .pat pw (ap (qv "Debug" "log") [str "gt_ee", .atexp (.paren (bin ">" (v "emptyL") (v "emptyL")))]), .pat pw (ap (qv "Debug" "log") [str "gt_ea", .atexp (.paren (bin ">" (v "emptyL") (listE [i 1])))]), .pat pw (ap (qv "Debug" "log") [str "gt_ae", .atexp (.paren (bin ">" (listE [i 1]) (v "emptyL")))]), .pat pw (ap (qv "Debug" "log") [str "ge_ee", .atexp (.paren (bin ">=" (v "emptyL") (v "emptyL")))]), .pat pw (ap (qv "Debug" "log") [str "ge_ea", .atexp (.paren (bin ">=" (v "emptyL") (listE [i 1])))]), .pat pw (ap (qv "Debug" "log") [str "ge_ae", .atexp (.paren (bin ">=" (listE [i 1]) (v "emptyL")))]), .pat pw (ap (qv "Debug" "log") [str "lt_ab", .atexp (.paren (bin "<" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2))])))]), .pat pw (ap (qv "Debug" "log") [str "ge_ab", .atexp (.paren (bin ">=" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2))])))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "lt_ee" "False" .data (bin "<" (v "emptyL") (v "emptyL")),
-    ckk "lt_ea" "True" .data (bin "<" (v "emptyL") (listE [i 1])),
-    ckk "lt_ae" "False" .data (bin "<" (listE [i 1]) (v "emptyL")),
-    ckk "le_ee" "True" .data (bin "<=" (v "emptyL") (v "emptyL")),
-    ckk "le_ea" "True" .data (bin "<=" (v "emptyL") (listE [i 1])),
-    ckk "le_ae" "False" .data (bin "<=" (listE [i 1]) (v "emptyL")),
-    ckk "gt_ee" "False" .data (bin ">" (v "emptyL") (v "emptyL")),
-    ckk "gt_ea" "False" .data (bin ">" (v "emptyL") (listE [i 1])),
-    ckk "gt_ae" "True" .data (bin ">" (listE [i 1]) (v "emptyL")),
-    ckk "ge_ee" "True" .data (bin ">=" (v "emptyL") (v "emptyL")),
-    ckk "ge_ea" "False" .data (bin ">=" (v "emptyL") (listE [i 1])),
-    ckk "ge_ae" "True" .data (bin ">=" (listE [i 1]) (v "emptyL")),
-    ckk "lt_ab" "True" .data (bin "<" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2))])),
-    ckk "ge_ab" "False" .data (bin ">=" (listE [.atexp (.scon (.intF 1))]) (listE [.atexp (.scon (.intF 2))])) ] }
+    chk .check "lt_ee: False" .data,
+    chk .check "lt_ea: True" .data,
+    chk .check "lt_ae: False" .data,
+    chk .check "le_ee: True" .data,
+    chk .check "le_ea: True" .data,
+    chk .check "le_ae: False" .data,
+    chk .check "gt_ee: False" .data,
+    chk .check "gt_ea: False" .data,
+    chk .check "gt_ae: True" .data,
+    chk .check "ge_ee: True" .data,
+    chk .check "ge_ea: False" .data,
+    chk .check "ge_ae: True" .data,
+    chk .check "lt_ab: True" .data,
+    chk .check "ge_ab: False" .data ] }
 
 /-- tests/elm-core/src/OrderingEmptyStringPapTest.elm -/
 def g_elm_core_OrderingEmptyStringPapTest : Program := {
   name := "OrderingEmptyStringPapTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "map" [pv "f", pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]) ],
-  locals := [
-    .fn "xs" [] (listE [str "", str "a", str "ab"]) ],
+    .fn "map" [pv "f", pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]),
+    .fn "main" [] (letDefs [.fn "xs" [] (listE [str "", str "a", str "ab"]), .pat pw (ap (qv "Debug" "log") [str "ltEmpty", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "<")) [str ""])), v "xs"]))]), .pat pw (ap (qv "Debug" "log") [str "leEmpty", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op "<=")) [str ""])), v "xs"]))]), .pat pw (ap (qv "Debug" "log") [str "gtEmpty", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op ">")) [str ""])), v "xs"]))]), .pat pw (ap (qv "Debug" "log") [str "geEmpty", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (.atexp (.op ">=")) [str ""])), v "xs"]))]), .pat pw (ap (qv "Debug" "log") [str "cmpEmpty", .atexp (.paren (ap (v "map") [.atexp (.paren (ap (v "compare") [str ""])), v "xs"]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "ltEmpty" "[False,True,True]" .data (ap (v "map") [.atexp (.paren (ap (.atexp (.op "<")) [str ""])), v "xs"]),
-    ckk "leEmpty" "[True,True,True]" .data (ap (v "map") [.atexp (.paren (ap (.atexp (.op "<=")) [str ""])), v "xs"]),
-    ckk "gtEmpty" "[False,False,False]" .data (ap (v "map") [.atexp (.paren (ap (.atexp (.op ">")) [str ""])), v "xs"]),
-    ckk "geEmpty" "[True,False,False]" .data (ap (v "map") [.atexp (.paren (ap (.atexp (.op ">=")) [str ""])), v "xs"]),
-    ckk "cmpEmpty" "[EQ,LT,LT]" .data (ap (v "map") [.atexp (.paren (ap (v "compare") [str ""])), v "xs"]) ] }
+    chk .check "ltEmpty: [False,True,True]" .data,
+    chk .check "leEmpty: [True,True,True]" .data,
+    chk .check "gtEmpty: [False,False,False]" .data,
+    chk .check "geEmpty: [True,False,False]" .data,
+    chk .check "cmpEmpty: [EQ,LT,LT]" .data ] }
 
 /-- tests/elm-core/src/OrderingEmptyStringTest.elm -/
 def g_elm_core_OrderingEmptyStringTest : Program := {
   name := "OrderingEmptyStringTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "lt_ee", .atexp (.paren (bin "<" (str "") (str "")))]), .pat pw (ap (qv "Debug" "log") [str "lt_ea", .atexp (.paren (bin "<" (str "") (str "a")))]), .pat pw (ap (qv "Debug" "log") [str "lt_ae", .atexp (.paren (bin "<" (str "a") (str "")))]), .pat pw (ap (qv "Debug" "log") [str "le_ee", .atexp (.paren (bin "<=" (str "") (str "")))]), .pat pw (ap (qv "Debug" "log") [str "le_ea", .atexp (.paren (bin "<=" (str "") (str "a")))]), .pat pw (ap (qv "Debug" "log") [str "le_ae", .atexp (.paren (bin "<=" (str "a") (str "")))]), .pat pw (ap (qv "Debug" "log") [str "gt_ee", .atexp (.paren (bin ">" (str "") (str "")))]), .pat pw (ap (qv "Debug" "log") [str "gt_ea", .atexp (.paren (bin ">" (str "") (str "a")))]), .pat pw (ap (qv "Debug" "log") [str "gt_ae", .atexp (.paren (bin ">" (str "a") (str "")))]), .pat pw (ap (qv "Debug" "log") [str "ge_ee", .atexp (.paren (bin ">=" (str "") (str "")))]), .pat pw (ap (qv "Debug" "log") [str "ge_ea", .atexp (.paren (bin ">=" (str "") (str "a")))]), .pat pw (ap (qv "Debug" "log") [str "ge_ae", .atexp (.paren (bin ">=" (str "a") (str "")))]), .pat pw (ap (qv "Debug" "log") [str "lt_ab", .atexp (.paren (bin "<" (str "a") (str "b")))]), .pat pw (ap (qv "Debug" "log") [str "ge_ab", .atexp (.paren (bin ">=" (str "a") (str "b")))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "lt_ee" "False" .data (bin "<" (str "") (str "")),
-    ckk "lt_ea" "True" .data (bin "<" (str "") (str "a")),
-    ckk "lt_ae" "False" .data (bin "<" (str "a") (str "")),
-    ckk "le_ee" "True" .data (bin "<=" (str "") (str "")),
-    ckk "le_ea" "True" .data (bin "<=" (str "") (str "a")),
-    ckk "le_ae" "False" .data (bin "<=" (str "a") (str "")),
-    ckk "gt_ee" "False" .data (bin ">" (str "") (str "")),
-    ckk "gt_ea" "False" .data (bin ">" (str "") (str "a")),
-    ckk "gt_ae" "True" .data (bin ">" (str "a") (str "")),
-    ckk "ge_ee" "True" .data (bin ">=" (str "") (str "")),
-    ckk "ge_ea" "False" .data (bin ">=" (str "") (str "a")),
-    ckk "ge_ae" "True" .data (bin ">=" (str "a") (str "")),
-    ckk "lt_ab" "True" .data (bin "<" (str "a") (str "b")),
-    ckk "ge_ab" "False" .data (bin ">=" (str "a") (str "b")) ] }
+    chk .check "lt_ee: False" .data,
+    chk .check "lt_ea: True" .data,
+    chk .check "lt_ae: False" .data,
+    chk .check "le_ee: True" .data,
+    chk .check "le_ea: True" .data,
+    chk .check "le_ae: False" .data,
+    chk .check "gt_ee: False" .data,
+    chk .check "gt_ea: False" .data,
+    chk .check "gt_ae: True" .data,
+    chk .check "ge_ee: True" .data,
+    chk .check "ge_ea: False" .data,
+    chk .check "ge_ae: True" .data,
+    chk .check "lt_ab: True" .data,
+    chk .check "ge_ab: False" .data ] }
 
 /-- tests/elm-core/src/OrderingMixedCaptureTest.elm -/
 def g_elm_core_OrderingMixedCaptureTest : Program := {
   name := "OrderingMixedCaptureTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "countWith" [pv "pred", pv "target", pv "xs"] (caseOf (v "xs") [(P (listP []), i 0), (.cons (P (pv "x")) (P (pv "rest")), ifte (ap (v "pred") [v "x", v "target"]) (bin "+" (i 1) (ap (v "countWith") [v "pred", v "target", v "rest"])) (ap (v "countWith") [v "pred", v "target", v "rest"]))]) ],
-  locals := [
-    .fn "ints" [] (listE [i 1, i 2, i 3, i 4, i 5]),
-    .fn "floats" [] (listE [.atexp (.scon (.float 10 (-1))), .atexp (.scon (.float 20 (-1))), .atexp (.scon (.float 30 (-1))), .atexp (.scon (.float 40 (-1))), .atexp (.scon (.float 50 (-1)))]),
-    .fn "chars" [] (listE [.atexp (chA 'a'), .atexp (chA 'b'), .atexp (chA 'c'), .atexp (chA 'd'), .atexp (chA 'e')]) ],
+    .fn "countWith" [pv "pred", pv "target", pv "xs"] (caseOf (v "xs") [(P (listP []), i 0), (.cons (P (pv "x")) (P (pv "rest")), ifte (ap (v "pred") [v "x", v "target"]) (bin "+" (i 1) (ap (v "countWith") [v "pred", v "target", v "rest"])) (ap (v "countWith") [v "pred", v "target", v "rest"]))]),
+    .fn "main" [] (letDefs [.fn "ints" [] (listE [i 1, i 2, i 3, i 4, i 5]), .fn "floats" [] (listE [.atexp (.scon (.float 10 (-1))), .atexp (.scon (.float 20 (-1))), .atexp (.scon (.float 30 (-1))), .atexp (.scon (.float 40 (-1))), .atexp (.scon (.float 50 (-1)))]), .fn "chars" [] (listE [.atexp (chA 'a'), .atexp (chA 'b'), .atexp (chA 'c'), .atexp (chA 'd'), .atexp (chA 'e')]), .pat pw (ap (qv "Debug" "log") [str "int_lt_count", .atexp (.paren (ap (v "countWith") [.atexp (.op "<"), i 4, v "ints"]))]), .pat pw (ap (qv "Debug" "log") [str "int_ge_count", .atexp (.paren (ap (v "countWith") [.atexp (.op ">="), i 4, v "ints"]))]), .pat pw (ap (qv "Debug" "log") [str "float_lt_count", .atexp (.paren (ap (v "countWith") [.atexp (.op "<"), .atexp (.scon (.float 40 (-1))), v "floats"]))]), .pat pw (ap (qv "Debug" "log") [str "float_ge_count", .atexp (.paren (ap (v "countWith") [.atexp (.op ">="), .atexp (.scon (.float 40 (-1))), v "floats"]))]), .pat pw (ap (qv "Debug" "log") [str "char_lt_count", .atexp (.paren (ap (v "countWith") [.atexp (.op "<"), .atexp (chA 'd'), v "chars"]))]), .pat pw (ap (qv "Debug" "log") [str "char_ge_count", .atexp (.paren (ap (v "countWith") [.atexp (.op ">="), .atexp (chA 'd'), v "chars"]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "int_lt_count" "3" .int (ap (v "countWith") [.atexp (.op "<"), i 4, v "ints"]),
-    ckk "int_ge_count" "2" .int (ap (v "countWith") [.atexp (.op ">="), i 4, v "ints"]),
-    ckk "float_lt_count" "3" .int (ap (v "countWith") [.atexp (.op "<"), .atexp (.scon (.float 40 (-1))), v "floats"]),
-    ckk "float_ge_count" "2" .int (ap (v "countWith") [.atexp (.op ">="), .atexp (.scon (.float 40 (-1))), v "floats"]),
-    ckk "char_lt_count" "3" .int (ap (v "countWith") [.atexp (.op "<"), .atexp (chA 'd'), v "chars"]),
-    ckk "char_ge_count" "2" .int (ap (v "countWith") [.atexp (.op ">="), .atexp (chA 'd'), v "chars"]) ] }
+    chk .check "int_lt_count: 3" .int,
+    chk .check "int_ge_count: 2" .int,
+    chk .check "float_lt_count: 3" .int,
+    chk .check "float_ge_count: 2" .int,
+    chk .check "char_lt_count: 3" .int,
+    chk .check "char_ge_count: 2" .int ] }
 
 /-- tests/elm-core/src/OrderingTupleWithEmptyListTest.elm -/
 def g_elm_core_OrderingTupleWithEmptyListTest : Program := {
   name := "OrderingTupleWithEmptyListTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "emptyL" [] (listE []),
-    .fn "e" [] (tup2 (i 0) (v "emptyL")),
-    .fn "a" [] (tup2 (i 0) (listE [i 1])) ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "emptyL" [] (listE []), .fn "e" [] (tup2 (i 0) (v "emptyL")), .fn "a" [] (tup2 (i 0) (listE [i 1])), .pat pw (ap (qv "Debug" "log") [str "lt_ee", .atexp (.paren (bin "<" (v "e") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "lt_eA", .atexp (.paren (bin "<" (v "e") (v "a")))]), .pat pw (ap (qv "Debug" "log") [str "lt_Ae", .atexp (.paren (bin "<" (v "a") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "le_ee", .atexp (.paren (bin "<=" (v "e") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "le_eA", .atexp (.paren (bin "<=" (v "e") (v "a")))]), .pat pw (ap (qv "Debug" "log") [str "le_Ae", .atexp (.paren (bin "<=" (v "a") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "gt_ee", .atexp (.paren (bin ">" (v "e") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "gt_eA", .atexp (.paren (bin ">" (v "e") (v "a")))]), .pat pw (ap (qv "Debug" "log") [str "gt_Ae", .atexp (.paren (bin ">" (v "a") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "ge_ee", .atexp (.paren (bin ">=" (v "e") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "ge_eA", .atexp (.paren (bin ">=" (v "e") (v "a")))]), .pat pw (ap (qv "Debug" "log") [str "ge_Ae", .atexp (.paren (bin ">=" (v "a") (v "e")))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "lt_ee" "False" .data (bin "<" (v "e") (v "e")),
-    ckk "lt_eA" "True" .data (bin "<" (v "e") (v "a")),
-    ckk "lt_Ae" "False" .data (bin "<" (v "a") (v "e")),
-    ckk "le_ee" "True" .data (bin "<=" (v "e") (v "e")),
-    ckk "le_eA" "True" .data (bin "<=" (v "e") (v "a")),
-    ckk "le_Ae" "False" .data (bin "<=" (v "a") (v "e")),
-    ckk "gt_ee" "False" .data (bin ">" (v "e") (v "e")),
-    ckk "gt_eA" "False" .data (bin ">" (v "e") (v "a")),
-    ckk "gt_Ae" "True" .data (bin ">" (v "a") (v "e")),
-    ckk "ge_ee" "True" .data (bin ">=" (v "e") (v "e")),
-    ckk "ge_eA" "False" .data (bin ">=" (v "e") (v "a")),
-    ckk "ge_Ae" "True" .data (bin ">=" (v "a") (v "e")) ] }
+    chk .check "lt_ee: False" .data,
+    chk .check "lt_eA: True" .data,
+    chk .check "lt_Ae: False" .data,
+    chk .check "le_ee: True" .data,
+    chk .check "le_eA: True" .data,
+    chk .check "le_Ae: False" .data,
+    chk .check "gt_ee: False" .data,
+    chk .check "gt_eA: False" .data,
+    chk .check "gt_Ae: True" .data,
+    chk .check "ge_ee: True" .data,
+    chk .check "ge_eA: False" .data,
+    chk .check "ge_Ae: True" .data ] }
 
 /-- tests/elm-core/src/OrderingTupleWithEmptyStringTest.elm -/
 def g_elm_core_OrderingTupleWithEmptyStringTest : Program := {
   name := "OrderingTupleWithEmptyStringTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "e" [] (tup2 (i 0) (str "")),
-    .fn "a" [] (tup2 (i 0) (str "a")) ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "e" [] (tup2 (i 0) (str "")), .fn "a" [] (tup2 (i 0) (str "a")), .pat pw (ap (qv "Debug" "log") [str "lt_ee", .atexp (.paren (bin "<" (v "e") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "lt_eA", .atexp (.paren (bin "<" (v "e") (v "a")))]), .pat pw (ap (qv "Debug" "log") [str "lt_Ae", .atexp (.paren (bin "<" (v "a") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "le_ee", .atexp (.paren (bin "<=" (v "e") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "le_eA", .atexp (.paren (bin "<=" (v "e") (v "a")))]), .pat pw (ap (qv "Debug" "log") [str "le_Ae", .atexp (.paren (bin "<=" (v "a") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "gt_ee", .atexp (.paren (bin ">" (v "e") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "gt_eA", .atexp (.paren (bin ">" (v "e") (v "a")))]), .pat pw (ap (qv "Debug" "log") [str "gt_Ae", .atexp (.paren (bin ">" (v "a") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "ge_ee", .atexp (.paren (bin ">=" (v "e") (v "e")))]), .pat pw (ap (qv "Debug" "log") [str "ge_eA", .atexp (.paren (bin ">=" (v "e") (v "a")))]), .pat pw (ap (qv "Debug" "log") [str "ge_Ae", .atexp (.paren (bin ">=" (v "a") (v "e")))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "lt_ee" "False" .data (bin "<" (v "e") (v "e")),
-    ckk "lt_eA" "True" .data (bin "<" (v "e") (v "a")),
-    ckk "lt_Ae" "False" .data (bin "<" (v "a") (v "e")),
-    ckk "le_ee" "True" .data (bin "<=" (v "e") (v "e")),
-    ckk "le_eA" "True" .data (bin "<=" (v "e") (v "a")),
-    ckk "le_Ae" "False" .data (bin "<=" (v "a") (v "e")),
-    ckk "gt_ee" "False" .data (bin ">" (v "e") (v "e")),
-    ckk "gt_eA" "False" .data (bin ">" (v "e") (v "a")),
-    ckk "gt_Ae" "True" .data (bin ">" (v "a") (v "e")),
-    ckk "ge_ee" "True" .data (bin ">=" (v "e") (v "e")),
-    ckk "ge_eA" "False" .data (bin ">=" (v "e") (v "a")),
-    ckk "ge_Ae" "True" .data (bin ">=" (v "a") (v "e")) ] }
+    chk .check "lt_ee: False" .data,
+    chk .check "lt_eA: True" .data,
+    chk .check "lt_Ae: False" .data,
+    chk .check "le_ee: True" .data,
+    chk .check "le_eA: True" .data,
+    chk .check "le_Ae: False" .data,
+    chk .check "gt_ee: False" .data,
+    chk .check "gt_eA: False" .data,
+    chk .check "gt_Ae: True" .data,
+    chk .check "ge_ee: True" .data,
+    chk .check "ge_eA: False" .data,
+    chk .check "ge_Ae: True" .data ] }
 
 /-- tests/elm-core/src/PipelineTest.elm -/
 def g_elm_core_PipelineTest : Program := {
   name := "PipelineTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
   defs := [
     .fn "double" [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))),
     .fn "addOne" [pv "x"] (bin "+" (v "x") (.atexp (.scon (.intF 1)))),
-    .fn "map" [pv "f", pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]) ],
-  locals := [ ],
+    .fn "map" [pv "f", pv "xs"] (caseOf (v "xs") [(P (listP []), listE []), (.cons (P (pv "x")) (P (pv "rest")), bin "::" (ap (v "f") [v "x"]) (ap (v "map") [v "f", v "rest"]))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "pipe1", .atexp (.paren (bin "|>" (bin "|>" (bin "|>" (.atexp (.scon (.intF 5))) (v "double")) (v "addOne")) (v "addOne")))]), .pat pw (ap (qv "Debug" "log") [str "pipe2", .atexp (.paren (bin "|>" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) (ap (v "map") [v "double"])))]), .pat pw (ap (qv "Debug" "log") [str "backpipe", .atexp (.paren (bin "<|" (v "double") (bin "<|" (v "addOne") (.atexp (.scon (.intF 4))))))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "pipe1" "12" .float (bin "|>" (bin "|>" (bin "|>" (.atexp (.scon (.intF 5))) (v "double")) (v "addOne")) (v "addOne")),
-    ckk "pipe2" "[2,4,6]" .data (bin "|>" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) (ap (v "map") [v "double"])),
-    ckk "backpipe" "10" .float (bin "<|" (v "double") (bin "<|" (v "addOne") (.atexp (.scon (.intF 4))))) ] }
+    chk .check "pipe1: 12" .float,
+    chk .check "pipe2: [2,4,6]" .data,
+    chk .check "backpipe: 10" .float ] }
 
 /-- tests/elm-core/src/RoundToIntTest.elm -/
 def g_elm_core_RoundToIntTest : Program := {
   name := "RoundToIntTest", source := "tests/elm-core/src", native := true,
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "round1", .atexp (.paren (ap (v "round") [.atexp (.scon (.float 27 (-1)))]))]), .pat pw (ap (qv "Debug" "log") [str "round2", .atexp (.paren (ap (v "round") [.atexp (.scon (.float 23 (-1)))]))]), .pat pw (ap (qv "Debug" "log") [str "round3", .atexp (.paren (ap (v "round") [.atexp (neg (.scon (.float 27 (-1))))]))])] (ap (v "text") [str "done"])) ],
   checks := [
-    ckk "round1" "3" .int (ap (v "round") [.atexp (.scon (.float 27 (-1)))]),
-    ckk "round2" "2" .int (ap (v "round") [.atexp (.scon (.float 23 (-1)))]),
-    ckk "round3" "-3" .int (ap (v "round") [.atexp (neg (.scon (.float 27 (-1))))]) ] }
+    chk .check "round1: 3" .int,
+    chk .check "round2: 2" .int,
+    chk .check "round3: -3" .int ] }
 
 /-- tests/elm-core/src/StandardA40IntOverflowTest.elm -/
 def g_elm_core_StandardA40IntOverflowTest : Program := {
   name := "StandardA40IntOverflowTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
     .fn "big" [] (bin "^" (i 10) (i 200)),
-    .fn "huge" [] (bin "^" (i 10) (i 308)) ],
-  locals := [ ],
+    .fn "huge" [] (bin "^" (i 10) (i 308)),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "big * big - big * big + 1 == 1", .atexp (.paren (bin "==" (bin "+" (bin "-" (bin "*" (v "big") (v "big")) (bin "*" (v "big") (v "big"))) (i 1)) (i 1)))]), .pat pw (ap (qv "Debug" "log") [str "huge + huge - (huge + huge) + 1 == 1", .atexp (.paren (bin "==" (bin "+" (bin "-" (bin "+" (v "huge") (v "huge")) (.atexp (.paren (bin "+" (v "huge") (v "huge"))))) (i 1)) (i 1)))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "big * big - big * big + 1 == 1" "True" .data (bin "==" (bin "+" (bin "-" (bin "*" (v "big") (v "big")) (bin "*" (v "big") (v "big"))) (i 1)) (i 1)),
-    ckk "huge + huge - (huge + huge) + 1 == 1" "True" .data (bin "==" (bin "+" (bin "-" (bin "+" (v "huge") (v "huge")) (.atexp (.paren (bin "+" (v "huge") (v "huge"))))) (i 1)) (i 1)) ] }
+    chk .check "big * big - big * big + 1 == 1: True" .data,
+    chk .check "huge + huge - (huge + huge) + 1 == 1: True" .data ] }
 
 /-- tests/elm-core/src/StandardA41IntDivisionWideTest.elm -/
 def g_elm_core_StandardA41IntDivisionWideTest : Program := {
   name := "StandardA41IntDivisionWideTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "5000000000 // 1 == 5000000000", .atexp (.paren (bin "==" (bin "//" (i 5000000000) (i 1)) (i 5000000000)))]), .pat pw (ap (qv "Debug" "log") [str "-5000000000 // 1 == -5000000000", .atexp (.paren (bin "==" (bin "//" (.atexp (neg (A (i 5000000000)))) (i 1)) (.atexp (neg (A (i 5000000000))))))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "5000000000 // 1 == 5000000000" "True" .data (bin "==" (bin "//" (i 5000000000) (i 1)) (i 5000000000)),
-    ckk "-5000000000 // 1 == -5000000000" "True" .data (bin "==" (bin "//" (.atexp (neg (A (i 5000000000)))) (i 1)) (.atexp (neg (A (i 5000000000))))) ] }
+    chk .check "5000000000 // 1 == 5000000000: True" .data,
+    chk .check "-5000000000 // 1 == -5000000000: True" .data ] }
 
 /-- tests/elm-core/src/StandardA42ModByZeroTest.elm -/
 def g_elm_core_StandardA42ModByZeroTest : Program := {
   name := "StandardA42ModByZeroTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "modBy 0 7 + 1 == 1", .atexp (.paren (bin "==" (bin "+" (ap (v "modBy") [i 0, i 7]) (i 1)) (i 1)))]), .pat pw (ap (qv "Debug" "log") [str "modBy 0 -7 + 1 == 1", .atexp (.paren (bin "==" (bin "+" (ap (v "modBy") [i 0, .atexp (neg (A (i 7)))]) (i 1)) (i 1)))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "modBy 0 7 + 1 == 1" "True" .data (bin "==" (bin "+" (ap (v "modBy") [i 0, i 7]) (i 1)) (i 1)),
-    ckk "modBy 0 -7 + 1 == 1" "True" .data (bin "==" (bin "+" (ap (v "modBy") [i 0, .atexp (neg (A (i 7)))]) (i 1)) (i 1)) ] }
+    chk .check "modBy 0 7 + 1 == 1: True" .data,
+    chk .check "modBy 0 -7 + 1 == 1: True" .data ] }
 
 /-- tests/elm-core/src/StandardA42RemainderByZeroTest.elm -/
 def g_elm_core_StandardA42RemainderByZeroTest : Program := {
   name := "StandardA42RemainderByZeroTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "remainderBy 0 7 + 1 == 1", .atexp (.paren (bin "==" (bin "+" (ap (v "remainderBy") [i 0, i 7]) (i 1)) (i 1)))]), .pat pw (ap (qv "Debug" "log") [str "remainderBy 0 7", .atexp (.paren (ap (v "remainderBy") [i 0, i 7]))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "remainderBy 0 7 + 1 == 1" "True" .data (bin "==" (bin "+" (ap (v "remainderBy") [i 0, i 7]) (i 1)) (i 1)),
-    ckk "remainderBy 0 7" "0" .int (ap (v "remainderBy") [i 0, i 7]) ] }
+    chk .check "remainderBy 0 7 + 1 == 1: True" .data,
+    chk .check "remainderBy 0 7: 0" .int ] }
 
 /-- tests/elm-core/src/StandardA42ZeroDivisorTest.elm -/
 def g_elm_core_StandardA42ZeroDivisorTest : Program := {
   name := "StandardA42ZeroDivisorTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "3 // 0", .atexp (.paren (bin "//" (i 3) (i 0)))]), .pat pw (ap (qv "Debug" "log") [str "modBy 0 3", .atexp (.paren (ap (v "modBy") [i 0, i 3]))]), .pat pw (ap (qv "Debug" "log") [str "remainderBy 0 3", .atexp (.paren (ap (v "remainderBy") [i 0, i 3]))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "3 // 0" "0" .int (bin "//" (i 3) (i 0)),
-    ckk "modBy 0 3" "0" .int (ap (v "modBy") [i 0, i 3]),
-    ckk "remainderBy 0 3" "0" .int (ap (v "remainderBy") [i 0, i 3]) ] }
+    chk .check "3 // 0: 0" .int,
+    chk .check "modBy 0 3: 0" .int,
+    chk .check "remainderBy 0 3: 0" .int ] }
 
 /-- tests/elm-core/src/StandardA43PowNegativeTest.elm -/
 def g_elm_core_StandardA43PowNegativeTest : Program := {
   name := "StandardA43PowNegativeTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "ipow" [pv "b", pv "e"] (bin "^" (v "b") (v "e")) ],
-  locals := [ ],
+    .fn "ipow" [pv "b", pv "e"] (bin "^" (v "b") (v "e")),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "1 ^ -1", .atexp (.paren (ap (v "ipow") [i 1, .atexp (neg (A (i 1)))]))]), .pat pw (ap (qv "Debug" "log") [str "(-1) ^ -3", .atexp (.paren (ap (v "ipow") [.atexp (neg (A (i 1))), .atexp (neg (A (i 3)))]))]), .pat pw (ap (qv "Debug" "log") [str "(-1) ^ -2", .atexp (.paren (ap (v "ipow") [.atexp (neg (A (i 1))), .atexp (neg (A (i 2)))]))]), .pat pw (ap (qv "Debug" "log") [str "2 ^ -1 + 1 == 1", .atexp (.paren (bin "==" (bin "+" (ap (v "ipow") [i 2, .atexp (neg (A (i 1)))]) (i 1)) (i 1)))]), .pat pw (ap (qv "Debug" "log") [str "0 ^ -1 + 1 == 1", .atexp (.paren (bin "==" (bin "+" (ap (v "ipow") [i 0, .atexp (neg (A (i 1)))]) (i 1)) (i 1)))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "1 ^ -1" "1" .int (ap (v "ipow") [i 1, .atexp (neg (A (i 1)))]),
-    ckk "(-1) ^ -3" "-1" .int (ap (v "ipow") [.atexp (neg (A (i 1))), .atexp (neg (A (i 3)))]),
-    ckk "(-1) ^ -2" "1" .int (ap (v "ipow") [.atexp (neg (A (i 1))), .atexp (neg (A (i 2)))]),
-    ckk "2 ^ -1 + 1 == 1" "True" .data (bin "==" (bin "+" (ap (v "ipow") [i 2, .atexp (neg (A (i 1)))]) (i 1)) (i 1)),
-    ckk "0 ^ -1 + 1 == 1" "True" .data (bin "==" (bin "+" (ap (v "ipow") [i 0, .atexp (neg (A (i 1)))]) (i 1)) (i 1)) ] }
+    chk .check "1 ^ -1: 1" .int,
+    chk .check "(-1) ^ -3: -1" .int,
+    chk .check "(-1) ^ -2: 1" .int,
+    chk .check "2 ^ -1 + 1 == 1: True" .data,
+    chk .check "0 ^ -1 + 1 == 1: True" .data ] }
 
 /-- tests/elm-core/src/StandardA44RoundNonFiniteTest.elm -/
 def g_elm_core_StandardA44RoundNonFiniteTest : Program := {
   name := "StandardA44RoundNonFiniteTest", source := "tests/elm-core/src", native := true,
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
     .fn "nan" [] (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))),
-    .fn "inf" [] (bin "/" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 0)))) ],
-  locals := [ ],
+    .fn "inf" [] (bin "/" (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 0)))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "round nan + 1 == 1", .atexp (.paren (bin "==" (bin "+" (ap (v "round") [v "nan"]) (i 1)) (i 1)))]), .pat pw (ap (qv "Debug" "log") [str "floor nan + 1 == 1", .atexp (.paren (bin "==" (bin "+" (ap (v "floor") [v "nan"]) (i 1)) (i 1)))]), .pat pw (ap (qv "Debug" "log") [str "ceiling nan + 1 == 1", .atexp (.paren (bin "==" (bin "+" (ap (v "ceiling") [v "nan"]) (i 1)) (i 1)))]), .pat pw (ap (qv "Debug" "log") [str "round inf - round inf + 1 == 1", .atexp (.paren (bin "==" (bin "+" (bin "-" (ap (v "round") [v "inf"]) (ap (v "round") [v "inf"])) (i 1)) (i 1)))]), .pat pw (ap (qv "Debug" "log") [str "floor -inf - floor -inf + 1 == 1", .atexp (.paren (bin "==" (bin "+" (bin "-" (ap (v "floor") [.atexp (neg (A (v "inf")))]) (ap (v "floor") [.atexp (neg (A (v "inf")))])) (i 1)) (i 1)))]), .pat pw (ap (qv "Debug" "log") [str "ceiling inf - ceiling inf + 1 == 1", .atexp (.paren (bin "==" (bin "+" (bin "-" (ap (v "ceiling") [v "inf"]) (ap (v "ceiling") [v "inf"])) (i 1)) (i 1)))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "round nan + 1 == 1" "True" .data (bin "==" (bin "+" (ap (v "round") [v "nan"]) (i 1)) (i 1)),
-    ckk "floor nan + 1 == 1" "True" .data (bin "==" (bin "+" (ap (v "floor") [v "nan"]) (i 1)) (i 1)),
-    ckk "ceiling nan + 1 == 1" "True" .data (bin "==" (bin "+" (ap (v "ceiling") [v "nan"]) (i 1)) (i 1)),
-    ckk "round inf - round inf + 1 == 1" "True" .data (bin "==" (bin "+" (bin "-" (ap (v "round") [v "inf"]) (ap (v "round") [v "inf"])) (i 1)) (i 1)),
-    ckk "floor -inf - floor -inf + 1 == 1" "True" .data (bin "==" (bin "+" (bin "-" (ap (v "floor") [.atexp (neg (A (v "inf")))]) (ap (v "floor") [.atexp (neg (A (v "inf")))])) (i 1)) (i 1)),
-    ckk "ceiling inf - ceiling inf + 1 == 1" "True" .data (bin "==" (bin "+" (bin "-" (ap (v "ceiling") [v "inf"]) (ap (v "ceiling") [v "inf"])) (i 1)) (i 1)) ] }
+    chk .check "round nan + 1 == 1: True" .data,
+    chk .check "floor nan + 1 == 1: True" .data,
+    chk .check "ceiling nan + 1 == 1: True" .data,
+    chk .check "round inf - round inf + 1 == 1: True" .data,
+    chk .check "floor -inf - floor -inf + 1 == 1: True" .data,
+    chk .check "ceiling inf - ceiling inf + 1 == 1: True" .data ] }
 
 /-- tests/elm-core/src/StandardA44TruncateWideTest.elm -/
 def g_elm_core_StandardA44TruncateWideTest : Program := {
   name := "StandardA44TruncateWideTest", source := "tests/elm-core/src", native := true,
-  cons := [],
-  defs := [ ],
-  locals := [ ],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "truncate 3.0e10 >= 2147483647", .atexp (.paren (bin ">=" (ap (v "truncate") [.atexp (.scon (.float 30 (9)))]) (i 2147483647)))]), .pat pw (ap (qv "Debug" "log") [str "truncate -3.0e10 <= -2147483648", .atexp (.paren (bin "<=" (ap (v "truncate") [.atexp (neg (.scon (.float 30 (9))))]) (.atexp (neg (A (i 2147483648))))))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "truncate 3.0e10 >= 2147483647" "True" .data (bin ">=" (ap (v "truncate") [.atexp (.scon (.float 30 (9)))]) (i 2147483647)),
-    ckk "truncate -3.0e10 <= -2147483648" "True" .data (bin "<=" (ap (v "truncate") [.atexp (neg (.scon (.float 30 (9))))]) (.atexp (neg (A (i 2147483648))))) ] }
+    chk .check "truncate 3.0e10 >= 2147483647: True" .data,
+    chk .check "truncate -3.0e10 <= -2147483648: True" .data ] }
 
 /-- tests/elm-core/src/StandardA45IntNegativeZeroTest.elm -/
 def g_elm_core_StandardA45IntNegativeZeroTest : Program := {
   name := "StandardA45IntNegativeZeroTest", source := "tests/elm-core/src", native := true,
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "positiveZero" [pv "n"] (andalso (bin "==" (v "n") (i 0)) (bin ">" (bin "/" (.atexp (.scon (.intF 1))) (ap (v "toFloat") [v "n"])) (.atexp (.scon (.intF 0))))) ],
-  locals := [ ],
+    .fn "positiveZero" [pv "n"] (andalso (bin "==" (v "n") (i 0)) (bin ">" (bin "/" (.atexp (.scon (.intF 1))) (ap (v "toFloat") [v "n"])) (.atexp (.scon (.intF 0))))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "negate 0", .atexp (.paren (ap (v "positiveZero") [.atexp (.paren (ap (v "negate") [i 0]))]))]), .pat pw (ap (qv "Debug" "log") [str "0 * -1", .atexp (.paren (ap (v "positiveZero") [.atexp (.paren (bin "*" (i 0) (.atexp (neg (A (i 1))))))]))]), .pat pw (ap (qv "Debug" "log") [str "modBy 4 -4", .atexp (.paren (ap (v "positiveZero") [.atexp (.paren (ap (v "modBy") [i 4, .atexp (neg (A (i 4)))]))]))]), .pat pw (ap (qv "Debug" "log") [str "remainderBy 4 -4", .atexp (.paren (ap (v "positiveZero") [.atexp (.paren (ap (v "remainderBy") [i 4, .atexp (neg (A (i 4)))]))]))]), .pat pw (ap (qv "Debug" "log") [str "round -0.4", .atexp (.paren (ap (v "positiveZero") [.atexp (.paren (ap (v "round") [.atexp (neg (.scon (.float 4 (-1))))]))]))]), .pat pw (ap (qv "Debug" "log") [str "ceiling -0.5", .atexp (.paren (ap (v "positiveZero") [.atexp (.paren (ap (v "ceiling") [.atexp (neg (.scon (.float 5 (-1))))]))]))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "negate 0" "True" .data (ap (v "positiveZero") [.atexp (.paren (ap (v "negate") [i 0]))]),
-    ckk "0 * -1" "True" .data (ap (v "positiveZero") [.atexp (.paren (bin "*" (i 0) (.atexp (neg (A (i 1))))))]),
-    ckk "modBy 4 -4" "True" .data (ap (v "positiveZero") [.atexp (.paren (ap (v "modBy") [i 4, .atexp (neg (A (i 4)))]))]),
-    ckk "remainderBy 4 -4" "True" .data (ap (v "positiveZero") [.atexp (.paren (ap (v "remainderBy") [i 4, .atexp (neg (A (i 4)))]))]),
-    ckk "round -0.4" "True" .data (ap (v "positiveZero") [.atexp (.paren (ap (v "round") [.atexp (neg (.scon (.float 4 (-1))))]))]),
-    ckk "ceiling -0.5" "True" .data (ap (v "positiveZero") [.atexp (.paren (ap (v "ceiling") [.atexp (neg (.scon (.float 5 (-1))))]))]) ] }
+    chk .check "negate 0: True" .data,
+    chk .check "0 * -1: True" .data,
+    chk .check "modBy 4 -4: True" .data,
+    chk .check "remainderBy 4 -4: True" .data,
+    chk .check "round -0.4: True" .data,
+    chk .check "ceiling -0.5: True" .data ] }
 
 /-- tests/elm-core/src/StandardA46CompareNanTest.elm -/
 def g_elm_core_StandardA46CompareNanTest : Program := {
   name := "StandardA46CompareNanTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
-    .fn "nan" [] (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))) ],
-  locals := [ ],
+    .fn "nan" [] (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "compare 1 nan", .atexp (.paren (ap (v "compare") [.atexp (.scon (.intF 1)), v "nan"]))]), .pat pw (ap (qv "Debug" "log") [str "compare nan nan", .atexp (.paren (ap (v "compare") [v "nan", v "nan"]))]), .pat pw (ap (qv "Debug" "log") [str "compare nan 1", .atexp (.paren (ap (v "compare") [v "nan", .atexp (.scon (.intF 1))]))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "compare 1 nan" "LT" .data (ap (v "compare") [.atexp (.scon (.intF 1)), v "nan"]),
-    ckk "compare nan nan" "EQ" .data (ap (v "compare") [v "nan", v "nan"]),
-    ckk "compare nan 1" "GT" .data (ap (v "compare") [v "nan", .atexp (.scon (.intF 1))]) ] }
+    chk .check "compare 1 nan: LT" .data,
+    chk .check "compare nan nan: EQ" .data,
+    chk .check "compare nan 1: GT" .data ] }
 
 /-- tests/elm-core/src/StandardA48MinMaxNanTest.elm -/
 def g_elm_core_StandardA48MinMaxNanTest : Program := {
   name := "StandardA48MinMaxNanTest", source := "tests/elm-core/src",
-  cons := [],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
   defs := [
     .fn "nan" [] (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))),
     .fn "zero" [] (.atexp (.scon (.intF 0))),
-    .fn "negativeZero" [] (.atexp (neg (A (v "zero")))) ],
-  locals := [ ],
+    .fn "negativeZero" [] (.atexp (neg (A (v "zero")))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "min nan 1 is NaN", .atexp (.paren (ap (v "isNaN") [.atexp (.paren (ap (v "min") [v "nan", .atexp (.scon (.intF 1))]))]))]), .pat pw (ap (qv "Debug" "log") [str "min 1 nan is NaN", .atexp (.paren (ap (v "isNaN") [.atexp (.paren (ap (v "min") [.atexp (.scon (.intF 1)), v "nan"]))]))]), .pat pw (ap (qv "Debug" "log") [str "max nan 1 is NaN", .atexp (.paren (ap (v "isNaN") [.atexp (.paren (ap (v "max") [v "nan", .atexp (.scon (.intF 1))]))]))]), .pat pw (ap (qv "Debug" "log") [str "max 1 nan is NaN", .atexp (.paren (ap (v "isNaN") [.atexp (.paren (ap (v "max") [.atexp (.scon (.intF 1)), v "nan"]))]))]), .pat pw (ap (qv "Debug" "log") [str "min 0 -0 is -0", .atexp (.paren (bin "<" (bin "/" (.atexp (.scon (.intF 1))) (ap (v "min") [v "zero", v "negativeZero"])) (.atexp (.scon (.intF 0)))))]), .pat pw (ap (qv "Debug" "log") [str "min -0 0 is -0", .atexp (.paren (bin "<" (bin "/" (.atexp (.scon (.intF 1))) (ap (v "min") [v "negativeZero", v "zero"])) (.atexp (.scon (.intF 0)))))]), .pat pw (ap (qv "Debug" "log") [str "max 0 -0 is +0", .atexp (.paren (bin ">" (bin "/" (.atexp (.scon (.intF 1))) (ap (v "max") [v "zero", v "negativeZero"])) (.atexp (.scon (.intF 0)))))]), .pat pw (ap (qv "Debug" "log") [str "max -0 0 is +0", .atexp (.paren (bin ">" (bin "/" (.atexp (.scon (.intF 1))) (ap (v "max") [v "negativeZero", v "zero"])) (.atexp (.scon (.intF 0)))))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
-    ckk "min nan 1 is NaN" "True" .data (ap (v "isNaN") [.atexp (.paren (ap (v "min") [v "nan", .atexp (.scon (.intF 1))]))]),
-    ckk "min 1 nan is NaN" "True" .data (ap (v "isNaN") [.atexp (.paren (ap (v "min") [.atexp (.scon (.intF 1)), v "nan"]))]),
-    ckk "max nan 1 is NaN" "True" .data (ap (v "isNaN") [.atexp (.paren (ap (v "max") [v "nan", .atexp (.scon (.intF 1))]))]),
-    ckk "max 1 nan is NaN" "True" .data (ap (v "isNaN") [.atexp (.paren (ap (v "max") [.atexp (.scon (.intF 1)), v "nan"]))]),
-    ckk "min 0 -0 is -0" "True" .data (bin "<" (bin "/" (.atexp (.scon (.intF 1))) (ap (v "min") [v "zero", v "negativeZero"])) (.atexp (.scon (.intF 0)))),
-    ckk "min -0 0 is -0" "True" .data (bin "<" (bin "/" (.atexp (.scon (.intF 1))) (ap (v "min") [v "negativeZero", v "zero"])) (.atexp (.scon (.intF 0)))),
-    ckk "max 0 -0 is +0" "True" .data (bin ">" (bin "/" (.atexp (.scon (.intF 1))) (ap (v "max") [v "zero", v "negativeZero"])) (.atexp (.scon (.intF 0)))),
-    ckk "max -0 0 is +0" "True" .data (bin ">" (bin "/" (.atexp (.scon (.intF 1))) (ap (v "max") [v "negativeZero", v "zero"])) (.atexp (.scon (.intF 0)))) ] }
-
-/-- tests/elm-core/src/StandardA49ClampTest.elm -/
-def g_elm_core_StandardA49ClampTest : Program := {
-  name := "StandardA49ClampTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [
-    .fn "nan" [] (bin "/" (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))),
-    .fn "negZero" [] (.atexp (neg (.scon (.intF 0)))),
-    .fn "isNotSelf" [pv "x"] (bin "/=" (v "x") (v "x")),
-    .fn "isPositiveZero" [pv "x"] (andalso (bin "==" (v "x") (.atexp (.scon (.intF 0)))) (bin ">" (bin "/" (.atexp (.scon (.intF 1))) (v "x")) (.atexp (.scon (.intF 0))))),
-    .fn "iclamp" [pv "lo", pv "hi", pv "x"] (ap (v "clamp") [v "lo", v "hi", v "x"]),
-    .fn "isNegativeZero" [pv "x"] (andalso (bin "==" (v "x") (.atexp (.scon (.intF 0)))) (bin "<" (bin "/" (.atexp (.scon (.intF 1))) (v "x")) (.atexp (.scon (.intF 0))))) ],
-  locals := [ ],
-  checks := [
-    ckk "clamp 10 0 5 at Float is +0" "True" .data (ap (v "isPositiveZero") [.atexp (.paren (ap (v "clamp") [.atexp (.scon (.intF 10)), .atexp (.scon (.intF 0)), .atexp (.scon (.intF 5))]))]),
-    ckk "clamp nan 1 0.5 is NaN" "True" .data (ap (v "isNotSelf") [.atexp (.paren (ap (v "clamp") [v "nan", .atexp (.scon (.intF 1)), .atexp (.scon (.float 5 (-1)))]))]),
-    ckk "clamp 0 1 -0 is +0" "True" .data (ap (v "isPositiveZero") [.atexp (.paren (ap (v "clamp") [.atexp (.scon (.intF 0)), .atexp (.scon (.intF 1)), v "negZero"]))]),
-    ckk "clamp -1 -0 0 is -0" "True" .data (ap (v "isNegativeZero") [.atexp (.paren (ap (v "clamp") [.atexp (neg (.scon (.intF 1))), v "negZero", .atexp (.scon (.intF 0))]))]),
-    ckk "clamp 10 0 5 at Int" "10" .int (ap (v "iclamp") [i 10, i 0, i 5]),
-    ckk "clamp 10 0 20 at Int" "0" .int (ap (v "iclamp") [i 10, i 0, i 20]),
-    ckk "clamp 0 10 -5 at Int" "0" .int (ap (v "iclamp") [i 0, i 10, .atexp (neg (A (i 5)))]),
-    ckk "clamp 0 10 15 at Int" "10" .int (ap (v "iclamp") [i 0, i 10, i 15]),
-    ckk "clamp 0 10 7 at Int" "7" .int (ap (v "iclamp") [i 0, i 10, i 7]) ] }
-
-/-- tests/elm-core/src/StandardA51FunctionEqualityTest.elm -/
-def g_elm_core_StandardA51FunctionEqualityTest : Program := {
-  name := "StandardA51FunctionEqualityTest", source := "tests/elm-core/src",
-  cons := [],
-  defs := [ ],
-  locals := [
-    .fn "same" [] (bin "==" (.atexp (.paren (lams [pv "k"] (bin "+" (v "k") (.atexp (.scon (.intF 1))))))) (.atexp (.paren (lams [pv "k"] (bin "+" (v "k") (.atexp (.scon (.intF 2)))))))) ],
-  checks := [
-    ckk "compared" "True" .data (orelse (v "same") (ap (v "not") [v "same"])) ] }
+    chk .check "min nan 1 is NaN: True" .data,
+    chk .check "min 1 nan is NaN: True" .data,
+    chk .check "max nan 1 is NaN: True" .data,
+    chk .check "max 1 nan is NaN: True" .data,
+    chk .check "min 0 -0 is -0: True" .data,
+    chk .check "min -0 0 is -0: True" .data,
+    chk .check "max 0 -0 is +0: True" .data,
+    chk .check "max -0 0 is +0: True" .data ] }
 
 /-- The programs of this shard. -/
 def shard_ElmCore03 : List Program :=
-  [g_elm_core_IntDivByZeroTest,
+  [g_elm_core_IntAddTest,
+   g_elm_core_IntCompareTest,
+   g_elm_core_IntDivByZeroTest,
    g_elm_core_IntDivTest,
    g_elm_core_IntMinMaxTest,
    g_elm_core_IntModByTest,
@@ -618,8 +672,6 @@ def shard_ElmCore03 : List Program :=
    g_elm_core_StandardA44TruncateWideTest,
    g_elm_core_StandardA45IntNegativeZeroTest,
    g_elm_core_StandardA46CompareNanTest,
-   g_elm_core_StandardA48MinMaxNanTest,
-   g_elm_core_StandardA49ClampTest,
-   g_elm_core_StandardA51FunctionEqualityTest]
+   g_elm_core_StandardA48MinMaxNanTest]
 
 end StandardElm

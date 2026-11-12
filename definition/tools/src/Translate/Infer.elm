@@ -2,6 +2,7 @@ module Translate.Infer exposing
     ( Inferred
     , Occurrence
     , components
+    , payloadOf
     , freeLocals
     , infer
     )
@@ -37,7 +38,13 @@ type alias Inferred =
     , occurrences : Dict Int Occurrence
     , groupKey : Dict Int Int
     , groupVars : Dict Int (List Int)
-    , checkTypes : List Type
+    , logTypes : Dict String (List Type)
+
+    -- each port, by binding id: outgoing or not, and its payload type
+    , ports : Dict Int ( Bool, Payload )
+
+    -- a worker's flags type (`main : Program flags model msg`); Nothing for a view
+    , flagsType : Maybe Type
     }
 
 
@@ -47,13 +54,17 @@ type alias St =
     , occurrences : Dict Int Occurrence
     , groupKey : Dict Int Int
     , groupVars : Dict Int (List Int)
+
+    -- for each literal label, the type of each `Debug.log "label"` occurrence (String -> a -> a)
+    , logTypes : Dict String (List Type)
+    , ports : Dict Int ( Bool, Payload )
     }
 
 
 type alias Env =
     { values : Dict Int Scheme
     , annVars : Dict String Type
-    , program : TestProgram
+    , modul : ModuleIr
     , cons : Dict String Scheme
     }
 
@@ -282,6 +293,148 @@ builtin : String -> Int -> Bool
 builtin name arity =
     (List.member name [ "Int", "Float", "Bool", "Char", "String", "Order", "Never" ] && arity == 0)
         || (List.member name [ "List", "Maybe" ] && arity == 1)
+        || (name == "Result" && arity == 2)
+
+
+{-| The types of the basis's other modules, by their name, the qualifiers they are written with,
+and their arity: `Cmd`, `Sub`, `Program`, `Value` (Json.Encode.Value, which Json.Decode.Value is),
+`Array`, `Bytes`.
+-}
+basisType : String -> String -> Int -> Bool
+basisType qual name arity =
+    case ( name, arity ) of
+        ( "Cmd", 1 ) ->
+            List.member qual [ "", "Cmd", "Platform.Cmd" ]
+
+        ( "Sub", 1 ) ->
+            List.member qual [ "", "Sub", "Platform.Sub" ]
+
+        ( "Program", 3 ) ->
+            List.member qual [ "", "Platform" ]
+
+        ( "Value", 0 ) ->
+            List.member qual [ "", "Json.Encode", "Json.Decode", "Encode", "Decode", "E", "D" ]
+
+        ( "Array", 1 ) ->
+            List.member qual [ "", "Array" ]
+
+        ( "Task", 2 ) ->
+            List.member qual [ "", "Task", "Platform" ]
+
+        ( "Id", 0 ) ->
+            qual == "Process"
+
+        ( "ProcessId", 0 ) ->
+            List.member qual [ "", "Platform" ]
+
+        ( "Bytes", 0 ) ->
+            List.member qual [ "", "Bytes" ]
+
+        _ ->
+            False
+
+
+{-| A port's direction and payload from its annotation (static-modules.tex, the port types):
+`τ -> Cmd msg` is outgoing, `(τ -> msg) -> Sub msg` incoming; τ a payload type.
+-}
+portType : Type -> Result String ( Bool, Payload )
+portType t =
+    case t of
+        TFun (TFun a _) (TCon "Sub" [ _ ]) ->
+            payloadOf a |> Result.map (Tuple.pair False)
+
+        TFun a (TCon "Cmd" [ _ ]) ->
+            payloadOf a |> Result.map (Tuple.pair True)
+
+        _ ->
+            Err "construct:port-type"
+
+
+{-| A payload type (Figure fig:static-modules-port), after alias expansion: a record's fields
+sorted by label.
+-}
+payloadOf : Type -> Result String Payload
+payloadOf t =
+    let
+        payload ty =
+            case ty of
+                TCon "Int" [] ->
+                    Ok TyInt
+
+                TCon "Float" [] ->
+                    Ok TyFloat
+
+                TCon "Bool" [] ->
+                    Ok TyBool
+
+                TCon "String" [] ->
+                    Ok TyString
+
+                TCon "Bytes" [] ->
+                    Ok TyBytes
+
+                TCon "Value" [] ->
+                    Ok TyValue
+
+                TTuple [] ->
+                    Ok TyUnit
+
+                TCon "List" [ a ] ->
+                    payload a |> Result.map TyList
+
+                TCon "Maybe" [ a ] ->
+                    payload a |> Result.map TyMaybe
+
+                TCon "Array" [ a ] ->
+                    payload a |> Result.map TyArray
+
+                TTuple [ a, b ] ->
+                    Result.map2 TyTuple2 (payload a) (payload b)
+
+                TTuple [ a, b, c ] ->
+                    Result.map3 TyTuple3 (payload a) (payload b) (payload c)
+
+                TRecord fields Nothing ->
+                    Dict.toList fields
+                        |> List.map (\( l, ft ) -> payload ft |> Result.map (Tuple.pair l))
+                        |> List.foldr (Result.map2 (::)) (Ok [])
+                        |> Result.map TyRecord
+
+                _ ->
+                    Err "construct:port-type"
+    in
+    payload t
+
+
+{-| The ports of a module: each port's scheme (its annotation's type, generalised), direction and
+payload.
+-}
+portSchemes : Env -> ModuleIr -> St -> Result String ( Env, St )
+portSchemes env m st0 =
+    List.foldl
+        (\pd acc ->
+            acc
+                |> Result.andThen
+                    (\( e, st ) ->
+                        annotation e Dict.empty pd.annotation st
+                            |> Result.andThen
+                                (\( t, _, st1 ) ->
+                                    portType (Types.apply st1.subst t)
+                                        |> Result.map
+                                            (\dirPayload ->
+                                                let
+                                                    vars =
+                                                        Types.ftv st1.subst t |> Set.toList
+                                                in
+                                                ( { e | values = Dict.insert pd.binder { quantified = List.map (\v -> ( v, Types.classOf st1.subst v )) vars, t = t } e.values }
+                                                , { st1 | ports = Dict.insert pd.binder dirPayload st1.ports }
+                                                )
+                                            )
+                                )
+                    )
+        )
+        (Ok ( env, st0 ))
+        m.ports
 
 
 classOfName : String -> Class
@@ -304,6 +457,22 @@ classOfName name =
 
 annotation : Env -> Dict String Type -> Node T.TypeAnnotation -> St -> Result String ( Type, Dict String Type, St )
 annotation env scope (Node _ ann) st =
+    let
+        -- a type or alias that an import of another module of the program brings in
+        imported visible targs scope1 st1 =
+            case Dict.get visible env.modul.importedTypes of
+                Just canonical ->
+                    Ok ( TCon canonical targs, scope1, st1 )
+
+                Nothing ->
+                    case Dict.get visible env.modul.importedAliases of
+                        Just alias ->
+                            annotation env (Dict.fromList (List.map2 Tuple.pair alias.params targs)) alias.annotation st1
+                                |> Result.map (\( t, _, st2 ) -> ( t, scope1, st2 ))
+
+                        Nothing ->
+                            Err ("unknown-type:" ++ visible)
+    in
     case ann of
         T.GenericType name ->
             case Dict.get name scope of
@@ -321,14 +490,35 @@ annotation env scope (Node _ ann) st =
             annotations env scope args st
                 |> Result.andThen
                     (\( targs, scope1, st1 ) ->
-                        if (List.isEmpty qual || List.member (String.join "." qual) [ "Basics", "List", "Maybe", "String", "Char" ]) && builtin name (List.length targs) then
+                        if (List.isEmpty qual || List.member (String.join "." qual) [ "Basics", "List", "Maybe", "Result", "String", "Char" ]) && builtin name (List.length targs) then
                             Ok ( TCon name targs, scope1, st1 )
 
+                        else if List.member ( String.join "." qual, name ) [ ( "", "Html" ), ( "Html", "Html" ), ( "VirtualDom", "Node" ) ] && List.length targs == 1 && not (Dict.member name env.modul.types || Dict.member name env.modul.aliases) then
+                            -- Html.Html is VirtualDom.Node (the harness, decision D2)
+                            Ok ( TCon "Node" targs, scope1, st1 )
+
+                        else if not (Dict.member name env.modul.types || Dict.member name env.modul.aliases) && basisType (String.join "." qual) name (List.length targs) then
+                            -- a type of the basis's modules Platform, Cmd, Sub, Task, Process, Json,
+                            -- Array, Bytes (Process.Id is Platform.ProcessId)
+                            Ok
+                                ( TCon
+                                    (if name == "Id" then
+                                        "ProcessId"
+
+                                     else
+                                        name
+                                    )
+                                    targs
+                                , scope1
+                                , st1
+                                )
+
                         else if not (List.isEmpty qual) then
-                            Err ("unknown-type:" ++ String.join "." qual ++ "." ++ name)
+                            -- a type of another module of the program, qualified
+                            imported (String.join "." qual ++ "." ++ name) targs scope1 st1
 
                         else
-                            case Dict.get name env.program.aliases of
+                            case Dict.get name env.modul.aliases of
                                 Just alias ->
                                     let
                                         aliasScope =
@@ -338,11 +528,11 @@ annotation env scope (Node _ ann) st =
                                         |> Result.map (\( t, _, st2 ) -> ( t, scope1, st2 ))
 
                                 Nothing ->
-                                    if Dict.member name env.program.types then
-                                        Ok ( TCon name targs, scope1, st1 )
+                                    if Dict.member name env.modul.types then
+                                        Ok ( TCon (env.modul.prefix ++ name) targs, scope1, st1 )
 
                                     else
-                                        Err ("unknown-type:" ++ name)
+                                        imported name targs scope1 st1
                     )
 
         T.Unit ->
@@ -435,7 +625,7 @@ constructorSchemes env st0 =
                                 Dict.fromList params
 
                             result =
-                                TCon typeName (List.map Tuple.second params)
+                                TCon (env.modul.prefix ++ typeName) (List.map Tuple.second params)
 
                             quantified =
                                 List.filterMap
@@ -455,7 +645,7 @@ constructorSchemes env st0 =
                                     |> Result.andThen
                                         (\( d2, s2 ) ->
                                             annotations env scope args s2
-                                                |> Result.map (\( targs, _, s3 ) -> ( Dict.insert k { quantified = quantified, t = fn targs result } d2, s3 ))
+                                                |> Result.map (\( targs, _, s3 ) -> ( Dict.insert (env.modul.prefix ++ k) { quantified = quantified, t = fn targs result } d2, s3 ))
                                         )
                             )
                             (Ok ( d, st1 ))
@@ -463,7 +653,66 @@ constructorSchemes env st0 =
                     )
         )
         (Ok ( Dict.empty, st0 ))
-        env.program.types
+        env.modul.types
+        |> Result.andThen (aliasConstructorSchemes env)
+
+
+{-| The constructor of each alias of a closed record (r:dm-typbind): with fields l1 ... ln in the
+order written, `P : τ1 -> ... -> τn -> P` (with the alias's parameters).
+-}
+aliasConstructorSchemes : Env -> ( Dict String Scheme, St ) -> Result String ( Dict String Scheme, St )
+aliasConstructorSchemes env start =
+    Dict.foldl
+        (\aliasName alias acc ->
+            case Node.value alias.annotation of
+                T.Record fields ->
+                    acc
+                        |> Result.andThen
+                            (\( d, st ) ->
+                                let
+                                    ( params, st1 ) =
+                                        List.foldl
+                                            (\p ( ps, s ) ->
+                                                let
+                                                    ( t, s1 ) =
+                                                        fresh Any s
+                                                in
+                                                ( ps ++ [ ( p, t ) ], s1 )
+                                            )
+                                            ( [], st )
+                                            alias.params
+
+                                    quantified =
+                                        List.filterMap
+                                            (\( _, t ) ->
+                                                case t of
+                                                    TVar x ->
+                                                        Just ( x, Any )
+
+                                                    _ ->
+                                                        Nothing
+                                            )
+                                            params
+                                in
+                                annotations env (Dict.fromList params) (List.map (\(Node _ ( _, t )) -> t) fields) st1
+                                    |> Result.map
+                                        (\( targs, _, st2 ) ->
+                                            let
+                                                labels =
+                                                    List.map (\(Node _ ( Node _ l, _ )) -> l) fields
+
+                                                record =
+                                                    TRecord (Dict.fromList (List.map2 Tuple.pair labels targs)) Nothing
+                                            in
+                                            ( Dict.insert (env.modul.prefix ++ aliasName) { quantified = quantified, t = fn targs record } d, st2 )
+                                        )
+                            )
+
+                _ ->
+                    acc
+        )
+        (Ok start)
+        env.modul.aliases
 
 
 
@@ -483,8 +732,17 @@ nameScheme env name =
             else
                 Basis.value m x |> Result.fromMaybe ("unknown value " ++ m ++ "." ++ x)
 
+        Exposed m x ->
+            Basis.value m x |> Result.fromMaybe ("unknown value " ++ m ++ "." ++ x)
+
         UserCon k ->
             Dict.get k env.cons |> Result.fromMaybe ("unknown constructor " ++ k)
+
+        Foreign f ->
+            Dict.get f.binder env.values |> Result.fromMaybe ("unbound " ++ f.name)
+
+        ForeignCon f ->
+            Dict.get f.key env.cons |> Result.fromMaybe ("unknown constructor " ++ f.key)
 
 
 occurrence : Env -> Int -> Name -> St -> R Type
@@ -499,6 +757,9 @@ occurrence env occ name st =
                 case name of
                     Local id _ ->
                         ( t, { st1 | occurrences = Dict.insert occ { binder = id, instance = mapping } st1.occurrences } )
+
+                    Foreign f ->
+                        ( t, { st1 | occurrences = Dict.insert occ { binder = f.binder, instance = mapping } st1.occurrences } )
 
                     _ ->
                         -- a value of E0: its instance, for the copies of the basis's Elm texts (abs)
@@ -528,6 +789,19 @@ expr env e st =
 
         EApp f args ->
             expr env f st
+                |> Result.map
+                    (\( tf, s0 ) ->
+                        case ( f, args ) of
+                            ( EVar _ name, (EStr label) :: _ ) ->
+                                if globalOf name == Just ( "Debug", "log" ) then
+                                    ( tf, { s0 | logTypes = Dict.update label (\ts -> Just (Maybe.withDefault [] ts ++ [ tf ])) s0.logTypes } )
+
+                                else
+                                    ( tf, s0 )
+
+                            _ ->
+                                ( tf, s0 )
+                    )
                 |> Result.andThen
                     (\( tf, st1 ) ->
                         List.foldl
@@ -1058,11 +1332,25 @@ generalise env bound st =
         frees =
             List.map (\( id, t ) -> ( id, Set.diff (Types.ftv st.subst t) outer )) bound
 
+        groupFree =
+            List.foldl (\( _, vs ) acc -> Set.union acc vs) Set.empty frees
+
+        -- in the canonical order (step 10, Choices, item 2): first occurrence over the members'
+        -- types, members in group order
         groupNumbers =
-            frees
-                |> List.foldl (\( _, vs ) acc -> Set.union acc vs) Set.empty
-                |> Set.filter (\v -> Types.classOf st.subst v == Number)
-                |> Set.toList
+            bound
+                |> List.concatMap (\( _, t ) -> Types.tyVarsSeq st.subst t)
+                |> List.foldl
+                    (\v ( seen, acc ) ->
+                        if Set.member v seen then
+                            ( seen, acc )
+
+                        else
+                            ( Set.insert v seen, acc ++ [ v ] )
+                    )
+                    ( Set.empty, [] )
+                |> Tuple.second
+                |> List.filter (\v -> Set.member v groupFree && Types.classOf st.subst v == Number)
 
         key =
             bound |> List.map Tuple.first |> List.minimum |> Maybe.withDefault -1
@@ -1107,35 +1395,77 @@ infer program =
             , occurrences = Dict.empty
             , groupKey = Dict.empty
             , groupVars = Dict.empty
+            , logTypes = Dict.empty
+            , ports = Dict.empty
             }
 
-        env0 =
-            { values = Dict.empty, annVars = Dict.empty, program = program, cons = Dict.empty }
+        mainBinder =
+            mainModule program
+                |> Maybe.map .defs
+                |> Maybe.withDefault []
+                |> List.filterMap
+                    (\d ->
+                        case d of
+                            DFn f ->
+                                if f.name == "main" then
+                                    Just f.binder
+
+                                else
+                                    Nothing
+
+                            _ ->
+                                Nothing
+                    )
+                |> List.head
+
+        -- the modules in program order, one substitution; the values and constructors of each
+        -- are in scope (by binding id and key) in the modules after it
+        inferModule m acc =
+            acc
+                |> Result.andThen
+                    (\( values, cons, st ) ->
+                        let
+                            env0 =
+                                { values = values, annVars = Dict.empty, modul = m, cons = cons }
+                        in
+                        constructorSchemes env0 st
+                            |> Result.andThen
+                                (\( own, st1 ) -> portSchemes { env0 | cons = Dict.union own cons } m st1)
+                            |> Result.andThen
+                                (\( env1, st1 ) ->
+                                    declarations env1 m.defs st1
+                                        |> Result.map (\( env2, st2 ) -> ( env2.values, env2.cons, st2 ))
+                                )
+                    )
     in
-    constructorSchemes env0 st0
+    List.foldl inferModule (Ok ( Dict.empty, Dict.empty, st0 )) program.modules
         |> Result.andThen
-            (\( cons, st1 ) ->
-                let
-                    env1 =
-                        { env0 | cons = cons }
-                in
-                declarations env1 program.defs st1
-                    |> Result.andThen (\( env2, st2 ) -> declarations env2 program.locals st2)
-                    |> Result.andThen
-                        (\( env3, st3 ) ->
-                            List.foldl
-                                (\c acc -> acc |> Result.andThen (\( ts, s ) -> expr env3 c.expr s |> Result.map (\( t, s1 ) -> ( ts ++ [ t ], s1 ))))
-                                (Ok ( [], st3 ))
-                                program.checks
-                        )
-                    |> Result.map
-                        (\( checkTypes, st4 ) ->
-                            { subst = st4.subst
-                            , literals = st4.literals
-                            , occurrences = st4.occurrences
-                            , groupKey = st4.groupKey
-                            , groupVars = st4.groupVars
-                            , checkTypes = checkTypes
-                            }
-                        )
+            (\( values, _, st2 ) ->
+                -- main must be a view: its type a Node (Html) of some message type
+                case mainBinder |> Maybe.andThen (\b -> Dict.get b values) of
+                    Just scheme ->
+                        case Types.apply st2.subst scheme.t of
+                            TCon "Node" [ _ ] ->
+                                Ok ( st2, Nothing )
+
+                            TCon "Program" [ flags, _, _ ] ->
+                                Ok ( st2, Just (Types.apply st2.subst flags) )
+
+                            _ ->
+                                Err "construct:main-type"
+
+                    Nothing ->
+                        Err "construct:main-shape"
+            )
+        |> Result.map
+            (\( st4, flagsType ) ->
+                { subst = st4.subst
+                , literals = st4.literals
+                , occurrences = st4.occurrences
+                , groupKey = st4.groupKey
+                , groupVars = st4.groupVars
+                , logTypes = st4.logTypes
+                , ports = st4.ports
+                , flagsType = flagsType
+                }
             )
