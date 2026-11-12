@@ -1,13 +1,13 @@
 /-
   A Standard Definition of Elm? Mechanisation: L10 of plan step 11 (milestone (b), section 8) and
-  the completeness of W for fragment F_b.
+  the completeness of W for fragment F_c.
 
   * `wResultChecks`: on a successful run from the root, step 9's checker accepts W's final
     result (`WResultChecks`); the induction is `WSoundExp.lean`'s, instantiated with the final
     substitution itself (it fixes the rigid variables, absorbs itself and respects every
     closure's constraint), in the root context, which the final substitution leaves unchanged
     (`ctxSb_root`).
-  * `wCompleteness`: section 7's completeness for F_b (`WCompleteness`): when a derivation
+  * `wCompleteness`: section 7's completeness for F_c (`WCompleteness`): when a derivation
     exists, W neither fails nor returns `internal` for any fuel, and for some fuel it does not run
     out.
 -/
@@ -18,9 +18,8 @@ open StandardElm.Stat
 
 /-- The root context and the initial state satisfy the precondition of the induction. -/
 theorem root_spre {C0 : Ctx} (hC : RootOK C0) : SPre (freshAbove C0) C0 ⟨[], freshAbove C0⟩ :=
-  ⟨⟨Nat.le_refl _, good_nil _ _, fun _ h => nomatch h⟩, fun a _ h => absurd (lk_nil a) h, root_ctxW hC,
-   fun a ha => rigid_of_old (old_of_root (mem_ctx_tyvars.mpr (.inl ha))),
-   fun c hc hn => by rw [old_of_root hc] at hn; cases hn⟩
+  ⟨⟨Nat.le_refl _, goodC_nil _ (fun _ h => nomatch h), fun _ h => nomatch h⟩, fun a _ h => absurd (lk_nil a) h,
+   root_ctxW hC, fun a ha => rigid_of_old (old_of_root (mem_ctx_tyvars.mpr (.inl ha))), fun _ _ => trivial⟩
 
 /-- L10: the checker accepts the final substitution applied to what W built. -/
 theorem wResultChecks : WResultChecks := by
@@ -30,7 +29,7 @@ theorem wResultChecks : WResultChecks := by
   have hc := (P.chk (lk st.θ) hi.sok (absorbs_self hi.good.idem) P.ks.dead).1
   rwa [ctxSb_root hi.good.fixesR] at hc
 
-/-- Completeness of W for F_b (section 7). -/
+/-- Completeness of W for F_c (section 7). -/
 theorem wCompleteness : WCompleteness := wCompleteness_of_checks wResultChecks
 
 end StandardElm.Stat.Complete

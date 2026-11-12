@@ -1,8 +1,8 @@
 /-
   A Standard Definition of Elm? Mechanisation: the unit examples of milestone (b) of plan step 11
   ("Unit examples", W), by `decide +kernel`, in the empty context (no type environment: a
-  monomorphic annotation uses `()`). Examples with integer constants, records or annotations with
-  type variables are outside F_b (`unsupported`); they belong to milestones (c) to (e).
+  monomorphic annotation uses `()`). Examples with records or annotations with type variables
+  belong to milestones (d) and (e); the class examples of milestone (c) are WExamplesC.lean.
 -/
 import StandardElmMech.Stat.Complete.W
 
@@ -59,10 +59,10 @@ theorem w_monoAnn_fail :
     (inferExpW wFuel C0 (.atexp (.letE (.val (.var "f" (some (.fn .unit .unit)) (lam "x" (v "x")) none))
       (.app (v "f") ch)))).isFail = true := by decide +kernel
 
-/-- An unbound variable fails; an integer constant is outside F_b. -/
+/-- An unbound variable fails; an integer constant (milestone (c)) has a fresh number type. -/
 theorem w_unbound : (inferExpW wFuel C0 (v "y")).isFail = true := by decide +kernel
-theorem w_int : (match inferExpW wFuel C0 (.atexp (.scon (.int 1))) with
-    | .unsupported => true | _ => false) = true := by decide +kernel
+theorem w_int : tyOf (inferExpW wFuel C0 (.atexp (.scon (.int 1)))) = some (.var (.fresh 0 .num)) := by
+  decide +kernel
 
 /-- `case` and patterns: `\p -> case p of (a, b) -> (b, a)` swaps. -/
 theorem w_case :

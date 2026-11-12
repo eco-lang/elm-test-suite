@@ -121,6 +121,71 @@ theorem num_app : mguC 10 flex 2 [(v 0 .num, v 1 .app)] = .fail := by decide +ke
 theorem num_comp :
     outLk (mguC 10 flex 2 [(v 0 .num, v 1 .comp)]) (.fresh 1 .comp) = some (v 0 .num) := by decide +kernel
 
+/-! ## W with classes (in the empty context; operators from OT_stat) -/
+
+open StandardElm.Src (BExp BAtExp BDec BValBind SLit)
+
+def C0 : Ctx := ⟨[], [], Env.empty⟩
+def ev (x : String) : BExp := .atexp (.var ⟨none, x⟩)
+def lam (x : String) (e : BExp) : BExp := .lam (.var x) e
+def letv (x : String) (e b : BExp) : BExp := .atexp (.letE (.val (.var x none e none)) b)
+def int (k : Nat) : BAtExp := .scon (.int k)
+def str : BAtExp := .scon (.str "s")
+def chr : BAtExp := .scon (.char 'c')
+def op2 (o : String) (a b : BAtExp) : BExp := .app (.app (.atexp (.op o)) a) b
+
+def tyOf : WRes → Option Ty
+  | .ok a => some a.ty
+  | _ => none
+
+/-- `1 + 2` has a number type (a fresh variable of class num, after unification). -/
+theorem w_plus : (match tyOf (inferExpW wFuel C0 (op2 "+" (int 1) (int 2))) with
+    | some (.var a) => a.cls == .num | _ => false) = true := by decide +kernel
+
+/-- `1 + 'c'` fails: Char is not a number. -/
+theorem w_plus_char : (inferExpW wFuel C0 (op2 "+" (int 1) chr)).isFail = true := by decide +kernel
+
+/-- `1 ++ 2` fails: number and appendable have no meet. -/
+theorem w_append_num : (inferExpW wFuel C0 (op2 "++" (int 1) (int 2))).isFail = true := by decide +kernel
+
+/-- `"a" < "s"` elaborates at Bool; `(\x -> x) < (\y -> y)` fails (functions are not comparable). -/
+theorem w_lt_string : tyOf (inferExpW wFuel C0 (op2 "<" str str)) = some (.con [] tBool) := by decide +kernel
+
+theorem w_lt_fn : (inferExpW wFuel C0 (op2 "<" (.paren (lam "x" (ev "x"))) (.paren (lam "y" (ev "y"))))).isFail = true := by
+  decide +kernel
+
+/-- `[1] ++ [2]`: an appendable list of numbers. `(1, 'c') < (2, 'd')`: comparable tuples. -/
+theorem w_append_list :
+    (inferExpW wFuel C0 (.app (.app (.atexp (.op "++")) (.paren (.app (.app (.atexp (.op "::")) (int 1)) .nil)))
+      (.paren (.app (.app (.atexp (.op "::")) (int 2)) .nil)))).isOk = true := by decide +kernel
+
+theorem w_lt_tuple :
+    tyOf (inferExpW wFuel C0 (op2 "<" (.tuple (.atexp (int 1)) (.atexp chr) none) (.tuple (.atexp (int 2)) (.atexp chr) none)))
+      = some (.con [] tBool) := by decide +kernel
+
+/-- Let-polymorphism with classes: `let id = \x -> x in (id 1, id "s")` elaborates. -/
+theorem w_letPoly_int :
+    (inferExpW wFuel C0 (letv "id" (lam "x" (ev "x")) (.atexp (.tuple (.app (ev "id") (int 1)) (.app (ev "id") str) none)))).isOk
+      = true := by decide +kernel
+
+/-- A number bound by `let` is generalised (A93 with the member's own variable): `let n = 1 in
+    (n + 1.5, n // 2)` elaborates, the two uses at Float and Int. -/
+theorem w_letNum :
+    (inferExpW wFuel C0 (letv "n" (.atexp (int 1)) (.atexp (.tuple (op2 "+" (.var ⟨none, "n"⟩) (.scon (.float 15 (-1))))
+      (op2 "//" (.var ⟨none, "n"⟩) (int 2)) none)))).isOk = true := by decide +kernel
+
+/-- A93: in the group `f = \x -> x`, `n = 1`, the closure of `f` also generalises `n`'s number
+    variable (vacuous in `f`'s type); the program elaborates and `f` is polymorphic. -/
+theorem w_a93 :
+    (inferExpW wFuel C0 (.atexp (.letE (.val (.var "f" none (lam "x" (ev "x")) (some (.var "n" none (.atexp (int 1)) none))))
+      (.atexp (.tuple (.app (ev "f") chr) (.app (ev "f") str) none))))).isOk = true := by decide +kernel
+
+/-- A93's closure of that group, as W computes it after the members: `f : ∀ α γ_num. α → α` (the
+    extra number variable), `n : ∀ γ_num. γ_num`. -/
+theorem a93_scheme :
+    (closGroup [] [("f", (mono (.fn (v 0 .any) (v 0 .any)), IdStatus.v)), ("n", (mono (v 1 .num), IdStatus.v))]).map
+      (fun p => p.2.1.bound.length) = [2, 1] := by decide +kernel
+
 end WExamplesC
 
 end StandardElm.Stat.Complete

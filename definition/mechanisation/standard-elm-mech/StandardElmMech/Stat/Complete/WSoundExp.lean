@@ -36,7 +36,7 @@ theorem otstat_sbScheme {o : Op} {σ : Scheme} {x : IdStatus} (h : OTstat o = so
 /-- An integer constant at a number type: its scheme's instance. -/
 theorem genAt_int {k : Nat} {τ : Ty} (h : Adm .num τ) : genAt (typeOf (.int k)) (litInst (.int k) τ) τ = true := by
   have hr : adm .num τ = true := (adm_iff _ _).mpr h
-  simp [genAt, typeOf, litInst, bindSubst, Subst.respectsB, Subst.apply, FMap.find?, TyVar.cls, hr]
+  simp [genAt, typeOf, litInst, bindSubst, Subst.respectsB, Subst.apply, FMap.find?, TyVar.cls, hr, Subst.id]
 
 theorem getθ_ok {st st' : WSt} {θ : Bnd} (h : getθ st = .ok θ st') : θ = st.θ ∧ st' = st := by
   change WOut.ok _ _ = _ at h
@@ -73,7 +73,7 @@ theorem wAtExp_sound (fuel n0 : Nat) : ∀ (a : BAtExp) (C : Ctx) (st : WSt) (r 
           have ha : Adm .num (s (.fresh st.n .num)) := hs.resp (.fresh st.n .num)
           simp only [checkAtExp, sb]
           exact genAt_int ha, rfl⟩
-      exact ⟨[], (P0.fresh (c := .num)).weaken (covSub fun τ hτ => by simpa using hτ) fun _ _ h => h⟩
+      exact ⟨[], (P0.freshC .num).weaken (covSub fun τ hτ => by simpa using hτ) fun _ _ h => h⟩
     | float m e =>
       simp only [wAtExp] at h; obtain ⟨rfl, rfl⟩ := pure_ok' h
       exact ⟨[], PostK.closed hp rfl fun s _ => by
@@ -222,7 +222,6 @@ theorem wAtExp_sound (fuel n0 : Nat) : ∀ (a : BAtExp) (C : Ctx) (st : WSt) (r 
         sok := hs
         abs := hab
         dead := hdk
-            (new_of_new hp.inv.le hz)
         ctxB := hp.ctxB
         ctxF := hp.ctxF
         rest := hp.rest }

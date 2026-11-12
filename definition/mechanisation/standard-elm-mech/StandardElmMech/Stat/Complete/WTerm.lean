@@ -421,7 +421,7 @@ theorem wExp_root_erase {fuel : Nat} {C0 : Ctx} {e : BExp} {τ : Ty} {ar : AExp}
   rw [stripExp_erase, stripExp_erase, sbExp_erase] at this
   rw [sbExp_erase]; exact this.trans he
 
-/-- Completeness of W (section 7) for F_b: when a derivation exists, W does not fail for any fuel,
+/-- Completeness of W (section 7) for F_c: when a derivation exists, W does not fail for any fuel,
     it does not run out from some fuel on (and then its outcome no longer changes), and it does
     not return `internal` provided the checker accepts W's result (`WResultChecks`, L10). -/
 theorem wCompleteness_parts {C0 : Ctx} {e : BExp} (hC : RootOK C0)

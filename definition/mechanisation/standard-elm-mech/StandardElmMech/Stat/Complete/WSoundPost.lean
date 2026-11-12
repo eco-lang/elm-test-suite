@@ -250,8 +250,8 @@ theorem lk_fresh_self {n0 : Nat} {st : WSt} {c : Cls} (hi : SInv n0 st) :
   · exact e
   · simp [TyVar.isNew] at e
 
-theorem PostK.fresh {n0 : Nat} {C : Ctx} {st st1 : WSt} {tys : List Ty} {Chk : FSub → Prop} {K : List ConW}
-    {c : Cls} (h : PostK n0 C st st1 tys Chk K) :
+theorem PostK.freshC {n0 : Nat} {C : Ctx} {st st1 : WSt} {tys : List Ty} {Chk : FSub → Prop} {K : List ConW}
+    (c : Cls) (h : PostK n0 C st st1 tys Chk K) :
     PostK n0 C st { st1 with n := st1.n + 1 } (tys ++ [.var (.fresh st1.n c)]) Chk K := by
   have hi1 := h.seg.inv
   have hfix := lk_fresh_self (c := c) hi1
@@ -274,6 +274,10 @@ theorem PostK.fresh {n0 : Nat} {C : Ctx} {st st1 : WSt} {tys : List Ty} {Chk : F
       simp only [TV, Ty.vars, List.mem_singleton, BVar.ty.injEq]
       rintro rfl
       have := (h.ks.zone k hk _ hb).2; simp [TyVar.isNew] at this
+
+theorem PostK.fresh {n0 : Nat} {C : Ctx} {st st1 : WSt} {tys : List Ty} {Chk : FSub → Prop} {K : List ConW}
+    (h : PostK n0 C st st1 tys Chk K) :
+    PostK n0 C st { st1 with n := st1.n + 1 } (tys ++ [.var (.fresh st1.n .any)]) Chk K := h.freshC .any
 
 theorem PostK.unify {fuel n0 : Nat} {C : Ctx} {st st2 st3 : WSt} {tys : List Ty} {Chk : FSub → Prop}
     {K : List ConW} {τ1 τ2 : Ty} {u : Unit} (h : PostK n0 C st st2 tys Chk K) (hc : Cov [τ1, τ2] tys)

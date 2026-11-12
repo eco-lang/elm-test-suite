@@ -1,5 +1,5 @@
 /-
-  A Standard Definition of Elm? Mechanisation: the statements of section 7 for W on F_b
+  A Standard Definition of Elm? Mechanisation: the statements of section 7 for W on F_c
   (plan step 11, milestone (b)), from the main induction L11 (WComplete.lean, L12).
 
   * `wRefutation`: `WRefutation` (W fails ⇒ no derivation without free `bnd` variables).

@@ -88,6 +88,9 @@ import StandardElmMech.Stat.RefuseFurtherAgree
 import StandardElmMech.Stat.RefuseFurther
 import StandardElmMech.Stat.RefuseTypes
 import StandardElmMech.Stat.RefuseAll
+import StandardElmMech.Stat.Complete.WAll
+import StandardElmMech.Stat.Complete.Examples
+import StandardElmMech.Stat.Complete.WExamplesC
 import StandardElmMech.SyntaxDecEq
 import StandardElmMech.Mod.Reduced
 import StandardElmMech.Stat.Erase

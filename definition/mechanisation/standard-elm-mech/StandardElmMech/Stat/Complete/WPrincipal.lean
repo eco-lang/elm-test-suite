@@ -1,6 +1,6 @@
 /-
   A Standard Definition of Elm? Mechanisation: the statements of completeness and principality of
-  W for fragment F_b, milestone (b) of plan step 11 (section 7), with the corrected instance
+  W for fragment F_c (milestones (b) and (c) of plan step 11, section 7; F_b a special case), with the corrected instance
   relation, and the first lemmas of their proof (section 8: L2's instantiation, the state
   invariant (I1) along W).
 
@@ -122,7 +122,7 @@ def RootOK (C0 : Ctx) : Prop :=
     (∀ v ∈ σ.bound, v.isBnd = true) ∧
     ∀ v ∈ σ.body.vars, v ∉ σ.bound → ∃ a, v = .ty a ∧ BVar.isBnd (.ty a) = false
 
-/-! ## The statements (section 7, for F_b) -/
+/-! ## The statements (section 7, for F_c) -/
 
 /-- Refutation: if W fails, no derivation without free `bnd` variables exists (with step 9's
     adequacy, `¬ ∃ τ, ElExp C0 e τ` for such derivations). The restriction is needed: a free
@@ -134,7 +134,7 @@ def WRefutation : Prop :=
     ¬ ∃ a', checkExp C0 a' = true ∧ NoFreeBndExp C0 a' ∧ a'.erase = e
 
 /-- Completeness: if a derivation exists, W neither fails nor returns `internal`, and for some
-    fuel it does not run out (so it returns `ok`, or `unsupported` outside F_b). -/
+    fuel it does not run out (so it returns `ok`, or `unsupported` outside F_c). -/
 def WCompleteness : Prop :=
   ∀ C0 e, RootOK C0 → (∃ a', checkExp C0 a' = true ∧ NoFreeBndExp C0 a' ∧ a'.erase = e) →
     (∀ fuel, inferExpW fuel C0 e ≠ .fail ∧ inferExpW fuel C0 e ≠ .internal) ∧

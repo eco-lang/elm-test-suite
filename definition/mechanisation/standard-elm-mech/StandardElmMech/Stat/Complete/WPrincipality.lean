@@ -1,5 +1,5 @@
 /-
-  A Standard Definition of Elm? Mechanisation: principality of W for fragment F_b (plan step 11,
+  A Standard Definition of Elm? Mechanisation: principality of W for fragment F_c (plan step 11,
   milestone (b), section 7 and L12): `wPrincipality : WPrincipality`.
 
   From L12 (`inferExpW_instance`, WTheorems.lean) every derivation `a'` without free `bnd`
@@ -348,7 +348,7 @@ theorem instanceNodes_of_F2 {T : FSub} {U0 A0 : List BVar} {ns ns' : List Node}
 
 /-! ## Principality (section 7, L12) -/
 
-/-- Principality of W for F_b: what W returns is principal among the derivations without free
+/-- Principality of W for F_c: what W returns is principal among the derivations without free
     `bnd` variables, with the instance relation of sec:static-core-principal (instance lists left
     out). -/
 theorem wPrincipality : WPrincipality := by
@@ -514,7 +514,7 @@ theorem isPrincipalB_iff {C0 : Ctx} {a : AExp} : IsPrincipalB C0 a ↔
   unfold IsPrincipalB
   simp only [instanceOfB_iff]
 
-/-- Section 7's principality of W for F_b, in step 9's terms: W's result is a derivation of the
+/-- Section 7's principality of W for F_c, in step 9's terms: W's result is a derivation of the
     phrase, and every derivation of it without free `bnd` variables is an instance of it
     (`InstanceOf`, sec:static-core-principal). -/
 theorem inferExpW_principal {fuel : Nat} {C0 : Ctx} {e : StandardElm.Src.BExp} {a : AExp} (hC : RootOK C0)
