@@ -52,7 +52,7 @@ theorem ctxRel_ftv_mono {n0 : Nat} {T : FSub} {C C' : Ctx} {VE : ValEnv}
     exact fun ⟨e, hs⟩ => ⟨e, hs.1⟩
 
 theorem ctxRel_ftv_clos {n0 n : Nat} {T : FSub} {C C' : Ctx} {VE : ValEnv}
-    (h : CtxRel (FtvRel T) (rigidFrom n0) C C') (hfx : FixesR (rigidFrom n0) T)
+    (h : CtxRel (FtvRel T) (rigidFrom n0) C C') (hfx : FixesR (rigidFrom n0) T) (hcls : RespC T)
     (hVE : ∀ q ∈ VE, q.2.1.bound = [] ∧ OkT n q.2.1.body ∧ NBτ (sb T q.2.1.body)) :
     CtxRel (FtvRel T) (rigidFrom n0) (C.plusVE (closGroup C.tyvars VE))
       (C'.plusVE (closGroup C'.tyvars (sbVE T VE))) :=
@@ -66,7 +66,7 @@ theorem ctxRel_ftv_clos {n0 n : Nat} {T : FSub} {C C' : Ctx} {VE : ValEnv}
       simp only
       have : p.1 = mono p.1.body := by obtain ⟨σ, _⟩ := p; cases σ; simp_all [mono]
       rw [this, sbScheme_mono]
-      exact (closE_rel hok (fun a ha _ => h.ftv (fun _ _ h => h) hfx a ha) hnb).1
+      exact (closE_rel hok hcls (fun a ha _ => h.ftv (fun _ _ h => h) hfx a ha) hnb).1
 
 theorem litInst_sb (T : FSub) (sc : StandardElm.Src.SLit) (τ : Ty) : litInst sc (sb T τ) = (litInst sc τ).map (sb T) := by
   cases sc <;> rfl
@@ -81,7 +81,7 @@ theorem nodesPat_rel' (T : FSub) {U U' U0 : List BVar} (hU : U = U0) (hU' : U' =
 
 theorem dec_head_rel {n0 n : Nat} {T : FSub} {U0 : List BVar} {C C' : Ctx} {VE : ValEnv} (path : List Nat)
     (hU : C.U = U0) (hU' : C'.U = U0) (hrel : CtxRel (FtvRel T) (rigidFrom n0) C C')
-    (hfx : FixesR (rigidFrom n0) T) (hcls : ∀ a, T a ≠ .var a → a.cls = .any)
+    (hfx : FixesR (rigidFrom n0) T) (hcls : RespC T)
     (hVE : ∀ q ∈ VE, q.2.1.bound = [] ∧ OkT n q.2.1.body ∧ NBτ (sb T q.2.1.body)) :
     NRel T U0 ⟨path, C.U, [], veSchemes (closGroup C.tyvars VE)⟩
       ⟨path, C'.U, [], veSchemes (closGroup C'.tyvars (sbVE T VE))⟩ := by
@@ -110,7 +110,7 @@ theorem rowS {T : FSub} {C : Ctx} {r : AExpRow} (hc : checkExpRow C r = true) :
 
 section
 variable (T : FSub) (n0 n : Nat) (U0 : List BVar) (hfx : FixesR (rigidFrom n0) T)
-  (hcls : ∀ a, T a ≠ .var a → a.cls = .any)
+  (hcls : RespC T)
 include hfx hcls
 
 mutual
@@ -157,7 +157,7 @@ theorem nodesAtExp_rel : ∀ (x : AAtExp) (C C' : Ctx) (path : List Nat), C.U = 
       exact forall2_append (forall2_append
         (.cons (nrel_mk hU (hrel.2.1.symm.trans hU) (by simp only [List.map_cons, List.map_nil, List.cons.injEq, and_true]; exact tyS_atexp (T := T) hc') rfl) .nil)
         (nodesDec_rel (.val VE vb) C C' _ hU hc.1 hrel hok1 hnb1))
-        (nodesExp_rel e _ _ _ hU hc.2 (ctxRel_ftv_clos hrel hfx hVE) hok2 hnb2)
+        (nodesExp_rel e _ _ _ hU hc.2 (ctxRel_ftv_clos hrel hfx hcls hVE) hok2 hnb2)
   | .paren e, C, C', path, hU, hc, hrel, hok, hnb => by
     have hc' := hc
     simp only [checkAtExp] at hc

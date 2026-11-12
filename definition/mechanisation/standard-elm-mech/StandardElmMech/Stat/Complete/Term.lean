@@ -11,9 +11,11 @@
 
   A valuation `ν : Path → Ty` gives each metavariable a type; `T.ev ν` evaluates a term.
   `hN` is the normalisation the valuation read off a derivation applies (Core.lean): the record
-  `{ | a }` of a named row variable alone is identified with the type variable `a`, so that the
-  two sorts an annotation's variable may take in a derivation (r:s-ty-tyvar, r:s-ty-rowvar) give
-  the same term.
+  `{ | a }` of a named row variable alone, of a name of class any, is identified with the type
+  variable `a`, so that the two sorts an annotation's variable may take in a derivation
+  (r:s-ty-tyvar, r:s-ty-rowvar, which names a row variable only by a name of class any) give the
+  same term; a name of another class keeps its record, so that a normalised type in a class other
+  than any comes from a type in that class (CoreTmpl.lean's `adm_hN_apply`).
 -/
 import StandardElmMech.Stat.Annotated
 
@@ -291,16 +293,37 @@ theorem gN_tList : gN tList = tList := gN_of_mem (by decide)
 theorem gN_tTuple2 : gN tTuple2 = tTuple2 := gN_of_mem (by decide)
 theorem gN_tTuple3 : gN tTuple3 = tTuple3 := gN_of_mem (by decide)
 
-/-- `{ | a }` for a named row variable `a` alone is `a`. -/
+/-- `{ | a }` for a named row variable `a` alone, of a name of class any (the only names a row
+    variable of an annotation has, r:s-ty-rowvar), is `a`. -/
 def hRec (ρ : Row) (tl : Option RowVar) : Ty :=
   match tl with
   | none => .record ρ none
   | some (.named s) =>
     match ρ with
-    | [] => .var (.named s)
+    | [] => if classOfName s = .any then .var (.named s) else .record [] (some (.named s))
     | f :: r => .record (f :: r) (some (.named s))
   | some (.fresh n) => .record ρ (some (.fresh n))
   | some (.bnd i) => .record ρ (some (.bnd i))
+
+/-- What `hRec` does: keeps the record, or turns `{ | a }` (a of class any) into `a`. -/
+theorem hRec_cases (ρ : Row) (tl : Option RowVar) :
+    (hRec ρ tl = .record ρ tl ∧ ¬ (ρ = [] ∧ ∃ s, tl = some (.named s) ∧ classOfName s = .any)) ∨
+    (∃ s, ρ = [] ∧ tl = some (.named s) ∧ classOfName s = .any ∧ hRec ρ tl = .var (.named s)) := by
+  cases tl with
+  | none => exact .inl ⟨rfl, fun h => by obtain ⟨_, s, h, _⟩ := h; cases h⟩
+  | some e =>
+    cases e with
+    | named s =>
+      cases ρ with
+      | nil =>
+        by_cases hc : classOfName s = .any
+        · exact .inr ⟨s, rfl, rfl, hc, by simp [hRec, hc]⟩
+        · refine .inl ⟨by simp [hRec, hc], fun h => ?_⟩
+          obtain ⟨_, s', h, h'⟩ := h
+          cases h; exact hc h'
+      | cons f r => exact .inl ⟨rfl, fun h => by cases h.1⟩
+    | fresh n => exact .inl ⟨rfl, fun h => by obtain ⟨_, s, h, _⟩ := h; cases h⟩
+    | bnd i => exact .inl ⟨rfl, fun h => by obtain ⟨_, s, h, _⟩ := h; cases h⟩
 
 mutual
 def hN : Ty → Ty
@@ -333,7 +356,7 @@ def mkRec (ρ : List (Lab × T)) (tl : Option RowVar) : T :=
   | none => .record ρ none
   | some (.named s) =>
     match ρ with
-    | [] => .var (.named s)
+    | [] => if classOfName s = .any then .var (.named s) else .record [] (some (.named s))
     | f :: r => .record (f :: r) (some (.named s))
   | some (.fresh n) => .record ρ (some (.fresh n))
   | some (.bnd i) => .record ρ (some (.bnd i))
@@ -344,7 +367,10 @@ theorem ev_mkRec (ν : Val) (ρ : List (Lab × T)) (tl : Option RowVar) :
   | none => rfl
   | some e =>
     cases e with
-    | named s => cases ρ <;> rfl
+    | named s =>
+      cases ρ with
+      | nil => simp only [mkRec, hRec, T.evRow]; split <;> rfl
+      | cons _ _ => rfl
     | fresh n => rfl
     | bnd i => rfl
 
@@ -375,7 +401,11 @@ theorem vars_of_hN : ∀ τ : Ty, (hN τ).vars = [] → τ.vars = []
     | some e =>
       exfalso
       cases e with
-      | named s => simp only [hN, hRec] at h; split at h <;> simp [Ty.vars] at h
+      | named s =>
+        simp only [hN, hRec] at h
+        split at h
+        · split at h <;> simp [Ty.vars] at h
+        · simp [Ty.vars] at h
       | fresh n => simp [hN, hRec, Ty.vars] at h
       | bnd i => simp [hN, hRec, Ty.vars] at h
   | .fn a b, h => by

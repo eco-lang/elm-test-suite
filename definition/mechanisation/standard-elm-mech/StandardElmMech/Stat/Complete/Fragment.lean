@@ -12,7 +12,11 @@
 
   F_b (milestone (b)): one module, no integer constant (an integer constant's type is a class
   variable), no class, no record, no annotation with type variables, and no port. Type
-  declarations are allowed. `InFragment .b B p` is decidable (`fragmentOf` computes it).
+  declarations are allowed. F_c (milestone (c)): as F_b, with integer constants, classes, and
+  annotations with type variables on top-level members alone in their group (`annTopPoly`); an
+  annotation with type variables anywhere else (nested in an expression, or on a member of a group
+  of several) is `annOther`, fragment F_e. `InFragment f B p` is decidable (`fragmentOf` computes
+  it).
 -/
 import StandardElmMech.Stat.Complete.W
 
@@ -151,20 +155,28 @@ structure TopSumm where
   declTys : List BTy
   localTyNames : List String
   ports : Bool
+  /-- The annotations of top-level members alone in their group. -/
+  topAnn : List BTy := []
+  /-- Every other annotation (nested, or on a member of a group of several). -/
+  otherAnn : List BTy := []
 
 def summTop : BTopDec → TopSumm
-  | .value vb => ⟨summValBind vb, [], [], false⟩
+  | .value vb =>
+    match vb with
+    | .var _ (some ty) e none => ⟨summValBind vb, [], [], false, [ty], (summExp e).tys⟩
+    | _ => ⟨summValBind vb, [], [], false, [], (summValBind vb).tys⟩
   | .types db tbs =>
     let cons := (db.getD []).flatMap fun d => d.2.2.map (·.1)
     let args := (db.getD []).flatMap fun d => d.2.2.flatMap (·.2)
     let params := (db.getD []).flatMap (·.2.1) ++ tbs.flatMap (·.params)
     ⟨{ binders := cons ++ tbs.map (·.c) }, args ++ tbs.map (·.t) ++ params.map BTy.tyvar,
-      (db.getD []).map (·.1) ++ tbs.map (·.c), false⟩
-  | .port _ t => ⟨{}, [t], [], true⟩
+      (db.getD []).map (·.1) ++ tbs.map (·.c), false, [], []⟩
+  | .port _ t => ⟨{}, [t], [], true, [], []⟩
   | .seq d1 d2 =>
     let a := summTop d1
     let b := summTop d2
-    ⟨a.s ++ b.s, a.declTys ++ b.declTys, a.localTyNames ++ b.localTyNames, a.ports || b.ports⟩
+    ⟨a.s ++ b.s, a.declTys ++ b.declTys, a.localTyNames ++ b.localTyNames, a.ports || b.ports,
+      a.topAnn ++ b.topAnn, a.otherAnn ++ b.otherAnn⟩
 
 /-! ## Features and fragments -/
 
@@ -172,7 +184,10 @@ structure Features where
   intConst : Bool
   classVar : Bool
   records : Bool
-  annVars : Bool
+  /-- A top-level annotation with type variables, on a member alone in its group. -/
+  annTopPoly : Bool
+  /-- Any other annotation with type variables. -/
+  annOther : Bool
   ports : Bool
   modules : Bool
   deriving DecidableEq, Repr
@@ -198,11 +213,11 @@ def classNamed (s : String) : Bool := classOfName s != .any
 /-- The features of a single-module program's first module in its import context. -/
 def featuresOf (B : SBasis) (p : BProgram) : Features :=
   match p.modules with
-  | [] => ⟨false, false, false, false, false, false⟩
+  | [] => ⟨false, false, false, false, false, false, false⟩
   | m :: rest =>
     let ts : TopSumm := match m.body with
       | some d => summTop d
-      | none => ⟨{}, [], [], false⟩
+      | none => ⟨{}, [], [], false, [], []⟩
     let s := ts.s
     let C? := importCtx B m.imports
     let reach (lv : LongId) : Option Scheme :=
@@ -218,7 +233,8 @@ def featuresOf (B : SBasis) (p : BProgram) : Features :=
     ⟨s.int,
      schemes.any schemeClass || allTys.any (fun t => (Stat.bTyNames t).any classNamed),
      s.hasRec || schemes.any schemeRec || allTys.any tyRec || allTys.any (fun t => (tyCons t).any tyFcnRec),
-     s.tys.any (fun t => !(Stat.bTyNames t).isEmpty),
+     ts.topAnn.any (fun t => !(Stat.bTyNames t).isEmpty),
+     ts.otherAnn.any (fun t => !(Stat.bTyNames t).isEmpty),
      ts.ports,
      !rest.isEmpty⟩
 
@@ -229,13 +245,13 @@ inductive Fragment where
 def Fragment.rank : Fragment → Nat
   | .b => 0 | .c => 1 | .d => 2 | .e => 3 | .f => 4
 
-/-- The least fragment of a program (section "Fragments"; ports count as F_f at milestone (b)). -/
+/-- The least fragment of a program (section "Fragments"; ports count as F_f). -/
 def fragmentOf (B : SBasis) (p : BProgram) : Fragment :=
   let F := featuresOf B p
   if F.modules || F.ports then .f
-  else if F.annVars then .e
+  else if F.annOther then .e
   else if F.records then .d
-  else if F.intConst || F.classVar then .c
+  else if F.intConst || F.classVar || F.annTopPoly then .c
   else .b
 
 def InFragment (fr : Fragment) (B : SBasis) (p : BProgram) : Prop := (fragmentOf B p).rank ≤ fr.rank

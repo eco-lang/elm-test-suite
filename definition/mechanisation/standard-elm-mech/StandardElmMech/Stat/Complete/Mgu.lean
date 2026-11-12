@@ -58,7 +58,7 @@ inductive Step where
   | unsupported
 
 /-- Bind the flexible `a` to `τ` (U2 without classes): occurs check, then the binding. -/
-def bindStep (a : TyVar) (τ : Ty) (rest : Eqs) (θ : Bnd) : Step :=
+def bindStepM (a : TyVar) (τ : Ty) (rest : Eqs) (θ : Bnd) : Step :=
   if a.cls = .any then
     if BVar.ty a ∈ τ.vars then .fail else .next (substEqs a τ rest) (bindV a τ θ)
   else .unsupported
@@ -68,12 +68,12 @@ def uStep (R : Rigid) (θ : Bnd) (l r : Ty) (rest : Eqs) : Step :=
   if l = r then .next rest θ else
   match l, r with
   | .var a, .var b =>
-    if !R a && a.cls == .any then bindStep a (.var b) rest θ
-    else if !R b && b.cls == .any then bindStep b (.var a) rest θ
+    if !R a && a.cls == .any then bindStepM a (.var b) rest θ
+    else if !R b && b.cls == .any then bindStepM b (.var a) rest θ
     else if !R a || !R b then .unsupported
     else .fail
-  | .var a, r => if !R a then bindStep a r rest θ else .fail
-  | l, .var b => if !R b then bindStep b l rest θ else .fail
+  | .var a, r => if !R a then bindStepM a r rest θ else .fail
+  | l, .var b => if !R b then bindStepM b l rest θ else .fail
   | .fn a b, .fn c d => .next ((a, c) :: (b, d) :: rest) θ
   | .con as t, .con bs t' =>
     if t = t' ∧ as.length = bs.length then .next (as.zip bs ++ rest) θ else .fail
@@ -250,9 +250,9 @@ theorem bindStep_next {R : Rigid} {θ : Bnd} {a : TyVar} {τ : Ty} {rest E' : Eq
     (hR : R a = false) (ha : lk θ a = .var a) (hτ : ∀ b, BVar.ty b ∈ τ.vars → lk θ b = .var b)
     (hrest : ∀ e ∈ rest, ∀ b, (BVar.ty b ∈ e.1.vars ∨ BVar.ty b ∈ e.2.vars) → lk θ b = .var b)
     (g : Good R θ ((.var a, τ) :: rest))
-    (h : bindStep a τ rest θ = .next E' θ') :
+    (h : bindStepM a τ rest θ = .next E' θ') :
     Good R θ' E' ∧ ∀ s, (s a = sb s τ ∧ Unifies s rest ∧ Absorbs s (lk θ) ↔ Unifies s E' ∧ Absorbs s (lk θ')) := by
-  unfold bindStep at h
+  unfold bindStepM at h
   split at h
   · rename_i hc
     split at h
@@ -260,9 +260,9 @@ theorem bindStep_next {R : Rigid} {θ : Bnd} {a : TyVar} {τ : Ty} {rest E' : Eq
     · rename_i hocc; cases h; exact bind_good hR hc hocc ha hτ hrest g
   · cases h
 
-theorem bindStep_fail_mem {a : TyVar} {τ : Ty} {rest : Eqs} {θ : Bnd} (h : bindStep a τ rest θ = .fail) :
+theorem bindStep_fail_mem {a : TyVar} {τ : Ty} {rest : Eqs} {θ : Bnd} (h : bindStepM a τ rest θ = .fail) :
     BVar.ty a ∈ τ.vars := by
-  unfold bindStep at h
+  unfold bindStepM at h
   split at h
   · split at h
     · assumption
@@ -283,7 +283,7 @@ theorem unifies_swap {s : FSub} {l r : Ty} {rest : Eqs} :
 
 /-- A binding step of the loop for the equation `var a ≐ τ`. -/
 theorem bind_case {R : Rigid} {θ : Bnd} {a : TyVar} {τ : Ty} {rest E' : Eqs} {θ' : Bnd}
-    (hR : R a = false) (g : Good R θ ((.var a, τ) :: rest)) (h : bindStep a τ rest θ = .next E' θ') :
+    (hR : R a = false) (g : Good R θ ((.var a, τ) :: rest)) (h : bindStepM a τ rest θ = .next E' θ') :
     Good R θ' E' ∧ Corr R ((.var a, τ) :: rest) θ E' θ' := by
   obtain ⟨hl, hr, hrest⟩ := stable_cons g
   obtain ⟨g', hc⟩ := bindStep_next hR (hl a (mem_vars_var a)) hr hrest g h
@@ -293,7 +293,7 @@ theorem bind_case {R : Rigid} {θ : Bnd} {a : TyVar} {τ : Ty} {rest E' : Eqs} {
   exact ⟨fun ⟨⟨a1, a2⟩, a3⟩ => ⟨a1, a2, a3⟩, fun ⟨a1, a2, a3⟩ => ⟨⟨a1, a2⟩, a3⟩⟩
 
 theorem bind_case' {R : Rigid} {θ : Bnd} {b : TyVar} {l : Ty} {rest E' : Eqs} {θ' : Bnd}
-    (hR : R b = false) (g : Good R θ ((l, .var b) :: rest)) (h : bindStep b l rest θ = .next E' θ') :
+    (hR : R b = false) (g : Good R θ ((l, .var b) :: rest)) (h : bindStepM b l rest θ = .next E' θ') :
     Good R θ' E' ∧ Corr R ((l, .var b) :: rest) θ E' θ' := by
   obtain ⟨g', hc⟩ := bind_case hR (good_swap g) h
   exact ⟨g', fun s hs => by rw [unifies_swap]; exact hc s hs⟩
@@ -375,10 +375,10 @@ where
       · exact .inr (ih hm)
 
 theorem fail_var_left {R : Rigid} {θ : Bnd} {a : TyVar} {r : Ty} {rest : Eqs} (hr : ∀ b, r ≠ .var b)
-    (h : (if !R a then bindStep a r rest θ else .fail) = Step.fail) : ∀ s, FixesR R s → s a ≠ sb s r := by
+    (h : (if !R a then bindStepM a r rest θ else .fail) = Step.fail) : ∀ s, FixesR R s → s a ≠ sb s r := by
   intro s hs
   split at h
-  · exact occurs_ne s (bindStep_fail_mem h) (hr a)
+  · exact occurs_neF s (bindStep_fail_mem h) (hr a)
   · rename_i hc
     simp only [Bool.not_eq_true', Bool.not_eq_false] at hc
     rw [hs a hc]

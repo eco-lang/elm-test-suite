@@ -17,17 +17,28 @@
   - a lambda- or pattern-bound variable, or an unannotated member inside its group: its type (a
     metavariable of its binding node);
   - a member annotated by a type with no variables: that type, inside and outside its group;
-  - a member annotated by a type with variables, and an unannotated member outside its group:
-    `shape`, every instance has the shape of the annotation, or of the member's type as the
-    group's constraints solved alone give it (functions, constructed types, closed parts), so each
-    occurrence is a copy of that term with fresh metavariables at the other parts;
-  - anything else (a local constructor, a port, a scheme with a bound row variable): `weak`, a
-    fresh unconstrained metavariable at each occurrence (dropping constraints keeps every
-    derivation a solution).
+  - a member annotated by a type with variables, a local constructor (of a custom type or a record
+    alias): a *template* (`tmpl`, CoreTmpl.lean), the normalised type with a metavariable per
+    variable name and per record with an extension (so repeated variables and repeated extended
+    records are linked), with the classes the names require and the fields the extended records
+    have. Every derivation gives such a value a canonical form of the elaborated type (`annScheme`,
+    `closScheme`, after the group's closure again), so every instance is the template under some
+    valuation. An occurrence names the template's metavariables by their first positions in the
+    occurrence's type. Used when every choice of sorts for the annotation's names gives a type
+    whose variables are named, each name of one sort, and whose extended records are sorted
+    (`goodTmpl`); otherwise `shape`;
+  - an unannotated member outside its group: `shape`, every instance has the shape of the
+    member's type as the group's constraints solved alone give it (functions, constructed types,
+    closed parts), each occurrence a copy with fresh metavariables at the other parts; when that
+    type is a metavariable with classes, a template with those classes (`mvInfo`: `y = 5; y 1`);
+  - anything else (a port, a scheme with a bound row variable): `weak`, a fresh unconstrained
+    metavariable at each occurrence (dropping constraints keeps every derivation a solution).
 
   Type expressions elaborate in an abstract context (RefuseTypes.lean's `absCtx`): the names of the
   module's own types collapse to one name per arity, and the valuation collapses the names a
-  derivation chooses the same way (`gN` in `hN`).
+  derivation chooses the same way (`gN` in `hN`). A local type may have the name of an imported
+  one when the body starts with its type declarations (ruling A98: the local name denotes the local
+  type throughout the module; CoreComplete.lean's `InvW`).
 
   An annotation's type: an annotation's variables may be type or row variables in a derivation
   (r:s-ty-tyvar, r:s-ty-rowvar), so every choice of sorts for its names is elaborated (as
@@ -35,10 +46,11 @@
   annotation's type, otherwise none is used.
 
   Deviations from the specification (section 5 and "Lean definitions"): no flexible row variables
-  (records whose extension a derivation chooses are metavariables with `has` constraints); local
-  constructors and ports are `weak` and local type names are collapsed per arity; metavariables
-  are named by (reversed) paths, not by a counter; the escape condition, A93's closure and lacks
-  constraints are dropped (each a dropped condition: every derivation stays a solution).
+  (records whose extension a derivation chooses are metavariables with `has` constraints); ports
+  are `weak` and local type names are collapsed per arity (so two local types of one arity are not
+  told apart); metavariables are named by (reversed) paths, not by a counter; the escape
+  condition, A93's closure and lacks constraints are dropped (each a dropped condition: every
+  derivation stays a solution).
 -/
 import StandardElmMech.Stat.Complete.Unify
 import StandardElmMech.Stat.RefuseTypes
@@ -58,6 +70,10 @@ inductive GInfo where
   /-- Every instance has the shape of the term at its functions, constructed types and closed
       parts (a member of an earlier group, or an annotated member with variables). -/
   | shape (t : T)
+  /-- Every instance is the template `t` under some valuation of its metavariables satisfying
+      `K` (an annotated member, a local constructor): the template's metavariables are its own,
+      and each occurrence names them by their first positions in `t`. -/
+  | tmpl (t : T) (K : List Con)
   deriving Inhabited
 
 structure GCtx where
@@ -89,11 +105,30 @@ def resolveIn (sol : List Con) : T → T
   | .mv q => (boundOf q sol).getD (.mv q)
   | t => t
 
+def clsSelOf (q : Path) (c : Con) : Option Cls :=
+  match c with
+  | .cls (.mv q') k => if q' = q then some k else none
+  | _ => none
+
+/-- The classes a solved group requires of a metavariable. -/
+def clsOf (q : Path) (sol : List Con) : List Cls := sol.filterMap (clsSelOf q)
+
+/-- A member whose type the group's constraints leave a metavariable: every instance has the
+    classes the group requires of it (a fresh metavariable with those classes). -/
+def mvInfo (sol : List Con) (q : Path) : GInfo :=
+  match clsOf q sol with
+  | [] => .shape (.mv q)
+  | ks => .tmpl (.mv [0]) (ks.map fun k => .cls (.mv [0]) k)
+
 def closeG (sol : List Con) : GInfo → GInfo
   | .mono t =>
     match resolveIn sol t with
-    | t' => if t'.closed then .mono t' else .shape t'
+    | t' => if t'.closed then .mono t' else
+      match t' with
+      | .mv q => mvInfo sol q
+      | _ => .shape t'
   | .shape t => .shape t
+  | .tmpl t K => .tmpl t K
   | _ => .weak
 
 /-- After a group: what its members stand for outside it, given the group's solved constraints. -/
@@ -132,6 +167,174 @@ def scRow (base : Path) : Nat → List (Lab × T) → List (Lab × T)
   | _, [] => []
   | i, (l, a) :: r => (l, sc (i :: base) a) :: scRow base (i + 1) r
 end
+
+
+/-! ## Templates -/
+
+def idxL {α : Type} [DecidableEq α] (x : α) : List α → Option Nat
+  | [] => none
+  | y :: ys => if y = x then some 0 else (idxL x ys).map (· + 1)
+
+/-- The names of the variables of a type, sort forgotten, in order of first occurrence. -/
+def tyNames (τ : Ty) : List String := dedupL (τ.vars.filterMap BVar.name?)
+
+mutual
+/-- The records with an extension of a type, outermost, in preorder. -/
+def recsT : Ty → List Ty
+  | .var _ => []
+  | .record ρ none => recsRow ρ
+  | .record ρ (some e) => [.record ρ (some e)]
+  | .fn a b => recsT a ++ recsT b
+  | .con as _ => recsList as
+def recsRow : Row → List Ty
+  | [] => []
+  | (_, x) :: r => recsT x ++ recsRow r
+def recsList : List Ty → List Ty
+  | [] => []
+  | x :: r => recsT x ++ recsList r
+end
+
+mutual
+/-- The template of a (normalised) type: a name's variable is the metavariable [0, i] (i its
+    index in `ns`), a record with an extension the metavariable [1, j] (j its index in `rs`). -/
+def tmplT (ns : List String) (rs : List Ty) : Ty → T
+  | .var a =>
+    match a with
+    | .named s =>
+      match idxL s ns with
+      | some i => .mv [0, i]
+      | none => .var a
+    | _ => .var a
+  | .record ρ none => .record (tmplRow ns rs ρ) none
+  | .record ρ (some e) =>
+    match idxL (Ty.record ρ (some e)) rs with
+    | some j => .mv [1, j]
+    | none => .record (tmplRow ns rs ρ) (some e)
+  | .fn a b => .fn (tmplT ns rs a) (tmplT ns rs b)
+  | .con as t => .con (tmplList ns rs as) t
+def tmplRow (ns : List String) (rs : List Ty) : Row → List (Lab × T)
+  | [] => []
+  | (l, x) :: r => (l, tmplT ns rs x) :: tmplRow ns rs r
+def tmplList (ns : List String) (rs : List Ty) : List Ty → List T
+  | [] => []
+  | x :: r => tmplT ns rs x :: tmplList ns rs r
+end
+
+/-- The classes the names require of their instances. -/
+def tmplCls : Nat → List String → List Con
+  | _, [] => []
+  | i, s :: ns =>
+    if classOfName s = .any then tmplCls (i + 1) ns else .cls (.mv [0, i]) (classOfName s) :: tmplCls (i + 1) ns
+
+/-- The fields a record with an extension (the metavariable [1, j]) has in every instance: those
+    of its row whose types contain no record with an extension. -/
+def tmplHasRec (ns : List String) (rs : List Ty) (j : Nat) : Ty → List Con
+  | .record ρ (some _) =>
+    (ρ.map (·.1)).filterMap fun l =>
+      match FMap.find? ρ l with
+      | some x => if (recsT x).isEmpty then some (.has (.mv [1, j]) l (tmplT ns rs x)) else none
+      | none => none
+  | _ => []
+
+def tmplHasL (ns : List String) (rs : List Ty) : Nat → List Ty → List Con
+  | _, [] => []
+  | j, r :: rest => tmplHasRec ns rs j r ++ tmplHasL ns rs (j + 1) rest
+
+/-- The template of a normalised type. -/
+def tmplInfo (r : Ty) : GInfo :=
+  .tmpl (tmplT (tyNames r) (dedupL (recsT r)) r)
+    (tmplCls 0 (tyNames r) ++ tmplHasL (tyNames r) (dedupL (recsT r)) 0 (dedupL (recsT r)))
+
+/-- A row sorted strictly by label. -/
+def sortedB : Row → Bool
+  | [] => true
+  | (l, _) :: r => r.all (fun p => labLt l p.1) && sortedB r
+
+mutual
+/-- Every record with an extension has a sorted row. -/
+def recSorted : Ty → Bool
+  | .var _ => true
+  | .record ρ tl => (tl.isNone || sortedB ρ) && recSortedRow ρ
+  | .fn a b => recSorted a && recSorted b
+  | .con as _ => recSortedList as
+def recSortedRow : Row → Bool
+  | [] => true
+  | (_, x) :: r => recSorted x && recSortedRow r
+def recSortedList : List Ty → Bool
+  | [] => true
+  | x :: r => recSorted x && recSortedList r
+end
+
+/-- A type whose variables are named, each name of one sort, a row variable's name of class any,
+    and whose records with an extension are sorted. -/
+def goodTmpl (τ : Ty) : Bool :=
+  (τ.vars.all fun v =>
+    match v with
+    | .ty (.named s) => !(τ.vars.contains (.row (.named s)))
+    | .row (.named s) => classOfName s == .any
+    | _ => false) && recSorted τ
+
+mutual
+/-- The first position (reversed path) of a metavariable in a term. -/
+def fpos (q : Path) (r : Path) : T → Option Path
+  | .mv q' => if q' = q then some r else none
+  | .var _ => none
+  | .record ρ _ => fposRow q r 0 ρ
+  | .fn a b => (fpos q (0 :: r) a).or (fpos q (1 :: r) b)
+  | .con as _ => fposList q r 0 as
+def fposRow (q : Path) (r : Path) : Nat → List (Lab × T) → Option Path
+  | _, [] => none
+  | i, (_, x) :: rest => (fpos q (i :: r) x).or (fposRow q r (i + 1) rest)
+def fposList (q : Path) (r : Path) : Nat → List T → Option Path
+  | _, [] => none
+  | i, x :: rest => (fpos q (i :: r) x).or (fposList q r (i + 1) rest)
+end
+
+/-- A template's metavariable at an occurrence: the slot of its first position. -/
+def slotOf (base : Path) (t0 : T) (q : Path) : Path :=
+  match fpos q [] t0 with
+  | some r => r ++ base
+  | none => q
+
+mutual
+def reloc (base : Path) (t0 : T) : T → T
+  | .mv q => .mv (slotOf base t0 q)
+  | .var a => .var a
+  | .record ρ tl => .record (relocRow base t0 ρ) tl
+  | .fn a b => .fn (reloc base t0 a) (reloc base t0 b)
+  | .con as t => .con (relocList base t0 as) t
+def relocRow (base : Path) (t0 : T) : List (Lab × T) → List (Lab × T)
+  | [] => []
+  | (l, x) :: r => (l, reloc base t0 x) :: relocRow base t0 r
+def relocList (base : Path) (t0 : T) : List T → List T
+  | [] => []
+  | x :: r => reloc base t0 x :: relocList base t0 r
+end
+
+mutual
+/-- Every metavariable of a term occurs in the template. -/
+def occIn (t0 : T) : T → Bool
+  | .mv q => (fpos q [] t0).isSome
+  | .var _ => true
+  | .record ρ _ => occInRow t0 ρ
+  | .fn a b => occIn t0 a && occIn t0 b
+  | .con as _ => occInList t0 as
+def occInRow (t0 : T) : List (Lab × T) → Bool
+  | [] => true
+  | (_, x) :: r => occIn t0 x && occInRow t0 r
+def occInList (t0 : T) : List T → Bool
+  | [] => true
+  | x :: r => occIn t0 x && occInList t0 r
+end
+
+/-- A template's constraints at an occurrence (those whose metavariables occur in the template). -/
+def relocK (base : Path) (t0 : T) (K : List Con) : List Con :=
+  K.filterMap fun c =>
+    match c with
+    | .cls (.mv q) k => if (fpos q [] t0).isSome then some (.cls (.mv (slotOf base t0 q)) k) else none
+    | .has (.mv q) l u =>
+      if (fpos q [] t0).isSome && occIn t0 u then some (.has (.mv (slotOf base t0 q)) l (reloc base t0 u)) else none
+    | _ => none
 
 /-! ## Occurrences -/
 
@@ -177,6 +380,7 @@ def occT (Γ : GCtx) (lv : LongId) (p : Path) : T × List Con :=
   | .mono t => (t, [])
   | .sch σ => schT p σ
   | .shape t => (sc (0 :: 0 :: p) t, [])
+  | .tmpl t K => (reloc (0 :: 0 :: p) t t, relocK (0 :: 0 :: p) t K)
 
 def litT (sc : SLit) (p : Path) : T × List Con :=
   match sc with
@@ -204,16 +408,25 @@ def arrowsT : List T → T → T
 
 /-- The type of an annotation, if every choice of sorts for its names that elaborates gives the same
     normalised type. -/
-def annT (C0 : Ctx) (ty : BTy) : Option T :=
+def annR (C0 : Ctx) (ty : BTy) : Option Ty :=
   match (RTypes.annCands ty).filterMap (fun U => (elabTy { C0 with U := U } ty).map hN) with
   | [] => none
-  | r :: rest => if rest.all (· == r) then some (ofTy r) else none
+  | r :: rest => if rest.all (· == r) then some r else none
+
+def annT (C0 : Ctx) (ty : BTy) : Option T := (annR C0 ty).map ofTy
+
+/-- Every choice of sorts that elaborates gives a type a template describes. -/
+def annGood (C0 : Ctx) (ty : BTy) : Bool :=
+  (RTypes.annCands ty).all fun U =>
+    match elabTy { C0 with U := U } ty with
+    | some τ => goodTmpl τ
+    | none => true
 
 def memberInfo (C0 : Ctx) (p : Path) : Option BTy → GInfo
   | none => .mono (.mv (0 :: p))
   | some ty =>
-    match annT C0 ty with
-    | some t => if t.closed then .mono t else .shape t
+    match annR C0 ty with
+    | some r => if (ofTy r).closed then .mono (ofTy r) else if annGood C0 ty then tmplInfo r else .shape (ofTy r)
     | none => .weak
 
 def annCs (C0 : Ctx) (p : Path) : Option BTy → List Con
@@ -393,10 +606,43 @@ end
 
 /-! ## Modules -/
 
-/-- The values a type declaration may bind: its constructors and its aliases (record aliases bind
-    a constructor). -/
-def tdNames (db : Option Src.BDatBind) (tbs : List Src.BTypBind) : List Var :=
-  (db.getD []).flatMap (fun c => c.2.2.map (·.1)) ++ tbs.map (·.c)
+/-- What a local constructor stands for: the template of its type, when it has one. -/
+def conInfo (body : Ty) : GInfo := if goodTmpl body then tmplInfo (hN body) else .weak
+
+def gConBind (A : Ctx) (τr : Option Ty) : Src.BConBind → FMap Var GInfo
+  | [] => []
+  | (k, tys) :: rest =>
+    FMap.modify [(k, match τr, elabTyList A tys with
+      | some τ, some τs => conInfo (arrows τs τ)
+      | _, _ => .weak)] (gConBind A τr rest)
+
+/-- The constructors of custom types, as `elabDatBind` binds them, the type names collapsed. -/
+def gDat (A : Ctx) : Src.BDatBind → FMap Var GInfo
+  | [] => []
+  | (_, ps, cb) :: rest =>
+    FMap.modify
+      (gConBind (A.plusU (seqVars ps (conBindExtNames cb)))
+        ((elabTyList (A.plusU (seqVars ps (conBindExtNames cb))) (ps.map .tyvar)).map
+          fun τs => .con τs ⟨RTypes.Did, ps.length⟩) cb)
+      (gDat A rest)
+
+/-- The constructor a record alias binds, as `elabTypBind` binds it. -/
+def aliasL (A : Ctx) (tb : Src.BTypBind) : FMap Var GInfo :=
+  match smlabs tb.t with
+  | none => []
+  | some ls =>
+    [(tb.c, match elabTy (A.plusU (seqVars tb.params (bTyExtNames tb.t))) tb.t with
+      | some (.record ρ none) =>
+        match Row.lookupAll ρ ls with
+        | some τs => if ρ.length = ls.length then conInfo (arrows τs (.record ρ none)) else .weak
+        | none => .weak
+      | _ => .weak)]
+
+/-- The values a type declaration binds: constructors and record aliases by their templates. -/
+def gTypes (A : Ctx) (db : Option Src.BDatBind) (tbs : List Src.BTypBind) : FMap Var GInfo :=
+  match db with
+  | none => FMap.plusAll (tbs.map (aliasL A))
+  | some d => FMap.modify (gDat A d) (FMap.plusAll (tbs.map (aliasL A)))
 
 def gTop (Γ : GCtx) (p : Path) : BTopDec → Option (FMap Var GInfo × List Con)
   | .value vb =>
@@ -411,18 +657,27 @@ def gTop (Γ : GCtx) (p : Path) : BTopDec → Option (FMap Var GInfo × List Con
       | some (L2, c2) => some (L2 ++ L1, c1 ++ c2)
       | none => none
     | none => none
-  | .types db tbs => some ((tdNames db tbs).map fun x => (x, .weak), [])
+  | .types db tbs => some (gTypes Γ.A db tbs, [])
   | .port x _ => some ([(x, .weak)], [])
 
 /-- The abstract type context of a module (RefuseTypes.lean). -/
 def absOf (B : SBasis) (C0 : Ctx) (d : BTopDec) : Ctx :=
   RTypes.absCtx (RTypes.fcol B.T) C0 (RTypes.localTE (RTypes.fcol B.T) C0 (some d))
 
+/-- The body starts with its type declarations. -/
+def startsTypes : BTopDec → Bool
+  | .types _ _ => true
+  | .seq (.types _ _) _ => true
+  | _ => false
+
 /-- What the simulation of type expressions needs of the basis and the module's type
-    declarations (RefuseTypes.lean's `preserves`). -/
+    declarations (RefuseTypes.lean's `preserves`): a local type may have the name of an imported
+    one when the body starts with the type declarations (ruling A98: the local name denotes the
+    local type throughout the module). -/
 def typesOK (B : SBasis) (C0 : Ctx) (d : BTopDec) : Bool :=
   RTypes.fixedNames.all (· ∈ B.T) && T0.all (· ∈ B.T) &&
-    RTypes.unboundB C0 (RTypes.localTE (RTypes.fcol B.T) C0 (some d)) && RTypes.preserves (absOf B C0 d) d
+    (RTypes.unboundB C0 (RTypes.localTE (RTypes.fcol B.T) C0 (some d)) || startsTypes d) &&
+    RTypes.preserves (absOf B C0 d) d
 
 /-- The weak constraint generator for a module in a basis: none when its imports fail, it has no
     body, or its type declarations are not simulated (`typesOK`). -/

@@ -104,7 +104,7 @@ theorem closE_inst {A A' : List BVar} {VE VE' : ValEnv} {τ : Ty} {T : FSub} {n 
     (hτ : OkT n τ)
     (hA : ∀ a, BVar.ty a ∈ A → BVar.ty a ∈ τ.vars → ∀ v ∈ (T a).tyvars, v ∈ A')
     (hNB : ∀ v ∈ (sb T τ).vars, v.isBnd = false)
-    (hbnd : ∀ i c, T (.bnd i c) = .var (.bnd i c)) (hcls : ∀ a, T a ≠ .var a → a.cls = .any) :
+    (hbnd : ∀ i c, T (.bnd i c) = .var (.bnd i c)) (hcls : RespC T) :
     ∀ t, Gen (closE A' VE' (mono (sb T τ))) t →
       Gen ⟨(closE A VE (mono τ)).bound, sb T (closE A VE (mono τ)).body⟩ t := by
   have hto : TyOnly τ := TyOnly.of_okT hτ
@@ -135,7 +135,8 @@ theorem closE_inst {A A' : List BVar} {VE VE' : ValEnv} {τ : Ty} {T : FSub} {n 
   simp only [Scheme.canon, mono_body] at hg
   obtain ⟨h1, h2, h3⟩ := renumber_spec true 0 (canonVars (closB A' VE' (mono (sb T τ))) (sb T τ))
   have hrv := renumber_var 0 (canonVars (closB A' VE' (mono (sb T τ))) (sb T τ))
-  generalize renumber true 0 (canonVars (closB A' VE' (mono (sb T τ))) (sb T τ)) = RN at hg h1 h2 h3 hrv
+  have hRN := renumber_respectsC 0 (canonVars (closB A' VE' (mono (sb T τ))) (sb T τ))
+  generalize renumber true 0 (canonVars (closB A' VE' (mono (sb T τ))) (sb T τ)) = RN at hg h1 h2 h3 hrv hRN
   obtain ⟨β, hβ⟩ := apply_isSome h1 (sb T τ)
   obtain ⟨ts, S2, hS2, hres, ht⟩ := hg
   rw [hβ, Option.getD_some] at ht
@@ -160,7 +161,7 @@ theorem closE_inst {A A' : List BVar} {VE VE' : ValEnv} {τ : Ty} {T : FSub} {n 
       have e2 := k3 c hc
       rw [e1] at e2
       rw [← hbc]; exact apply_var_adm hres e2
-    · rw [hcls c hTc]; exact .any _
+    · exact admC_post hres (admC_post hRN (hcls c))
   let h := post S2 (post RN.1 T)
   unfold closE
   rw [mono_body, hc, rnBs_eq]

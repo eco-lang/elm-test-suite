@@ -100,6 +100,18 @@ theorem mem_rnBs : ∀ (i : Nat) (as : List TyVar) (a : TyVar), a ∈ as →
       have := mem_rnBs (i + 1) bs a hm
       rw [show i + (List.idxOf a bs + 1) = i + 1 + List.idxOf a bs by omega]; exact this
 
+theorem rnBs_cls : ∀ (i : Nat) (as : List TyVar) (j : Nat) (c : Cls), BVar.ty (.bnd j c) ∈ rnBs i as →
+    i ≤ j ∧ j - i < as.length ∧ ∀ d, c = (as.getD (j - i) d).cls
+  | _, [], _, _, h => by cases h
+  | i, b :: bs, j, c, h => by
+    simp only [rnBs, List.mem_cons, BVar.ty.injEq, TyVar.bnd.injEq] at h
+    rcases h with ⟨rfl, rfl⟩ | h
+    · simp
+    · obtain ⟨h1, h2, h3⟩ := rnBs_cls (i + 1) bs j c h
+      refine ⟨by omega, by simp; omega, fun d => ?_⟩
+      rw [show j - i = (j - (i + 1)) + 1 by omega]
+      simpa using h3 d
+
 theorem rnBs_bnd : ∀ (i : Nat) (as : List TyVar), ∀ v ∈ rnBs i as, ∃ j c, v = .ty (.bnd j c)
   | _, [], _, h => by cases h
   | i, b :: bs, v, h => by
@@ -201,7 +213,7 @@ theorem closGroup_eq (A : List BVar) (VE : ValEnv) : closGroup A VE = VE.mapV fu
 
 theorem find?_closGroup (A : List BVar) (VE : ValEnv) (x : String) :
     FMap.find? (closGroup A VE) x = (FMap.find? VE x).map fun p => (closE A VE p.1, p.2) := by
-  rw [closGroup_eq]; exact find?_mapV _ VE x
+  rw [closGroup_eq]; exact find?_mapVW _ VE x
 
 theorem mono_tyvars (τ : Ty) : (mono τ).tyvars = τ.tyvars := by
   simp [Scheme.tyvars, mono, diffL]
@@ -226,7 +238,7 @@ theorem closE_bound_ty {A : List BVar} {VE : ValEnv} {τ : Ty} (hτ : TyOnly τ)
 /-- L3 for a member of a group: the closure in W's context is related to the closure of its
     image in the derivation's context. -/
 theorem closE_rel {A A' : List BVar} {VE VE' : ValEnv} {τ : Ty} {T : FSub} {n : Nat}
-    (hτ : OkT n τ)
+    (hτ : OkT n τ) (hTadm : RespC T)
     (hA : ∀ a, BVar.ty a ∈ A → BVar.ty a ∈ τ.vars → ∀ v ∈ (T a).tyvars, v ∈ A')
     (hNB : ∀ v ∈ (sb T τ).vars, v.isBnd = false) :
     SchRel T (closE A VE (mono τ)) (closE A' VE' (mono (sb T τ))) := by
@@ -280,9 +292,10 @@ theorem closE_rel {A A' : List BVar} {VE VE' : ValEnv} {τ : Ty} {T : FSub} {n :
     unfold closE at hg
     simp only [Scheme.canon, mono_body] at hg
     obtain ⟨h1, h2, h3⟩ := renumber_spec true 0 (canonVars (closB A' VE' (mono (sb T τ))) (sb T τ))
-    generalize renumber true 0 (canonVars (closB A' VE' (mono (sb T τ))) (sb T τ)) = RN at hg h1 h2 h3
+    have hRN := renumber_respectsC 0 (canonVars (closB A' VE' (mono (sb T τ))) (sb T τ))
+    generalize renumber true 0 (canonVars (closB A' VE' (mono (sb T τ))) (sb T τ)) = RN at hg h1 h2 h3 hRN
     obtain ⟨β, hβ⟩ := apply_isSome h1 (sb T τ)
-    obtain ⟨ts, S2, hS2, -, ht⟩ := hg
+    obtain ⟨ts, S2, hS2, hr2, ht⟩ := hg
     rw [hβ, Option.getD_some] at ht
     obtain ⟨k1, k2⟩ := apply_sb _ T τ β hto hβ
     subst k2
@@ -300,7 +313,18 @@ theorem closE_rel {A A' : List BVar} {VE VE' : ValEnv} {τ : Ty} {T : FSub} {n :
     let h := post S2 (post RN.1 T)
     refine ⟨fun b => match b with
       | .bnd j _ => if j < as.length then h (as.getD j b) else .var b
-      | b => .var b, ?_⟩
+      | b => .var b, ?_, ?_⟩
+    · intro a ha
+      unfold closE at ha
+      rw [mono_body, hc] at ha
+      obtain ⟨j, cl, e⟩ := rnBs_bnd 0 as _ ha
+      injection e with e; subst e
+      obtain ⟨-, h2, h3⟩ := rnBs_cls 0 as j cl ha
+      simp only [Nat.sub_zero] at h2 h3
+      simp only [if_pos h2]
+      have := admC_post hr2 (admC_post hRN (hTadm (as.getD j (.bnd j cl))))
+      rw [← h3 (.bnd j cl)] at this
+      exact this
     unfold closE
     rw [mono_body, hc, sb_sb]
     apply sb_congr

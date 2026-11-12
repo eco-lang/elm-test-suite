@@ -124,10 +124,10 @@ theorem bind_measure {a : TyVar} {τ : Ty} {rest : Eqs} (hocc : BVar.ty a ∉ τ
   · exact key _ (fun hm => mem_evars.mpr ⟨e0, he0, .inl hm⟩) h
   · exact key _ (fun hm => mem_evars.mpr ⟨e0, he0, .inr hm⟩) h
 
-theorem bindStep_measure {a : TyVar} {τ : Ty} {rest E' : Eqs} {θ θ' : Bnd} (h : bindStep a τ rest θ = .next E' θ')
+theorem bindStep_measure {a : TyVar} {τ : Ty} {rest E' : Eqs} {θ θ' : Bnd} (h : bindStepM a τ rest θ = .next E' θ')
     (E0 : Eqs) (ha : a ∈ evars E0) (hrest : ∀ b, b ∈ evars rest → b ∈ evars E0)
     (hτ0 : ∀ b, BVar.ty b ∈ τ.vars → b ∈ evars E0) : nd E' < nd E0 := by
-  unfold bindStep at h
+  unfold bindStepM at h
   split at h
   · split at h
     · cases h

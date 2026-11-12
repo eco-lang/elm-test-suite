@@ -4,7 +4,7 @@
   context (`GOK`, `RelL`, `Sim`), occurrences (instantiation of a scheme), annotations (every
   choice of sorts is a candidate), closing a group.
 -/
-import StandardElmMech.Stat.Complete.Core
+import StandardElmMech.Stat.Complete.CoreTmpl
 
 namespace StandardElm.Stat.Complete
 open StandardElm (Var Lab ModId Op LongId)
@@ -144,52 +144,6 @@ theorem Shp_closed {t : T} {τ : Ty} (hc : t.closed = true) (h : Shp ν t τ) : 
   | record ρ tl => exact h.1 hc
   | mv _ => simp [T.closed] at hc
   | var _ => simp [T.closed] at hc
-
-theorem hN_fn_inv {τ a b : Ty} (h : hN τ = .fn a b) : ∃ x y, τ = .fn x y ∧ hN x = a ∧ hN y = b := by
-  cases τ with
-  | var _ => simp [hN] at h
-  | record ρ tl =>
-    exfalso
-    simp only [hN] at h
-    unfold hRec at h
-    split at h
-    · cases h
-    · split at h <;> cases h
-    · cases h
-    · cases h
-  | fn x y => simp only [hN, Ty.fn.injEq] at h; exact ⟨x, y, rfl, h.1, h.2⟩
-  | con _ _ => simp [hN] at h
-
-theorem hN_con_inv {τ : Ty} {as : List Ty} {tn : TyName} (h : hN τ = .con as tn) :
-    ∃ xs t, τ = .con xs t ∧ hNList xs = as ∧ gN t = tn := by
-  cases τ with
-  | var _ => simp [hN] at h
-  | record ρ tl =>
-    exfalso
-    simp only [hN] at h
-    unfold hRec at h
-    split at h
-    · cases h
-    · split at h <;> cases h
-    · cases h
-    · cases h
-  | fn x y => simp [hN] at h
-  | con xs t => simp only [hN, Ty.con.injEq] at h; exact ⟨xs, t, rfl, h.1, h.2⟩
-
-theorem hN_rec_inv {τ : Ty} {ρ : Row} (h : hN τ = .record ρ none) : ∃ xs, τ = .record xs none ∧ hNRow xs = ρ := by
-  cases τ with
-  | var _ => simp [hN] at h
-  | fn _ _ => simp [hN] at h
-  | con _ _ => simp [hN] at h
-  | record xs tl =>
-    cases tl with
-    | none => simp only [hN, hRec, Ty.record.injEq] at h; exact ⟨xs, rfl, h.1⟩
-    | some e =>
-      exfalso
-      cases e with
-      | named s => simp only [hN, hRec] at h; split at h <;> simp at h
-      | fresh _ => simp [hN, hRec] at h
-      | bnd _ => simp [hN, hRec] at h
 
 theorem closed_hN_apply {t : T} {τ0 τ1 : Ty} {S : Subst} (hc : t.closed = true) (h : hN τ0 = t.ev ν)
     (ha : S.apply τ0 = some τ1) : τ1 = τ0 := by
@@ -375,6 +329,7 @@ def GOK (ν : Val) : GInfo → Scheme → Prop
   | .sch σ, σd => σ = σd
   | .mono t, σd => (∀ inst τ, genAt σd inst τ = true → t.ev ν = hN τ) ∧ t.ev ν = hN σd.body
   | .shape t, σd => (∀ inst τ, genAt σd inst τ = true → Shp ν t (hN τ)) ∧ Shp ν t (hN σd.body)
+  | .tmpl t K, σd => ∃ τ0, InstOf σd τ0 ∧ TmplOK t K τ0
 
 /-- A generator entry against a derivation's entry: both absent, related, or a `weak` entry the
     derivation does not have (the derivation then looks further, `weak` stands for anything). -/
@@ -497,6 +452,9 @@ theorem RelL.close {L : FMap Var GInfo} {VE : ValEnv} {sol : List Con} (A : List
       cases g with
       | weak => trivial
       | sch _ => trivial
+      | tmpl t K =>
+        obtain ⟨τ0, h1, h2⟩ := hx
+        exact ⟨τ0, instOf_close h1 _, h2⟩
       | shape t =>
         simp only [closeG]
         obtain ⟨_, h2⟩ := hx
@@ -516,7 +474,22 @@ theorem RelL.close {L : FMap Var GInfo} {VE : ValEnv} {sol : List Con} (A : List
         · have hb := Shp_canon (σ.bound ++ diffL (dedupL σ.tyvars) A ++
             List.filter BVar.isNumTyVar (diffL (dedupL (ValEnv.tyvars VE)) (σ.tyvars ++ A)))
             (he ▸ Shp_refl (resolveIn sol t))
-          exact ⟨fun inst τ hg => Shp_gen hb hg, hb⟩
+          have hsh : GOK ν (.shape (resolveIn sol t)) (Scheme.canon ⟨σ.bound ++ diffL (dedupL σ.tyvars) A ++
+              List.filter BVar.isNumTyVar (diffL (dedupL (ValEnv.tyvars VE)) (σ.tyvars ++ A)), σ.body⟩) :=
+            ⟨fun inst τ hg => Shp_gen hb hg, hb⟩
+          revert he hsh
+          generalize resolveIn sol t = t'
+          intro he hsh
+          split
+          · rename_i q
+            unfold mvInfo
+            split
+            · exact hsh
+            · refine ⟨σ.body, instOf_canon _ _, tmplMv_ok fun k hk => ?_⟩
+              have := hs _ (mem_clsOf hk)
+              simp only [Con.holds, T.ev] at this he
+              rw [← he]; exact this
+          · exact hsh
 
 /-! ## The simulation of a derivation's context -/
 
@@ -547,8 +520,8 @@ theorem Sim.base {f : TyName → TyName} (C0 A : Ctx) (hT : TySim f C0 A) : Sim 
       rfl
   ty := hT
 
-theorem Sim.extend {f : TyName → TyName} {Γ : GCtx} {C C' : Ctx} {L : FMap Var GInfo} {VE : ValEnv}
-    (hS : Sim ν f Γ C) (hR : RelL ν L VE)
+theorem Sim.extendV {f : TyName → TyName} {Γ : GCtx} {C C' : Ctx} {L : FMap Var GInfo} {VE : ValEnv}
+    (hval : ∀ lv σ is, C.lookupVal lv = some (σ, is) → GOK ν (Γ.look lv) σ) (hR : RelL ν L VE)
     (hv : ∀ x, C'.lookupVal ⟨none, x⟩ = (VE.find? x).or (C.lookupVal ⟨none, x⟩))
     (hq : ∀ m x, C'.lookupVal ⟨some m, x⟩ = C.lookupVal ⟨some m, x⟩)
     (ht : TySim f C' Γ.A) : Sim ν f (Γ.add L) C' where
@@ -570,7 +543,7 @@ theorem Sim.extend {f : TyName → TyName} {Γ : GCtx} {C C' : Ctx} {L : FMap Va
         cases e2 : FMap.find? VE x with
         | none =>
           rw [e2, Option.none_or] at h
-          exact hS.val _ σ is h
+          exact hval _ σ is h
         | some v => rw [e1, e2] at hx; exact hx.elim
       | some g =>
         cases e2 : FMap.find? VE x with
@@ -586,8 +559,28 @@ theorem Sim.extend {f : TyName → TyName} {Γ : GCtx} {C C' : Ctx} {L : FMap Va
           exact hx
     | some m =>
       rw [hq] at h
-      exact hS.val _ σ is h
+      exact hval _ σ is h
   ty := ht
+
+theorem Sim.extend {f : TyName → TyName} {Γ : GCtx} {C C' : Ctx} {L : FMap Var GInfo} {VE : ValEnv}
+    (hS : Sim ν f Γ C) (hR : RelL ν L VE)
+    (hv : ∀ x, C'.lookupVal ⟨none, x⟩ = (VE.find? x).or (C.lookupVal ⟨none, x⟩))
+    (hq : ∀ m x, C'.lookupVal ⟨some m, x⟩ = C.lookupVal ⟨some m, x⟩)
+    (ht : TySim f C' Γ.A) : Sim ν f (Γ.add L) C' :=
+  Sim.extendV hS.val hR hv hq ht
+
+/-- The values of the imports' context. -/
+theorem valSim_base (C0 A : Ctx) : ∀ lv σ is, C0.lookupVal lv = some (σ, is) →
+    GOK ν ((⟨[], C0, A⟩ : GCtx).look lv) σ := by
+  rintro ⟨q, x⟩ σ is h
+  cases q with
+  | none =>
+    simp only [Ctx.lookupVal, Env.lookupVal] at h
+    simp only [GCtx.look, FMap.find?, h]
+    rfl
+  | some m =>
+    simp only [GCtx.look, h]
+    rfl
 
 theorem Sim.plusVE {f : TyName → TyName} {Γ : GCtx} {C : Ctx} {L : FMap Var GInfo} {VE : ValEnv}
     (hS : Sim ν f Γ C) (hR : RelL ν L VE) : Sim ν f (Γ.add L) (C.plusVE VE) :=
@@ -601,6 +594,17 @@ theorem Sim.plusU {f : TyName → TyName} {Γ : GCtx} {C : Ctx} (hS : Sim ν f �
 theorem find?_modify_nil {K V : Type} [DecidableEq K] (f : FMap K V) (k : K) :
     FMap.find? (FMap.modify f []) k = FMap.find? f k := by
   rw [FMap.find?_modify]; rfl
+
+/-- Adding an environment with no modules, given the values of the context. -/
+theorem Sim.oplusEV {f : TyName → TyName} {Γ : GCtx} {C : Ctx} {L : FMap Var GInfo} {E : Env}
+    (hval : ∀ lv σ is, C.lookupVal lv = some (σ, is) → GOK ν (Γ.look lv) σ) (hR : RelL ν L E.VE)
+    (hQ : E.QE = []) (ht : TySim f (C.oplusE E) Γ.A) : Sim ν f (Γ.add L) (C.oplusE E) := by
+  obtain ⟨QE, TE, VE⟩ := E
+  simp only at hQ hR
+  subst hQ
+  refine Sim.extendV hval hR (fun x => ?_) (fun m x => ?_) ht
+  · simp [Ctx.oplusE, Env.plus, Ctx.lookupVal, Env.lookupVal, FMap.find?_modify]
+  · simp only [Ctx.oplusE, Env.plus, Ctx.lookupVal, Env.lookupVal, find?_modify_nil]
 
 /-- Adding an environment with no types and no modules: value lookups extended, the rest kept. -/
 theorem Sim.oplusE {f : TyName → TyName} {Γ : GCtx} {C : Ctx} {L : FMap Var GInfo} {E : Env}
@@ -817,6 +821,13 @@ theorem occT_ok {f : TyName → TyName} {Γ : GCtx} {C : Ctx} {lv : LongId} {σ 
     refine ⟨Holds.nil, sc_ok t _ _ (hok.1 inst τ hg) ?_⟩
     have h0 := child (ν := ν) 0 hr (G := fun q => rdOcc inst τ (0 :: q)) (fun q => rfl)
     exact child 0 h0 (G := fun q => subAt (hN τ) q) (fun q => rfl)
+  · rename_i t K ht
+    rw [ht] at hok
+    obtain ⟨τ0, hi, htm⟩ := hok
+    obtain ⟨S, hS, hSa⟩ := instOf_gen hi hg
+    obtain ⟨μ, he, hK⟩ := htm S τ hS hSa
+    have h0 := child (ν := ν) 0 hr (G := fun q => rdOcc inst τ (0 :: q)) (fun q => rfl)
+    exact occ_tmpl (child 0 h0 (G := fun q => subAt (hN τ) q) (fun q => rfl)) he hK
 
 /-! ## Annotations -/
 
@@ -893,10 +904,47 @@ theorem hNList_mapTys {f : TyName → TyName} (hg : ∀ t, gN (f t) = gN t) : �
   | x :: r => by simp only [RTypes.mapTys, hNList, hN_mapTy hg x, hNList_mapTys hg r]
 end
 
-/-- The annotation's type in a derivation is, normalised, the one `annT` computes in the abstract
-    context. -/
-theorem annT_ok {f : TyName → TyName} {C A : Ctx} {ty : BTy} {τ : Ty} {t : T} (hT : TySim f C A)
-    (he : elabTy C ty = some τ) (ha : annT A ty = some t) : t.ev ν = hN τ := by
+mutual
+theorem vars_mapTy (f : TyName → TyName) : ∀ τ : Ty, (RTypes.mapTy f τ).vars = τ.vars
+  | .var _ => rfl
+  | .record ρ none => by simp only [RTypes.mapTy, Ty.vars, rowVars_mapRow f ρ]
+  | .record ρ (some _) => by simp only [RTypes.mapTy, Ty.vars, rowVars_mapRow f ρ]
+  | .fn a b => by simp only [RTypes.mapTy, Ty.vars, vars_mapTy f a, vars_mapTy f b]
+  | .con as _ => by simp only [RTypes.mapTy, Ty.vars, listVars_mapTys f as]
+theorem rowVars_mapRow (f : TyName → TyName) : ∀ ρ : Row, Ty.rowVars (RTypes.mapRow f ρ) = Ty.rowVars ρ
+  | [] => rfl
+  | (_, x) :: r => by simp only [RTypes.mapRow, Ty.rowVars, vars_mapTy f x, rowVars_mapRow f r]
+theorem listVars_mapTys (f : TyName → TyName) : ∀ l : List Ty, Ty.listVars (RTypes.mapTys f l) = Ty.listVars l
+  | [] => rfl
+  | x :: r => by simp only [RTypes.mapTys, Ty.listVars, vars_mapTy f x, listVars_mapTys f r]
+end
+
+theorem labels_mapRow (f : TyName → TyName) (ρ : Row) : (RTypes.mapRow f ρ).map (·.1) = ρ.map (·.1) := by
+  rw [RTypes.mapRow_eq]; simp
+
+mutual
+theorem recSorted_mapTy (f : TyName → TyName) : ∀ τ : Ty, recSorted (RTypes.mapTy f τ) = recSorted τ
+  | .var _ => rfl
+  | .record ρ tl => by
+    simp only [RTypes.mapTy, recSorted, sortedB_labels (labels_mapRow f ρ), recSortedRow_mapRow f ρ]
+  | .fn a b => by simp only [RTypes.mapTy, recSorted, recSorted_mapTy f a, recSorted_mapTy f b]
+  | .con as _ => by simp only [RTypes.mapTy, recSorted, recSortedList_mapTys f as]
+theorem recSortedRow_mapRow (f : TyName → TyName) : ∀ ρ : Row, recSortedRow (RTypes.mapRow f ρ) = recSortedRow ρ
+  | [] => rfl
+  | (_, x) :: r => by simp only [RTypes.mapRow, recSortedRow, recSorted_mapTy f x, recSortedRow_mapRow f r]
+theorem recSortedList_mapTys (f : TyName → TyName) : ∀ l : List Ty, recSortedList (RTypes.mapTys f l) = recSortedList l
+  | [] => rfl
+  | x :: r => by simp only [RTypes.mapTys, recSortedList, recSorted_mapTy f x, recSortedList_mapTys f r]
+end
+
+theorem goodTmpl_mapTy (f : TyName → TyName) (τ : Ty) : goodTmpl (RTypes.mapTy f τ) = goodTmpl τ := by
+  simp only [goodTmpl, vars_mapTy, recSorted_mapTy]
+
+/-- The annotation's type in a derivation is, normalised, the one `annR` computes in the abstract
+    context; and it has a template when `annGood` holds. -/
+theorem annR_ok {f : TyName → TyName} {C A : Ctx} {ty : BTy} {τ : Ty} {r : Ty} (hT : TySim f C A)
+    (he : elabTy C ty = some τ) (ha : annR A ty = some r) :
+    r = hN τ ∧ (annGood A ty = true → goodTmpl τ = true) := by
   obtain ⟨U, hU, hc⟩ := RTypes.assigns_cover (fun s => BVar.ty (.named s) ∈ C.U) (fun s => BVar.row (.named s) ∈ C.U)
     (dedupL (bTyNames ty))
   have hag : Agree { C with U := U } C (bTyNames ty) := by
@@ -910,22 +958,42 @@ theorem annT_ok {f : TyName → TyName} {C A : Ctx} {ty : BTy} {τ : Ty} {t : T}
       (fun lc _ => hT.look lc) he'
   have hmem : hN τ ∈ (RTypes.annCands ty).filterMap (fun U => (elabTy { A with U := U } ty).map hN) :=
     List.mem_filterMap.mpr ⟨U, hU, by rw [helab, Option.map_some, hN_mapTy hT.g]⟩
-  unfold annT at ha
-  split at ha
-  · cases ha
-  · rename_i r rest hl
+  refine ⟨?_, fun hg => ?_⟩
+  · unfold annR at ha
     split at ha
-    · rename_i hall
-      simp only [Option.some.injEq] at ha
-      subst ha
-      rw [ev_ofTy]
-      rw [hl] at hmem
-      rcases List.mem_cons.mp hmem with e | e
-      · exact e.symm
-      · have := List.all_eq_true.mp hall _ e
-        simp only [beq_iff_eq] at this
-        exact this.symm
     · cases ha
+    · rename_i r' rest hl
+      split at ha
+      · rename_i hall
+        simp only [Option.some.injEq] at ha
+        subst ha
+        rw [hl] at hmem
+        rcases List.mem_cons.mp hmem with e | e
+        · exact e.symm
+        · have := List.all_eq_true.mp hall _ e
+          simp only [beq_iff_eq] at this
+          exact this.symm
+      · cases ha
+  · have := List.all_eq_true.mp hg U hU
+    rw [helab] at this
+    simpa [goodTmpl_mapTy] using this
+
+theorem annT_ok {f : TyName → TyName} {C A : Ctx} {ty : BTy} {τ : Ty} {t : T} (hT : TySim f C A)
+    (he : elabTy C ty = some τ) (ha : annT A ty = some t) : t.ev ν = hN τ := by
+  unfold annT at ha
+  cases hr : annR A ty with
+  | none => rw [hr] at ha; cases ha
+  | some r =>
+    rw [hr] at ha
+    simp only [Option.map_some, Option.some.injEq] at ha
+    subst ha
+    rw [ev_ofTy]
+    exact (annR_ok hT he hr).1
+
+/-- A value whose scheme is a canonical form of `τ` with a template. -/
+theorem gok_tmpl {σ : Scheme} {τ : Ty} (hi : InstOf σ τ) (hg : goodTmpl τ = true) :
+    GOK ν (tmplInfo (hN τ)) σ :=
+  ⟨τ, hi, tmplInfo_ok hg⟩
 
 /-- An annotated member whose annotation has a closed type. -/
 theorem gok_ann {t : T} {τ : Ty} (U' : List BVar) (ht : t.ev ν = hN τ) (hc : t.closed = true) :

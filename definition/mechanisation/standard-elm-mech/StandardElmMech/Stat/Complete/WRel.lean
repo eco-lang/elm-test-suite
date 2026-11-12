@@ -8,8 +8,8 @@
 
   * `SchRel s σ σ'`: the free variables of `s σ` are free in `σ'` (`FtvRel`), and every instance
     of `σ'` is an instance of `s σ` (`InstUnder`: `σ`'s body with its bound variables replaced
-    by anything, its free variables by their images under `s`) when `σ` binds only type
-    variables of class any (W fails nothing on other schemes: it returns `unsupported`);
+    by admissible types of their classes, its free variables by their images under `s`) when `σ`
+    binds only type variables (W fails nothing on other schemes: it returns `unsupported`);
   * `CtxRel P R C C'`: the same type names, `U`, interfaces and type environment, related value
     environments (`VEMatch`: the same identifiers bound, with the same status, the schemes related
     by `P`), and the free variables outside the value environment rigid.
@@ -29,17 +29,19 @@ open StandardElm.Stat
 /-- `g` on the bound variables of `σ`, `s` on the others. -/
 def ext (σ : Scheme) (g s : FSub) : FSub := fun a => if BVar.ty a ∈ σ.bound then g a else s a
 
-/-- `τ` is an instance of `s σ`. -/
-def InstUnder (s : FSub) (σ : Scheme) (τ : Ty) : Prop := ∃ g : FSub, τ = sb (ext σ g s) σ.body
+/-- `τ` is an instance of `s σ`: the bound variables replaced by admissible types of their
+    classes. -/
+def InstUnder (s : FSub) (σ : Scheme) (τ : Ty) : Prop :=
+  ∃ g : FSub, (∀ a, BVar.ty a ∈ σ.bound → Adm a.cls (g a)) ∧ τ = sb (ext σ g s) σ.body
 
-/-- The bound variables are type variables of class any (what W instantiates in F_b). -/
-def AnyBound (σ : Scheme) : Prop := ∃ as : List TyVar, σ.bound = as.map BVar.ty ∧ ∀ a ∈ as, a.cls = .any
+/-- The bound variables are type variables (what W instantiates in F_c). -/
+def TyBound (σ : Scheme) : Prop := ∃ as : List TyVar, σ.bound = as.map BVar.ty
 
 def FtvRel (s : FSub) (σ σ' : Scheme) : Prop :=
   ∀ a, BVar.ty a ∈ σ.tyvars → ∀ v ∈ (s a).tyvars, v ∈ σ'.tyvars
 
 def SchRel (s : FSub) (σ σ' : Scheme) : Prop :=
-  FtvRel s σ σ' ∧ (AnyBound σ → ∀ τ, Gen σ' τ → InstUnder s σ τ)
+  FtvRel s σ σ' ∧ (TyBound σ → ∀ τ, Gen σ' τ → InstUnder s σ τ)
 
 def OptRel (P : Scheme → Scheme → Prop) : Option (Scheme × IdStatus) → Option (Scheme × IdStatus) → Prop
   | none, none => True
@@ -151,18 +153,18 @@ theorem find?_mem {K V : Type} [DecidableEq K] : ∀ {l : FMap K V} {k : K} {v :
     · rename_i e; subst e; cases h; exact .head _
     · exact .tail _ (find?_mem h)
 
-theorem find?_mapV {K V W : Type} [DecidableEq K] (g : V → W) : ∀ (l : FMap K V) (k : K),
+theorem find?_mapVW {K V W : Type} [DecidableEq K] (g : V → W) : ∀ (l : FMap K V) (k : K),
     FMap.find? (FMap.mapV l g) k = (FMap.find? l k).map g
   | [], _ => rfl
   | (k', v) :: r, k => by
     simp only [FMap.mapV, List.map_cons, FMap.find?]
     split
     · rfl
-    · exact find?_mapV g r k
+    · exact find?_mapVW g r k
 
 theorem find?_sbVE (s : FSub) (VE : ValEnv) (x : String) :
     FMap.find? (sbVE s VE) x = (FMap.find? VE x).map fun p => (sbScheme s p.1, p.2) :=
-  find?_mapV (fun q : Scheme × IdStatus => (sbScheme s q.1, q.2)) VE x
+  find?_mapVW (fun q : Scheme × IdStatus => (sbScheme s q.1, q.2)) VE x
 
 /-! ## Related contexts -/
 
@@ -221,6 +223,12 @@ theorem lookupVal_plusVE (C : Ctx) (VE : ValEnv) (lv : LongId) :
       | some _ => C.lookupVal lv := by
   cases h : lv.qual <;> simp [Ctx.lookupVal, Env.lookupVal, Ctx.plusVE, h, FMap.find?_append]
 
+/-- A binding list of admissible types gives admissible images. -/
+theorem adm_lk {l : Bnd} (h : ∀ p ∈ l, Adm p.1.cls p.2) (a : TyVar) : Adm a.cls (lk l a) := by
+  rcases lk_cases l a with e | e
+  · rw [e]; exact admC_self a
+  · exact h _ e
+
 /-- A scheme is related to itself under a substitution fixing its free variables. -/
 theorem schRel_refl {s : FSub} {σ : Scheme}
     (hs : ∀ a, BVar.ty a ∈ σ.body.vars → BVar.ty a ∉ σ.bound → s a = .var a) : SchRel s σ σ := by
@@ -233,11 +241,11 @@ theorem schRel_refl {s : FSub} {σ : Scheme}
     rw [hs a ha'.1 ha'.2] at hv
     simp only [Ty.tyvars, Ty.vars, List.mem_filter, List.mem_singleton] at hv
     rw [hv.1]; exact ha
-  · rintro ⟨as, hb, -⟩ τ hg
+  · rintro ⟨as, hb⟩ τ hg
     have hσ : σ = ⟨as.map BVar.ty, σ.body⟩ := by cases σ; simp_all
     rw [hσ, gen_tyBound] at hg
-    obtain ⟨ts, -, -, rfl⟩ := hg
-    refine ⟨lk (as.zip ts), sb_congr _ fun a ha => ?_⟩
+    obtain ⟨ts, -, hadm, rfl⟩ := hg
+    refine ⟨lk (as.zip ts), fun a _ => adm_lk hadm a, sb_congr _ fun a ha => ?_⟩
     simp only [ext, hb, List.mem_map, BVar.ty.injEq, exists_eq_right]
     split
     · rfl

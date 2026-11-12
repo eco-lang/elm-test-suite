@@ -19,17 +19,11 @@ open StandardElm.Src (BTy BAtPat BAtExp BExp BMatch BMRule BDec BValBind)
 
 /-! ## Variables -/
 
-/-- A variable W creates when its counter is at least `n`. -/
-def _root_.StandardElm.Stat.TyVar.isNew (n : Nat) : TyVar → Bool
-  | .fresh k _ => decide (n ≤ k)
-  | _ => false
+/-! `TyVar.isNew n`: a variable W creates when its counter is at least `n` (MguC.lean). -/
 
 def _root_.StandardElm.Stat.TyVar.isBndT : TyVar → Bool
   | .bnd _ _ => true
   | _ => false
-
-theorem isNew_mono {n m : Nat} (h : n ≤ m) {a : TyVar} (ha : a.isNew n = false) : a.isNew m = false := by
-  cases a <;> simp_all [TyVar.isNew]; omega
 
 theorem rigidFrom_eq (n0 : Nat) (a : TyVar) : rigidFrom n0 a = !a.isNew n0 := by
   cases a with
@@ -44,9 +38,9 @@ theorem not_rigid_of_new {n0 n : Nat} (h0 : n0 ≤ n) {a : TyVar} (h : a.isNew n
   rw [rigidFrom_eq]
   cases a <;> simp_all [TyVar.isNew]; omega
 
-theorem isNew_fresh (n : Nat) : (TyVar.fresh n .any).isNew n = true := by simp [TyVar.isNew]
+theorem isNew_fresh (n : Nat) {c : Cls} : (TyVar.fresh n c).isNew n = true := by simp [TyVar.isNew]
 
-theorem isNew_fresh_lt {n m : Nat} (h : n < m) : (TyVar.fresh n .any).isNew m = false := by
+theorem isNew_fresh_lt {n m : Nat} {c : Cls} (h : n < m) : (TyVar.fresh n c).isNew m = false := by
   simp [TyVar.isNew]; omega
 
 /-- A type W builds: its variables are type variables, not `bnd`, below the counter. -/

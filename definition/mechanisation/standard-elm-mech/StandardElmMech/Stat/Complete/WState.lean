@@ -4,7 +4,7 @@
   milestone (b), section 8).
 
   `SInv n0 st`: the counter is at least the root's `n0`; the accumulated substitution is good
-  (Mgu.lean: idempotent, binding only flexible variables of class any) and binds only variables
+  (MguC.lean: idempotent, binding only flexible variables, to admissible types of their classes) and binds only variables
   below the counter, each to a type W builds (`OkT`).
 -/
 import StandardElmMech.Stat.Complete.WRel
@@ -22,7 +22,7 @@ def BndOk (n : Nat) (θ : Bnd) : Prop := ∀ p ∈ θ, p.1.isNew n = false ∧ O
 
 structure SInv (n0 : Nat) (st : WSt) : Prop where
   le : n0 ≤ st.n
-  good : Good (rigidFrom n0) st.θ []
+  good : GoodC (rigidFrom n0) st.n st.θ []
   okL : BndOk st.n st.θ
 
 theorem BndOk.mono {n m : Nat} (h : n ≤ m) {θ : Bnd} (hθ : BndOk n θ) : BndOk m θ := fun p hp =>
@@ -48,7 +48,7 @@ theorem ThetaOk.okT {n : Nat} {θ : Bnd} (hθ : ThetaOk n θ) {τ : Ty} (hτ : O
     · exact h2
 
 theorem SInv.fresh {n0 : Nat} {st : WSt} (h : SInv n0 st) : SInv n0 { st with n := st.n + 1 } :=
-  ⟨Nat.le_succ_of_le h.le, h.good, h.okL.mono (Nat.le_succ _)⟩
+  ⟨Nat.le_succ_of_le h.le, h.good.mono (Nat.le_succ _), h.okL.mono (Nat.le_succ _)⟩
 
 /-- A substitution that agrees with `s` on the old variables fixes the rigid ones and absorbs `θ`
     when `s` does. -/
@@ -77,11 +77,11 @@ theorem sb_agree {n : Nat} {τ : Ty} (hτ : OkT n τ) {s T : FSub} (hT : ∀ a, 
 /-! ## Instantiation (L2) -/
 
 theorem lk_zip_fresh : ∀ (as : List TyVar) (n : Nat) (a : TyVar),
-    lk (as.zip (freshFrom n as.length)) a =
-      if a ∈ as then .var (.fresh (n + as.idxOf a) .any) else .var a
+    lk (as.zip (freshFrom n as)) a =
+      if a ∈ as then .var (.fresh (n + as.idxOf a) a.cls) else .var a
   | [], _, _ => by simp [lk_nil]
   | b :: bs, n, a => by
-    simp only [List.length_cons, freshFrom, List.zip_cons_cons, lk_cons]
+    simp only [freshFrom, List.zip_cons_cons, lk_cons]
     by_cases e : b = a
     · subst e; simp
     · rw [if_neg e, lk_zip_fresh bs (n + 1) a]
@@ -92,16 +92,22 @@ theorem lk_zip_fresh : ∀ (as : List TyVar) (n : Nat) (a : TyVar),
         congr 2; omega
       · rw [if_neg hm, if_neg (by simp [hne, hm])]
 
+theorem getD_idxOf {as : List TyVar} {a x : TyVar} (hm : a ∈ as) : as.getD (as.idxOf a) x = a := by
+  rw [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem (List.idxOf_lt_length_of_mem hm), Option.getD_some,
+    List.getElem_idxOf]
+
 /-- W's instance of a scheme over type variables is most general: every instance of `s σ` is an
-    image of it, by a substitution agreeing with `s` outside W's new variables. -/
+    image of it, by a substitution agreeing with `s` outside W's new variables, and mapping each
+    of them to an admissible type of its class. -/
 theorem inst_exists {n : Nat} {σ : Scheme} {as : List TyVar} {s : FSub} {τ' : Ty}
     (hσ : SchW n σ) (hb : σ.bound = as.map BVar.ty) (hi : InstUnder s σ τ') :
     ∃ T : FSub, (∀ a, a.isNew n = false → T a = s a) ∧ (∀ a, a.isNew (n + as.length) = true → T a = s a) ∧
-      (∀ a, T a ≠ s a → a.cls = .any) ∧
-      sb T (sb (lk (as.zip (freshFrom n as.length))) σ.body) = τ' := by
-  obtain ⟨g, rfl⟩ := hi
+      (∀ a, T a ≠ s a → Adm a.cls (T a)) ∧
+      sb T (sb (lk (as.zip (freshFrom n as))) σ.body) = τ' := by
+  obtain ⟨g, hg, rfl⟩ := hi
   let T : FSub := fun a => match a with
-    | .fresh k c => if c = .any ∧ n ≤ k ∧ k < n + as.length then g (as.getD (k - n) a) else s a
+    | .fresh k c =>
+      if n ≤ k ∧ k < n + as.length ∧ c = (as.getD (k - n) a).cls then g (as.getD (k - n) a) else s a
     | a => s a
   refine ⟨T, ?_, ?_, ?_, ?_⟩
   · intro a ha
@@ -121,9 +127,17 @@ theorem inst_exists {n : Nat} {σ : Scheme} {as : List TyVar} {s : FSub} {τ' : 
   · intro a ha
     match a, ha with
     | .fresh k c, ha =>
-      simp only [T] at ha
+      simp only [T] at ha ⊢
       split at ha
-      · rename_i h; simp [TyVar.cls, h.1]
+      · rename_i h
+        rw [if_pos h]
+        obtain ⟨h1, h2, h3⟩ := h
+        have hm : as.getD (k - n) (.fresh k c) ∈ as := by
+          rw [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem (by omega), Option.getD_some]
+          exact List.getElem_mem _
+        have hb' := hg _ (by rw [hb]; exact List.mem_map_of_mem hm)
+        rw [← h3] at hb'
+        exact hb'
       · exact absurd rfl ha
     | .named _, ha => exact absurd rfl ha
     | .bnd _ _, ha => exact absurd rfl ha
@@ -133,12 +147,11 @@ theorem inst_exists {n : Nat} {σ : Scheme} {as : List TyVar} {s : FSub} {τ' : 
     simp only [comp, lk_zip_fresh, ext, hb, List.mem_map, BVar.ty.injEq, exists_eq_right]
     split
     · rename_i hm
-      simp only [sb, T]
-      rw [if_pos ⟨trivial, by omega, by have := List.idxOf_lt_length_of_mem hm; omega⟩]
-      congr 1
-      rw [Nat.add_sub_cancel_left, List.getD_eq_getElem?_getD,
-        List.getElem?_eq_getElem (List.idxOf_lt_length_of_mem hm), Option.getD_some,
-        List.getElem_idxOf]
+      have hl := List.idxOf_lt_length_of_mem hm
+      simp only [sb, T, Nat.add_sub_cancel_left, getD_idxOf hm]
+      split
+      · rfl
+      · rename_i hc; exact absurd ⟨by omega, by omega, trivial⟩ hc
     · rename_i hm
       simp only [sb]
       obtain ⟨b, e, -, hold⟩ := hσ.2 _ ha (by rw [hb]; simpa using hm)
@@ -152,7 +165,7 @@ theorem inst_exists {n : Nat} {σ : Scheme} {as : List TyVar} {s : FSub} {τ' : 
 
 /-- W's instance is a type W builds. -/
 theorem inst_okT {n : Nat} {σ : Scheme} {as : List TyVar} (hσ : SchW n σ) (hb : σ.bound = as.map BVar.ty) :
-    OkT (n + as.length) (sb (lk (as.zip (freshFrom n as.length))) σ.body) := by
+    OkT (n + as.length) (sb (lk (as.zip (freshFrom n as))) σ.body) := by
   intro v hv
   rcases vars_sb _ _ v hv with ⟨e, rfl, he⟩ | ⟨a, ha, hv'⟩
   · by_cases hm : BVar.row e ∈ σ.bound
@@ -197,7 +210,18 @@ theorem freshAbove_aux : ∀ (l : List BVar) (m : Nat),
 theorem old_of_root {C0 : Ctx} {a : TyVar} (h : BVar.ty a ∈ C0.tyvars) : a.isNew (freshAbove C0) = false := by
   cases a with
   | fresh k c =>
-    have := (freshAbove_aux C0.tyvars 0).2 k c h
+    have := (freshAbove_aux (C0.tyvars ++ veAllVars C0.E.VE) 0).2 k c (List.mem_append_left _ h)
+    simp only [TyVar.isNew, decide_eq_false_iff_not, Nat.not_le]
+    exact this
+  | _ => rfl
+
+/-- A variable of a binding of the root context, shadowed or not, is not W's. -/
+theorem old_of_root_ve {C0 : Ctx} {a : TyVar} {p : String × (Scheme × IdStatus)} (hp : p ∈ C0.E.VE)
+    (h : BVar.ty a ∈ p.2.1.body.vars) : a.isNew (freshAbove C0) = false := by
+  cases a with
+  | fresh k c =>
+    have := (freshAbove_aux (C0.tyvars ++ veAllVars C0.E.VE) 0).2 k c
+      (List.mem_append_right _ (List.mem_flatMap.mpr ⟨p, hp, h⟩))
     simp only [TyVar.isNew, decide_eq_false_iff_not, Nat.not_le]
     exact this
   | _ => rfl

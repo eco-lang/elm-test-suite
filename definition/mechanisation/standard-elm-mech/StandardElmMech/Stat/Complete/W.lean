@@ -1,28 +1,31 @@
 /-
-  A Standard Definition of Elm? Mechanisation: algorithm W for fragment F_b (Core phrases with
-  let-polymorphism and monomorphic annotations; no classes, no records), milestone (b) of plan
+  A Standard Definition of Elm? Mechanisation: algorithm W for fragment F_c (Core phrases with
+  let-polymorphism, classes, monomorphic annotations; no records), milestones (b) and (c) of plan
   step 11 (section 6).
 
-  The state is the accumulated substitution `θ` (a binding list, idempotent: Mgu.lean's `Good`)
-  and the counter of fresh variables. Every variable W creates is `fresh n .any` with `n` at least
-  the first index `n0` above the root context's fresh variables; every other variable is rigid
-  (section 1: the root context's free variables, and in F_b there are no explicit ones). A call of
-  `unify` runs Mgu.lean's loop from the current `θ` on the one equation, with the fuel given.
+  The state is the accumulated substitution `θ` (a binding list, idempotent: MguC.lean's
+  `GoodC`) and the counter of fresh variables. Every variable W creates is `fresh n c` with `n`
+  at least the first index `n0` above the root context's fresh variables (an integer constant's
+  type is a fresh variable of class num, a scheme's bound variable is instantiated with a fresh
+  one of its class, and unification refines classes with fresh variables); every other variable
+  is rigid (section 1: the root context's free variables, and the explicit variables). A call of
+  `unify` runs MguC.lean's loop from the current `θ` and counter on the one equation, with the
+  fuel given.
 
   The annotated phrase is built with the types W chose, not yet substituted; `inferExpW` applies
   the final `θ` to it and then *checks* the result with step 9's checker (and that it erases to
   the phrase). So soundness is by construction (`inferExpW_sound`): whatever W returns is a
   derivation step 9's proved checker accepts. A result W built that the checker refuses would be
-  reported as `internal`, never as a refusal; completeness (stated in WPrincipal.lean, not yet
-  proved) says it does not
-  happen.
+  reported as `internal`, never as a refusal.
 
   Outcomes: `ok`, `fail` (a genuine refusal: a unification failure, an unbound identifier, a
-  constant or constructor pattern no derivation can type), `unsupported` (outside F_b: an integer
-  constant's class, a scheme quantifying a class or row variable, a record, an annotation with
-  type variables), `outOfFuel`, `internal`.
+  constant or constructor pattern no derivation can type), `unsupported` (outside F_c: a scheme
+  quantifying a row variable, a record, an annotation with type variables; also two shapes no
+  derivation types, left `unsupported` rather than refuted: an annotation in a context with
+  ambiguous explicit variables, and a pattern binding one of whose variables names a constructor
+  of the context), `outOfFuel`, `internal`.
 -/
-import StandardElmMech.Stat.Complete.Mgu
+import StandardElmMech.Stat.Complete.MguCVars
 import StandardElmMech.SyntaxDecEq
 import StandardElmMech.Stat.CheckSound
 
@@ -147,25 +150,27 @@ def wUnsupported {α : Type} : WM α := fun _ => .unsupported
 /-- A fresh flexible variable of class any. -/
 def freshV : WM Ty := fun st => .ok (.var (.fresh st.n .any)) { st with n := st.n + 1 }
 
+/-- A fresh flexible variable of class `c`. -/
+def freshC (c : Cls) : WM Ty := fun st => .ok (.var (.fresh st.n c)) { st with n := st.n + 1 }
+
 def getθ : WM Bnd := fun st => .ok st.θ st
 
-/-- unify (τ ≐ τ'): Mgu.lean's loop from the current substitution. -/
+/-- unify (τ ≐ τ'): MguC.lean's loop from the current substitution and counter. -/
 def unifyW (fuel : Nat) (R : Rigid) (τ1 τ2 : Ty) : WM Unit := fun st =>
-  match uLoop R fuel [(sb (lk st.θ) τ1, sb (lk st.θ) τ2)] st.θ with
-  | .ok θ' => .ok () { st with θ := θ' }
+  match cLoop R fuel [(sb (lk st.θ) τ1, sb (lk st.θ) τ2)] st.θ st.n with
+  | .ok θ' n' => .ok () ⟨θ', n'⟩
   | .fail => .fail
   | .unsupported => .unsupported
   | .outOfFuel => .outOfFuel
 
-/-- Fresh variables for the bound variables of a scheme (F_b: type variables of class any). -/
+/-- Fresh variables for the bound variables of a scheme, each of the class of the bound one (a
+    bound row variable: records, milestone (d)). -/
 def instVars : List BVar → WM (List Ty)
   | [] => pure []
-  | .ty a :: rest =>
-    if a.cls = .any then do
-      let t ← freshV
-      let ts ← instVars rest
-      pure (t :: ts)
-    else wUnsupported
+  | .ty a :: rest => do
+    let t ← freshC a.cls
+    let ts ← instVars rest
+    pure (t :: ts)
   | .row _ :: _ => wUnsupported
 
 /-- The most general instance of a scheme: its instance list and type. -/
@@ -265,19 +270,29 @@ def wAtPats (C : Ctx) : List BAtPat → WM (List (Ty × AAtPat))
   | a :: as => do let r ← wAtPat C a; let rs ← wAtPats C as; pure (r :: rs)
 end
 
+/-- `x`, unqualified, names a constructor in `C`. A pattern binding none of whose variables does
+    is checked in the context its variables extend (`r:s-valbind-pat`) as in `C`; W leaves the
+    others `unsupported` (no derivation types them: a variable shadowing a constructor of the same
+    pattern makes the constructor's lookup find a variable). -/
+def conBound (C : Ctx) (x : String) : Bool :=
+  match C.lookupVal ⟨none, x⟩ with
+  | some (_, .c) => true
+  | _ => false
+
 /-! ## Groups: the entries before the members are typed -/
 
 /-- Step 1 of section 6 for a chain of variable bindings (a pattern binding is a group by itself:
     one inside a chain is left `unsupported`): an annotated member's type is its
     annotation's (monomorphic in F_b: U' = [], and closed: an annotation whose type has a variable,
-    through an alias with a free variable, is left `unsupported`), an unannotated one's a fresh
-    variable. -/
+    through an alias with a free variable, is left `unsupported`; so is an annotation in a context
+    whose explicit variables are ambiguous, which no derivation admits, `newForB`), an unannotated
+    one's a fresh variable. -/
 def groupEntries (C : Ctx) : BValBind → WM (List (Option (BTy × List BVar) × Ty))
   | .var _ ann _ rest => do
     let e ← match ann with
       | none => do let α ← freshV; pure ((none : Option (BTy × List BVar)), α)
       | some ty =>
-        if (Stat.bTyNames ty).isEmpty then
+        if (Stat.bTyNames ty).isEmpty && decide (Unambiguous C.U) then
           match elabTy (C.plusU []) ty with
           | some τ => if τ.vars.isEmpty then pure (some (ty, []), τ) else wUnsupported
           | none => wFail
@@ -303,7 +318,7 @@ mutual
 def wAtExp (C : Ctx) : BAtExp → WM (Ty × AAtExp)
   | .scon sc =>
     match sc with
-    | .int _ => wUnsupported
+    | .int _ => do let γ ← freshC .num; pure (γ, .scon sc γ)
     | .float _ _ => pure (tFloatTy, .scon sc tFloatTy)
     | .char _ => pure (tCharTy, .scon sc tCharTy)
     | .str _ => pure (tStringTy, .scon sc tStringTy)
@@ -376,9 +391,11 @@ def wDec (C : Ctx) : BDec → WM ADec
   | .val (.pat p e) => do
     let (τp, ap) ← wAtPat fuel R C p
     let VE0 := ap.ve
-    let (τe, ae) ← wExp (C.plusVE VE0) e
-    unifyW fuel R τe τp
-    pure (.val VE0 (.pat ap ae))
+    if VE0.all (fun q => !conBound C q.1) then
+      let (τe, ae) ← wExp (C.plusVE VE0) e
+      unifyW fuel R τe τp
+      pure (.val VE0 (.pat ap ae))
+    else wUnsupported
   | .val (.var x ann e rest) => do
     let es ← groupEntries C (.var x ann e rest)
     let VE0 := groupVE (.var x ann e rest) es
@@ -400,9 +417,14 @@ end
 
 /-! ## The root -/
 
-/-- The first index above every fresh variable free in the root context. -/
+/-- The variables of the bodies of a value environment's schemes, shadowed bindings included. -/
+def veAllVars (VE : ValEnv) : List BVar := VE.flatMap fun p => p.2.1.body.vars
+
+/-- The first index above every fresh variable of the root context: its free variables and the
+    variables of its shadowed bindings (so that W's substitution moves none of the context's
+    schemes, `ctxSb (lk θ) C0 = C0`). -/
 def freshAbove (C0 : Ctx) : Nat :=
-  C0.tyvars.foldl (fun m v => match v with
+  (C0.tyvars ++ veAllVars C0.E.VE).foldl (fun m v => match v with
     | .ty (.fresh k _) => max m (k + 1)
     | _ => m) 0
 

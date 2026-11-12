@@ -41,8 +41,8 @@ structure Found (n0 : Nat) (S' : FSub) (n : Nat) (st' : WSt) (T : FSub) : Prop w
   fix : FixesR (rigidFrom n0) T
   abs : Absorbs T (lk st'.θ)
   agree : ∀ a, a.isNew n = false → T a = S' a
-  /-- `T` differs from `S'` only on variables of class any (W's own). -/
-  cls : ∀ a, T a ≠ S' a → a.cls = .any
+  /-- Where `T` differs from `S'`, it maps a variable to an admissible type of its class. -/
+  cls : ∀ a, T a ≠ S' a → Adm a.cls (T a)
 
 structure Pre (n0 : Nat) (C C' : Ctx) (S' : FSub) (st : WSt) : Prop where
   inv : SInv n0 st
@@ -50,6 +50,13 @@ structure Pre (n0 : Nat) (C C' : Ctx) (S' : FSub) (st : WSt) : Prop where
   rel : CtxRel (SchRel S') (rigidFrom n0) C C'
   fix : FixesR (rigidFrom n0) S'
   abs : Absorbs S' (lk st.θ)
+  resp : RespC S'
+
+theorem Found.resp {n0 n : Nat} {S' T : FSub} {st : WSt} (h : Found n0 S' n st T) (hS : RespC S') : RespC T :=
+  fun a => by
+    by_cases e : T a = S' a
+    · rw [e]; exact hS a
+    · exact h.cls a e
 
 theorem Found.refl {n0 : Nat} {C C' : Ctx} {S' : FSub} {st : WSt} (hp : Pre n0 C C' S' st) :
     Found n0 S' st.n st S' := ⟨hp.fix, hp.abs, fun _ _ => rfl, fun _ h => absurd rfl h⟩
@@ -58,7 +65,7 @@ theorem Found.trans {n0 n n1 : Nat} {S' T1 T2 : FSub} {st1 st2 : WSt} (h1 : Foun
     (h2 : Found n0 T1 n1 st2 T2) (hn : n ≤ n1) : Found n0 S' n st2 T2 :=
   ⟨h2.fix, h2.abs, fun a ha => (h2.agree a (isNew_mono hn ha)).trans (h1.agree a ha), fun a ha => by
     by_cases e : T2 a = T1 a
-    · rw [e] at ha; exact h1.cls a ha
+    · rw [e] at ha ⊢; exact h1.cls a ha
     · exact h2.cls a e⟩
 
 theorem Found.sb_eq {n0 n : Nat} {S' T : FSub} {st : WSt} (h : Found n0 S' n st T) {τ : Ty} (hτ : OkT n τ) :
@@ -77,8 +84,8 @@ theorem schRel_congr {n : Nat} {σ σ' : Scheme} {S T : FSub} (hσ : SchW n σ)
         decide_eq_false_iff_not] at ha
       exact ⟨ha.1.1, ha.2⟩
     rw [free a ha'.1 ha'.2] at hv; exact h.1 a ha v hv
-  · obtain ⟨g, hg'⟩ := h.2 hab τ hg
-    refine ⟨g, hg'.trans (sb_congr _ fun a ha => ?_)⟩
+  · obtain ⟨g, hga, hg'⟩ := h.2 hab τ hg
+    refine ⟨g, hga, hg'.trans (sb_congr _ fun a ha => ?_)⟩
     simp only [ext]
     split
     · rfl
@@ -90,7 +97,7 @@ theorem CtxRel.congr {n n0 : Nat} {C C' : Ctx} {S T : FSub} (h : CtxRel (SchRel 
 
 theorem Pre.next {n0 : Nat} {C C' : Ctx} {S' T : FSub} {st st' : WSt} (hp : Pre n0 C C' S' st)
     (hi : SInv n0 st') (hn : st.n ≤ st'.n) (hF : Found n0 S' st.n st' T) : Pre n0 C C' T st' :=
-  ⟨hi, hp.ctxW.mono hn, hp.rel.congr hp.ctxW hF.agree, hF.fix, hF.abs⟩
+  ⟨hi, hp.ctxW.mono hn, hp.rel.congr hp.ctxW hF.agree, hF.fix, hF.abs, hF.resp hp.resp⟩
 
 /-- `S'` with the fresh variable `n` mapped to `τ'`. -/
 def ext1 (S' : FSub) (n : Nat) (τ' : Ty) : FSub := fun c => if c = .fresh n .any then τ' else S' c
@@ -103,8 +110,28 @@ theorem found_ext1 {n0 : Nat} {C C' : Ctx} {S' : FSub} {st : WSt} (hp : Pre n0 C
   refine ⟨h1, h2, hag, fun a ha => ?_⟩
   simp only [ext1] at ha
   split at ha
-  · rename_i e; subst e; rfl
+  · rename_i e; subst e; exact Adm.any _
   · exact absurd rfl ha
+
+/-- `S'` with the fresh variable `n` of class `c` mapped to `τ'`. -/
+def ext1C (S' : FSub) (n : Nat) (c : Cls) (τ' : Ty) : FSub := fun d => if d = .fresh n c then τ' else S' d
+
+theorem found_ext1C {n0 : Nat} {C C' : Ctx} {S' : FSub} {st : WSt} (hp : Pre n0 C C' S' st) {c : Cls} {τ' : Ty}
+    (hadm : Adm c τ') : Found n0 S' st.n { st with n := st.n + 1 } (ext1C S' st.n c τ') := by
+  have hag : ∀ a, a.isNew st.n = false → ext1C S' st.n c τ' a = S' a := fun a ha => by
+    simp only [ext1C]; rw [if_neg]; rintro rfl; simp [TyVar.isNew] at ha
+  obtain ⟨h1, h2⟩ := agree_ok hp.inv.le hp.inv.ok hp.fix hp.abs hag
+  refine ⟨h1, h2, hag, fun a ha => ?_⟩
+  simp only [ext1C] at ha ⊢
+  split at ha
+  · rename_i e; subst e; rw [if_pos rfl]; exact hadm
+  · exact absurd rfl ha
+
+theorem ext1C_self (S' : FSub) (n : Nat) (c : Cls) (τ' : Ty) : ext1C S' n c τ' (.fresh n c) = τ' := by
+  simp [ext1C]
+
+theorem okT_freshC {st : WSt} {c : Cls} : OkT (st.n + 1) (.var (.fresh st.n c)) :=
+  OkT_var rfl (isNew_fresh_lt (by omega))
 
 theorem ext1_self (S' : FSub) (n : Nat) (τ' : Ty) : ext1 S' n τ' (.fresh n .any) = τ' := by simp [ext1]
 
@@ -112,8 +139,8 @@ theorem okT_fresh {st : WSt} : OkT (st.n + 1) (.var (.fresh st.n .any)) := OkT_v
 
 /-! ## Constants and constructors in patterns -/
 
-theorem genAt_mono {τ0 τ : Ty} (h : genAt (mono τ0) [] τ = true) : τ = τ0 := by
-  simp only [genAt, mono, bindSubst, apply_id, Bool.and_eq_true, decide_eq_true_eq, Option.some.injEq] at h
+theorem genAt_monoW {τ0 τ : Ty} (h : genAt (mono τ0) [] τ = true) : τ = τ0 := by
+  simp only [genAt, mono, bindSubst, apply_idF, Bool.and_eq_true, decide_eq_true_eq, Option.some.injEq] at h
   exact h.2.symm
 
 theorem scon_pat_ty {sc : StandardElm.Src.SLit} {τ : Ty} (h1 : genAt (typeOf sc) (litInst sc τ) τ = true)
@@ -126,9 +153,9 @@ theorem scon_pat_ty {sc : StandardElm.Src.SLit} {τ : Ty} (h1 : genAt (typeOf sc
     · rfl
     · exact absurd h1 (by simp only [typeOf, litInst]; decide)
     · exact absurd h1 (by simp only [typeOf, litInst]; decide)
-  | char c => exact genAt_mono h1
-  | str s => exact genAt_mono h1
-  | float m e => exact genAt_mono h1
+  | char c => exact genAt_monoW h1
+  | str s => exact genAt_monoW h1
+  | float m e => exact genAt_monoW h1
 
 theorem sb_con {s : FSub} {τ : Ty} {as : List Ty} {t : TyName} (h : sb s τ = .con as t) :
     (∃ us, τ = .con us t) ∨ ∃ a, τ = .var a := by
@@ -213,20 +240,33 @@ theorem sbAtPats_map (s : FSub) : ∀ l : List AAtPat, sbAtPats s l = l.map (sbA
   | [] => rfl
   | a :: l => by simp [sbAtPats, sbAtPats_map s l]
 
-/-- `unifyArgs`: if `T` unifies the two lists, it does not fail, and `T` absorbs the result. -/
+/-- The conclusion of a `unify` step for the main induction. -/
+theorem Found.ofUnify {n0 n : Nat} {T T' : FSub} {st' : WSt} (fx : FixesR (rigidFrom n0) T')
+    (ab : Absorbs T' (lk st'.θ)) (ag : ∀ a, a.isNew n = false → T' a = T a) (r : RespC T') :
+    Found n0 T n st' T' := ⟨fx, ab, ag, fun a _ => r a⟩
+
+/-- `unifyArgs`: if `T` unifies the two lists, it does not fail, and a `T'` agreeing with `T` on
+    the old variables absorbs the result. -/
 theorem outP_unifyArgs {fuel n0 : Nat} : ∀ (l1 l2 : List Ty) (st : WSt) (T : FSub), SInv n0 st →
-    (∀ x ∈ l1, OkT st.n x) → (∀ x ∈ l2, OkT st.n x) → FixesR (rigidFrom n0) T → Absorbs T (lk st.θ) →
+    (∀ x ∈ l1, OkT st.n x) → (∀ x ∈ l2, OkT st.n x) → FixesR (rigidFrom n0) T → RespC T → Absorbs T (lk st.θ) →
     sbList T l1 = sbList T l2 →
-    OutP (fun _ st' => st'.n = st.n ∧ SInv n0 st' ∧ Absorbs T (lk st'.θ)) (unifyArgs fuel (rigidFrom n0) l1 l2 st)
-  | [], [], st, T, hi, _, _, _, ha, _ => ⟨rfl, hi, ha⟩
-  | t :: l1, u :: l2, st, T, hi, h1, h2, hT, ha, he => by
+    OutP (fun _ st' => st.n ≤ st'.n ∧ SInv n0 st' ∧ ∃ T', Found n0 T st.n st' T' ∧ RespC T')
+      (unifyArgs fuel (rigidFrom n0) l1 l2 st)
+  | [], [], st, T, hi, _, _, hT, hr, ha, _ => ⟨Nat.le_refl _, hi, T, ⟨hT, ha, fun _ _ => rfl, fun _ h => absurd rfl h⟩, hr⟩
+  | t :: l1, u :: l2, st, T, hi, h1, h2, hT, hr, ha, he => by
     simp only [sbList, List.cons.injEq] at he
     simp only [unifyArgs]
-    refine outP_unifyW hi (h1 t (.head _)) (h2 u (.head _)) hT ha he.1 fun st' hn hi' ha' => ?_
-    refine outP_mono (outP_unifyArgs l1 l2 st' T hi' (fun x hx => hn ▸ h1 x (.tail _ hx))
-      (fun x hx => hn ▸ h2 x (.tail _ hx)) hT ha' he.2) fun _ st'' ⟨e, hi'', ha''⟩ => ⟨e.trans hn, hi'', ha''⟩
-  | [], _ :: _, _, _, _, _, _, _, _, he => by simp [sbList] at he
-  | _ :: _, [], _, _, _, _, _, _, _, he => by simp [sbList] at he
+    refine outP_unifyW hi (h1 t (.head _)) (h2 u (.head _)) hT hr ha he.1 fun st' T' hn hi' ag fx r ha' => ?_
+    have hF : Found n0 T st.n st' T' := Found.ofUnify fx ha' ag r
+    have e2 : sbList T' l1 = sbList T' l2 := by
+      rw [sbList_eq, sbList_eq, List.map_congr_left (fun x hx => hF.sb_eq (h1 x (.tail _ hx))),
+        List.map_congr_left (fun x hx => hF.sb_eq (h2 x (.tail _ hx))), ← sbList_eq, ← sbList_eq]
+      exact he.2
+    refine outP_mono (outP_unifyArgs l1 l2 st' T' hi' (fun x hx => (h1 x (.tail _ hx)).mono hn)
+      (fun x hx => (h2 x (.tail _ hx)).mono hn) fx r ha' e2) fun _ st'' ⟨e, hi'', T'', hF'', r''⟩ =>
+        ⟨Nat.le_trans hn e, hi'', T'', hF.trans hF'' hn, r''⟩
+  | [], _ :: _, _, _, _, _, _, _, _, _, he => by simp [sbList] at he
+  | _ :: _, [], _, _, _, _, _, _, _, _, he => by simp [sbList] at he
 
 /-! ## Patterns -/
 
@@ -429,12 +469,14 @@ theorem wPat_complete (fuel n0 : Nat) : ∀ (p : BPat) (C C' C'' : Ctx) (S' : FS
             simp only [bind]
             refine outP_bind (outP_unifyArgs (fuel := fuel) _ _ st1 T1 hi1 (fun x hx => by
                 obtain ⟨q, hq, rfl⟩ := List.mem_map.mp hx; exact (hps1 q hq).1)
-              (fun x hx => (hokτs x hx).mono hn1) hF1.fix hF1.abs htys) ?_
-            rintro _ st2 ⟨hn2, hi2, hab2⟩
-            refine outP_pure ⟨by omega, hi2, by rw [hn2]; exact hokr.mono hn1, rfl,
-              OkA.cons (by rw [hn2]; exact hokr.mono hn1) (by rw [hn2]; exact hokA1), T1,
-              (hF0.trans hF1 hle0).trans ⟨hF1.fix, hab2, fun _ _ => rfl, fun _ h => absurd rfl h⟩ (by omega), ?_⟩
-            simp only [sbPat, stripPat, hs1, sb]
+              (fun x hx => (hokτs x hx).mono hn1) hF1.fix ((hF0.trans hF1 hle0).resp hp.resp) hF1.abs htys) ?_
+            rintro _ st2 ⟨hn2, hi2, T2, hF2, -⟩
+            refine outP_pure ⟨by omega, hi2, (hokr.mono hn1).mono hn2, rfl,
+              OkA.cons ((hokr.mono hn1).mono hn2) (hokA1.mono hn2), T2,
+              (hF0.trans hF1 hle0).trans hF2 (by omega), ?_⟩
+            simp only [sbPat, stripPat]
+            rw [sbAtPats_congr _ (hF2.agreeOn hokA1), hF2.sb_eq (hokr.mono hn1)]
+            simp only [hs1, sb]
             congr 1
             rw [hus]
             exact congrArg (Ty.con · _) (by
@@ -467,13 +509,16 @@ theorem wPat_complete (fuel n0 : Nat) : ∀ (p : BPat) (C C' C'' : Ctx) (S' : FS
         rw [hF2.sb_eq hok1, ← hty1, ← sbPat_ty, ← stripPat_ty, hs1, stripPat_ty]
       have e2 : sb T2 τ2 = q2.ty := by rw [← hty2, ← sbPat_ty, ← stripPat_ty, hs2, stripPat_ty]
       simp only
-      refine outP_unifyW hi2 hok2 (OkT_list (hok1.mono hn2)) hF2.fix hF2.abs
-        (by rw [e2, listTy_sb, e1, hc3]) fun st3 hn3 hi3 hab3 => ?_
-      refine outP_pure ⟨by omega, hi3, by rw [hn3]; exact OkT_list (hok1.mono hn2), by simp [APat.ty, hty1], ?_,
-        T2, (hF1.trans hF2 hn1).trans ⟨hF2.fix, hab3, fun _ _ => rfl, fun _ h => absurd rfl h⟩ (by omega), ?_⟩
-      · simp only [tysPat]; rw [hn3]; exact (hokA1.mono hn2).app hokA2
+      have hF12 := hF1.trans hF2 hn1
+      refine outP_unifyW hi2 hok2 (OkT_list (hok1.mono hn2)) hF2.fix (hF12.resp hp.resp) hF2.abs
+        (by rw [e2, listTy_sb, e1, hc3]) fun st3 T3 hn3 hi3 ag3 fx3 r3 hab3 => ?_
+      have hF3 : Found n0 T2 st2.n st3 T3 := Found.ofUnify fx3 hab3 ag3 r3
+      refine outP_pure ⟨by omega, hi3, OkT_list ((hok1.mono hn2).mono hn3), by simp [APat.ty, hty1], ?_,
+        T3, hF12.trans hF3 (by omega), ?_⟩
+      · simp only [tysPat]; exact ((hokA1.mono hn2).app hokA2).mono hn3
       · simp only [sbPat, stripPat] at hs1 hs2 ⊢
-        rw [hs2, sbPat_congr a1 (hF2.agreeOn hokA1), hs1]
+        rw [sbPat_congr a2 (hF3.agreeOn hokA2), sbPat_congr a1 (hF3.agreeOn (hokA1.mono hn2)), hs2,
+          sbPat_congr a1 (hF2.agreeOn hokA1), hs1]
     | _ => simp [APat.erase] at he
   | .as p x, C, C', C'', S', st, p', hp, hl, hc, he, hnb => by
     cases p' with

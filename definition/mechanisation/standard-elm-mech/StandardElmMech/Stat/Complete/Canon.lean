@@ -301,4 +301,99 @@ theorem applyList_sb (S : Subst) (f : FSub) : ∀ (l l' : List Ty), (∀ v ∈ T
         · exact g3 x hx
 end
 
+/-! ## Class respect through step 9's substitutions (K11) -/
+
+/-- The image of a variable under a class-respecting substitution is admissible for its class. -/
+theorem admC_apply_var {S : Subst} (hS : S.Respects) {b : TyVar} {t : Ty} (h : S.apply (.var b) = some t) :
+    Adm b.cls t := by
+  simp only [Subst.apply, Option.some.injEq] at h
+  cases hf : FMap.find? S.ty b with
+  | none => rw [hf] at h; subst h; exact admC_self b
+  | some u => rw [hf] at h; subst h; exact hS _ (find?_some_mem' hf)
+where
+  find?_some_mem' {θ : FMap TyVar Ty} {a : TyVar} {τ : Ty} (h : FMap.find? θ a = some τ) : (a, τ) ∈ θ := by
+    induction θ with
+    | nil => cases h
+    | cons p r ih =>
+      obtain ⟨b, u⟩ := p
+      simp only [FMap.find?] at h
+      split at h
+      · rename_i hb; cases h; subst hb; exact .head _
+      · exact .tail _ (ih h)
+
+theorem apply_con_inv {S : Subst} {as : List Ty} {t : TyName} {τ' : Ty} (h : S.apply (.con as t) = some τ') :
+    ∃ as', S.applyList as = some as' ∧ τ' = .con as' t := by
+  simp only [Subst.apply] at h
+  split at h
+  · rename_i as' h'; cases h; exact ⟨as', h', rfl⟩
+  · cases h
+
+theorem applyList_cons_inv {S : Subst} {x : Ty} {xs l : List Ty} (h : S.applyList (x :: xs) = some l) :
+    ∃ y ys, S.apply x = some y ∧ S.applyList xs = some ys ∧ l = y :: ys := by
+  simp only [Subst.applyList] at h
+  split at h
+  · rename_i y ys h1 h2; cases h; exact ⟨y, ys, h1, h2, rfl⟩
+  · cases h
+
+theorem applyList_nil_inv {S : Subst} {l : List Ty} (h : S.applyList [] = some l) : l = [] := by
+  simp only [Subst.applyList, Option.some.injEq] at h; exact h.symm
+
+/-- K11 for step 9's substitutions: admissibility is stable under a class-respecting one. -/
+theorem admC_apply {S : Subst} (hS : S.Respects) {k : Cls} {τ τ' : Ty} (h : Adm k τ)
+    (ha : S.apply τ = some τ') : Adm k τ' := by
+  induction h generalizing τ' with
+  | any => exact .any _
+  | num_int | num_float | comp_int | comp_float | comp_char | comp_string | app_string | capp_string =>
+    obtain ⟨as', h1, rfl⟩ := apply_con_inv ha
+    rw [applyList_nil_inv h1]; constructor
+  | num_var a h => have := admC_apply_var hS ha; rw [h] at this; exact this
+  | comp_var a h => exact adm_mono h (admC_apply_var hS ha)
+  | app_var a h => exact adm_mono h (admC_apply_var hS ha)
+  | capp_var a h => have := admC_apply_var hS ha; rw [h] at this; exact this
+  | comp_list τ _ ih =>
+    obtain ⟨as', h1, rfl⟩ := apply_con_inv ha
+    obtain ⟨y, ys, hy, hys, rfl⟩ := applyList_cons_inv h1
+    rw [applyList_nil_inv hys]; exact .comp_list _ (ih hy)
+  | app_list τ =>
+    obtain ⟨as', h1, rfl⟩ := apply_con_inv ha
+    obtain ⟨y, ys, hy, hys, rfl⟩ := applyList_cons_inv h1
+    rw [applyList_nil_inv hys]; exact .app_list _
+  | capp_list τ _ ih =>
+    obtain ⟨as', h1, rfl⟩ := apply_con_inv ha
+    obtain ⟨y, ys, hy, hys, rfl⟩ := applyList_cons_inv h1
+    rw [applyList_nil_inv hys]; exact .capp_list _ (ih hy)
+  | comp_tuple2 τ1 τ2 _ _ ih1 ih2 =>
+    obtain ⟨as', h1, rfl⟩ := apply_con_inv ha
+    obtain ⟨y1, ys, hy1, hys, rfl⟩ := applyList_cons_inv h1
+    obtain ⟨y2, ys', hy2, hys', rfl⟩ := applyList_cons_inv hys
+    rw [applyList_nil_inv hys']; exact .comp_tuple2 _ _ (ih1 hy1) (ih2 hy2)
+  | comp_tuple3 τ1 τ2 τ3 _ _ _ ih1 ih2 ih3 =>
+    obtain ⟨as', h1, rfl⟩ := apply_con_inv ha
+    obtain ⟨y1, ys, hy1, hys, rfl⟩ := applyList_cons_inv h1
+    obtain ⟨y2, ys', hy2, hys', rfl⟩ := applyList_cons_inv hys
+    obtain ⟨y3, ys'', hy3, hys'', rfl⟩ := applyList_cons_inv hys'
+    rw [applyList_nil_inv hys'']; exact .comp_tuple3 _ _ _ (ih1 hy1) (ih2 hy2) (ih3 hy3)
+
+/-- The values of a class-respecting substitution composed after a class-respecting `f`. -/
+theorem admC_post {S : Subst} (hS : S.Respects) {f : FSub} {a : TyVar} (h : Adm a.cls (f a)) :
+    Adm a.cls (post S f a) := by
+  unfold post
+  cases e : S.apply (f a) with
+  | none => exact h
+  | some u => exact admC_apply hS h e
+
+/-- step 9's renumbering respects classes. -/
+theorem renumber_respectsC : ∀ (i : Nat) (vs : List BVar), (renumber true i vs).1.Respects
+  | _, [] => fun _ h => nomatch h
+  | i, .ty a :: vs => by
+    intro p hp
+    simp only [renumber, List.mem_cons] at hp
+    rcases hp with rfl | hp
+    · exact admC_self (.bnd i a.cls)
+    · exact renumber_respectsC (i + 1) vs p hp
+  | i, .row e :: vs => by
+    intro p hp
+    simp only [renumber] at hp
+    exact renumber_respectsC (i + 1) vs p hp
+
 end StandardElm.Stat.Complete

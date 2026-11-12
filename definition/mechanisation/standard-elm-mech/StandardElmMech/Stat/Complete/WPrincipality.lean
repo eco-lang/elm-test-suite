@@ -316,7 +316,7 @@ theorem applyVar_mkP {T : FSub} {L : List TyVar} {v : BVar} (h : ∀ a, v = .ty 
     variables of the root context. -/
 theorem instanceNodes_of_F2 {T : FSub} {U0 A0 : List BVar} {ns ns' : List Node}
     (hF : F2 (NRel T U0) ns ns') (hpd : PD ns)
-    (hcls : ∀ a, T a ≠ .var a → a.cls = .any) (hA0 : ∀ a, BVar.ty a ∈ A0 → T a = .var a)
+    (hcls : RespC T) (hA0 : ∀ a, BVar.ty a ∈ A0 → T a = .var a)
     (hU0 : ∀ a, BVar.ty a ∈ U0 → T a = .var a) : InstanceNodes A0 ns' ns := by
   let L : List TyVar := (ns.flatMap fun n => n.tys ++ n.schemes.map (·.body)).flatMap tvs
   have hagree : ∀ n ∈ ns, ∀ τ, (τ ∈ n.tys ∨ τ ∈ n.schemes.map (·.body)) → sb (lk (mkP T L)) τ = sb T τ := by
@@ -330,7 +330,7 @@ theorem instanceNodes_of_F2 {T : FSub} {U0 A0 : List BVar} {ns ns' : List Node}
       exact absurd (List.mem_flatMap.mpr ⟨τ, List.mem_flatMap.mpr ⟨n, hn, List.mem_append.mpr hτ⟩, mem_tvs.mpr ha⟩) hm
   refine ⟨ofBnd (mkP T L), fun p hp => ?_, fun v hv hvA => ?_, fun τ _ => ?_, fun n hn n' hn' hp => ?_⟩
   · obtain ⟨h1, h2⟩ := mem_mkP hp
-    rw [h2, hcls _ h1]; exact .any _
+    rw [h2]; exact hcls _
   · simp only [Subst.dom, ofBnd, List.map_nil, List.append_nil, List.mem_map] at hv
     obtain ⟨p, hp, rfl⟩ := hv
     exact (mem_mkP hp).1 (hA0 _ hvA)
@@ -365,7 +365,7 @@ theorem wPrincipality : WPrincipality := by
       rw [hok] at hw
       obtain ⟨-, hinv, -, hokA, T, hF, -, hs⟩ := hw
       have hTa : sbExp T (sbExp (lk st.θ) ar) = sbExp T ar := by rw [sbExp_sb, comp_of_absorbs hF.abs]
-      have hcls : ∀ x, T x ≠ .var x → x.cls = .any := fun x hx => hF.cls x hx
+      have hcls : RespC T := hF.resp respC_id
       have hrel : CtxRel (FtvRel T) (rigidFrom (freshAbove C0)) C0 C0 :=
         (root_rel hF.fix).mono fun _ _ _ _ _ h => h.1
       have hok' : OkA st.n (tysExp true (sbExp (lk st.θ) ar)) := by

@@ -17,8 +17,13 @@
   proved in WTheorems.lean (`wRefutation`), with the first half of completeness
   (`inferExpW_ne_fail`) and L12 (`inferExpW_instance`: every derivation is the image of W's result
   by a substitution fixing the root context's variables, instance lists left out); the node-wise
-  packaging of principality is WNodeRel*.lean (in progress). The root context must be well formed
-  in the sense of `RootOK`, and the derivations considered have no free `bnd` variable.
+  packaging of principality is WNodes.lean, WNodeRel*.lean and WNodeClos.lean, and
+  `WPrincipality` is proved in WPrincipality.lean (`wPrincipality`). Termination (L13) is
+  WTerm.lean, which reduces `WCompleteness` to the checker's acceptance of W's result
+  (`wCompleteness_of_checks`); that acceptance (L10, `wResultChecks`) and `WCompleteness`
+  (`wCompleteness`) are proved in WSound.lean, on WSoundBase/Post/Clos/Pat/Aux/Exp.lean. The root
+  context must be well formed in the sense of `RootOK`, and the derivations considered have no
+  free `bnd` variable.
 
   *Proved here:* `gen_tyBound` (σ ≻ τ for a scheme whose bound variables are type variables, as a
   substitution of them: the form every later lemma uses), `instantiate_ok` (W's instance is the
@@ -182,52 +187,43 @@ theorem gen_tyBound {vs : List TyVar} {body τ : Ty} :
 
 /-! ## W's instantiation (L2) -/
 
-/-- `n`, `n + 1`, ...: the fresh variables W gives `k` bound variables. -/
-def freshFrom (n : Nat) : Nat → List Ty
-  | 0 => []
-  | k + 1 => .var (.fresh n .any) :: freshFrom (n + 1) k
+/-- `n`, `n + 1`, ...: the fresh variables W gives the bound variables `as`, each of its class. -/
+def freshFrom (n : Nat) : List TyVar → List Ty
+  | [] => []
+  | a :: as => .var (.fresh n a.cls) :: freshFrom (n + 1) as
 
 theorem instVars_ok : ∀ (vs : List BVar) (st : WSt) (ts : List Ty) (st' : WSt),
     instVars vs st = .ok ts st' →
-    (∃ as : List TyVar, vs = as.map BVar.ty ∧ ∀ a ∈ as, a.cls = .any) ∧
-    ts = freshFrom st.n vs.length ∧ st'.θ = st.θ ∧ st'.n = st.n + vs.length
+    ∃ as : List TyVar, vs = as.map BVar.ty ∧ ts = freshFrom st.n as ∧ st'.θ = st.θ ∧
+      st'.n = st.n + as.length
   | [], st, ts, st', h => by
     simp only [instVars, pure] at h; cases h
-    exact ⟨⟨[], rfl, fun _ h => by cases h⟩, rfl, rfl, rfl⟩
+    exact ⟨[], rfl, rfl, rfl, rfl⟩
   | .ty a :: rest, st, ts, st', h => by
-    simp only [instVars] at h
-    split at h
-    · rename_i hc
-      simp only [bind, WM.bind, freshV] at h
-      cases hr : instVars rest { st with n := st.n + 1 } with
-      | ok ts' st'' =>
-        rw [hr] at h
-        simp only [pure, WOut.ok.injEq] at h
-        obtain ⟨rfl, rfl⟩ := h
-        obtain ⟨⟨as, has, hcl⟩, hts, hθ, hn⟩ := instVars_ok rest _ ts' st'' hr
-        refine ⟨⟨a :: as, by simp [has], ?_⟩, ?_, hθ, ?_⟩
-        · intro b hb
-          rcases List.mem_cons.mp hb with rfl | hb
-          · exact hc
-          · exact hcl b hb
-        · simp only [List.length_cons, freshFrom, hts]
-        · simp only [hn, List.length_cons]; omega
-      | fail => rw [hr] at h; cases h
-      | unsupported => rw [hr] at h; cases h
-      | outOfFuel => rw [hr] at h; cases h
-    · cases h
+    simp only [instVars, bind, WM.bind, freshC] at h
+    cases hr : instVars rest { st with n := st.n + 1 } with
+    | ok ts' st'' =>
+      rw [hr] at h
+      simp only [pure, WOut.ok.injEq] at h
+      obtain ⟨rfl, rfl⟩ := h
+      obtain ⟨as, has, hts, hθ, hn⟩ := instVars_ok rest _ ts' st'' hr
+      refine ⟨a :: as, by simp [has], by simp only [freshFrom, hts], hθ, ?_⟩
+      simp only [hn, List.length_cons]; omega
+    | fail => rw [hr] at h; cases h
+    | unsupported => rw [hr] at h; cases h
+    | outOfFuel => rw [hr] at h; cases h
   | .row _ :: _, _, _, _, h => by simp [instVars, wUnsupported] at h
 
-theorem freshFrom_length : ∀ (n k : Nat), (freshFrom n k).length = k
-  | _, 0 => rfl
-  | n, k + 1 => by simp [freshFrom, freshFrom_length (n + 1) k]
+theorem freshFrom_length : ∀ (n : Nat) (as : List TyVar), (freshFrom n as).length = as.length
+  | _, [] => rfl
+  | n, _ :: as => by simp [freshFrom, freshFrom_length (n + 1) as]
 
-/-- What W's instantiation returns: fresh variables for the bound ones, the body under them, the
-    substitution unchanged, the counter past them. -/
+/-- What W's instantiation returns: fresh variables of their classes for the bound ones, the body
+    under them, the substitution unchanged, the counter past them. -/
 theorem instantiate_ok {σ : Scheme} {st st' : WSt} {ts : List Ty} {τ : Ty}
     (h : instantiate σ st = .ok (ts, τ) st') :
-    ∃ as : List TyVar, σ.bound = as.map BVar.ty ∧ (∀ a ∈ as, a.cls = .any) ∧
-      ts = freshFrom st.n as.length ∧ τ = sb (lk (as.zip ts)) σ.body ∧ st'.θ = st.θ ∧
+    ∃ as : List TyVar, σ.bound = as.map BVar.ty ∧
+      ts = freshFrom st.n as ∧ τ = sb (lk (as.zip ts)) σ.body ∧ st'.θ = st.θ ∧
       st'.n = st.n + as.length := by
   unfold instantiate at h
   simp only [bind, WM.bind] at h
@@ -235,16 +231,16 @@ theorem instantiate_ok {σ : Scheme} {st st' : WSt} {ts : List Ty} {τ : Ty}
   | ok ts0 st0 =>
     rw [hv] at h
     dsimp only at h
-    obtain ⟨⟨as, has, hcl⟩, hts, hθ, hn⟩ := instVars_ok _ _ _ _ hv
+    obtain ⟨as, has, hts, hθ, hn⟩ := instVars_ok _ _ _ _ hv
     rw [has] at h
-    have hl : as.length = ts0.length := by rw [hts, freshFrom_length, has, List.length_map]
+    have hl : as.length = ts0.length := by rw [hts, freshFrom_length]
     rw [bindSubst_of_length hl] at h
     dsimp only at h
     rw [apply_ofBnd] at h
     dsimp only at h
     simp only [pure, WOut.ok.injEq, Prod.mk.injEq] at h
     obtain ⟨⟨rfl, rfl⟩, rfl⟩ := h
-    refine ⟨as, has, hcl, by rw [hts, has]; simp, rfl, hθ, by rw [hn, has]; simp⟩
+    exact ⟨as, has, hts, rfl, hθ, hn⟩
   | fail => rw [hv] at h; cases h
   | unsupported => rw [hv] at h; cases h
   | outOfFuel => rw [hv] at h; cases h
@@ -255,7 +251,7 @@ theorem instance_of_fresh {as : List TyVar} {body : Ty} {n : Nat} {ts' : List Ty
     (hnd : as.Nodup) (hl : as.length = ts'.length)
     (hfree : ∀ a, BVar.ty a ∈ body.vars → a ∉ as → ∀ k c, a = .fresh k c → k < n) :
     ∃ g : FSub, (∀ a, (∀ k c, a = .fresh k c → k < n ∨ n + as.length ≤ k) → g a = .var a) ∧
-      sb (lk (as.zip ts')) body = sb g (sb (lk (as.zip (freshFrom n as.length))) body) := by
+      sb (lk (as.zip ts')) body = sb g (sb (lk (as.zip (freshFrom n as))) body) := by
   -- g maps the i-th fresh variable to the i-th type of ts'
   let g : FSub := fun a => match a with
     | .fresh k _ => if n ≤ k ∧ k < n + as.length then (ts'.getD (k - n) (.var a)) else .var a
@@ -278,9 +274,9 @@ theorem instance_of_fresh {as : List TyVar} {body : Ty} {n : Nat} {ts' : List Ty
     · -- the i-th bound variable
       obtain ⟨i, hi, rfl⟩ := List.getElem_of_mem hm
       have e1 : lk (as.zip ts') as[i] = ts'[i]'(by rw [← hl]; exact hi) := lk_zip_nodup hnd hl i hi
-      have e2 : lk (as.zip (freshFrom n as.length)) as[i] = .var (.fresh (n + i) .any) := by
-        rw [lk_zip_nodup hnd (freshFrom_length n as.length).symm i hi]
-        exact freshFrom_get n as.length i (by rw [freshFrom_length]; exact hi)
+      have e2 : lk (as.zip (freshFrom n as)) as[i] = .var (.fresh (n + i) as[i].cls) := by
+        rw [lk_zip_nodup hnd (freshFrom_length n as).symm i hi]
+        exact freshFrom_get n as i (by rw [freshFrom_length]; exact hi)
       rw [e1, e2]
       simp only [sb, g]
       rw [if_pos (by omega)]
@@ -323,68 +319,79 @@ where
           simp only [List.getElem_cons_succ]
           rw [if_neg hne]
           exact ih hnd'.2 (by simpa using hl) i (by simpa using hi)
-  freshFrom_get : ∀ (n k i : Nat) (hi : i < (freshFrom n k).length),
-      (freshFrom n k)[i] = .var (.fresh (n + i) .any)
-    | _, 0, _, hi => by simp [freshFrom] at hi
-    | n, k + 1, 0, _ => by simp [freshFrom]
-    | n, k + 1, i + 1, hi => by
+  freshFrom_get : ∀ (n : Nat) (as : List TyVar) (i : Nat) (hi : i < (freshFrom n as).length),
+      (freshFrom n as)[i] = .var (.fresh (n + i) (as[i]'(by rw [freshFrom_length] at hi; exact hi)).cls)
+    | _, [], _, hi => by simp [freshFrom] at hi
+    | n, a :: as, 0, _ => by simp [freshFrom]
+    | n, a :: as, i + 1, hi => by
       simp only [freshFrom, List.getElem_cons_succ]
-      rw [freshFrom_get (n + 1) k i (by simpa [freshFrom] using hi)]
+      rw [freshFrom_get (n + 1) as i (by simpa [freshFrom] using hi)]
       congr 2; omega
 
 /-! ## W's unification step in the state (L9 inside W) -/
 
-/-- An equation of types substituted by an idempotent `θ` is stable under `θ`. -/
-theorem good_sb {R : Rigid} {θ : Bnd} (g : Good R θ []) (τ1 τ2 : Ty) :
-    Good R θ [(sb (lk θ) τ1, sb (lk θ) τ2)] := by
-  refine ⟨g.keys, g.idem, ?_⟩
-  intro e he c hc
-  simp only [List.mem_singleton] at he; subst he
-  rcases hc with hc | hc
-  · obtain ⟨d, _, hd⟩ := tyvar_sb hc; exact g.idem d c hd
-  · obtain ⟨d, _, hd⟩ := tyvar_sb hc; exact g.idem d c hd
+/-- An equation of types substituted by `θ` is stable under `θ`, and its variables are old. -/
+theorem good_sb {R : Rigid} {n : Nat} {θ : Bnd} (g : GoodC R n θ []) {τ1 τ2 : Ty}
+    (h1 : ∀ b, BVar.ty b ∈ τ1.vars → b.isNew n = false) (h2 : ∀ b, BVar.ty b ∈ τ2.vars → b.isNew n = false) :
+    GoodC R n θ [(sb (lk θ) τ1, sb (lk θ) τ2)] := by
+  refine ⟨g.keys, g.adm, g.idem, ?_, ?_, g.oldθ⟩
+  · intro e he c hc
+    simp only [List.mem_singleton] at he; subst he
+    rcases hc with hc | hc
+    · obtain ⟨d, _, hd⟩ := tyvar_sb hc; exact g.idem d c hd
+    · obtain ⟨d, _, hd⟩ := tyvar_sb hc; exact g.idem d c hd
+  · intro e he c hc
+    simp only [List.mem_singleton] at he; subst he
+    rcases hc with hc | hc
+    · obtain ⟨d, hd1, hd⟩ := tyvar_sb hc; exact g.lk_old (h1 d hd1) c hd
+    · obtain ⟨d, hd1, hd⟩ := tyvar_sb hc; exact g.lk_old (h2 d hd1) c hd
 
 /-- A unifier that absorbs `θ` unifies the substituted equation iff it unifies the original. -/
 theorem absorbs_sb {s : FSub} {θ : Bnd} (h : Absorbs s (lk θ)) (τ : Ty) : sb s (sb (lk θ) τ) = sb s τ := by
   rw [sb_sb]; congr 1; funext a; exact h a
 
-/-- `unify` in W's state: the new substitution is good, the counter unchanged, and a substitution
-    absorbs it exactly when it absorbs the old one and unifies the two types (section 6). -/
+/-- `unify` in W's state: the new substitution is good, the counter does not decrease; a
+    substitution absorbing the new substitution unifies the two types and absorbs the old one;
+    and a class-respecting one fixing the rigid variables that unifies them and absorbs the old
+    substitution agrees on the old variables with one absorbing the new (section 6). -/
 theorem unifyW_ok {fuel : Nat} {R : Rigid} {τ1 τ2 : Ty} {st st' : WSt} {u : Unit}
-    (g : Good R st.θ []) (h : unifyW fuel R τ1 τ2 st = .ok u st') :
-    Good R st'.θ [] ∧ st'.n = st.n ∧
-      ∀ s, FixesR R s → (sb s τ1 = sb s τ2 ∧ Absorbs s (lk st.θ) ↔ Absorbs s (lk st'.θ)) := by
+    (hN : NewFlex R st.n) (g : GoodC R st.n st.θ [])
+    (h1 : ∀ b, BVar.ty b ∈ τ1.vars → b.isNew st.n = false) (h2 : ∀ b, BVar.ty b ∈ τ2.vars → b.isNew st.n = false)
+    (h : unifyW fuel R τ1 τ2 st = .ok u st') :
+    GoodC R st'.n st'.θ [] ∧ st.n ≤ st'.n ∧
+      (∀ s, Absorbs s (lk st'.θ) → sb s τ1 = sb s τ2 ∧ Absorbs s (lk st.θ)) ∧
+      (∀ s, FixesR R s → RespC s → sb s τ1 = sb s τ2 → Absorbs s (lk st.θ) →
+        ∃ s', (∀ a, a.isNew st.n = false → s' a = s a) ∧ RespC s' ∧ Absorbs s' (lk st'.θ)) := by
   unfold unifyW at h
   split at h
-  · rename_i θ' hu
+  · rename_i θ' n' hu
     simp only [WOut.ok.injEq] at h; obtain ⟨_, rfl⟩ := h
-    obtain ⟨g', c⟩ := uLoop_ok fuel _ _ _ (good_sb g τ1 τ2) hu
-    refine ⟨g', rfl, fun s hs => ?_⟩
-    rw [← (c s hs).trans ⟨fun h => h.2, fun h => ⟨unifies_nil s, h⟩⟩]
-    constructor
-    · rintro ⟨he, ha⟩
-      refine ⟨?_, ha⟩
-      rw [unifies_cons]; exact ⟨by rw [absorbs_sb ha, absorbs_sb ha]; exact he, unifies_nil s⟩
-    · rintro ⟨hu, ha⟩
-      have := (unifies_cons.mp hu).1
-      rw [absorbs_sb ha, absorbs_sb ha] at this
-      exact ⟨this, ha⟩
+    obtain ⟨g', hn, c⟩ := cLoop_ok fuel _ _ _ _ _ hN (good_sb g h1 h2) hu
+    refine ⟨g', hn, fun s hs => ?_, fun s hs hr he ha => ?_⟩
+    · obtain ⟨hu', ha'⟩ := c.1 s (unifies_nil s) hs
+      have := (unifies_cons.mp hu').1
+      rw [absorbs_sb ha', absorbs_sb ha'] at this
+      exact ⟨this, ha'⟩
+    · obtain ⟨s', ag, r', _, ab⟩ := c.2 s hs hr
+        (unifies_cons.mpr ⟨by rw [absorbs_sb ha, absorbs_sb ha]; exact he, unifies_nil s⟩) ha
+      exact ⟨s', ag, r', ab⟩
   · cases h
   · cases h
   · cases h
 
-/-- A failing `unify` in W's state: no substitution fixing the rigid variables and absorbing the
-    current one unifies the two types (K1 to K3, K7 through the state). -/
+/-- A failing `unify` in W's state: no class-respecting substitution fixing the rigid variables
+    and absorbing the current one unifies the two types (K1 to K7 through the state). -/
 theorem unifyW_fail {fuel : Nat} {R : Rigid} {τ1 τ2 : Ty} {st : WSt}
-    (g : Good R st.θ []) (h : unifyW fuel R τ1 τ2 st = .fail) :
-    ∀ s, FixesR R s → Absorbs s (lk st.θ) → sb s τ1 ≠ sb s τ2 := by
+    (hN : NewFlex R st.n) (g : GoodC R st.n st.θ [])
+    (h1 : ∀ b, BVar.ty b ∈ τ1.vars → b.isNew st.n = false) (h2 : ∀ b, BVar.ty b ∈ τ2.vars → b.isNew st.n = false)
+    (h : unifyW fuel R τ1 τ2 st = .fail) :
+    ∀ s, FixesR R s → RespC s → Absorbs s (lk st.θ) → sb s τ1 ≠ sb s τ2 := by
   unfold unifyW at h
   split at h
   · cases h
   · rename_i hu
-    intro s hs ha he
-    apply uLoop_fail fuel _ _ (good_sb g τ1 τ2) hu s hs
-    refine ⟨?_, ha⟩
+    intro s hs hr ha he
+    apply cLoop_fail fuel _ _ _ hN (good_sb g h1 h2) hu s hs hr _ ha
     rw [unifies_cons]; exact ⟨by rw [absorbs_sb ha, absorbs_sb ha]; exact he, unifies_nil s⟩
   · cases h
   · cases h

@@ -63,6 +63,15 @@ def VBOptPost (n0 : Nat) (st : WSt) (S' : FSub) (vb' : Option AValBind) (r : Opt
 
 /-! ## Helpers -/
 
+/-- An instance of an integer constant's scheme is a number type. -/
+theorem adm_int_gen {k : Nat} {τ : Ty} (h : Gen (typeOf (.int k)) τ) : Adm .num τ := by
+  have := (gen_tyBound (vs := [.bnd 0 .num]) (body := .var (.bnd 0 .num)) (τ := τ)).mp h
+  obtain ⟨ts, hl, hadm, rfl⟩ := this
+  match ts, hl with
+  | [t], _ =>
+    have := hadm (.bnd 0 .num, t) (by simp)
+    simpa [sb, lk_cons, TyVar.cls] using this
+
 theorem pent_schW {n : Nat} {l : List Ty} (hl : OkA n l) {q : String × (Scheme × IdStatus)} (h : PEnt l q) :
     SchW n q.2.1 := by
   have : q.2.1 = mono q.2.1.body := by obtain ⟨_, σ, _⟩ := q; cases σ; simp_all [PEnt, mono]
@@ -101,7 +110,8 @@ theorem pre_pat {n0 : Nat} {C C' : Ctx} {S' T : FSub} {st st1 : WSt} {VE : ValEn
     (hVE : ∀ q ∈ VE, PEnt l q) (hl : OkA st1.n l) :
     Pre n0 (C.plusVE VE) (C'.plusVE (sbVE T VE)) T st1 :=
   ⟨hi1, (hp.ctxW.mono hn).plusVE fun q hq => pent_schW hl (hVE q hq),
-    (hp.rel.congr hp.ctxW hF.agree).plusVE (VEMatch_mono fun q hq => (hVE q hq).1), hF.fix, hF.abs⟩
+    (hp.rel.congr hp.ctxW hF.agree).plusVE (VEMatch_mono fun q hq => (hVE q hq).1), hF.fix, hF.abs,
+    hF.resp hp.resp⟩
 
 theorem esRel_mem {S : FSub} : ∀ (es : List (Option (BTy × List BVar) × Ty)) (vb' : AValBind),
     EsRel S es vb' → ∀ e ∈ es, sb S e.2 ∈ tysValBind false vb'
@@ -143,10 +153,16 @@ theorem wAtExp_complete (fuel n0 : Nat) : ∀ (a : BAtExp) (C C' : Ctx) (S' : FS
         outP_pure ⟨Nat.le_refl _, hp.inv, okT_closed hv, OkA.cons (okT_closed hv) OkA.nil, S', Found.refl hp,
           by simp [sb_closed hv, e, AAtExp.ty], by simp [sbAtExp, stripAtExp, sb_closed hv, e]⟩
       cases sc' with
-      | int k => simp only [wAtExp]; trivial
-      | float m e => simp only [wAtExp]; exact hpost _ rfl (genAt_mono hc)
-      | char c => simp only [wAtExp]; exact hpost _ rfl (genAt_mono hc)
-      | str s => simp only [wAtExp]; exact hpost _ rfl (genAt_mono hc)
+      | int k =>
+        simp only [wAtExp]
+        have hnum : Adm .num τ' := adm_int_gen (gen_of_genAt hc)
+        refine outP_freshC (outP_pure ⟨Nat.le_succ _, hp.inv.fresh, okT_freshC, OkA.cons okT_freshC OkA.nil,
+          ext1C S' st.n .num τ', found_ext1C hp hnum, ?_, ?_⟩)
+        · simp [sb, ext1C_self, AAtExp.ty]
+        · simp [sbAtExp, stripAtExp, sb, ext1C_self]
+      | float m e => simp only [wAtExp]; exact hpost _ rfl (genAt_monoW hc)
+      | char c => simp only [wAtExp]; exact hpost _ rfl (genAt_monoW hc)
+      | str s => simp only [wAtExp]; exact hpost _ rfl (genAt_monoW hc)
     | _ => simp [AAtExp.erase] at he
   | .var lv, C, C', S', st, a', hp, hc, he, _ => by
     cases a' with
@@ -306,16 +322,22 @@ theorem wExp_complete (fuel n0 : Nat) : ∀ (e : BExp) (C C' : Ctx) (S' : FSub) 
       dsimp only at *
       refine outP_freshV ?_
       have hF3 := found_ext1 hp2 r
+      have hF123 := (hF1.trans hF2 hn1).trans hF3 (by omega)
       refine outP_unifyW hi2.fresh ((hok1.mono hn2).mono (Nat.le_succ _))
-        (OkT_fn (hok2.mono (Nat.le_succ _)) okT_fresh) hF3.fix hF3.abs ?_ fun st4 hn4 hi4 hab4 => ?_
+        (OkT_fn (hok2.mono (Nat.le_succ _)) okT_fresh) hF3.fix (hF123.resp hp.resp) hF3.abs ?_
+        fun st4 T4 hn4 hi4 ag4 fx4 r4 hab4 => ?_
       · rw [hF3.sb_eq (hok1.mono hn2), hF2.sb_eq hok1, hty1, hr]
         simp only [sb, ext1_self, hF3.sb_eq hok2, hty2]
-      · refine outP_pure ⟨by simp only [hn4]; omega, hi4, by rw [hn4]; exact okT_fresh,
-          by rw [hn4]; exact ((hokA1.mono hn2).app hokA2).mono (Nat.le_succ _), ext1 T2 st2.n r,
-          (hF1.trans hF2 hn1).trans ⟨hF3.fix, hab4, hF3.agree, hF3.cls⟩ (by omega), ?_, ?_⟩
-        · simp [sb, ext1_self, AExp.ty, hr, Ty.cod]
+      · dsimp only at hn4 ag4
+        have hF4 : Found n0 (ext1 T2 st2.n r) (st2.n + 1) st4 T4 := Found.ofUnify fx4 hab4 ag4 r4
+        refine outP_pure ⟨by omega, hi4, okT_fresh.mono hn4,
+          (((hokA1.mono hn2).app hokA2).mono (Nat.le_succ _)).mono hn4, T4,
+          hF123.trans hF4 (by omega), ?_, ?_⟩
+        · rw [hF4.sb_eq okT_fresh]; simp [sb, ext1_self, AExp.ty, hr, Ty.cod]
         · simp only [sbExp, stripExp] at hs1 hs2 ⊢
-          rw [sbAtExp_congr aa (hF3.agreeOn hokA2), hs2, sbExp_congr ae (hF3.agreeOn (hokA1.mono hn2)),
+          rw [sbAtExp_congr aa (hF4.agreeOn (hokA2.mono (Nat.le_succ _))),
+            sbExp_congr ae (hF4.agreeOn ((hokA1.mono hn2).mono (Nat.le_succ _))),
+            sbAtExp_congr aa (hF3.agreeOn hokA2), hs2, sbExp_congr ae (hF3.agreeOn (hokA1.mono hn2)),
             sbExp_congr ae (hF2.agreeOn hokA1), hs1]
     | _ => simp [AExp.erase] at he
   | .lam p e, C, C', S', st, a', hp, hc, he, hnb => by
@@ -358,16 +380,22 @@ theorem wExp_complete (fuel n0 : Nat) : ∀ (e : BExp) (C C' : Ctx) (S' : FSub) 
       dsimp only at *
       refine outP_freshV ?_
       have hF3 := found_ext1 hp2 r
+      have hF123 := (hF1.trans hF2 hn1).trans hF3 (by omega)
       refine outP_unifyW hi2.fresh (hok2.mono (Nat.le_succ _))
-        (OkT_fn ((hok1.mono hn2).mono (Nat.le_succ _)) okT_fresh) hF3.fix hF3.abs ?_ fun st4 hn4 hi4 hab4 => ?_
+        (OkT_fn ((hok1.mono hn2).mono (Nat.le_succ _)) okT_fresh) hF3.fix (hF123.resp hp.resp) hF3.abs ?_
+        fun st4 T4 hn4 hi4 ag4 fx4 r4 hab4 => ?_
       · rw [hF3.sb_eq hok2, hty2, hr]
         simp only [sb, ext1_self, hF3.sb_eq (hok1.mono hn2), hF2.sb_eq hok1, hty1]
-      · refine outP_pure ⟨by simp only [hn4]; omega, hi4, by rw [hn4]; exact okT_fresh,
-          by rw [hn4]; exact ((hokA1.mono hn2).app hokA2).mono (Nat.le_succ _), ext1 T2 st2.n r,
-          (hF1.trans hF2 hn1).trans ⟨hF3.fix, hab4, hF3.agree, hF3.cls⟩ (by omega), ?_, ?_⟩
-        · simp [sb, ext1_self, AExp.ty, hr, Ty.cod]
+      · dsimp only at hn4 ag4
+        have hF4 : Found n0 (ext1 T2 st2.n r) (st2.n + 1) st4 T4 := Found.ofUnify fx4 hab4 ag4 r4
+        refine outP_pure ⟨by omega, hi4, okT_fresh.mono hn4,
+          (((hokA1.mono hn2).app hokA2).mono (Nat.le_succ _)).mono hn4, T4,
+          hF123.trans hF4 (by omega), ?_, ?_⟩
+        · rw [hF4.sb_eq okT_fresh]; simp [sb, ext1_self, AExp.ty, hr, Ty.cod]
         · simp only [sbExp, stripExp] at hs1 hs2 ⊢
-          rw [sbMatch_congr am (hF3.agreeOn hokA2), hs2, sbExp_congr ae (hF3.agreeOn (hokA1.mono hn2)),
+          rw [sbMatch_congr am (hF4.agreeOn (hokA2.mono (Nat.le_succ _))),
+            sbExp_congr ae (hF4.agreeOn ((hokA1.mono hn2).mono (Nat.le_succ _))),
+            sbMatch_congr am (hF3.agreeOn hokA2), hs2, sbExp_congr ae (hF3.agreeOn (hokA1.mono hn2)),
             sbExp_congr ae (hF2.agreeOn hokA1), hs1]
     | _ => simp [AExp.erase] at he
 theorem wExpOpt_complete (fuel n0 : Nat) : ∀ (e : Option BExp) (C C' : Ctx) (S' : FSub) (st : WSt)
@@ -429,10 +457,11 @@ theorem wMatchOpt_complete (fuel n0 : Nat) : ∀ (m : Option BMatch) (C C' : Ctx
       refine outP_bind (wMatch_complete fuel n0 _ C C' S' st m'' hp hc1 rfl hnb) ?_
       rintro ⟨τm, am⟩ st1 ⟨hn1, hi1, hok1, hokA1, T1, hF1, hty1, hs1⟩
       dsimp only at *
-      refine outP_unifyW hi1 hok1 (hok.mono hn1) hF1.fix hF1.abs (by rw [hty1, hF1.sb_eq hok, hτ, hc2])
-        fun st2 hn2 hi2 hab2 => ?_
-      exact outP_pure ⟨by omega, hi2, by rw [hn2]; exact hokA1, T1, hF1.trans ⟨hF1.fix, hab2, fun _ _ => rfl, fun _ h => absurd rfl h⟩ hn1,
-        by simp only [sbMatchOpt, stripMatchOpt, hs1]⟩
+      refine outP_unifyW hi1 hok1 (hok.mono hn1) hF1.fix (hF1.resp hp.resp) hF1.abs
+        (by rw [hty1, hF1.sb_eq hok, hτ, hc2]) fun st2 T2 hn2 hi2 ag2 fx2 r2 hab2 => ?_
+      have hF2 : Found n0 T1 st1.n st2 T2 := Found.ofUnify fx2 hab2 ag2 r2
+      exact outP_pure ⟨by omega, hi2, hokA1.mono hn2, T2, hF1.trans hF2 hn1,
+        by simp only [sbMatchOpt, stripMatchOpt]; rw [sbMatch_congr am (hF2.agreeOn hokA1), hs1]⟩
     | none => simp [AMatch.eraseOpt] at he
 theorem wMRule_complete (fuel n0 : Nat) : ∀ (mr : BMRule) (C C' : Ctx) (S' : FSub) (st : WSt) (mr' : AMRule),
     Pre n0 C C' S' st → checkMRule C' mr' = true → mr'.erase = mr → NB (tysMRule false mr') →
@@ -479,35 +508,42 @@ theorem wDec_complete (fuel n0 : Nat) : ∀ (d : BDec) (C C' : Ctx) (S' : FSub) 
           (lkC_plusVE fun q hq => (atpat_ve p' q hq).2.1) hc1 rfl hnb1) ?_
         rintro ⟨τp, ap⟩ st1 ⟨hn1, hi1, hok1, hty1, hokA1, T1, hF1, hs1⟩
         dsimp only at *
+        by_cases hsh : (ap.ve.all fun q => !conBound C q.1) = true
+        rotate_left
+        · rw [if_neg hsh]; exact outP_unsupported
+        rw [if_pos hsh]
         have hve := pat_ve_eq hs1
         have hpre := pre_pat hp hn1 hi1 hF1 (atpat_ve ap) hokA1
         rw [← hve] at hpre
         refine outP_bind (wExp_complete fuel n0 _ _ _ T1 st1 e' hpre hc2 rfl hnb2) ?_
         rintro ⟨τe, ae⟩ st2 ⟨hn2, hi2, hok2, hokA2, T2, hF2, hty2, hs2⟩
         dsimp only at *
-        refine outP_unifyW hi2 hok2 (hok1.mono hn2) hF2.fix hF2.abs
-          (by rw [hty2, hc3, hF2.sb_eq hok1, ← hty1, atpat_ty_eq hs1]) fun st3 hn3 hi3 hab3 => ?_
+        have hF12 := hF1.trans hF2 hn1
+        refine outP_unifyW hi2 hok2 (hok1.mono hn2) hF2.fix (hF12.resp hp.resp) hF2.abs
+          (by rw [hty2, hc3, hF2.sb_eq hok1, ← hty1, atpat_ty_eq hs1]) fun st3 T3 hn3 hi3 ag3 fx3 r3 hab3 => ?_
+        have hF3 : Found n0 T2 st2.n st3 T3 := Found.ofUnify fx3 hab3 ag3 r3
         have hokVE : OkA st1.n (veBodies ap.ve) := fun τ hτ => by
           simp only [veBodies, List.mem_map] at hτ
           obtain ⟨q, hq, rfl⟩ := hτ
           exact okT_pent hokA1 (atpat_ve ap q hq)
-        refine outP_pure ⟨by omega, hi3, ?_, ?_, T2, (hF1.trans hF2 hn1).trans ⟨hF2.fix, hab3, fun _ _ => rfl, fun _ h => absurd rfl h⟩
-          (by omega), ?_, ?_⟩
+        refine outP_pure ⟨by omega, hi3, ?_, ?_, T3, hF12.trans hF3 (by omega), ?_, ?_⟩
         · simp only [tysDec, ↓reduceIte, tysValBind]
-          rw [hn3]
-          exact (hokVE.mono hn2).app ((hokA1.mono hn2).app hokA2)
+          exact ((hokVE.mono hn2).app ((hokA1.mono hn2).app hokA2)).mono hn3
         · intro q hq
           simp only [ADec.env] at hq
-          exact ⟨(atpat_ve ap q hq).1, by rw [hn3]; exact (okT_pent hokA1 (atpat_ve ap q hq)).mono hn2⟩
+          exact ⟨(atpat_ve ap q hq).1, ((okT_pent hokA1 (atpat_ve ap q hq)).mono hn2).mono hn3⟩
         · simp only [sbDec, stripDec, sbValBind, stripValBind] at hs2 ⊢
-          rw [sbVE_congr (hF2.agreeOn hokVE), sbAtPat_congr ap (hF2.agreeOn hokA1), hs1, hs2, hve]
+          rw [sbVE_congr (hF3.agreeOn (hokVE.mono hn2)), sbAtPat_congr ap (hF3.agreeOn (hokA1.mono hn2)),
+            sbExp_congr ae (hF3.agreeOn hokA2),
+            sbVE_congr (hF2.agreeOn hokVE), sbAtPat_congr ap (hF2.agreeOn hokA1), hs1, hs2, hve]
         · intro q hq
           simp only [ADec.env] at hq
           have hq' : (q.1, (sbScheme T1 q.2.1, q.2.2)) ∈ p'.ve := by
             rw [hve]; simp only [sbVE, List.mem_map]; exact ⟨q, hq, rfl⟩
           have := nb_of_pent hnb1 (atpat_ve p' _ hq')
           simp only [sbScheme] at this
-          rw [hF2.sb_eq (okT_pent hokA1 (atpat_ve ap q hq))]; exact this
+          rw [hF3.sb_eq ((okT_pent hokA1 (atpat_ve ap q hq)).mono hn2), hF2.sb_eq (okT_pent hokA1 (atpat_ve ap q hq))]
+          exact this
       | var => simp [ADec.erase, AValBind.erase] at he
   | .val (.var x ann e rest), C, C', S', st, d', hp, hc, he, hnb => by
     cases d' with
@@ -533,7 +569,8 @@ theorem wDec_complete (fuel n0 : Nat) : ∀ (d : BDec) (C C' : Ctx) (S' : FSub) 
       have hpre : Pre n0 (C.plusVE (groupVE (.var x ann e rest) es)) (C'.plusVE VE') S1 st1 := by
         rw [hVE']
         refine ⟨hi1, (hp.ctxW.mono hn1).plusVE fun q hq => ?_,
-          (hp.rel.congr hp.ctxW hF1.agree).plusVE (VEMatch_mono fun q hq => (hmono q hq).1), hF1.fix, hF1.abs⟩
+          (hp.rel.congr hp.ctxW hF1.agree).plusVE (VEMatch_mono fun q hq => (hmono q hq).1), hF1.fix, hF1.abs,
+          hF1.resp hp.resp⟩
         have : q.2.1 = mono q.2.1.body := by
           have hb := (hmono q hq).1
           revert hb; obtain ⟨_, ⟨b, body⟩, _⟩ := q; intro hb; simp only at hb; subst hb; rfl
@@ -580,23 +617,24 @@ theorem wMembers_complete (fuel n0 : Nat) : ∀ (vb : BValBind) (Cg Cg' : Ctx) (
       refine outP_bind (wExp_complete fuel n0 _ Cg Cg' S' st e' hp hc2 rfl hnb1) ?_
       rintro ⟨τe, ae⟩ st1 ⟨hn1, hi1, hok1, hokA1, T1, hF1, hty1, hs1⟩
       dsimp only at *
-      refine outP_unifyW hi1 hok1 (hokx.mono hn1) hF1.fix hF1.abs (by rw [hty1, hc3, hF1.sb_eq hokx, hτx])
-        fun st2 hn2 hi2 hab2 => ?_
-      have hF1' : Found n0 S' st.n st2 T1 := hF1.trans ⟨hF1.fix, hab2, fun _ _ => rfl, fun _ h => absurd rfl h⟩ hn1
-      have hp2 : Pre n0 Cg Cg' T1 st2 := hp.next hi2 (by omega) hF1'
-      have hrest' : EsRelOpt T1 es rest' := by
+      refine outP_unifyW hi1 hok1 (hokx.mono hn1) hF1.fix (hF1.resp hp.resp) hF1.abs
+        (by rw [hty1, hc3, hF1.sb_eq hokx, hτx]) fun st2 T2 hn2 hi2 ag2 fx2 r2 hab2 => ?_
+      have hF2 : Found n0 T1 st1.n st2 T2 := Found.ofUnify fx2 hab2 ag2 r2
+      have hF1' : Found n0 S' st.n st2 T2 := hF1.trans hF2 hn1
+      have hp2 : Pre n0 Cg Cg' T2 st2 := hp.next hi2 (by omega) hF1'
+      have hrest' : EsRelOpt T2 es rest' := by
         cases rest' with
         | none => exact hrest
-        | some vb => exact EsRel.congr hF1.agree es vb (fun e he => (hes e (.tail _ he)).1) hrest
-      refine outP_bind (wMembersOpt_complete fuel n0 _ Cg Cg' T1 st2 es rest' hp2 hc4 rfl hnb2 hrest'
+        | some vb => exact EsRel.congr hF1'.agree es vb (fun e he => (hes e (.tail _ he)).1) hrest
+      refine outP_bind (wMembersOpt_complete fuel n0 _ Cg Cg' T2 st2 es rest' hp2 hc4 rfl hnb2 hrest'
         (fun e he => ⟨((hes e (.tail _ he)).1.mono hn1).mono (by omega), (hes e (.tail _ he)).2⟩)) ?_
       rintro ar st3 ⟨hn3, hi3, hokA3, T3, hF3, hs3⟩
       refine outP_pure ⟨by omega, hi3, ?_, T3, hF1'.trans hF3 (by omega), ?_⟩
       · simp only [tysValBind, List.cons_append, annMark, hann, ↓reduceIte, List.nil_append]
         exact OkA.cons ((hokx.mono hn1).mono (by omega)) (((hokA1.mono (by omega))).app hokA3)
       · simp only [sbValBind, stripValBind] at hs3 ⊢
-        rw [hs3, sbExp_congr ae (hF3.agreeOn (hokA1.mono (by omega))), hs1, hF3.sb_eq ((hokx.mono hn1).mono (by omega)),
-          hF1.sb_eq hokx, hτx]
+        rw [hs3, sbExp_congr ae (hF3.agreeOn (hokA1.mono (by omega))), sbExp_congr ae (hF2.agreeOn hokA1), hs1,
+          hF3.sb_eq ((hokx.mono hn1).mono (by omega)), hF2.sb_eq (hokx.mono hn1), hF1.sb_eq hokx, hτx]
     | pat _ _ => simp [AValBind.erase] at he
 theorem wMembersOpt_complete (fuel n0 : Nat) : ∀ (vb : Option BValBind) (Cg Cg' : Ctx) (S' : FSub) (st : WSt)
     (es : List (Option (BTy × List BVar) × Ty)) (vb' : Option AValBind),

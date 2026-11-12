@@ -209,8 +209,8 @@ theorem nb_of_noFreeBnd {C0 : Ctx} {a : AExp} (h : NoFreeBndExp C0 a) : NB (tysE
 
 theorem root_pre (C0 : Ctx) (hC : RootOK C0) :
     Pre (freshAbove C0) C0 C0 idS ⟨[], freshAbove C0⟩ :=
-  ⟨⟨Nat.le_refl _, good_nil _ _, fun _ h => by cases h⟩, root_ctxW hC, root_rel (fun _ _ => rfl),
-    fun _ _ => rfl, absorbs_id idS⟩
+  ⟨⟨Nat.le_refl _, goodC_nil _ (fun _ h => nomatch h), fun _ h => by cases h⟩, root_ctxW hC,
+    root_rel (fun _ _ => rfl), fun _ _ => rfl, absorbs_id idS, respC_id⟩
 
 /-- The main induction at the root: W does not fail when a derivation exists, and every
     derivation is an image of W's result. -/

@@ -265,6 +265,8 @@
   {"refuse": "refuse_elm_TypeMismatchNumberLeftOfAndTest"},
   "elm/TypeMismatchNumberIntoNotWithPipeLeftTest":
   {"refuse": "refuse_elm_TypeMismatchNumberIntoNotWithPipeLeftTest"},
+  "elm/TypeMismatchNumberAndCompappendListEntriesTest":
+  {"refuse": "refuse_elm_TypeMismatchNumberAndCompappendListEntriesTest"},
   "elm/TypeMismatchNumberAndAppendableListEntriesTest":
   {"refuse": "refuse_elm_TypeMismatchNumberAndAppendableListEntriesTest"},
   "elm/TypeMismatchNegateTest": {"refuse": "refuse_elm_TypeMismatchNegateTest"},
@@ -276,6 +278,8 @@
   {"refuse": "refuse_elm_TypeMismatchMaybeOfANumberAgainstARigidVarTest"},
   "elm/TypeMismatchMaybeConsedOntoAListOfStringsTest":
   {"refuse": "refuse_elm_TypeMismatchMaybeConsedOntoAListOfStringsTest"},
+  "elm/TypeMismatchLocalTypeNamedLikeAnImportedOneTest":
+  {"refuse": "refuse_elm_TypeMismatchLocalTypeNamedLikeAnImportedOneTest"},
   "elm/TypeMismatchListsAddedTest":
   {"refuse": "refuse_elm_TypeMismatchListsAddedTest"},
   "elm/TypeMismatchListRightOfTimesTest":
@@ -314,6 +318,8 @@
   {"refuse": "refuse_elm_TypeMismatchIntRightOfAppendTest"},
   "elm/TypeMismatchIntAgainstNumberAfterAMismatchTest":
   {"refuse": "refuse_elm_TypeMismatchIntAgainstNumberAfterAMismatchTest"},
+  "elm/TypeMismatchImportedTypeNamedLikeAnAliasTest":
+  {"refuse": "refuse_elm_TypeMismatchImportedTypeNamedLikeAnAliasTest"},
   "elm/TypeMismatchIfUnderIntTest":
   {"refuse": "refuse_elm_TypeMismatchIfUnderIntTest"},
   "elm/TypeMismatchIfConditionIntTest":
@@ -352,6 +358,8 @@
   {"refuse": "refuse_elm_TypeMismatchFieldTypoTest"},
   "elm/TypeMismatchFieldAccessUnderIntTest":
   {"refuse": "refuse_elm_TypeMismatchFieldAccessUnderIntTest"},
+  "elm/TypeMismatchExtensibleRecordMissingAFieldTest":
+  {"refuse": "refuse_elm_TypeMismatchExtensibleRecordMissingAFieldTest"},
   "elm/TypeMismatchExtensibleRecordGivenAClosedOneTest":
   {"refuse": "refuse_elm_TypeMismatchExtensibleRecordGivenAClosedOneTest"},
   "elm/TypeMismatchDestructureTest":
@@ -374,6 +382,8 @@
   {"refuse": "refuse_elm_TypeMismatchCompappendAgainstATupleTest"},
   "elm/TypeMismatchCompappendAgainstARigidVarTest":
   {"refuse": "refuse_elm_TypeMismatchCompappendAgainstARigidVarTest"},
+  "elm/TypeMismatchClosedRecordWhereExtensibleTest":
+  {"refuse": "refuse_elm_TypeMismatchClosedRecordWhereExtensibleTest"},
   "elm/TypeMismatchCharUnderIntTest":
   {"refuse": "refuse_elm_TypeMismatchCharUnderIntTest"},
   "elm/TypeMismatchCaseAsAnArgumentTest":
@@ -396,12 +406,18 @@
   {"refuse": "refuse_elm_TypeMismatchBoolLeftOfAppendTest"},
   "elm/TypeMismatchArgumentToAnOperatorFunctionTest":
   {"refuse": "refuse_elm_TypeMismatchArgumentToAnOperatorFunctionTest"},
+  "elm/TypeMismatchArgumentToAConstructorTest":
+  {"refuse": "refuse_elm_TypeMismatchArgumentToAConstructorTest"},
+  "elm/TypeMismatchArgumentOfAFixedConstructorPatternTest":
+  {"refuse": "refuse_elm_TypeMismatchArgumentOfAFixedConstructorPatternTest"},
   "elm/TypeMismatchAppendableAgainstATupleTest":
   {"refuse": "refuse_elm_TypeMismatchAppendableAgainstATupleTest"},
   "elm/TypeMismatchAliasedRecordFieldOfTheWrongTypeTest":
   {"refuse": "refuse_elm_TypeMismatchAliasedRecordFieldOfTheWrongTypeTest"},
   "elm/TypeMismatchAliasWhereARecordTest":
   {"refuse": "refuse_elm_TypeMismatchAliasWhereARecordTest"},
+  "elm/TypeMismatchAliasNamedLikeAnImportedTypeTest":
+  {"refuse": "refuse_elm_TypeMismatchAliasNamedLikeAnImportedTypeTest"},
   "elm/TypeMismatchAccessorUnderIntTest":
   {"refuse": "refuse_elm_TypeMismatchAccessorUnderIntTest"},
   "elm/TypeMismatchAccessOnAnEmptyRecordTest":
@@ -457,6 +473,10 @@
   {"refuse": "refuse_elm_TopLevelConstructorTwiceTest"},
   "elm/TooManyArgsTooManyArgumentsToAnOperatorTest":
   {"refuse": "refuse_elm_TooManyArgsTooManyArgumentsToAnOperatorTest"},
+  "elm/TooManyArgsTooManyArgumentsToANullaryConstructorTest":
+  {"refuse": "refuse_elm_TooManyArgsTooManyArgumentsToANullaryConstructorTest"},
+  "elm/TooManyArgsTooManyArgumentsToALocalTest":
+  {"refuse": "refuse_elm_TooManyArgsTooManyArgumentsToALocalTest"},
   "elm/TooManyArgsTooManyArgumentsToALiteralTest":
   {"refuse": "refuse_elm_TooManyArgsTooManyArgumentsToALiteralTest"},
   "elm/TooManyArgsTooManyArgumentsToALambdaTest":
@@ -2398,6 +2418,8 @@
    "mean": "mean_elm_CoreIssue1141UnusedPortCallBreaksSubscriptionTest",
    "legal": "legal_elm_CoreIssue1141UnusedPortCallBreaksSubscriptionTest",
    "ident": "ident_elm_CoreIssue1141UnusedPortCallBreaksSubscriptionTest"},
+  "elm/CompilerIssue2338LambdaLetAnnotationTupleCrashTest":
+  {"refuse": "refuse_elm_CompilerIssue2338LambdaLetAnnotationTupleCrashTest"},
   "elm/CompilerIssue2298IdentityAliasResultTest":
   {"spec": "spec_elm_CompilerIssue2298IdentityAliasResultTest",
    "native": false,
@@ -2420,18 +2442,24 @@
    "mean": "mean_elm_CompilerIssue2252IdentityAliasTest",
    "legal": "legal_elm_CompilerIssue2252IdentityAliasTest",
    "ident": "ident_elm_CompilerIssue2252IdentityAliasTest"},
+  "elm/CompilerIssue2241FoldMapInfiniteTypeHangTest":
+  {"refuse": "refuse_elm_CompilerIssue2241FoldMapInfiniteTypeHangTest"},
   "elm/CompilerIssue2221TcoContinuationTest":
   {"spec": "spec_elm_CompilerIssue2221TcoContinuationTest",
    "native": false,
    "mean": "mean_elm_CompilerIssue2221TcoContinuationTest",
    "legal": "legal_elm_CompilerIssue2221TcoContinuationTest",
    "ident": "ident_elm_CompilerIssue2221TcoContinuationTest"},
+  "elm/CompilerIssue2214LensSetterArgumentOrderHangTest":
+  {"refuse": "refuse_elm_CompilerIssue2214LensSetterArgumentOrderHangTest"},
   "elm/CompilerIssue2207MutualRecursionSecondFunctionTest":
   {"spec": "spec_elm_CompilerIssue2207MutualRecursionSecondFunctionTest",
    "native": false,
    "mean": "mean_elm_CompilerIssue2207MutualRecursionSecondFunctionTest",
    "legal": "legal_elm_CompilerIssue2207MutualRecursionSecondFunctionTest",
    "ident": "ident_elm_CompilerIssue2207MutualRecursionSecondFunctionTest"},
+  "elm/CompilerIssue2206RecordUpdateLetCrashTest":
+  {"refuse": "refuse_elm_CompilerIssue2206RecordUpdateLetCrashTest"},
   "elm/CompilerIssue2200ConstrainedExtensibleErrorCrashTest":
   {"refuse": "refuse_elm_CompilerIssue2200ConstrainedExtensibleErrorCrashTest"},
   "elm/CompilerIssue2184LetRecursionTooManyArgsCrashTest":
@@ -2444,12 +2472,18 @@
   {"refuse": "refuse_elm_CompilerIssue2153RecursiveCallWrongArgCrashTest"},
   "elm/CompilerIssue2148RecordUpdateFoldrCrashTest":
   {"refuse": "refuse_elm_CompilerIssue2148RecordUpdateFoldrCrashTest"},
+  "elm/CompilerIssue2146RoseLambdaPatternCrashTest":
+  {"refuse": "refuse_elm_CompilerIssue2146RoseLambdaPatternCrashTest"},
   "elm/CompilerIssue2119MutualRecursionUnannotatedTest":
   {"spec": "spec_elm_CompilerIssue2119MutualRecursionUnannotatedTest",
    "native": false,
    "mean": "mean_elm_CompilerIssue2119MutualRecursionUnannotatedTest",
    "legal": "legal_elm_CompilerIssue2119MutualRecursionUnannotatedTest",
    "ident": "ident_elm_CompilerIssue2119MutualRecursionUnannotatedTest"},
+  "elm/CompilerIssue2112CaseBranchInfiniteTypeHangTest":
+  {"refuse": "refuse_elm_CompilerIssue2112CaseBranchInfiniteTypeHangTest"},
+  "elm/CompilerIssue2105ExtensibleFoldlCrashTest":
+  {"refuse": "refuse_elm_CompilerIssue2105ExtensibleFoldlCrashTest"},
   "elm/CompilerIssue2100LetAnnotationRank2CrashTest":
   {"refuse": "refuse_elm_CompilerIssue2100LetAnnotationRank2CrashTest"},
   "elm/CompilerIssue2097ExtensibleUnitArgCrashTest":
@@ -2469,6 +2503,8 @@
    "mean": "mean_elm_CompilerIssue2057CallSiteChangesInferredTypeTest",
    "legal": "legal_elm_CompilerIssue2057CallSiteChangesInferredTypeTest",
    "ident": "ident_elm_CompilerIssue2057CallSiteChangesInferredTypeTest"},
+  "elm/CompilerIssue2036LensRecordUpdateHangTest":
+  {"refuse": "refuse_elm_CompilerIssue2036LensRecordUpdateHangTest"},
   "elm/CompilerIssue2019AliasOfTypeVariableTest":
   {"spec": "spec_elm_CompilerIssue2019AliasOfTypeVariableTest",
    "native": false,
@@ -2485,6 +2521,13 @@
   {"refuse": "refuse_elm_CompilerIssue2014RankCrashIdentityLetAnnotationTest"},
   "elm/CompilerIssue2013RankCrashLambdaLetAnnotationTest":
   {"refuse": "refuse_elm_CompilerIssue2013RankCrashLambdaLetAnnotationTest"},
+  "elm/CompilerIssue2006IndexOutOfBoundsMaybeWithDefaultTest":
+  {"refuse":
+   "refuse_elm_CompilerIssue2006IndexOutOfBoundsMaybeWithDefaultTest"},
+  "elm/CompilerIssue1975LetOrderCrashTest":
+  {"refuse": "refuse_elm_CompilerIssue1975LetOrderCrashTest"},
+  "elm/CompilerIssue1974RankCrashWrongAnnotationTest":
+  {"refuse": "refuse_elm_CompilerIssue1974RankCrashWrongAnnotationTest"},
   "elm/CompilerIssue1964AnnotatedPolymorphicRecursionWrapperTest":
   {"spec": "spec_elm_CompilerIssue1964AnnotatedPolymorphicRecursionWrapperTest",
    "native": false,
@@ -2495,6 +2538,8 @@
    "ident_elm_CompilerIssue1964AnnotatedPolymorphicRecursionWrapperTest"},
   "elm/CompilerIssue1952ExtendIntCrashTest":
   {"refuse": "refuse_elm_CompilerIssue1952ExtendIntCrashTest"},
+  "elm/CompilerIssue1951OpenRecordLetCrashTest":
+  {"refuse": "refuse_elm_CompilerIssue1951OpenRecordLetCrashTest"},
   "elm/CompilerIssue1916PhantomExtensibleAliasCrashTest":
   {"spec": "spec_elm_CompilerIssue1916PhantomExtensibleAliasCrashTest",
    "native": false,
@@ -2543,8 +2588,12 @@
   {"refuse": "refuse_elm_CompilerIssue1748DestructureMissingFieldCrashTest"},
   "elm/CompilerIssue1700InfiniteTypeFoldrLambdaHangTest":
   {"refuse": "refuse_elm_CompilerIssue1700InfiniteTypeFoldrLambdaHangTest"},
+  "elm/CompilerIssue1669InfiniteTypeArrayGetSetHangTest":
+  {"refuse": "refuse_elm_CompilerIssue1669InfiniteTypeArrayGetSetHangTest"},
   "elm/CompilerIssue1550RecordExtensionDuplicateFieldTest":
   {"refuse": "refuse_elm_CompilerIssue1550RecordExtensionDuplicateFieldTest"},
+  "elm/CompilerIssue1491PhantomTupleUnsoundTest":
+  {"refuse": "refuse_elm_CompilerIssue1491PhantomTupleUnsoundTest"},
   "elm/CombinatorWDupTest":
   {"spec": "spec_elm_CombinatorWDupTest",
    "native": false,
@@ -4081,50 +4130,24 @@
  "summary":
  "static semantics: 622 legal (613 of one module, 9 of several), 0 without a theorem, 28 contexts, 9 by native_decide",
  "refusedSummary":
- "refused: 245 (Stat.not_legal_of_typesFailB 13, Stat.not_legal_of_scopeFailB 6, Stat.not_legal_of_coreRefutes 176, Stat.not_legal_of_modsyn 9, Stat.not_legal_of_furtherFailB 9, Stat.not_legal_of_mainFailB 8, Stat.not_legal_of_syn 22, Stat.not_legal_of_imports 2), 40 not refused",
- "refused": 245,
+ "refused: 269 (Stat.not_legal_of_typesFailB 13, Stat.not_legal_of_scopeFailB 6, Stat.not_legal_of_coreRefutes 200, Stat.not_legal_of_modsyn 9, Stat.not_legal_of_furtherFailB 9, Stat.not_legal_of_mainFailB 8, Stat.not_legal_of_syn 22, Stat.not_legal_of_imports 2), 16 not refused",
+ "refused": 269,
  "notRefused":
- [{"test": "elm/CompilerIssue1491PhantomTupleUnsoundTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue1639LetAnnotationTypeVarCrashTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue1669InfiniteTypeArrayGetSetHangTest",
+ [{"test": "elm/CompilerIssue1639LetAnnotationTypeVarCrashTest",
    "reason": "no decider refuses it (inference)"},
   {"test": "elm/CompilerIssue1691ContradictoryExtensibleRecordHangTest",
    "reason": "no decider refuses it (inference)"},
   {"test": "elm/CompilerIssue1839RigidLetAnnotationCrashTest",
    "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue1951OpenRecordLetCrashTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue1974RankCrashWrongAnnotationTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue1975LetOrderCrashTest",
-   "reason": "no decider refuses it (inference)"},
   {"test": "elm/CompilerIssue2001RankCrashParametricLetAnnotationTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue2006IndexOutOfBoundsMaybeWithDefaultTest",
    "reason": "no decider refuses it (inference)"},
   {"test": "elm/CompilerIssue2027IncompatibleExtensibleRecordsHangTest",
    "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue2036LensRecordUpdateHangTest",
-   "reason": "no decider refuses it (inference)"},
   {"test": "elm/CompilerIssue2077RankCrashExtensibleLetAnnotationTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue2105ExtensibleFoldlCrashTest",
    "reason": "no decider refuses it (inference)"},
   {"test": "elm/CompilerIssue2106FoldlExtensibleRecordHangTest",
    "reason": "no decider refuses it (inference)"},
   {"test": "elm/CompilerIssue2108IfBranchExtensibleRecordHangTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue2112CaseBranchInfiniteTypeHangTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue2146RoseLambdaPatternCrashTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue2206RecordUpdateLetCrashTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue2214LensSetterArgumentOrderHangTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue2241FoldMapInfiniteTypeHangTest",
    "reason": "no decider refuses it (inference)"},
   {"test": "elm/CompilerIssue2274MutualRecursionTransmuteTest",
    "reason": "no decider refuses it (inference)"},
@@ -4132,33 +4155,11 @@
    "reason": "no decider refuses it (inference)"},
   {"test": "elm/CompilerIssue2301InnerSkolemOuterVarCrashTest",
    "reason": "no decider refuses it (inference)"},
-  {"test": "elm/CompilerIssue2338LambdaLetAnnotationTupleCrashTest",
-   "reason": "no decider refuses it (inference)"},
   {"test": "elm/StandardA96NumberFlagsTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/TooManyArgsTooManyArgumentsToALocalTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/TooManyArgsTooManyArgumentsToANullaryConstructorTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/TypeMismatchAliasNamedLikeAnImportedTypeTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/TypeMismatchArgumentOfAFixedConstructorPatternTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/TypeMismatchArgumentToAConstructorTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/TypeMismatchClosedRecordWhereExtensibleTest",
    "reason": "no decider refuses it (inference)"},
   {"test": "elm/TypeMismatchDifferentlyNamedComparableVarsTest",
    "reason": "no decider refuses it (inference)"},
   {"test": "elm/TypeMismatchDifferentlyNamedFlexVarsTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/TypeMismatchExtensibleRecordMissingAFieldTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/TypeMismatchImportedTypeNamedLikeAnAliasTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/TypeMismatchLocalTypeNamedLikeAnImportedOneTest",
-   "reason": "no decider refuses it (inference)"},
-  {"test": "elm/TypeMismatchNumberAndCompappendListEntriesTest",
    "reason": "no decider refuses it (inference)"},
   {"test": "elm/TypeMismatchTwoComparableVarsTest",
    "reason": "no decider refuses it (inference)"},

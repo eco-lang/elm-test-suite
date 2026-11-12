@@ -15,32 +15,32 @@ open StandardElm.Src (BTy BTyRow BAtPat BPat BValBind)
 /-! ## Type expressions (L7) -/
 
 mutual
-theorem elabTy_congr {C1 C2 : Ctx} (hU : C1.U = C2.U) (hT : ∀ lc, C1.lookupTy lc = C2.lookupTy lc) :
+theorem elabTy_congrW {C1 C2 : Ctx} (hU : C1.U = C2.U) (hT : ∀ lc, C1.lookupTy lc = C2.lookupTy lc) :
     ∀ ty : BTy, elabTy C1 ty = elabTy C2 ty
   | .tyvar a => by simp only [elabTy, hU]
   | .record row => by simp only [elabTy, elabTyRowOpt_congr hU hT row]
-  | .openRecord r row => by simp only [elabTy, hU, elabTyRow_congr hU hT row]
+  | .openRecord r row => by simp only [elabTy, hU, elabTyRow_congrW hU hT row]
   | .unit => rfl
   | .tuple t1 t2 t3 => by
-    simp only [elabTy, elabTy_congr hU hT t1, elabTy_congr hU hT t2, elabTyOpt_congr hU hT t3]
-  | .con c args => by simp only [elabTy, hT c, elabTyList_congr hU hT args]
-  | .fn t1 t2 => by simp only [elabTy, elabTy_congr hU hT t1, elabTy_congr hU hT t2]
-  | .paren t => by simp only [elabTy, elabTy_congr hU hT t]
-theorem elabTyRow_congr {C1 C2 : Ctx} (hU : C1.U = C2.U) (hT : ∀ lc, C1.lookupTy lc = C2.lookupTy lc) :
+    simp only [elabTy, elabTy_congrW hU hT t1, elabTy_congrW hU hT t2, elabTyOpt_congr hU hT t3]
+  | .con c args => by simp only [elabTy, hT c, elabTyList_congrW hU hT args]
+  | .fn t1 t2 => by simp only [elabTy, elabTy_congrW hU hT t1, elabTy_congrW hU hT t2]
+  | .paren t => by simp only [elabTy, elabTy_congrW hU hT t]
+theorem elabTyRow_congrW {C1 C2 : Ctx} (hU : C1.U = C2.U) (hT : ∀ lc, C1.lookupTy lc = C2.lookupTy lc) :
     ∀ row : BTyRow, elabTyRow C1 row = elabTyRow C2 row
-  | .field l t rest => by simp only [elabTyRow, elabTy_congr hU hT t, elabTyRowOpt_congr hU hT rest]
+  | .field l t rest => by simp only [elabTyRow, elabTy_congrW hU hT t, elabTyRowOpt_congr hU hT rest]
 theorem elabTyRowOpt_congr {C1 C2 : Ctx} (hU : C1.U = C2.U) (hT : ∀ lc, C1.lookupTy lc = C2.lookupTy lc) :
     ∀ row : Option BTyRow, elabTyRowOpt C1 row = elabTyRowOpt C2 row
   | none => rfl
-  | some row => by simp only [elabTyRowOpt, elabTyRow_congr hU hT row]
+  | some row => by simp only [elabTyRowOpt, elabTyRow_congrW hU hT row]
 theorem elabTyOpt_congr {C1 C2 : Ctx} (hU : C1.U = C2.U) (hT : ∀ lc, C1.lookupTy lc = C2.lookupTy lc) :
     ∀ ty : Option BTy, elabTyOpt C1 ty = elabTyOpt C2 ty
   | none => rfl
-  | some t => by simp only [elabTyOpt, elabTy_congr hU hT t]
-theorem elabTyList_congr {C1 C2 : Ctx} (hU : C1.U = C2.U) (hT : ∀ lc, C1.lookupTy lc = C2.lookupTy lc) :
+  | some t => by simp only [elabTyOpt, elabTy_congrW hU hT t]
+theorem elabTyList_congrW {C1 C2 : Ctx} (hU : C1.U = C2.U) (hT : ∀ lc, C1.lookupTy lc = C2.lookupTy lc) :
     ∀ l : List BTy, elabTyList C1 l = elabTyList C2 l
   | [] => rfl
-  | t :: ts => by simp only [elabTyList, elabTy_congr hU hT t, elabTyList_congr hU hT ts]
+  | t :: ts => by simp only [elabTyList, elabTy_congrW hU hT t, elabTyList_congrW hU hT ts]
 end
 
 /-- An annotation without type variables names no explicit variable. -/
@@ -71,7 +71,7 @@ theorem newFor_nil {U' : List BVar} {ty : BTy} {CU : List BVar} (h : newForB U' 
 theorem annScheme_nil (τ : Ty) : annScheme [] τ = mono τ := by
   have h : ∀ l : List BVar, l.filter (fun _ => false) = [] := by
     intro l; induction l <;> simp_all [List.filter_cons]
-  simp [annScheme, Scheme.canon, canonVars, dedupL, renumber, apply_id, mono, h]
+  simp [annScheme, Scheme.canon, canonVars, dedupL, renumber, apply_idF, mono, h]
 
 /-! ## Groups -/
 
@@ -127,7 +127,7 @@ theorem found_ext1' {n0 : Nat} {S' : FSub} {st : WSt} (hi : SInv n0 st) (hfx : F
   refine ⟨h1, h2, hag, fun a ha => ?_⟩
   simp only [ext1] at ha
   split at ha
-  · rename_i e; subst e; rfl
+  · rename_i e; subst e; exact Adm.any _
   · exact absurd rfl ha
 
 theorem groupEntries_complete {n0 : Nat} {C C2 : Ctx}
@@ -187,10 +187,10 @@ theorem groupEntries_complete {n0 : Nat} {C C2 : Ctx}
         obtain ⟨⟨hnew, hel⟩, -⟩ := hck1
         split
         · rename_i hn
-          have hU' := newFor_nil hnew hn
+          have hU' := newFor_nil hnew (Bool.and_eq_true _ _ ▸ hn).1
           subst hU'
           have hel' : elabTy (C.plusU []) ty = some τ' := by
-            rw [← hel, elabTy_congr (C1 := C.plusU []) (C2 := C2.plusU [])]
+            rw [← hel, elabTy_congrW (C1 := C.plusU []) (C2 := C2.plusU [])]
             · simp [Ctx.plusU, hU]
             · intro lc; simp only [plusU_nil]; exact (hT lc).symm
           rw [hel']
@@ -268,8 +268,8 @@ theorem schRel_mono (s : FSub) (τ : Ty) : SchRel s (mono τ) (mono (sb s τ)) :
     | cons _ _ => simp [mono, bindSubst] at hS
     | nil =>
       simp only [mono, bindSubst, Option.some.injEq] at hS; subst hS
-      rw [apply_id, Option.some.injEq] at hap
-      refine ⟨idS, ?_⟩
+      rw [apply_idF, Option.some.injEq] at hap
+      refine ⟨idS, ⟨fun _ h => by simp [mono] at h, ?_⟩⟩
       rw [← hap]; simp only [mono]; congr 1
 
 /-- An environment of monotypes and its image. -/
@@ -332,7 +332,7 @@ theorem otstat_rel {o : Op} {σ : Scheme} {st : IdStatus} (h : OTstat o = some (
 
 /-- The free variables of `T (θ C)` are free in `C'`. -/
 theorem ctxSb_ftv {n0 n : Nat} {C C' : Ctx} {T : FSub} {θ : Bnd} (hrel : CtxRel (SchRel T) (rigidFrom n0) C C')
-    (hC : CtxW n C) (hT : FixesR (rigidFrom n0) T) (habs : Absorbs T (lk θ)) (hg : Good (rigidFrom n0) θ []) :
+    (hC : CtxW n C) (hT : FixesR (rigidFrom n0) T) (habs : Absorbs T (lk θ)) {m : Nat} (hg : GoodC (rigidFrom n0) m θ []) :
     ∀ a, BVar.ty a ∈ (ctxSb (lk θ) C).tyvars → ∀ v ∈ (T a).tyvars, v ∈ C'.tyvars := by
   intro a ha v hv
   have hftv := hrel.ftv (fun _ _ h => h.1) hT
@@ -380,7 +380,7 @@ theorem let_pre {n0 : Nat} {C C' : Ctx} {S' T1 : FSub} {st st1 : WSt} {VE0 VE' :
   have hC1 : CtxW st1.n C := hp.ctxW.mono hn
   have hrel1 := hp.rel.congr hp.ctxW hF.agree
   have hmono : ∀ σ : Scheme, σ.bound = [] → σ = mono σ.body := fun σ h => by cases σ; simp_all [mono]
-  refine ⟨hi1, hC1.plusVE fun q hq => ?_, hrel1.plusVE fun x => ?_, hF.fix, hF.abs⟩
+  refine ⟨hi1, hC1.plusVE fun q hq => ?_, hrel1.plusVE fun x => ?_, hF.fix, hF.abs, hF.resp hp.resp⟩
   · -- the closures are schemes W can hold
     simp only [closGroup_eq, FMap.mapV, List.mem_map] at hq
     obtain ⟨r, hr, rfl⟩ := hq
@@ -400,7 +400,7 @@ theorem let_pre {n0 : Nat} {C C' : Ctx} {S' T1 : FSub} {st st1 : WSt} {VE0 VE' :
       rw [hmono p.1 hb]
       simp only [sbScheme_mono]
       rw [show sb T1 p.1.body = sb T1 (sb (lk st1.θ) p.1.body) from (absorbs_comp hF.abs _).symm]
-      refine closE_rel (hi1.ok.okT hok) (fun a ha _ => ctxSb_ftv hrel1 hC1 hF.fix hF.abs hi1.good a ha) ?_
+      refine closE_rel (hi1.ok.okT hok) (hF.resp hp.resp) (fun a ha _ => ctxSb_ftv hrel1 hC1 hF.fix hF.abs hi1.good a ha) ?_
       rw [absorbs_comp hF.abs]; exact hnb
 
 end StandardElm.Stat.Complete

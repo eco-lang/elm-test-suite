@@ -37,11 +37,17 @@ theorem gVBEnv_rel {C0 : Ctx} : (vb : AValBind) → ∀ {C : Ctx} {p : Path}, Ty
         obtain ⟨ty, U'⟩ := a
         simp only [Option.map_some, memberInfo, Option.isSome_some, ite_true, annU]
         split
-        · rename_i t ht
+        · rename_i r hr'
+          have ht : annT C0 ty = some (ofTy r) := by simp [annT, hr']
           split
           · rename_i hc
             exact gok_ann U' (annT_ok (hL.same (C' := C.plusU U') (fun _ => rfl)) (checkAnn_elab ha) ht) hc
-          · exact gok_ann_shape U' (annT_ok (hL.same (C' := C.plusU U') (fun _ => rfl)) (checkAnn_elab ha) ht)
+          · split
+            · rename_i hgood
+              obtain ⟨e, hgt⟩ := annR_ok (hL.same (C' := C.plusU U') (fun _ => rfl)) (checkAnn_elab ha) hr'
+              subst e
+              exact gok_tmpl (instOf_canon _ τ) (hgt hgood)
+            · exact gok_ann_shape U' (annT_ok (hL.same (C' := C.plusU U') (fun _ => rfl)) (checkAnn_elab ha) ht)
         · trivial
     cases rest with
     | none =>

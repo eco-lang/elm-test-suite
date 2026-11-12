@@ -321,7 +321,7 @@ theorem size_lt_sbList (s : FSub) : ∀ (l : List Ty) (a : TyVar), BVar.ty a ∈
 end
 
 /-- K3: a variable never equals, under any substitution, a proper type it occurs in. -/
-theorem occurs_ne (s : FSub) {a : TyVar} {τ : Ty} (h : BVar.ty a ∈ τ.vars) (hne : τ ≠ .var a) :
+theorem occurs_neF (s : FSub) {a : TyVar} {τ : Ty} (h : BVar.ty a ∈ τ.vars) (hne : τ ≠ .var a) :
     s a ≠ sb s τ := by
   intro e
   have hs : tsize (s a) < tsize (sb s τ) := by
@@ -422,7 +422,7 @@ theorem applyList_ofBnd (θ : Bnd) : ∀ l : List Ty, (ofBnd θ).applyList l = s
 end
 
 /-- The identity substitution of step 9 is defined everywhere and changes nothing. -/
-theorem apply_id (τ : Ty) : Subst.id.apply τ = some τ := by
+theorem apply_idF (τ : Ty) : Subst.id.apply τ = some τ := by
   have := apply_ofBnd [] τ
   simp only [ofBnd] at this
   rw [show (Subst.id : Subst) = ⟨[], []⟩ from rfl, this]

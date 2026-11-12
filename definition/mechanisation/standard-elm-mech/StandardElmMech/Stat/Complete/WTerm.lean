@@ -31,6 +31,8 @@ theorem stable_unsupported {α : Type} (st : WSt) : StableAt (fun _ => (wUnsuppo
 
 theorem stable_freshV (st : WSt) : StableAt (fun _ => freshV) st := stable_const (fun h => by cases h)
 
+theorem stable_freshC (c : Cls) (st : WSt) : StableAt (fun _ => freshC c) st := stable_const (fun h => by cases h)
+
 theorem stable_getθ (st : WSt) : StableAt (fun _ => getθ) st := stable_const (fun h => by cases h)
 
 theorem stable_bind {α β : Type} {M : Nat → WM α} {F : Nat → α → WM β} {st : WSt}
@@ -62,7 +64,7 @@ theorem stable_bind {α β : Type} {M : Nat → WM α} {F : Nat → α → WM β
   | outOfFuel => exact absurd hr h1
 
 theorem stable_unifyW (R : Rigid) (τ1 τ2 : Ty) (st : WSt) : StableAt (fun k => unifyW k R τ1 τ2) st := by
-  obtain ⟨N, hN⟩ := uLoop_terminates R [(sb (lk st.θ) τ1, sb (lk st.θ) τ2)] st.θ
+  obtain ⟨N, hN⟩ := cLoop_terminates R st.n st.θ [(sb (lk st.θ) τ1, sb (lk st.θ) τ2)]
   refine ⟨N, ?_, fun k hk => ?_⟩
   · simp only [unifyW]
     split
@@ -70,7 +72,7 @@ theorem stable_unifyW (R : Rigid) (τ1 τ2 : Ty) (st : WSt) : StableAt (fun k =>
     · exact fun h => by cases h
     · exact fun h => by cases h
     · rename_i h; exact absurd h hN
-  · have := uLoop_mono N (k - N) _ _ hN
+  · have := cLoop_mono N (k - N) _ _ _ hN
     rw [Nat.add_sub_cancel' hk] at this
     simp only [unifyW, this]
 
@@ -78,10 +80,8 @@ theorem stable_instVars : ∀ (vs : List BVar) (st : WSt), StableAt (fun _ => in
   | [], st => stable_pure _ st
   | .ty a :: rest, st => by
     simp only [instVars]
-    split
-    · exact stable_bind (stable_freshV st) fun _ st1 =>
-        stable_bind (stable_instVars rest st1) fun _ _ => stable_pure _ _
-    · exact stable_unsupported st
+    exact stable_bind (stable_freshC _ st) fun _ st1 =>
+      stable_bind (stable_instVars rest st1) fun _ _ => stable_pure _ _
   | .row _ :: _, st => stable_unsupported st
 
 theorem stable_instantiate (σ : Scheme) (st : WSt) : StableAt (fun _ => instantiate σ) st := by
@@ -208,7 +208,8 @@ end
 
 mutual
 theorem wAtExp_stable : ∀ (C : Ctx) (a : BAtExp) (st : WSt), StableAt (fun k => wAtExp k R C a) st
-  | _, .scon (.int _), st => by simp only [wAtExp]; exact stable_unsupported _
+  | _, .scon (.int _), st => by
+    simp only [wAtExp]; exact stable_bind (stable_freshC _ st) fun _ _ => stable_pure _ _
   | _, .scon (.float _ _), st | _, .scon (.char _), st | _, .scon (.str _), st => by
     simp only [wAtExp]; exact stable_pure _ _
   | C, .var lv, st => by
@@ -282,8 +283,14 @@ theorem wMRule_stable : ∀ (C : Ctx) (mr : BMRule) (st : WSt), StableAt (fun k 
 theorem wDec_stable : ∀ (C : Ctx) (d : BDec) (st : WSt), StableAt (fun k => wDec k R C d) st
   | C, .val (.pat p e), st => by
     simp only [wDec]
-    exact stable_bind (wAtPat_stable R C p st) fun _ st1 => stable_bind (wExp_stable _ e st1) fun _ st2 =>
-      stable_bind (stable_unifyW R _ _ st2) fun _ _ => stable_pure _ _
+    refine stable_bind (wAtPat_stable R C p st) fun r st1 => ?_
+    rcases r with ⟨τp, ap⟩
+    dsimp only
+    by_cases hc : (ap.ve.all fun q => !conBound C q.1) = true
+    · simp only [hc, ↓reduceIte]
+      exact stable_bind (wExp_stable _ e st1) fun _ st2 => stable_bind (stable_unifyW R _ _ st2) fun _ _ => stable_pure _ _
+    · simp only [hc, ↓reduceIte]
+      exact stable_unsupported _
   | C, .val (.var x ann e rest), st => by
     simp only [wDec]
     exact stable_bind (groupEntries_stable C _ st) fun _ st1 =>
@@ -393,7 +400,7 @@ end
 
 /-- What remains of `WCompleteness` (L10, soundness of W's result for the checker): on a
     successful run from the root, the checker accepts the final substitution applied to the
-    annotated phrase. -/
+    annotated phrase. Proved in WSound.lean (`wResultChecks`, without using the derivation). -/
 def WResultChecks : Prop :=
   ∀ fuel C0 e τ ar st, RootOK C0 →
     wExp fuel (rigidFrom (freshAbove C0)) C0 e ⟨[], freshAbove C0⟩ = .ok (τ, ar) st →
