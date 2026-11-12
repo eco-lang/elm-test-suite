@@ -417,8 +417,8 @@ theorem elabTypBinds_sound (C : Ctx) : (tbs : List BTypBind) → (VEs : List Val
 /-- The type names a type environment gives its custom types. -/
 def namesOf (TE : TyEnv) (c : String) : Option TyName := (TE.find? c).bind fun s => s.1.name?
 
-/-- The premises of r:sm-topdec-types for a given TE and VE. -/
-def checkTypes (C : Ctx) (TE : TyEnv) (VE : ValEnv) (db : Option BDatBind) (tbs : List BTypBind) : Bool :=
+/-- The premises of r:sm-topdec-types for a given TE and VE, except that TE is closed. -/
+def checkTypesFix (C : Ctx) (TE : TyEnv) (VE : ValEnv) (db : Option BDatBind) (tbs : List BTypBind) : Bool :=
   let Cte := C.oplusTE TE
   match db with
   | none =>
@@ -432,9 +432,24 @@ def checkTypes (C : Ctx) (TE : TyEnv) (VE : ValEnv) (db : Option BDatBind) (tbs 
         FMap.modify VE' (FMap.plusAll VEs) = VE)
     | _, _ => false
 
-theorem checkTypes_sound (C : Ctx) (TE : TyEnv) (VE : ValEnv) (db : Option BDatBind) (tbs : List BTypBind)
-    (h : checkTypes C TE VE db tbs = true) : TypesOK (C.oplusTE TE) C db tbs TE VE := by
-  unfold checkTypes at h
+/-- The premises of r:sm-topdec-types for a given TE and VE: TE is a fixed point and has no free
+    type or row variable (the side condition `tyvars TE = ∅`, erratum of 2026-11-12: without it a
+    custom type's constructors may stay open, their variables free in TE because free in TE,
+    ModuleStepCounterexample.lean). -/
+def checkTypes (C : Ctx) (TE : TyEnv) (VE : ValEnv) (db : Option BDatBind) (tbs : List BTypBind) : Bool :=
+  checkTypesFix C TE VE db tbs && (TyEnv.tyvars TE).isEmpty
+
+theorem checkTypes_fix {C : Ctx} {TE : TyEnv} {VE : ValEnv} {db : Option BDatBind} {tbs : List BTypBind}
+    (h : checkTypes C TE VE db tbs = true) : checkTypesFix C TE VE db tbs = true := by
+  simp only [checkTypes, Bool.and_eq_true] at h; exact h.1
+
+theorem checkTypes_closed {C : Ctx} {TE : TyEnv} {VE : ValEnv} {db : Option BDatBind} {tbs : List BTypBind}
+    (h : checkTypes C TE VE db tbs = true) : TyEnv.tyvars TE = [] := by
+  simp only [checkTypes, Bool.and_eq_true, List.isEmpty_iff] at h; exact h.2
+
+theorem checkTypesFix_sound (C : Ctx) (TE : TyEnv) (VE : ValEnv) (db : Option BDatBind) (tbs : List BTypBind)
+    (h : checkTypesFix C TE VE db tbs = true) : TypesOK (C.oplusTE TE) C db tbs TE VE := by
+  unfold checkTypesFix at h
   cases db with
   | none =>
     simp only at h
@@ -457,6 +472,10 @@ theorem checkTypes_sound (C : Ctx) (TE : TyEnv) (VE : ValEnv) (db : Option BDatB
         | opt_some hd =>
           exact .opt_some hd (namesNewB_spec _ _ hn) hne (elabTypBinds_sound _ _ _ _ h2)
     · cases h
+
+theorem checkTypes_sound (C : Ctx) (TE : TyEnv) (VE : ValEnv) (db : Option BDatBind) (tbs : List BTypBind)
+    (h : checkTypes C TE VE db tbs = true) : TypesOK (C.oplusTE TE) C db tbs TE VE ∧ TyEnv.tyvars TE = [] :=
+  ⟨checkTypesFix_sound C TE VE db tbs (checkTypes_fix h), checkTypes_closed h⟩
 
 /-! ## Ports -/
 

@@ -1,8 +1,7 @@
 # Step 10: end to end (number specialisation and reduction in Lean)
 
 Part of [the plan](../lean-full-definition.md), Part II. Follows [conventions.md](conventions.md).
-Status: specified 2026-11-11; done 2026-11-12 except `ident_` (see the last bullet), with
-these differences from this specification:
+Status: specified 2026-11-11; done 2026-11-12, with these differences from this specification:
 
 - **Accepted.** `Stat/Specialise.lean`, `Stat/Erase.lean`, `Stat/EndToEnd.lean`,
   `Stat/EndToEndIn.lean`, `Stat/Pipeline.lean`, `Stat/CopyLoop.lean`, `Mod/Reduced.lean` (Part I has
@@ -24,15 +23,17 @@ these differences from this specification:
   `../static-report.json`).
 - **Issues found:** item 8 (an occurrence outside its group, fixed in Lean and the translator) and
   item 9 (incoherent modules: `ident_` is false as the definitions stand).
-- **`ident_` not delivered.** The invariance lemma is proved up to the step across bases:
-  specialisation is invariant under renaming (`specExp_rename`, `reduceWith_rename`), and two module
-  derivations that are instances of each other in one basis differ by a renaming of their value
-  items (`mutualInstanceMod_items`), in `Stat/Rename*.lean` and `Stat/Mutual*.lean` (about 4,400
-  lines). `reduce_principal_unique`, `specOf_functional` and `ident_of_spec` are false as the
-  definitions stand (item 9, `Stat/SplitCounterexample.lean`); the remaining work (transport of
-  principal derivations across bases, the rest of `ProgRel`, the induction over modules; about 1,700
-  lines) waits for the decision item 9 asks for. `IsPrincipalMod` now quantifies over derivations
-  without free `bnd` variables (`NoFreeBnd`, `Stat/Principal.lean`), the derivations of the book.
+- **`ident_`.** The invariance lemma is proved (`Stat/Rename*`, `Stat/Mutual*`, `Stat/NameRen*`,
+  `Stat/ItemsCompose.lean`, `Stat/ProgInduction.lean`, `Stat/Ident.lean`, `Stat/ModuleStep*.lean`):
+  `ident_of_spec' (hT : ∀ m ∈ (bareOf s).modules, TypesOrdered m) (hI : InferPrincipalFor Btest
+  (bareOf s)) (h : endToEnd Btest s = .ok q) : ∀ r, SpecOf Btest (bareOf s) r → r = q`, with
+  `TypesOrdered` (distinct type names, each alias mentioning only earlier ones) decidable per
+  module. It needed the decisions and errata of issues 8 to 11 and of step 9's encoding: ruling
+  A98 (no split of type declarations), `genNames` the custom types' names, `tyvars TE = ∅`
+  (erratum), `IsPrincipalMod` over derivations without free `bnd` variables, and occurrence nodes
+  without instance lists (the sentence of an occurrence does not contain its instance). The
+  uniqueness of the type declarations (`checkTypes_unique`) also settles the "second risk" of
+  issue 9.
 
 ## Goal
 
@@ -173,7 +174,12 @@ The book leaves these open; each is fixed here, with the reason.
    `σ ≻ τ` of `r:s-atexp-longvar` has its witness outside the sentence), so the book's principal
    derivation does not determine it; the book says "a variable that nothing at the occurrence
    fixes is Float" (`sec:dynamic-core-numbers`), and nothing at the occurrence fixes a variable
-   the type does not mention. See Issues, item 5.
+   the type does not mention. See Issues, item 5. The instance's type at a variable the body
+   mentions is read off the occurrence's type τ (`Ty.readVar`: τ read against the scheme body),
+   not off the instance list the annotated phrase records, which is not part of the sentence and
+   which step 9's occurrence nodes do not carry (found 2026-11-12: reading the list made
+   `ident_of_spec'` false for a module with two top-level bindings of one name,
+   `Stat/DupValuesCounterexample.lean`).
 4. **Copies of one declaration in the bare syntax.** The copies of a group are emitted as
    definitions in the order: default copy first, then the others by the lexicographic order of
    their assignments with Float before Int (which is the string order of their keys); within a
@@ -1113,4 +1119,25 @@ an assumption).
    environment differs from the whole phrase's; (c) drop `typesSplit` from the checker. A second
    risk: `checkTypes` checks a fixed point, so a recursive alias admits many solutions (some with
    junk type names); solving the type declarations in order, as the inference does, would remove it.
-   Decision needed before the invariance lemma is finished.
+   Decision needed before the invariance lemma is finished. **Resolved 2026-11-12: option (c)**
+   (ruling A98; Elm 0.19.1 to 0.19.3 treat a module's type declarations as one scope): the split is
+   gone from the book and from Lean, and `Stat/SplitCounterexample.lean` with it.
+10. **`genNames` counted names no custom type is given** (found 2026-11-12,
+   `Stat/JunkCounterexample.lean`). A derivation may put any type at a position the phrase leaves
+   free, including a type name in no basis (`main : Html t`); `genNames` took every name of the
+   module's environment outside `T of B`, so such a derivation "generated" a name the inferred one
+   did not, the bijection of `InstanceOfMod` could not exist, and `InferPrincipalFor` was false for
+   nearly every program (every view's `main : Html msg`), making the theorems under it vacuous.
+   Fixed: `genNames` is the names the module's custom types are given, as
+   `sec:static-modules-principal` says ("which a derivation chooses freely outside T of B (rules
+   r:sm-datbind and r:sm-topdec-types)"). The book has a tension here worth recording: `r:sm-module`
+   sets `T' = tynames E \ T of B`, which counts such names too; it should say that the types of a
+   derivation mention only type names of `T of C` and those the module generates.
+11. **A type environment could justify itself** (found 2026-11-12,
+   `Stat/ModuleStepCounterexample.lean`). `r:sm-topdec-types` asks `TE` to be a solution of an
+   equation in `C ⊕ TE`, and the closures of `r:sm-datbind` and `r:sm-typbind-record` are taken in
+   that context, which contains `TE`'s own free variables; so for `type T a = K a` the environment
+   with `K : a -> T a`, `a` free, was a solution too, and the book's property that `TE` is
+   determined by `C` and the phrase was false (`two_solutions`). Erratum: `r:sm-topdec-types` has
+   the side condition `tyvars TE = ∅`, in the book and in Lean (`checkTypes`, `r_sm_topdec_types`).
+   No program is affected: Elm, the translator and the inference give constructors closed types.

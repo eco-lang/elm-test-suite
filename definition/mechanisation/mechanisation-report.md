@@ -1,5 +1,23 @@
 # Mechanisation Report
 
+> **Update, 2026-11-12 (plan step 11, milestone (a), and the end of step 10).** Step 10 is
+> complete: the specialisation of a program is unique (`ident_of_spec'`, under D11 and a
+> decidable condition that a module's type names are distinct and its aliases ordered), and each of
+> the 579 translated tests has its `ident_` theorem. Getting there corrected the encoding in four
+> places, each found as a counterexample checked by the kernel and kept as a regression theorem: a
+> module's type declarations are one scope (ruling A98; Elm 0.19.1 to 0.19.3 agree; two new tests);
+> the type names a derivation generates are its custom types' (`genNames`), not every name outside
+> the basis; a type environment may not keep free variables (an erratum to r:sm-topdec-types); and a
+> node of a derivation is the sentence, without the instance at an occurrence, which specialisation
+> now reads off the occurrence's type. Before these, D11's hypothesis was false for nearly every
+> program, so the theorems under it were vacuous; no program's meaning changed. Step 11, milestone
+> (a): unification over the full type language with its refutation theorem and a constraint
+> generator proved complete for every derivation refute 176 of the 217 compile-error tests that need
+> inference, unconditionally, and none of the 625 that compile; 245 compile-error tests are now
+> refused in all. Milestone (b) is under way (the most general unifier, algorithm W sound,
+> refuting, principal and terminating for the Hindley–Milner fragment). 10,823 theorems, 0 axiom
+> problems; run-examples unchanged (1,708 checks, 579 programs).
+
 > **Update, 2026-11-12 (plan step 10, end to end, done except `ident_`).** Lean computes each
 > translated test's reduced program from its source: step 8's derived forms, step 9's inference and
 > proved checker, number specialisation (`Stat/Specialise.lean`: copies from the outside in, the
@@ -17,13 +35,13 @@
 > (2) for a module whose custom type mentions a local alias spelt like an imported type (finding
 > B6), a split derivation of its type declaration is principal too and gives a different
 > constructor type, so "the specialisation of the program" is not unique and `ident_` is false as
-> the definitions stand (`Stat/SplitCounterexample.lean`); the invariance lemma is proved up to the
-> step across bases (about 4,400 lines), and the rest waits for a decision on how step 9 should
-> treat such modules. `IsPrincipalMod` now ranges over derivations without free `bnd` variables.
+> the definitions stood (resolved by ruling A98, which removes the split, as Elm does); the
+> invariance lemma is proved up to the step across bases (about 4,400 lines). `IsPrincipalMod`
+> now ranges over derivations without free `bnd` variables, the derivations of the book.
 > 8,800 theorems, 0 axiom problems; run-examples unchanged (1,708 checks, 579 programs).
 
 > **Update, 2026-11-12 (plan step 9, the static semantics, done).** Chapters 4 and 5 and the static
-> half of Chapter 9 are in Lean: 45 + 20 + 3 rule constructors, one per rule label of the book
+> half of Chapter 9 are in Lean: 45 + 20 + 3 rule constructors (45 + 19 + 3 since ruling A98 removed the split of a type declaration), one per rule label of the book
 > (`#check_static_rules`), the objects, substitutions, schemes and closure (A93), Appendix C and the
 > test basis (`Btest_agrees`, `default_imports_test`), and `LegalProgram` (a program as written meets
 > the syntactic restrictions and elaborates with each module's principal derivation meeting the

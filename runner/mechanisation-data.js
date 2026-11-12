@@ -206,8 +206,6 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
             // a logged constructor (RulesL.lean, plan decision D4) is the rule's twin: r_d_exp_app_l
             let slug = m[2] ? m[1].replace(/_/g, '-') + '-' + m[2].replace(/_/g, '-') : m[3];
             if (m[2] && !ruleSlugs.has(slug) && slug.endsWith('-l') && ruleSlugs.has(slug.slice(0, -2))) slug = slug.slice(0, -2);
-            // r_sm_topdec_seq_types is a second constructor for r:sm-topdec-seq (Stat/Modules.lean)
-            if (slug === 'sm-topdec-seq-types') slug = 'sm-topdec-seq';
             if (ruleSlugs.has(slug)) found.add(slug);
             else problems.push(`${t.name} (${t.file}:${t.line}) names the rule ${slug}, which the book does not have`);
         }

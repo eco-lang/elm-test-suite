@@ -5,10 +5,11 @@
 
   `RAtExp r D a a'` (and its companions for the other annotated phrases) says that `a'` is the
   image of `a` under the renaming `r` in everything specialisation reads: the types of constants,
-  the instances at occurrences of variables, the value environments of declarations and of
-  patterns, the types of bindings; the U' of an annotation only on the variables `D` (those of the
-  derivation's types), and nothing of the types specialisation does not read (the instances of
-  constructors and operators, the types of occurrences, the types inside patterns). Under it,
+  the types of occurrences of variables and of updated records (from which specialisation reads
+  the instance, `Ty.readVar`), the value environments of declarations and of patterns, the types
+  of bindings; the U' of an annotation only on the variables `D` (those of the derivation's types),
+  and nothing specialisation does not read (the instance lists of every occurrence, the types of
+  occurrences of constructors and operators, the types inside patterns). Under it,
   every function of the mutual specialisation gives the same result, from renamed assignments of
   the enclosing copies, a related scope and a related context (`specExp_rename` and its
   companions).
@@ -32,7 +33,7 @@ def AnnRel (r : Renaming) (D : BVar → Prop) : Option (Src.BTy × List BVar) �
 mutual
 inductive RAtExp (r : Renaming) (D : BVar → Prop) : AAtExp → AAtExp → Prop
   | scon (sc : Src.SLit) (τ : Ty) : RAtExp r D (.scon sc τ) (.scon sc (r.ty τ))
-  | var (lv : LongId) (inst : List Ty) (τ τ' : Ty) : RAtExp r D (.var lv inst τ) (.var lv (r.tys inst) τ')
+  | var (lv : LongId) (inst : List Ty) (τ : Ty) (inst' : List Ty) : RAtExp r D (.var lv inst τ) (.var lv inst' (r.ty τ))
   | con (lc : LongId) (inst : List Ty) (τ : Ty) (inst' : List Ty) (τ' : Ty) :
       RAtExp r D (.con lc inst τ) (.con lc inst' τ')
   | op (o : Op) (inst : List Ty) (τ : Ty) (inst' : List Ty) (τ' : Ty) : RAtExp r D (.op o inst τ) (.op o inst' τ')
@@ -41,8 +42,8 @@ inductive RAtExp (r : Renaming) (D : BVar → Prop) : AAtExp → AAtExp → Prop
       RExp r D e1 e1' → RExp r D e2 e2' → RExpOpt r D e3 e3' → RAtExp r D (.tuple e1 e2 e3) (.tuple e1' e2' e3')
   | nil (τ τ' : Ty) : RAtExp r D (.nil τ) (.nil τ')
   | record {row row' : Option AExpRow} : RExpRowOpt r D row row' → RAtExp r D (.record row) (.record row')
-  | update {x : Var} {inst : List Ty} {τ τ' : Ty} {row row' : AExpRow} :
-      RExpRow r D row row' → RAtExp r D (.update x inst τ row) (.update x (r.tys inst) τ' row')
+  | update {x : Var} {inst : List Ty} {τ : Ty} {inst' : List Ty} {row row' : AExpRow} :
+      RExpRow r D row row' → RAtExp r D (.update x inst τ row) (.update x inst' (r.ty τ) row')
   | letE {VE : ValEnv} {vb vb' : AValBind} {e e' : AExp} :
       (∀ p ∈ VE, ∀ v ∈ p.2.1.tyvars, D v) → RValBind r D vb vb' → RExp r D e e' →
       RAtExp r D (.letE (.val VE vb) e) (.letE (.val (r.valEnv VE) vb') e')
@@ -257,15 +258,82 @@ theorem lookup_zip_rename {r r' : Renaming} (hr' : r'.WF) (bv : List BVar) (inst
         have e2 : (BVar.ty v == b) = false := beq_eq_false_iff_ne.mpr hb
         simp only [e1, e2]; exact ih ts
 
+theorem row_lookup_rename (r : Renaming) (l : Lab) : ∀ ρ : Row, (r.row ρ).lookup l = (ρ.lookup l).map r.ty
+  | [] => rfl
+  | (l', t) :: rest => by
+    have ih := row_lookup_rename r l rest
+    simp only [Row.lookup] at ih ⊢
+    by_cases h : l' = l
+    · simp [Renaming.row, FMap.find?, h]
+    · simp only [Renaming.row, FMap.find?, h, ↓reduceIte]; exact ih
+
+section ReadVar
+variable (r r' : Renaming) (hr' : ∀ a b, r'.tvApply a = r'.tvApply b → a = b)
+include hr'
+
+mutual
+/-- Reading an occurrence's type against a scheme body commutes with renamings: the body by `r'`,
+    the type by `r`. -/
+theorem readVar_rename : (body : Ty) → ∀ (τ : Ty) (v : TyVar),
+    (r'.ty body).readVar (r'.tvApply v) (r.ty τ) = (body.readVar v τ).map r.ty
+  | .var a, τ, v => by
+    by_cases h : a = v
+    · subst h; simp [Renaming.ty, Ty.readVar]
+    · have h' : r'.tvApply a ≠ r'.tvApply v := fun e => h (hr' _ _ e)
+      simp [Renaming.ty, Ty.readVar, h, h']
+  | .record ρ tl, τ, v => by
+    cases τ with
+    | record ρ' tl' => simp only [Renaming.ty, Ty.readVar]; exact readRow_rename ρ ρ' v
+    | _ => simp [Renaming.ty, Ty.readVar]
+  | .fn a b, τ, v => by
+    cases τ with
+    | fn a' b' =>
+      simp only [Renaming.ty, Ty.readVar, readVar_rename a a' v]
+      cases a.readVar v a' with
+      | some t => rfl
+      | none => simp only [Option.map_none]; exact readVar_rename b b' v
+    | _ => simp [Renaming.ty, Ty.readVar]
+  | .con as t, τ, v => by
+    cases τ with
+    | con as' t' => simp only [Renaming.ty, Ty.readVar]; exact readList_rename as as' v
+    | _ => simp [Renaming.ty, Ty.readVar]
+theorem readRow_rename : (ρ : Row) → ∀ (ρ' : Row) (v : TyVar),
+    Ty.readRow (r'.tvApply v) (r'.row ρ) (r.row ρ') = (Ty.readRow v ρ ρ').map r.ty
+  | [], _, _ => rfl
+  | (l, t) :: rest, ρ', v => by
+    simp only [Renaming.row, Ty.readRow, row_lookup_rename]
+    cases ρ'.lookup l with
+    | none => simp only [Option.map_none]; exact readRow_rename rest ρ' v
+    | some t' =>
+      simp only [Option.map_some, readVar_rename t t' v]
+      cases t.readVar v t' with
+      | some x => rfl
+      | none => simp only [Option.map_none]; exact readRow_rename rest ρ' v
+theorem readList_rename : (l : List Ty) → ∀ (l' : List Ty) (v : TyVar),
+    Ty.readList (r'.tvApply v) (r'.tys l) (r.tys l') = (Ty.readList v l l').map r.ty
+  | [], _, _ => rfl
+  | t :: ts, l', v => by
+    cases l' with
+    | nil => simp [Renaming.tys, Ty.readList]
+    | cons t' ts' =>
+      simp only [Renaming.tys, Ty.readList, readVar_rename t t' v]
+      cases t.readVar v t' with
+      | some x => rfl
+      | none => simp only [Option.map_none]; exact readList_rename ts ts' v
+end
+
+end ReadVar
+
 theorem occNum_rename {r r' : Renaming} (hr : r.WF) (hr' : r'.WF) (ρ : NumEnv) (bv : List BVar) (body : Ty)
-    (inst : List Ty) (v : TyVar) (hv : bv.contains (.ty v) = false → r'.tvApply v = r.tvApply v) :
-    occNum (r.numEnv ρ) (bv.map r'.bvar) (r'.ty body).tyVarsSeq ((bv.map r'.bvar).zip (inst.map r.ty)) (r'.tvApply v) =
-      occNum ρ bv body.tyVarsSeq (bv.zip inst) v := by
+    (read read' : TyVar → Option Ty) (hread : ∀ v, read' (r'.tvApply v) = (read v).map r.ty)
+    (v : TyVar) (hv : bv.contains (.ty v) = false → r'.tvApply v = r.tvApply v) :
+    occNum (r.numEnv ρ) (bv.map r'.bvar) (r'.ty body).tyVarsSeq read' (r'.tvApply v) =
+      occNum ρ bv body.tyVarsSeq read v := by
   unfold occNum
-  rw [bv_contains hr' bv v, tyVarsSeq_contains hr' body v, lookup_zip_rename hr' bv inst v]
+  rw [bv_contains hr' bv v, tyVarsSeq_contains hr' body v, hread v]
   split
   · split
-    · cases (bv.zip inst).lookup (.ty v) with
+    · cases read v with
       | none => rfl
       | some τ => simp only [Option.map_some, Option.bind_some, resolve_rename hr]
     · rfl
@@ -276,39 +344,39 @@ theorem occNum_rename {r r' : Renaming} (hr : r.WF) (hr' : r'.WF) (ρ : NumEnv) 
     rw [this]
 
 theorem occNums_rename {r r' : Renaming} (hr : r.WF) (hr' : r'.WF) (ρ : NumEnv) (bv : List BVar) (body : Ty)
-    (inst : List Ty) : ∀ (V : List TyVar), (∀ v ∈ V, bv.contains (.ty v) = false → r'.tvApply v = r.tvApply v) →
-    occNums (r.numEnv ρ) (bv.map r'.bvar) (r'.ty body).tyVarsSeq ((bv.map r'.bvar).zip (inst.map r.ty)) (V.map r'.tvApply) =
-      occNums ρ bv body.tyVarsSeq (bv.zip inst) V
+    (read read' : TyVar → Option Ty) (hread : ∀ v, read' (r'.tvApply v) = (read v).map r.ty) :
+    ∀ (V : List TyVar), (∀ v ∈ V, bv.contains (.ty v) = false → r'.tvApply v = r.tvApply v) →
+    occNums (r.numEnv ρ) (bv.map r'.bvar) (r'.ty body).tyVarsSeq read' (V.map r'.tvApply) =
+      occNums ρ bv body.tyVarsSeq read V
   | [], _ => rfl
   | v :: vs, h => by
     simp only [List.map_cons, occNums]
-    rw [occNum_rename hr hr' ρ bv body inst v (h v (List.mem_cons_self ..)),
-      occNums_rename hr hr' ρ bv body inst vs (fun w hw => h w (List.mem_cons_of_mem _ hw))]
+    rw [occNum_rename hr hr' ρ bv body read read' hread v (h v (List.mem_cons_self ..)),
+      occNums_rename hr hr' ρ bv body read read' hread vs (fun w hw => h w (List.mem_cons_of_mem _ hw))]
 
 /-- `specOcc` after the lookup. -/
-def occRefSpec (ρ : NumEnv) (ref : Ref) (lv : LongId) (inst : List Ty) : Except SpecError (LongId × List Req) :=
+def occRefSpec (ρ : NumEnv) (ref : Ref) (lv : LongId) (τ : Ty) : Except SpecError (LongId × List Req) :=
   match ref with
   | .plain => .ok (lv, [])
   | .group gid V body bv => do
-    let a ← occAssignment ρ V bv body inst
+    let a ← occAssignment ρ V bv body τ
     pure (⟨lv.qual, copyName lv.id a⟩, [(gid, a)])
   | .basis V body bv => do
-    let a ← occAssignment ρ V bv body inst
+    let a ← occAssignment ρ V bv body τ
     pure (⟨lv.qual, copyName lv.id a⟩, [])
 
-theorem specOcc_eq (ρ : NumEnv) (Γ : Scope) (lv : LongId) (inst : List Ty) :
-    specOcc ρ Γ lv inst = occRefSpec ρ (Γ.ref lv) lv inst := rfl
+theorem specOcc_eq (ρ : NumEnv) (Γ : Scope) (lv : LongId) (τ : Ty) :
+    specOcc ρ Γ lv τ = occRefSpec ρ (Γ.ref lv) lv τ := rfl
 
 theorem RefRel.spec_occ {r : Renaming} (hr : r.WF) {ref ref' : Ref} (h : RefRel r ref ref') (ρ : NumEnv)
-    (lv : LongId) (inst : List Ty) : occRefSpec (r.numEnv ρ) ref' lv (r.tys inst) = occRefSpec ρ ref lv inst := by
+    (lv : LongId) (τ : Ty) : occRefSpec (r.numEnv ρ) ref' lv (r.ty τ) = occRefSpec ρ ref lv τ := by
   have key : ∀ r' : Renaming, r'.WF → ∀ V bv body,
       (∀ v ∈ V, bv.contains (.ty v) = false → r'.tvApply v = r.tvApply v) →
-      occAssignment (r.numEnv ρ) (V.map r'.tvApply) (bv.map r'.bvar) (r'.ty body) (r.tys inst) =
-        occAssignment ρ V bv body inst := by
+      occAssignment (r.numEnv ρ) (V.map r'.tvApply) (bv.map r'.bvar) (r'.ty body) (r.ty τ) =
+        occAssignment ρ V bv body τ := by
     intro r' hr' V bv body hV
     unfold occAssignment
-    rw [Renaming.tys_map]
-    exact occNums_rename hr hr' ρ bv body inst V hV
+    exact occNums_rename hr hr' ρ bv body _ _ (fun v => readVar_rename r r' hr'.tv_inj body τ v) V hV
   have hcl : ∀ (V : List TyVar) (bv : List BVar), (∀ v ∈ V, BVar.ty v ∈ bv) → ∀ (r' : Renaming),
       ∀ v ∈ V, bv.contains (.ty v) = false → r'.tvApply v = r.tvApply v := by
     intro V bv hc r' v hv hn
@@ -327,9 +395,9 @@ theorem RefRel.spec_occ {r : Renaming} (hr : r.WF) {ref ref' : Ref} (h : RefRel 
       simp only [Renaming.ref, occRefSpec]; rw [key r' hr' V bv body (hcl V bv hc r')]
 
 theorem specOcc_rename {r : Renaming} (hr : r.WF) {Γ Γ' : Scope} (h : ScopeRel r Γ Γ') (ρ : NumEnv)
-    (lv : LongId) (inst : List Ty) : specOcc (r.numEnv ρ) Γ' lv (r.tys inst) = specOcc ρ Γ lv inst := by
+    (lv : LongId) (τ : Ty) : specOcc (r.numEnv ρ) Γ' lv (r.ty τ) = specOcc ρ Γ lv τ := by
   rw [specOcc_eq, specOcc_eq]
-  exact (h.ref lv).spec_occ hr ρ lv inst
+  exact (h.ref lv).spec_occ hr ρ lv τ
 
 theorem specSCon_rename {r : Renaming} (hr : r.WF) (ρ : NumEnv) (sc : Src.SLit) (τ : Ty) :
     specSCon (r.numEnv ρ) sc (r.ty τ) = specSCon ρ sc τ := by

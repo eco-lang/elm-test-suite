@@ -16,49 +16,12 @@ open StandardElm (Var Lab ModId Op LongId)
 
 /-! ## Type declarations have no value declarations -/
 
-theorem splitShape_types {d1 d2 : Src.BTopDec} (h : splitShape d1 d2 = true) :
-    (∃ db tbs, d1 = .types db tbs) ∧ ∃ tbs, d2 = .types none tbs := by
-  unfold splitShape at h
-  split at h
-  · exact ⟨⟨_, _, rfl⟩, _, rfl⟩
-  · cases h
-
 theorem values_of_types : ∀ (d : ATopDec) (C : Ctx), (checkTopDec C d).isSome →
     (∃ db tbs, d.erase = .types db tbs) → valuesOnly d.items = []
   | .value _ _, _, _, ⟨_, _, he⟩ => by simp [ATopDec.erase] at he
   | .types _ _ _ _, _, _, _ => rfl
-  | .typesSplit a1 a2, C, hc, _ => by
-    simp only [checkTopDec] at hc
-    split at hc
-    · rename_i hs
-      obtain ⟨⟨db, tbs, h1⟩, tbs2, h2⟩ := splitShape_types hs
-      cases hc1 : checkTopDec C a1 with
-      | none => rw [hc1] at hc; cases hc
-      | some p =>
-        obtain ⟨E1, PE1⟩ := p
-        rw [hc1] at hc
-        simp only at hc
-        cases hc2 : checkTopDec (C.oplusE E1) a2 with
-        | none => rw [hc2] at hc; cases hc
-        | some _ =>
-          simp only [ATopDec.items, valuesOnly, List.filter_append]
-          have e1 := values_of_types a1 C (by rw [hc1]; rfl) ⟨_, _, h1⟩
-          have e2 := values_of_types a2 (C.oplusE E1) (by rw [hc2]; rfl) ⟨_, _, h2⟩
-          simp only [valuesOnly] at e1 e2
-          rw [e1, e2]; rfl
-    · cases hc
   | .port _ _ _, _, _, ⟨_, _, he⟩ => by simp [ATopDec.erase] at he
   | .seq _ _, _, _, ⟨_, _, he⟩ => by simp [ATopDec.erase] at he
-
-theorem typesSplit_erase {a1 a2 : ATopDec} {C : Ctx} (hc : (checkTopDec C (.typesSplit a1 a2)).isSome) :
-    ∃ db tbs, (ATopDec.typesSplit a1 a2).erase = .types db tbs := by
-  simp only [checkTopDec] at hc
-  split at hc
-  · rename_i hs
-    obtain ⟨⟨db, tbs, h1⟩, tbs2, h2⟩ := splitShape_types hs
-    simp only [ATopDec.erase, h1, h2]
-    exact ⟨_, _, rfl⟩
-  · cases hc
 
 /-! ## Pairs of node types -/
 
@@ -153,9 +116,6 @@ theorem walkTop (hw : WalkHyp S S' ν r D) : (d : ATopDec) → ∀ (d'' : ATopDe
           exact ⟨⟨rfl, hD, hvb⟩, trivial⟩
         · cases hc''
       · cases hc
-    | typesSplit a1 a2 =>
-      obtain ⟨db, tbs, e⟩ := typesSplit_erase hc''
-      rw [e] at he; simp [ATopDec.erase] at he
     | types _ _ _ _ | port _ _ _ | seq _ _ => simp [ATopDec.erase] at he
   | .seq a1 a2, d'', C, C'', path, he, hc, hc'', hn, hn'', h => by
     cases d'' with
@@ -184,21 +144,12 @@ theorem walkTop (hw : WalkHyp S S' ν r D) : (d : ATopDec) → ∀ (d'' : ATopDe
               (h.mono (fun n hn => by simp [hn]) (fun n hn => by simp [hn])))
             (walkTop hw a2 b2 _ _ (path ++ [1]) he2 hc2 hc2'' hn.2 hn''.2
               (h.mono (fun n hn => by simp [hn]) (fun n hn => by simp [hn])))
-    | typesSplit b1 b2 =>
-      obtain ⟨db, tbs, e⟩ := typesSplit_erase hc''
-      rw [e] at he; simp [ATopDec.erase] at he
     | value _ _ | types _ _ _ _ | port _ _ _ => simp [ATopDec.erase] at he
   | .types TE VE db tbs, d'', C, C'', path, he, hc, hc'', _, _, _ => by
     rw [values_of_types _ C hc ⟨_, _, rfl⟩, values_of_types d'' C'' hc'' ⟨_, _, he⟩]; trivial
-  | .typesSplit a1 a2, d'', C, C'', path, he, hc, hc'', _, _, _ => by
-    obtain ⟨db, tbs, e⟩ := typesSplit_erase hc
-    rw [values_of_types _ C hc ⟨_, _, e⟩, values_of_types d'' C'' hc'' ⟨_, _, he.trans e⟩]; trivial
   | .port x ty U, d'', C, C'', path, he, hc, hc'', _, _, _ => by
     cases d'' with
     | port _ _ _ => trivial
-    | typesSplit b1 b2 =>
-      obtain ⟨db, tbs, e⟩ := typesSplit_erase hc''
-      rw [e] at he; simp [ATopDec.erase] at he
     | value _ _ | types _ _ _ _ | seq _ _ => simp [ATopDec.erase] at he
 
 end Walk
@@ -348,21 +299,7 @@ end Mod
 
 theorem genNames_new {B : SBasis} {a : AModule} {t : TyName} (h : t ∈ genNames B a) : t ∉ B.T := by
   unfold genNames at h
-  split at h
-  · rename_i B' E hr
-    unfold AModule.result at hr
-    split at hr
-    · cases hr
-    · unfold AModule.resultIn at hr
-      split at hr
-      · cases hr
-      · split at hr
-        · cases hr
-        · split at hr
-          · cases hr
-          · cases hr
-            exact (mem_diffL.mp h).2
-  · simp at h
+  simpa using (List.mem_filter.mp h).2
 
 theorem nodes_instance {B : SBasis} {a' a : AModule} {ν : List (TyName × TyName)} {S : Subst}
     (h : ∀ n ∈ (nodesModule B a).map (Node.renameNames ν), ∀ n' ∈ nodesModule B a', n.path = n'.path →

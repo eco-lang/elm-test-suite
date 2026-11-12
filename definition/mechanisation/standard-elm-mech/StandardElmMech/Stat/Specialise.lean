@@ -111,9 +111,7 @@ def BVar.tyVar? : BVar → Option TyVar
     (the monotype of an unannotated member, the annotation's type of an annotated one, before
     canonical renaming), the variables of its U', and the bound variables of its scheme outside
     the group (`Clos_C VE`, sec:static-core-closure, A93) and inside it (∀U' of an annotated member,
-    none of an unannotated one), each in the order of the canonical scheme's bound variables, so
-    that the instance recorded at an occurrence (a list, one type per bound variable) is read
-    against them. -/
+    none of an unannotated one), each in the order of the canonical scheme's bound variables. -/
 structure Member where
   x : Var
   body : Ty
@@ -240,15 +238,61 @@ inductive SpecError where
   | noModule (m : ModId)
   deriving DecidableEq, Repr
 
+/-! ## Reading an occurrence's type against a scheme body -/
+
+mutual
+/-- The type τ gives the variable `v` of a scheme body: τ read against the body, at the first
+    occurrence of `v` (left to right; a field of a record by its label). At an occurrence of a
+    variable whose scheme has body `body`, this is the instance's type at `v` when the body
+    mentions `v`: the instance of a bound variable that the body mentions is determined by the
+    type of the occurrence, which is the type in the sentence (sec:static-core-principal). -/
+def Ty.readVar (v : TyVar) : Ty → Ty → Option Ty
+  | .var a, τ => if a = v then some τ else none
+  | .record ρ _, τ =>
+    match τ with
+    | .record ρ' _ => Ty.readRow v ρ ρ'
+    | _ => none
+  | .fn a b, τ =>
+    match τ with
+    | .fn a' b' =>
+      match Ty.readVar v a a' with
+      | some t => some t
+      | none => Ty.readVar v b b'
+    | _ => none
+  | .con as _, τ =>
+    match τ with
+    | .con as' _ => Ty.readList v as as'
+    | _ => none
+def Ty.readRow (v : TyVar) : Row → Row → Option Ty
+  | [], _ => none
+  | (l, t) :: rest, ρ' =>
+    match (match ρ'.lookup l with
+           | some t' => Ty.readVar v t t'
+           | none => none) with
+    | some x => some x
+    | none => Ty.readRow v rest ρ'
+def Ty.readList (v : TyVar) : List Ty → List Ty → Option Ty
+  | [], _ => none
+  | t :: ts, l' =>
+    match l' with
+    | t' :: ts' =>
+      match Ty.readVar v t t' with
+      | some x => some x
+      | none => Ty.readList v ts ts'
+    | [] => none
+end
+
 /-- The number one variable `v` of the declaration takes at an occurrence (Choices, items 3 and
     5): the instance's type when the scheme seen here binds `v` and its body mentions it; Float when
     the scheme binds it and its body does not (A93); the enclosing copy's when the scheme does not
-    bind it. `pairs` is the instance keyed by the scheme's bound variables. -/
-def occNum (ρ : NumEnv) (bv : List BVar) (bodyVars : List TyVar) (pairs : List (BVar × Ty))
+    bind it. `read v` is the instance's type at `v`, read off the occurrence's type (`Ty.readVar`):
+    the instance list an annotated phrase records is a witness of the side condition `σ ≻ τ`, not a
+    type of the sentence, and is not read. -/
+def occNum (ρ : NumEnv) (bv : List BVar) (bodyVars : List TyVar) (read : TyVar → Option Ty)
     (v : TyVar) : Except SpecError Num :=
   if bv.contains (.ty v) then
     if bodyVars.contains v then
-      match (pairs.lookup (.ty v)).bind (resolve ρ) with
+      match (read v).bind (resolve ρ) with
       | some n => .ok n
       | none => .error .notANumber
     else .ok .float
@@ -257,18 +301,18 @@ def occNum (ρ : NumEnv) (bv : List BVar) (bodyVars : List TyVar) (pairs : List 
     | some n => .ok n
     | none => .error .notANumber
 
-def occNums (ρ : NumEnv) (bv : List BVar) (bodyVars : List TyVar) (pairs : List (BVar × Ty)) :
+def occNums (ρ : NumEnv) (bv : List BVar) (bodyVars : List TyVar) (read : TyVar → Option Ty) :
     List TyVar → Except SpecError Assignment
   | [] => .ok []
   | v :: vs => do
-    let n ← occNum ρ bv bodyVars pairs v
-    let ns ← occNums ρ bv bodyVars pairs vs
+    let n ← occNum ρ bv bodyVars read v
+    let ns ← occNums ρ bv bodyVars read vs
     pure (n :: ns)
 
-/-- The assignment an occurrence selects. -/
-def occAssignment (ρ : NumEnv) (V : List TyVar) (bv : List BVar) (body : Ty) (inst : List Ty) :
+/-- The assignment an occurrence of type τ selects. -/
+def occAssignment (ρ : NumEnv) (V : List TyVar) (bv : List BVar) (body : Ty) (τ : Ty) :
     Except SpecError Assignment :=
-  occNums ρ bv body.tyVarsSeq (bv.zip inst) V
+  occNums ρ bv body.tyVarsSeq (fun v => body.readVar v τ) V
 
 /-- A copy of a group at an assignment. -/
 abbrev Req := Nat × Assignment
@@ -277,17 +321,17 @@ structure Spec (α : Type) where
   out : α
   reqs : List Req
 
-/-- An occurrence of `lv` with instance `inst`: the copy it refers to, and the request for it
-    (none for a value of the basis, whose copies the basis binds). The qualifier is kept. -/
-def specOcc (ρ : NumEnv) (Γ : Scope) (lv : LongId) (inst : List Ty) :
+/-- An occurrence of `lv` at type τ: the copy it refers to, and the request for it (none for a
+    value of the basis, whose copies the basis binds). The qualifier is kept. -/
+def specOcc (ρ : NumEnv) (Γ : Scope) (lv : LongId) (τ : Ty) :
     Except SpecError (LongId × List Req) :=
   match Γ.ref lv with
   | .plain => .ok (lv, [])
   | .group gid V body bv => do
-    let a ← occAssignment ρ V bv body inst
+    let a ← occAssignment ρ V bv body τ
     pure (⟨lv.qual, copyName lv.id a⟩, [(gid, a)])
   | .basis V body bv => do
-    let a ← occAssignment ρ V bv body inst
+    let a ← occAssignment ρ V bv body τ
     pure (⟨lv.qual, copyName lv.id a⟩, [])
 
 /-- A special constant of an expression: an integer constant at Int or at Float. -/
@@ -409,8 +453,8 @@ def specAtExp (ρ : NumEnv) (Γ : Scope) (L : Ctx) (g : Nat) : AAtExp → Except
   | .scon sc τ => do
     let c ← specSCon ρ sc τ
     pure ⟨.scon c, []⟩
-  | .var lv inst _ => do
-    let (lv', r) ← specOcc ρ Γ lv inst
+  | .var lv _ τ => do
+    let (lv', r) ← specOcc ρ Γ lv τ
     pure ⟨.var lv', r⟩
   | .con lc _ _ => .ok ⟨.con lc, []⟩
   | .op o _ _ => .ok ⟨.op o, []⟩
@@ -424,8 +468,8 @@ def specAtExp (ρ : NumEnv) (Γ : Scope) (L : Ctx) (g : Nat) : AAtExp → Except
   | .record row => do
     let s ← specExpRowOpt ρ Γ L g row
     pure ⟨.record s.out, s.reqs⟩
-  | .update x inst _ row => do
-    let (lv', r) ← specOcc ρ Γ ⟨none, x⟩ inst
+  | .update x _ τ row => do
+    let (lv', r) ← specOcc ρ Γ ⟨none, x⟩ τ
     let s ← specExpRow ρ Γ L g row
     pure ⟨.update lv'.id s.out, r ++ s.reqs⟩
   | .letE (.val VE vb) e => do
@@ -554,7 +598,6 @@ inductive TopItem where
 def ATopDec.items : ATopDec → List TopItem
   | .value VE vb => [.value VE vb]
   | .types _ _ db tbs => [.types db tbs]
-  | .typesSplit a1 a2 => ATopDec.items a1 ++ ATopDec.items a2
   | .port x _ _ => [.port x]
   | .seq a1 a2 => ATopDec.items a1 ++ ATopDec.items a2
 

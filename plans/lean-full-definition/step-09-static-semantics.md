@@ -21,6 +21,10 @@ differences from this specification:
   `elabTypes_complete`, `annotated_main_scheme`, `forcedHead_sound`, `ports_det`, `uses_bound`,
   `elab_basis_mono`, and Group 10 (stretch). Section 14's names (`Stat/Interface.lean`) are left to
   step 10, which adds those it uses.
+- **Changed 2026-11-12 (ruling A98, option (c) of step 10's issue 9):** `r:sm-topdec-seq` no longer
+  splits a type-declaration phrase, so `r_sm_topdec_seq_types` and `ATopDec.typesSplit` are gone
+  (19 constructors for Chapter 5's 19 labels: 45 + 19 + 3); this specification's mentions of them,
+  and of 20 constructors, describe the earlier encoding. Issue 1 below is resolved that way.
 
 ## Goal
 

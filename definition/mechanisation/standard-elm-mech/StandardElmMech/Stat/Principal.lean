@@ -12,7 +12,9 @@
   it. For modules, up to a bijection between the type names the two derivations generate.
 
   The book's properties `PrincipalExistsCore` and `PrincipalExistsMod` are definitions here; no
-  theorem is stated under them (finding B6: the module property is false as the book stands).
+  theorem is stated under them (finding B6: the module property was false while r:sm-topdec-seq
+  could split a type-declaration phrase; the book no longer allows that split, decision of
+  2026-11-12, option (c) of step 10's issue 9, and the property is not proved here).
   Theorems are stated under `InferPrincipalFor B p`, decision D11.
 -/
 import StandardElmMech.Stat.Infer
@@ -24,7 +26,10 @@ open StandardElm.Src (BExp BModule BProgram)
 /-! ## Nodes -/
 
 /-- A node of a derivation: the occurrence it is about (its path), the U of its context, and the
-    types and type schemes of its sentence. -/
+    types and type schemes of its sentence. At an occurrence of a variable, constructor or operator
+    the sentence is `C ⊢ longvar ⇒ τ`: the instance chosen for the scheme's bound variables is a
+    witness of the side condition `σ ≻ τ`, not a type of the sentence, and is not in the node
+    (`Complete/InstCounter.lean`). -/
 structure Node where
   path : List Nat
   U : List BVar
@@ -48,7 +53,7 @@ def nodesPatRowOpt (U : List BVar) (path : List Nat) : Option APatRow → List N
   | some r => nodesPatRow U path r
 def nodesPat (U : List BVar) (path : List Nat) : APat → List Node
   | .atpat a => [⟨path, U, [a.ty], veSchemes a.ve⟩] ++ nodesAtPat U (path ++ [0]) a
-  | .con lc inst args τ => [⟨path, U, [τ] ++ inst, veSchemes (APat.con lc inst args τ).ve⟩] ++
+  | .con lc inst args τ => [⟨path, U, [τ], veSchemes (APat.con lc inst args τ).ve⟩] ++
       nodesAtPats U path 0 args
   | .cons p1 p2 => [⟨path, U, [listTy p1.ty], veSchemes (APat.cons p1 p2).ve⟩] ++
       nodesPat U (path ++ [0]) p1 ++ nodesPat U (path ++ [1]) p2
@@ -64,16 +69,16 @@ end
 mutual
 /-- The nodes of the derivation an annotated expression stands for, in context C, in preorder. -/
 def nodesAtExp (C : Ctx) (path : List Nat) : AAtExp → List Node
-  | .scon sc τ => [⟨path, C.U, [τ] ++ litInst sc τ, []⟩]
-  | .var lv inst τ => [⟨path, C.U, [τ] ++ inst, []⟩]
-  | .con lc inst τ => [⟨path, C.U, [τ] ++ inst, []⟩]
-  | .op o inst τ => [⟨path, C.U, [τ] ++ inst, []⟩]
+  | .scon _ τ => [⟨path, C.U, [τ], []⟩]
+  | .var _ _ τ => [⟨path, C.U, [τ], []⟩]
+  | .con _ _ τ => [⟨path, C.U, [τ], []⟩]
+  | .op _ _ τ => [⟨path, C.U, [τ], []⟩]
   | .unit => [⟨path, C.U, [tUnitTy], []⟩]
   | .tuple e1 e2 e3 => [⟨path, C.U, [(AAtExp.tuple e1 e2 e3).ty], []⟩] ++
       nodesExp C (path ++ [0]) e1 ++ nodesExp C (path ++ [1]) e2 ++ nodesExpOpt C (path ++ [2]) e3
   | .nil τ => [⟨path, C.U, [τ], []⟩]
   | .record row => [⟨path, C.U, [(AAtExp.record row).ty], []⟩] ++ nodesExpRowOpt C (path ++ [0]) row
-  | .update x inst τ row => [⟨path, C.U, [τ] ++ inst, []⟩] ++ nodesExpRow C (path ++ [0]) row
+  | .update _ _ τ row => [⟨path, C.U, [τ], []⟩] ++ nodesExpRow C (path ++ [0]) row
   | .letE d e => [⟨path, C.U, [e.ty], []⟩] ++ nodesDec C (path ++ [0]) d ++
       nodesExp (C.plusVE (d.result C)) (path ++ [1]) e
   | .paren e => [⟨path, C.U, [e.ty], []⟩] ++ nodesExp C (path ++ [0]) e
@@ -114,10 +119,6 @@ end
 def nodesTopDec (C : Ctx) (path : List Nat) : ATopDec → List Node
   | .value VE vb => [⟨path, C.U, [], veSchemes (closGroup C.tyvars VE)⟩] ++ nodesValBind (C.plusVE VE) (path ++ [0]) vb
   | .types TE VE _ _ => [⟨path, C.U, TE.map (·.2.1.body), veSchemes VE⟩]
-  | .typesSplit a1 a2 =>
-    match checkTopDec C a1 with
-    | some (E1, _) => nodesTopDec C (path ++ [0]) a1 ++ nodesTopDec (C.oplusE E1) (path ++ [1]) a2
-    | none => []
   | .port x ty U => match elabPort C x ty U with
     | some (E, PE) => [⟨path, C.U ++ U, PE.map (·.2.2), veSchemes E.VE⟩]
     | none => []
@@ -183,11 +184,20 @@ theorem principal_unique {C : Ctx} {a a' : AExp} (h : IsPrincipal C a) (h' : IsP
 
 /-! ## Modules (sec:static-modules-principal) -/
 
-/-- The type names a module's derivation generates: those of its result that are new. -/
+/-- The type names a module's type declarations give its custom types (the `name?` of their type
+    functions, `namesOf`). -/
+def ATopDec.custNames : ATopDec → List TyName
+  | .types TE _ db _ => (db.getD []).filterMap fun d => namesOf TE d.1
+  | .seq a1 a2 => a1.custNames ++ a2.custNames
+  | _ => []
+
+/-- The type names a module's derivation chooses freely outside `T of B` (sec:static-modules-principal:
+    r:sm-datbind and r:sm-topdec-types): the names of its custom types. Other type names of its
+    environment are not chosen by the derivation, and are compared literally (a type name in no
+    basis at a node the sentence leaves free is an instance, JunkCounterexample.lean). The result's
+    `T'` (r:sm-module) is unchanged. -/
 def genNames (B : SBasis) (a : AModule) : List TyName :=
-  match a.result B with
-  | some (B', _) => B'.T
-  | none => []
+  ((a.body.map ATopDec.custNames).getD []).filter fun t => !decide (t ∈ B.T)
 
 /-- Renaming of type names by a finite map (the others unchanged). -/
 def renameName (ρ : List (TyName × TyName)) (t : TyName) : TyName := ((ρ.find? (·.1 == t)).map (·.2)).getD t
@@ -227,7 +237,6 @@ def InstanceOfMod (B : SBasis) (a' a : AModule) : Prop :=
 def ATopDec.NoFreeBnd : ATopDec → Prop
   | .value _ vb => ∀ (C : Ctx) (path : List Nat), ∀ n ∈ nodesValBind C path vb, ∀ τ ∈ n.tys, ∀ v ∈ τ.vars, v.isBnd = false
   | .types _ _ _ _ => True
-  | .typesSplit a1 a2 => a1.NoFreeBnd ∧ a2.NoFreeBnd
   | .port _ _ _ => True
   | .seq a1 a2 => a1.NoFreeBnd ∧ a2.NoFreeBnd
 
@@ -237,7 +246,8 @@ def IsPrincipalMod (B : SBasis) (a : AModule) : Prop :=
   checkModule B a = true ∧ a.NoFreeBnd ∧
     ∀ a', checkModule B a' = true → a'.NoFreeBnd → a'.erase = a.erase → InstanceOfMod B a' a
 
-/-- sec:static-modules-principal (finding B6: false as the book stands). -/
+/-- sec:static-modules-principal (finding B6: false while r:sm-topdec-seq could split a
+    type-declaration phrase, which the book no longer allows; not proved here). -/
 def PrincipalExistsMod : Prop :=
   ∀ (B : SBasis) (m : BModule), (∃ B' E, ElModule B m B' E) → ∃ a, a.erase = m ∧ IsPrincipalMod B a
 

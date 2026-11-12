@@ -669,16 +669,6 @@ theorem sTop : ∀ (d : ATopDec) (C : Ctx) (E : Env) (PE : PortEnv), CtxInv C0 C
     · cases h
   | .types _ _ _ _, _, _, _, _, hn, _ => by simp [ATopDec.erase, noTypesB] at hn
   | .port _ _ _, _, _, _, _, hn, _ => by simp [ATopDec.erase, noTypesB] at hn
-  | .typesSplit a1 a2, C, E, PE, _, hn, h => by
-    simp only [checkTopDec] at h
-    split at h
-    · rename_i hs
-      obtain ⟨db, tbs1, tbs2, h1e, h2e, _, _⟩ := splitShape_spec hs
-      have : (ATopDec.typesSplit a1 a2).erase = .types db (tbs1 ++ tbs2) := by
-        simp only [ATopDec.erase, h1e, h2e]
-      rw [this] at hn
-      simp [noTypesB] at hn
-    · cases h
   | .seq a1 a2, C, E, PE, hinv, hn, h => by
     simp only [ATopDec.erase, noTypesB, Bool.and_eq_true] at hn
     simp only [checkTopDec] at h
@@ -871,7 +861,7 @@ end
 
 def tTop : ATopDec → List Ty
   | .value _ vb => tValBind vb
-  | .seq a1 a2 | .typesSplit a1 a2 => tTop a1 ++ tTop a2
+  | .seq a1 a2 => tTop a1 ++ tTop a2
   | _ => []
 
 /-- The types the inference gives the sites of a module (no hypothesis about them is needed). -/

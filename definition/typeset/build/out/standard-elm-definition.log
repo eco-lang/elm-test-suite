@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Debian) (preloaded format=pdflatex 2026.5.27)  12 NOV 2026 12:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Debian) (preloaded format=pdflatex 2026.5.27)  12 NOV 2026 13:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -501,7 +501,11 @@ Underfull \hbox (badness 2245) in paragraph at lines 289--289
 []|\T1/cmr/m/n/10 (+20) type vari-ables, con-strained
  []
 
-[45] [46] [47] [48] [49] [50] [51] [52] [53]) [54]
+[45] [46] [47] [48] [49] [50] [51]
+Underfull \vbox (badness 1057) has occurred while \output is active []
+
+ [52]
+[53]) [54]
 \openout2 = `dynamic-core.aux'.
 
  (./dynamic-core.tex
@@ -700,11 +704,11 @@ Package rerunfilecheck Info: File `standard-elm-definition.out' has not changed
 (rerunfilecheck)             Checksum: 793FA2EB3795B3F6246041FC58DCBF33;23821.
  ) 
 Here is how much of TeX's memory you used:
- 13793 strings out of 478051
- 218636 string characters out of 5840943
+ 13795 strings out of 478051
+ 218652 string characters out of 5840943
  1884330 words of memory out of 5000000
  32383 multiletter control sequences out of 15000+600000
- 562943 words of font info for 356 fonts, out of 8000000 for 9000
+ 563051 words of font info for 357 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  75i,21n,76p,1020b,591s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-t1.enc}{/usr/share/texmf/
@@ -745,10 +749,10 @@ blic/cm-super/sfti1000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti10
 exmf/fonts/type1/public/cm-super/sftt0900.pfb></usr/share/texmf/fonts/type1/pub
 lic/cm-super/sftt1000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt109
 5.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt1200.pfb>
-Output written on out/standard-elm-definition.pdf (187 pages, 1356915 bytes).
+Output written on out/standard-elm-definition.pdf (187 pages, 1357821 bytes).
 PDF statistics:
- 3329 PDF objects out of 3580 (max. 8388607)
- 3010 compressed objects within 31 object streams
+ 3331 PDF objects out of 3580 (max. 8388607)
+ 3012 compressed objects within 31 object streams
  785 named destinations out of 1000 (max. 500000)
  87769 words of extra memory for PDF output out of 89155 (max. 10000000)
 

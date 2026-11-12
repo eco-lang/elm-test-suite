@@ -22,6 +22,10 @@ Rebuilt on 2026-11-12 after the preface's account of the mechanisation said that
 
 Rebuilt on 2026-11-12 after the preface's account of the mechanisation said that, for each of the 579 translated test programs, Lean computes from its source the program the translator writes (plan step 10). 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
 
+Rebuilt on 2026-11-12 after ruling A98: rule r:sm-topdec-seq does not split a type-declaration phrase (a side condition), so a module's type declarations are elaborated together and their order does not matter; the comments on r:sm-topdec-types and r:sm-topdec-seq say so, with the example `type T = T String` before `type alias String = Int`. 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
+Rebuilt on 2026-11-12 after an erratum to rule r:sm-topdec-types: the side condition tyvars TE = ∅, without which an environment whose constructors keep a free variable (`K : a -> T a` for `type T a = K a`) justified itself, since the closures of r:sm-datbind and r:sm-typbind-record are taken in C ⊕ TE; the comment says so. 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
 ## Status
 
 | Field | Value |

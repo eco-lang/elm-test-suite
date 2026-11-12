@@ -3,9 +3,9 @@
   (section 4 and 5). `#check_static_rules` reads the `\defnrule` labels of static-core.tex,
   static-modules.tex and programs.tex, and fails unless every label `r:s-…`, `r:sm-…` and
   `r:p-stat-…` has a relation constructor of the same name (with `_` for `-` and `:`), and every
-  such constructor a label; `r_sm_topdec_seq_types` is the one exception, a second constructor
-  for rule r:sm-topdec-seq (Modules.lean). Expected: 45 + 20 + 3 constructors for 45 + 19 + 3
-  labels.
+  such constructor a label. Expected: 45 + 19 + 3 constructors for 45 + 19 + 3 labels. (Step 9's
+  second constructor for r:sm-topdec-seq, splitting a type-declaration phrase, is gone: the book no
+  longer allows that split, decision of 2026-11-12, option (c) of step 10's issue 9.)
 -/
 import Lean
 import StandardElmMech.Stat.Program
@@ -43,15 +43,15 @@ elab "#check_static_rules" : command => do
   let labels := ruleLabels core "r:s-" ++ ruleLabels mods "r:sm-" ++ ruleLabels progs "r:p-stat-"
   let toCtor (l : String) := (l.replace ":" "_").replace "-" "_"
   let missing := labels.filter fun l => !(rules.contains (toCtor l))
-  let extra := rules.filter fun c => !(labels.map toCtor).contains c && c != "r_sm_topdec_seq_types"
+  let extra := rules.filter fun c => !(labels.map toCtor).contains c
   unless missing.isEmpty && extra.isEmpty do
     throwError "#check_static_rules: labels without a constructor {missing}, constructors without a label {extra}"
   let count (p : String) := (rules.filter (·.startsWith p)).length
   let nS := count "r_s_"
   let nSM := count "r_sm_"
   let nP := count "r_p_stat_"
-  unless nS = 45 ∧ nSM = 20 ∧ nP = 3 do
-    throwError "#check_static_rules: {nS} + {nSM} + {nP} constructors, expected 45 + 20 + 3"
+  unless nS = 45 ∧ nSM = 19 ∧ nP = 3 do
+    throwError "#check_static_rules: {nS} + {nSM} + {nP} constructors, expected 45 + 19 + 3"
   logInfo m!"#check_static_rules: {labels.length} labels, {rules.length} constructors ({nS} + {nSM} + {nP}) agree"
 
 #check_static_rules

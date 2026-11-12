@@ -129,12 +129,12 @@ end
 
 def FurtherTopDec (tbl : ConTable) : ATopDec → Prop
   | .value _ vb => FurtherValBind tbl vb
-  | .typesSplit a1 a2 | .seq a1 a2 => FurtherTopDec tbl a1 ∧ FurtherTopDec tbl a2
+  | .seq a1 a2 => FurtherTopDec tbl a1 ∧ FurtherTopDec tbl a2
   | _ => True
 
 def furtherTopDecB (tbl : ConTable) : ATopDec → Bool
   | .value _ vb => furtherValBindB tbl vb
-  | .typesSplit a1 a2 | .seq a1 a2 => furtherTopDecB tbl a1 && furtherTopDecB tbl a2
+  | .seq a1 a2 => furtherTopDecB tbl a1 && furtherTopDecB tbl a2
   | _ => true
 
 /-- The further restrictions of a module's derivation, with the constructors of the basis and of

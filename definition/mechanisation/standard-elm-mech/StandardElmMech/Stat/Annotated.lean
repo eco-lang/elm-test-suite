@@ -7,8 +7,9 @@
   record pattern), the instance (the types for the scheme's bound variables) at each occurrence of
   a variable, constructor or operator, the group's value environment before closure at each
   declaration, U' at each annotated binding, and, in modules, the type environment of the type
-  declarations (with its generated type names), the split of `r_sm_topdec_seq_types`, and the U
-  of each port. The other types (of applications, lambdas, tuples, matches, rows and value
+  declarations (with its generated type names) and the U of each port. (Step 9 also had a node
+  for r:sm-topdec-seq splitting a type-declaration phrase; the book no longer allows that split,
+  decision of 2026-11-12, option (c) of step 10's issue 9, so the node is gone.) The other types (of applications, lambdas, tuples, matches, rows and value
   environments of patterns) are computed from the nodes (`ty`, `ve`, `row`), so a certificate
   stores only what a derivation chooses. Imports, headers, type expressions and type declarations
   given their names are computed by Deterministic.lean.
@@ -400,18 +401,12 @@ end
 inductive ATopDec where
   | value (VE : ValEnv) (vb : AValBind)
   | types (TE : TyEnv) (VE : ValEnv) (db : Option BDatBind) (tbs : List BTypBind)
-  /-- r_sm_topdec_seq_types: the phrase split at a separator. -/
-  | typesSplit (a1 a2 : ATopDec)
   | port (x : Var) (ty : BTy) (U : List BVar)
   | seq (a1 a2 : ATopDec)
 
 def ATopDec.erase : ATopDec → BTopDec
   | .value _ vb => .value vb.erase
   | .types _ _ db tbs => .types db tbs
-  | .typesSplit a1 a2 =>
-    match ATopDec.erase a1, ATopDec.erase a2 with
-    | .types db tbs1, .types _ tbs2 => .types db (tbs1 ++ tbs2)
-    | d, _ => d
   | .port x ty _ => .port x ty
   | .seq a1 a2 => .seq (ATopDec.erase a1) (ATopDec.erase a2)
 
@@ -424,26 +419,12 @@ abbrev AProgram := List AModule
 
 def AModule.erase (a : AModule) : BModule := ⟨a.header, a.imports, a.body.map ATopDec.erase⟩
 
-/-- A type-declaration phrase that r:sm-topdec-seq may split there: its two parts. -/
-def splitShape : BTopDec → BTopDec → Bool
-  | .types db tbs1, .types none tbs2 => (db.isSome || !tbs1.isEmpty) && !tbs2.isEmpty
-  | _, _ => false
-
 def checkTopDec (C : Ctx) : ATopDec → Option (Env × PortEnv)
   | .value VE vb =>
     if checkValBind (C.plusVE VE) vb && decide (vb.ve = VE) then
       some (Env.ofVE (closGroup C.tyvars VE), [])
     else none
   | .types TE VE db tbs => if checkTypes C TE VE db tbs then some (⟨[], TE, VE⟩, []) else none
-  | .typesSplit a1 a2 =>
-    if splitShape a1.erase a2.erase then
-      match checkTopDec C a1 with
-      | some (E1, PE1) =>
-        match checkTopDec (C.oplusE E1) a2 with
-        | some (E2, PE2) => some (E1.plus E2, Env.plusPE PE1 PE2)
-        | none => none
-      | none => none
-    else none
   | .port x ty U => elabPort C x ty U
   | .seq a1 a2 =>
     match checkTopDec C a1 with

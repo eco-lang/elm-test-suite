@@ -28,3 +28,7 @@ root = "Certify"
 [[lean_exe]]
 name = "compare-e2e"
 root = "CompareE2E"
+
+[[lean_exe]]
+name = "measure-cores"
+root = "MeasureCores"

@@ -7,6 +7,7 @@ import StandardElmMech.Stat.Refusals
 import StandardElmMech.Stat.RefuseScope
 import StandardElmMech.Stat.RefuseFurther
 import StandardElmMech.Stat.RefuseTypes
+import StandardElmMech.Stat.Complete.CoreComplete
 
 namespace StandardElm.Stat
 open StandardElm.Src (SProgram SModule)

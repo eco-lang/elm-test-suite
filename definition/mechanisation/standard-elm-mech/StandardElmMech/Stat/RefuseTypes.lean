@@ -5,8 +5,8 @@
   `typesFailB B sp`: some type expression of the first module (an alias, a constructor argument, a
   top-level annotation, a port) elaborates in no derivation. `mainFailB B sp`: the one module gives
   `main` a type that is neither a `Program` nor a `Node` type in every derivation. Both are
-  unconditional: they quantify over every derivation, its generated type names, its splits of the
-  type declarations (r:sm-topdec-seq), and the sorts of the new variables of its annotations.
+  unconditional: they quantify over every derivation, its generated type names, and the sorts of
+  the new variables of its annotations.
 
   The method is a simulation. A derivation chooses the names of its custom types; collapsing every
   type name outside B.T to a name ⟨D, arity⟩ (`fcol`) maps every type a derivation computes to the
@@ -986,7 +986,8 @@ theorem types_leaf {C : Ctx} (hI : Inv B f A C) {TE : TyEnv} {VE : ValEnv} {db' 
     have := hnd'.2.1
     rw [List.map_append] at this
     exact (List.nodup_append.mp this).1
-  unfold checkTypes at h
+  replace h := checkTypes_fix h
+  unfold checkTypesFix at h
   cases db' with
   | none =>
     simp only at h
@@ -1048,101 +1049,6 @@ theorem types_leaf {C : Ctx} (hI : Inv B f A C) {TE : TyEnv} {VE : ValEnv} {db' 
     · cases h
 
 end types
-
-theorem aliasOrderB_suffix : ∀ (l1 l2 : List BTypBind), aliasOrderB (l1 ++ l2) = true → aliasOrderB l2 = true
-  | [], _, h => h
-  | _ :: l1, l2, h => by
-    simp only [List.cons_append, aliasOrderB, Bool.and_eq_true] at h
-    exact aliasOrderB_suffix l1 l2 h.2
-
-theorem splitShape_inv {d1 d2 : BTopDec} (h : splitShape d1 d2 = true) :
-    ∃ db tbs1 tbs2, d1 = .types db tbs1 ∧ d2 = .types none tbs2 := by
-  cases d1 <;> cases d2 <;> try simp [splitShape] at h
-  rename_i db tbs1 db2 tbs2
-  cases db2
-  · exact ⟨db, tbs1, tbs2, rfl, rfl⟩
-  · simp at h
-
-theorem typesSplit_erase {C : Ctx} {a1 a2 : ATopDec} {r : Env × PortEnv}
-    (h : checkTopDec C (.typesSplit a1 a2) = some r) :
-    ∃ db tbs1 tbs2, a1.erase = .types db tbs1 ∧ a2.erase = .types none tbs2 ∧
-      (ATopDec.typesSplit a1 a2).erase = .types db (tbs1 ++ tbs2) := by
-  simp only [checkTopDec] at h
-  split at h
-  · rename_i hs
-    obtain ⟨db, tbs1, tbs2, h1, h2⟩ := splitShape_inv hs
-    exact ⟨db, tbs1, tbs2, h1, h2, by simp [ATopDec.erase, h1, h2]⟩
-  · cases h
-
-section types2
-set_option linter.unusedSectionVars false
-variable {B : SBasis} {f : TyName → TyName} (hcol : Col B f) {A : Ctx} (hAU : A.U = [])
-include hcol hAU
-
-theorem types_claim : ∀ (a : ATopDec) (C : Ctx) (E : Env) (PE : PortEnv) (db' : Option BDatBind)
-    (seg post : List BTypBind),
-    a.erase = .types db' seg → Inv B f A C →
-    ((db'.getD []).map (·.1) ++ (seg ++ post).map (·.c)).Nodup → customsOK A db' = true →
-    aliasOrderB (seg ++ post) = true →
-    (aliasesRefuted A (seg ++ post) = true ∨ aliasesAllOK A (seg ++ post) = true) →
-    checkTopDec C a = some (E, PE) →
-    (aliasesRefuted A (seg ++ post) = true → aliasesRefuted A post = true) ∧
-    (aliasesAllOK A (seg ++ post) = true → aliasesAllOK A post = true) ∧
-    Inv B f A (C.oplusE E) ∧ consOK A db' = true
-  | .types TE VE db'' tbs'', C, E, PE, db', seg, post, he, hI, hnd, hcu, hord, hH, h => by
-    simp only [ATopDec.erase, BTopDec.types.injEq] at he
-    obtain ⟨rfl, rfl⟩ := he
-    simp only [checkTopDec] at h
-    split at h
-    · rename_i hc
-      simp only [Option.some.injEq, Prod.mk.injEq] at h
-      obtain ⟨rfl, rfl⟩ := h
-      have hl := types_leaf hcol hAU hI hnd hcu hord hH hc
-      refine ⟨hl.1, hl.2.1, ?_, hl.2.2.2⟩
-      exact ⟨fun lc => lookSim_of_same (sameTy_oplusE_types C _ _) (hl.2.2.1 lc), hI.U,
-        fun t ht => T_oplusE C _ t (hI.T t ht)⟩
-    · cases h
-  | .typesSplit a1 a2, C, E, PE, db', seg, post, he, hI, hnd, hcu, hord, hH, h => by
-    obtain ⟨db1, tbs1, tbs2, h1, h2, he'⟩ := typesSplit_erase h
-    rw [he'] at he
-    simp only [BTopDec.types.injEq] at he
-    obtain ⟨rfl, rfl⟩ := he
-    simp only [checkTopDec] at h
-    split at h
-    · cases hc1 : checkTopDec C a1 with
-      | none => rw [hc1] at h; simp at h
-      | some r1 =>
-        obtain ⟨E1, PE1⟩ := r1
-        rw [hc1] at h
-        simp only at h
-        cases hc2 : checkTopDec (C.oplusE E1) a2 with
-        | none => rw [hc2] at h; simp at h
-        | some r2 =>
-          obtain ⟨E2, PE2⟩ := r2
-          rw [hc2] at h
-          simp only [Option.some.injEq, Prod.mk.injEq] at h
-          obtain ⟨rfl, rfl⟩ := h
-          simp only [List.append_assoc] at hnd hord hH ⊢
-          have ih1 := types_claim a1 C E1 PE1 db1 tbs1 (tbs2 ++ post) h1 hI hnd hcu hord hH hc1
-          have hnd2 : (((none : Option BDatBind).getD []).map (·.1) ++ (tbs2 ++ post).map (·.c)).Nodup := by
-            have := (List.nodup_append.mp hnd).2.1
-            rw [List.map_append] at this
-            simpa using (List.nodup_append.mp this).2.1
-          have hH2 : aliasesRefuted A (tbs2 ++ post) = true ∨ aliasesAllOK A (tbs2 ++ post) = true := by
-            rcases hH with h | h
-            · exact .inl (ih1.1 h)
-            · exact .inr (ih1.2.1 h)
-          have ih2 := types_claim a2 (C.oplusE E1) E2 PE2 none tbs2 post h2 ih1.2.2.1 hnd2 rfl
-            (aliasOrderB_suffix tbs1 _ hord) hH2 hc2
-          refine ⟨fun h => ih2.1 (ih1.1 h), fun h => ih2.2.1 (ih1.2.1 h), ?_, ih1.2.2.2⟩
-          exact ⟨fun lc => lookSim_of_same (sameTy_oplusE_plus C E1 E2) (ih2.2.2.1.look lc), hI.U,
-            fun t ht => T_oplusE C _ t (hI.T t ht)⟩
-    · cases h
-  | .value _ _, _, _, _, _, _, _, he, _, _, _, _, _, _ => by simp [ATopDec.erase] at he
-  | .port _ _ _, _, _, _, _, _, _, he, _, _, _, _, _, _ => by simp [ATopDec.erase] at he
-  | .seq _ _, _, _, _, _, _, _, he, _, _, _, _, _, _ => by simp [ATopDec.erase] at he
-
-end types2
 
 /-! ## Annotations and ports -/
 
@@ -1353,12 +1259,24 @@ theorem types_top {a : ATopDec} {C : Ctx} {E : Env} {PE : PortEnv} {db : Option 
     (hH : aliasesRefuted A tbs = true ∨ aliasesAllOK A tbs = true) (h : checkTopDec C a = some (E, PE)) :
     aliasesRefuted A tbs = false ∧ Inv B f A (C.oplusE E) ∧ consOK A db = true := by
   simp only [typesNodeOK, Bool.and_eq_true, decide_eq_true_eq] at hn
-  have hc := types_claim hcol hAU a C E PE db tbs [] he hI (by simpa using hn.1.1) hn.1.2
-    (by simpa using hn.2) (by simpa using hH) h
-  refine ⟨?_, hc.2.2.1, hc.2.2.2⟩
-  cases hr : aliasesRefuted A tbs with
-  | false => rfl
-  | true => have := hc.1 (by simpa using hr); simp [aliasesRefuted] at this
+  cases a with
+  | types TE VE db'' tbs'' =>
+    simp only [ATopDec.erase, BTopDec.types.injEq] at he
+    obtain ⟨rfl, rfl⟩ := he
+    simp only [checkTopDec] at h
+    split at h
+    · rename_i hc
+      simp only [Option.some.injEq, Prod.mk.injEq] at h
+      obtain ⟨rfl, rfl⟩ := h
+      have hl := types_leaf hcol hAU (post := []) hI (by simpa using hn.1.1) hn.1.2 (by simpa using hn.2)
+        (by simpa using hH) hc
+      refine ⟨?_, ⟨fun lc => lookSim_of_same (sameTy_oplusE_types C _ _) (hl.2.2.1 lc), hI.U,
+        fun t ht => T_oplusE C _ t (hI.T t ht)⟩, hl.2.2.2⟩
+      cases hr : aliasesRefuted A tbs'' with
+      | false => rfl
+      | true => have := hl.1 (by simpa using hr); simp [aliasesRefuted] at this
+    · cases h
+  | value _ _ | port _ _ _ | seq _ _ => simp [ATopDec.erase] at he
 
 theorem pres : ∀ (a : ATopDec) (C : Ctx) (E : Env) (PE : PortEnv), Inv B f A C →
     preserves A a.erase = true → checkTopDec C a = some (E, PE) → Inv B f A (C.oplusE E)
@@ -1372,11 +1290,6 @@ theorem pres : ∀ (a : ATopDec) (C : Ctx) (E : Env) (PE : PortEnv), Inv B f A C
   | .types TE VE db tbs, C, E, PE, hI, hp, h => by
     simp only [ATopDec.erase, preserves, Bool.and_eq_true] at hp
     exact (types_top hcol hAU rfl hI hp.1 (.inr hp.2) h).2.1
-  | .typesSplit a1 a2, C, E, PE, hI, hp, h => by
-    obtain ⟨db, tbs1, tbs2, _, _, he⟩ := typesSplit_erase h
-    rw [he] at hp
-    simp only [preserves, Bool.and_eq_true] at hp
-    exact (types_top hcol hAU he hI hp.1 (.inr hp.2) h).2.1
   | .port x ty U, C, E, PE, hI, _, h => by
     obtain ⟨_, _, s, PE', hr⟩ := elabPort_shape h
     simp only [checkTopDec, hr] at h
@@ -1424,22 +1337,6 @@ theorem ref : ∀ (a : ATopDec) (C : Ctx), Inv B f A C → refTop A a.erase = tr
         · exact .inl h'
         · exact .inr h'.1
       have ht := types_top hcol hAU rfl hI hr.1 hH h
-      rcases hr.2 with h' | h'
-      · rw [ht.1] at h'; cases h'
-      · rw [ht.2.2] at h'; cases h'.2
-  | .typesSplit a1 a2, C, hI, hr => by
-    cases h : checkTopDec C (.typesSplit a1 a2) with
-    | none => rfl
-    | some r =>
-      obtain ⟨E, PE⟩ := r
-      obtain ⟨db, tbs1, tbs2, _, _, he⟩ := typesSplit_erase h
-      rw [he] at hr
-      simp only [refTop, Bool.and_eq_true, Bool.or_eq_true, Bool.not_eq_true'] at hr
-      have hH : aliasesRefuted A (tbs1 ++ tbs2) = true ∨ aliasesAllOK A (tbs1 ++ tbs2) = true := by
-        rcases hr.2 with h' | h'
-        · exact .inl h'
-        · exact .inr h'.1
-      have ht := types_top hcol hAU he hI hr.1 hH h
       rcases hr.2 with h' | h'
       · rw [ht.1] at h'; cases h'
       · rw [ht.2.2] at h'; cases h'.2
@@ -1743,9 +1640,6 @@ theorem no_main : ∀ (a : ATopDec) (C : Ctx) (E : Env) (PE : PortEnv), noMain a
       rfl
     · cases h
   | .types _ _ _ _, _, _, _, hn, _ => by simp [ATopDec.erase, noMain] at hn
-  | .typesSplit a1 a2, C, E, PE, hn, h => by
-    obtain ⟨_, _, _, _, _, he⟩ := typesSplit_erase h
-    rw [he] at hn; simp [noMain] at hn
   | .port x ty U, C, E, PE, hn, h => by
     simp only [ATopDec.erase, noMain, bne_iff_ne, ne_eq] at hn
     replace h : elabPort C x ty U = some (E, PE) := h
@@ -1791,9 +1685,6 @@ theorem main_bad : ∀ (a : ATopDec) (C : Ctx) (E : Env) (PE : PortEnv), Inv B f
       exact ⟨_, _, rfl, badHead_canon _ hb⟩
     · cases h
   | .types _ _ _ _, _, _, _, _, hm, _ => by simp [ATopDec.erase, mainRef] at hm
-  | .typesSplit a1 a2, C, E, PE, _, hm, h => by
-    obtain ⟨_, _, _, _, _, he⟩ := typesSplit_erase h
-    rw [he] at hm; simp [mainRef] at hm
   | .port _ _ _, _, _, _, _, hm, _ => by simp [ATopDec.erase, mainRef] at hm
   | .seq a1 a2, C, E, PE, hI, hm, h => by
     simp only [ATopDec.erase, mainRef, Bool.or_eq_true, Bool.and_eq_true] at hm

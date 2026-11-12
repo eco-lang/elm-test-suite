@@ -364,17 +364,6 @@ theorem elabPort_sound (C : Ctx) (x : Var) (ty : BTy) (U : List BVar) (E : Env) 
     · cases h
   · cases h
 
-theorem splitShape_spec {d1 d2 : BTopDec} (h : splitShape d1 d2 = true) :
-    ∃ db tbs1 tbs2, d1 = .types db tbs1 ∧ d2 = .types none tbs2 ∧ (db.isSome ∨ tbs1 ≠ []) ∧ tbs2 ≠ [] := by
-  match d1, d2, h with
-  | .types db tbs1, .types none tbs2, h =>
-    simp only [splitShape, Bool.and_eq_true, Bool.or_eq_true, Bool.not_eq_true',
-      List.isEmpty_eq_false_iff] at h
-    refine ⟨db, tbs1, tbs2, rfl, rfl, ?_, h.2⟩
-    rcases h.1 with h1 | h1
-    · exact .inl h1
-    · exact .inr h1
-
 theorem checkTopDec_sound (C : Ctx) : (a : ATopDec) → (E : Env) → (PE : PortEnv) →
     checkTopDec C a = some (E, PE) → ElTopDec C a.erase E PE
   | .value VE vb, E, PE, h => by
@@ -394,29 +383,7 @@ theorem checkTopDec_sound (C : Ctx) : (a : ATopDec) → (E : Env) → (PE : Port
     · rename_i hc
       simp only [Option.some.injEq, Prod.mk.injEq] at h
       obtain ⟨rfl, rfl⟩ := h
-      exact .r_sm_topdec_types (checkTypes_sound C TE VE db tbs hc)
-    · cases h
-  | .typesSplit a1 a2, E, PE, h => by
-    simp only [checkTopDec] at h
-    split at h
-    · rename_i hs
-      obtain ⟨db, tbs1, tbs2, h1e, h2e, hc1, hc2⟩ := splitShape_spec hs
-      split at h
-      · rename_i E1 PE1 h1
-        split at h
-        · rename_i E2 PE2 h2
-          simp only [Option.some.injEq, Prod.mk.injEq] at h
-          obtain ⟨rfl, rfl⟩ := h
-          have d1 := checkTopDec_sound C a1 E1 PE1 h1
-          have d2 := checkTopDec_sound _ a2 E2 PE2 h2
-          rw [h1e] at d1
-          rw [h2e] at d2
-          have : (ATopDec.typesSplit a1 a2).erase = .types db (tbs1 ++ tbs2) := by
-            simp only [ATopDec.erase, h1e, h2e]
-          rw [this]
-          exact .r_sm_topdec_seq_types hc1 hc2 d1 d2
-        · cases h
-      · cases h
+      exact .r_sm_topdec_types (checkTypes_sound C TE VE db tbs hc).1 (checkTypes_sound C TE VE db tbs hc).2
     · cases h
   | .port x ty U, E, PE, h => by
     simp only [checkTopDec] at h

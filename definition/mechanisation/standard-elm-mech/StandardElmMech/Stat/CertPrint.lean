@@ -178,7 +178,6 @@ end
 partial def topDec : ATopDec → String
   | .value VE vb => paren (".value " ++ valEnv VE ++ " " ++ valBind vb)
   | .types TE VE db tbs => paren (".types " ++ tyEnv TE ++ " " ++ valEnv VE ++ " " ++ opt datBind db ++ " " ++ list typBind tbs)
-  | .typesSplit a1 a2 => paren (".typesSplit " ++ topDec a1 ++ " " ++ topDec a2)
   | .port x t U => paren (".port " ++ q x ++ " " ++ bty t ++ " " ++ list bvar U)
   | .seq a1 a2 => paren (".seq\n    " ++ topDec a1 ++ "\n    " ++ topDec a2)
 

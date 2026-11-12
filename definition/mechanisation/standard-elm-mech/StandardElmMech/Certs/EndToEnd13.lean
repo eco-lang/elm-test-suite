@@ -7,6 +7,7 @@ import StandardElmMech.Generated.SrcElmCore03
 import StandardElmMech.Generated.ElmCore03
 import StandardElmMech.Generated.ChecksElmCore03
 import StandardElmMech.Stat.Pipeline
+import StandardElmMech.Stat.ModuleStep
 
 /-! Plan step 10: for each translated test, Lean's pipeline (derived forms, inference, the proved
     checker, number specialisation, erasure) gives the reduced program the translator wrote (`spec_`),
@@ -24,6 +25,11 @@ theorem mean_elm_core_EqualityBoolVarTest (h : Stat.D11For Stat.Btest (Stat.bare
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_EqualityBoolVarTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_EqualityBoolVarTest (legal_elm_core_EqualityBoolVarTest h) (Stat.value_of_viewChecks t_elm_core_EqualityBoolVarTest)
 
+/-- tests/elm-core/src/EqualityBoolVarTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_EqualityBoolVarTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_EqualityBoolVarTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_EqualityBoolVarTest) r → r = g_elm_core_EqualityBoolVarTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_EqualityBoolVarTest
+
 /-- tests/elm-core/src/EqualityOtherConstantsTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_EqualityOtherConstantsTest : Stat.endToEnd Stat.Btest s_elm_core_EqualityOtherConstantsTest = .ok g_elm_core_EqualityOtherConstantsTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -32,6 +38,11 @@ theorem spec_elm_core_EqualityOtherConstantsTest : Stat.endToEnd Stat.Btest s_el
 theorem mean_elm_core_EqualityOtherConstantsTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_EqualityOtherConstantsTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_EqualityOtherConstantsTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_EqualityOtherConstantsTest (legal_elm_core_EqualityOtherConstantsTest h) (Stat.value_of_viewChecks t_elm_core_EqualityOtherConstantsTest)
+
+/-- tests/elm-core/src/EqualityOtherConstantsTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_EqualityOtherConstantsTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_EqualityOtherConstantsTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_EqualityOtherConstantsTest) r → r = g_elm_core_EqualityOtherConstantsTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_EqualityOtherConstantsTest
 
 /-- tests/elm-core/src/EqualityTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_EqualityTest : Stat.endToEnd Stat.Btest s_elm_core_EqualityTest = .ok g_elm_core_EqualityTest.reduced :=
@@ -42,6 +53,11 @@ theorem mean_elm_core_EqualityTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_el
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_EqualityTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_EqualityTest (legal_elm_core_EqualityTest h) (Stat.value_of_viewChecks t_elm_core_EqualityTest)
 
+/-- tests/elm-core/src/EqualityTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_EqualityTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_EqualityTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_EqualityTest) r → r = g_elm_core_EqualityTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_EqualityTest
+
 /-- tests/elm-core/src/FloatAbsTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatAbsTest : Stat.endToEnd Stat.Btest s_elm_core_FloatAbsTest = .ok g_elm_core_FloatAbsTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -50,6 +66,11 @@ theorem spec_elm_core_FloatAbsTest : Stat.endToEnd Stat.Btest s_elm_core_FloatAb
 theorem mean_elm_core_FloatAbsTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatAbsTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatAbsTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatAbsTest (legal_elm_core_FloatAbsTest h) (Stat.value_of_viewChecks t_elm_core_FloatAbsTest)
+
+/-- tests/elm-core/src/FloatAbsTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatAbsTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatAbsTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatAbsTest) r → r = g_elm_core_FloatAbsTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatAbsTest
 
 /-- tests/elm-core/src/FloatAddTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatAddTest : Stat.endToEnd Stat.Btest s_elm_core_FloatAddTest = .ok g_elm_core_FloatAddTest.reduced :=
@@ -60,6 +81,11 @@ theorem mean_elm_core_FloatAddTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_el
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatAddTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatAddTest (legal_elm_core_FloatAddTest h) (Stat.value_of_viewChecks t_elm_core_FloatAddTest)
 
+/-- tests/elm-core/src/FloatAddTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatAddTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatAddTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatAddTest) r → r = g_elm_core_FloatAddTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatAddTest
+
 /-- tests/elm-core/src/FloatCeilingTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatCeilingTest : Stat.endToEnd Stat.Btest s_elm_core_FloatCeilingTest = .ok g_elm_core_FloatCeilingTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -68,6 +94,11 @@ theorem spec_elm_core_FloatCeilingTest : Stat.endToEnd Stat.Btest s_elm_core_Flo
 theorem mean_elm_core_FloatCeilingTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatCeilingTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatCeilingTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatCeilingTest (legal_elm_core_FloatCeilingTest h) (Stat.value_of_viewChecks t_elm_core_FloatCeilingTest)
+
+/-- tests/elm-core/src/FloatCeilingTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatCeilingTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatCeilingTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatCeilingTest) r → r = g_elm_core_FloatCeilingTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatCeilingTest
 
 /-- tests/elm-core/src/FloatCompareTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatCompareTest : Stat.endToEnd Stat.Btest s_elm_core_FloatCompareTest = .ok g_elm_core_FloatCompareTest.reduced :=
@@ -78,6 +109,11 @@ theorem mean_elm_core_FloatCompareTest (h : Stat.D11For Stat.Btest (Stat.bareOf 
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatCompareTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatCompareTest (legal_elm_core_FloatCompareTest h) (Stat.value_of_viewChecks t_elm_core_FloatCompareTest)
 
+/-- tests/elm-core/src/FloatCompareTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatCompareTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatCompareTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatCompareTest) r → r = g_elm_core_FloatCompareTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatCompareTest
+
 /-- tests/elm-core/src/FloatDivTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatDivTest : Stat.endToEnd Stat.Btest s_elm_core_FloatDivTest = .ok g_elm_core_FloatDivTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -86,6 +122,11 @@ theorem spec_elm_core_FloatDivTest : Stat.endToEnd Stat.Btest s_elm_core_FloatDi
 theorem mean_elm_core_FloatDivTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatDivTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatDivTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatDivTest (legal_elm_core_FloatDivTest h) (Stat.value_of_viewChecks t_elm_core_FloatDivTest)
+
+/-- tests/elm-core/src/FloatDivTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatDivTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatDivTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatDivTest) r → r = g_elm_core_FloatDivTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatDivTest
 
 /-- tests/elm-core/src/FloatFloorTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatFloorTest : Stat.endToEnd Stat.Btest s_elm_core_FloatFloorTest = .ok g_elm_core_FloatFloorTest.reduced :=
@@ -96,6 +137,11 @@ theorem mean_elm_core_FloatFloorTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatFloorTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatFloorTest (legal_elm_core_FloatFloorTest h) (Stat.value_of_viewChecks t_elm_core_FloatFloorTest)
 
+/-- tests/elm-core/src/FloatFloorTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatFloorTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatFloorTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatFloorTest) r → r = g_elm_core_FloatFloorTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatFloorTest
+
 /-- tests/elm-core/src/FloatInfinityTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatInfinityTest : Stat.endToEnd Stat.Btest s_elm_core_FloatInfinityTest = .ok g_elm_core_FloatInfinityTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -104,6 +150,11 @@ theorem spec_elm_core_FloatInfinityTest : Stat.endToEnd Stat.Btest s_elm_core_Fl
 theorem mean_elm_core_FloatInfinityTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatInfinityTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatInfinityTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatInfinityTest (legal_elm_core_FloatInfinityTest h) (Stat.value_of_viewChecks t_elm_core_FloatInfinityTest)
+
+/-- tests/elm-core/src/FloatInfinityTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatInfinityTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatInfinityTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatInfinityTest) r → r = g_elm_core_FloatInfinityTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatInfinityTest
 
 /-- tests/elm-core/src/FloatMathAcosTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMathAcosTest : Stat.endToEnd Stat.Btest s_elm_core_FloatMathAcosTest = .ok g_elm_core_FloatMathAcosTest.reduced :=
@@ -114,6 +165,11 @@ theorem mean_elm_core_FloatMathAcosTest (h : Stat.D11For Stat.Btest (Stat.bareOf
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMathAcosTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMathAcosTest (legal_elm_core_FloatMathAcosTest h) (Stat.value_of_viewChecks t_elm_core_FloatMathAcosTest)
 
+/-- tests/elm-core/src/FloatMathAcosTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMathAcosTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathAcosTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMathAcosTest) r → r = g_elm_core_FloatMathAcosTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMathAcosTest
+
 /-- tests/elm-core/src/FloatMathAsinTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMathAsinTest : Stat.endToEnd Stat.Btest s_elm_core_FloatMathAsinTest = .ok g_elm_core_FloatMathAsinTest.reduced :=
   Stat.endToEnd_of_ctx ctx_4_eq (by decide +kernel)
@@ -122,6 +178,11 @@ theorem spec_elm_core_FloatMathAsinTest : Stat.endToEnd Stat.Btest s_elm_core_Fl
 theorem mean_elm_core_FloatMathAsinTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathAsinTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMathAsinTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMathAsinTest (legal_elm_core_FloatMathAsinTest h) (Stat.value_of_viewChecks t_elm_core_FloatMathAsinTest)
+
+/-- tests/elm-core/src/FloatMathAsinTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMathAsinTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathAsinTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMathAsinTest) r → r = g_elm_core_FloatMathAsinTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMathAsinTest
 
 /-- tests/elm-core/src/FloatMathAtan2Test.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMathAtan2Test : Stat.endToEnd Stat.Btest s_elm_core_FloatMathAtan2Test = .ok g_elm_core_FloatMathAtan2Test.reduced :=
@@ -132,6 +193,11 @@ theorem mean_elm_core_FloatMathAtan2Test (h : Stat.D11For Stat.Btest (Stat.bareO
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMathAtan2Test) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMathAtan2Test (legal_elm_core_FloatMathAtan2Test h) (Stat.value_of_viewChecks t_elm_core_FloatMathAtan2Test)
 
+/-- tests/elm-core/src/FloatMathAtan2Test.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMathAtan2Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathAtan2Test)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMathAtan2Test) r → r = g_elm_core_FloatMathAtan2Test.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMathAtan2Test
+
 /-- tests/elm-core/src/FloatMathAtanTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMathAtanTest : Stat.endToEnd Stat.Btest s_elm_core_FloatMathAtanTest = .ok g_elm_core_FloatMathAtanTest.reduced :=
   Stat.endToEnd_of_ctx ctx_4_eq (by decide +kernel)
@@ -140,6 +206,11 @@ theorem spec_elm_core_FloatMathAtanTest : Stat.endToEnd Stat.Btest s_elm_core_Fl
 theorem mean_elm_core_FloatMathAtanTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathAtanTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMathAtanTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMathAtanTest (legal_elm_core_FloatMathAtanTest h) (Stat.value_of_viewChecks t_elm_core_FloatMathAtanTest)
+
+/-- tests/elm-core/src/FloatMathAtanTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMathAtanTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathAtanTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMathAtanTest) r → r = g_elm_core_FloatMathAtanTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMathAtanTest
 
 /-- tests/elm-core/src/FloatMathBasicsETest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMathBasicsETest : Stat.endToEnd Stat.Btest s_elm_core_FloatMathBasicsETest = .ok g_elm_core_FloatMathBasicsETest.reduced :=
@@ -150,6 +221,11 @@ theorem mean_elm_core_FloatMathBasicsETest (h : Stat.D11For Stat.Btest (Stat.bar
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMathBasicsETest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMathBasicsETest (legal_elm_core_FloatMathBasicsETest h) (Stat.value_of_viewChecks t_elm_core_FloatMathBasicsETest)
 
+/-- tests/elm-core/src/FloatMathBasicsETest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMathBasicsETest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathBasicsETest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMathBasicsETest) r → r = g_elm_core_FloatMathBasicsETest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMathBasicsETest
+
 /-- tests/elm-core/src/FloatMathFloatLessThanTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMathFloatLessThanTest : Stat.endToEnd Stat.Btest s_elm_core_FloatMathFloatLessThanTest = .ok g_elm_core_FloatMathFloatLessThanTest.reduced :=
   Stat.endToEnd_of_ctx ctx_4_eq (by decide +kernel)
@@ -158,6 +234,11 @@ theorem spec_elm_core_FloatMathFloatLessThanTest : Stat.endToEnd Stat.Btest s_el
 theorem mean_elm_core_FloatMathFloatLessThanTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathFloatLessThanTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMathFloatLessThanTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMathFloatLessThanTest (legal_elm_core_FloatMathFloatLessThanTest h) (Stat.value_of_viewChecks t_elm_core_FloatMathFloatLessThanTest)
+
+/-- tests/elm-core/src/FloatMathFloatLessThanTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMathFloatLessThanTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathFloatLessThanTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMathFloatLessThanTest) r → r = g_elm_core_FloatMathFloatLessThanTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMathFloatLessThanTest
 
 /-- tests/elm-core/src/FloatMathIsNaNTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMathIsNaNTest : Stat.endToEnd Stat.Btest s_elm_core_FloatMathIsNaNTest = .ok g_elm_core_FloatMathIsNaNTest.reduced :=
@@ -168,6 +249,11 @@ theorem mean_elm_core_FloatMathIsNaNTest (h : Stat.D11For Stat.Btest (Stat.bareO
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMathIsNaNTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMathIsNaNTest (legal_elm_core_FloatMathIsNaNTest h) (Stat.value_of_viewChecks t_elm_core_FloatMathIsNaNTest)
 
+/-- tests/elm-core/src/FloatMathIsNaNTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMathIsNaNTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathIsNaNTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMathIsNaNTest) r → r = g_elm_core_FloatMathIsNaNTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMathIsNaNTest
+
 /-- tests/elm-core/src/FloatMathSin2PlusCos21Test.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMathSin2PlusCos21Test : Stat.endToEnd Stat.Btest s_elm_core_FloatMathSin2PlusCos21Test = .ok g_elm_core_FloatMathSin2PlusCos21Test.reduced :=
   Stat.endToEnd_of_ctx ctx_4_eq (by decide +kernel)
@@ -176,6 +262,11 @@ theorem spec_elm_core_FloatMathSin2PlusCos21Test : Stat.endToEnd Stat.Btest s_el
 theorem mean_elm_core_FloatMathSin2PlusCos21Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathSin2PlusCos21Test)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMathSin2PlusCos21Test) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMathSin2PlusCos21Test (legal_elm_core_FloatMathSin2PlusCos21Test h) (Stat.value_of_viewChecks t_elm_core_FloatMathSin2PlusCos21Test)
+
+/-- tests/elm-core/src/FloatMathSin2PlusCos21Test.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMathSin2PlusCos21Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathSin2PlusCos21Test)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMathSin2PlusCos21Test) r → r = g_elm_core_FloatMathSin2PlusCos21Test.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMathSin2PlusCos21Test
 
 /-- tests/elm-core/src/FloatMathTanTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMathTanTest : Stat.endToEnd Stat.Btest s_elm_core_FloatMathTanTest = .ok g_elm_core_FloatMathTanTest.reduced :=
@@ -186,6 +277,11 @@ theorem mean_elm_core_FloatMathTanTest (h : Stat.D11For Stat.Btest (Stat.bareOf 
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMathTanTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMathTanTest (legal_elm_core_FloatMathTanTest h) (Stat.value_of_viewChecks t_elm_core_FloatMathTanTest)
 
+/-- tests/elm-core/src/FloatMathTanTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMathTanTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMathTanTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMathTanTest) r → r = g_elm_core_FloatMathTanTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMathTanTest
+
 /-- tests/elm-core/src/FloatMinMaxTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMinMaxTest : Stat.endToEnd Stat.Btest s_elm_core_FloatMinMaxTest = .ok g_elm_core_FloatMinMaxTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -194,6 +290,11 @@ theorem spec_elm_core_FloatMinMaxTest : Stat.endToEnd Stat.Btest s_elm_core_Floa
 theorem mean_elm_core_FloatMinMaxTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMinMaxTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMinMaxTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMinMaxTest (legal_elm_core_FloatMinMaxTest h) (Stat.value_of_viewChecks t_elm_core_FloatMinMaxTest)
+
+/-- tests/elm-core/src/FloatMinMaxTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMinMaxTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMinMaxTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMinMaxTest) r → r = g_elm_core_FloatMinMaxTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMinMaxTest
 
 /-- tests/elm-core/src/FloatMulTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatMulTest : Stat.endToEnd Stat.Btest s_elm_core_FloatMulTest = .ok g_elm_core_FloatMulTest.reduced :=
@@ -204,6 +305,11 @@ theorem mean_elm_core_FloatMulTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_el
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatMulTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatMulTest (legal_elm_core_FloatMulTest h) (Stat.value_of_viewChecks t_elm_core_FloatMulTest)
 
+/-- tests/elm-core/src/FloatMulTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatMulTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatMulTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatMulTest) r → r = g_elm_core_FloatMulTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatMulTest
+
 /-- tests/elm-core/src/FloatNaNTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatNaNTest : Stat.endToEnd Stat.Btest s_elm_core_FloatNaNTest = .ok g_elm_core_FloatNaNTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -212,6 +318,11 @@ theorem spec_elm_core_FloatNaNTest : Stat.endToEnd Stat.Btest s_elm_core_FloatNa
 theorem mean_elm_core_FloatNaNTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatNaNTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatNaNTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatNaNTest (legal_elm_core_FloatNaNTest h) (Stat.value_of_viewChecks t_elm_core_FloatNaNTest)
+
+/-- tests/elm-core/src/FloatNaNTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatNaNTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatNaNTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatNaNTest) r → r = g_elm_core_FloatNaNTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatNaNTest
 
 /-- tests/elm-core/src/FloatNegateTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatNegateTest : Stat.endToEnd Stat.Btest s_elm_core_FloatNegateTest = .ok g_elm_core_FloatNegateTest.reduced :=
@@ -222,6 +333,11 @@ theorem mean_elm_core_FloatNegateTest (h : Stat.D11For Stat.Btest (Stat.bareOf s
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatNegateTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatNegateTest (legal_elm_core_FloatNegateTest h) (Stat.value_of_viewChecks t_elm_core_FloatNegateTest)
 
+/-- tests/elm-core/src/FloatNegateTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatNegateTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatNegateTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatNegateTest) r → r = g_elm_core_FloatNegateTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatNegateTest
+
 /-- tests/elm-core/src/FloatNegativeZeroTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatNegativeZeroTest : Stat.endToEnd Stat.Btest s_elm_core_FloatNegativeZeroTest = .ok g_elm_core_FloatNegativeZeroTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -230,6 +346,11 @@ theorem spec_elm_core_FloatNegativeZeroTest : Stat.endToEnd Stat.Btest s_elm_cor
 theorem mean_elm_core_FloatNegativeZeroTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatNegativeZeroTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatNegativeZeroTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatNegativeZeroTest (legal_elm_core_FloatNegativeZeroTest h) (Stat.value_of_viewChecks t_elm_core_FloatNegativeZeroTest)
+
+/-- tests/elm-core/src/FloatNegativeZeroTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatNegativeZeroTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatNegativeZeroTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatNegativeZeroTest) r → r = g_elm_core_FloatNegativeZeroTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatNegativeZeroTest
 
 /-- tests/elm-core/src/FloatPowTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatPowTest : Stat.endToEnd Stat.Btest s_elm_core_FloatPowTest = .ok g_elm_core_FloatPowTest.reduced :=
@@ -240,6 +361,11 @@ theorem mean_elm_core_FloatPowTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_el
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatPowTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatPowTest (legal_elm_core_FloatPowTest h) (Stat.value_of_viewChecks t_elm_core_FloatPowTest)
 
+/-- tests/elm-core/src/FloatPowTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatPowTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatPowTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatPowTest) r → r = g_elm_core_FloatPowTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatPowTest
+
 /-- tests/elm-core/src/FloatRoundTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatRoundTest : Stat.endToEnd Stat.Btest s_elm_core_FloatRoundTest = .ok g_elm_core_FloatRoundTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -248,6 +374,11 @@ theorem spec_elm_core_FloatRoundTest : Stat.endToEnd Stat.Btest s_elm_core_Float
 theorem mean_elm_core_FloatRoundTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatRoundTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatRoundTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatRoundTest (legal_elm_core_FloatRoundTest h) (Stat.value_of_viewChecks t_elm_core_FloatRoundTest)
+
+/-- tests/elm-core/src/FloatRoundTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatRoundTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatRoundTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatRoundTest) r → r = g_elm_core_FloatRoundTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatRoundTest
 
 /-- tests/elm-core/src/FloatSqrtTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatSqrtTest : Stat.endToEnd Stat.Btest s_elm_core_FloatSqrtTest = .ok g_elm_core_FloatSqrtTest.reduced :=
@@ -258,6 +389,11 @@ theorem mean_elm_core_FloatSqrtTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_e
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatSqrtTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatSqrtTest (legal_elm_core_FloatSqrtTest h) (Stat.value_of_viewChecks t_elm_core_FloatSqrtTest)
 
+/-- tests/elm-core/src/FloatSqrtTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatSqrtTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatSqrtTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatSqrtTest) r → r = g_elm_core_FloatSqrtTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatSqrtTest
+
 /-- tests/elm-core/src/FloatSubTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatSubTest : Stat.endToEnd Stat.Btest s_elm_core_FloatSubTest = .ok g_elm_core_FloatSubTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -266,6 +402,11 @@ theorem spec_elm_core_FloatSubTest : Stat.endToEnd Stat.Btest s_elm_core_FloatSu
 theorem mean_elm_core_FloatSubTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatSubTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatSubTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatSubTest (legal_elm_core_FloatSubTest h) (Stat.value_of_viewChecks t_elm_core_FloatSubTest)
+
+/-- tests/elm-core/src/FloatSubTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatSubTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatSubTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatSubTest) r → r = g_elm_core_FloatSubTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatSubTest
 
 /-- tests/elm-core/src/FloatTruncateTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloatTruncateTest : Stat.endToEnd Stat.Btest s_elm_core_FloatTruncateTest = .ok g_elm_core_FloatTruncateTest.reduced :=
@@ -276,6 +417,11 @@ theorem mean_elm_core_FloatTruncateTest (h : Stat.D11For Stat.Btest (Stat.bareOf
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloatTruncateTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloatTruncateTest (legal_elm_core_FloatTruncateTest h) (Stat.value_of_viewChecks t_elm_core_FloatTruncateTest)
 
+/-- tests/elm-core/src/FloatTruncateTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloatTruncateTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloatTruncateTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloatTruncateTest) r → r = g_elm_core_FloatTruncateTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloatTruncateTest
+
 /-- tests/elm-core/src/FloorToIntTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_FloorToIntTest : Stat.endToEnd Stat.Btest s_elm_core_FloorToIntTest = .ok g_elm_core_FloorToIntTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -284,6 +430,11 @@ theorem spec_elm_core_FloorToIntTest : Stat.endToEnd Stat.Btest s_elm_core_Floor
 theorem mean_elm_core_FloorToIntTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloorToIntTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_FloorToIntTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_FloorToIntTest (legal_elm_core_FloorToIntTest h) (Stat.value_of_viewChecks t_elm_core_FloorToIntTest)
+
+/-- tests/elm-core/src/FloorToIntTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_FloorToIntTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_FloorToIntTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_FloorToIntTest) r → r = g_elm_core_FloorToIntTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_FloorToIntTest
 
 /-- tests/elm-core/src/IntAbsTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_IntAbsTest : Stat.endToEnd Stat.Btest s_elm_core_IntAbsTest = .ok g_elm_core_IntAbsTest.reduced :=
@@ -294,6 +445,11 @@ theorem mean_elm_core_IntAbsTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_IntAbsTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_IntAbsTest (legal_elm_core_IntAbsTest h) (Stat.value_of_viewChecks t_elm_core_IntAbsTest)
 
+/-- tests/elm-core/src/IntAbsTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_IntAbsTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntAbsTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_IntAbsTest) r → r = g_elm_core_IntAbsTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_IntAbsTest
+
 /-- tests/elm-core/src/IntAddTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_IntAddTest : Stat.endToEnd Stat.Btest s_elm_core_IntAddTest = .ok g_elm_core_IntAddTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -302,6 +458,11 @@ theorem spec_elm_core_IntAddTest : Stat.endToEnd Stat.Btest s_elm_core_IntAddTes
 theorem mean_elm_core_IntAddTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntAddTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_IntAddTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_IntAddTest (legal_elm_core_IntAddTest h) (Stat.value_of_viewChecks t_elm_core_IntAddTest)
+
+/-- tests/elm-core/src/IntAddTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_IntAddTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntAddTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_IntAddTest) r → r = g_elm_core_IntAddTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_IntAddTest
 
 /-- tests/elm-core/src/IntCompareTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_IntCompareTest : Stat.endToEnd Stat.Btest s_elm_core_IntCompareTest = .ok g_elm_core_IntCompareTest.reduced :=
@@ -312,6 +473,11 @@ theorem mean_elm_core_IntCompareTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_IntCompareTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_IntCompareTest (legal_elm_core_IntCompareTest h) (Stat.value_of_viewChecks t_elm_core_IntCompareTest)
 
+/-- tests/elm-core/src/IntCompareTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_IntCompareTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntCompareTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_IntCompareTest) r → r = g_elm_core_IntCompareTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_IntCompareTest
+
 /-- tests/elm-core/src/IntDivByZeroTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_IntDivByZeroTest : Stat.endToEnd Stat.Btest s_elm_core_IntDivByZeroTest = .ok g_elm_core_IntDivByZeroTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -320,6 +486,11 @@ theorem spec_elm_core_IntDivByZeroTest : Stat.endToEnd Stat.Btest s_elm_core_Int
 theorem mean_elm_core_IntDivByZeroTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntDivByZeroTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_IntDivByZeroTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_IntDivByZeroTest (legal_elm_core_IntDivByZeroTest h) (Stat.value_of_viewChecks t_elm_core_IntDivByZeroTest)
+
+/-- tests/elm-core/src/IntDivByZeroTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_IntDivByZeroTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntDivByZeroTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_IntDivByZeroTest) r → r = g_elm_core_IntDivByZeroTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_IntDivByZeroTest
 
 /-- tests/elm-core/src/IntDivTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_IntDivTest : Stat.endToEnd Stat.Btest s_elm_core_IntDivTest = .ok g_elm_core_IntDivTest.reduced :=
@@ -330,6 +501,11 @@ theorem mean_elm_core_IntDivTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_IntDivTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_IntDivTest (legal_elm_core_IntDivTest h) (Stat.value_of_viewChecks t_elm_core_IntDivTest)
 
+/-- tests/elm-core/src/IntDivTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_IntDivTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntDivTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_IntDivTest) r → r = g_elm_core_IntDivTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_IntDivTest
+
 /-- tests/elm-core/src/IntMinMaxTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_IntMinMaxTest : Stat.endToEnd Stat.Btest s_elm_core_IntMinMaxTest = .ok g_elm_core_IntMinMaxTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -338,6 +514,11 @@ theorem spec_elm_core_IntMinMaxTest : Stat.endToEnd Stat.Btest s_elm_core_IntMin
 theorem mean_elm_core_IntMinMaxTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntMinMaxTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_IntMinMaxTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_IntMinMaxTest (legal_elm_core_IntMinMaxTest h) (Stat.value_of_viewChecks t_elm_core_IntMinMaxTest)
+
+/-- tests/elm-core/src/IntMinMaxTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_IntMinMaxTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntMinMaxTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_IntMinMaxTest) r → r = g_elm_core_IntMinMaxTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_IntMinMaxTest
 
 /-- tests/elm-core/src/IntModByTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_IntModByTest : Stat.endToEnd Stat.Btest s_elm_core_IntModByTest = .ok g_elm_core_IntModByTest.reduced :=
@@ -348,6 +529,11 @@ theorem mean_elm_core_IntModByTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_el
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_IntModByTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_IntModByTest (legal_elm_core_IntModByTest h) (Stat.value_of_viewChecks t_elm_core_IntModByTest)
 
+/-- tests/elm-core/src/IntModByTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_IntModByTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntModByTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_IntModByTest) r → r = g_elm_core_IntModByTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_IntModByTest
+
 /-- tests/elm-core/src/IntMulTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_IntMulTest : Stat.endToEnd Stat.Btest s_elm_core_IntMulTest = .ok g_elm_core_IntMulTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -356,6 +542,11 @@ theorem spec_elm_core_IntMulTest : Stat.endToEnd Stat.Btest s_elm_core_IntMulTes
 theorem mean_elm_core_IntMulTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntMulTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_IntMulTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_IntMulTest (legal_elm_core_IntMulTest h) (Stat.value_of_viewChecks t_elm_core_IntMulTest)
+
+/-- tests/elm-core/src/IntMulTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_IntMulTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntMulTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_IntMulTest) r → r = g_elm_core_IntMulTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_IntMulTest
 
 /-- tests/elm-core/src/IntNegateTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_IntNegateTest : Stat.endToEnd Stat.Btest s_elm_core_IntNegateTest = .ok g_elm_core_IntNegateTest.reduced :=
@@ -366,6 +557,11 @@ theorem mean_elm_core_IntNegateTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_e
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_IntNegateTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_IntNegateTest (legal_elm_core_IntNegateTest h) (Stat.value_of_viewChecks t_elm_core_IntNegateTest)
 
+/-- tests/elm-core/src/IntNegateTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_IntNegateTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntNegateTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_IntNegateTest) r → r = g_elm_core_IntNegateTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_IntNegateTest
+
 /-- tests/elm-core/src/IntPowTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_core_IntPowTest : Stat.endToEnd Stat.Btest s_elm_core_IntPowTest = .ok g_elm_core_IntPowTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -374,5 +570,10 @@ theorem spec_elm_core_IntPowTest : Stat.endToEnd Stat.Btest s_elm_core_IntPowTes
 theorem mean_elm_core_IntPowTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntPowTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_IntPowTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_core_IntPowTest (legal_elm_core_IntPowTest h) (Stat.value_of_viewChecks t_elm_core_IntPowTest)
+
+/-- tests/elm-core/src/IntPowTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_core_IntPowTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_core_IntPowTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_IntPowTest) r → r = g_elm_core_IntPowTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_core_IntPowTest
 
 end StandardElm

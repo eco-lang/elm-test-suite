@@ -235,13 +235,11 @@ end
 
 def setTop (w : Witness) : ATopDec → ATopDec
   | .value VE vb => .value VE (setVB w vb)
-  | .typesSplit a1 a2 => .typesSplit (setTop w a1) (setTop w a2)
   | .seq a1 a2 => .seq (setTop w a1) (setTop w a2)
   | d => d
 
 def instsTop (x : Var) : ATopDec → List (List Ty)
   | .value _ vb => instsVB x vb
-  | .typesSplit a1 a2 => instsTop x a1 ++ instsTop x a2
   | .seq a1 a2 => instsTop x a1 ++ instsTop x a2
   | _ => []
 

@@ -71,9 +71,8 @@ theorem walkAtExp (hw : WalkHyp S S' ν r D) : (a : AAtExp) → ∀ (a'' : AAtEx
     cases a'' <;> simp [AAtExp.erase] at he
     subst he
     simp only [nodesAtExp, List.cons_append, List.singleton_append] at h
-    obtain ⟨_, e2, _, _⟩ := h.head_ty hw
-    simp only [List.nil_append] at e2
-    rw [e2, ← Renaming.tys_eq_map]
+    obtain ⟨e1, _, _, _⟩ := h.head_ty hw
+    subst e1
     exact .var _ _ _ _
   | .con lc inst τ, a'', _, _, _, he, _, _, _ => by
     cases a'' <;> simp [AAtExp.erase] at he
@@ -109,9 +108,8 @@ theorem walkAtExp (hw : WalkHyp S S' ν r D) : (a : AAtExp) → ∀ (a'' : AAtEx
     obtain ⟨rfl, he2⟩ := he
     simp only [checkAtExp, Bool.and_eq_true] at hc hc''
     simp only [nodesAtExp, List.cons_append, List.singleton_append] at h
-    obtain ⟨_, e2, _, _⟩ := h.head_ty hw
-    simp only [List.nil_append] at e2
-    rw [e2, ← Renaming.tys_eq_map]
+    obtain ⟨e1, _, _, _⟩ := h.head_ty hw
+    subst e1
     exact .update (walkExpRow hw row row'' C C'' (path ++ [0]) he2 hc.1.2 hc''.1.2
       (h.mono (fun n hn => by simp [hn]) (fun n hn => by simp [hn])))
   | .letE (.val VE vb) e, a'', C, C'', path, he, hc, hc'', h => by

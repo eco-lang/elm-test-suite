@@ -108,8 +108,10 @@ import StandardElmMech.Stat.MutualWalk
 import StandardElmMech.Stat.MutualWalkExp
 import StandardElmMech.Stat.MutualModule
 import StandardElmMech.Stat.RenameCounterexample
-import StandardElmMech.Stat.SplitCounterexample
+import StandardElmMech.Stat.DupValuesCounterexample
 import StandardElmMech.Stat.SpecExamples
+import StandardElmMech.Stat.ModuleStep
+import StandardElmMech.Stat.ModuleStepCounterexample
 import StandardElmMech.Theorems
 import StandardElmMech.AllPrograms
 

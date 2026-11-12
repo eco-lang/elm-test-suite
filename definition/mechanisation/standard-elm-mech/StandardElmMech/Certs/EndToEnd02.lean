@@ -5,6 +5,7 @@ import StandardElmMech.Generated.ChecksElm02
 import StandardElmMech.Generated.SrcElm02
 import StandardElmMech.Generated.SrcElm03
 import StandardElmMech.Stat.Pipeline
+import StandardElmMech.Stat.ModuleStep
 
 /-! Plan step 10: for each translated test, Lean's pipeline (derived forms, inference, the proved
     checker, number specialisation, erasure) gives the reduced program the translator wrote (`spec_`),
@@ -22,6 +23,11 @@ theorem mean_elm_CaseMultiFieldExtractTest (h : Stat.D11For Stat.Btest (Stat.bar
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseMultiFieldExtractTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseMultiFieldExtractTest (legal_elm_CaseMultiFieldExtractTest h) (Stat.value_of_viewChecks t_elm_CaseMultiFieldExtractTest)
 
+/-- tests/elm/src/CaseMultiFieldExtractTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseMultiFieldExtractTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseMultiFieldExtractTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseMultiFieldExtractTest) r → r = g_elm_CaseMultiFieldExtractTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseMultiFieldExtractTest
+
 /-- tests/elm/src/CaseNestedCtorTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseNestedCtorTest : Stat.endToEnd Stat.Btest s_elm_CaseNestedCtorTest = .ok g_elm_CaseNestedCtorTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -30,6 +36,11 @@ theorem spec_elm_CaseNestedCtorTest : Stat.endToEnd Stat.Btest s_elm_CaseNestedC
 theorem mean_elm_CaseNestedCtorTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseNestedCtorTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseNestedCtorTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseNestedCtorTest (legal_elm_CaseNestedCtorTest h) (Stat.value_of_viewChecks t_elm_CaseNestedCtorTest)
+
+/-- tests/elm/src/CaseNestedCtorTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseNestedCtorTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseNestedCtorTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseNestedCtorTest) r → r = g_elm_CaseNestedCtorTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseNestedCtorTest
 
 /-- tests/elm/src/CaseNestedRecordAccessTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseNestedRecordAccessTest : Stat.endToEnd Stat.Btest s_elm_CaseNestedRecordAccessTest = .ok g_elm_CaseNestedRecordAccessTest.reduced :=
@@ -40,6 +51,11 @@ theorem mean_elm_CaseNestedRecordAccessTest (h : Stat.D11For Stat.Btest (Stat.ba
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseNestedRecordAccessTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseNestedRecordAccessTest (legal_elm_CaseNestedRecordAccessTest h) (Stat.value_of_viewChecks t_elm_CaseNestedRecordAccessTest)
 
+/-- tests/elm/src/CaseNestedRecordAccessTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseNestedRecordAccessTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseNestedRecordAccessTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseNestedRecordAccessTest) r → r = g_elm_CaseNestedRecordAccessTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseNestedRecordAccessTest
+
 /-- tests/elm/src/CaseNestedTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseNestedTest : Stat.endToEnd Stat.Btest s_elm_CaseNestedTest = .ok g_elm_CaseNestedTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -48,6 +64,11 @@ theorem spec_elm_CaseNestedTest : Stat.endToEnd Stat.Btest s_elm_CaseNestedTest 
 theorem mean_elm_CaseNestedTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseNestedTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseNestedTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseNestedTest (legal_elm_CaseNestedTest h) (Stat.value_of_viewChecks t_elm_CaseNestedTest)
+
+/-- tests/elm/src/CaseNestedTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseNestedTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseNestedTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseNestedTest) r → r = g_elm_CaseNestedTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseNestedTest
 
 /-- tests/elm/src/CaseOrderTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseOrderTest : Stat.endToEnd Stat.Btest s_elm_CaseOrderTest = .ok g_elm_CaseOrderTest.reduced :=
@@ -58,6 +79,11 @@ theorem mean_elm_CaseOrderTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_Ca
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseOrderTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseOrderTest (legal_elm_CaseOrderTest h) (Stat.value_of_viewChecks t_elm_CaseOrderTest)
 
+/-- tests/elm/src/CaseOrderTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseOrderTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseOrderTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseOrderTest) r → r = g_elm_CaseOrderTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseOrderTest
+
 /-- tests/elm/src/CaseResultTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseResultTest : Stat.endToEnd Stat.Btest s_elm_CaseResultTest = .ok g_elm_CaseResultTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -66,6 +92,11 @@ theorem spec_elm_CaseResultTest : Stat.endToEnd Stat.Btest s_elm_CaseResultTest 
 theorem mean_elm_CaseResultTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseResultTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseResultTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseResultTest (legal_elm_CaseResultTest h) (Stat.value_of_viewChecks t_elm_CaseResultTest)
+
+/-- tests/elm/src/CaseResultTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseResultTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseResultTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseResultTest) r → r = g_elm_CaseResultTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseResultTest
 
 /-- tests/elm/src/CaseReturnFunctionTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseReturnFunctionTest : Stat.endToEnd Stat.Btest s_elm_CaseReturnFunctionTest = .ok g_elm_CaseReturnFunctionTest.reduced :=
@@ -76,6 +107,11 @@ theorem mean_elm_CaseReturnFunctionTest (h : Stat.D11For Stat.Btest (Stat.bareOf
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseReturnFunctionTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseReturnFunctionTest (legal_elm_CaseReturnFunctionTest h) (Stat.value_of_viewChecks t_elm_CaseReturnFunctionTest)
 
+/-- tests/elm/src/CaseReturnFunctionTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseReturnFunctionTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseReturnFunctionTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseReturnFunctionTest) r → r = g_elm_CaseReturnFunctionTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseReturnFunctionTest
+
 /-- tests/elm/src/CaseReturningLambdaTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseReturningLambdaTest : Stat.endToEnd Stat.Btest s_elm_CaseReturningLambdaTest = .ok g_elm_CaseReturningLambdaTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -84,6 +120,11 @@ theorem spec_elm_CaseReturningLambdaTest : Stat.endToEnd Stat.Btest s_elm_CaseRe
 theorem mean_elm_CaseReturningLambdaTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseReturningLambdaTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseReturningLambdaTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseReturningLambdaTest (legal_elm_CaseReturningLambdaTest h) (Stat.value_of_viewChecks t_elm_CaseReturningLambdaTest)
+
+/-- tests/elm/src/CaseReturningLambdaTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseReturningLambdaTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseReturningLambdaTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseReturningLambdaTest) r → r = g_elm_CaseReturningLambdaTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseReturningLambdaTest
 
 /-- tests/elm/src/CaseSharedBranchTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseSharedBranchTest : Stat.endToEnd Stat.Btest s_elm_CaseSharedBranchTest = .ok g_elm_CaseSharedBranchTest.reduced :=
@@ -94,6 +135,11 @@ theorem mean_elm_CaseSharedBranchTest (h : Stat.D11For Stat.Btest (Stat.bareOf s
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseSharedBranchTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseSharedBranchTest (legal_elm_CaseSharedBranchTest h) (Stat.value_of_viewChecks t_elm_CaseSharedBranchTest)
 
+/-- tests/elm/src/CaseSharedBranchTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseSharedBranchTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseSharedBranchTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseSharedBranchTest) r → r = g_elm_CaseSharedBranchTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseSharedBranchTest
+
 /-- tests/elm/src/CaseSingleCtorBoolMultiTypeTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseSingleCtorBoolMultiTypeTest : Stat.endToEnd Stat.Btest s_elm_CaseSingleCtorBoolMultiTypeTest = .ok g_elm_CaseSingleCtorBoolMultiTypeTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -102,6 +148,11 @@ theorem spec_elm_CaseSingleCtorBoolMultiTypeTest : Stat.endToEnd Stat.Btest s_el
 theorem mean_elm_CaseSingleCtorBoolMultiTypeTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseSingleCtorBoolMultiTypeTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseSingleCtorBoolMultiTypeTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseSingleCtorBoolMultiTypeTest (legal_elm_CaseSingleCtorBoolMultiTypeTest h) (Stat.value_of_viewChecks t_elm_CaseSingleCtorBoolMultiTypeTest)
+
+/-- tests/elm/src/CaseSingleCtorBoolMultiTypeTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseSingleCtorBoolMultiTypeTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseSingleCtorBoolMultiTypeTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseSingleCtorBoolMultiTypeTest) r → r = g_elm_CaseSingleCtorBoolMultiTypeTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseSingleCtorBoolMultiTypeTest
 
 /-- tests/elm/src/CaseSingleCtorBoolTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseSingleCtorBoolTest : Stat.endToEnd Stat.Btest s_elm_CaseSingleCtorBoolTest = .ok g_elm_CaseSingleCtorBoolTest.reduced :=
@@ -112,6 +163,11 @@ theorem mean_elm_CaseSingleCtorBoolTest (h : Stat.D11For Stat.Btest (Stat.bareOf
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseSingleCtorBoolTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseSingleCtorBoolTest (legal_elm_CaseSingleCtorBoolTest h) (Stat.value_of_viewChecks t_elm_CaseSingleCtorBoolTest)
 
+/-- tests/elm/src/CaseSingleCtorBoolTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseSingleCtorBoolTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseSingleCtorBoolTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseSingleCtorBoolTest) r → r = g_elm_CaseSingleCtorBoolTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseSingleCtorBoolTest
+
 /-- tests/elm/src/CaseStringEmptyPatternTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseStringEmptyPatternTest : Stat.endToEnd Stat.Btest s_elm_CaseStringEmptyPatternTest = .ok g_elm_CaseStringEmptyPatternTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -120,6 +176,11 @@ theorem spec_elm_CaseStringEmptyPatternTest : Stat.endToEnd Stat.Btest s_elm_Cas
 theorem mean_elm_CaseStringEmptyPatternTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseStringEmptyPatternTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseStringEmptyPatternTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseStringEmptyPatternTest (legal_elm_CaseStringEmptyPatternTest h) (Stat.value_of_viewChecks t_elm_CaseStringEmptyPatternTest)
+
+/-- tests/elm/src/CaseStringEmptyPatternTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseStringEmptyPatternTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseStringEmptyPatternTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseStringEmptyPatternTest) r → r = g_elm_CaseStringEmptyPatternTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseStringEmptyPatternTest
 
 /-- tests/elm/src/CaseStringEscapeTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseStringEscapeTest : Stat.endToEnd Stat.Btest s_elm_CaseStringEscapeTest = .ok g_elm_CaseStringEscapeTest.reduced :=
@@ -130,6 +191,11 @@ theorem mean_elm_CaseStringEscapeTest (h : Stat.D11For Stat.Btest (Stat.bareOf s
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseStringEscapeTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseStringEscapeTest (legal_elm_CaseStringEscapeTest h) (Stat.value_of_viewChecks t_elm_CaseStringEscapeTest)
 
+/-- tests/elm/src/CaseStringEscapeTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseStringEscapeTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseStringEscapeTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseStringEscapeTest) r → r = g_elm_CaseStringEscapeTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseStringEscapeTest
+
 /-- tests/elm/src/CaseStringManyBranchTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseStringManyBranchTest : Stat.endToEnd Stat.Btest s_elm_CaseStringManyBranchTest = .ok g_elm_CaseStringManyBranchTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -138,6 +204,11 @@ theorem spec_elm_CaseStringManyBranchTest : Stat.endToEnd Stat.Btest s_elm_CaseS
 theorem mean_elm_CaseStringManyBranchTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseStringManyBranchTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseStringManyBranchTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseStringManyBranchTest (legal_elm_CaseStringManyBranchTest h) (Stat.value_of_viewChecks t_elm_CaseStringManyBranchTest)
+
+/-- tests/elm/src/CaseStringManyBranchTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseStringManyBranchTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseStringManyBranchTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseStringManyBranchTest) r → r = g_elm_CaseStringManyBranchTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseStringManyBranchTest
 
 /-- tests/elm/src/CaseStringTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseStringTest : Stat.endToEnd Stat.Btest s_elm_CaseStringTest = .ok g_elm_CaseStringTest.reduced :=
@@ -148,6 +219,11 @@ theorem mean_elm_CaseStringTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_C
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseStringTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseStringTest (legal_elm_CaseStringTest h) (Stat.value_of_viewChecks t_elm_CaseStringTest)
 
+/-- tests/elm/src/CaseStringTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseStringTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseStringTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseStringTest) r → r = g_elm_CaseStringTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseStringTest
+
 /-- tests/elm/src/CaseTreeTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseTreeTest : Stat.endToEnd Stat.Btest s_elm_CaseTreeTest = .ok g_elm_CaseTreeTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -156,6 +232,11 @@ theorem spec_elm_CaseTreeTest : Stat.endToEnd Stat.Btest s_elm_CaseTreeTest = .o
 theorem mean_elm_CaseTreeTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseTreeTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseTreeTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseTreeTest (legal_elm_CaseTreeTest h) (Stat.value_of_viewChecks t_elm_CaseTreeTest)
+
+/-- tests/elm/src/CaseTreeTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseTreeTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseTreeTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseTreeTest) r → r = g_elm_CaseTreeTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseTreeTest
 
 /-- tests/elm/src/CaseTripleTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseTripleTest : Stat.endToEnd Stat.Btest s_elm_CaseTripleTest = .ok g_elm_CaseTripleTest.reduced :=
@@ -166,6 +247,11 @@ theorem mean_elm_CaseTripleTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_C
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseTripleTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseTripleTest (legal_elm_CaseTripleTest h) (Stat.value_of_viewChecks t_elm_CaseTripleTest)
 
+/-- tests/elm/src/CaseTripleTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseTripleTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseTripleTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseTripleTest) r → r = g_elm_CaseTripleTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseTripleTest
+
 /-- tests/elm/src/CaseTupleLiteralTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseTupleLiteralTest : Stat.endToEnd Stat.Btest s_elm_CaseTupleLiteralTest = .ok g_elm_CaseTupleLiteralTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -174,6 +260,11 @@ theorem spec_elm_CaseTupleLiteralTest : Stat.endToEnd Stat.Btest s_elm_CaseTuple
 theorem mean_elm_CaseTupleLiteralTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseTupleLiteralTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseTupleLiteralTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseTupleLiteralTest (legal_elm_CaseTupleLiteralTest h) (Stat.value_of_viewChecks t_elm_CaseTupleLiteralTest)
+
+/-- tests/elm/src/CaseTupleLiteralTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseTupleLiteralTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseTupleLiteralTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseTupleLiteralTest) r → r = g_elm_CaseTupleLiteralTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseTupleLiteralTest
 
 /-- tests/elm/src/CaseTupleTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseTupleTest : Stat.endToEnd Stat.Btest s_elm_CaseTupleTest = .ok g_elm_CaseTupleTest.reduced :=
@@ -184,6 +275,11 @@ theorem mean_elm_CaseTupleTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_Ca
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseTupleTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseTupleTest (legal_elm_CaseTupleTest h) (Stat.value_of_viewChecks t_elm_CaseTupleTest)
 
+/-- tests/elm/src/CaseTupleTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseTupleTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseTupleTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseTupleTest) r → r = g_elm_CaseTupleTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseTupleTest
+
 /-- tests/elm/src/CaseUnicodeCharTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CaseUnicodeCharTest : Stat.endToEnd Stat.Btest s_elm_CaseUnicodeCharTest = .ok g_elm_CaseUnicodeCharTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -192,6 +288,11 @@ theorem spec_elm_CaseUnicodeCharTest : Stat.endToEnd Stat.Btest s_elm_CaseUnicod
 theorem mean_elm_CaseUnicodeCharTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseUnicodeCharTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CaseUnicodeCharTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CaseUnicodeCharTest (legal_elm_CaseUnicodeCharTest h) (Stat.value_of_viewChecks t_elm_CaseUnicodeCharTest)
+
+/-- tests/elm/src/CaseUnicodeCharTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CaseUnicodeCharTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CaseUnicodeCharTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CaseUnicodeCharTest) r → r = g_elm_CaseUnicodeCharTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CaseUnicodeCharTest
 
 /-- tests/elm/src/CharAstralClosureCaptureTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CharAstralClosureCaptureTest : Stat.endToEnd Stat.Btest s_elm_CharAstralClosureCaptureTest = .ok g_elm_CharAstralClosureCaptureTest.reduced :=
@@ -202,6 +303,11 @@ theorem mean_elm_CharAstralClosureCaptureTest (h : Stat.D11For Stat.Btest (Stat.
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CharAstralClosureCaptureTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CharAstralClosureCaptureTest (legal_elm_CharAstralClosureCaptureTest h) (Stat.value_of_viewChecks t_elm_CharAstralClosureCaptureTest)
 
+/-- tests/elm/src/CharAstralClosureCaptureTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CharAstralClosureCaptureTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharAstralClosureCaptureTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CharAstralClosureCaptureTest) r → r = g_elm_CharAstralClosureCaptureTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CharAstralClosureCaptureTest
+
 /-- tests/elm/src/CharAstralCustomFieldTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CharAstralCustomFieldTest : Stat.endToEnd Stat.Btest s_elm_CharAstralCustomFieldTest = .ok g_elm_CharAstralCustomFieldTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -210,6 +316,11 @@ theorem spec_elm_CharAstralCustomFieldTest : Stat.endToEnd Stat.Btest s_elm_Char
 theorem mean_elm_CharAstralCustomFieldTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharAstralCustomFieldTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CharAstralCustomFieldTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CharAstralCustomFieldTest (legal_elm_CharAstralCustomFieldTest h) (Stat.value_of_viewChecks t_elm_CharAstralCustomFieldTest)
+
+/-- tests/elm/src/CharAstralCustomFieldTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CharAstralCustomFieldTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharAstralCustomFieldTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CharAstralCustomFieldTest) r → r = g_elm_CharAstralCustomFieldTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CharAstralCustomFieldTest
 
 /-- tests/elm/src/CharAstralRecordFieldTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CharAstralRecordFieldTest : Stat.endToEnd Stat.Btest s_elm_CharAstralRecordFieldTest = .ok g_elm_CharAstralRecordFieldTest.reduced :=
@@ -220,6 +331,11 @@ theorem mean_elm_CharAstralRecordFieldTest (h : Stat.D11For Stat.Btest (Stat.bar
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CharAstralRecordFieldTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CharAstralRecordFieldTest (legal_elm_CharAstralRecordFieldTest h) (Stat.value_of_viewChecks t_elm_CharAstralRecordFieldTest)
 
+/-- tests/elm/src/CharAstralRecordFieldTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CharAstralRecordFieldTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharAstralRecordFieldTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CharAstralRecordFieldTest) r → r = g_elm_CharAstralRecordFieldTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CharAstralRecordFieldTest
+
 /-- tests/elm/src/CharAstralTupleTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CharAstralTupleTest : Stat.endToEnd Stat.Btest s_elm_CharAstralTupleTest = .ok g_elm_CharAstralTupleTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -228,6 +344,11 @@ theorem spec_elm_CharAstralTupleTest : Stat.endToEnd Stat.Btest s_elm_CharAstral
 theorem mean_elm_CharAstralTupleTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharAstralTupleTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CharAstralTupleTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CharAstralTupleTest (legal_elm_CharAstralTupleTest h) (Stat.value_of_viewChecks t_elm_CharAstralTupleTest)
+
+/-- tests/elm/src/CharAstralTupleTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CharAstralTupleTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharAstralTupleTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CharAstralTupleTest) r → r = g_elm_CharAstralTupleTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CharAstralTupleTest
 
 /-- tests/elm/src/CharCaptureEscapedTailDefTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CharCaptureEscapedTailDefTest : Stat.endToEnd Stat.Btest s_elm_CharCaptureEscapedTailDefTest = .ok g_elm_CharCaptureEscapedTailDefTest.reduced :=
@@ -238,6 +359,11 @@ theorem mean_elm_CharCaptureEscapedTailDefTest (h : Stat.D11For Stat.Btest (Stat
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CharCaptureEscapedTailDefTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CharCaptureEscapedTailDefTest (legal_elm_CharCaptureEscapedTailDefTest h) (Stat.value_of_viewChecks t_elm_CharCaptureEscapedTailDefTest)
 
+/-- tests/elm/src/CharCaptureEscapedTailDefTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CharCaptureEscapedTailDefTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharCaptureEscapedTailDefTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CharCaptureEscapedTailDefTest) r → r = g_elm_CharCaptureEscapedTailDefTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CharCaptureEscapedTailDefTest
+
 /-- tests/elm/src/CharCasePredicateTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CharCasePredicateTest : Stat.endToEnd Stat.Btest s_elm_CharCasePredicateTest = .ok g_elm_CharCasePredicateTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -246,6 +372,11 @@ theorem spec_elm_CharCasePredicateTest : Stat.endToEnd Stat.Btest s_elm_CharCase
 theorem mean_elm_CharCasePredicateTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharCasePredicateTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CharCasePredicateTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CharCasePredicateTest (legal_elm_CharCasePredicateTest h) (Stat.value_of_viewChecks t_elm_CharCasePredicateTest)
+
+/-- tests/elm/src/CharCasePredicateTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CharCasePredicateTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharCasePredicateTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CharCasePredicateTest) r → r = g_elm_CharCasePredicateTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CharCasePredicateTest
 
 /-- tests/elm/src/CharLiteralPatternMatchMinimalTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CharLiteralPatternMatchMinimalTest : Stat.endToEnd Stat.Btest s_elm_CharLiteralPatternMatchMinimalTest = .ok g_elm_CharLiteralPatternMatchMinimalTest.reduced :=
@@ -256,6 +387,11 @@ theorem mean_elm_CharLiteralPatternMatchMinimalTest (h : Stat.D11For Stat.Btest 
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CharLiteralPatternMatchMinimalTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CharLiteralPatternMatchMinimalTest (legal_elm_CharLiteralPatternMatchMinimalTest h) (Stat.value_of_viewChecks t_elm_CharLiteralPatternMatchMinimalTest)
 
+/-- tests/elm/src/CharLiteralPatternMatchMinimalTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CharLiteralPatternMatchMinimalTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharLiteralPatternMatchMinimalTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CharLiteralPatternMatchMinimalTest) r → r = g_elm_CharLiteralPatternMatchMinimalTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CharLiteralPatternMatchMinimalTest
+
 /-- tests/elm/src/CharLiteralPatternMatchVariousTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CharLiteralPatternMatchVariousTest : Stat.endToEnd Stat.Btest s_elm_CharLiteralPatternMatchVariousTest = .ok g_elm_CharLiteralPatternMatchVariousTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -264,6 +400,11 @@ theorem spec_elm_CharLiteralPatternMatchVariousTest : Stat.endToEnd Stat.Btest s
 theorem mean_elm_CharLiteralPatternMatchVariousTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharLiteralPatternMatchVariousTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CharLiteralPatternMatchVariousTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CharLiteralPatternMatchVariousTest (legal_elm_CharLiteralPatternMatchVariousTest h) (Stat.value_of_viewChecks t_elm_CharLiteralPatternMatchVariousTest)
+
+/-- tests/elm/src/CharLiteralPatternMatchVariousTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CharLiteralPatternMatchVariousTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharLiteralPatternMatchVariousTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CharLiteralPatternMatchVariousTest) r → r = g_elm_CharLiteralPatternMatchVariousTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CharLiteralPatternMatchVariousTest
 
 /-- tests/elm/src/CharUnicodeTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CharUnicodeTest : Stat.endToEnd Stat.Btest s_elm_CharUnicodeTest = .ok g_elm_CharUnicodeTest.reduced :=
@@ -274,6 +415,11 @@ theorem mean_elm_CharUnicodeTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CharUnicodeTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CharUnicodeTest (legal_elm_CharUnicodeTest h) (Stat.value_of_viewChecks t_elm_CharUnicodeTest)
 
+/-- tests/elm/src/CharUnicodeTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CharUnicodeTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CharUnicodeTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CharUnicodeTest) r → r = g_elm_CharUnicodeTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CharUnicodeTest
+
 /-- tests/elm/src/ClosureCapture01Test.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_ClosureCapture01Test : Stat.endToEnd Stat.Btest s_elm_ClosureCapture01Test = .ok g_elm_ClosureCapture01Test.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -282,6 +428,11 @@ theorem spec_elm_ClosureCapture01Test : Stat.endToEnd Stat.Btest s_elm_ClosureCa
 theorem mean_elm_ClosureCapture01Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCapture01Test)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_ClosureCapture01Test) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_ClosureCapture01Test (legal_elm_ClosureCapture01Test h) (Stat.value_of_viewChecks t_elm_ClosureCapture01Test)
+
+/-- tests/elm/src/ClosureCapture01Test.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_ClosureCapture01Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCapture01Test)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_ClosureCapture01Test) r → r = g_elm_ClosureCapture01Test.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_ClosureCapture01Test
 
 /-- tests/elm/src/ClosureCapture02Test.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_ClosureCapture02Test : Stat.endToEnd Stat.Btest s_elm_ClosureCapture02Test = .ok g_elm_ClosureCapture02Test.reduced :=
@@ -292,6 +443,11 @@ theorem mean_elm_ClosureCapture02Test (h : Stat.D11For Stat.Btest (Stat.bareOf s
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_ClosureCapture02Test) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_ClosureCapture02Test (legal_elm_ClosureCapture02Test h) (Stat.value_of_viewChecks t_elm_ClosureCapture02Test)
 
+/-- tests/elm/src/ClosureCapture02Test.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_ClosureCapture02Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCapture02Test)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_ClosureCapture02Test) r → r = g_elm_ClosureCapture02Test.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_ClosureCapture02Test
+
 /-- tests/elm/src/ClosureCapture03Test.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_ClosureCapture03Test : Stat.endToEnd Stat.Btest s_elm_ClosureCapture03Test = .ok g_elm_ClosureCapture03Test.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -300,6 +456,11 @@ theorem spec_elm_ClosureCapture03Test : Stat.endToEnd Stat.Btest s_elm_ClosureCa
 theorem mean_elm_ClosureCapture03Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCapture03Test)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_ClosureCapture03Test) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_ClosureCapture03Test (legal_elm_ClosureCapture03Test h) (Stat.value_of_viewChecks t_elm_ClosureCapture03Test)
+
+/-- tests/elm/src/ClosureCapture03Test.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_ClosureCapture03Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCapture03Test)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_ClosureCapture03Test) r → r = g_elm_ClosureCapture03Test.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_ClosureCapture03Test
 
 /-- tests/elm/src/ClosureCapture04Test.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_ClosureCapture04Test : Stat.endToEnd Stat.Btest s_elm_ClosureCapture04Test = .ok g_elm_ClosureCapture04Test.reduced :=
@@ -310,6 +471,11 @@ theorem mean_elm_ClosureCapture04Test (h : Stat.D11For Stat.Btest (Stat.bareOf s
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_ClosureCapture04Test) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_ClosureCapture04Test (legal_elm_ClosureCapture04Test h) (Stat.value_of_viewChecks t_elm_ClosureCapture04Test)
 
+/-- tests/elm/src/ClosureCapture04Test.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_ClosureCapture04Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCapture04Test)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_ClosureCapture04Test) r → r = g_elm_ClosureCapture04Test.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_ClosureCapture04Test
+
 /-- tests/elm/src/ClosureCapture05Test.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_ClosureCapture05Test : Stat.endToEnd Stat.Btest s_elm_ClosureCapture05Test = .ok g_elm_ClosureCapture05Test.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -318,6 +484,11 @@ theorem spec_elm_ClosureCapture05Test : Stat.endToEnd Stat.Btest s_elm_ClosureCa
 theorem mean_elm_ClosureCapture05Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCapture05Test)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_ClosureCapture05Test) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_ClosureCapture05Test (legal_elm_ClosureCapture05Test h) (Stat.value_of_viewChecks t_elm_ClosureCapture05Test)
+
+/-- tests/elm/src/ClosureCapture05Test.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_ClosureCapture05Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCapture05Test)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_ClosureCapture05Test) r → r = g_elm_ClosureCapture05Test.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_ClosureCapture05Test
 
 /-- tests/elm/src/ClosureCapture06Test.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_ClosureCapture06Test : Stat.endToEnd Stat.Btest s_elm_ClosureCapture06Test = .ok g_elm_ClosureCapture06Test.reduced :=
@@ -328,6 +499,11 @@ theorem mean_elm_ClosureCapture06Test (h : Stat.D11For Stat.Btest (Stat.bareOf s
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_ClosureCapture06Test) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_ClosureCapture06Test (legal_elm_ClosureCapture06Test h) (Stat.value_of_viewChecks t_elm_ClosureCapture06Test)
 
+/-- tests/elm/src/ClosureCapture06Test.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_ClosureCapture06Test (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCapture06Test)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_ClosureCapture06Test) r → r = g_elm_ClosureCapture06Test.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_ClosureCapture06Test
+
 /-- tests/elm/src/ClosureCaptureBoolTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_ClosureCaptureBoolTest : Stat.endToEnd Stat.Btest s_elm_ClosureCaptureBoolTest = .ok g_elm_ClosureCaptureBoolTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -336,6 +512,11 @@ theorem spec_elm_ClosureCaptureBoolTest : Stat.endToEnd Stat.Btest s_elm_Closure
 theorem mean_elm_ClosureCaptureBoolTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCaptureBoolTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_ClosureCaptureBoolTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_ClosureCaptureBoolTest (legal_elm_ClosureCaptureBoolTest h) (Stat.value_of_viewChecks t_elm_ClosureCaptureBoolTest)
+
+/-- tests/elm/src/ClosureCaptureBoolTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_ClosureCaptureBoolTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCaptureBoolTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_ClosureCaptureBoolTest) r → r = g_elm_ClosureCaptureBoolTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_ClosureCaptureBoolTest
 
 /-- tests/elm/src/ClosureCaptureRecordTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_ClosureCaptureRecordTest : Stat.endToEnd Stat.Btest s_elm_ClosureCaptureRecordTest = .ok g_elm_ClosureCaptureRecordTest.reduced :=
@@ -346,6 +527,11 @@ theorem mean_elm_ClosureCaptureRecordTest (h : Stat.D11For Stat.Btest (Stat.bare
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_ClosureCaptureRecordTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_ClosureCaptureRecordTest (legal_elm_ClosureCaptureRecordTest h) (Stat.value_of_viewChecks t_elm_ClosureCaptureRecordTest)
 
+/-- tests/elm/src/ClosureCaptureRecordTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_ClosureCaptureRecordTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCaptureRecordTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_ClosureCaptureRecordTest) r → r = g_elm_ClosureCaptureRecordTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_ClosureCaptureRecordTest
+
 /-- tests/elm/src/ClosureCaptureTupleTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_ClosureCaptureTupleTest : Stat.endToEnd Stat.Btest s_elm_ClosureCaptureTupleTest = .ok g_elm_ClosureCaptureTupleTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -354,6 +540,11 @@ theorem spec_elm_ClosureCaptureTupleTest : Stat.endToEnd Stat.Btest s_elm_Closur
 theorem mean_elm_ClosureCaptureTupleTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCaptureTupleTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_ClosureCaptureTupleTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_ClosureCaptureTupleTest (legal_elm_ClosureCaptureTupleTest h) (Stat.value_of_viewChecks t_elm_ClosureCaptureTupleTest)
+
+/-- tests/elm/src/ClosureCaptureTupleTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_ClosureCaptureTupleTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureCaptureTupleTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_ClosureCaptureTupleTest) r → r = g_elm_ClosureCaptureTupleTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_ClosureCaptureTupleTest
 
 /-- tests/elm/src/ClosureDifferentClosuresPerIfBranchInsideACaseTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest : Stat.endToEnd Stat.Btest s_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest = .ok g_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest.reduced :=
@@ -364,6 +555,11 @@ theorem mean_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest (h : Stat.D1
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest (legal_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest h) (Stat.value_of_viewChecks t_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest)
 
+/-- tests/elm/src/ClosureDifferentClosuresPerIfBranchInsideACaseTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest) r → r = g_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_ClosureDifferentClosuresPerIfBranchInsideACaseTest
+
 /-- tests/elm/src/CombinatorBComposeTest.elm: Lean's elaboration, specialisation and erasure give the translator's reduced program [parse] [harness] [principal] [params] -/
 theorem spec_elm_CombinatorBComposeTest : Stat.endToEnd Stat.Btest s_elm_CombinatorBComposeTest = .ok g_elm_CombinatorBComposeTest.reduced :=
   Stat.endToEnd_of_ctx ctx_0_eq (by decide +kernel)
@@ -372,5 +568,10 @@ theorem spec_elm_CombinatorBComposeTest : Stat.endToEnd Stat.Btest s_elm_Combina
 theorem mean_elm_CombinatorBComposeTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CombinatorBComposeTest)) :
     ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CombinatorBComposeTest) (τ, PE, v) :=
   Stat.programSem_of_legal h spec_elm_CombinatorBComposeTest (legal_elm_CombinatorBComposeTest h) (Stat.value_of_viewChecks t_elm_CombinatorBComposeTest)
+
+/-- tests/elm/src/CombinatorBComposeTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [principal] [params] -/
+theorem ident_elm_CombinatorBComposeTest (h : Stat.D11For Stat.Btest (Stat.bareOf s_elm_CombinatorBComposeTest)) :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CombinatorBComposeTest) r → r = g_elm_CombinatorBComposeTest.reduced :=
+  Stat.ident_of_spec' (by decide +kernel) h spec_elm_CombinatorBComposeTest
 
 end StandardElm

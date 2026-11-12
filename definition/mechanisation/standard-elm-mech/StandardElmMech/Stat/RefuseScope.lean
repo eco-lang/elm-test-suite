@@ -280,22 +280,6 @@ theorem mapV_plusAll (fs : List (FMap K V)) (h : V → W) :
   rw [mapV_foldl_modify]
   rfl
 
-theorem find?_foldl_modify (fs : List (FMap K V)) (acc : FMap K V) (k : K) :
-    FMap.find? (fs.foldl FMap.modify acc) k = (FMap.find? (FMap.plusAll fs) k).or (FMap.find? acc k) := by
-  induction fs generalizing acc with
-  | nil => simp [FMap.plusAll]
-  | cons f fs ih =>
-    simp only [List.foldl_cons, FMap.plusAll] at ih ⊢
-    rw [ih, ih (FMap.modify [] f), FMap.find?_modify, FMap.find?_modify]
-    simp [Option.or_assoc]
-
-theorem find?_plusAll_append (l1 l2 : List (FMap K V)) (k : K) :
-    FMap.find? (FMap.plusAll (l1 ++ l2)) k =
-      (FMap.find? (FMap.plusAll l2) k).or (FMap.find? (FMap.plusAll l1) k) := by
-  conv => lhs; unfold FMap.plusAll
-  rw [List.foldl_append, find?_foldl_modify]
-  rfl
-
 theorem keys_modify (f g : FMap K V) :
     FMap.keys (FMap.modify f g) = FMap.keys g ++ (FMap.keys f).filter (fun k => !decide (k ∈ FMap.keys g)) := by
   simp [FMap.modify, FMap.keys, List.map_append, List.filter_map, Function.comp_def]
@@ -945,7 +929,8 @@ theorem vesound_typBinds {C : Ctx} {tbs : List BTypBind} {VEs : List ValEnv} {TE
 
 theorem vesound_checkTypes {C : Ctx} {TE : TyEnv} {VE : ValEnv} {db : Option BDatBind}
     {tbs : List BTypBind} (h : checkTypes C TE VE db tbs = true) : VESound VE (typesBs db tbs) := by
-  unfold checkTypes at h
+  replace h := checkTypes_fix h
+  unfold checkTypesFix at h
   cases db with
   | none =>
     simp only at h
@@ -995,11 +980,6 @@ theorem elabPort_shape {C : Ctx} {x : Var} {ty : BTy} {U : List BVar} {E : Env} 
     · cases h
   · cases h
 
-theorem erase_typesSplit {a1 a2 : ATopDec} {db : Option BDatBind} {tbs1 tbs2 : List BTypBind}
-    (h1 : a1.erase = .types db tbs1) (h2 : a2.erase = .types none tbs2) :
-    (ATopDec.typesSplit a1 a2).erase = .types db (tbs1 ++ tbs2) := by
-  simp only [ATopDec.erase, h1, h2]
-
 theorem topSound : (a : ATopDec) → (C : Ctx) → (E : Env) → (PE : PortEnv) →
     checkTopDec C a = some (E, PE) → TopSound E (topBs a.erase)
   | .value VE vb, C, E, PE, h => by
@@ -1021,29 +1001,6 @@ theorem topSound : (a : ATopDec) → (C : Ctx) → (E : Env) → (PE : PortEnv) 
       simp only [Option.some.injEq, Prod.mk.injEq] at h
       obtain ⟨rfl, rfl⟩ := h
       exact ⟨rfl, vesound_checkTypes hc⟩
-    · cases h
-  | .typesSplit a1 a2, C, E, PE, h => by
-    simp only [checkTopDec] at h
-    split at h
-    · rename_i hs
-      obtain ⟨db, tbs1, tbs2, h1e, h2e, _, _⟩ := splitShape_spec hs
-      split at h
-      · rename_i E1 PE1 h1
-        split at h
-        · rename_i E2 PE2 h2
-          simp only [Option.some.injEq, Prod.mk.injEq] at h
-          obtain ⟨rfl, rfl⟩ := h
-          have s1 := topSound a1 C E1 PE1 h1
-          have s2 := topSound a2 _ E2 PE2 h2
-          rw [h1e] at s1
-          rw [h2e] at s2
-          rw [erase_typesSplit h1e h2e]
-          have := topSound_plus s1 s2
-          simp only [topBs, typesBs, datBs, List.append_nil, List.map_append, List.reverse_append,
-            vs] at this ⊢
-          simpa using this
-        · cases h
-      · cases h
     · cases h
   | .port x ty U, C, E, PE, h => by
     simp only [checkTopDec] at h
@@ -1084,14 +1041,6 @@ theorem sc_top : (a : ATopDec) → (C : Ctx) → (Γ : Shape) → (E : Env) → 
       exact sc_valBind vb _ _ (abs_plusVE hA hk) hc.1
     · cases h
   | .types _ _ _ _, _, _, _, _, _, _ => rfl
-  | .typesSplit a1 a2, C, Γ, E, PE, hA, h => by
-    simp only [checkTopDec] at h
-    split at h
-    · rename_i hs
-      obtain ⟨db, tbs1, tbs2, h1e, h2e, _, _⟩ := splitShape_spec hs
-      rw [erase_typesSplit h1e h2e]
-      rfl
-    · cases h
   | .port _ _ _, _, _, _, _, _, _ => rfl
   | .seq a1 a2, C, Γ, E, PE, hA, h => by
     simp only [checkTopDec] at h
@@ -1496,7 +1445,8 @@ theorem typBinds_sk (C : Ctx) : (tbs : List BTypBind) → (VEs : List ValEnv) �
 
 theorem checkTypes_sk {C : Ctx} {TE : TyEnv} {VE : ValEnv} {db : Option BDatBind} {tbs : List BTypBind}
     (h : checkTypes C TE VE db tbs = true) : FMap.mapV TE skS = teSkTypes db tbs := by
-  unfold checkTypes at h
+  replace h := checkTypes_fix h
+  unfold checkTypesFix at h
   cases db with
   | none =>
     simp only at h
@@ -1553,29 +1503,6 @@ theorem teSk_top : (a : ATopDec) → (C : Ctx) → (E : Env) → (PE : PortEnv) 
       obtain ⟨rfl, rfl⟩ := h
       simp only [ATopDec.erase, teSkTop]
       rw [checkTypes_sk hc]
-    · cases h
-  | .typesSplit a1 a2, C, E, PE, h, c => by
-    simp only [checkTopDec] at h
-    split at h
-    · rename_i hs
-      obtain ⟨db, tbs1, tbs2, h1e, h2e, _, _⟩ := splitShape_spec hs
-      split at h
-      · rename_i E1 PE1 h1
-        split at h
-        · rename_i E2 PE2 h2
-          simp only [Option.some.injEq, Prod.mk.injEq] at h
-          obtain ⟨rfl, rfl⟩ := h
-          have s1 := teSk_top a1 C E1 PE1 h1 c
-          have s2 := teSk_top a2 _ E2 PE2 h2 c
-          rw [h1e] at s1
-          rw [h2e] at s2
-          rw [erase_typesSplit h1e h2e]
-          simp only [Env.plus]
-          rw [mapV_modify, FMap.find?_modify, s1, s2]
-          simp only [teSkTop, teSkTypes, datTeSk, FMap.find?_modify, List.map_append,
-            find?_plusAll_append, FMap.find?_nil, Option.or_none, Option.or_assoc]
-        · cases h
-      · cases h
     · cases h
   | .port x ty U, C, E, PE, h, c => by
     simp only [checkTopDec] at h

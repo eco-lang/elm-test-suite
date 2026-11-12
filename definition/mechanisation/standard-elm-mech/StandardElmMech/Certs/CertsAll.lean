@@ -15,7 +15,13 @@ import StandardElmMech.Certs.ElmCore01
 import StandardElmMech.Certs.ElmCore02
 import StandardElmMech.Certs.ElmCore03
 import StandardElmMech.Certs.ElmCore04
-import StandardElmMech.Certs.Refusals
+import StandardElmMech.Certs.Refusals01
+import StandardElmMech.Certs.Refusals02
+import StandardElmMech.Certs.Refusals03
+import StandardElmMech.Certs.Refusals04
+import StandardElmMech.Certs.Refusals05
+import StandardElmMech.Certs.Refusals06
+import StandardElmMech.Certs.Refusals07
 import StandardElmMech.Certs.EndToEnd01
 import StandardElmMech.Certs.EndToEnd02
 import StandardElmMech.Certs.EndToEnd03

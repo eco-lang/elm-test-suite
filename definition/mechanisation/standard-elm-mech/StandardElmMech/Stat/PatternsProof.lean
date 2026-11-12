@@ -1133,9 +1133,6 @@ end
 
 theorem furtherTopDecB_sound (tbl : ConTable) : (a : ATopDec) → furtherTopDecB tbl a = true → FurtherTopDec tbl a
   | .value _ vb, h => furtherValBindB_sound tbl vb h
-  | .typesSplit a1 a2, h => by
-    simp only [furtherTopDecB, Bool.and_eq_true] at h
-    exact ⟨furtherTopDecB_sound tbl a1 h.1, furtherTopDecB_sound tbl a2 h.2⟩
   | .seq a1 a2, h => by
     simp only [furtherTopDecB, Bool.and_eq_true] at h
     exact ⟨furtherTopDecB_sound tbl a1 h.1, furtherTopDecB_sound tbl a2 h.2⟩

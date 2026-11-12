@@ -204,7 +204,7 @@ theorem specAtExp_rename {r : Renaming} (hr : r.WF) {D : BVar → Prop} :
     intro ρ Γ Γ' L L' g hΓ hL
     cases h with
     | update h1 =>
-      have := specOcc_rename hr hΓ ρ ⟨none, x⟩ inst
+      have := specOcc_rename hr hΓ ρ ⟨none, x⟩ τ
       simp only [specAtExp, this, specExpRow_rename hr row h1 ρ g hΓ hL]
   | .letE (.val VE vb) e, _, h => by
     intro ρ Γ Γ' L L' g hΓ hL

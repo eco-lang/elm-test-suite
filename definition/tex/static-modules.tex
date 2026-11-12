@@ -465,13 +465,13 @@ constructors of \kw{T} are not available.
 
 \defnrule[r:sm-topdec-value]{\jdg{C + \VE}{\valbind}{\VE} \premsep \VE' = \Clos_C \VE}{\jdg{C}{\valbind}{\VE'\ \text{in}\ \Env,\ \emptymap}}
 
-\defnrule[r:sm-topdec-types]{\opt{\jdg{C \oplus \TE}{\datbind}{\VE', \TE'} \premsep \forall (t, \VE'') \in \Ran\TE',\ t \notin T \of C} \\ \jdg{C \oplus \TE}{\typbind_i}{\VE_i, \TE_i} \quad (1 \le i \le l) \\ \TE = \opt{\TE' +{}} \TE_1 + \cdots + \TE_l \premsep \VE = \opt{\VE' +{}} \VE_1 + \cdots + \VE_l}{C \vdash \opt{\kw{type}\ \datbind\ \kw{;}}\ \kw{type alias}\ \typbind_1\ \kw{;}\ \cdots \\ \qquad \kw{;}\ \kw{type alias}\ \typbind_l \Rightarrow (\emptymap, \TE, \VE),\ \emptymap}
+\defnrule[r:sm-topdec-types]{\opt{\jdg{C \oplus \TE}{\datbind}{\VE', \TE'} \premsep \forall (t, \VE'') \in \Ran\TE',\ t \notin T \of C} \\ \jdg{C \oplus \TE}{\typbind_i}{\VE_i, \TE_i} \quad (1 \le i \le l) \\ \TE = \opt{\TE' +{}} \TE_1 + \cdots + \TE_l \premsep \VE = \opt{\VE' +{}} \VE_1 + \cdots + \VE_l \\ \tyvars \TE = \emptyset}{C \vdash \opt{\kw{type}\ \datbind\ \kw{;}}\ \kw{type alias}\ \typbind_1\ \kw{;}\ \cdots \\ \qquad \kw{;}\ \kw{type alias}\ \typbind_l \Rightarrow (\emptymap, \TE, \VE),\ \emptymap}
 
 \defnrule[r:sm-topdec-portout]{U \text{ is new for } \ty \text{ in } C \premsep \jdg{C + U}{\ty}{\tau} \\ \tau = \tau' \rightarrow \alpha\,\sbtCmd \premsep \Port(\tau')}{\jdg{C}{\kw{port}\ \var\ \kw{:}\ \ty}{\{\var \mapsto (\Clos_C \tau, \isv)\}\ \text{in}\ \Env,\ \{\var \mapsto (\smdirout, \tau')\}}}
 
 \defnrule[r:sm-topdec-portin]{U \text{ is new for } \ty \text{ in } C \premsep \jdg{C + U}{\ty}{\tau} \\ \tau = (\tau' \rightarrow \alpha) \rightarrow \alpha\,\sbtSub \premsep \Port(\tau')}{\jdg{C}{\kw{port}\ \var\ \kw{:}\ \ty}{\{\var \mapsto (\Clos_C \tau, \isv)\}\ \text{in}\ \Env,\ \{\var \mapsto (\smdirin, \tau')\}}}
 
-\defnrule[r:sm-topdec-seq]{\jdg{C}{\topdec_1}{E_1, \PE_1} \premsep \jdg{C \oplus E_1}{\topdec_2}{E_2, \PE_2}}{\jdg{C}{\topdec_1\ \kw{;}\ \topdec_2}{E_1 + E_2,\ \PE_1 + \PE_2}}
+\defnrule[r:sm-topdec-seq]{\jdg{C}{\topdec_1}{E_1, \PE_1} \premsep \jdg{C \oplus E_1}{\topdec_2}{E_2, \PE_2} \\ \text{the separator is not one of a type-declaration phrase}}{\jdg{C}{\topdec_1\ \kw{;}\ \topdec_2}{E_1 + E_2,\ \PE_1 + \PE_2}}
 
 \begin{rulecomments}
 \rcomment{r:sm-topdec-value} The rule is that for declarations in the Core
@@ -494,11 +494,20 @@ The equation has a solution determined by $C$ and the phrase up to the choice
 of new type names (Section~\ref{sec:static-modules-rules}), because the type
 function of a custom type is its type name alone, and no alias refers to itself
 through aliases. The side condition on $T \of C$ makes the type names of the
-custom types new. Rule~\ruleref{r:sm-topdec-seq} also applies to such a
-phrase, splitting it at one of its separators. Where both rules apply they give
-the same result, and rule~\ruleref{r:sm-topdec-types} is needed because a custom type
-may mention an alias that follows it. A local type spelt as an imported one is
-a different type, and the unqualified type constructor denotes the local one.
+custom types new. The side condition $\tyvars\TE = \emptyset$ keeps the
+equation from justifying itself: the closures of rules~\ruleref{r:sm-datbind}
+and~\ruleref{r:sm-typbind-record} are taken in $C \oplus \TE$, so without it an
+environment whose constructors keep a free variable, as \kw{K : a -> T a} for
+\kw{type T a = K a}, would be a solution too; with it, the constructors are
+closed and $\TE$ is determined as the property above says. % erratum, 2026-11-12
+Rule~\ruleref{r:sm-topdec-seq} does not split such a
+phrase (its side condition), so the type declarations of a module are
+elaborated together, and their order does not matter: a custom type may
+mention an alias that follows it. A local type spelt as an imported one is
+a different type, and the unqualified type constructor denotes the local one,
+in the declarations before it as well as after it: with \kw{type T = T String}
+followed by \kw{type alias String = Int}, the constructor \kw{T} takes an
+\kw{Int}. % A98
 
 \rcomment{r:sm-topdec-portout} The variables of the annotation are made
 explicit, as for an annotated value. The argument of $\sbtCmd$ must be a type
@@ -520,7 +529,9 @@ port, \kw{port recv : (Json.Decode.Value -> msg) -> Sub msg} elaborates, and
 \kw{port recv : (Result String Int -> msg) -> Sub msg} does not.
 
 \rcomment{r:sm-topdec-seq} Each declaration is elaborated in a context that
-contains the declarations before it. Since $E_1$ modifies the environment of
+contains the declarations before it. A type-declaration phrase, whose parts are
+separated by \kw{;} too, is not split: rule~\ruleref{r:sm-topdec-types} elaborates
+it as a whole, so that a custom type sees the aliases that follow it. % A98 Since $E_1$ modifies the environment of
 $C$, a declaration of the module replaces an imported binding of the same
 identifier, or makes an ambiguous one available. The syntactic restrictions
 ensure that $\Dom E_1 \cap \Dom E_2 = \emptyset$ and $\Dom\PE_1 \cap \Dom\PE_2

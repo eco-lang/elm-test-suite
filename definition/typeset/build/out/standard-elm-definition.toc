@@ -37,7 +37,7 @@
 \contentsline {section}{\numberline {5.3}Provider Maps}{44}{section.5.3}%
 \contentsline {section}{\numberline {5.4}Port Types}{45}{section.5.4}%
 \contentsline {section}{\numberline {5.5}Inference Rules}{46}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Principal Derivations}{53}{section.5.6}%
+\contentsline {section}{\numberline {5.6}Principal Derivations}{54}{section.5.6}%
 \contentsline {section}{\numberline {5.7}Further Restrictions}{54}{section.5.7}%
 \contentsline {chapter}{\numberline {6}Dynamic Semantics for the Core}{55}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Reduced Syntax}{55}{section.6.1}%

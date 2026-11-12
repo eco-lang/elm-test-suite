@@ -12,11 +12,11 @@ statics); step 8 done (source and bare syntax, derived forms with the book's cho
 restrictions, theorems for the 916 programs elm-syntax parses); step 9 done (2026-11-12: Chapters 4, 5 and 9's statics, the checker
 sound, the pattern decider correct, the test basis; 622 `legal_` theorems under D11, 9 of them by
 `native_decide` for the memory budget; 68 `refuse_` theorems, unconditional; see the step's
-"Status" for the theorems of its specification proved in another form or not proved); step 10 done except `ident_` (2026-11-12: specialisation,
-erasure and the pipeline in Lean, agreeing with the translator on all 579 translated tests; 579
-`spec_` and 577 `mean_` theorems; the rulings; the invariance lemma proved up to the step across
-bases, and found false for incoherent modules, step 10's issue 9, which needs a decision); step 11
-not started.**
+"Status" for the theorems of its specification proved in another form or not proved); step 10 done (2026-11-12: specialisation, erasure and the pipeline in Lean,
+agreeing with the translator on all 579 translated tests; 579 `spec_` and 577 `mean_` theorems;
+the rulings; the invariance lemma, `ident_of_spec'`, after ruling A98 and three errata in the
+encoding and the book); step 11 under way (milestone (a): 176 of the 217 inference tests refuted
+unconditionally; milestone (b): W sound, completeness in progress).**
 
 This file is the plan: what is built, in what order, under which decisions, and how
 each step is accepted. Each step has an implementation specification in
@@ -361,7 +361,12 @@ Each specification ends with its own checks. Every step also passes these
   neither is an instance of the other, and the module has no principal derivation: the property
   of Section `sec:static-modules-principal` is false as stated. Proposed fix: `r:sm-topdec-seq`
   applies only at separators outside a type-declaration phrase. Until the book is fixed, step 11
-  proves principality for *coherent* modules (D11), which include every test.
+  proves principality for *coherent* modules (D11), which include every test. **Resolved
+  2026-11-12 (ruling A98, option (c)):** the book now has that side condition, which agrees with
+  Elm 0.19.1 to 0.19.3 (a module's type declarations are one scope); the Lean checker has no split
+  derivation (`r_sm_topdec_seq_types` and `ATopDec.typesSplit` removed), so every module is
+  coherent in this sense, and step 11 need not restrict principality to coherent modules on this
+  account.
 - **B7. Copies in the reduced syntax.** Number specialisation replaces a declaration by copies,
   but the book does not say where the copies stand in the declaration sequence when they refer to
   one another, nor how a destructuring binding is copied (its variables are spelt as labels in a

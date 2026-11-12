@@ -112,7 +112,7 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `StandardElmMech/Stat/Subst.lean` | Substitutions, the classes and their meets, admissible types (`Adm`, `adm_iff`, `adm_mono`) |
 | `StandardElmMech/Stat/Schemes.lean` | Type functions, schemes and their canonical form, instances (`Gen`, `genAt`), explicit variables (`NewFor`), closure (`closGroup`, A93) |
 | `StandardElmMech/Stat/Rules.lean` | Chapter 4: the 45 rules of the static semantics of the Core, one constructor each (`r_s_*`) |
-| `StandardElmMech/Stat/Modules.lean` | Chapter 5: Expose, provider maps, Port, and the 19 rules of modules (`r_sm_*`, with `r_sm_topdec_seq_types` for the split of a type declaration) |
+| `StandardElmMech/Stat/Modules.lean` | Chapter 5: Expose, provider maps, Port, and the 19 rules of modules (`r_sm_*`, one constructor each; `r:sm-topdec-seq` does not split a type-declaration phrase) |
 | `StandardElmMech/Stat/Deterministic.lean` | The deterministic parts as functions, each sound for its relation: type expressions, imports and exposing, type declarations given their names (`checkTypes`), ports |
 | `StandardElmMech/Stat/Annotated.lean` | Annotated phrases (D10: a derivation is a phrase with the objects its rules choose) and the checker (`checkExp`, `checkModule`, `checkProgram`) |
 | `StandardElmMech/Stat/CheckSound.lean` | The checker is sound: a phrase that checks has a derivation by the rules of Chapters 4 and 5 (`checkExp_sound`, `checkModule_sound`) |
@@ -124,10 +124,10 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `StandardElmMech/Stat/Program.lean` | Chapter 9's static rules (`r_p_stat_*`), Dflt, and `LegalProgram`: a program as written meets the syntactic restrictions and elaborates by principal derivations meeting the further restrictions |
 | `StandardElmMech/Stat/Legal.lean` | The master theorems: a program whose inferred derivation checks, meets the further restrictions and gives `main` a Chapter 9 type is legal, under D11 (`legal_of_infer1`, `legal_of_infer`) |
 | `StandardElmMech/Stat/TestBasis.lean`, `Stat/TestBasisProps.lean` | The static test basis `Btest` (Appendix C, the harness's `Html.text`, the core library values of D2) and its agreement with the initial basis (`Btest_agrees`, `default_imports_test`) |
-| `StandardElmMech/Stat/RuleCount.lean` | `#check_static_rules`: every static rule label of the book has its constructor and conversely (45 + 20 + 3) |
+| `StandardElmMech/Stat/RuleCount.lean` | `#check_static_rules`: every static rule label of the book has its constructor and conversely (45 + 19 + 3) |
 | `StandardElmMech/Stat/Refusals.lean` | Refusals (milestone 9d): inversion of Chapter 9's rules, and the lemmas that turn "no derivation checks", "no derivation meets the further restrictions" or "no derivation gives `main` a Chapter 9 type" into `¬ LegalProgram`, with no hypothesis about principality |
 | `StandardElmMech/Stat/RefuseScope.lean` | Refusals by scope, constructor arity and imports, for one module and for a module after a helper (`scopeFailB`) |
-| `StandardElmMech/Stat/RefuseTypes.lean` | Refusals by type expressions (aliases, constructor arguments, annotations, ports) and by the type of `main` (`typesFailB`, `mainFailB`), for every choice of generated names, splits and variable sorts |
+| `StandardElmMech/Stat/RefuseTypes.lean` | Refusals by type expressions (aliases, constructor arguments, annotations, ports) and by the type of `main` (`typesFailB`, `mainFailB`), for every choice of generated names and variable sorts |
 | `StandardElmMech/Stat/RefuseFurtherAgree.lean`, `Stat/RefuseFurther.lean` | Refusals by exhaustiveness and irredundancy, at every type a derivation can give the patterns (`useful_agree`, `furtherFailB`) |
 | `StandardElmMech/Stat/RefuseAll.lean` | The refusal deciders `certify` tries, and the refusals of step 8's syntactic restrictions for one-module programs and texts without `main` |
 | `StandardElmMech/Stat/CertPrint.lean` | Printing contexts and terms for `certify` |
@@ -142,9 +142,15 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `StandardElmMech/Stat/Rename.lean`, `Stat/RenameSyntax.lean` | Renamings of type variables, row variables and generated type names, of types, schemes and annotated derivations, for the invariance lemma (finding B1) |
 | `StandardElmMech/Stat/RenameObjects.lean`, `Stat/RenameSpecExp.lean`, `Stat/RenameSpec.lean`, `Stat/RenameReduce.lean`, `Stat/RenameExtend.lean` | The invariance lemma, first half: specialisation is invariant under renaming (`specExp_rename`, `reduceWith_rename`) |
 | `StandardElmMech/Stat/MutualInstance.lean`, `Stat/MutualWalk.lean`, `Stat/MutualWalkExp.lean`, `Stat/MutualModule.lean` | The invariance lemma, second half: two module derivations that are instances of each other in one basis differ by a renaming of their value items (`mutualInstanceMod_items`) |
-| `StandardElmMech/Stat/SplitCounterexample.lean` | Finding B6 at the program level: a module with a split and a whole derivation of its type declaration, both principal, giving different flags types (`ce_differ`), so `ident_` is false as the definitions stand |
 | `StandardElmMech/Stat/RenameCounterexample.lean` | Two principal derivations of one program that specialisation once told apart (finding of 2026-11-12), kept as a regression theorem (`ce_equal`) |
+| `StandardElmMech/Stat/DupValuesCounterexample.lean` | Two derivations with the same nodes that differ only in an instance specialisation once read through a scope the checker disagrees with (a module with two top-level `x`); specialisation now reads instances off the occurrence's type (`same`) |
 | `StandardElmMech/Stat/SpecExamples.lean` | The rulings on small programs: A27 (a free `number` is Float, annotations bind), A87 (the default copy is made), A93 (vacuous variables), polymorphic recursion, copy names, `abs$Int`, exposing items, payload types, kinds of `main`, eight copies, renaming invariance, record-pattern copies |
+| `StandardElmMech/Stat/NameRen.lean`, `Stat/NameRenCheck.lean`, `Stat/NameRenInst.lean`, `Stat/NameRenMod.lean`, `Stat/NameRenResult.lean` | Renamings of type names that fix the initial basis commute with the whole checker, its results, nodes and instances (`instanceOfMod_nr`) |
+| `StandardElmMech/Stat/ItemsCompose.lean`, `Stat/ProgInduction.lean`, `Stat/Ident.lean` | The invariance lemma over programs: the induction over modules (`prog_rel`), `reduce_principal_unique`, `specOf_functional`, `TypesOrdered`, `Btest_inv` |
+| `StandardElmMech/Stat/ModuleStepSwap.lean`, `Stat/ModuleStepClosed.lean`, `Stat/ModuleStepTypes.lean`, `Stat/ModuleStepPorts.lean`, `Stat/ModuleStepWalk.lean`, `Stat/ModuleStep.lean` | The module step of the invariance lemma (`MStep.moduleStep`): closed contexts, unique type declarations (`checkTypes_unique`), ports, the parallel walk; `ident_of_spec'`, the specialisation of a program is unique under D11 |
+| `StandardElmMech/Stat/JunkCounterexample.lean`, `Stat/ModuleStepCounterexample.lean`, `Stat/DupValuesCounterexample.lean` | Regression theorems for errors found on the way: type names no custom type is given are not generated (`mJ_instance`), a type environment cannot justify itself (`ModuleStepCE.regression`), and a module with two top-level bindings of one name |
+| `StandardElmMech/Stat/Complete/Term.lean`, `Classes.lean`, `Unify.lean`, `Core.lean`, `CoreLemmas.lean`, `CorePat.lean`, `CoreExp.lean`, `CoreComplete.lean`, `Examples.lean` | Step 11, milestone (a): unification over the full type language with its refutation theorem, a constraint generator proved complete for every derivation (`coreGen_complete`), and the unconditional refusal `not_legal_of_coreRefutes` |
+| `StandardElmMech/Stat/Complete/FSubst.lean`, `Mgu.lean`, `MguTerm.lean`, `W.lean`, `WPrincipal.lean`, `W*.lean`, `Canon.lean`, `Closure.lean`, `Fragment.lean`, `InstCounter.lean` | Step 11, milestone (b): substitutions, the most general unifier (`mgu_ok`, `mgu_fail`, termination), algorithm W for the Hindley–Milner fragment, sound (`inferExpW_sound`), refuting (`wRefutation`), principal (`wPrincipality`, `isPrincipalB_iff`), terminating (`inferExpW_terminates`) |
 | `CompareE2E.lean` | `lake exe compare-e2e`: Lean's end-to-end reduced program of every translated test against the translator's (`../e2e-report.json`) |
 | `Certify.lean` | `lake exe certify`: runs the inference compiled and writes `Certs/` and `../static-report.json`; `--check` compares. Lists the 9 tests whose kernel check breaks the memory budget (`staticBudgetNative`, proved by `native_decide`, `[native]`) |
 | `CompareDerived.lean` | `lake exe compare-derived`: the derived forms of each translated program's source against the translator's module form |
@@ -217,7 +223,10 @@ theorems do not need it), and `[native]` (the Lean compiler, for a theorem prove
   reduced program the translator wrote, so the theorems about it no longer rest on `[elab]`;
   `mean_<project>_<Test>` (577; the other two stop at Debug.todo): under D11, the program has a
   meaning by r:p-program with both premises.
-* `refuse_<project>_<Test>` (Certs/Refusals.lean, 68 compile-error tests): the program is not
+* `ident_<project>_<Test>` (579): under D11, the specialisation of the program is unique and is the
+  reduced program the translator wrote (`ident_of_spec'`).
+* `refuse_<project>_<Test>` (Certs/Refusals*.lean, 245 compile-error tests: 68 by steps 8 and 9, 176
+  by step 11's core refutation, 1 more by imports): the program is not
   legal, for every derivation (31 by step 8's restrictions, 37 by the static semantics: scope,
   constructor arity, imports, type expressions, ports, the type of `main`, exhaustiveness and
   irredundancy).

@@ -19,6 +19,7 @@ import StandardElmMech.Stat.TestBasis
 import StandardElmMech.Stat.CertPrint
 import StandardElmMech.Stat.RefuseAll
 import StandardElmMech.Stat.Pipeline
+import StandardElmMech.Stat.ModuleStep
 import StandardElmMech.AllPrograms
 import StandardElmMech.WorkerTheorems
 import Lean
@@ -60,10 +61,11 @@ def refusers : List (String × (SBasis → SProgram → Bool)) :=
    ("Stat.not_legal_of_scopeFailB", scopeFailB),
    ("Stat.not_legal_of_furtherFailB", furtherFailB),
    ("Stat.not_legal_of_typesFailB", typesFailB),
-   ("Stat.not_legal_of_mainFailB", mainFailB)]
+   ("Stat.not_legal_of_mainFailB", mainFailB),
+   ("Stat.not_legal_of_coreRefutes", Complete.coreRefutes)]   -- step 11, milestone (a)
 
 /-- The compile-error classes of step 7 that this step refuses. -/
-def refusedClasses : List String := ["syntactic", "further", "static-deterministic"]
+def refusedClasses : List String := ["syntactic", "further", "static-deterministic", "inference", "fixity-inference"]
 
 /-- Why a program gets no theorem. -/
 def diagnose1 (B : SBasis) (C : Ctx) (sp : SProgram) (m : BModule) : String :=
@@ -238,16 +240,22 @@ def main (args : List String) : IO UInt32 := do
             perTest := perTest.insert key [("refuse", Json.str s!"refuse_{ident sp.project}_{n}")]
             refusedBy := refusedBy.insert lem ((refusedBy.getD lem 0) + 1)
           | none => refuseFailed := refuseFailed.push (key, s!"no decider refuses it ({c})")
-  if !refusals.isEmpty then
-    let srcImports := (refusals.toList.map (·.1)).eraseDups
-    let body := header ++ String.join (srcImports.map fun s => s!"import StandardElmMech.Generated.{s}\n") ++
+  let refChunks := (List.range ((refusals.size + shardSize - 1) / shardSize)).map fun i => (refusals.toList.drop (i * shardSize)).take shardSize
+  for i in [0:refChunks.length] do
+    let chunk := refChunks[i]!
+    let fname := "Refusals" ++ pad2 (i + 1)
+    let prev := match certFiles.back? with
+      | some f => s!"import StandardElmMech.Certs.{f}\n"
+      | none => ""
+    let srcImports := (chunk.map (·.1)).eraseDups
+    let body := header ++ prev ++ String.join (srcImports.map fun s => s!"import StandardElmMech.Generated.{s}\n") ++
       "import StandardElmMech.Generated.SynAll\nimport StandardElmMech.Stat.RefuseAll\nimport StandardElmMech.Stat.TestBasis\n" ++
       "\n/-! The programs of this file are not legal (plan step 9, milestone 9d): each theorem holds of\n" ++
       "    every derivation, so it needs no hypothesis about principality. -/\n\n" ++
       "namespace StandardElm\nset_option maxRecDepth 100000\n\n" ++
-      "\n".intercalate (refusals.toList.map (·.2)) ++ "\nend StandardElm\n"
-    outs := outs.push ⟨certsDir ++ "Refusals.lean", body⟩
-    certFiles := certFiles.push "Refusals"
+      "\n".intercalate (chunk.map (·.2)) ++ "\nend StandardElm\n"
+    outs := outs.push ⟨certsDir ++ fname ++ ".lean", body⟩
+    certFiles := certFiles.push fname
   -- step 10: the end-to-end theorems of the translated tests, after every legality theorem, one
   -- shard at a time (each imports the one before), so that a build stays within the memory budget
   let man ← IO.FS.readFile "../translation-manifest.json"
@@ -256,6 +264,7 @@ def main (args : List String) : IO UInt32 := do
   let mut e2e : Array (List String × String) := #[]   -- (imports, theorem texts)
   let mut nSpec := 0
   let mut nMean := 0
+  let mut nIdent := 0
   let mut nSpecNative := 0
   let mut e2eSkipped : Array (String × String) := #[]
   -- whether Part I's theorem t_X is native, decided as the commands that write it decide
@@ -309,15 +318,19 @@ def main (args : List String) : IO UInt32 := do
       s!"theorem mean_{suffix} (h : Stat.D11For Stat.Btest (Stat.bareOf {sdef})) :\n    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf {sdef}) (τ, PE, v) :=\n" ++
       s!"  Stat.programSem_of_legal h spec_{suffix} (legal_{suffix} h) ({tv})\n"
     if meaning then nMean := nMean + 1
+    let ident := s!"\n/-- tests/{p}/src/{n}.elm: the specialisation of the program is unique, and is the reduced program the translator wrote {tags} -/\n" ++
+      s!"theorem ident_{suffix} (h : Stat.D11For Stat.Btest (Stat.bareOf {sdef})) :\n    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf {sdef}) r → r = {rdef}.reduced :=\n" ++
+      s!"  Stat.ident_of_spec' (by decide +kernel) h spec_{suffix}\n"
+    nIdent := nIdent + 1
     let prevT := perTest.getD key []
     let prevNative := match prevT.lookup "native" with
       | some (Json.bool b) => b
       | _ => false
     perTest := perTest.insert key ((prevT.filter (·.1 != "native")) ++
-      [("spec", Json.str s!"spec_{suffix}"), ("mean", if meaning then Json.str s!"mean_{suffix}" else Json.null),
+      [("spec", Json.str s!"spec_{suffix}"), ("mean", if meaning then Json.str s!"mean_{suffix}" else Json.null), ("ident", Json.str s!"ident_{suffix}"),
        ("native", Json.bool (prevNative || native || tNative))])
     e2e := e2e.push ([s!"StandardElmMech.Generated.{gshard}", s!"StandardElmMech.Generated.Checks{gshard}",
-      s!"StandardElmMech.Generated.{sshard}"], spec ++ mean)
+      s!"StandardElmMech.Generated.{sshard}"], spec ++ mean ++ ident)
   let mut e2eFiles : Array String := #[]
   let e2eChunks := (List.range ((e2e.size + shardSize - 1) / shardSize)).map fun i => (e2e.toList.drop (i * shardSize)).take shardSize
   for i in [0:e2eChunks.length] do
@@ -328,7 +341,7 @@ def main (args : List String) : IO UInt32 := do
       | none => (String.join (certFiles.toList.map fun f => s!"import StandardElmMech.Certs.{f}\n"))
     let imps := (chunk.flatMap (·.1)).eraseDups
     let body := header ++ prev ++ String.join (imps.map fun m => s!"import {m}\n") ++
-      "import StandardElmMech.Stat.Pipeline\n" ++
+      "import StandardElmMech.Stat.Pipeline\nimport StandardElmMech.Stat.ModuleStep\n" ++
       "\n/-! Plan step 10: for each translated test, Lean's pipeline (derived forms, inference, the proved\n" ++
       "    checker, number specialisation, erasure) gives the reduced program the translator wrote (`spec_`),\n" ++
       "    and, under D11, the program has a meaning by r:p-program with both premises (`mean_`). -/\n\n" ++
@@ -341,7 +354,7 @@ def main (args : List String) : IO UInt32 := do
     String.join (certFiles.toList.map fun f => s!"import StandardElmMech.Certs.{f}\n")⟩
   -- report
   let refuseSummary := s!"refused: {refusals.size} ({", ".intercalate (refusedBy.toList.map fun (l, k) => s!"{l} {k}")}), {refuseFailed.size} not refused"
-  let e2eSummary := s!"end to end: {nSpec} spec_ theorems ({nSpecNative} by native_decide), {nMean} mean_ theorems, {e2eSkipped.size} translated tests skipped"
+  let e2eSummary := s!"end to end: {nSpec} spec_ theorems ({nSpecNative} by native_decide), {nMean} mean_ theorems, {nIdent} ident_ theorems, {e2eSkipped.size} translated tests skipped"
   let summary := s!"static semantics: {nOne + nMany} legal ({nOne} of one module, {nMany} of several), {failed.size} without a theorem, {ctxs.size} contexts, {natives.size} by native_decide"
   let report := Json.mkObj [
     ("generatedBy", Json.str "lake exe certify (Certify.lean)"),

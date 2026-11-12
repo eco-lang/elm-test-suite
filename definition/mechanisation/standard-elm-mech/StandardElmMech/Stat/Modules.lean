@@ -1,10 +1,13 @@
 /-
   A Standard Definition of Elm? Mechanisation: the static semantics of Modules (static-modules.tex),
   plan step 9 (section 5): Expose, provider maps, env(ME, π), Port, and the 19 rules, one
-  constructor each, named r_sm_<slug>, with a second constructor for r:sm-topdec-seq,
-  `r_sm_topdec_seq_types`, which splits a type-declaration phrase at one of its separators (the
-  bare syntax has one node for the phrase; the book lets r:sm-topdec-seq split it, comment on
-  r:sm-topdec-types). 20 constructors for 19 labels.
+  constructor each, named r_sm_<slug>. 19 constructors for 19 labels.
+
+  A module's type declarations form one phrase (`BTopDec.types db tbs`), elaborated by
+  r:sm-topdec-types in a context holding all of them. The book no longer lets r:sm-topdec-seq split
+  such a phrase at one of its separators (decision of 2026-11-12, option (c) of step 10's issue 9:
+  the split gave an order-dependent result, finding B6, that Elm never gives), so step 9's second
+  constructor for r:sm-topdec-seq, which did that split, is gone.
 -/
 import StandardElmMech.Stat.Rules
 
@@ -295,7 +298,7 @@ inductive ElTopDec : Ctx → BTopDec → Env → PortEnv → Prop where
   | r_sm_topdec_value : ElValBind (C.plusVE VE) vb VE →
       ElTopDec C (.value vb) (Env.ofVE (closGroup C.tyvars VE)) []
   /-- r:sm-topdec-types -/
-  | r_sm_topdec_types : TypesOK (C.oplusTE TE) C db tbs TE VE →
+  | r_sm_topdec_types : TypesOK (C.oplusTE TE) C db tbs TE VE → TyEnv.tyvars TE = [] →
       ElTopDec C (.types db tbs) ⟨[], TE, VE⟩ []
   /-- r:sm-topdec-portout -/
   | r_sm_topdec_portout : NewFor U ty C.U → ElTy (C.plusU U) ty τ →
@@ -308,10 +311,6 @@ inductive ElTopDec : Ctx → BTopDec → Env → PortEnv → Prop where
   /-- r:sm-topdec-seq -/
   | r_sm_topdec_seq : ElTopDec C d1 E1 PE1 → ElTopDec (C.oplusE E1) d2 E2 PE2 →
       ElTopDec C (.seq d1 d2) (E1.plus E2) (Env.plusPE PE1 PE2)
-  /-- r:sm-topdec-seq, at a separator inside a type-declaration phrase. -/
-  | r_sm_topdec_seq_types : (db.isSome ∨ tbs1 ≠ []) → tbs2 ≠ [] →
-      ElTopDec C (.types db tbs1) E1 PE1 → ElTopDec (C.oplusE E1) (.types none tbs2) E2 PE2 →
-      ElTopDec C (.types db (tbs1 ++ tbs2)) (E1.plus E2) (Env.plusPE PE1 PE2)
 
 inductive ElTopDecOpt : Ctx → Option BTopDec → Env → PortEnv → Prop where
   | opt_none : ElTopDecOpt C none Env.empty []

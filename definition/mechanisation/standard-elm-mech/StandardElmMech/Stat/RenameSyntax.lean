@@ -116,7 +116,6 @@ end
 def Renaming.topDec (r : Renaming) : ATopDec → ATopDec
   | .value VE vb => .value (r.valEnv VE) (r.valBind vb)
   | .types TE VE db tbs => .types (r.tyEnv TE) (r.valEnv VE) db tbs
-  | .typesSplit a1 a2 => .typesSplit (r.topDec a1) (r.topDec a2)
   | .port x ty U => .port x ty (U.map r.bvar)
   | .seq a1 a2 => .seq (r.topDec a1) (r.topDec a2)
 
@@ -201,7 +200,6 @@ end
 theorem erase_topDec (r : Renaming) : (d : ATopDec) → (r.topDec d).erase = d.erase
   | .value _ vb => by simp only [Renaming.topDec, ATopDec.erase, erase_valBind r vb]
   | .types _ _ _ _ => rfl
-  | .typesSplit a1 a2 => by simp only [Renaming.topDec, ATopDec.erase, erase_topDec r a1, erase_topDec r a2]
   | .port _ _ _ => rfl
   | .seq a1 a2 => by simp only [Renaming.topDec, ATopDec.erase, erase_topDec r a1, erase_topDec r a2]
 
