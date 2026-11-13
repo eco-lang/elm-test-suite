@@ -4,6 +4,8 @@ module Route.Standard exposing (ActionData, Data, Model, Msg, RouteParams, route
 -}
 
 import BackendTask exposing (BackendTask)
+import Content
+import Dict
 import Discuss
 import FatalError exposing (FatalError)
 import Head
@@ -39,6 +41,7 @@ type alias Data =
     { title : String
     , description : String
     , index : Index
+    , intro : String
     }
 
 
@@ -51,14 +54,16 @@ route =
     RouteBuilder.single
         { head = head
         , data =
-            Standard.index
-                |> BackendTask.map
-                    (\idx ->
-                        { title = idx.title ++ " · " ++ Site.title
-                        , description = idx.title ++ " (" ++ idx.edition ++ "): a formal definition of the Elm language, with a page for every rule"
-                        , index = idx
-                        }
-                    )
+            BackendTask.map2
+                (\idx intro ->
+                    { title = idx.title ++ " · " ++ Site.title
+                    , description = idx.title ++ " (" ++ idx.edition ++ "): a formal definition of the Elm language, with a page for every rule"
+                    , index = idx
+                    , intro = intro
+                    }
+                )
+                Standard.index
+                (Content.load "standard/front")
         }
         |> RouteBuilder.buildNoState { view = view }
 
@@ -79,75 +84,59 @@ head app =
 view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
 view app _ =
     { title = app.data.title
-    , body = [ View.freeze (front app.data.index) ]
+    , body = [ View.freeze (front app.data.index app.data.intro) ]
     }
 
 
-front : Index -> Html msg
-front idx =
+{-| The front page: the book's title, its introduction (content/standard/front.md, with the
+buttons and the counts filled in), and its contents.
+-}
+front : Index -> String -> Html msg
+front idx intro =
     let
         part p =
             List.filter (\c -> c.summary.part == p) idx.chapters
+
+        count kind =
+            String.fromInt (List.length (List.filter (\it -> it.kind == kind) idx.items))
+
+        actions =
+            Html.div [ Attr.class "sd-actions" ]
+                (List.filterMap identity
+                    [ Just (Html.a [ Attr.class "sd-button", Attr.href (Route.toString Route.Standard__Rules) ] [ Html.text ("All " ++ String.fromInt (List.length idx.rules) ++ " rules") ])
+                    , Just (Html.a [ Attr.class "sd-button", Attr.href (Route.toString Route.Standard__Proofs) ] [ Html.text "Lean proofs" ])
+                    , idx.pdf
+                        |> Maybe.map
+                            (\pdf ->
+                                Html.a [ Attr.class "sd-button sd-button-quiet", Attr.href ("/" ++ pdf) ] [ Html.text "Download the PDF" ]
+                            )
+                    ]
+                )
     in
     Html.div [ Attr.class "sd-book sd-front" ]
-        [ Html.h1 [ Attr.class "sd-title" ] [ Html.text idx.title ]
-        , Html.div [ Attr.class "sd-edition" ] [ Html.text idx.edition ]
-        , Html.div [ Attr.class "sd-author" ] [ Html.text idx.author ]
-        , Html.p [ Attr.class "sd-lede" ]
-            [ Html.text "A formal definition of the Elm language: its grammar, its static semantics (which programs are legal, and their types) and its dynamic semantics (what they do), as numbered inference rules in the manner of "
-            , Html.em [] [ Html.text "The Definition of Standard ML" ]
-            , Html.text ". Every rule has its own page and a permanent address, so that it can be cited, linked to and discussed."
-            ]
-        , Html.p [ Attr.class "sd-draft-note" ]
-            [ Html.strong [] [ Html.text "Draft. " ]
-            , Html.text "This edition is a draft for review. Many of its rulings are provisional, and rule numbers may change between editions; a rule's address, which uses its name, does not."
-            ]
-        , Html.div [ Attr.class "sd-actions" ]
-            (List.filterMap identity
-                [ Just (Html.a [ Attr.class "sd-button", Attr.href (Route.toString Route.Standard__Rules) ] [ Html.text ("All " ++ String.fromInt (List.length idx.rules) ++ " rules") ])
-                , Just (Html.a [ Attr.class "sd-button", Attr.href (Route.toString Route.Standard__Proofs) ] [ Html.text "Lean proofs" ])
-                , idx.pdf
-                    |> Maybe.map
-                        (\pdf ->
-                            Html.a [ Attr.class "sd-button sd-button-quiet", Attr.href ("/" ++ pdf) ] [ Html.text "Download the PDF" ]
-                        )
-                ]
-            )
-        , let
-            count kind =
-                String.fromInt (List.length (List.filter (\it -> it.kind == kind) idx.items))
-          in
-          Html.p [ Attr.class "sd-also" ]
-            [ Html.text "Also with a page each: "
-            , Html.a [ Attr.href (Route.toString Route.Standard__Restrictions) ] [ Html.text (count Restriction ++ " restrictions") ]
-            , Html.text ", "
-            , Html.a [ Attr.href (Route.toString Route.Standard__DerivedForms) ] [ Html.text (count DerivedForm ++ " derived forms") ]
-            , Html.text ", "
-            , Html.a [ Attr.href (Route.toString Route.Standard__Basis) ] [ Html.text (count BasisEntry ++ " entries of the initial basis") ]
-            , Html.text " and "
-            , Html.a [ Attr.href (Route.toString Route.Standard__Figures) ] [ Html.text (count FigureItem ++ " figures") ]
-            , Html.text "."
-            ]
-        , Html.p [ Attr.class "sd-also" ]
-            [ Html.strong [] [ Html.text "Mechanised. " ]
-            , Html.text "The dynamic semantics of the Core is encoded in the proof assistant Lean 4, with an evaluator proved sound for its rules and checked against the test programs. See the "
-            , Html.a [ Attr.href (Route.toString Route.Standard__Proofs) ] [ Html.text "Lean proofs" ]
-            , Html.text ", each with a page of its own."
-            ]
-        , Html.p [ Attr.class "sd-also" ]
-            [ Html.strong [] [ Html.text "Take part. " ]
-            , Html.text "Each of those pages, and each chapter, has a Discussions section: start a discussion of the item on GitHub with its Discuss link, and the discussion is shown on the page. See "
-            , Html.a [ Attr.href (Route.toString Route.Standard__Discussions) ] [ Html.text "all the discussions" ]
-            , Html.text ", or the "
-            , Html.a [ Attr.href (Discuss.categoryUrl Discuss.Standard), Attr.target "_blank", Attr.rel "noopener noreferrer" ] [ Html.text "Standard category" ]
-            , Html.text " of the repository's GitHub Discussions."
-            ]
-        , Html.h2 [ Attr.class "sd-contents-head" ] [ Html.text "Contents" ]
-        , Html.ol [ Attr.class "sd-contents" ] (List.map contentsEntry (part "front" ++ part "main"))
-        , Html.h3 [ Attr.class "sd-contents-sub" ] [ Html.text "Appendices" ]
-        , Html.ol [ Attr.class "sd-contents" ] (List.map contentsEntry (part "appendix"))
-        , Render.licence idx
-        ]
+        ([ Html.h1 [ Attr.class "sd-title" ] [ Html.text idx.title ]
+         , Html.div [ Attr.class "sd-edition" ] [ Html.text idx.edition ]
+         , Html.div [ Attr.class "sd-author" ] [ Html.text idx.author ]
+         ]
+            ++ Content.view Content.Book
+                { vars =
+                    Dict.fromList
+                        [ ( "restrictions", count Restriction )
+                        , ( "derivedForms", count DerivedForm )
+                        , ( "basis", count BasisEntry )
+                        , ( "figures", count FigureItem )
+                        , ( "categoryUrl", Discuss.categoryUrl Discuss.Standard )
+                        ]
+                , slots = Dict.fromList [ ( "actions", actions ) ]
+                }
+                intro
+            ++ [ Html.h2 [ Attr.class "sd-contents-head" ] [ Html.text "Contents" ]
+               , Html.ol [ Attr.class "sd-contents" ] (List.map contentsEntry (part "front" ++ part "main"))
+               , Html.h3 [ Attr.class "sd-contents-sub" ] [ Html.text "Appendices" ]
+               , Html.ol [ Attr.class "sd-contents" ] (List.map contentsEntry (part "appendix"))
+               , Render.licence idx
+               ]
+        )
 
 
 contentsEntry : IndexChapter -> Html msg

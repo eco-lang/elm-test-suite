@@ -1,0 +1,1 @@
+The types and values that every program starts with: for each, its type scheme in the static basis, its value in the dynamic basis, and where it is a basic value, its *APPLY*. An operator is listed under the hidden variable it stands for (`+` under `add`), and a custom type together with its constructors. Each entry's address is its qualified name.

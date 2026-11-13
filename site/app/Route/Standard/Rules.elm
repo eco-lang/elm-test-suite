@@ -4,6 +4,8 @@ module Route.Standard.Rules exposing (ActionData, Data, Model, Msg, RouteParams,
 -}
 
 import BackendTask exposing (BackendTask)
+import Content
+import Dict
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
@@ -37,6 +39,7 @@ type alias Data =
     { title : String
     , description : String
     , index : Index
+    , intro : String
     }
 
 
@@ -49,14 +52,16 @@ route =
     RouteBuilder.single
         { head = head
         , data =
-            Standard.index
-                |> BackendTask.map
-                    (\idx ->
-                        { title = "Rules · " ++ idx.title
-                        , description = "The " ++ String.fromInt (List.length idx.rules) ++ " inference rules of " ++ idx.title
-                        , index = idx
-                        }
-                    )
+            BackendTask.map2
+                (\idx intro ->
+                    { title = "Rules · " ++ idx.title
+                    , description = "The " ++ String.fromInt (List.length idx.rules) ++ " inference rules of " ++ idx.title
+                    , index = idx
+                    , intro = intro
+                    }
+                )
+                Standard.index
+                (Content.load "standard/rules")
         }
         |> RouteBuilder.buildNoState { view = view }
 
@@ -77,12 +82,12 @@ head app =
 view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
 view app _ =
     { title = app.data.title
-    , body = [ View.freeze (allRules app.data.index) ]
+    , body = [ View.freeze (allRules app.data.index app.data.intro) ]
     }
 
 
-allRules : Index -> Html msg
-allRules idx =
+allRules : Index -> String -> Html msg
+allRules idx intro =
     Html.div [ Attr.class "sd-book" ]
         [ Html.div [ Attr.class "ts-crumbs" ]
             [ Html.a [ Attr.href (Route.toString Route.Standard) ] [ Html.text idx.title ]
@@ -90,10 +95,7 @@ allRules idx =
             , Html.text " / Rules"
             ]
         , Html.h1 [ Attr.class "sd-chapter-title" ] [ Html.text "Rules" ]
-        , Html.p [ Attr.class "sd-lede" ]
-            [ Html.text "Each rule's address uses its name, which does not change between editions; its number may. "
-            , Html.text "Choose a rule for its page, with its comments and the places that refer to it."
-            ]
+        , Html.div [] (Content.view Content.Book Content.none intro)
         , Html.div [] (List.filterMap (chapterRules idx) idx.chapters)
         , Render.licence idx
         ]

@@ -9,8 +9,8 @@ module Mechanisation exposing
     , ProofSummary
     , Statics
     , Tactic
-    , Translation
     , TranslatedCheck
+    , Translation
     , generated
     , generatedSlug
     , index
@@ -156,7 +156,7 @@ type alias Translation =
 {-| The test's theorems of the static semantics (plan steps 9 and 11: `legal_`, without hypothesis unless `conditional`, or `refuse_`) and
 of the end-to-end pipeline (plan step 10: `spec_`, Lean's reduced program is the translator's, and
 `mean_`, the program's meaning by r:p-program); `native` when one of them is proved by
-native_decide. `refusedBy` is the lemma a `refuse_` theorem's proof applies, and `breaks` the
+native\_decide. `refusedBy` is the lemma a `refuse_` theorem's proof applies, and `breaks` the
 syntactic restrictions the program breaks when that lemma is a syntactic one.
 -}
 type alias Statics =

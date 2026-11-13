@@ -230,6 +230,9 @@ typographyStyles =
         , p "max-width" "760px"
         , p "margin" "0 0 4px"
         ]
+    , Css.Global.class "ts-prose" [ p "max-width" "760px" ]
+    , Css.Global.selector ".sd-note > p:last-child" [ p "margin-bottom" "0" ]
+    , Css.Global.selector ".sd-also.sd-note" [ p "margin" "0 0 1em" ]
     , Css.Global.class "ts-muted" [ p "color" colors.muted ]
     , Css.Global.class "ts-small" [ p "font-size" "13px" ]
     , Css.Global.class "ts-big-number"

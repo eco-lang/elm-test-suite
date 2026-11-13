@@ -5,6 +5,7 @@ module Route.Standard.Proofs.Proof_ exposing (ActionData, Data, Model, Msg, Rout
 -}
 
 import BackendTask exposing (BackendTask)
+import Content
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
@@ -42,7 +43,7 @@ type alias Data =
 
 type Page
     = TheoremPage Mechanisation.Proof
-    | GeneratedPage Mechanisation.Generated
+    | GeneratedPage Mechanisation.Generated String
 
 
 type alias ActionData =
@@ -71,16 +72,17 @@ pages =
 data : RouteParams -> BackendTask FatalError Data
 data params =
     if params.proof == Mechanisation.generatedSlug then
-        BackendTask.map2
-            (\idx g ->
+        BackendTask.map3
+            (\idx g text ->
                 { title = "Generated Lean theorems · " ++ idx.title
                 , description = String.fromInt g.count ++ " Lean theorems, generated at compile time, that the rules of " ++ idx.title ++ " derive the expected values of test programs"
                 , index = idx
-                , page = GeneratedPage g
+                , page = GeneratedPage g text
                 }
             )
             Standard.index
             Mechanisation.generated
+            (Content.load "standard/generated")
 
     else
         BackendTask.map2
@@ -131,8 +133,8 @@ view app _ =
                 TheoremPage p ->
                     MechView.proofPage app.data.index p
 
-                GeneratedPage g ->
-                    MechView.generatedPage app.data.index g
+                GeneratedPage g text ->
+                    MechView.generatedPage app.data.index g text
             )
         ]
     }

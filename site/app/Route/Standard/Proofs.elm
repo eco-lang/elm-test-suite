@@ -4,6 +4,7 @@ module Route.Standard.Proofs exposing (ActionData, Data, Model, Msg, RouteParams
 -}
 
 import BackendTask exposing (BackendTask)
+import Content
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
@@ -36,6 +37,7 @@ type alias Data =
     , description : String
     , index : Index
     , mechanisation : Mechanisation.Index
+    , intro : String
     }
 
 
@@ -48,16 +50,18 @@ route =
     RouteBuilder.single
         { head = head
         , data =
-            BackendTask.map2
-                (\idx mech ->
+            BackendTask.map3
+                (\idx mech intro ->
                     { title = "Lean proofs · " ++ idx.title
                     , description = "The Lean 4 proofs of the mechanisation of " ++ idx.title ++ ", each with a page of its own"
                     , index = idx
                     , mechanisation = mech
+                    , intro = intro
                     }
                 )
                 Standard.index
                 Mechanisation.index
+                (Content.load "standard/proofs")
         }
         |> RouteBuilder.buildNoState { view = view }
 
@@ -78,5 +82,5 @@ head app =
 view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
 view app _ =
     { title = app.data.title
-    , body = [ View.freeze (MechView.listPage app.data.index app.data.mechanisation) ]
+    , body = [ View.freeze (MechView.listPage app.data.index app.data.mechanisation app.data.intro) ]
     }

@@ -1,0 +1,1 @@
+The phrases whose meaning is given by translation into the bare language: each derived form is rewritten to its equivalent form before the semantics applies. Each has a page at an address made from its name.

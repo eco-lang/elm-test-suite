@@ -5,6 +5,7 @@ initial basis and figures): one list page per kind, and a page for each item. Li
 are put inside `View.freeze`.
 -}
 
+import Content
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Route
@@ -82,8 +83,10 @@ isType slug =
 -- THE LISTS
 
 
-listPage : Index -> ItemKind -> Html msg
-listPage idx kind =
+{-| The page listing the items of a kind, with its introduction (Markdown, from content/standard/).
+-}
+listPage : Index -> ItemKind -> String -> Html msg
+listPage idx kind intro =
     let
         items =
             List.filter (\it -> it.kind == kind) idx.items
@@ -91,7 +94,7 @@ listPage idx kind =
     Html.div [ Attr.class "sd-book" ]
         [ crumbs idx [ Html.text (" / " ++ listTitle kind) ]
         , Html.h1 [ Attr.class "sd-chapter-title" ] [ Html.text (listTitle kind) ]
-        , Html.p [ Attr.class "sd-lede" ] (lede kind)
+        , Html.div [] (Content.view Content.Book Content.none intro)
         , case kind of
             Restriction ->
                 Html.div [] (List.filterMap (restrictionsOf idx items) idx.chapters)
@@ -106,35 +109,6 @@ listPage idx kind =
                 Html.div [] (List.filterMap (figuresOf items) idx.chapters)
         , Render.licence idx
         ]
-
-
-lede : ItemKind -> List (Html msg)
-lede kind =
-    case kind of
-        Restriction ->
-            [ Html.text "The conditions on programs that are stated apart from the grammar and the inference rules: the syntactic restrictions on modules and programs, and the further restrictions of the static semantics. A program that breaks one is not legal. "
-            , Html.text "Like a rule, each has a page at an address made from its name, which does not change between editions."
-            ]
-
-        DerivedForm ->
-            [ Html.text "The phrases whose meaning is given by translation into the bare language: each derived form is rewritten to its equivalent form before the semantics applies. "
-            , Html.text "Each has a page at an address made from its name."
-            ]
-
-        BasisEntry ->
-            [ Html.text "The types and values that every program starts with: for each, its type scheme in the static basis, its value in the dynamic basis, and where it is a basic value, its "
-            , Html.em [] [ Html.text "APPLY" ]
-            , Html.text ". An operator is listed under the hidden variable it stands for ("
-            , Html.code [] [ Html.text "+" ]
-            , Html.text " under "
-            , Html.code [] [ Html.text "add" ]
-            , Html.text "), and a custom type together with its constructors. Each entry's address is its qualified name."
-            ]
-
-        FigureItem ->
-            [ Html.text "The figures of the book, by chapter: its grammar, the classes of its phrases and semantic objects, its tables of escapes and fixities, its derived forms, and the tables of its basis. "
-            , Html.text "Each has a page at an address made from its label, which does not change between editions, though its number may."
-            ]
 
 
 restrictionsOf : Index -> List IndexItem -> Standard.IndexChapter -> Maybe (Html msg)
@@ -453,7 +427,15 @@ meta it =
                 )
 
         named =
-            case ( if it.kind == FigureItem then Nothing else it.title, it.group ) of
+            case
+                ( if it.kind == FigureItem then
+                    Nothing
+
+                  else
+                    it.title
+                , it.group
+                )
+            of
                 ( Just t, _ ) ->
                     [ Html.text ", under " ] ++ [ Html.strong [] (Render.inlines t) ]
 

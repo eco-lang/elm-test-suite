@@ -1,0 +1,1 @@
+The figures of the book, by chapter: its grammar, the classes of its phrases and semantic objects, its tables of escapes and fixities, its derived forms, and the tables of its basis. Each has a page at an address made from its label, which does not change between editions, though its number may.

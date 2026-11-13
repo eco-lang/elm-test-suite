@@ -1,7 +1,9 @@
 module Route.Results exposing (ActionData, Data, Model, Msg, RouteParams, route)
 
 import BackendTask exposing (BackendTask)
+import Content
 import Data exposing (Compiler, Differing, ProjectSummary, Report)
+import Dict
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
@@ -29,7 +31,9 @@ type alias RouteParams =
 
 
 type alias Data =
-    Report
+    { report : Report
+    , intro : String
+    }
 
 
 type alias ActionData =
@@ -47,7 +51,7 @@ route =
 
 data : BackendTask FatalError Data
 data =
-    Data.report
+    BackendTask.map2 (\r i -> { report = r, intro = i }) Data.report (Content.load "results")
 
 
 head : App Data ActionData RouteParams -> List Head.Tag
@@ -67,7 +71,7 @@ view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
 view app _ =
     let
         report =
-            app.data
+            app.data.report
     in
     { title = Site.title ++ ": results"
     , body =
@@ -86,24 +90,7 @@ view app _ =
             , Html.text " a different outcome under different compilers. "
             , Html.span [ Attr.class "ts-jump-action" ] [ Html.text "See the differences ↓" ]
             ]
-        , Html.p [ Attr.class "ts-lede" ]
-            [ Html.text "Each test is a real Elm program: the suite compiles it with each compiler, runs it, and checks its output against the expected output in its comments. "
-            , Html.text "The tests tagged "
-            , Route.link [] [ Html.code [] [ Html.text "elm19-bug" ] ] (Route.Tags__Tag_ { tag = "elm19-bug" })
-            , Html.text " and "
-            , Route.link [] [ Html.code [] [ Html.text "elm19-bug-fix" ] ] (Route.Tags__Tag_ { tag = "elm19-bug-fix" })
-            , Html.text " expect the correct behaviour where Elm 0.19.1 has a bug, so they fail under 0.19.1 by design."
-            ]
-        , Html.p [ Attr.class "ts-lede" ]
-            [ Html.text "The site also carries "
-            , Route.link [] [ Html.em [] [ Html.text "A Standard Definition of Elm?" ] ] Route.Standard
-            , Html.text ", a formal definition of the language with a page for every rule."
-            ]
-        , Html.p [ Attr.class "ts-lede" ]
-            [ Html.text "Each test, project and tag has a Discussions section: start a discussion of a test on GitHub from its page, and it is shown there. See "
-            , Route.link [] [ Html.text "all the discussions of the tests" ] Route.Discussions
-            , Html.text "."
-            ]
+        , Html.div [] (Content.view Content.Site Content.none app.data.intro)
         , Html.section [ Attr.class "ts-section" ]
             [ Html.h2 [ Attr.class "ts-h2" ] [ Html.text "Compilers" ]
             , Html.div [ Attr.class "ts-cards" ] (List.map compilerCard report.compilers)

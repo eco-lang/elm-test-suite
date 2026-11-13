@@ -5,6 +5,8 @@ is fetched by the browser from GitHub (see `Discussions`); the rest of the page 
 -}
 
 import BackendTask
+import Content
+import Dict
 import Discuss
 import DiscussionsView
 import FatalError exposing (FatalError)
@@ -40,6 +42,7 @@ type alias Data =
     { title : String
     , description : String
     , index : Index
+    , intro : String
     }
 
 
@@ -52,14 +55,16 @@ route =
     RouteBuilder.single
         { head = head
         , data =
-            Standard.index
-                |> BackendTask.map
-                    (\idx ->
-                        { title = "Discussions · " ++ idx.title
-                        , description = "The discussions of " ++ idx.title ++ ", by the rule or item they are about"
-                        , index = idx
-                        }
-                    )
+            BackendTask.map2
+                (\idx intro ->
+                    { title = "Discussions · " ++ idx.title
+                    , description = "The discussions of " ++ idx.title ++ ", by the rule or item they are about"
+                    , index = idx
+                    , intro = intro
+                    }
+                )
+                Standard.index
+                (Content.load "standard/discussions")
         }
         |> RouteBuilder.buildNoState { view = view }
 
@@ -81,15 +86,15 @@ view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
 view app shared =
     { title = app.data.title
     , body =
-        [ View.freeze (top app.data.index)
+        [ View.freeze (top app.data.index app.data.intro)
         , Html.div [ Attr.class "sd-book" ] [ DiscussionsView.overview Discuss.Standard shared.discussions ]
         , View.freeze (Html.div [ Attr.class "sd-book" ] [ Render.licence app.data.index ])
         ]
     }
 
 
-top : Index -> Html msg
-top idx =
+top : Index -> String -> Html msg
+top idx intro =
     Html.div [ Attr.class "sd-book" ]
         [ Html.div [ Attr.class "ts-crumbs" ]
             [ Html.a [ Attr.href (Route.toString Route.Standard) ] [ Html.text idx.title ]
@@ -97,12 +102,9 @@ top idx =
             , Html.text " / Discussions"
             ]
         , Html.h1 [ Attr.class "sd-chapter-title" ] [ Html.text "Discussions" ]
-        , Html.p [ Attr.class "sd-lede" ]
-            [ Html.text "The Definition is discussed in the "
-            , Html.a [ Attr.href (Discuss.categoryUrl Discuss.Standard), Attr.target "_blank", Attr.rel "noopener noreferrer" ]
-                [ Html.text "Standard category of the repository's GitHub Discussions" ]
-            , Html.text ". A discussion is about a rule, restriction, derived form, entry of the basis, figure or chapter when its title holds that item's key in brackets, "
-            , Html.code [] [ Html.text "[r:d-atexp-var]" ]
-            , Html.text "; the Discuss link on each item's page starts one with the key in place, and the discussion is then shown on that page."
-            ]
+        , Html.div []
+            (Content.view Content.Book
+                { vars = Dict.fromList [ ( "categoryUrl", Discuss.categoryUrl Discuss.Standard ) ], slots = Dict.empty }
+                intro
+            )
         ]

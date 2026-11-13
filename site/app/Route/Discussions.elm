@@ -5,6 +5,8 @@ browser from GitHub (see `Discussions`).
 -}
 
 import BackendTask
+import Content
+import Dict
 import Discuss
 import DiscussionsView
 import FatalError exposing (FatalError)
@@ -33,7 +35,7 @@ type alias RouteParams =
 
 
 type alias Data =
-    {}
+    { intro : String }
 
 
 type alias ActionData =
@@ -44,7 +46,7 @@ route : StatelessRoute RouteParams Data ActionData
 route =
     RouteBuilder.single
         { head = head
-        , data = BackendTask.succeed {}
+        , data = BackendTask.map (\i -> { intro = i }) (Content.load "discussions")
         }
         |> RouteBuilder.buildNoState { view = view }
 
@@ -63,23 +65,15 @@ head _ =
 
 
 view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
-view _ shared =
+view app shared =
     { title = "Discussions · " ++ Site.title
     , body =
         [ Html.div [ Attr.class "ts-crumbs" ] [ Route.link [] [ Html.text "Results" ] Route.Results, Html.text " / " ]
-        , Html.h1 [ Attr.class "ts-h1" ] [ Html.text "Discussions" ]
-        , Html.p [ Attr.class "ts-lede" ]
-            [ Html.text "The tests and their results are discussed in the "
-            , Html.a [ Attr.href (Discuss.categoryUrl Discuss.Tests), Attr.target "_blank", Attr.rel "noopener noreferrer" ]
-                [ Html.text "Tests category of the repository's GitHub Discussions" ]
-            , Html.text ". A discussion is about a test when its title holds the test's key in brackets, "
-            , Html.code [] [ Html.text "[t:elm/CompilerIssue2281LongLineListTest]" ]
-            , Html.text ", about a whole project with "
-            , Html.code [] [ Html.text "[p:elm]" ]
-            , Html.text ", or about a tag with "
-            , Html.code [] [ Html.text "[tag:elm19-bug]" ]
-            , Html.text "; the Discuss link on each test's page starts one with the key in place, and the discussion is then shown on that page."
-            ]
+        , Html.div []
+            (Content.view Content.Site
+                { vars = Dict.fromList [ ( "categoryUrl", Discuss.categoryUrl Discuss.Tests ) ], slots = Dict.empty }
+                app.data.intro
+            )
         , DiscussionsView.overview Discuss.Tests shared.discussions
         ]
     }

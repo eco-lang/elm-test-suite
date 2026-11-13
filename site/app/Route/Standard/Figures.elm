@@ -4,6 +4,7 @@ module Route.Standard.Figures exposing (ActionData, Data, Model, Msg, RouteParam
 -}
 
 import BackendTask exposing (BackendTask)
+import Content
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
@@ -34,6 +35,7 @@ type alias Data =
     { title : String
     , description : String
     , index : Index
+    , intro : String
     }
 
 
@@ -46,14 +48,16 @@ route =
     RouteBuilder.single
         { head = head
         , data =
-            Standard.index
-                |> BackendTask.map
-                    (\idx ->
-                        { title = ItemView.listTitle FigureItem ++ " · " ++ idx.title
-                        , description = ItemView.listTitle FigureItem ++ " of " ++ idx.title ++ ", each with a page of its own"
-                        , index = idx
-                        }
-                    )
+            BackendTask.map2
+                (\idx intro ->
+                    { title = ItemView.listTitle FigureItem ++ " · " ++ idx.title
+                    , description = ItemView.listTitle FigureItem ++ " of " ++ idx.title ++ ", each with a page of its own"
+                    , index = idx
+                    , intro = intro
+                    }
+                )
+                Standard.index
+                (Content.load "standard/figures")
         }
         |> RouteBuilder.buildNoState { view = view }
 
@@ -74,5 +78,5 @@ head app =
 view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
 view app _ =
     { title = app.data.title
-    , body = [ View.freeze (ItemView.listPage app.data.index FigureItem) ]
+    , body = [ View.freeze (ItemView.listPage app.data.index FigureItem app.data.intro) ]
     }

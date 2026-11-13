@@ -4,6 +4,7 @@ module Route.Standard.Basis exposing (ActionData, Data, Model, Msg, RouteParams,
 -}
 
 import BackendTask exposing (BackendTask)
+import Content
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
@@ -34,6 +35,7 @@ type alias Data =
     { title : String
     , description : String
     , index : Index
+    , intro : String
     }
 
 
@@ -46,14 +48,16 @@ route =
     RouteBuilder.single
         { head = head
         , data =
-            Standard.index
-                |> BackendTask.map
-                    (\idx ->
-                        { title = ItemView.listTitle BasisEntry ++ " · " ++ idx.title
-                        , description = ItemView.listTitle BasisEntry ++ " of " ++ idx.title ++ ", each with a page of its own"
-                        , index = idx
-                        }
-                    )
+            BackendTask.map2
+                (\idx intro ->
+                    { title = ItemView.listTitle BasisEntry ++ " · " ++ idx.title
+                    , description = ItemView.listTitle BasisEntry ++ " of " ++ idx.title ++ ", each with a page of its own"
+                    , index = idx
+                    , intro = intro
+                    }
+                )
+                Standard.index
+                (Content.load "standard/basis")
         }
         |> RouteBuilder.buildNoState { view = view }
 
@@ -74,5 +78,5 @@ head app =
 view : App Data ActionData RouteParams -> Shared.Model -> View (PagesMsg Msg)
 view app _ =
     { title = app.data.title
-    , body = [ View.freeze (ItemView.listPage app.data.index BasisEntry) ]
+    , body = [ View.freeze (ItemView.listPage app.data.index BasisEntry app.data.intro) ]
     }

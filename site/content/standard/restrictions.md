@@ -1,0 +1,1 @@
+The conditions on programs that are stated apart from the grammar and the inference rules: the syntactic restrictions on modules and programs, and the further restrictions of the static semantics. A program that breaks one is not legal. Like a rule, each has a page at an address made from its name, which does not change between editions.
