@@ -50,7 +50,9 @@ Translates the tests of `tests/` tagged `elm-spec` into Lean, for the mechanisat
 - `src/Translate/ToLean.elm`: printing in the helper notation of `Derived.lean`.
 
 It writes `definition/mechanisation/standard-elm-mech/StandardElmMech/Generated/` (the programs, in
-shards of at most 40, `All.lean`, and one file of theorems per shard), the list of those modules in
+shards that are fixed alphabetical buckets of `project/Test`, `All.lean`, one file of theorems per
+shard, and the source programs in buckets of their own with a file of syntactic theorems each; a
+file there it wrote before but no longer writes is removed), the list of those modules in
 `StandardElmMech.lean`, and `definition/mechanisation/translation-manifest.json`, which lists every
 `elm-spec` test as translated or refused, with its reason and the sha256 of its source. Two
 reasons are about size, not the fragment: `construct:large-program` (a source over 20000

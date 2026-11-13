@@ -28,7 +28,8 @@ echo "wall clock: $(awk -F': ' '/Elapsed \(wall clock\)/{print $2}' "${COPY:?}/t
 echo "peak summed PSS (KB): $(cat "${COPY:?}/pss-peak")"
 echo "at the peak (file:PSS KB):$(cat "${COPY:?}/pss-peak-files" 2>/dev/null)"
 grep -q "Exit status: 0" "${COPY:?}/time.txt" || { echo "the build FAILED:"; grep -E "^error|✖" "${COPY:?}/build.txt" | head -20; }
-for f in StandardElmMech/Generated/Checks*.lean StandardElmMech/Generated/Syn0*.lean; do
+for f in StandardElmMech/Generated/Checks*.lean StandardElmMech/Generated/Syn*.lean; do
+  [ "$f" = StandardElmMech/Generated/SynAll.lean ] && continue
   /usr/bin/time -f "$f %M KB %e s" lake env lean "$f" 2>&1 >/dev/null | tail -1
 done
 rm -rf "${COPY:?}"

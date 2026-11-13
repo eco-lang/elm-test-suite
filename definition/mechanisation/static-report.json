@@ -66,7 +66,7 @@
   "elm/WideCtorField24Test":
   {"wcheck": "wcheck_elm_WideCtorField24Test",
    "spec": "spec_elm_WideCtorField24Test",
-   "native": true,
+   "native": false,
    "mean": "mean_elm_WideCtorField24Test",
    "legal": "legal_elm_WideCtorField24Test",
    "ident": "ident_elm_WideCtorField24Test"},
@@ -1959,6 +1959,8 @@
    "ident": "ident_elm_LetDestructAliasTest"},
   "elm/LetCycleThroughRecordLambdaTest":
   {"refuse": "refuse_elm_LetCycleThroughRecordLambdaTest"},
+  "elm/LetCycleThroughLambdaArgumentTest":
+  {"refuse": "refuse_elm_LetCycleThroughLambdaArgumentTest"},
   "elm/LetBoundLambdaCallTest":
   {"wcheck": "wcheck_elm_LetBoundLambdaCallTest",
    "spec": "spec_elm_LetBoundLambdaCallTest",
@@ -2771,10 +2773,6 @@
   {"refuse": "refuse_elm_CompilerIssue2296LetAnnotationFreeVarCrashTest"},
   "elm/CompilerIssue2295LambdaLetAnnotationCrashTest":
   {"refuse": "refuse_elm_CompilerIssue2295LambdaLetAnnotationCrashTest"},
-  "elm/CompilerIssue2281LongLineListTest":
-  {"native": true,
-   "legal": "legal_elm_CompilerIssue2281LongLineListTest",
-   "conditional": true},
   "elm/CompilerIssue2274MutualRecursionTransmuteTest":
   {"refuse": "refuse_elm_CompilerIssue2274MutualRecursionTransmuteTest"},
   "elm/CompilerIssue2268TcoClosureCaptureTest":
@@ -3065,7 +3063,7 @@
   "elm/CombinatorListStringTest":
   {"wcheck": "wcheck_elm_CombinatorListStringTest",
    "spec": "spec_elm_CombinatorListStringTest",
-   "native": true,
+   "native": false,
    "mean": "mean_elm_CombinatorListStringTest",
    "legal": "legal_elm_CombinatorListStringTest",
    "ident": "ident_elm_CombinatorListStringTest"},
@@ -4762,25 +4760,24 @@
    "legal": "legal_elm_core_BasicsClampTest",
    "ident": "ident_elm_core_BasicsClampTest"}},
  "summary":
- "static semantics: 623 legal (614 of one module, 9 of several), 0 without a theorem, 28 contexts, 16 by native_decide, 1 conditional on D11",
+ "static semantics: 622 legal (613 of one module, 9 of several), 0 without a theorem, 11 by native_decide, 0 conditional on D11",
  "specNative":
- ["elm/WideCtorMixedTest",
+ ["elm/WideClosureSat26Test",
+  "elm/WideCtorMixedTest",
+  "elm/WideRecord33Test",
+  "elm/WideRecord40Test",
   "elm/WideRecordDecoder26Test",
   "elm/WideRecordDecoder30Test",
-  "elm/WideRecordDecoder70Test",
-  "elm/WideRecord40Test"],
+  "elm/WideRecordDecoder70Test"],
+ "shards":
+ "shards: 77 (28 Ctx_, 8 Legal_, 8 Refusals_, 33 EndToEnd_); no shard imports another but for the Ctx_ files of its tests' imports",
  "refusedSummary":
- "refused: 286 (Stat.not_legal_of_wMainVar_test 1, Stat.not_legal_of_typesFailB 13, Stat.not_legal_of_scopeFailB 6, Stat.not_legal_of_wRefutes Stat.Btest_inv 15, Stat.not_legal_of_coreRefutes 201, Stat.not_legal_of_modsyn 9, Stat.not_legal_of_furtherFailB 9, Stat.not_legal_of_mainFailB 8, Stat.not_legal_of_syn 22, Stat.not_legal_of_imports 2), 0 not refused",
- "refused": 286,
+ "refused: 287 (Stat.not_legal_of_wMainVar_test 1, Stat.not_legal_of_typesFailB 13, Stat.not_legal_of_scopeFailB 6, Stat.not_legal_of_wRefutes Stat.Btest_inv 15, Stat.not_legal_of_coreRefutes 201, Stat.not_legal_of_modsyn 9, Stat.not_legal_of_furtherFailB 9, Stat.not_legal_of_mainFailB 8, Stat.not_legal_of_syn 23, Stat.not_legal_of_imports 2), 0 not refused",
+ "refused": 287,
  "notRefused": [],
  "native":
- ["elm/AppendTypeSplitTest",
-  "elm/CombinatorListStringTest",
-  "elm/CompilerIssue2281LongLineListTest",
-  "elm/FloatEdgeTest",
-  "elm/WideClosureArity300Test",
+ ["elm/WideClosureArity300Test",
   "elm/WideClosureSat26Test",
-  "elm/WideCtorField24Test",
   "elm/WideCtorMixedTest",
   "elm/WideRecord1100Test",
   "elm/WideRecord33Test",
@@ -4790,10 +4787,9 @@
   "elm/WideRecordDecoder300Test",
   "elm/WideRecordDecoder30Test",
   "elm/WideRecordDecoder70Test"],
- "legal": 623,
+ "legal": 622,
  "generatedBy": "lake exe certify (Certify.lean)",
  "failed": [],
  "endToEnd":
- "end to end: 580 spec_ theorems (5 by native_decide), 578 mean_ theorems, 580 ident_ theorems, 0 translated tests skipped",
- "contexts": 28,
- "conditional": ["elm/CompilerIssue2281LongLineListTest"]}
+ "end to end: 580 spec_ theorems (0 by native_decide, 7 from a wcheck_ by native_decide), 578 mean_ theorems, 580 ident_ theorems, 0 translated tests skipped",
+ "conditional": []}

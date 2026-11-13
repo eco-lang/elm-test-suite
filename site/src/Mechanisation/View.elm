@@ -140,7 +140,7 @@ coverageSection mech =
     Html.section [ Attr.class "ts-section" ]
         [ heading "Which tests are translated"
         , Html.p [ Attr.class "sd-p" ]
-            [ Html.text ("Every one of the " ++ String.fromInt mech.coverage.total ++ " tests tagged elm-spec is either translated into Lean, by the translator definition/tools/src/Translate.elm, or not, for one of the reasons below. A test that expects a compile error is outside the encoding, which covers evaluation (Chapter 6), not the static semantics; so are effects and modules; and a value of the basis the encoding does not include keeps a test out until the encoding includes it.") ]
+            [ Html.text ("Every one of the " ++ String.fromInt mech.coverage.total ++ " tests tagged elm-spec is either translated into Lean, by the translator definition/tools/src/Translate.elm, or not, for one of the reasons below. A test that expects a compile error has no meaning to run, so it is not translated; its refusal is proved in Lean from its source instead. A value or module of the basis that the encoding does not include keeps a test out until the encoding includes it.") ]
         , Html.div [ Attr.class "sd-table-wrap" ]
             [ Html.table [ Attr.class "ts-table" ]
                 [ Html.thead [] [ Html.tr [] [ Html.th [] [ Html.text "Tests" ], Html.th [] [ Html.text "Status" ] ] ]
@@ -182,10 +182,10 @@ reasonWords reason =
         "translated"
 
     else if reason == "compile-error" then
-        "expects a compile error: the encoding covers evaluation, not the static semantics"
+        "expects a compile error, so it has no meaning to evaluate; its refusal is proved from the source syntax (below), unless elm-syntax rejects the program or loses the error"
 
     else if reason == "effects" then
-        "uses effects, ports, flags, standard input or the environment (Chapters 8 and 9 are not encoded)"
+        "uses effects the encoding does not include"
 
     else if reason == "parse" then
         "is not parsed by elm-syntax 7.3.9"
@@ -203,7 +203,7 @@ reasonWords reason =
         "uses " ++ after "basis:" ++ ", which the encoding does not include"
 
     else if String.startsWith "import:" reason then
-        "imports " ++ after "import:" ++ " (modules, Chapter 7, are not encoded)"
+        "imports " ++ after "import:" ++ ", a library module the encoding does not include"
 
     else if reason == "construct:large-program" || reason == "construct:large-type" then
         "tests a compiler's limits, with a program or type too large to encode"
@@ -458,11 +458,6 @@ pager label maybe =
 -- THE GENERATED THEOREMS
 
 
-derivableOf : String -> String
-derivableOf shard =
-    "derivable_" ++ shard
-
-
 generatedPage : Index -> Generated -> Html msg
 generatedPage idx g =
     let
@@ -484,45 +479,46 @@ generatedPage idx g =
 
         totalChecks =
             List.sum (List.map .checks g.groups)
+
+        programs =
+            List.sum (List.map .programs g.groups)
     in
     Html.div [ Attr.class "sd-book" ]
         [ crumbs idx False
         , Html.h1 [ Attr.class "sd-chapter-title" ]
             [ Html.text "Theorems"
-            , Html.code [ Attr.class "sd-rule-slug" ] [ Html.text "kc_<Shard>_<n>" ]
+            , Html.code [ Attr.class "sd-rule-slug" ] [ Html.text "t_<project>_<Test>" ]
             ]
         , Html.p [ Attr.class "sd-item-meta" ]
-            [ Html.text (n g.count ++ " theorems generated at compile time · ")
+            [ Html.text (n programs ++ " program theorems, covering " ++ n g.count ++ " checks, generated at compile time · ")
             , methodChip Kernel
             ]
         , Html.p [ Attr.class "sd-lede" ]
-            [ Html.text ("Each of these " ++ n g.count ++ " theorems states that the rules of ")
-            , Html.a [ Attr.href (Render.chapterHref "dynamic-core" "") ] [ Html.text "Chapter 6" ]
-            , Html.text " derive the value a test program expects for one of its checks. Nothing about them is written by hand: the test programs are translated into Lean by a program, and the theorems are written by Lean from the translations, as follows."
+            [ Html.text "Each of these theorems states that a test program, evaluated by the rules of "
+            , Html.a [ Attr.href (Render.chapterHref "dynamic-core" "") ] [ Html.text "Chapters 6, 7 and 9" ]
+            , Html.text ", logs the value each of its checks expects, or, for a program that stops at Debug.todo, has no meaning. Nothing about them is written by hand: the test programs are translated into Lean by a program, and the theorems are written by Lean from the translations, as follows."
             ]
         , step 1
             "The translator turns each test into Lean"
             [ para
                 [ Html.text "The translator, "
                 , code "definition/tools/src/Translate.elm"
-                , Html.text ", reads every test tagged elm-spec. It parses the program with elm-syntax, resolves its names, works out the type of every integer constant (Int or Float, by the book's number specialisation, with the copies it makes of declarations used at both), and prints the program as a Lean syntax tree of the bare Core, built with the functions of "
+                , Html.text ", reads every test tagged elm-spec. It parses the program with elm-syntax, resolves its names, works out the type of every number constant by the book's number specialisation, and prints each module of the program as a Lean syntax tree of the bare Core (the derived forms of Appendix A applied by "
                 , code "Derived.lean"
-                , Html.text " that apply the derived forms of Appendix A. Each "
-                , code "Debug.log \"label\" (exp)"
-                , Html.text " of the program becomes one check, with the expected value copied from its "
+                , Html.text "), with its exposing list, imports, custom types and aliases. Each "
                 , code "-- CHECK: label: value"
-                , Html.text " line. A test outside what the encoding covers is not translated, and its page says why. For example, the test ClosureCapture01Test"
+                , Html.text " line of the test becomes a check on what the program logs. A test outside what the encoding covers is not translated, and its page says why. For example, the test ClosureCapture01Test"
                 ]
             , pre "unwrapLater w =\n    \\dummy ->\n        case w of\n            Wrap x -> x\n\n_ = Debug.log \"unwrap1\" (unwrapLater (Wrap 42) 0)    -- CHECK: unwrap1: 42"
             , para [ Html.text "becomes" ]
-            , pre "def g_elm_ClosureCapture01Test : Program := {\n  name := \"ClosureCapture01Test\", source := \"tests/elm/src\",\n  cons := [(\"Wrap\", 1)],\n  defs := [\n    .fn \"unwrapLater\" [pv \"w\"] (lams [pv \"dummy\"] (caseOf (v \"w\") [(pcon \"Wrap\" [pv \"x\"], v \"x\")])) ],\n  locals := [ ],\n  checks := [\n    ckk \"unwrap1\" \"42\" .int (ap (v \"unwrapLater\") [.atexp (.paren (ap (c \"Wrap\") [i 42])), i 0]), ... ] }"
+            , pre "def g_elm_ClosureCapture01Test : Program := {\n  name := \"ClosureCapture01Test\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [(\"Wrapper\", [(\"Wrap\", 1)])],\n  defs := [\n    .fn \"unwrapLater\" [pv \"w\"] (lams [pv \"dummy\"] (caseOf (v \"w\") [(pcon \"Wrap\" [pv \"x\"], v \"x\")])),\n    .fn \"main\" [] (letDefs [ ... Debug.log \"unwrap1\" ... ] ...) ],\n  checks := [\n    chk .check \"unwrap1: 42\" .int,\n    chk .check \"unwrap2: 99\" .int ] }"
             , para
                 [ Html.text "Every translated test shows its translation on its own page, under “Lean translation”, beside its Elm source. The translations are generated again whenever the mechanisation is rebuilt, so they follow their tests; a page whose test has changed since says so." ]
             ]
         , step 2
             "The translations are gathered in shards"
             [ para
-                [ Html.text ("The translated programs are written in files of at most 40, called shards, so that Lean builds them in parallel; " ++ n totalChecks ++ " checks in all:") ]
+                [ Html.text ("The translated programs are written in files of at most 40, called shards, so that Lean builds them in parallel; " ++ n programs ++ " programs and " ++ n totalChecks ++ " checks in all:") ]
             , Html.div [ Attr.class "sd-table-wrap" ]
                 [ Html.table [ Attr.class "ts-table" ]
                     [ Html.thead []
@@ -530,7 +526,7 @@ generatedPage idx g =
                             [ Html.th [] [ Html.text "Shard" ]
                             , Html.th [] [ Html.text "Programs" ]
                             , Html.th [] [ Html.text "Checks" ]
-                            , Html.th [] [ Html.text "Theorems generated" ]
+                            , Html.th [] [ Html.text "Checks in a theorem" ]
                             ]
                         ]
                     , Html.tbody []
@@ -549,89 +545,53 @@ generatedPage idx g =
                 ]
             ]
         , step 3
-            "Lean selects the checks the kernel can compare"
+            "Lean writes one theorem per program"
             [ para
-                [ Html.text "In each shard's file the command "
-                , code "#kernel_checks"
-                , Html.text ", a metaprogram in Theorems.lean, runs while Lean compiles the file. It goes through the shard's checks in order and keeps those whose value is an Int, a string or a constructor without arguments, by the kind of value the translator found; it leaves out:"
+                [ Html.text "Each shard has a file of theorems, "
+                , code "Generated/Checks<Shard>.lean"
+                , Html.text ", in which the command "
+                , code "#mod_program_theorems"
+                , Html.text ", a metaprogram in Theorems.lean, runs while Lean compiles the file. For each program of the shard it writes the text of one theorem and has Lean elaborate it as if it were in the file:"
                 ]
-            , Html.ul [ Attr.class "sd-list" ]
-                (List.filterMap identity
-                    [ if g.skipped.divergence > 0 then
-                        Just (Html.li [] [ Html.text (n g.skipped.divergence ++ " known divergences, where the book deliberately gives a different value from the one the check expects;") ])
-
-                      else
-                        Nothing
-                    , if g.skipped.native > 0 then
-                        Just (Html.li [] [ Html.text (n g.skipped.native ++ " checks of programs that use round, floor, ceiling, truncate, an elementary function, ^ at Float or Debug.toString, whose results the C library computes and the kernel cannot (the translator marks the program native);") ])
-
-                      else
-                        Nothing
-                    , Just (Html.li [] [ Html.text (n g.skipped.float ++ " checks of a float value, which is compared as it prints;") ])
-                    , Just (Html.li [] [ Html.text (n g.skipped.value ++ " checks of a list, tuple, record, function, character or other value, or of no value at all (a program that stops at Debug.todo).") ])
-                    ]
-                )
+            , pre "theorem t_elm_ClosureCapture01Test :\n    Mod.ViewChecks (Mod.Btest []) g_elm_ClosureCapture01Test.modules [checks] :=\n  Mod.viewChecks_sound (o := .const false) (by decide +kernel)"
             , para
-                [ Html.text ("That leaves " ++ n totalChecks ++ " − " ++ n (g.skipped.divergence + g.skipped.native + g.skipped.float + g.skipped.value) ++ " = " ++ n g.count ++ " checks. The ones left out are proved by each shard's theorem ")
-                , code "derivable_<Shard>"
-                , Html.text " (from "
-                , proofLink "derivableOf"
-                , Html.text "), which compares values as they print and is proved by native_decide, except a check of no value: Lean's evaluator gives none, as the run of the examples checks, but the soundness theorem speaks only of the values the evaluator gives, so that is not a theorem."
-                ]
-            ]
-        , step 4
-            "Lean writes one theorem per check"
-            [ para
-                [ Html.text "For each check it keeps, the metaprogram writes the text of a theorem and has Lean elaborate it as if it were in the file. The theorems of a shard are numbered "
-                , code "kc_<Shard>_0"
-                , Html.text ", "
-                , code "kc_<Shard>_1"
-                , Html.text ", … in the order of its checks. The theorem for the check above is"
-                ]
-            , pre "/-- ClosureCapture01Test: unwrap1 -/\ntheorem kc_Elm02_N : ∃ v, EvalExp env (phrase) v ∧ (Expect.int 42).holds v := by\n  first\n  | exact kcheck_sound (ch := false) (by decide +kernel)\n  | exact kcheck_sound (ch := true) (by decide +kernel)"
-            , para
-                [ Html.text "Here "
-                , code "phrase"
-                , Html.text " is the program's definitions placed in a "
-                , code "let"
-                , Html.text " around the logged expression, and "
-                , code "env"
-                , Html.text " is the initial environment with the program's constructors added. In words: there is a value v such that the rules derive "
-                , Html.em [] [ Html.text "env ⊢ phrase ⇒ v" ]
-                , Html.text ", and v is the integer 42."
+                [ Html.text "In words: the program's modules, evaluated by Chapter 7's rules in the test basis, have a derivation whose log meets every check. For a program the test expects to stop at Debug.todo the theorem is instead "
+                , code "Mod.NoMeaning (Mod.Btest []) g.modules"
+                , Html.text ", by "
+                , code "Mod.noMeaning_sound"
+                , Html.text ": no derivation gives it a meaning. Where the book lets an implementation choose ("
+                , Html.em [] [ Html.text "APPLY" ]
+                , Html.text " gives a set), the theorem names the choice that meets the checks."
                 ]
             , case g.source of
                 Just src ->
                     Html.details []
-                        [ Html.summary [] [ Html.text ("The source of #kernel_checks (" ++ src.file ++ ":" ++ n src.line ++ ")") ]
+                        [ Html.summary [] [ Html.text ("The source of #mod_program_theorems (" ++ src.file ++ ":" ++ n src.line ++ ")") ]
                         , pre src.text
                         ]
 
                 Nothing ->
                     Html.text ""
             ]
-        , step 5
+        , step 4
             "Lean's kernel proves each one"
             [ para
                 [ Html.code [] [ Html.text "decide +kernel" ]
-                , Html.text " has Lean's kernel itself run the mechanisation's evaluator on the phrase and check that the result is the expected value; nothing outside the kernel is trusted for this step. The evaluator is proved sound for the rules ("
+                , Html.text " has Lean's kernel itself run the mechanisation's evaluator on the program and check its log against the checks; nothing outside the kernel is trusted for this step. The evaluator is proved sound for the rules ("
                 , proofLink "evExp_sound"
-                , Html.text "), and "
-                , proofLink "kcheck_sound"
-                , Html.text " uses that to turn the kernel's computation into a derivation in the rules. Where the book lets an implementation choose between values ("
-                , Html.em [] [ Html.text "APPLY" ]
-                , Html.text " gives a set), the theorem tries both choices the evaluator can make."
+                , Html.text "), and the lemmas named above turn the kernel's computation into a statement about the rules. "
+                , Html.text (n g.skipped.native ++ " checks belong to programs proved by native_decide instead, tagged [native]: programs that use a value only the C library computes (round, floor, an elementary function, ^ at Float, Debug.toString), or whose proof breaks the memory budget.")
                 ]
             , para
-                [ Html.text "All of this happens on every build of the Lean project: when a test changes, the translator writes its new translation, its theorems are generated afresh, and if the rules no longer derive an expected value, the build fails." ]
+                [ Html.text "All of this happens on every build of the Lean project: when a test changes, the translator writes its new translation, its theorem is generated afresh, and if the rules no longer give an expected value, the build fails." ]
             ]
-        , step 6
+        , step 5
             "What they establish, and what they do not"
             [ para
-                [ Html.text ("Together the " ++ n g.count ++ " theorems establish that, for each of these checks, the rules of Chapter 6 with the encoded part of APPLY derive exactly the value the check expects. They say this about the Lean translation of each program, which the translator makes; the translator is checked by its own tests, and was checked against the hand translations it replaced.") ]
+                [ Html.text ("Together the theorems establish that, for each of these " ++ n g.count ++ " checks, the rules with the encoded part of APPLY give exactly the value the check expects. A check of what a program logs before it stops at Debug.todo is in no theorem (its program's theorem says only that it has no meaning); the run of the examples compares it. Each theorem is about the Lean translation of its program, which the translator makes; for the translated tests, the end-to-end theorem on the test's page shows that Lean computes the same translation from the source.") ]
             ]
         , Html.section [ Attr.class "ts-section" ]
-            [ heading "The theorems"
+            [ heading "The checks and their theorems"
             , Html.div [ Attr.class "sd-table-wrap" ]
                 [ Html.table [ Attr.class "ts-table sd-kc-table" ]
                     [ Html.thead []
@@ -930,10 +890,6 @@ translationSection t =
 
 translatedRow : Translation -> TranslatedCheck -> Html msg
 translatedRow t c =
-    let
-        theoremLink name =
-            Html.a [ Attr.href (proofHref name) ] [ Html.code [] [ Html.text name ] ]
-    in
     Html.tr []
         [ Html.td [] [ Html.code [] [ Html.text c.label ] ]
         , Html.td []
@@ -967,17 +923,10 @@ translatedRow t c =
                 ( Nothing, Just "divergence" ) ->
                     [ Html.text "none: a known divergence" ]
 
-                ( Nothing, Just "float" ) ->
-                    [ theoremLink (derivableOf t.shard), Html.text " (a float, compared as printed)" ]
-
-                ( Nothing, Just "native" ) ->
-                    [ theoremLink (derivableOf t.shard), Html.text " (computed by the C library, compared as printed)" ]
+                ( Nothing, Just "partial-log" ) ->
+                    [ Html.text "no theorem: the program stops at Debug.todo, and its theorem says only that it has no meaning; the run of the examples compares what it logs first" ]
 
                 ( Nothing, _ ) ->
-                    if c.expected == "(no value)" then
-                        [ Html.text "no theorem: Lean's evaluator gives no value, as the run of the examples checks, but soundness speaks only of the values it gives" ]
-
-                    else
-                        [ theoremLink (derivableOf t.shard), Html.text " (compared as printed)" ]
+                    [ Html.text "no theorem: compared by the run of the examples" ]
             )
         ]

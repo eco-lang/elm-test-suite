@@ -206,18 +206,20 @@ the dynamic rules and the transitions of programs of
 Chapter~\ref{ch:programs}, and the arithmetic, equality, order, Boolean,
 conversion, elementary-function, append and character part of $\APPLY$,
 with an evaluator proved sound and complete, and a scheduler proved sound,
-with respect to those rules, and checked against the expected results of 579 of the test programs that
+with respect to those rules, and checked against the expected results of 580 of the test programs that
 accompany this book, which a program translates into the encoding from their
 source, each as the program of modules it is; it also encoded the static
 semantics, every rule of Chapters~\ref{ch:static-core} and~\ref{ch:static-modules}
 and the static rules of Chapter~\ref{ch:programs}, with the derived forms of
 Appendix~\ref{ch:appendix-derived-forms}, the syntactic restrictions that can be
 stated on a syntax tree, and Appendix~\ref{ch:appendix-static-basis}, with a checker
-of derivations proved sound, by which 622 of the test programs are shown legal
-(given that the derivation an unproved inference finds for each is principal)
-and 68 that must be refused are shown not legal; and for each of the 579
-translated programs, Lean computes from its source, through that checker,
-number specialisation and type erasure, the program the translator writes. The author set the directions the
+of derivations proved sound and a type inference proved sound and principal, by
+which 622 of the test programs are shown legal and 287 of the 313 that must be
+refused are shown not legal (the parser the encoding starts from rejects the
+others, or reads them in a form that has lost the error); and for each of the
+580 translated programs, Lean computes from its source, through that inference,
+number specialisation and type erasure, the program the translator writes, and
+shows that this specialisation is the only one. The author set the directions the
 definition follows, reviewed every ruling, and is responsible for the
 whole; the AI system is not an author. The survey, the record of rulings,
 the audit reports and the mechanisation are kept with the sources of this

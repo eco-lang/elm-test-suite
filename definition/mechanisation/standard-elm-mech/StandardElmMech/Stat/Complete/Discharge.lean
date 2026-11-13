@@ -175,6 +175,229 @@ theorem legal_of_W {s : SProgram} {q : Option Mod.Reduced} (h : wCheck Btest s q
     LegalProgram Btest s :=
   legal_of_wCheck Btest_inv h
 
+/-! ## The check with the context of the imports given
+
+In the kernel, the context of a module's imports (`importCtx`: the environment the default imports
+and the module's own give) is about half the cost of `wCheck` on a small program, and W, the checker
+and `namesB` each ask for it. `wCheckIn B imps C s q` is `wCheck B s q` for a program of one module
+whose imports are `imps`, with the context read from `C`; given `importCtx B imps = some C`, proved
+once per list of imports (`ctx_<k>_eq`, Certs/Ctx_*.lean), it gives `wCheck` (`wCheck_of_ctx`), so
+a per-test theorem is
+
+    theorem wcheck_X : Stat.wCheck Stat.Btest s_X (some g_X.reduced) = true :=
+      Stat.wCheck_of_ctx ctx_k_eq (by decide +kernel)
+
+with the statement unchanged. -/
+
+/-- `nodesModule` with the context of the imports given. -/
+def nodesModuleIn (C : Ctx) (a : AModule) : List Node :=
+  match a.body with
+  | some d => nodesTopDec C [] d
+  | none => []
+
+/-- `MW.namesB` with the context of the imports given. -/
+def namesBIn (B : SBasis) (C : Ctx) (a : AModule) : Bool :=
+  let ok : TyName → Bool := fun t => decide (t ∈ B.T) || decide (t ∈ genNames B a)
+  (nodesModuleIn C a).all fun n =>
+    n.tys.all (fun τ => τ.tynames.all ok) && n.schemes.all fun σ => σ.body.tynames.all ok
+
+/-- `MW.finish` with the context of the imports given. -/
+def finishIn (B : SBasis) (C : Ctx) (a : AModule) : MW.MRes :=
+  if (a.resultIn B C).isSome && namesBIn B C a then .ok a else .internal
+
+/-- `MW.valuesW` with the context of the imports given. -/
+def valuesWIn (fuel : Nat) (B : SBasis) (C : Ctx) (m : BModule) (at? : Option ATopDec) (C1 : Ctx) :
+    Option Src.BTopDec → MW.MRes
+  | none => finishIn B C ⟨m.header, m.imports, MW.joinBody at? none⟩
+  | some r =>
+    match MW.bodyExp r with
+    | none => .unsupported
+    | some e =>
+      if MW.rootOKB C1 then
+        match WE.inferExpWD fuel C1 e with
+        | .ok ae =>
+          match MW.unLet r ae with
+          | some av =>
+            if MW.portsOKB C1 r ae then finishIn B C ⟨m.header, m.imports, MW.joinBody at? (some av)⟩
+            else .unsupported
+          | none => .internal
+        | .fail => if MW.hasPortB r then .unsupported else .fail
+        | .unsupported => .unsupported
+        | .outOfFuel => .outOfFuel
+        | .internal => .internal
+      else .unsupported
+
+/-- `MW.inferModuleW` with the context of the imports given. -/
+def inferModuleWIn (fuel : Nat) (B : SBasis) (C : Ctx) (m : BModule) : MW.MRes :=
+  match m.body with
+  | none => finishIn B C ⟨m.header, m.imports, none⟩
+  | some d =>
+    match MW.typesPart C (MW.splitBody d).1 with
+    | none => .unsupported
+    | some (at?, C1) => valuesWIn fuel B C m at? C1 (MW.splitBody d).2
+
+/-- `wCheck` for a program of one module whose imports are `imps`, with their context `C` given. -/
+def wCheckIn (B : SBasis) (imps : List Src.BImport) (C : Ctx) (s : SProgram) (q : Option Mod.Reduced) : Bool :=
+  Src.decSynOK s &&
+  match (bareOf s).modules with
+  | [m] =>
+    decide (m.imports = imps) &&
+    match inferModuleWIn MW.wFuel B C m with
+    | .ok a =>
+      match a.resultIn B C with
+      | some (B', E) =>
+        checksAll [(B, B', E)] && furtherModInB B E a &&
+          match q with
+          | none => true
+          | some r =>
+            match reduceWith B [a] [(B, B', E)] with
+            | .ok r' => decide (r' = r)
+            | .error _ => false
+      | none => false
+    | _ => false
+  | _ => false
+
+theorem finish_eq_In {B : SBasis} {C : Ctx} {a : AModule} (h : importCtx B a.imports = some C) :
+    MW.finish B a = finishIn B C a := by
+  have hn : nodesModule B a = nodesModuleIn C a := by
+    unfold nodesModule nodesModuleIn; rw [h]; cases a.body <;> rfl
+  unfold MW.finish finishIn checkModule MW.namesB namesBIn
+  rw [AModule.result_of_ctx h, hn]
+
+theorem inferModuleW_eq_In {fuel : Nat} {B : SBasis} {C : Ctx} {m : BModule} (h : importCtx B m.imports = some C) :
+    MW.inferModuleW fuel B m = inferModuleWIn fuel B C m := by
+  have hf : ∀ hd body, MW.finish B ⟨hd, m.imports, body⟩ = finishIn B C ⟨hd, m.imports, body⟩ :=
+    fun _ _ => finish_eq_In h
+  have hv : ∀ at? C1 r, MW.valuesW fuel B m at? C1 r = valuesWIn fuel B C m at? C1 r := by
+    intro at? C1 r
+    cases r <;> simp only [MW.valuesW, valuesWIn, hf] <;> rfl
+  unfold MW.inferModuleW inferModuleWIn
+  rw [h]
+  simp only [hf, hv]
+  all_goals rfl
+
+/-- A check with the context given is the check. -/
+theorem wCheck_of_ctx {B : SBasis} {imps : List Src.BImport} {C : Ctx} {s : SProgram} {q : Option Mod.Reduced}
+    (hC : importCtx B imps = some C) (h : wCheckIn B imps C s q = true) : wCheck B s q = true := by
+  unfold wCheckIn at h
+  simp only [Bool.and_eq_true] at h
+  obtain ⟨hsyn, h⟩ := h
+  unfold wCheck
+  rw [hsyn, Bool.true_and]
+  split at h
+  · rename_i m hm
+    simp only [Bool.and_eq_true, decide_eq_true_eq] at h
+    obtain ⟨rfl, h⟩ := h
+    rw [hm]
+    have hw := inferModuleW_eq_In (fuel := MW.wFuel) hC
+    split at h
+    · rename_i a ha
+      rw [← hw] at ha
+      obtain ⟨-, -, -, -, -, haim, -⟩ := MW.inferModuleW_ok_inv ha
+      have hCa : importCtx B a.imports = some C := haim ▸ hC
+      have hres := AModule.result_of_ctx hCa
+      split at h
+      · rename_i B' E hr
+        simp only [Bool.and_eq_true] at h
+        obtain ⟨⟨hc, hfu⟩, hq⟩ := h
+        have hp : MW.inferProgramW MW.wFuel B [m] = .ok [a] := by
+          simp only [MW.inferProgramW, ha, hres, hr]
+        have hpr : progResults B [a] = some [(B, B', E)] := by
+          simp only [progResults, hres, hr, Option.map_some]
+        rw [hp]
+        simp only [hpr, hc, furtherAllB, hres, hr, hfu, Bool.true_and, Bool.and_true]
+        exact hq
+      · cases h
+    · cases h
+  · cases h
+
+/-! ## Lean's pipeline with W
+
+`endToEndW` is step 10's pipeline (`endToEnd`: derived forms, inference, the checker of each module,
+Chapter 9's side conditions, specialisation and erasure) with W (`MW.inferProgramW`) in place of
+step 9's unverified inference. It lives here, not beside `endToEnd`, because W's definitions come
+after step 10's (W's proofs use `SpecOf` and the module step). Its run is part of `wCheck`, so the
+per-test theorem `spec_X` (`endToEndW Btest s_X = .ok g_X.reduced`) follows from `wcheck_X` without
+running the inference again (`endToEndW_of_wCheck`), and step 10's statements about `endToEnd` hold
+of it without D11 (`specOf_of_endToEndW`, `ident_of_endToEndW`). -/
+
+/-- derive (total, step 8), W, check, reduce. -/
+def endToEndW (B : SBasis) (s : SProgram) : Except E2EError Mod.Reduced :=
+  match MW.inferProgramW MW.wFuel B (bareOf s).modules with
+  | .ok as =>
+    match progResults B as with
+    | none => .error .check
+    | some rs => if checksAll rs then (reduceWith B as rs).mapError .spec else .error .check
+  | .fail => .error (.infer "W fails")
+  | .other => .error (.infer "W gives no derivation")
+
+/-- What a successful run of the pipeline with W gives. -/
+theorem endToEndW_ok {B : SBasis} {s : SProgram} {r : Mod.Reduced} (h : endToEndW B s = .ok r) :
+    ∃ as rs, MW.inferProgramW MW.wFuel B (bareOf s).modules = .ok as ∧ progResults B as = some rs ∧
+      checksAll rs = true ∧ reduceWith B as rs = .ok r := by
+  unfold endToEndW at h
+  split at h
+  · rename_i as hw
+    split at h
+    · cases h
+    · rename_i rs hr
+      split at h
+      · rename_i hc
+        refine ⟨as, rs, hw, hr, hc, ?_⟩
+        cases hred : reduceWith B as rs with
+        | error e => rw [hred] at h; cases h
+        | ok r' => rw [hred] at h; cases h; rfl
+      · cases h
+  · cases h
+  · cases h
+
+/-- A W check that names a reduced program says that the pipeline with W gives it. -/
+theorem endToEndW_of_wCheck {B : SBasis} {s : SProgram} {r : Mod.Reduced} (h : wCheck B s (some r) = true) :
+    endToEndW B s = .ok r := by
+  unfold wCheck at h
+  simp only [Bool.and_eq_true] at h
+  obtain ⟨-, h⟩ := h
+  unfold endToEndW
+  split at h
+  · rename_i as hw
+    rw [hw]
+    split at h
+    · rename_i rs hr
+      simp only [hr]
+      simp only [Bool.and_eq_true] at h
+      obtain ⟨⟨hc, -⟩, hq⟩ := h
+      simp only [hc, ↓reduceIte]
+      split at hq
+      · rename_i r' hr'
+        simp only [decide_eq_true_eq] at hq
+        rw [hr', hq]; rfl
+      · cases hq
+    · cases h
+  · cases h
+
+/-- Step 10's `specOf_of_endToEnd` for the pipeline with W, without D11: what it gives is a
+    specialisation of the program. -/
+theorem specOf_of_endToEndW {B : SBasis} {s : SProgram} {r : Mod.Reduced} (hB : BasisInv B)
+    (h : endToEndW B s = .ok r) : SpecOf B (bareOf s) r := by
+  obtain ⟨as, rs, hw, hr, -, hred⟩ := endToEndW_ok h
+  exact ⟨as, MW.inferProgramW_principal hB hw, by simp only [reduceProgram, hr]; exact hred⟩
+
+/-- Step 10's `ident_of_spec'` for the pipeline with W, without D11: the specialisation of the
+    program is unique, and is what the pipeline with W gives. -/
+theorem ident_of_endToEndW {s : SProgram} {q : Mod.Reduced} (h : endToEndW Btest s = .ok q) :
+    ∀ r, SpecOf Btest (bareOf s) r → r = q := by
+  obtain ⟨as, -, hw, -⟩ := endToEndW_ok h
+  have hT := typesOrdered_of_inferProgramW _ _ _ Btest_inv hw
+  exact fun r hr => specOf_functional MStep.moduleStep Btest_inv hT hr (specOf_of_endToEndW Btest_inv h)
+
+/-- Step 10's `programSem_of_legal` for the pipeline with W, without D11. -/
+theorem programSem_of_endToEndW {B : SBasis} {s : SProgram} {r : Mod.Reduced} (hB : BasisInv B)
+    (h : endToEndW B s = .ok r) (hL : LegalProgram B s) (hv : ∃ v, DynOf r v) :
+    ∃ τ PE v, ProgramSem B (bareOf s) (τ, PE, v) := by
+  obtain ⟨-, τ, PE, hst⟩ := hL
+  obtain ⟨v, hd⟩ := hv
+  exact ⟨τ, PE, v, .r_p_program hst (specOf_of_endToEndW hB h) hd⟩
+
 /-! ## A96: flags of a type variable (StandardA96NumberFlagsTest) -/
 
 /-- W's principal scheme of `main`, for a program of one module, is that of a worker whose flags type

@@ -1234,4 +1234,20 @@ At (g) also:
    two tests of ruling A98, and to resolve a built-in type name before a module's own alias (against
    A98); with that fixed (`Translate/Infer.elm`): 623 `legal_`, 286 `refuse_` (the A98 mismatch test
    by the core refutation, 201), 580 `spec_`/`ident_`, 578 `mean_`; W gives a derivation for 622 of
-   the 623 legal programs.
+   the 623 legal programs. Then CompilerIssue2281LongLineListTest lost its `elm-spec` tag (by the
+   author's decision, 2026-11-13): it tests a compiler's column limit, which the book does not speak
+   of, and names only rules its program happens to use. So it leaves the examples, and with it the
+   only theorem under D11: 622 `legal_`, all without hypothesis; `wSkip` is empty and
+   `check-hypotheses` lists no per-test theorem. W still gives no result on that list of 22,000
+   elements, a known limit of the proved inference.
+   Finally the certificates were restructured (2026-11-13). The shards are now fixed alphabetical
+   buckets that import no other test shard, with `LEAN_NUM_THREADS=4` and `scripts/verify.sh`.
+   `spec_` now states that `endToEndW` (step 10's pipeline with W) gives the reduced program; it
+   follows from `wcheck_` (`endToEndW_of_wCheck`), so the kernel infers once per test. W checks read
+   the context of the imports from `Certs/Ctx_<hash>.lean` (`wCheck_of_ctx`). After this, 11 W
+   checks use `native_decide` and no `spec_` does, and a clean certificate build takes 15.2 min,
+   peak 6.19 GB per process. The figures above (15 natives, 5 `spec_`, 1 h 50 min) are from
+   before this change. The translator's Generated shards then became fixed alphabetical buckets
+   too (`viewBounds` equal to `e2eBounds`, `srcBounds`, a Syn file per source shard), so adding a
+   test rebuilds the 2 to 7 certificate shards that import its bucket, not about 27. There are now
+   18 more per-shard theorems (`derivable_`, `ports_canon_`), giving 15,512 theorems.

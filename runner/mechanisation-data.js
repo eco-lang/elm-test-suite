@@ -7,8 +7,8 @@
 //                                       proof) and the summary of the generated theorems
 //   mechanisation/proofs/<slug>.json    one theorem: doc comment, statement, proof, the theorems it
 //                                       uses and that use it, the book's rules it names
-//   mechanisation/proofs/kc.json        the theorems kc_<Shard>_<n> that the command #kernel_checks
-//                                       generates at compile time, one per check the kernel can compare
+//   mechanisation/proofs/kc.json        the program theorems t_<project>_<Test> that the command #mod_program_theorems
+//                                       generates at compile time, one per program, with the checks each covers
 //   mechanisation/translations/<project>/<Test>.json
 //                                       an elm-spec test's Lean translation and what became of each of
 //                                       its checks, or why it is not translated

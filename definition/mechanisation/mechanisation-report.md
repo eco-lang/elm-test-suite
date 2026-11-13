@@ -1,33 +1,62 @@
 # Mechanisation Report
 
+> **Update, 2026-11-13 (certificates restructured).** `Certs/` is now in fixed alphabetical
+> buckets of `project/Test` (the bounds are in `Certify.lean`), and no test shard imports another, so
+> a change to one test rewrites one certificate file. Lake 5 has no job flag; `LEAN_NUM_THREADS=K`
+> caps the `lean` processes, and `scripts/verify.sh quick|full` runs the build and every check with
+> K = 4 in a 24 GB scope. `spec_X` now states `endToEndW Btest s_X = .ok g_X.reduced`: step 10's
+> pipeline with step 11's W in place of step 9's inference. It follows from `wcheck_X`
+> (`endToEndW_of_wCheck`), so the kernel runs inference and specialisation once per test.
+> compare-e2e checks `endToEndW` and agrees on 580 of 580; step 9's pipeline also still agrees on
+> 580. About half of each W check was the kernel recomputing the context of the module's imports;
+> W checks now read it from one lemma per list of imports (`Certs/Ctx_<hash>.lean`,
+> `wCheck_of_ctx`, proved without hypothesis). That cut an end-to-end shard of 20 tests from 98 s
+> to 32 s and brought four programs back within the kernel's memory budget: 11 W checks use
+> `native_decide` (was 15), and no `spec_` does (was 5; seven `spec_` theorems rest on a native
+> `wcheck_`). A clean certificate build takes 15.2 min wall (93 min serially before) and 47 min of
+> CPU. The largest process is 6.19 GB, and the scope peaks at 7.44 GB. The critical path is
+> WideRecordDecoder300Test's `native_decide`, 14 min in Lean's interpreter. With nothing changed,
+> `verify.sh quick` takes about 1 min 50 s; rebuilding one changed shard takes about 32 s. The
+> translator's Generated shards are now fixed alphabetical buckets as well (`viewBounds`, the same
+> as `e2eBounds`, and `srcBounds`, in `Translate.elm`), with a Syn file per source shard, and the
+> translator removes the files it no longer writes. Before this, adding one test
+> (LetCycleThroughLambdaArgumentTest) renamed the contents of 16 of the 24 source shards and
+> rebuilt 27 certificate shards in 901 s. Now a test's source bucket is imported by 2 to 7
+> certificate shards (3 at the median). For that test the bucket is imported by 6, which took about
+> 4.5 min of CPU together in the last clean build. A clean build with these shards: 885 s, 110
+> modules, largest process 6.20 GB, scope peak 8.85 GB.
+
 > **Update, 2026-11-13 (plan step 11, milestone (g): D11 discharged).** The hypothesis that the
-> inference's derivation is principal (D11, `[principal]`) is gone from every per-test theorem but
-> one. Module-level W now handles ports (as the annotated group `x : ty; x = x`, kept only when its
-> closed environment is the port rule's) and returns a derivation for 622 of the 623 legal programs.
-> For each translated test a theorem `wcheck_` has the kernel run W, Chapter 9's conditions, the
-> further restrictions and the specialisation, and `legal_of_W`, `ident_of_wCheck` and
-> `programSem_of_wCheck` give its `legal_`, `ident_` and `mean_` theorems without hypothesis;
-> `spec_` is unchanged, so compare-e2e still agrees (580 of 580). The exception is
-> CompilerIssue2281LongLineListTest, a list literal of 22,000 elements, on which compiled W gave no
-> result within two hours: its `legal_` keeps step 9's form under D11. StandardA96NumberFlagsTest is
-> refused (`not_legal_of_wMainVar`: W's `main` has a variable as its flags type, which every
-> principal derivation keeps and which no port type is), so all 286 compile-error tests are refused.
-> W costs two to four times step 9's inference in the kernel: 15 W checks over the memory budget use
-> `native_decide`, `spec_` of WideRecord40Test joins them, and the certificates take about 1 h 50 min
-> to build serially, peak 6.1 GB. The general properties `PrincipalExistsCore` and
-> `PrincipalExistsMod` are proved only from W's coverage; unconditionally they need the `internal`
-> clause of W's completeness (milestone (e)), W's coverage of what it answers `unsupported`
-> (pattern bindings in groups, ambiguous contexts, aliases with free variables), and bases and
-> contexts outside W's invariants. The two tests of ruling A98 had not been translated; the
-> translator resolved a built-in type name (`String`) before the module's own alias, against A98,
-> and now lets the module's types and aliases take the name first, so StandardA98TypeBeforeAliasTest
-> is translated (580 tests) and its mismatch twin is refused by the core refutation. Counts: 623
-> `legal_` (16 by `native_decide`, 1 under D11), 286 `refuse_`, 0 compile-error tests unrefused;
-> 580 `spec_` (5 native), 578 `mean_`, 580 `ident_`; 15,481 theorems (242 using `native_decide`), 0
-> axiom problems; run-examples 1,709 of 1,709; compare-e2e 580 of 580; measure-cores 201 refuted,
-> none of the 626 compile-success tests; measure-w: W refutes none of the 625 compile-success tests
-> it runs and gives a derivation for all 622 legal programs it runs; `scripts/check-hypotheses.lean`
-> lists 13 general lemmas and 2281's `legal_`; the certificates build in 93 min, peak 5.8 GB.
+> inference's derivation is principal (D11, `[principal]`) is gone from every per-test theorem.
+> Module-level W now handles ports, as the annotated group `x : ty; x = x`, kept only when its
+> closed environment is the port rule's. It returns a derivation for all 622 legal programs. For
+> each translated test, a theorem `wcheck_` has the kernel run W, Chapter 9's conditions, the
+> further restrictions and the specialisation. `legal_of_W`, `ident_of_wCheck` and
+> `programSem_of_wCheck` then give its `legal_`, `ident_` and `mean_` theorems without hypothesis.
+> StandardA96NumberFlagsTest is refused by `not_legal_of_wMainVar`: W gives `main` a variable as
+> its flags type, every principal derivation keeps that variable, and no port type is a variable.
+> So all compile-error tests that reach Lean are refused. CompilerIssue2281LongLineListTest, a list literal of
+> 22,000 elements on which compiled W gave no result within two hours, lost its `elm-spec` tag by
+> the author's decision. It tests a compiler's column limit, which the book does not speak of, and
+> it names only rules its program happens to use; W's failure on it is a known limit. The general
+> properties `PrincipalExistsCore` and `PrincipalExistsMod` are proved only from W's coverage.
+> Proving them unconditionally needs three things: the `internal` clause of W's completeness
+> (milestone (e)); W's coverage of what it answers `unsupported` (pattern bindings in groups,
+> ambiguous contexts, aliases with free variables); and bases and contexts outside W's invariants.
+> The translator had not translated the two tests of ruling A98. It resolved a built-in type name
+> (`String`) before the module's own alias, against A98. It now lets the module's types and aliases
+> take the name first, so StandardA98TypeBeforeAliasTest is translated (580 tests), and the core
+> refutation refuses its mismatch twin. Counts, after the restructure above:
+> - `legal_`: 622, 11 by `native_decide`, none under D11.
+> - `refuse_`: 287 (with LetCycleThroughLambdaArgumentTest, added on 2026-11-13 and refused by its
+>   restriction core-let-recursion), with no compile-error test left unrefused.
+> - 580 `spec_` (0 by `native_decide`), 578 `mean_` and 580 `ident_`.
+> - check-axioms: 15,512 theorems, 228 using `native_decide`, no axiom problems.
+> - run-examples: 1,709 of 1,709.
+> - compare-e2e: 580 of 580.
+> - measure-cores: 201 refuted, and none of the 625 compile-success tests.
+> - measure-w: W refutes no compile-success test and gives a derivation for all 622 legal programs.
+> - `scripts/check-hypotheses.lean`: 13 general lemmas, and no per-test theorem.
 
 > **Update, 2026-11-12 (plan step 11, milestone (f), modules and programs).** Module- and
 > program-level W (`MW.inferModuleW`, `MW.inferProgramW`, `Stat/Complete/Modules*.lean`) elaborates

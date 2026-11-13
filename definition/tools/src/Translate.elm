@@ -8,7 +8,8 @@ Definition of Elm? (plans/elm-to-lean-translator.md). Run from the repository's 
     site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --report-all-refusals FILE
 
 It writes, under `definition/mechanisation/standard-elm-mech/StandardElmMech/Generated/`, one Lean
-file of programs per shard (at most 40 tests), `All.lean`, and one file of theorems per shard; the
+file of programs per shard (a fixed alphabetical bucket of test names, `bucketOf`), `All.lean`, and
+one file of theorems per shard, and removes any file there it wrote before but no longer writes; the
 list of those modules in `StandardElmMech.lean`; and `definition/mechanisation/translation-manifest.json`,
 with every `elm-spec` test, translated or refused with its reason. With `--check` it writes nothing:
 it prints the files that would change, and exits 0 either way. With `--report-all-refusals FILE` it
@@ -58,9 +59,96 @@ manifestPath =
     "definition/mechanisation/translation-manifest.json"
 
 
-shardSize : Int
-shardSize =
-    40
+{-| The shards are fixed alphabetical buckets of the key `project/Test` (`bucketOf`), so that adding,
+removing or renaming a test changes its own bucket's files only, and Lake rebuilds only what imports
+them. A bucket's files are named after its bound (`bucketName`: `elm/CaseF` gives `Elm_CaseF`,
+`elm/` gives `Elm`). A bucket that grows too large is split by adding a bound, which changes that
+bucket's files and adds one.
+
+The buckets of the translated view programs (`Elm_*.lean` and `ChecksElm_*.lean`). They are the
+bounds of the end-to-end certificates (`e2eBounds` in Certify.lean), so that each certificate file
+imports the program and check files of its own bucket only; if the two lists differ, nothing is
+wrong but a change spreads to more files.
+-}
+viewBounds : List String
+viewBounds =
+    [ "elm-core/", "elm-core/CompareI", "elm-core/CoreIssue115", "elm-core/FloatD", "elm-core/FloatSu"
+    , "elm-core/NotEqualBoolP", "elm-core/StandardA42", "elm-core/TaskOnErrorS"
+    , "elm/", "elm/Ap", "elm/As", "elm/CaseF", "elm/CaseS", "elm/CharU", "elm/CombinatorL", "elm/CombinatorP"
+    , "elm/CombinatorSP", "elm/CompilerIssue22"
+    , "elm/CovTailRecPairParameters", "elm/EmbeddedNo", "elm/Fli", "elm/ImportE", "elm/InfixPrecO"
+    , "elm/LetN", "elm/LetNumberLo", "elm/Li", "elm/M", "elm/PartialAppCh", "elm/PortEchoN"
+    , "elm/RecordAccessorFunctionT", "elm/SingleCtorPairBoolF", "elm/StandardL", "elm/TailRecT"
+    ]
+
+
+{-| The buckets of the source programs (`SrcElm_*.lean`, and one `SynElm_*.lean` each), chosen on
+2026-11-13 as every 40th of the 918 written programs.
+-}
+srcBounds : List String
+srcBounds =
+    [ "elm-core/", "elm-core/CoreIssue112", "elm-core/FloatS", "elm-core/StandardA41"
+    , "elm/", "elm/CaseCustomTypeT", "elm/CharC", "elm/CompilerIssue176", "elm/CompilerIssue217"
+    , "elm/CustomTypeUnboundV", "elm/Flo", "elm/InfixAssocP", "elm/LetNumberAp", "elm/LetNumberRecordM"
+    , "elm/Mu", "elm/PolyStepLoopFo", "elm/RecordNarrow06", "elm/StandardA9"
+    , "elm/TooManyArgsTooManyArgumentsToAN", "elm/TypeMismatchCon", "elm/TypeMismatchListE"
+    , "elm/TypeMismatchRigidNumberAsF", "elm/TypeMismatchTu", "elm/WideRecordDecoder30T"
+    ]
+
+
+{-| The bucket of a key: the last bound (in the order of `String`) that is not after it, or the first
+bound. The same as `bucketOf` in Certify.lean.
+-}
+bucketOf : List String -> String -> String
+bucketOf bounds key =
+    let
+        sorted =
+            List.sort bounds
+    in
+    sorted
+        |> List.filter (\b -> b <= key)
+        |> List.reverse
+        |> List.head
+        |> Maybe.withDefault (List.head sorted |> Maybe.withDefault "")
+
+
+{-| The name of a bucket's files: `elm/CaseF` gives `Elm_CaseF`, `elm-core/` gives `ElmCore`.
+-}
+bucketName : String -> String
+bucketName bound =
+    case String.split "/" bound of
+        [ project, prefix ] ->
+            upperCamel project
+                ++ (if prefix == "" then
+                        ""
+
+                    else
+                        "_" ++ prefix
+                   )
+
+        _ ->
+            "All"
+
+
+{-| The items in their buckets, in the order of the bounds, each bucket's items in their given order;
+empty buckets are left out.
+-}
+bucketed : List String -> (a -> String) -> List a -> List ( String, List a )
+bucketed bounds keyOf xs =
+    let
+        tagged =
+            List.map (\x -> ( bucketOf bounds (keyOf x), x )) xs
+    in
+    List.sort bounds
+        |> List.filterMap
+            (\b ->
+                case List.filterMap (\( c, x ) -> if c == b then Just x else Nothing) tagged of
+                    [] ->
+                        Nothing
+
+                    ys ->
+                        Just ( b, ys )
+            )
 
 
 type alias Test =
@@ -224,61 +312,27 @@ translatedOf kind =
         )
 
 
-{-| The shards of the translated tests: the view programs by project, then the worker tests
-(Prog/Worker.lean), whose theorems are statements about executions, in shards `WorkerNN`.
+{-| The shards of the translated tests: the view programs in the buckets of `viewBounds`, then the
+worker tests (Prog/Worker.lean), whose theorems are statements about executions, in the one shard
+`Worker01` (35 tests; hand-written proofs in Prog/ import it by that name).
 -}
 shards : List Entry -> List Shard
 shards entries =
     viewShards entries
-        ++ (translatedOf "worker" entries
-                |> chunks shardSize
-                |> List.indexedMap
-                    (\i chunk -> { name = "Worker" ++ String.padLeft 2 '0' (String.fromInt (i + 1)), entries = chunk, worker = True })
+        ++ (case translatedOf "worker" entries of
+                [] ->
+                    []
+
+                ws ->
+                    [ { name = "Worker01", entries = ws, worker = True } ]
            )
 
 
 viewShards : List Entry -> List Shard
 viewShards entries =
-    let
-        translated =
-            translatedOf "view" entries
-
-        projects =
-            translated |> List.map (\( e, _ ) -> e.test.project) |> unique
-    in
-    projects
-        |> List.concatMap
-            (\project ->
-                translated
-                    |> List.filter (\( e, _ ) -> e.test.project == project)
-                    |> chunks shardSize
-                    |> List.indexedMap
-                        (\i chunk ->
-                            { name = upperCamel project ++ String.padLeft 2 '0' (String.fromInt (i + 1)), entries = chunk, worker = False }
-                        )
-            )
-
-
-unique : List comparable -> List comparable
-unique =
-    List.foldl
-        (\x acc ->
-            if List.member x acc then
-                acc
-
-            else
-                acc ++ [ x ]
-        )
-        []
-
-
-chunks : Int -> List a -> List (List a)
-chunks n xs =
-    if List.isEmpty xs then
-        []
-
-    else
-        List.take n xs :: chunks n (List.drop n xs)
+    translatedOf "view" entries
+        |> bucketed viewBounds (\( e, _ ) -> e.test.project ++ "/" ++ e.test.name)
+        |> List.map (\( b, es ) -> { name = bucketName b, entries = es, worker = False })
 
 
 header : String
@@ -925,7 +979,8 @@ classification labels basis basisSha allTests sources =
 
 
 {-| The source syntax of every `elm-spec` test whose program parses (plan step 8): the shards
-`Generated/Src<Project><nn>.lean`, `Generated/SrcAll.lean`, each test's outcome for the manifest,
+`Generated/Src<Bucket>.lean` (the buckets of `srcBounds`), `Generated/SrcAll.lean`, a file of
+syntactic theorems per shard (`Generated/Syn<Bucket>.lean`), each test's outcome for the manifest,
 and the summary line.
 -}
 sourceSyntax : List Test -> Sources -> { files : List Output, byTest : Dict String Encode.Value, summary : String }
@@ -983,18 +1038,10 @@ sourceSyntax allTests sources =
         written =
             results |> List.filterMap (\( t, r, mods ) -> Result.toMaybe r |> Maybe.map (\lean -> ( t, lean, mods )))
 
-        projects =
-            written |> List.map (\( t, _, _ ) -> t.project) |> unique
-
         srcShards =
-            projects
-                |> List.concatMap
-                    (\project ->
-                        written
-                            |> List.filter (\( t, _, _ ) -> t.project == project)
-                            |> chunks shardSize
-                            |> List.indexedMap (\i chunk -> ( "Src" ++ upperCamel project ++ String.padLeft 2 '0' (String.fromInt (i + 1)), chunk ))
-                    )
+            written
+                |> bucketed srcBounds (\( t, _, _ ) -> t.project ++ "/" ++ t.name)
+                |> List.map (\( b, chunk ) -> ( "Src" ++ bucketName b, chunk ))
 
         shardOf =
             srcShards |> List.concatMap (\( n, chunk ) -> List.map (\( t, _, _ ) -> ( t.project ++ "/" ++ t.name, n )) chunk) |> Dict.fromList
@@ -1022,12 +1069,11 @@ sourceSyntax allTests sources =
                     ++ "]\n\nend StandardElm\n"
             }
 
-        -- the theorems of the restrictions, a file per four source shards (one file for all needs
-        -- more than the memory budget, 2026-11-12: 6.5 GB)
+        -- the theorems of the restrictions, a file per source shard, so that a change to one source
+        -- shard rebuilds one (one file for all needs more than the memory budget, 2026-11-12: 6.5 GB)
         synGroups =
             srcShards
-                |> chunks 4
-                |> List.indexedMap (\i g -> ( "Syn" ++ String.padLeft 2 '0' (String.fromInt (i + 1)), List.map Tuple.first g ))
+                |> List.map (\( n, _ ) -> ( "Syn" ++ String.dropLeft 3 n, [ n ] ))
 
         synFile ( g, names ) =
             { path = generatedDir ++ g ++ ".lean"
@@ -1114,6 +1160,58 @@ writeAll files =
                     |> BackendTask.sequence
                     |> BackendTask.andThen (\_ -> Script.log ("written: " ++ String.fromInt (List.length files) ++ " files"))
             )
+        |> BackendTask.andThen (\_ -> staleFiles files)
+        |> BackendTask.andThen
+            (\stale ->
+                stale
+                    |> List.map (\path -> BackendTask.Custom.run "removeFile" (Encode.string path) (Decode.succeed ()) |> BackendTask.allowFatal)
+                    |> BackendTask.sequence
+                    |> BackendTask.andThen
+                        (\_ ->
+                            if List.isEmpty stale then
+                                BackendTask.succeed ()
+
+                            else
+                                Script.log ("removed: " ++ String.join ", " stale)
+                        )
+            )
+
+
+{-| The Lean files of `Generated/` that this translator wrote (they start with its header) and that
+it no longer writes: a shard whose bucket is now empty, or a file of an earlier naming of the shards.
+-}
+staleFiles : List Output -> BackendTask FatalError (List String)
+staleFiles files =
+    let
+        written =
+            Set.fromList (List.map .path files)
+    in
+    Glob.succeed (\path _ -> path)
+        |> Glob.captureFilePath
+        |> Glob.match (Glob.literal generatedDir)
+        |> Glob.capture Glob.wildcard
+        |> Glob.match (Glob.literal ".lean")
+        |> Glob.toBackendTask
+        |> BackendTask.andThen
+            (\paths ->
+                paths
+                    |> List.filter (\path -> not (Set.member path written))
+                    |> List.map
+                        (\path ->
+                            BackendTask.File.rawFile path
+                                |> BackendTask.allowFatal
+                                |> BackendTask.map
+                                    (\body ->
+                                        if String.startsWith header body then
+                                            Just path
+
+                                        else
+                                            Nothing
+                                    )
+                        )
+                    |> BackendTask.combine
+                    |> BackendTask.map (List.filterMap identity >> List.sort)
+            )
 
 
 compareAll : List Output -> BackendTask FatalError ()
@@ -1138,6 +1236,7 @@ compareAll files =
                         )
             )
         |> BackendTask.combine
+        |> BackendTask.map2 (\stale changes -> changes ++ List.map (\path -> Just ("would remove: " ++ path)) stale) (staleFiles files)
         |> BackendTask.andThen
             (\changes ->
                 case List.filterMap identity changes of

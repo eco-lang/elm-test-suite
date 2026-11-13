@@ -28,6 +28,10 @@ Rebuilt on 2026-11-12 after an erratum to rule r:sm-topdec-types: the side condi
 
 Rebuilt on 2026-11-12 after an erratum in Section 4.4 (explicit type variables): the kind of an annotation's new variable is fixed there, a row variable when the annotation uses the name as a record extension and a type variable otherwise, since rules r:s-ty-tyvar and r:s-ty-rowvar could both elaborate a name written alone. 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
 
+Rebuilt on 2026-11-13 after the preface's account of the mechanisation said that the type inference is proved sound and principal (plan step 11), so that 622 test programs are shown legal without hypothesis, 286 of the 312 that must be refused are shown not legal (the parser the encoding starts from rejects the others or loses their error), and for each of the 580 translated programs Lean computes the program the translator writes and shows its specialisation unique. 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
+Rebuilt on 2026-11-13 after a compile-error test was added (LetCycleThroughLambdaArgumentTest, restriction core-let-recursion): the preface now says 287 of the 313 programs that must be refused are shown not legal. 187 pages, no warnings, the same 3 overfull boxes.
+
 ## Status
 
 | Field | Value |

@@ -5,7 +5,7 @@
     "compileError": {
       "parse-fail": 18,
       "lexical-accepted": 8,
-      "syntactic": 31,
+      "syntactic": 32,
       "further": 9,
       "fixity-inference": 1,
       "static-deterministic": 28,
@@ -13,7 +13,7 @@
     },
     "compileSuccess": {
       "B0": 39,
-      "harness": 541,
+      "harness": 540,
       "library": 34,
       "helper": 9,
       "outside": 3,
@@ -2223,6 +2223,29 @@
       "subclass": null,
       "step": null,
       "trust": [],
+      "title": null,
+      "override": null
+    },
+    {
+      "project": "elm",
+      "name": "LetCycleThroughLambdaArgumentTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/LetCycleThroughLambdaArgumentTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "rules": [
+        "res:core-let-recursion"
+      ],
+      "rule": "res:core-let-recursion",
+      "class": "syntactic",
+      "subclass": null,
+      "step": 8,
+      "trust": [
+        "parse"
+      ],
       "title": null,
       "override": null
     },
@@ -9642,23 +9665,6 @@
       "modules": [
         {
           "path": "tests/elm/src/CompilerIssue2268TcoClosureCaptureTest.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "harness",
-      "needs": [
-        "harness"
-      ],
-      "main": "other",
-      "mainAnnotated": false
-    },
-    {
-      "project": "elm",
-      "name": "CompilerIssue2281LongLineListTest",
-      "modules": [
-        {
-          "path": "tests/elm/src/CompilerIssue2281LongLineListTest.elm",
           "parse": "ok"
         }
       ],

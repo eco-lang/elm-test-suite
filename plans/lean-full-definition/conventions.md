@@ -67,9 +67,15 @@ files that define commands such as `#kernel_checks` import it.
 
 ## Data the translator writes
 
-- Each translated test is one Lean `def` in a shard `Generated/<Shard><nn>.lean` of at most 40
-  programs, with a docstring naming its source file. The shards' checks are in
-  `Generated/Checks<Shard><nn>.lean`.
+- Each translated test is one Lean `def` in a shard `Generated/<Bucket>.lean`, with a docstring
+  naming its source file. The shards' checks are in `Generated/Checks<Bucket>.lean`. A shard is a
+  fixed alphabetical bucket of the key `project/Test` (`viewBounds` and `srcBounds` in
+  `Translate.elm`; `elm/CaseF` gives `Elm_CaseF`), so adding or removing a test changes its own
+  bucket's files only; the view buckets are the end-to-end certificates' (`e2eBounds`), so each
+  certificate file imports its own bucket's files. The source programs are in
+  `Generated/Src<Bucket>.lean`, each with its syntactic theorems in `Generated/Syn<Bucket>.lean`.
+  The worker tests are in the one shard `Worker01`. The translator removes a Generated file it
+  wrote before but no longer writes.
 - The manifest `definition/mechanisation/translation-manifest.json` has one entry per `elm-spec`
   test: `project`, `name`, `status` (`translated` or `refused`), `reason` (when refused),
   `shard`, `def`, `checks`, and from step 3 `sources`: a list of `{path, sha256}`, one per module
@@ -89,10 +95,18 @@ site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
 export PATH=$HOME/.elan/bin:$PATH
 (cd definition/mechanisation/standard-elm-mech && lake build && lake exe run-examples)
 (cd definition/mechanisation/standard-elm-mech && lake env lean scripts/check-axioms.lean)
+(cd definition/mechanisation/standard-elm-mech && scripts/verify.sh full)
 pnpm test:all && node runner/check-baseline.js
 node runner/definition-data.js && node runner/site-data.js && node runner/mechanisation-data.js
 (cd site && npm run build)
 ```
+
+`scripts/verify.sh full` runs, inside a systemd scope of 24 GB (it starts one), `lake exe certify`, the
+build of `Certs/CertsAll` and the root with at most `K` (default 4) `lean` processes at once,
+`certify --check`, the translator's `--check`, and every check of the Lean project (`run-examples`,
+`measure-cores`, `compare-e2e`, `check-axioms`, `measure-w`, `check-hypotheses`, `syn-report`), one
+line each, with the wall time and the largest single process's resident set; `quick` stops after
+`certify --check`.
 
 `lake exe run-examples` prints `Total: N checks, N agree, 0 diverge (0 known); K theorems by
 decide +kernel.` until step 1, and from step 1, when theorems become one per program, `Total: N
@@ -107,7 +121,10 @@ repository): no single `lean` process above 6.5 GB of resident set size
 processes of the proportional set size (`Pss:` of `/proc/<pid>/smaps_rollup`, sampled every 0.5 s)
 under 12 GB. A test that breaks the budget is proved by `native_decide` only, or refused with the
 reason `construct:large-*`, and listed in the step's report. Smaller shards do not lower the
-single-test peak.
+single-test peak. The certificate shards (`Certs/`) import no other shard, so a build may check
+several at once: Lake runs as many `lean` processes as the Lean task manager has threads, so
+`LEAN_NUM_THREADS=K` bounds them (`scripts/verify.sh` sets K = 4 and runs the build in a scope of 24
+GB); each shard's largest resident set stays at most 6.3 GB.
 
 ## Reports and the site, after every step
 

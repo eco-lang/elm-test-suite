@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 
 /** The sha256 of a file, in hex, for the translation manifest. */
@@ -25,4 +25,10 @@ export async function sha256Tree(dir: string): Promise<string> {
     hash.update(readFileSync(f));
   }
   return hash.digest("hex");
+}
+
+/** Removes a file: a Generated file the translator no longer writes. */
+export async function removeFile(path: string): Promise<null> {
+  unlinkSync(path);
+  return null;
 }

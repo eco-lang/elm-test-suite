@@ -80,7 +80,7 @@ def programDecider : String → SProgram → Bool
     of 300 parameters), proved by `native_decide` (2026-11-11: the kernel overflowed its recursion
     depth on them). -/
 def synNative : List String :=
-  ["CompilerIssue2281LongLineListTest", "WideClosureArity300Test", "WideRecord1100Test",
+  ["WideClosureArity300Test", "WideRecord1100Test",
    "WideRecord600Test", "WideRecordDecoder300Test"]
 
 elab "#syn_theorems " shardsId:ident : command => do

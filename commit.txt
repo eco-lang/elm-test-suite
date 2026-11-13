@@ -1,0 +1,17 @@
+Shard the certificates and translations by test name and derive spec_ from W
+
+Split Certs/ into fixed alphabetical buckets of project/Test that import no other test shard,
+capped at K lean processes by LEAN_NUM_THREADS; scripts/verify.sh quick|full runs in a 24 GB scope.
+spec_ now states endToEndW (the pipeline with W) and follows from wcheck_, so the kernel infers
+once per test; W checks read the import context from Certs/Ctx_<hash>.lean. 11 W checks stay
+native, no spec_ is, and a clean build takes 15 min, not 93. The translator's Generated shards use
+the same buckets and it removes files it no longer writes, so adding a test rebuilds 2 to 7
+certificate shards, not 27.
+
+Drop elm-spec from CompilerIssue2281LongLineListTest: it tests a compiler's column limit, which
+the book does not define, and W gives no result on its 22,000-element list. That removes the last
+theorem under D11: 622 legal_ without hypothesis, [principal] retired for every test.
+
+Add LetCycleThroughLambdaArgumentTest, a let value on a cycle through a lambda argument; 0.19.3
+segfaults and Lamdera crashes after the header (CHECK-NOT: Crash). It is refused by
+core-let-recursion: 287 refuse_. Update the preface, reports, plan and site to match.

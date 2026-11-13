@@ -17,7 +17,6 @@ reproduces the same bug with a local tail-recursive `length` in its place.
 -}
 
 -- TAGS: elm19-bug-fix
--- TAGS: elm-spec, df:list, df:infix, d-atexp-paren, d-atexp-op, d-exp-app, d-app-con, d-atexp-nil
 -- CHECK: length: 22000
 
 import Html exposing (text)

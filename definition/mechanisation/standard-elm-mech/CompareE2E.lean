@@ -1,14 +1,17 @@
 /-
   `lake exe compare-e2e` (plan step 10): for every program translated today, the reduced program
-  that Lean computes from its source syntax (`Stat.endToEnd Stat.Btest s_X`: derived forms,
-  inference, checker, specialisation, erasure) against the reduced part of the translator's program
-  (`g_X.reduced`, or `w_X.reduced` for a worker). Prints the totals and, for each difference or
-  error, the test and its first difference; writes `../e2e-report.json` with the result per test.
-  "Agree" means equal reduced programs: no normalisation is applied to either side.
+  that Lean computes from its source syntax (`Stat.endToEndW Stat.Btest s_X`, the pipeline the
+  per-test `spec_X` states: derived forms, W, checker, specialisation, erasure) against the reduced
+  part of the translator's program (`g_X.reduced`, or `w_X.reduced` for a worker). Prints the totals
+  and, for each difference or error, the test and its first difference; writes `../e2e-report.json`
+  with the result per test. "Agree" means equal reduced programs: no normalisation is applied to
+  either side. It also runs step 10's pipeline with step 9's inference (`Stat.endToEnd`), which no
+  per-test theorem states any more, and counts the programs on which it gives the same.
 -/
 import StandardElmMech.AllPrograms
 import StandardElmMech.Generated.SrcAll
 import StandardElmMech.Stat.EndToEnd
+import StandardElmMech.Stat.Complete.Discharge
 import StandardElmMech.Stat.TestBasis
 
 open StandardElm StandardElm.Src
@@ -78,6 +81,7 @@ def main : IO UInt32 := do
   let mut agree := 0
   let mut differ := 0
   let mut errors := 0
+  let mut step9Agree := 0
   let mut missing : Array String := #[]
   let mut entries : Array String := #[]
   for (p, expected) in views ++ workers do
@@ -89,13 +93,16 @@ def main : IO UInt32 := do
     | some s =>
       total := total + 1
       let t0 ← IO.monoMsNow
-      let r := Stat.endToEnd Stat.Btest s
+      let r := Stat.endToEndW Stat.Btest s
       let (res, detail) := match r with
         | .ok got =>
           if got == expected then ("agree", "")
           else ("differ", describe expected got)
         | .error e => ("error", oneLine (repr e))
       let t1 ← IO.monoMsNow
+      match Stat.endToEnd Stat.Btest s with
+      | .ok got9 => if got9 == expected then step9Agree := step9Agree + 1
+      | .error _ => pure ()
       if res == "agree" then agree := agree + 1
       else if res == "differ" then
         differ := differ + 1
@@ -107,6 +114,7 @@ def main : IO UInt32 := do
         ", \"result\": " ++ jsonStr res ++ ", \"ms\": " ++ toString (t1 - t0) ++
         (if detail.isEmpty then "" else ", \"detail\": " ++ jsonStr detail) ++ "}")
   IO.println s!"End to end: {total} programs; {agree} agree; {differ} differ; {errors} errors"
+  IO.println s!"Step 9's inference in the pipeline (Stat.endToEnd): {step9Agree} of {total} agree"
   if !missing.isEmpty then IO.println s!"not found in the source syntax: {missing.toList}"
   IO.FS.writeFile "../e2e-report.json" ("[\n" ++ ",\n".intercalate entries.toList ++ "\n]\n")
   return (if differ == 0 && errors == 0 then 0 else 1)

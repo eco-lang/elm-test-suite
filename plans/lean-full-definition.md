@@ -21,9 +21,12 @@ complete, principal and terminating at expression level for Hindley–Milner, cl
 rows; step 9's checker made exact (canonical rows, no free `bnd`, the erratum on an annotation's
 new variables); milestone (e): W with annotations sound, refuting and principal (one clause of
 completeness open); milestone (f): module- and program-level W refuting and principal; milestone
-(g), 2026-11-13: D11 discharged test by test, `[principal]` retired for every test but
-CompilerIssue2281LongLineListTest, all 286 compile-error tests refused (with the two tests of ruling A98, now translated: 623 `legal_`, 580 end to end), the general
-`PrincipalExistsCore`/`PrincipalExistsMod` proved only from W's coverage; see step 11's "Issues
+(g), 2026-11-13: D11 discharged test by test, `[principal]` retired for every test, 622
+`legal_` theorems without hypothesis, all 287 compile-error tests that reach Lean refused, 580
+tests end to end (with the two tests of ruling A98, now translated), the general
+`PrincipalExistsCore`/`PrincipalExistsMod` proved only from W's coverage; the certificates
+then restructured into independent shards by name, `spec_` derived from W's check, built in
+15 min by `scripts/verify.sh`; see step 11's "Issues
 with the plan", items 10 to 12, for what remains).**
 
 This file is the plan: what is built, in what order, under which decisions, and how
@@ -87,7 +90,7 @@ on, by the tags in brackets.
 | elm-syntax parses the test as Elm does, and groups its operators by Figure `fig:core-fixities` | always | `[parse]` |
 | The translator's elaboration: its number specialisation, its reduced syntax, the port payload types, the order of modules, the type of `main` | retired by step 10 for the 580 tests with an end-to-end theorem (`spec_`) (except that the meaning does not depend on the order of modules, which no step proves) | `[elab]` |
 | The harness basis: `Html.text` and the core library's interfaces, which the book does not bind (decision D2) | always (an assumption about the test harness, not about Elm) | `[harness]` |
-| The derivation the inference finds for each module of the test's program is principal (`InferPrincipalFor`, decision D11), so "the principal derivation" has a referent | retired by step 11 (2026-11-13) for every test but CompilerIssue2281LongLineListTest, whose `legal_` theorem keeps it (W did not finish on its list of 22,000 elements) | `[principal]` |
+| The derivation the inference finds for each module of the test's program is principal (`InferPrincipalFor`, decision D11), so "the principal derivation" has a referent | retired by step 11 (2026-11-13) for every test | `[principal]` |
 | The Lean compiler, for a theorem proved by `native_decide` | always, for those theorems | `[native]` |
 | The implementation parameters: IntRange and norm as eco's (64-bit, wrapping), the empty platform (no managers, primitives or events), and the characters as Lean's `Char` | always (parameters of the definition, fixed by choice) | `[params]` |
 
