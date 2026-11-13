@@ -156,7 +156,7 @@ view report _ _ _ pageView =
                     Route.About
                 , Html.nav [ Attr.class "ts-nav" ]
                     [ Route.link [] [ Html.text "About" ] Route.About
-                    , Route.link [] [ Html.text "Standard" ] Route.Standard
+                    , Route.link [] [ Html.text "Specification" ] Route.Standard
                     , Route.link [] [ Html.text "Results" ] Route.Results
                     ]
                 , Html.a
