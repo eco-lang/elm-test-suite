@@ -128,7 +128,71 @@ function staticOf(key) {
         staticReport = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
     }
     const per = (staticReport.tests || {})[key];
-    return per ? { legal: per.legal || null, refuse: per.refuse || null, spec: per.spec || null, mean: per.mean || null, ident: per.ident || null, native: !!per.native, conditional: !!per.conditional } : null;
+    if (!per) return null;
+    const how = per.refuse ? refusalLemmas().get(per.refuse) || null : null;
+    return {
+        legal: per.legal || null, refuse: per.refuse || null, spec: per.spec || null, mean: per.mean || null, ident: per.ident || null,
+        native: !!per.native, conditional: !!per.conditional,
+        // how the refusal is proved: the lemma its proof applies, and for a syntactic refusal the
+        // restrictions the program breaks (syntactic-report.json)
+        refusedBy: how,
+        breaks: how === 'not_legal_of_syn' || how === 'not_legal_of_modsyn' ? synBreaks().get(key) || [] : [],
+    };
+}
+
+// The lemma each refuse_ theorem's proof applies (Certs/Refusals_*.lean: `theorem refuse_X : ... :=`
+// then `  Stat.<lemma> ...`), by theorem name.
+let refusalLemmaMap = null;
+function refusalLemmas() {
+    if (refusalLemmaMap) return refusalLemmaMap;
+    refusalLemmaMap = new Map();
+    const certs = path.join(PROJECT, 'StandardElmMech/Certs');
+    if (!fs.existsSync(certs)) return refusalLemmaMap;
+    for (const f of fs.readdirSync(certs).filter((n) => n.startsWith('Refusals') && n.endsWith('.lean'))) {
+        const text = fs.readFileSync(path.join(certs, f), 'utf8');
+        for (const m of text.matchAll(/^theorem (refuse_\w+) [^\n]*:=\n\s+Stat\.(\w+)/gm)) refusalLemmaMap.set(m[1], m[2]);
+    }
+    return refusalLemmaMap;
+}
+
+// The restrictions each written program breaks (syntactic-report.json), by `project/Test`.
+let synBreakMap = null;
+function synBreaks() {
+    if (synBreakMap) return synBreakMap;
+    synBreakMap = new Map();
+    const file = path.join(MECH, 'syntactic-report.json');
+    if (fs.existsSync(file)) {
+        for (const p of JSON.parse(fs.readFileSync(file, 'utf8')).programs || []) synBreakMap.set(p.project + '/' + p.name, p.breaks || []);
+    }
+    return synBreakMap;
+}
+
+// What Lean proves about the legality of an elm-spec test's program (plan steps 8 to 11), as a key
+// of the site's table: proved legal or not legal, or why there is no such theorem.
+let classification = null;
+function leanStaticStatus(t) {
+    if (classification === null) {
+        const file = path.join(MECH, 'static-classification.json');
+        classification = new Map();
+        if (fs.existsSync(file)) {
+            const c = JSON.parse(fs.readFileSync(file, 'utf8'));
+            for (const kind of ['compileError', 'compileSuccess']) {
+                const v = c[kind] || [];
+                for (const e of Array.isArray(v) ? v : Object.values(v)) classification.set(e.project + '/' + e.name, e);
+            }
+        }
+    }
+    const key = t.project + '/' + t.name;
+    const error = t.status === 'refused' && t.reason === 'compile-error';
+    const st = staticOf(key);
+    if (st && st.legal) return 'legal';
+    if (st && st.refuse) return 'refuse';
+    const side = error ? 'error' : 'success';
+    if (t.src && t.src.status === 'refused') return side + ':' + (t.src.reason === 'source:surrogate' ? 'surrogate' : 'parse');
+    const c = classification.get(key) || {};
+    if (error && c.class === 'lexical-accepted') return 'error:lexical';
+    if (!error && c.basis === 'outside') return 'success:outside';
+    return side + ':other';
 }
 
 function manifest() {
@@ -249,16 +313,24 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
         method: methodOf(t.proof),
     });
 
-    // The elm-spec tests by status and reason, for the coverage table.
+    // The elm-spec tests for the coverage tables: what Lean proves about the legality of each
+    // program (in a fixed order of the keys), and, for the tests whose program compiles, whether it
+    // is translated into a reduced program the evaluator runs, or why not.
     const reasonClass = (r) => (r.startsWith('checks:unmatched:') ? 'checks:unmatched' : r);
-    const byReason = new Map();
-    for (const t of tests) {
-        const k = t.status === 'translated' ? 'translated' : reasonClass(t.reason);
-        if (!byReason.has(k)) byReason.set(k, []);
-        byReason.get(k).push({ project: t.project, name: t.name });
-    }
-    const coverage = [...byReason.entries()]
-        .map(([reason, list]) => ({ reason, count: list.length, tests: list }))
+    const isError = (t) => t.status === 'refused' && t.reason === 'compile-error';
+    const group = (list, keyOf) => {
+        const by = new Map();
+        for (const t of list) {
+            const k = keyOf(t);
+            if (!by.has(k)) by.set(k, []);
+            by.get(k).push({ project: t.project, name: t.name });
+        }
+        return [...by.entries()].map(([reason, l]) => ({ reason, count: l.length, tests: l }));
+    };
+    const staticOrder = ['legal', 'success:outside', 'success:parse', 'success:other', 'refuse', 'error:parse', 'error:surrogate', 'error:lexical', 'error:other'];
+    const statics = group(tests, leanStaticStatus).sort((a, b) => staticOrder.indexOf(a.reason) - staticOrder.indexOf(b.reason));
+    const successes = tests.filter((t) => !isError(t));
+    const coverage = group(successes, (t) => (t.status === 'translated' ? 'translated' : reasonClass(t.reason)))
         .sort((a, b) => (a.reason === 'translated' ? -1 : b.reason === 'translated' ? 1 : b.count - a.count || (a.reason < b.reason ? -1 : 1)));
 
     const dir = path.join(out, 'mechanisation');
@@ -271,7 +343,7 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
             .map((f) => ({ path: f, description: descriptions.get(f) || '' })),
         theorems: theorems.map(summary),
         generated: { count: generated.length, slug: 'kc' },
-        coverage: { total: tests.length, reasons: coverage },
+        coverage: { total: tests.length, compileSuccess: successes.length, statics, reasons: coverage },
     });
     theorems.forEach((t, i) => {
         const link = (u) => (u ? { name: u.name, slug: slugOf(u.name) } : null);
@@ -368,6 +440,9 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
             // plan steps 9 and 10 (lake exe certify, ../static-report.json): the test's static
             // theorems and, for a translated test, its end-to-end theorems
             statics: staticOf(t.project + '/' + t.name),
+            // what Lean proves about the program's legality, or why it proves nothing (the keys of
+            // the coverage table)
+            staticStatus: leanStaticStatus(t),
         });
     }
     writeJson(path.join(dir, 'translations', 'index.json'), written);

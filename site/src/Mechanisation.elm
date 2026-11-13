@@ -1,11 +1,13 @@
 module Mechanisation exposing
-    ( Generated
+    ( CoverageRow
+    , Generated
     , GeneratedCheck
     , Index
     , Method(..)
     , Proof
     , ProofLink
     , ProofSummary
+    , Statics
     , Tactic
     , Translation
     , TranslatedCheck
@@ -50,8 +52,14 @@ type alias Index =
     , files : List { path : String, description : String }
     , theorems : List ProofSummary
     , generatedCount : Int
-    , coverage : { total : Int, reasons : List { reason : String, count : Int, tests : List { project : String, name : String } } }
+    , coverage : { total : Int, compileSuccess : Int, statics : List CoverageRow, reasons : List CoverageRow }
     }
+
+
+{-| A row of a coverage table: a status or reason, and its tests.
+-}
+type alias CoverageRow =
+    { reason : String, count : Int, tests : List { project : String, name : String } }
 
 
 type alias ProofSummary =
@@ -141,13 +149,15 @@ type alias Translation =
     , native : Bool
     , dropped : List String
     , statics : Maybe Statics
+    , staticStatus : String
     }
 
 
 {-| The test's theorems of the static semantics (plan steps 9 and 11: `legal_`, without hypothesis unless `conditional`, or `refuse_`) and
 of the end-to-end pipeline (plan step 10: `spec_`, Lean's reduced program is the translator's, and
 `mean_`, the program's meaning by r:p-program); `native` when one of them is proved by
-native_decide.
+native_decide. `refusedBy` is the lemma a `refuse_` theorem's proof applies, and `breaks` the
+syntactic restrictions the program breaks when that lemma is a syntactic one.
 -}
 type alias Statics =
     { legal : Maybe String
@@ -157,6 +167,8 @@ type alias Statics =
     , ident : Maybe String
     , native : Bool
     , conditional : Bool
+    , refusedBy : Maybe String
+    , breaks : List String
     }
 
 
@@ -292,26 +304,28 @@ indexDecoder =
         |> andMap (Decode.at [ "generated", "count" ] Decode.int)
         |> andMap
             (Decode.field "coverage"
-                (Decode.map2 (\t r -> { total = t, reasons = r })
+                (Decode.map4 (\t c st r -> { total = t, compileSuccess = c, statics = st, reasons = r })
                     (Decode.field "total" Decode.int)
-                    (Decode.field "reasons"
-                        (Decode.list
-                            (Decode.map3 (\reason count tests -> { reason = reason, count = count, tests = tests })
-                                (Decode.field "reason" Decode.string)
-                                (Decode.field "count" Decode.int)
-                                (Decode.field "tests"
-                                    (Decode.list
-                                        (Decode.map2 (\pr nm -> { project = pr, name = nm })
-                                            (Decode.field "project" Decode.string)
-                                            (Decode.field "name" Decode.string)
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
+                    (Decode.field "compileSuccess" Decode.int)
+                    (Decode.field "statics" (Decode.list coverageRowDecoder))
+                    (Decode.field "reasons" (Decode.list coverageRowDecoder))
                 )
             )
+
+
+coverageRowDecoder : Decoder CoverageRow
+coverageRowDecoder =
+    Decode.map3 (\reason count tests -> { reason = reason, count = count, tests = tests })
+        (Decode.field "reason" Decode.string)
+        (Decode.field "count" Decode.int)
+        (Decode.field "tests"
+            (Decode.list
+                (Decode.map2 (\pr nm -> { project = pr, name = nm })
+                    (Decode.field "project" Decode.string)
+                    (Decode.field "name" Decode.string)
+                )
+            )
+        )
 
 
 summaryDecoder : Decoder ProofSummary
@@ -451,8 +465,11 @@ translationDecoder =
                             |> andMap (Decode.oneOf [ Decode.field "ident" (Decode.nullable Decode.string), Decode.succeed Nothing ])
                             |> andMap (Decode.field "native" Decode.bool)
                             |> andMap (Decode.oneOf [ Decode.field "conditional" Decode.bool, Decode.succeed False ])
+                            |> andMap (Decode.oneOf [ Decode.field "refusedBy" (Decode.nullable Decode.string), Decode.succeed Nothing ])
+                            |> andMap (Decode.oneOf [ Decode.field "breaks" (Decode.list Decode.string), Decode.succeed [] ])
                         )
                     )
                 , Decode.succeed Nothing
                 ]
             )
+        |> andMap (Decode.oneOf [ Decode.field "staticStatus" Decode.string, Decode.succeed "" ])

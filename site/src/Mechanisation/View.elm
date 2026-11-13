@@ -133,41 +133,108 @@ translatedCount mech =
     mech.coverage.reasons |> List.filter (\r -> r.reason == "translated") |> List.map .count |> List.sum
 
 
-{-| The `elm-spec` tests by whether they are translated into Lean, and why not.
+{-| The `elm-spec` tests by what Lean has of them: the legality of the program as written, and, for
+a test whose program compiles, whether it is translated into a reduced program the evaluator runs.
 -}
 coverageSection : Mechanisation.Index -> Html msg
 coverageSection mech =
+    let
+        count reason rows =
+            rows |> List.filter (\r -> r.reason == reason) |> List.map .count |> List.sum
+    in
     Html.section [ Attr.class "ts-section" ]
-        [ heading "Which tests are translated"
+        [ heading "Which tests are in Lean"
         , Html.p [ Attr.class "sd-p" ]
-            [ Html.text ("Every one of the " ++ String.fromInt mech.coverage.total ++ " tests tagged elm-spec is either translated into Lean, by the translator definition/tools/src/Translate.elm, or not, for one of the reasons below. A test that expects a compile error has no meaning to run, so it is not translated; its refusal is proved in Lean from its source instead. A value or module of the basis that the encoding does not include keeps a test out until the encoding includes it.") ]
-        , Html.div [ Attr.class "sd-table-wrap" ]
-            [ Html.table [ Attr.class "ts-table" ]
-                [ Html.thead [] [ Html.tr [] [ Html.th [] [ Html.text "Tests" ], Html.th [] [ Html.text "Status" ] ] ]
-                , Html.tbody []
-                    (List.map
-                        (\r ->
-                            Html.tr []
-                                [ Html.td [] [ Html.text (String.fromInt r.count) ]
-                                , Html.td []
-                                    [ Html.details []
-                                        [ Html.summary [] [ Html.text (reasonWords r.reason) ]
-                                        , Html.p [ Attr.class "ts-small" ]
-                                            (List.intersperse (Html.text ", ")
-                                                (List.map
-                                                    (\t -> Html.a [ Attr.href (Route.toString (Route.Projects__Project___Test_ { project = t.project, test = t.name }) ++ "#lean") ] [ Html.text t.name ])
-                                                    r.tests
-                                                )
+            [ Html.text ("The translator, definition/tools/src/Translate.elm, puts each of the " ++ String.fromInt mech.coverage.total ++ " tests tagged elm-spec into Lean in up to two forms. The first is the program as written, in the source syntax the book starts from; the static semantics is proved about it. The second, only for a test whose program compiles, is the reduced program, which Lean's evaluator runs to prove the test's checks.") ]
+        , Html.h3 [ Attr.class "sd-h3" ] [ Html.text "Static semantics: is the program legal?" ]
+        , Html.p [ Attr.class "sd-p" ]
+            [ Html.text
+                ("Lean proves "
+                    ++ String.fromInt (count "legal" mech.coverage.statics)
+                    ++ " programs legal (a theorem legal_<project>_<Test>) and "
+                    ++ String.fromInt (count "refuse" mech.coverage.statics)
+                    ++ " not legal (refuse_<project>_<Test>), the second for the tests that expect a compile error. Each test's page names its theorem and how it is proved."
+                )
+            ]
+        , coverageTable staticWords mech.coverage.statics
+        , Html.h3 [ Attr.class "sd-h3" ] [ Html.text "Evaluation: the reduced program" ]
+        , Html.p [ Attr.class "sd-p" ]
+            [ Html.text
+                ("Of the "
+                    ++ String.fromInt mech.coverage.compileSuccess
+                    ++ " tests whose program compiles, "
+                    ++ String.fromInt (translatedCount mech)
+                    ++ " are translated into a reduced program the evaluator runs. The rest are not, for one of the reasons below. A test that expects a compile error has no meaning to run, so it has no reduced program. A value or module of the basis that the encoding does not include keeps a test out until the encoding includes it."
+                )
+            ]
+        , coverageTable reasonWords mech.coverage.reasons
+        ]
+
+
+{-| A coverage table: the count of each row and its tests, each linked to the Lean section of its
+page.
+-}
+coverageTable : (String -> String) -> List Mechanisation.CoverageRow -> Html msg
+coverageTable words rows =
+    Html.div [ Attr.class "sd-table-wrap" ]
+        [ Html.table [ Attr.class "ts-table" ]
+            [ Html.thead [] [ Html.tr [] [ Html.th [] [ Html.text "Tests" ], Html.th [] [ Html.text "Status" ] ] ]
+            , Html.tbody []
+                (List.map
+                    (\r ->
+                        Html.tr []
+                            [ Html.td [] [ Html.text (String.fromInt r.count) ]
+                            , Html.td []
+                                [ Html.details []
+                                    [ Html.summary [] [ Html.text (words r.reason) ]
+                                    , Html.p [ Attr.class "ts-small" ]
+                                        (List.intersperse (Html.text ", ")
+                                            (List.map
+                                                (\t -> Html.a [ Attr.href (Route.toString (Route.Projects__Project___Test_ { project = t.project, test = t.name }) ++ "#lean") ] [ Html.text t.name ])
+                                                r.tests
                                             )
-                                        ]
+                                        )
                                     ]
                                 ]
-                        )
-                        mech.coverage.reasons
+                            ]
                     )
-                ]
+                    rows
+                )
             ]
         ]
+
+
+{-| What Lean proves about the legality of a test's program, in words.
+-}
+staticWords : String -> String
+staticWords status =
+    case status of
+        "legal" ->
+            "expected to compile: proved legal"
+
+        "success:outside" ->
+            "expected to compile, written in Lean, but uses a module outside the test basis (Dict, Bitwise, Bytes), so it has no legality theorem"
+
+        "success:parse" ->
+            "expected to compile, but not parsed by elm-syntax 7.3.9, so it is not in Lean"
+
+        "refuse" ->
+            "expected to be rejected: proved not legal"
+
+        "error:parse" ->
+            "expected to be rejected, and elm-syntax 7.3.9 rejects it too (the error is a parse error), so it is not in Lean"
+
+        "error:surrogate" ->
+            "expected to be rejected for a surrogate escape, which the source syntax cannot hold, so it is not in Lean"
+
+        "error:lexical" ->
+            "expected to be rejected, but elm-syntax 7.3.9 accepts it and loses the error, so it has no refusal theorem"
+
+        "success:other" ->
+            "expected to compile: no legality theorem"
+
+        _ ->
+            "expected to be rejected: no refusal theorem"
 
 
 {-| A refusal reason of the translator, in words.
@@ -182,7 +249,7 @@ reasonWords reason =
         "translated"
 
     else if reason == "compile-error" then
-        "expects a compile error, so it has no meaning to evaluate; its refusal is proved from the source syntax (below), unless elm-syntax rejects the program or loses the error"
+        "expects a compile error, so it has no meaning to evaluate"
 
     else if reason == "effects" then
         "uses effects the encoding does not include"
@@ -685,10 +752,11 @@ staticsParas t =
                             []
                     , case s.refuse of
                         Just n ->
-                            [ Html.text "Static semantics (Chapters 4, 5 and 9, and the syntactic restrictions): "
+                            [ Html.text "Static semantics: Lean proves that the program as written is not legal, so a compiler must reject it ("
                             , code n
-                            , Html.text " states that the program is not legal, for every derivation, with no hypothesis about principality. "
+                            , Html.text ", in StandardElmMech/Certs/). "
                             ]
+                                ++ refusalHow s
 
                         Nothing ->
                             []
@@ -721,6 +789,68 @@ staticsParas t =
             ]
 
 
+{-| How a `refuse_` theorem is proved, from the lemma its proof applies: for a syntactic refusal,
+the restrictions the program breaks, each linked to its page.
+-}
+refusalHow : Mechanisation.Statics -> List (Html msg)
+refusalHow s =
+    let
+        restriction label =
+            Html.a [ Attr.href (Route.toString (Route.Standard__Restrictions__Restriction_ { restriction = String.replace "res:" "" label })) ] [ Html.code [] [ Html.text label ] ]
+
+        words =
+            case s.refusedBy of
+                Just "not_legal_of_syn" ->
+                    Just "The program breaks a syntactic restriction, which the kernel checks on its syntax tree; no type inference is involved"
+
+                Just "not_legal_of_modsyn" ->
+                    Just "The program breaks a syntactic restriction, which the kernel checks on its syntax tree; no type inference is involved"
+
+                Just "not_legal_of_coreRefutes" ->
+                    Just "The kernel finds a core of the program's typing constraints that has no solution, so no derivation types it (core refutation, plan step 11)"
+
+                Just "not_legal_of_wRefutes" ->
+                    Just "The proved inference W fails on a module of the program, and W fails only where no derivation exists (plan step 11)"
+
+                Just "not_legal_of_wMainVar_test" ->
+                    Just "The proved inference W gives main a type variable as its flags type; every principal derivation keeps it, and no port type is a variable"
+
+                Just "not_legal_of_typesFailB" ->
+                    Just "Some type expression of the program (an alias, a constructor's argument, an annotation, a port) elaborates in no derivation"
+
+                Just "not_legal_of_scopeFailB" ->
+                    Just "A name is out of scope (or a constructor pattern has the wrong arity) in every derivation"
+
+                Just "not_legal_of_furtherFailB" ->
+                    Just "The program breaks a further restriction (Chapter 9) in every derivation"
+
+                Just "not_legal_of_mainFailB" ->
+                    Just "Every derivation gives main a type Chapter 9 does not allow"
+
+                Just "not_legal_of_imports" ->
+                    Just "An import of the program does not elaborate in the test basis"
+
+                _ ->
+                    Nothing
+    in
+    case words of
+        Just w ->
+            [ Html.text (w ++ " (")
+            , Html.code [] [ Html.text ("Stat." ++ Maybe.withDefault "" s.refusedBy) ]
+            , Html.text ")"
+            ]
+                ++ (if List.isEmpty s.breaks then
+                        []
+
+                    else
+                        Html.text ": " :: List.intersperse (Html.text ", ") (List.map restriction s.breaks)
+                   )
+                ++ [ Html.text ". It holds for every derivation, with no hypothesis about principality. " ]
+
+        Nothing ->
+            [ Html.text "It holds for every derivation, with no hypothesis about principality. " ]
+
+
 {-| The section of an `elm-spec` test's page about its Lean translation: the translation with what
 became of each check, or why the test is not translated.
 -}
@@ -739,12 +869,26 @@ translationSection t =
             :: (case t.status of
                     "refused" ->
                         [ Html.p [ Attr.class "ts-small" ]
-                            [ Html.text "Not translated into Lean: it "
-                            , Html.text (reasonWords (Maybe.withDefault "" t.reason))
-                            , Html.text ". See "
-                            , Html.a [ Attr.href listHref ] [ Html.text "the Lean mechanisation" ]
-                            , Html.text " for which tests are translated, and why."
-                            ]
+                            ([ Html.text "No reduced program for Lean's evaluator: the test "
+                             , Html.text (reasonWords (Maybe.withDefault "" t.reason))
+                             , Html.text ". "
+                             ]
+                                ++ (case t.statics of
+                                        Just _ ->
+                                            [ Html.text "Lean has the program as written, in source syntax, and proves what the static semantics says of it (below). " ]
+
+                                        Nothing ->
+                                            if t.staticStatus == "" then
+                                                []
+
+                                            else
+                                                [ Html.text ("Static semantics: " ++ staticWords t.staticStatus ++ ". ") ]
+                                   )
+                                ++ [ Html.text "See "
+                                   , Html.a [ Attr.href listHref ] [ Html.text "the Lean mechanisation" ]
+                                   , Html.text " for which tests are in Lean, and why."
+                                   ]
+                            )
                         ]
 
                     _ ->
