@@ -400,21 +400,21 @@ end
 
 /-- What remains of `WCompleteness` (L10, soundness of W's result for the checker): on a
     successful run from the root, the checker accepts the final substitution applied to the
-    annotated phrase. Proved in WSound.lean (`wResultChecks`, without using the derivation). -/
+    annotated phrase. Proved in WSound.lean (`wResultChecks`; the derivation gives the types W records `Ty.okB`). -/
 def WResultChecks : Prop :=
   ∀ fuel C0 e τ ar st, RootOK C0 →
     wExp fuel (rigidFrom (freshAbove C0)) C0 e ⟨[], freshAbove C0⟩ = .ok (τ, ar) st →
-    (∃ a', checkExp C0 a' = true ∧ NoFreeBndExp C0 a' ∧ a'.erase = e) →
+    (∃ a', checkExp C0 a' = true ∧ a'.erase = e) →
     checkExp C0 (sbExp (lk st.θ) ar) = true
 
 /-- When a derivation exists, W's result erases to the phrase (`inferExpW`'s second check never
     fires): the image of the result is the derivation, instance lists left out. -/
 theorem wExp_root_erase {fuel : Nat} {C0 : Ctx} {e : BExp} {τ : Ty} {ar : AExp} {st : WSt} (hC : RootOK C0)
-    (hd : ∃ a', checkExp C0 a' = true ∧ NoFreeBndExp C0 a' ∧ a'.erase = e)
+    (hd : ∃ a', checkExp C0 a' = true ∧ a'.erase = e)
     (h : wExp fuel (rigidFrom (freshAbove C0)) C0 e ⟨[], freshAbove C0⟩ = .ok (τ, ar) st) :
     (sbExp (lk st.θ) ar).erase = e := by
-  obtain ⟨a', hc, hnb, he⟩ := hd
-  have hw := wExp_root (fuel := fuel) hC hc hnb he
+  obtain ⟨a', hc, he⟩ := hd
+  have hw := wExp_root (fuel := fuel) hC hc he
   rw [h] at hw
   obtain ⟨-, -, -, -, T, -, -, hs⟩ := hw
   have := congrArg AExp.erase hs
@@ -425,7 +425,7 @@ theorem wExp_root_erase {fuel : Nat} {C0 : Ctx} {e : BExp} {τ : Ty} {ar : AExp}
     it does not run out from some fuel on (and then its outcome no longer changes), and it does
     not return `internal` provided the checker accepts W's result (`WResultChecks`, L10). -/
 theorem wCompleteness_parts {C0 : Ctx} {e : BExp} (hC : RootOK C0)
-    (hd : ∃ a', checkExp C0 a' = true ∧ NoFreeBndExp C0 a' ∧ a'.erase = e) :
+    (hd : ∃ a', checkExp C0 a' = true ∧ a'.erase = e) :
     (∀ fuel, inferExpW fuel C0 e ≠ .fail) ∧
     (∃ n, inferExpW n C0 e ≠ .outOfFuel ∧ ∀ m, n ≤ m → inferExpW m C0 e = inferExpW n C0 e) ∧
     ∀ fuel, inferExpW fuel C0 e = .internal → ∃ τ ar st,

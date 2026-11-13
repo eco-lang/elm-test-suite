@@ -565,19 +565,6 @@ theorem anyOpt_false {α : Type} {g : α → Option Bool} : ∀ {xs : List α}, 
       · exact anyOpt_false h y hy
     · cases h
 
-theorem mem_dedupL {α : Type} [DecidableEq α] {x : α} : ∀ {l : List α}, x ∈ dedupL l ↔ x ∈ l
-  | [] => by simp [dedupL]
-  | y :: l => by
-    simp only [dedupL, List.mem_cons, List.mem_filter, mem_dedupL, decide_eq_true_eq, ne_eq]
-    constructor
-    · rintro (h | ⟨h, _⟩)
-      · exact .inl h
-      · exact .inr h
-    · rintro (h | h)
-      · exact .inl h
-      · by_cases e : x = y
-        · exact .inl e
-        · exact .inr ⟨h, e⟩
 
 theorem mem_headCons {P : List (List PatN)} {k : String} {args : List PatN} {rest : List PatN}
     (h : (PatN.con k args :: rest) ∈ P) : k ∈ headCons P := by

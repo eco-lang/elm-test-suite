@@ -23,96 +23,10 @@ namespace StandardElm.Stat
 open StandardElm (Var Lab ModId Op LongId)
 open StandardElm.Src (BExp BModule BProgram)
 
-/-! ## Nodes -/
+/-! ## Nodes
 
-/-- A node of a derivation: the occurrence it is about (its path), the U of its context, and the
-    types and type schemes of its sentence. At an occurrence of a variable, constructor or operator
-    the sentence is `C ⊢ longvar ⇒ τ`: the instance chosen for the scheme's bound variables is a
-    witness of the side condition `σ ≻ τ`, not a type of the sentence, and is not in the node
-    (`Complete/InstCounter.lean`). -/
-structure Node where
-  path : List Nat
-  U : List BVar
-  tys : List Ty
-  schemes : List Scheme
-  deriving Inhabited
-
-def veSchemes (VE : ValEnv) : List Scheme := VE.map (·.2.1)
-
-mutual
-def nodesAtPat (U : List BVar) (path : List Nat) : AAtPat → List Node
-  | .tuple p1 p2 p3 => [⟨path, U, [tupleTy p1.ty p2.ty (APat.tyOpt p3)], veSchemes (AAtPat.tuple p1 p2 p3).ve⟩] ++
-      nodesPat U (path ++ [0]) p1 ++ nodesPat U (path ++ [1]) p2 ++ nodesPatOpt U (path ++ [2]) p3
-  | .record row τ => [⟨path, U, [τ], veSchemes (APatRow.veOpt row)⟩] ++ nodesPatRowOpt U (path ++ [0]) row
-  | .paren p => [⟨path, U, [p.ty], veSchemes p.ve⟩] ++ nodesPat U (path ++ [0]) p
-  | a => [⟨path, U, [a.ty] ++ a.ve.map (·.2.1.body), []⟩]
-def nodesPatRow (U : List BVar) (path : List Nat) : APatRow → List Node
-  | .field l τ rest => [⟨path, U, [τ] ++ (APatRow.row (.field l τ rest)).map (·.2), []⟩] ++ nodesPatRowOpt U (path ++ [0]) rest
-def nodesPatRowOpt (U : List BVar) (path : List Nat) : Option APatRow → List Node
-  | none => []
-  | some r => nodesPatRow U path r
-def nodesPat (U : List BVar) (path : List Nat) : APat → List Node
-  | .atpat a => [⟨path, U, [a.ty], veSchemes a.ve⟩] ++ nodesAtPat U (path ++ [0]) a
-  | .con lc inst args τ => [⟨path, U, [τ], veSchemes (APat.con lc inst args τ).ve⟩] ++
-      nodesAtPats U path 0 args
-  | .cons p1 p2 => [⟨path, U, [listTy p1.ty], veSchemes (APat.cons p1 p2).ve⟩] ++
-      nodesPat U (path ++ [0]) p1 ++ nodesPat U (path ++ [1]) p2
-  | .as p x => [⟨path, U, [p.ty], veSchemes (APat.as p x).ve⟩] ++ nodesPat U (path ++ [0]) p
-def nodesPatOpt (U : List BVar) (path : List Nat) : Option APat → List Node
-  | none => []
-  | some p => nodesPat U path p
-def nodesAtPats (U : List BVar) (path : List Nat) : Nat → List AAtPat → List Node
-  | _, [] => []
-  | i, a :: as => nodesAtPat U (path ++ [i]) a ++ nodesAtPats U path (i + 1) as
-end
-
-mutual
-/-- The nodes of the derivation an annotated expression stands for, in context C, in preorder. -/
-def nodesAtExp (C : Ctx) (path : List Nat) : AAtExp → List Node
-  | .scon _ τ => [⟨path, C.U, [τ], []⟩]
-  | .var _ _ τ => [⟨path, C.U, [τ], []⟩]
-  | .con _ _ τ => [⟨path, C.U, [τ], []⟩]
-  | .op _ _ τ => [⟨path, C.U, [τ], []⟩]
-  | .unit => [⟨path, C.U, [tUnitTy], []⟩]
-  | .tuple e1 e2 e3 => [⟨path, C.U, [(AAtExp.tuple e1 e2 e3).ty], []⟩] ++
-      nodesExp C (path ++ [0]) e1 ++ nodesExp C (path ++ [1]) e2 ++ nodesExpOpt C (path ++ [2]) e3
-  | .nil τ => [⟨path, C.U, [τ], []⟩]
-  | .record row => [⟨path, C.U, [(AAtExp.record row).ty], []⟩] ++ nodesExpRowOpt C (path ++ [0]) row
-  | .update _ _ τ row => [⟨path, C.U, [τ], []⟩] ++ nodesExpRow C (path ++ [0]) row
-  | .letE d e => [⟨path, C.U, [e.ty], []⟩] ++ nodesDec C (path ++ [0]) d ++
-      nodesExp (C.plusVE (d.result C)) (path ++ [1]) e
-  | .paren e => [⟨path, C.U, [e.ty], []⟩] ++ nodesExp C (path ++ [0]) e
-def nodesExpRow (C : Ctx) (path : List Nat) : AExpRow → List Node
-  | .field l e rest => [⟨path, C.U, (AExpRow.field l e rest).row.map (·.2), []⟩] ++
-      nodesExp C (path ++ [0]) e ++ nodesExpRowOpt C (path ++ [1]) rest
-def nodesExpRowOpt (C : Ctx) (path : List Nat) : Option AExpRow → List Node
-  | none => []
-  | some r => nodesExpRow C path r
-def nodesExp (C : Ctx) (path : List Nat) : AExp → List Node
-  | .atexp a => [⟨path, C.U, [a.ty], []⟩] ++ nodesAtExp C (path ++ [0]) a
-  | .app e a => [⟨path, C.U, [(AExp.app e a).ty], []⟩] ++ nodesExp C (path ++ [0]) e ++ nodesAtExp C (path ++ [1]) a
-  | .lam p e => [⟨path, C.U, [(AExp.lam p e).ty], []⟩] ++ nodesAtPat C.U (path ++ [0]) p ++
-      nodesExp (C.plusVE p.ve) (path ++ [1]) e
-  | .caseE e m => [⟨path, C.U, [(AExp.caseE e m).ty], []⟩] ++ nodesExp C (path ++ [0]) e ++ nodesMatch C (path ++ [1]) m
-def nodesExpOpt (C : Ctx) (path : List Nat) : Option AExp → List Node
-  | none => []
-  | some e => nodesExp C path e
-def nodesMatch (C : Ctx) (path : List Nat) : AMatch → List Node
-  | .mk (.mk p e) rest => [⟨path, C.U, [(AMRule.mk p e).ty], []⟩] ++ nodesPat C.U (path ++ [0]) p ++
-      nodesExp (C.plusVE p.ve) (path ++ [1]) e ++ nodesMatchOpt C (path ++ [2]) rest
-def nodesMatchOpt (C : Ctx) (path : List Nat) : Option AMatch → List Node
-  | none => []
-  | some m => nodesMatch C path m
-def nodesDec (C : Ctx) (path : List Nat) : ADec → List Node
-  | .val VE vb => [⟨path, C.U, [], veSchemes (closGroup C.tyvars VE)⟩] ++ nodesValBind (C.plusVE VE) (path ++ [0]) vb
-def nodesValBind (C : Ctx) (path : List Nat) : AValBind → List Node
-  | .var x ann τ e rest => [⟨path, C.U, [τ], veSchemes (AValBind.var x ann τ e rest).ve⟩] ++
-      nodesExp (C.plusU (annU ann)) (path ++ [0]) e ++ nodesValBindOpt C (path ++ [1]) rest
-  | .pat p e => [⟨path, C.U, [p.ty], veSchemes p.ve⟩] ++ nodesAtPat C.U (path ++ [0]) p ++ nodesExp C (path ++ [1]) e
-def nodesValBindOpt (C : Ctx) (path : List Nat) : Option AValBind → List Node
-  | none => []
-  | some vb => nodesValBind C path vb
-end
+`Node` and the nodes of an expression's derivation (`nodesExp`) are in Annotated.lean: the
+checker requires every type at a node to be `Ty.okB`. -/
 
 /-- The nodes of a module's derivation: its top-level declarations' (the contexts as the checker
     computes them), with the environment and port types of each declaration. -/
@@ -232,8 +146,9 @@ def InstanceOfMod (B : SBasis) (a' a : AModule) : Prop :=
 
 /-- The types at the nodes of a module's value declarations have no `bnd` variable: those are the
     bound variables of canonical schemes and type functions, never free in a sentence (Objects.lean).
-    The checker does not test it; a derivation of the book is read with this convention (step 10,
-    the invariance lemma: a renaming of a derivation fixes the bound variables). -/
+    The checker tests it (`Ty.okB` at every node of a value declaration), so every derivation it
+    accepts has it (`Complete.noFreeBnd_of_checkModule`, and `Complete.isPrincipalMod_iff`: the
+    restriction in `IsPrincipalMod` is no restriction). -/
 def ATopDec.NoFreeBnd : ATopDec → Prop
   | .value _ vb => ∀ (C : Ctx) (path : List Nat), ∀ n ∈ nodesValBind C path vb, ∀ τ ∈ n.tys, ∀ v ∈ τ.vars, v.isBnd = false
   | .types _ _ _ _ => True

@@ -2,7 +2,7 @@
   A Standard Definition of Elm? Mechanisation: the statements of section 7 for W on F_c
   (plan step 11, milestone (b)), from the main induction L11 (WComplete.lean, L12).
 
-  * `wRefutation`: `WRefutation` (W fails ⇒ no derivation without free `bnd` variables).
+  * `wRefutation`: `WRefutation` (W fails ⇒ no derivation).
   * `inferExpW_ne_fail`: the first half of completeness (a derivation exists ⇒ W does not fail,
     for every fuel).
   * `inferExpW_instance`: L12 for the result of W: every derivation is the image of W's result by
@@ -10,9 +10,9 @@
     left out. This is the substance of principality; `IsPrincipalB` (node by node) is assembled
     from it in a later file.
 
-  The derivations considered are those without free `bnd` variables (`NoFreeBndExp`, as in
-  `IsPrincipalB`): the types at the nodes of the derivation; `tysExp_nodes` reads the types of the
-  phrase off its nodes.
+  The derivations considered are those step 9's checker accepts, which have no free `bnd`
+  variable at a node (`noFreeBndExp_of_checkExp`); `tysExp_nodes` reads the types of the phrase off
+  its nodes.
 -/
 import StandardElmMech.Stat.Complete.WComplete
 
@@ -215,15 +215,15 @@ theorem root_pre (C0 : Ctx) (hC : RootOK C0) :
 /-- The main induction at the root: W does not fail when a derivation exists, and every
     derivation is an image of W's result. -/
 theorem wExp_root {fuel : Nat} {C0 : Ctx} {e : BExp} {a' : AExp} (hC : RootOK C0) (hc : checkExp C0 a' = true)
-    (hnb : NoFreeBndExp C0 a') (he : a'.erase = e) :
+    (he : a'.erase = e) :
     OutP (EPost (freshAbove C0) ⟨[], freshAbove C0⟩ idS a')
       (wExp fuel (rigidFrom (freshAbove C0)) C0 e ⟨[], freshAbove C0⟩) :=
-  wExp_complete fuel _ e C0 C0 idS _ a' (root_pre C0 hC) hc he (nb_of_noFreeBnd hnb)
+  wExp_complete fuel _ e C0 C0 idS _ a' (root_pre C0 hC) (checkExpS_of_checkExp hc) he (nb_of_noFreeBnd (noFreeBndExp_of_checkExp hc))
 
-/-- Refutation (section 7): if W fails, no derivation without free `bnd` variables exists. -/
+/-- Refutation (section 7): if W fails, no derivation exists. -/
 theorem wRefutation : WRefutation := by
-  rintro fuel C0 e hC hf ⟨a', hc, hnb, he⟩
-  have h := wExp_root (fuel := fuel) hC hc hnb he
+  rintro fuel C0 e hC hf ⟨a', hc, he⟩
+  have h := wExp_root (fuel := fuel) hC hc he
   unfold inferExpW at hf
   simp only at hf
   split at hf
@@ -234,17 +234,17 @@ theorem wRefutation : WRefutation := by
 
 /-- The first half of completeness: W does not fail, for any fuel. -/
 theorem inferExpW_ne_fail {fuel : Nat} {C0 : Ctx} {e : BExp} (hC : RootOK C0)
-    (h : ∃ a', checkExp C0 a' = true ∧ NoFreeBndExp C0 a' ∧ a'.erase = e) : inferExpW fuel C0 e ≠ .fail :=
+    (h : ∃ a', checkExp C0 a' = true ∧ a'.erase = e) : inferExpW fuel C0 e ≠ .fail :=
   fun hf => wRefutation fuel C0 e hC hf h
 
-/-- L12: every derivation (without free `bnd` variables) is the image of W's result under a
+/-- L12: every derivation is the image of W's result under a
     substitution fixing every variable of the root context, with the instance lists left out. -/
 theorem inferExpW_instance {fuel : Nat} {C0 : Ctx} {e : BExp} {a : AExp} (hC : RootOK C0)
     (h : inferExpW fuel C0 e = .ok a) :
-    ∀ a', checkExp C0 a' = true → NoFreeBndExp C0 a' → a'.erase = e →
+    ∀ a', checkExp C0 a' = true → a'.erase = e →
       ∃ T : FSub, FixesR (rigidFrom (freshAbove C0)) T ∧ stripExp (sbExp T a) = stripExp a' := by
-  intro a' hc hnb he
-  have hw := wExp_root (fuel := fuel) hC hc hnb he
+  intro a' hc he
+  have hw := wExp_root (fuel := fuel) hC hc he
   unfold inferExpW at h
   simp only at h
   split at h

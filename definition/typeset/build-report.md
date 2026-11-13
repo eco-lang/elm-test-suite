@@ -26,6 +26,8 @@ Rebuilt on 2026-11-12 after ruling A98: rule r:sm-topdec-seq does not split a ty
 
 Rebuilt on 2026-11-12 after an erratum to rule r:sm-topdec-types: the side condition tyvars TE = ∅, without which an environment whose constructors keep a free variable (`K : a -> T a` for `type T a = K a`) justified itself, since the closures of r:sm-datbind and r:sm-typbind-record are taken in C ⊕ TE; the comment says so. 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
 
+Rebuilt on 2026-11-12 after an erratum in Section 4.4 (explicit type variables): the kind of an annotation's new variable is fixed there, a row variable when the annotation uses the name as a record extension and a type variable otherwise, since rules r:s-ty-tyvar and r:s-ty-rowvar could both elaborate a name written alone. 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
 ## Status
 
 | Field | Value |

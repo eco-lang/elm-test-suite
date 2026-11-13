@@ -277,8 +277,8 @@ theorem kseg_clos {n0 : Nat} {C : Ctx} {st st1 : WSt} {VE0 : ValEnv} (hp : SPre 
 theorem checkAnn_closed {C' : Ctx} {ty : BTy} {τ : Ty} (hb : bTyNames ty = []) (hU : Unambiguous C'.U)
     (hel : elabTy (C'.plusU []) ty = some τ) : checkAnn C' (some (ty, [])) τ = true := by
   simp only [checkAnn, Bool.and_eq_true, decide_eq_true_eq, List.all_nil, Bool.and_true, hel, and_true]
-  unfold newForB
-  simp [hb, namesU, hU]
+  unfold newForB newU newU0
+  simp [hb, dedupL, namesU, hU]
 
 /-- A group entry (`groupEntries`' first step). -/
 def entryW (C : Ctx) : Option BTy → WM (Option (BTy × List BVar) × Ty)

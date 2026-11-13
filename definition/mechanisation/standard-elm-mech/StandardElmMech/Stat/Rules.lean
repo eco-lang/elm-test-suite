@@ -115,8 +115,9 @@ inductive ElAtPatList : Ctx → List BAtPat → List ValEnv → List Ty → Prop
   | seq_cons : ElAtPat C a VE τ → ElAtPatList C as VEs τs → ElAtPatList C (a :: as) (VE :: VEs) (τ :: τs)
 end
 
-/-- The first option of r:s-valbind-var: U' is new for ty in C, ty elaborates to τ in C + U', and
-    U' ∩ tyvars C = ∅. -/
+/-- The first option of r:s-valbind-var: U' is new for ty in C (each of its names standing for
+    the variable of the kind ty uses it with, `nameVar`: the erratum of 2026-11-12 to
+    sec:static-core-explicit), ty elaborates to τ in C + U', and U' ∩ tyvars C = ∅. -/
 inductive AnnOK : Ctx → Option BTy → List BVar → Ty → Prop where
   | opt_none : AnnOK C none [] τ
   | opt_some : NewFor U' ty C.U → ElTy (C.plusU U') ty τ → (∀ v ∈ U', v ∉ C.tyvars) →

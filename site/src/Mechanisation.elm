@@ -144,7 +144,7 @@ type alias Translation =
     }
 
 
-{-| The test's theorems of the static semantics (plan step 9: `legal_`, under D11, or `refuse_`) and
+{-| The test's theorems of the static semantics (plan steps 9 and 11: `legal_`, without hypothesis unless `conditional`, or `refuse_`) and
 of the end-to-end pipeline (plan step 10: `spec_`, Lean's reduced program is the translator's, and
 `mean_`, the program's meaning by r:p-program); `native` when one of them is proved by
 native_decide.
@@ -154,7 +154,9 @@ type alias Statics =
     , refuse : Maybe String
     , spec : Maybe String
     , mean : Maybe String
+    , ident : Maybe String
     , native : Bool
+    , conditional : Bool
     }
 
 
@@ -446,7 +448,9 @@ translationDecoder =
                             |> andMap (Decode.field "refuse" (Decode.nullable Decode.string))
                             |> andMap (Decode.field "spec" (Decode.nullable Decode.string))
                             |> andMap (Decode.field "mean" (Decode.nullable Decode.string))
+                            |> andMap (Decode.oneOf [ Decode.field "ident" (Decode.nullable Decode.string), Decode.succeed Nothing ])
                             |> andMap (Decode.field "native" Decode.bool)
+                            |> andMap (Decode.oneOf [ Decode.field "conditional" Decode.bool, Decode.succeed False ])
                         )
                     )
                 , Decode.succeed Nothing

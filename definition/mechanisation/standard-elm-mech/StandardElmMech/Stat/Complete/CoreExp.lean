@@ -4,7 +4,7 @@
   generator context that simulates the checker's context (`Sim`), and the valuation that reads
   the derivation's types at the phrase's nodes, the phrase's constraints hold and its term
   evaluates to its type (normalised). By structural induction on the annotated phrase, following
-  `checkExp`.
+  `checkExpS`.
 -/
 import StandardElmMech.Stat.Complete.CorePat
 
@@ -197,14 +197,14 @@ theorem gExpRowOpt_ok : (r : Option AExpRow) → ∀ {C : Ctx} {Γ : GCtx} {p : 
     simp only [checkExpRowOpt] at h
     simp only [AExpRow.eraseOpt, gExpRowOpt, AExpRow.rowOpt]
     exact gExpRow_ok r hS h hr
-theorem gExp_ok : (a : AExp) → ∀ {C : Ctx} {Γ : GCtx} {p : Path}, Sim ν f Γ C → checkExp C a = true →
+theorem gExp_ok : (a : AExp) → ∀ {C : Ctx} {Γ : GCtx} {p : Path}, Sim ν f Γ C → checkExpS C a = true →
     (∀ q, ν (q.reverse ++ p) = rdExp a q) → Holds ν (gExp Γ p a.erase).2 ∧ (gExp Γ p a.erase).1.ev ν = hN a.ty
   | .atexp a, C, Γ, p, hS, h, hr => by
-    simp only [checkExp] at h
+    simp only [checkExpS] at h
     simp only [AExp.erase, gExp, AExp.ty]
     exact gAtExp_ok a hS h (child 0 hr (fun q => rfl))
   | .app e a, C, Γ, p, hS, h, hr => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     obtain ⟨⟨h1, h2⟩, h3⟩ := h
     obtain ⟨τ, hτ⟩ := fn_of_match h3
     obtain ⟨c1, v1⟩ := gExp_ok e hS h1 (child 0 hr (fun q => rfl))
@@ -220,7 +220,7 @@ theorem gExp_ok : (a : AExp) → ∀ {C : Ctx} {Γ : GCtx} {p : Path}, Sim ν f 
     simp only [Con.holds, T.ev, v1, v2, hτ, h2']
     rfl
   | .lam q0 e, C, Γ, p, hS, h, hr => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     obtain ⟨h1, h2⟩ := h
     obtain ⟨c1, v1⟩ := gAtPat_ok hS q0 h1 (child 0 hr (fun q => rfl))
     have hR := penvAt_rel q0 (child 0 hr (fun q => rfl))
@@ -233,7 +233,7 @@ theorem gExp_ok : (a : AExp) → ∀ {C : Ctx} {Γ : GCtx} {p : Path}, Sim ν f 
     simp only at c1 v1 c2 v2 ⊢
     exact ⟨Holds.append.mpr ⟨c1, c2⟩, by simp only [T.ev, v1, v2, hN]⟩
   | .caseE e m, C, Γ, p, hS, h, hr => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     obtain ⟨⟨h1, h2⟩, h3⟩ := h
     obtain ⟨τ, hτ⟩ := fn_of_match h3
     obtain ⟨c1, v1⟩ := gExp_ok e hS h1 (child 0 hr (fun q => rfl))

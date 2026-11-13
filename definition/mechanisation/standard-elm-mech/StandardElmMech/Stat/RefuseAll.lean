@@ -8,6 +8,7 @@ import StandardElmMech.Stat.RefuseScope
 import StandardElmMech.Stat.RefuseFurther
 import StandardElmMech.Stat.RefuseTypes
 import StandardElmMech.Stat.Complete.CoreComplete
+import StandardElmMech.Stat.Complete.ModulesProgram
 
 namespace StandardElm.Stat
 open StandardElm.Src (SProgram SModule)

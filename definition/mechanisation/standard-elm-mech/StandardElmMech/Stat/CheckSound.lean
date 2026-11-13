@@ -1,6 +1,6 @@
 /-
   A Standard Definition of Elm? Mechanisation: the checker is sound, plan step 9 (section
-  "Theorems", group 2, decision D10). `checkExp C a = true` gives a derivation of
+  "Theorems", group 2, decision D10). `checkExpS C a = true` gives a derivation of
   `C ⊢ erase a ⇒ ty a` by the rules of Chapter 4, and likewise for every phrase class;
   `checkModule_sound` gives a derivation of `B ⊢ erase a ⇒ B', E` by the rules of Chapter 5. By
   structural induction on the annotated phrase, each node's checks giving the premises of its rule.
@@ -132,7 +132,7 @@ theorem checkAnn_sound (C : Ctx) (ann : Option (BTy × List BVar)) (τ : Ty) (h 
     simp only [checkAnn, Bool.and_eq_true, decide_eq_true_eq, List.all_eq_true, Bool.not_eq_true',
       decide_eq_false_iff_not] at h
     obtain ⟨⟨h1, h2⟩, h3⟩ := h
-    exact .opt_some ((newForB_iff _ _ _).mp h1) (elabTy_sound _ _ _ h2) h3
+    exact .opt_some (newFor_of_newForB h1) (elabTy_sound _ _ _ h2) h3
 
 theorem lookup_gen {C : Ctx} {lv : LongId} {inst : List Ty} {τ : Ty}
     (h : (match C.lookupVal lv with
@@ -169,7 +169,7 @@ theorem checkAtExp_sound (C : Ctx) : (a : AAtExp) → checkAtExp C a = true → 
   | .tuple e1 e2 e3, h => by
     simp only [checkAtExp, Bool.and_eq_true] at h
     simp only [AAtExp.erase, AAtExp.ty]
-    exact .r_s_atexp_tuple (checkExp_sound C e1 h.1.1) (checkExp_sound C e2 h.1.2) (checkExpOpt_sound C e3 h.2)
+    exact .r_s_atexp_tuple (checkExpS_sound C e1 h.1.1) (checkExpS_sound C e2 h.1.2) (checkExpOpt_sound C e3 h.2)
   | .nil τ, h => by
     simp only [checkAtExp] at h
     obtain ⟨τ0, rfl⟩ := isListTy_spec h
@@ -190,16 +190,16 @@ theorem checkAtExp_sound (C : Ctx) : (a : AAtExp) → checkAtExp C a = true → 
   | .letE d e, h => by
     simp only [checkAtExp, Bool.and_eq_true] at h
     simp only [AAtExp.erase, AAtExp.ty]
-    exact .r_s_atexp_let (checkDec_sound C d h.1) (checkExp_sound _ e h.2)
+    exact .r_s_atexp_let (checkDec_sound C d h.1) (checkExpS_sound _ e h.2)
   | .paren e, h => by
     simp only [checkAtExp] at h
     simp only [AAtExp.erase, AAtExp.ty]
-    exact .r_s_atexp_paren (checkExp_sound C e h)
+    exact .r_s_atexp_paren (checkExpS_sound C e h)
 theorem checkExpRow_sound (C : Ctx) : (r : AExpRow) → checkExpRow C r = true → ElExpRow C r.erase r.row
   | .field l e rest, h => by
     simp only [checkExpRow, Bool.and_eq_true] at h
     simp only [AExpRow.erase, AExpRow.row]
-    exact .r_s_exprow (checkExp_sound C e h.1) (checkExpRowOpt_sound C rest h.2)
+    exact .r_s_exprow (checkExpS_sound C e h.1) (checkExpRowOpt_sound C rest h.2)
 theorem checkExpRowOpt_sound (C : Ctx) : (r : Option AExpRow) → checkExpRowOpt C r = true →
     ElExpRowOpt C (AExpRow.eraseOpt r) (AExpRow.rowOpt r)
   | none, _ => by simp only [AExpRow.eraseOpt, AExpRow.rowOpt]; exact .opt_none
@@ -207,38 +207,38 @@ theorem checkExpRowOpt_sound (C : Ctx) : (r : Option AExpRow) → checkExpRowOpt
     simp only [checkExpRowOpt] at h
     simp only [AExpRow.eraseOpt, AExpRow.rowOpt]
     exact .opt_some (checkExpRow_sound C r h)
-theorem checkExp_sound (C : Ctx) : (a : AExp) → checkExp C a = true → ElExp C a.erase a.ty
+theorem checkExpS_sound (C : Ctx) : (a : AExp) → checkExpS C a = true → ElExp C a.erase a.ty
   | .atexp a, h => by
-    simp only [checkExp] at h
+    simp only [checkExpS] at h
     simp only [AExp.erase, AExp.ty]
     exact .r_s_exp_atexp (checkAtExp_sound C a h)
   | .app e a, h => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     obtain ⟨⟨h1, h2⟩, h3⟩ := h
-    have he := checkExp_sound C e h1
+    have he := checkExpS_sound C e h1
     obtain ⟨τ, hτ⟩ := fn_of_match h3
     rw [hτ] at he
     simp only [AExp.erase, AExp.ty, hτ, Ty.cod]
     exact .r_s_exp_app he (checkAtExp_sound C a h2)
   | .lam p e, h => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     simp only [AExp.erase, AExp.ty]
-    exact .r_s_exp_lambda (checkAtPat_sound C p h.1) (checkExp_sound _ e h.2)
+    exact .r_s_exp_lambda (checkAtPat_sound C p h.1) (checkExpS_sound _ e h.2)
   | .caseE e m, h => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     obtain ⟨⟨h1, h2⟩, h3⟩ := h
     have hm := checkMatch_sound C m h2
     obtain ⟨τ', hτ⟩ := fn_of_match h3
     rw [hτ] at hm
     simp only [AExp.erase, AExp.ty, hτ, Ty.cod]
-    exact .r_s_exp_case (checkExp_sound C e h1) hm
+    exact .r_s_exp_case (checkExpS_sound C e h1) hm
 theorem checkExpOpt_sound (C : Ctx) : (e : Option AExp) → checkExpOpt C e = true →
     ElExpOpt C (AExp.eraseOpt e) (AExp.tyOpt e)
   | none, _ => by simp only [AExp.eraseOpt, AExp.tyOpt]; exact .opt_none
   | some e, h => by
     simp only [checkExpOpt] at h
     simp only [AExp.eraseOpt, AExp.tyOpt]
-    exact .opt_some (checkExp_sound C e h)
+    exact .opt_some (checkExpS_sound C e h)
 theorem checkMatch_sound (C : Ctx) : (m : AMatch) → checkMatch C m = true → ElMatch C m.erase m.ty
   | .mk mr rest, h => by
     simp only [checkMatch, Bool.and_eq_true] at h
@@ -257,7 +257,7 @@ theorem checkMRule_sound (C : Ctx) : (mr : AMRule) → checkMRule C mr = true �
   | .mk p e, h => by
     simp only [checkMRule, Bool.and_eq_true] at h
     simp only [AMRule.erase, AMRule.ty]
-    exact .r_s_mrule (checkPat_sound C p h.1) (checkExp_sound _ e h.2)
+    exact .r_s_mrule (checkPat_sound C p h.1) (checkExpS_sound _ e h.2)
 theorem checkDec_sound (C : Ctx) : (d : ADec) → checkDec C d = true → ElDec C d.erase (d.result C)
   | .val VE vb, h => by
     simp only [checkDec, Bool.and_eq_true, decide_eq_true_eq] at h
@@ -269,7 +269,7 @@ theorem checkValBind_sound (C : Ctx) : (vb : AValBind) → checkValBind C vb = t
   | .var x ann τ e rest, h => by
     simp only [checkValBind, Bool.and_eq_true, decide_eq_true_eq] at h
     obtain ⟨⟨⟨h1, h2⟩, h3⟩, h4⟩ := h
-    have he := checkExp_sound _ e h2
+    have he := checkExpS_sound _ e h2
     rw [h3] at he
     have hr := checkValBindOpt_sound C rest h4
     have hv := ElValBind.r_s_valbind_var (x := x) (checkAnn_sound C ann τ h1) he hr
@@ -279,7 +279,7 @@ theorem checkValBind_sound (C : Ctx) : (vb : AValBind) → checkValBind C vb = t
   | .pat p e, h => by
     simp only [checkValBind, Bool.and_eq_true, decide_eq_true_eq] at h
     obtain ⟨⟨h1, h2⟩, h3⟩ := h
-    have he := checkExp_sound C e h2
+    have he := checkExpS_sound C e h2
     rw [h3] at he
     simp only [AValBind.erase]
     exact .r_s_valbind_pat (checkAtPat_sound C p h1) he
@@ -291,6 +291,9 @@ theorem checkValBindOpt_sound (C : Ctx) : (vb : Option AValBind) → checkValBin
     simp only [AValBind.eraseOpt, AValBind.veOpt]
     exact .opt_some (checkValBind_sound C vb h)
 end
+
+theorem checkExp_sound (C : Ctx) (a : AExp) (h : checkExp C a = true) : ElExp C a.erase a.ty :=
+  checkExpS_sound C a (checkExpS_of_checkExp h)
 
 /-! ## Modules -/
 
@@ -341,7 +344,7 @@ theorem elabPort_sound (C : Ctx) (x : Var) (ty : BTy) (U : List BVar) (E : Env) 
   unfold elabPort at h
   split at h
   · rename_i hn
-    have hnew := (newForB_iff _ _ _).mp hn
+    have hnew := newFor_of_newForB hn
     split at h
     · rename_i τ' α t hτ
       have hel := elabTy_sound _ _ _ hτ
@@ -373,8 +376,8 @@ theorem checkTopDec_sound (C : Ctx) : (a : ATopDec) → (E : Env) → (PE : Port
       simp only [Bool.and_eq_true, decide_eq_true_eq] at hc
       simp only [Option.some.injEq, Prod.mk.injEq] at h
       obtain ⟨rfl, rfl⟩ := h
-      have hv := checkValBind_sound _ vb hc.1
-      rw [hc.2] at hv
+      have hv := checkValBind_sound _ vb hc.1.1
+      rw [hc.1.2] at hv
       exact .r_sm_topdec_value hv
     · cases h
   | .types TE VE db tbs, E, PE, h => by

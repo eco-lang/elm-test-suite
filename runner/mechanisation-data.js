@@ -128,7 +128,7 @@ function staticOf(key) {
         staticReport = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
     }
     const per = (staticReport.tests || {})[key];
-    return per ? { legal: per.legal || null, refuse: per.refuse || null, spec: per.spec || null, mean: per.mean || null, native: !!per.native } : null;
+    return per ? { legal: per.legal || null, refuse: per.refuse || null, spec: per.spec || null, mean: per.mean || null, ident: per.ident || null, native: !!per.native, conditional: !!per.conditional } : null;
 }
 
 function manifest() {

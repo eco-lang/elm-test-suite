@@ -103,6 +103,7 @@ theorem walkTop (hw : WalkHyp S S' ν r D) : (d : ATopDec) → ∀ (d'' : ATopDe
         split at hc''
         · rename_i hcv''
           simp only [Bool.and_eq_true, decide_eq_true_eq] at hcv hcv''
+          replace hcv := hcv.1; replace hcv'' := hcv''.1
           simp only [nodesTopDec, List.cons_append, List.singleton_append] at h
           have h3 := (h.mono (ms := nodesValBind (C.plusVE VE) (path ++ [0]) vb)
             (ms'' := nodesValBind (C''.plusVE VE'') (path ++ [0]) vb'')

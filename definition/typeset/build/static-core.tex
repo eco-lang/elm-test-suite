@@ -396,9 +396,14 @@ set $U'$ of type and row variables is \emph{new for $\ty$ in $C$} if
 \end{array}
 \]
 Thus $U'$ holds, for each type variable of $\ty$ that is not already explicit
-in $C$, the type variable or the row variable that it names; which of the two
-is fixed by the rules for type expressions, which accept only variables of $U
-\of C$. The members of $U'$ are added to $U$ while the annotation and the body of
+in $C$, the type variable or the row variable that it names: the row variable
+when $\ty$ uses it as the extension of a record type
+(\kw{\kwlb\ r | \ldots\ \kwrb}), and the type variable otherwise. % erratum, 2026-11-12
+The rules for type expressions accept only variables of $U \of C$, and both
+kinds could elaborate a name written alone (rules~\ruleref{r:s-ty-tyvar}
+and~\ruleref{r:s-ty-rowvar}), so the kind is fixed here: in \kw{f : a -> a}
+the name \kw{a} is a type variable, and in
+\kw{f : \kwlb\ r | x : Int \kwrb\ -> r} the name \kw{r} is a row variable. The members of $U'$ are added to $U$ while the annotation and the body of
 its definition elaborate, so that an annotation nested within the body that
 writes one of these names means the same variable. % A21
 They are bound in the type scheme of the annotated variable, and they must not

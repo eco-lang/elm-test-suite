@@ -4,6 +4,18 @@ import StandardElmMech.Src.Notation
 namespace StandardElm
 set_option maxRecDepth 100000
 
+/-- tests/elm/src/TypeMismatchListEntryPatternTest.elm -/
+def s_elm_TypeMismatchListEntryPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchListEntryPatternTest" [
+  Src.mdl (Src.hdr false "TypeMismatchListEntryPatternTest" (.all))
+    []
+    [Src.val "x" none [] (.caseE (.list [Src.i 1]) [(.list [.lit (.int 1), .lit (.str "a")], Src.i 1), (.wild, Src.i 2)])] ]
+
+/-- tests/elm/src/TypeMismatchListMultipliedTest.elm -/
+def s_elm_TypeMismatchListMultipliedTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchListMultipliedTest" [
+  Src.mdl (Src.hdr false "TypeMismatchListMultipliedTest" (.all))
+    []
+    [Src.val "x" none [] (Src.bin "*" (.list [Src.i 1]) (Src.i 2))] ]
+
 /-- tests/elm/src/TypeMismatchListPatternTest.elm -/
 def s_elm_TypeMismatchListPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchListPatternTest" [
   Src.mdl (Src.hdr false "TypeMismatchListPatternTest" (.all))
@@ -232,21 +244,11 @@ def s_elm_TypeMismatchRigidNumberAsAliasTest : Src.SProgram := Src.canonOrder <|
     []
     [.alias "P" [] (.record [("y", Src.tc "Int" [])]), Src.val "p" (some (Src.tc "P" [])) [] (.record [("y", Src.i 1)]), Src.val "f" (some (.fn (Src.tv "number") (Src.tv "number"))) [Src.pv "x"] (Src.v "p")] ]
 
-/-- tests/elm/src/TypeMismatchRigidNumberAsFunctionTest.elm -/
-def s_elm_TypeMismatchRigidNumberAsFunctionTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchRigidNumberAsFunctionTest" [
-  Src.mdl (Src.hdr false "TypeMismatchRigidNumberAsFunctionTest" (.all))
-    []
-    [Src.val "f" (some (.fn (Src.tv "number") (Src.tv "number"))) [Src.pv "x"] (.lam [Src.pv "y"] (Src.v "y"))] ]
-
-/-- tests/elm/src/TypeMismatchRigidNumberAsMaybeTest.elm -/
-def s_elm_TypeMismatchRigidNumberAsMaybeTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchRigidNumberAsMaybeTest" [
-  Src.mdl (Src.hdr false "TypeMismatchRigidNumberAsMaybeTest" (.all))
-    []
-    [Src.val "f" (some (.fn (Src.tv "number") (Src.tv "number"))) [Src.pv "x"] (Src.app (Src.c "Just") [Src.v "x"])] ]
-
 /-- The programs of this shard, by test name. -/
 def srcShard_SrcElm17 : List (String × Src.SProgram) :=
-  [("TypeMismatchListPatternTest", s_elm_TypeMismatchListPatternTest),
+  [("TypeMismatchListEntryPatternTest", s_elm_TypeMismatchListEntryPatternTest),
+   ("TypeMismatchListMultipliedTest", s_elm_TypeMismatchListMultipliedTest),
+   ("TypeMismatchListPatternTest", s_elm_TypeMismatchListPatternTest),
    ("TypeMismatchListRightOfAppendWithAStringTest", s_elm_TypeMismatchListRightOfAppendWithAStringTest),
    ("TypeMismatchListRightOfPlusTest", s_elm_TypeMismatchListRightOfPlusTest),
    ("TypeMismatchListRightOfTimesTest", s_elm_TypeMismatchListRightOfTimesTest),
@@ -283,8 +285,6 @@ def srcShard_SrcElm17 : List (String × Src.SProgram) :=
    ("TypeMismatchRigidComparableAsNumberTest", s_elm_TypeMismatchRigidComparableAsNumberTest),
    ("TypeMismatchRigidExtensionWhereClosedTest", s_elm_TypeMismatchRigidExtensionWhereClosedTest),
    ("TypeMismatchRigidExtensionWhereFlexibleAfterAMismatchTest", s_elm_TypeMismatchRigidExtensionWhereFlexibleAfterAMismatchTest),
-   ("TypeMismatchRigidNumberAsAliasTest", s_elm_TypeMismatchRigidNumberAsAliasTest),
-   ("TypeMismatchRigidNumberAsFunctionTest", s_elm_TypeMismatchRigidNumberAsFunctionTest),
-   ("TypeMismatchRigidNumberAsMaybeTest", s_elm_TypeMismatchRigidNumberAsMaybeTest)]
+   ("TypeMismatchRigidNumberAsAliasTest", s_elm_TypeMismatchRigidNumberAsAliasTest)]
 
 end StandardElm

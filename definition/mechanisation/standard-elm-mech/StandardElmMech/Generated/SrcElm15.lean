@@ -4,6 +4,18 @@ import StandardElmMech.Src.Notation
 namespace StandardElm
 set_option maxRecDepth 100000
 
+/-- tests/elm/src/TooManyArgsTooManyArgumentsToANullaryConstructorTest.elm -/
+def s_elm_TooManyArgsTooManyArgumentsToANullaryConstructorTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TooManyArgsTooManyArgumentsToANullaryConstructorTest" [
+  Src.mdl (Src.hdr false "TooManyArgsTooManyArgumentsToANullaryConstructorTest" (.all))
+    []
+    [.custom "T" [] [("T", [])], Src.val "x" none [] (Src.app (Src.c "T") [Src.i 1])] ]
+
+/-- tests/elm/src/TooManyArgsTooManyArgumentsToAnOperatorTest.elm -/
+def s_elm_TooManyArgsTooManyArgumentsToAnOperatorTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TooManyArgsTooManyArgumentsToAnOperatorTest" [
+  Src.mdl (Src.hdr false "TooManyArgsTooManyArgumentsToAnOperatorTest" (.all))
+    []
+    [Src.val "x" none [] (Src.app (.opVal "+") [Src.i 1, Src.i 2, Src.i 3])] ]
+
 /-- tests/elm/src/TopLevelConstructorTwiceTest.elm -/
 def s_elm_TopLevelConstructorTwiceTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TopLevelConstructorTwiceTest" [
   Src.mdl (Src.hdr false "TopLevelConstructorTwiceTest" (.items [.var "main"]))
@@ -232,21 +244,11 @@ def s_elm_TypeMismatchComposedWithANumberTest : Src.SProgram := Src.canonOrder <
     []
     [Src.val "x" none [] (Src.bin ">>" (Src.v "not") (Src.i 1))] ]
 
-/-- tests/elm/src/TypeMismatchConsHeadAgainstAConsTailTest.elm -/
-def s_elm_TypeMismatchConsHeadAgainstAConsTailTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchConsHeadAgainstAConsTailTest" [
-  Src.mdl (Src.hdr false "TypeMismatchConsHeadAgainstAConsTailTest" (.all))
-    []
-    [Src.val "x" none [] (.caseE (.list [Src.i 1]) [(.cons (.lit (.int 1)) (.cons (.lit (.str "s")) (Src.pv "rest")), Src.i 1), (.wild, Src.i 2)])] ]
-
-/-- tests/elm/src/TypeMismatchConsedOntoABoolTest.elm -/
-def s_elm_TypeMismatchConsedOntoABoolTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchConsedOntoABoolTest" [
-  Src.mdl (Src.hdr false "TypeMismatchConsedOntoABoolTest" (.all))
-    []
-    [Src.val "x" none [] (Src.bin "::" (Src.i 1) (Src.c "True"))] ]
-
 /-- The programs of this shard, by test name. -/
 def srcShard_SrcElm15 : List (String × Src.SProgram) :=
-  [("TopLevelConstructorTwiceTest", s_elm_TopLevelConstructorTwiceTest),
+  [("TooManyArgsTooManyArgumentsToANullaryConstructorTest", s_elm_TooManyArgsTooManyArgumentsToANullaryConstructorTest),
+   ("TooManyArgsTooManyArgumentsToAnOperatorTest", s_elm_TooManyArgsTooManyArgumentsToAnOperatorTest),
+   ("TopLevelConstructorTwiceTest", s_elm_TopLevelConstructorTwiceTest),
    ("TopLevelNameReplacesImportTest", s_elm_TopLevelNameReplacesImportTest),
    ("TopLevelPortAndValueSameNameTest", s_elm_TopLevelPortAndValueSameNameTest),
    ("TopLevelRecordAliasConstructorClashTest", s_elm_TopLevelRecordAliasConstructorClashTest),
@@ -283,8 +285,6 @@ def srcShard_SrcElm15 : List (String × Src.SProgram) :=
    ("TypeMismatchCompappendAgainstATupleTest", s_elm_TypeMismatchCompappendAgainstATupleTest),
    ("TypeMismatchCompappendListEntryWithABoolTest", s_elm_TypeMismatchCompappendListEntryWithABoolTest),
    ("TypeMismatchComparableAgainstATupleTest", s_elm_TypeMismatchComparableAgainstATupleTest),
-   ("TypeMismatchComposedWithANumberTest", s_elm_TypeMismatchComposedWithANumberTest),
-   ("TypeMismatchConsHeadAgainstAConsTailTest", s_elm_TypeMismatchConsHeadAgainstAConsTailTest),
-   ("TypeMismatchConsedOntoABoolTest", s_elm_TypeMismatchConsedOntoABoolTest)]
+   ("TypeMismatchComposedWithANumberTest", s_elm_TypeMismatchComposedWithANumberTest)]
 
 end StandardElm

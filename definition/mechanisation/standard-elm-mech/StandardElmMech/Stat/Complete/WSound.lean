@@ -12,6 +12,7 @@
     out.
 -/
 import StandardElmMech.Stat.Complete.WSoundExp
+import StandardElmMech.Stat.Complete.NodesOk
 
 namespace StandardElm.Stat.Complete
 open StandardElm.Stat
@@ -23,11 +24,26 @@ theorem root_spre {C0 : Ctx} (hC : RootOK C0) : SPre (freshAbove C0) C0 ⟨[], f
 
 /-- L10: the checker accepts the final substitution applied to what W built. -/
 theorem wResultChecks : WResultChecks := by
-  intro fuel C0 e τ ar st hC h _
+  intro fuel C0 e τ ar st hC h hd
   obtain ⟨K, P⟩ := wExp_sound fuel _ e C0 _ (τ, ar) st (root_spre hC) h
   have hi := P.seg.inv
   have hc := (P.chk (lk st.θ) hi.sok (absorbs_self hi.good.idem) P.ks.dead).1
-  rwa [ctxSb_root hi.good.fixesR] at hc
+  rw [ctxSb_root hi.good.fixesR] at hc
+  refine checkExp_iff.mpr ⟨hc, okNodesExp C0 [] _ fun σ hσ => ?_⟩
+  -- the types W records are `Ty.okB`: their images under the substitution relating W's result to a
+  -- derivation are the derivation's (L11), which the checker asks to be `Ty.okB`
+  obtain ⟨a', hc', he'⟩ := hd
+  have hw := wExp_root (fuel := fuel) hC hc' he'
+  rw [h] at hw
+  obtain ⟨-, -, -, -, T, hF, -, hs⟩ := hw
+  have hTa : sbExp T (sbExp (lk st.θ) ar) = sbExp T ar := by rw [sbExp_sb, comp_of_absorbs hF.abs]
+  have h1 : sb T σ ∈ tysExp false (sbExp T (sbExp (lk st.θ) ar)) := by
+    rw [tysExp_sb]; exact List.mem_map_of_mem hσ
+  rw [← tysExp_strip, hTa, hs, tysExp_strip] at h1
+  have h2 := tysExp_nodes C0 [] a' _ h1
+  simp only [NTys, List.mem_flatMap] at h2
+  obtain ⟨n, hn, hτn⟩ := h2
+  exact okB_of_sb (fun i c => hF.fix (.bnd i c) rfl) (okB_of_checkExp hc' n hn _ hτn)
 
 /-- Completeness of W for F_c (section 7). -/
 theorem wCompleteness : WCompleteness := wCompleteness_of_checks wResultChecks

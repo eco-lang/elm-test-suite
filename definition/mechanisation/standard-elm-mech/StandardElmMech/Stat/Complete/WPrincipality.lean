@@ -354,8 +354,9 @@ theorem instanceNodes_of_F2 {T : FSub} {U0 A0 : List BVar} {ns ns' : List Node}
 theorem wPrincipality : WPrincipality := by
   intro fuel C0 e a hC h
   obtain ⟨hc, he⟩ := inferExpW_sound h
-  refine ⟨hc, fun a' hc' hnb he' => ?_⟩
-  have hw := wExp_root (fuel := fuel) hC hc' hnb (he'.trans he)
+  refine ⟨hc, fun a' hc' he' => ?_⟩
+  have hnb := noFreeBndExp_of_checkExp hc'
+  have hw := wExp_root (fuel := fuel) hC hc' (he'.trans he)
   unfold inferExpW at h
   simp only at h
   split at h
@@ -379,7 +380,7 @@ theorem wPrincipality : WPrincipality := by
           rw [tysExp_sb]; exact List.mem_map_of_mem hτ
         rw [← tysExp_strip, hTa, hs, tysExp_strip] at h1
         exact nb_of_noFreeBnd hnb _ h1 v hv
-      have hF2 := nodesExp_rel T (freshAbove C0) st.n C0.U hF.fix hcls _ C0 C0 [] rfl hc hrel hok' hnbm
+      have hF2 := nodesExp_rel T (freshAbove C0) st.n C0.U hF.fix hcls _ C0 C0 [] rfl (checkExpS_of_checkExp hc) hrel hok' hnbm
       rw [hTa, hs] at hF2
       refine ⟨by rw [stripExp_erase, stripExp_erase]; exact he', instanceNodes_of_F2 hF2
         (nodesExp_pd C0 _ []).1 hcls (fun x hx => hF.fix x (rigid_of_old (old_of_root hx)))
@@ -509,7 +510,7 @@ theorem instanceOfB_iff {C0 : Ctx} {a' a : AExp} : InstanceOfB C0 a' a ↔ Insta
 /-- `IsPrincipalB` is step 9's `IsPrincipal` with the derivations compared restricted to those
     without free `bnd` variables. -/
 theorem isPrincipalB_iff {C0 : Ctx} {a : AExp} : IsPrincipalB C0 a ↔
-    checkExp C0 a = true ∧ ∀ a', checkExp C0 a' = true → NoFreeBndExp C0 a' → a'.erase = a.erase →
+    checkExp C0 a = true ∧ ∀ a', checkExp C0 a' = true → a'.erase = a.erase →
       InstanceOf C0 a' a := by
   unfold IsPrincipalB
   simp only [instanceOfB_iff]
@@ -520,7 +521,7 @@ theorem isPrincipalB_iff {C0 : Ctx} {a : AExp} : IsPrincipalB C0 a ↔
 theorem inferExpW_principal {fuel : Nat} {C0 : Ctx} {e : StandardElm.Src.BExp} {a : AExp} (hC : RootOK C0)
     (h : inferExpW fuel C0 e = .ok a) :
     a.erase = e ∧ checkExp C0 a = true ∧
-      ∀ a', checkExp C0 a' = true → NoFreeBndExp C0 a' → a'.erase = a.erase → InstanceOf C0 a' a :=
+      ∀ a', checkExp C0 a' = true → a'.erase = a.erase → InstanceOf C0 a' a :=
   ⟨(inferExpW_sound h).2, isPrincipalB_iff.mp (wPrincipality fuel C0 e a hC h)⟩
 
 end StandardElm.Stat.Complete

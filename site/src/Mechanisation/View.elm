@@ -678,8 +678,8 @@ staticsAfter t paras =
     paras ++ staticsParas t
 
 
-{-| What plans steps 9 and 10 prove about the test: its static theorem (`legal_`, under D11, or
-`refuse_`, for every derivation) and, for a translated test, its end-to-end theorems, which retire
+{-| What plans steps 9 to 11 prove about the test: its static theorem (`legal_`, without hypothesis
+since step 11 except where `conditional` keeps D11, or `refuse_`, for every derivation) and, for a translated test, its end-to-end theorems, which retire
 the trust in the translator's elaboration ([elab]) for that test. The theorems are in
 `StandardElmMech/Certs/`, written by `lake exe certify`.
 -}
@@ -712,7 +712,13 @@ staticsParas t =
                         Just n ->
                             [ Html.text "Static semantics (Chapters 4, 5 and 9): "
                             , code n
-                            , Html.text " states that the program as written is legal, if the derivation Lean's inference finds is principal ([principal]): it meets the syntactic restrictions, and each module elaborates by a derivation the proved checker accepts, meeting the further restrictions, with a type of main Chapter 9 allows. "
+                            , Html.text
+                                (if s.conditional then
+                                    " states that the program as written is legal, if the derivation Lean's inference finds is principal ([principal]; the proved inference W gave no result on this program within the time allowed): it meets the syntactic restrictions, and each module elaborates by a derivation the proved checker accepts, meeting the further restrictions, with a type of main Chapter 9 allows. "
+
+                                 else
+                                    " states that the program as written is legal, with no hypothesis: the proved inference W gives each module a principal derivation, which meets the syntactic restrictions and the further restrictions, with a type of main Chapter 9 allows. "
+                                )
                             ]
 
                         Nothing ->
@@ -734,7 +740,14 @@ staticsParas t =
                             ]
                                 ++ (case s.mean of
                                         Just m ->
-                                            [ code m, Html.text " states that the program has a meaning by r:p-program, with both premises, if the inferred derivation is principal ([principal])." ]
+                                            [ code m, Html.text " states that the program has a meaning by r:p-program, with both premises" ]
+                                                ++ (case s.ident of
+                                                        Just i ->
+                                                            [ Html.text ", and ", code i, Html.text " that its specialisation is unique and is the reduced program above, both with no hypothesis about principality." ]
+
+                                                        Nothing ->
+                                                            [ Html.text "." ]
+                                                   )
 
                                         Nothing ->
                                             [ Html.text "the program has no meaning (it stops at Debug.todo)." ]

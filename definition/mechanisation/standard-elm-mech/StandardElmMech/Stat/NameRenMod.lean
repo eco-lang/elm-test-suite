@@ -291,7 +291,8 @@ theorem nr_plusPE (PE PE' : PortEnv) : Env.plusPE ((nr ρ).portEnv PE) ((nr ρ).
 theorem nr_checkTopDec (h : NR ρ) : (d : ATopDec) → (C : Ctx) →
     checkTopDec ((nr ρ).ctx C) ((nr ρ).topDec d) = (checkTopDec C d).map fun p => ((nr ρ).env p.1, (nr ρ).portEnv p.2)
   | .value VE vb, C => by
-    simp only [Renaming.topDec, checkTopDec, nr_plusVE, nr_checkValBind h, nr_valBind_ve h, nr_valEnv_dec h]
+    simp only [Renaming.topDec, checkTopDec, nr_plusVE, nr_checkValBind h, nr_valBind_ve h, nr_valEnv_dec h,
+      nr_okValBindB h]
     split
     · simp only [Option.map_some, nr_ctx_tyvars h, nr_closGroup h, nr_ofVE]; rfl
     · rfl

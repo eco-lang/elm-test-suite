@@ -46,6 +46,18 @@ def s_elm_StandardA97SelfOnlyTypeTest : Src.SProgram := Src.canonOrder <| Src.pr
     [Src.imp "Html" none (some (.items [.var "text"]))]
     [.custom "V" [] [("V", [Src.tc "V" []])], Src.val "fromResult" (some (.fn (Src.tc "Result" [Src.tc "V" [], Src.tc "Int" []]) (Src.tc "Int" []))) [Src.pv "r"] (.caseE (Src.v "r") [(Src.pc "Ok" [Src.pv "n"], Src.v "n"), (Src.pc "Err" [.paren (Src.pc "V" [.wild])], Src.i 0)]), Src.val "depth" (some (.fn (Src.tc "V" []) (Src.tc "Int" []))) [Src.pv "v"] (.caseE (Src.v "v") [(Src.pc "V" [.paren (Src.pc "V" [.wild])], Src.i 2)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "fromResult (Ok 3)", .paren (Src.app (Src.v "fromResult") [.paren (Src.app (Src.c "Ok") [Src.i 3])])])] (Src.app (Src.v "text") [Src.str "done"]))] ]
 
+/-- tests/elm/src/StandardA98TypeBeforeAliasStringMismatchTest.elm -/
+def s_elm_StandardA98TypeBeforeAliasStringMismatchTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA98TypeBeforeAliasStringMismatchTest" [
+  Src.mdl (Src.hdr false "StandardA98TypeBeforeAliasStringMismatchTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [.custom "T" [] [("T", [Src.tc "String" []])], .alias "String" [] (Src.tc "Int" []), Src.val "len" (some (.fn (Src.tc "T" []) (Src.tc "Int" []))) [.paren (Src.pc "T" [Src.pv "s"])] (Src.app (Src.qv "String" "length") [Src.v "s"]), Src.val "main" none [] (Src.app (Src.v "text") [.paren (Src.app (Src.qv "Debug" "toString") [.paren (Src.app (Src.v "len") [.paren (Src.app (Src.c "T") [Src.i 3])])])])] ]
+
+/-- tests/elm/src/StandardA98TypeBeforeAliasTest.elm -/
+def s_elm_StandardA98TypeBeforeAliasTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA98TypeBeforeAliasTest" [
+  Src.mdl (Src.hdr false "StandardA98TypeBeforeAliasTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [.custom "T" [] [("T", [Src.tc "String" []])], .alias "String" [] (Src.tc "Int" []), Src.val "field" (some (.fn (Src.tc "T" []) (Src.tc "Int" []))) [.paren (Src.pc "T" [Src.pv "n"])] (Src.bin "+" (Src.v "n") (Src.i 1)), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "field (T 3)", .paren (Src.app (Src.v "field") [.paren (Src.app (Src.c "T") [Src.i 3])])])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
 /-- tests/elm/src/StandardApplicationStrictTest.elm -/
 def s_elm_StandardApplicationStrictTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardApplicationStrictTest" [
   Src.mdl (Src.hdr false "StandardApplicationStrictTest" (.items [.var "main"]))
@@ -232,18 +244,6 @@ def s_elm_TooManyArgsTooManyArgumentsToALocalTest : Src.SProgram := Src.canonOrd
     []
     [Src.val "y" none [] (Src.i 5), Src.val "x" none [] (Src.app (Src.v "y") [Src.i 1])] ]
 
-/-- tests/elm/src/TooManyArgsTooManyArgumentsToANullaryConstructorTest.elm -/
-def s_elm_TooManyArgsTooManyArgumentsToANullaryConstructorTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TooManyArgsTooManyArgumentsToANullaryConstructorTest" [
-  Src.mdl (Src.hdr false "TooManyArgsTooManyArgumentsToANullaryConstructorTest" (.all))
-    []
-    [.custom "T" [] [("T", [])], Src.val "x" none [] (Src.app (Src.c "T") [Src.i 1])] ]
-
-/-- tests/elm/src/TooManyArgsTooManyArgumentsToAnOperatorTest.elm -/
-def s_elm_TooManyArgsTooManyArgumentsToAnOperatorTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TooManyArgsTooManyArgumentsToAnOperatorTest" [
-  Src.mdl (Src.hdr false "TooManyArgsTooManyArgumentsToAnOperatorTest" (.all))
-    []
-    [Src.val "x" none [] (Src.app (.opVal "+") [Src.i 1, Src.i 2, Src.i 3])] ]
-
 /-- The programs of this shard, by test name. -/
 def srcShard_SrcElm14 : List (String × Src.SProgram) :=
   [("StandardA91BasicsAliasTest", s_elm_StandardA91BasicsAliasTest),
@@ -253,6 +253,8 @@ def srcShard_SrcElm14 : List (String × Src.SProgram) :=
    ("StandardA97MaybeNeverMissingJustTest", s_elm_StandardA97MaybeNeverMissingJustTest),
    ("StandardA97NeverErrBranchTest", s_elm_StandardA97NeverErrBranchTest),
    ("StandardA97SelfOnlyTypeTest", s_elm_StandardA97SelfOnlyTypeTest),
+   ("StandardA98TypeBeforeAliasStringMismatchTest", s_elm_StandardA98TypeBeforeAliasStringMismatchTest),
+   ("StandardA98TypeBeforeAliasTest", s_elm_StandardA98TypeBeforeAliasTest),
    ("StandardApplicationStrictTest", s_elm_StandardApplicationStrictTest),
    ("StandardCoreEvaluationExamplesTest", s_elm_StandardCoreEvaluationExamplesTest),
    ("StandardLetStrictTest", s_elm_StandardLetStrictTest),
@@ -283,8 +285,6 @@ def srcShard_SrcElm14 : List (String × Src.SProgram) :=
    ("TooManyArgsTooManyArgumentsToAFunctionTest", s_elm_TooManyArgsTooManyArgumentsToAFunctionTest),
    ("TooManyArgsTooManyArgumentsToALambdaTest", s_elm_TooManyArgsTooManyArgumentsToALambdaTest),
    ("TooManyArgsTooManyArgumentsToALiteralTest", s_elm_TooManyArgsTooManyArgumentsToALiteralTest),
-   ("TooManyArgsTooManyArgumentsToALocalTest", s_elm_TooManyArgsTooManyArgumentsToALocalTest),
-   ("TooManyArgsTooManyArgumentsToANullaryConstructorTest", s_elm_TooManyArgsTooManyArgumentsToANullaryConstructorTest),
-   ("TooManyArgsTooManyArgumentsToAnOperatorTest", s_elm_TooManyArgsTooManyArgumentsToAnOperatorTest)]
+   ("TooManyArgsTooManyArgumentsToALocalTest", s_elm_TooManyArgsTooManyArgumentsToALocalTest)]
 
 end StandardElm

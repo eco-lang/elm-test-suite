@@ -507,7 +507,7 @@ theorem gTop_ok : (a : ATopDec) → ∀ {C : Ctx} {Γ : GCtx} {p : Path} {E : En
       simp only [Option.some.injEq, Prod.mk.injEq] at h
       obtain ⟨rfl, rfl⟩ := h
       simp only [Bool.and_eq_true, decide_eq_true_eq] at hc
-      obtain ⟨h1, h2⟩ := hc
+      obtain ⟨⟨h1, h2⟩, -⟩ := hc
       simp only [ATopDec.erase, gTop, Option.some.injEq, Prod.mk.injEq] at hgt
       obtain ⟨rfl, rfl⟩ := hgt
       have hrv := child 0 hr (fun q => rfl)

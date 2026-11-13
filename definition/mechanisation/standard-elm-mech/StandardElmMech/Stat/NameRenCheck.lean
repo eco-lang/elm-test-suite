@@ -319,7 +319,7 @@ theorem nr_checkAtExp (h : NR ρ) (C : Ctx) : (a : AAtExp) → checkAtExp ((nr �
       rw [nr_genAt h]
   | .unit => rfl
   | .tuple e1 e2 e3 => by
-    simp only [Renaming.atExp, checkAtExp, nr_checkExp h C e1, nr_checkExp h C e2, nr_checkExpOpt h C e3]
+    simp only [Renaming.atExp, checkAtExp, nr_checkExpS h C e1, nr_checkExpS h C e2, nr_checkExpOpt h C e3]
   | .nil τ => by simp only [Renaming.atExp, checkAtExp]; exact nr_isListTy h τ
   | .record row => by simp only [Renaming.atExp, checkAtExp]; exact nr_checkExpRowOpt h C row
   | .update x inst τ row => by
@@ -329,32 +329,32 @@ theorem nr_checkAtExp (h : NR ρ) (C : Ctx) : (a : AAtExp) → checkAtExp ((nr �
     · rfl
     · simp only [Option.map_some, nr_tys, nr_genAt h]
   | .letE d e => by
-    simp only [Renaming.atExp, checkAtExp, nr_checkDec h C d, nr_dec_result h, nr_plusVE, nr_checkExp h _ e]
-  | .paren e => by simp only [Renaming.atExp, checkAtExp]; exact nr_checkExp h C e
+    simp only [Renaming.atExp, checkAtExp, nr_checkDec h C d, nr_dec_result h, nr_plusVE, nr_checkExpS h _ e]
+  | .paren e => by simp only [Renaming.atExp, checkAtExp]; exact nr_checkExpS h C e
 theorem nr_checkExpRow (h : NR ρ) (C : Ctx) : (r : AExpRow) → checkExpRow ((nr ρ).ctx C) ((nr ρ).expRow r) = checkExpRow C r
   | .field _ e rest => by
-    simp only [Renaming.expRow, checkExpRow, nr_checkExp h C e, nr_checkExpRowOpt h C rest]
+    simp only [Renaming.expRow, checkExpRow, nr_checkExpS h C e, nr_checkExpRowOpt h C rest]
 theorem nr_checkExpRowOpt (h : NR ρ) (C : Ctx) : (r : Option AExpRow) →
     checkExpRowOpt ((nr ρ).ctx C) ((nr ρ).expRowOpt r) = checkExpRowOpt C r
   | none => rfl
   | some r => by simp only [Renaming.expRowOpt, checkExpRowOpt]; exact nr_checkExpRow h C r
-theorem nr_checkExp (h : NR ρ) (C : Ctx) : (e : AExp) → checkExp ((nr ρ).ctx C) ((nr ρ).exp e) = checkExp C e
-  | .atexp a => by simp only [Renaming.exp, checkExp]; exact nr_checkAtExp h C a
+theorem nr_checkExpS (h : NR ρ) (C : Ctx) : (e : AExp) → checkExpS ((nr ρ).ctx C) ((nr ρ).exp e) = checkExpS C e
+  | .atexp a => by simp only [Renaming.exp, checkExpS]; exact nr_checkAtExp h C a
   | .app e a => by
-    simp only [Renaming.exp, checkExp, nr_checkExp h C e, nr_checkAtExp h C a, nr_exp_ty h, nr_atExp_ty h]
+    simp only [Renaming.exp, checkExpS, nr_checkExpS h C e, nr_checkAtExp h C a, nr_exp_ty h, nr_atExp_ty h]
     congr 1
     generalize AExp.ty e = τ
     cases τ <;> simp [nr_ty_eq_iff h]
   | .lam p e => by
-    simp only [Renaming.exp, checkExp, nr_checkAtPat h C p, nr_atPat_ve h, nr_plusVE, nr_checkExp h _ e]
+    simp only [Renaming.exp, checkExpS, nr_checkAtPat h C p, nr_atPat_ve h, nr_plusVE, nr_checkExpS h _ e]
   | .caseE e m => by
-    simp only [Renaming.exp, checkExp, nr_checkExp h C e, nr_checkMatch h C m, nr_match_ty h, nr_exp_ty h]
+    simp only [Renaming.exp, checkExpS, nr_checkExpS h C e, nr_checkMatch h C m, nr_match_ty h, nr_exp_ty h]
     congr 1
     generalize AMatch.ty m = τ
     cases τ <;> simp [nr_ty_eq_iff h]
 theorem nr_checkExpOpt (h : NR ρ) (C : Ctx) : (e : Option AExp) → checkExpOpt ((nr ρ).ctx C) ((nr ρ).expOpt e) = checkExpOpt C e
   | none => rfl
-  | some e => by simp only [Renaming.expOpt, checkExpOpt]; exact nr_checkExp h C e
+  | some e => by simp only [Renaming.expOpt, checkExpOpt]; exact nr_checkExpS h C e
 theorem nr_checkMatch (h : NR ρ) (C : Ctx) : (m : AMatch) → checkMatch ((nr ρ).ctx C) ((nr ρ).match_ m) = checkMatch C m
   | .mk mr rest => by
     simp only [Renaming.match_, checkMatch, nr_checkMRule h C mr, nr_mrule_ty h, nr_checkMatchOptAt h C]
@@ -365,22 +365,267 @@ theorem nr_checkMatchOptAt (h : NR ρ) (C : Ctx) (τ : Ty) : (m : Option AMatch)
     simp only [Renaming.matchOpt, checkMatchOptAt, nr_checkMatch h C m, nr_match_ty h, nr_dec_ty h]
 theorem nr_checkMRule (h : NR ρ) (C : Ctx) : (mr : AMRule) → checkMRule ((nr ρ).ctx C) ((nr ρ).mrule mr) = checkMRule C mr
   | .mk p e => by
-    simp only [Renaming.mrule, checkMRule, nr_checkPat h C p, nr_pat_ve h, nr_plusVE, nr_checkExp h _ e]
+    simp only [Renaming.mrule, checkMRule, nr_checkPat h C p, nr_pat_ve h, nr_plusVE, nr_checkExpS h _ e]
 theorem nr_checkDec (h : NR ρ) (C : Ctx) : (d : ADec) → checkDec ((nr ρ).ctx C) ((nr ρ).dec d) = checkDec C d
   | .val VE vb => by
     simp only [Renaming.dec, checkDec, nr_plusVE, nr_checkValBind h _ vb, nr_valBind_ve h, nr_valEnv_dec h]
 theorem nr_checkValBind (h : NR ρ) (C : Ctx) : (vb : AValBind) → checkValBind ((nr ρ).ctx C) ((nr ρ).valBind vb) = checkValBind C vb
   | .var _ ann τ e rest => by
-    simp only [Renaming.valBind, checkValBind, nr_checkAnn h, nr_ann_annU, nr_plusU, nr_checkExp h _ e,
+    simp only [Renaming.valBind, checkValBind, nr_checkAnn h, nr_ann_annU, nr_plusU, nr_checkExpS h _ e,
       nr_exp_ty h, nr_dec_ty h, nr_checkValBindOpt h C rest]
   | .pat p e => by
-    simp only [Renaming.valBind, checkValBind, nr_checkAtPat h C p, nr_checkExp h C e, nr_exp_ty h,
+    simp only [Renaming.valBind, checkValBind, nr_checkAtPat h C p, nr_checkExpS h C e, nr_exp_ty h,
       nr_atPat_ty h, nr_dec_ty h]
 theorem nr_checkValBindOpt (h : NR ρ) (C : Ctx) : (vb : Option AValBind) →
     checkValBindOpt ((nr ρ).ctx C) ((nr ρ).valBindOpt vb) = checkValBindOpt C vb
   | none => rfl
   | some vb => by simp only [Renaming.valBindOpt, checkValBindOpt]; exact nr_checkValBind h C vb
 end
+
+/-! ## Nodes -/
+
+mutual
+theorem renameNames_nr : (τ : Ty) → Ty.renameNames ρ τ = (nr ρ).ty τ
+  | .var _ => rfl
+  | .record r tl => by simp only [Ty.renameNames, nr_ty_record, renameRow_nr r]
+  | .fn a b => by simp only [Ty.renameNames, nr_ty_fn, renameNames_nr a, renameNames_nr b]
+  | .con as t => by
+    simp only [Ty.renameNames, renameName_eq, renameList_nr as, nr_tys, nr_ty_con]
+    rfl
+theorem renameRow_nr : (r : Row) → Ty.renameRow ρ r = (nr ρ).row r
+  | [] => rfl
+  | (l, τ) :: rest => by simp only [Ty.renameRow, renameNames_nr τ, renameRow_nr rest, nr_row_cons]
+theorem renameList_nr : (l : List Ty) → Ty.renameList ρ l = (nr ρ).tys l
+  | [] => rfl
+  | τ :: rest => by simp only [Ty.renameList, renameNames_nr τ, renameList_nr rest, Renaming.tys]
+end
+
+/-- A node renamed. -/
+theorem node_renameNames (n : Node) :
+    n.renameNames ρ = ⟨n.path, n.U, n.tys.map (nr ρ).ty, n.schemes.map (nr ρ).scheme⟩ := by
+  simp only [Node.renameNames]
+  congr 1
+  · exact List.map_congr_left fun τ _ => renameNames_nr τ
+  · exact List.map_congr_left fun σ _ => by simp [Renaming.scheme, renameNames_nr]
+
+@[simp] theorem nr_veSchemes (VE : ValEnv) : veSchemes ((nr ρ).valEnv VE) = (veSchemes VE).map (nr ρ).scheme := by
+  simp [veSchemes, Renaming.valEnv]
+
+/-- `ns.map (Node.renameNames ρ)`, the nodes renamed. -/
+abbrev nrNodes (ρ : List (TyName × TyName)) (ns : List Node) : List Node := ns.map (Node.renameNames ρ)
+
+theorem nrNode_mk (p : List Nat) (U : List BVar) (ts : List Ty) (ss : List Scheme) :
+    Node.renameNames ρ ⟨p, U, ts, ss⟩ = ⟨p, U, ts.map (nr ρ).ty, ss.map (nr ρ).scheme⟩ := node_renameNames _
+
+mutual
+theorem nr_nodesAtPat (h : NR ρ) (U : List BVar) (path : List Nat) : (p : AAtPat) →
+    nodesAtPat U path ((nr ρ).atPat p) = nrNodes ρ (nodesAtPat U path p)
+  | .wild τ | .scon _ τ | .var _ τ | .nil τ => by
+    simp [Renaming.atPat, nodesAtPat, nrNode_mk, AAtPat.ty, AAtPat.ve, Renaming.valEnv, mono, Renaming.scheme]
+  | .con lc inst τ => by
+    simp [Renaming.atPat, nodesAtPat, nrNode_mk, AAtPat.ty, AAtPat.ve, nr_tys]
+  | .unit => by simp [Renaming.atPat, nodesAtPat, nrNode_mk, AAtPat.ty, AAtPat.ve, nr_tUnitTy h]
+  | .tuple p1 p2 p3 => by
+    have e1 := nr_atPat_ty h (.tuple p1 p2 p3)
+    have e2 := nr_atPat_ve h (.tuple p1 p2 p3)
+    simp only [Renaming.atPat, AAtPat.ty] at e1 e2
+    simp only [Renaming.atPat, nodesAtPat, List.map_append, List.map_cons, List.map_nil, nrNode_mk,
+      nr_nodesPat h, nr_nodesPatOpt h, e2, nr_veSchemes, nr_pat_ty h, nr_patOpt_ty h, nr_tupleTy h]
+  | .record row τ => by
+    simp only [Renaming.atPat, nodesAtPat, List.map_append, List.map_cons, List.map_nil, nrNode_mk,
+      nr_nodesPatRowOpt h, nr_patRowOpt_ve h, nr_veSchemes]
+  | .paren p => by
+    simp only [Renaming.atPat, nodesAtPat, List.map_append, List.map_cons, List.map_nil, nrNode_mk,
+      nr_nodesPat h, nr_pat_ty h, nr_pat_ve h, nr_veSchemes]
+theorem nr_nodesPatRow (h : NR ρ) (U : List BVar) (path : List Nat) : (r : APatRow) →
+    nodesPatRow U path ((nr ρ).patRow r) = nrNodes ρ (nodesPatRow U path r)
+  | .field l τ rest => by
+    have e1 := nr_patRow_row (ρ := ρ) (.field l τ rest)
+    simp only [Renaming.patRow] at e1
+    simp only [Renaming.patRow, nodesPatRow, List.map_append, List.map_cons, List.map_nil, nrNode_mk,
+      nr_nodesPatRowOpt h, e1, nr_row_map, List.map_map]
+    rfl
+theorem nr_nodesPatRowOpt (h : NR ρ) (U : List BVar) (path : List Nat) : (r : Option APatRow) →
+    nodesPatRowOpt U path ((nr ρ).patRowOpt r) = nrNodes ρ (nodesPatRowOpt U path r)
+  | none => rfl
+  | some r => by simp only [Renaming.patRowOpt, nodesPatRowOpt]; exact nr_nodesPatRow h U path r
+theorem nr_nodesPat (h : NR ρ) (U : List BVar) (path : List Nat) : (p : APat) →
+    nodesPat U path ((nr ρ).pat p) = nrNodes ρ (nodesPat U path p)
+  | .atpat a => by
+    simp only [Renaming.pat, nodesPat, List.map_append, List.map_cons, List.map_nil, nrNode_mk,
+      nr_nodesAtPat h, nr_atPat_ty h, nr_atPat_ve h, nr_veSchemes]
+  | .con lc inst args τ => by
+    have e2 := nr_pat_ve h (.con lc inst args τ)
+    simp only [Renaming.pat, nr_tys] at e2
+    simp only [Renaming.pat, nodesPat, List.map_append, List.map_cons, List.map_nil, nrNode_mk,
+      nr_nodesAtPats h, e2, nr_veSchemes, nr_tys]
+  | .cons p1 p2 => by
+    have e2 := nr_pat_ve h (.cons p1 p2)
+    simp only [Renaming.pat] at e2
+    simp only [Renaming.pat, nodesPat, List.map_append, List.map_cons, List.map_nil, nrNode_mk,
+      nr_nodesPat h, e2, nr_veSchemes, nr_pat_ty h, nr_listTy h]
+  | .as p x => by
+    have e2 := nr_pat_ve h (.as p x)
+    simp only [Renaming.pat] at e2
+    simp only [Renaming.pat, nodesPat, List.map_append, List.map_cons, List.map_nil, nrNode_mk,
+      nr_nodesPat h, e2, nr_veSchemes, nr_pat_ty h]
+theorem nr_nodesPatOpt (h : NR ρ) (U : List BVar) (path : List Nat) : (p : Option APat) →
+    nodesPatOpt U path ((nr ρ).patOpt p) = nrNodes ρ (nodesPatOpt U path p)
+  | none => rfl
+  | some p => by simp only [Renaming.patOpt, nodesPatOpt]; exact nr_nodesPat h U path p
+theorem nr_nodesAtPats (h : NR ρ) (U : List BVar) (path : List Nat) : (i : Nat) → (ps : List AAtPat) →
+    nodesAtPats U path i ((nr ρ).atPats ps) = nrNodes ρ (nodesAtPats U path i ps)
+  | _, [] => rfl
+  | i, p :: ps => by
+    simp only [Renaming.atPats, nodesAtPats, List.map_append, nr_nodesAtPat h, nr_nodesAtPats h U path (i + 1) ps]
+end
+
+theorem nr_nodesE_head (C : Ctx) (path : List Nat) (τ : Ty) (ts : List Ty) :
+    Node.renameNames ρ ⟨path, C.U, τ :: ts, []⟩ = ⟨path, ((nr ρ).ctx C).U, (nr ρ).ty τ :: ts.map (nr ρ).ty, []⟩ := by
+  rw [nrNode_mk]; simp
+
+mutual
+theorem nr_nodesAtExp (h : NR ρ) (C : Ctx) (path : List Nat) : (a : AAtExp) →
+    nodesAtExp ((nr ρ).ctx C) path ((nr ρ).atExp a) = nrNodes ρ (nodesAtExp C path a)
+  | .scon sc τ => by
+    simp [Renaming.atExp, nodesAtExp, nrNode_mk, nr_litInst]
+  | .var lv inst τ => by simp [Renaming.atExp, nodesAtExp, nrNode_mk, nr_tys]
+  | .con lc inst τ => by simp [Renaming.atExp, nodesAtExp, nrNode_mk, nr_tys]
+  | .op o inst τ => by simp [Renaming.atExp, nodesAtExp, nrNode_mk, nr_tys]
+  | .unit => by simp [Renaming.atExp, nodesAtExp, nrNode_mk, nr_tUnitTy h]
+  | .nil τ => by simp [Renaming.atExp, nodesAtExp, nrNode_mk]
+  | .tuple e1 e2 e3 => by
+    have e := nr_atExp_ty h (.tuple e1 e2 e3)
+    simp only [Renaming.atExp] at e
+    simp only [Renaming.atExp, nodesAtExp, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      e, nr_nodesExp h, nr_nodesExpOpt h]
+  | .record row => by
+    have e := nr_atExp_ty h (.record row)
+    simp only [Renaming.atExp] at e
+    simp only [Renaming.atExp, nodesAtExp, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      e, nr_nodesExpRowOpt h]
+  | .update x inst τ row => by
+    simp only [Renaming.atExp, nodesAtExp, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      nr_nodesExpRow h, nr_tys]
+  | .letE d e => by
+    simp only [Renaming.atExp, nodesAtExp, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      nr_exp_ty h, nr_nodesDec h, nr_dec_result h, nr_plusVE, nr_nodesExp h]
+  | .paren e => by
+    simp only [Renaming.atExp, nodesAtExp, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      nr_exp_ty h, nr_nodesExp h]
+theorem nr_nodesExpRow (h : NR ρ) (C : Ctx) (path : List Nat) : (r : AExpRow) →
+    nodesExpRow ((nr ρ).ctx C) path ((nr ρ).expRow r) = nrNodes ρ (nodesExpRow C path r)
+  | .field l e rest => by
+    have e1 := nr_expRow_row h (.field l e rest)
+    simp only [Renaming.expRow] at e1
+    simp only [Renaming.expRow, nodesExpRow, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      e1, nr_nodesExp h, nr_nodesExpRowOpt h, nr_row_map, List.map_map]
+    rfl
+theorem nr_nodesExpRowOpt (h : NR ρ) (C : Ctx) (path : List Nat) : (r : Option AExpRow) →
+    nodesExpRowOpt ((nr ρ).ctx C) path ((nr ρ).expRowOpt r) = nrNodes ρ (nodesExpRowOpt C path r)
+  | none => rfl
+  | some r => by simp only [Renaming.expRowOpt, nodesExpRowOpt]; exact nr_nodesExpRow h C path r
+theorem nr_nodesExp (h : NR ρ) (C : Ctx) (path : List Nat) : (e : AExp) →
+    nodesExp ((nr ρ).ctx C) path ((nr ρ).exp e) = nrNodes ρ (nodesExp C path e)
+  | .atexp a => by
+    simp only [Renaming.exp, nodesExp, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      nr_atExp_ty h, nr_nodesAtExp h]
+  | .app e a => by
+    have e1 := nr_exp_ty h (.app e a)
+    simp only [Renaming.exp] at e1
+    simp only [Renaming.exp, nodesExp, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      e1, nr_nodesExp h, nr_nodesAtExp h]
+  | .lam p e => by
+    have e1 := nr_exp_ty h (.lam p e)
+    simp only [Renaming.exp] at e1
+    simp only [Renaming.exp, nodesExp, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      e1, nr_nodesAtPat h, nr_atPat_ve h, nr_plusVE, nr_nodesExp h]
+  | .caseE e m => by
+    have e1 := nr_exp_ty h (.caseE e m)
+    simp only [Renaming.exp] at e1
+    simp only [Renaming.exp, nodesExp, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      e1, nr_nodesExp h, nr_nodesMatch h]
+theorem nr_nodesExpOpt (h : NR ρ) (C : Ctx) (path : List Nat) : (e : Option AExp) →
+    nodesExpOpt ((nr ρ).ctx C) path ((nr ρ).expOpt e) = nrNodes ρ (nodesExpOpt C path e)
+  | none => rfl
+  | some e => by simp only [Renaming.expOpt, nodesExpOpt]; exact nr_nodesExp h C path e
+theorem nr_nodesMatch (h : NR ρ) (C : Ctx) (path : List Nat) : (m : AMatch) →
+    nodesMatch ((nr ρ).ctx C) path ((nr ρ).match_ m) = nrNodes ρ (nodesMatch C path m)
+  | .mk (.mk p e) rest => by
+    have e1 := nr_mrule_ty h (.mk p e)
+    simp only [Renaming.mrule] at e1
+    simp only [Renaming.match_, Renaming.mrule, nodesMatch, List.map_append, List.map_cons, List.map_nil, nrNode_mk,
+      nr_ctx_U, e1, nr_nodesPat h, nr_pat_ve h, nr_plusVE, nr_nodesExp h, nr_nodesMatchOpt h]
+theorem nr_nodesMatchOpt (h : NR ρ) (C : Ctx) (path : List Nat) : (m : Option AMatch) →
+    nodesMatchOpt ((nr ρ).ctx C) path ((nr ρ).matchOpt m) = nrNodes ρ (nodesMatchOpt C path m)
+  | none => rfl
+  | some m => by simp only [Renaming.matchOpt, nodesMatchOpt]; exact nr_nodesMatch h C path m
+theorem nr_nodesDec (h : NR ρ) (C : Ctx) (path : List Nat) : (d : ADec) →
+    nodesDec ((nr ρ).ctx C) path ((nr ρ).dec d) = nrNodes ρ (nodesDec C path d)
+  | .val VE vb => by
+    simp only [Renaming.dec, nodesDec, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      nr_ctx_tyvars h, nr_closGroup h, nr_veSchemes, nr_plusVE, nr_nodesValBind h]
+theorem nr_nodesValBind (h : NR ρ) (C : Ctx) (path : List Nat) : (vb : AValBind) →
+    nodesValBind ((nr ρ).ctx C) path ((nr ρ).valBind vb) = nrNodes ρ (nodesValBind C path vb)
+  | .var x ann τ e rest => by
+    have e1 := nr_valBind_ve h (.var x ann τ e rest)
+    simp only [Renaming.valBind] at e1
+    simp only [Renaming.valBind, nodesValBind, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      e1, nr_veSchemes, nr_ann_annU, nr_plusU, nr_nodesExp h, nr_nodesValBindOpt h]
+  | .pat p e => by
+    simp only [Renaming.valBind, nodesValBind, List.map_append, List.map_cons, List.map_nil, nrNode_mk, nr_ctx_U,
+      nr_atPat_ty h, nr_atPat_ve h, nr_veSchemes, nr_nodesAtPat h, nr_nodesExp h]
+theorem nr_nodesValBindOpt (h : NR ρ) (C : Ctx) (path : List Nat) : (vb : Option AValBind) →
+    nodesValBindOpt ((nr ρ).ctx C) path ((nr ρ).valBindOpt vb) = nrNodes ρ (nodesValBindOpt C path vb)
+  | none => rfl
+  | some vb => by simp only [Renaming.valBindOpt, nodesValBindOpt]; exact nr_nodesValBind h C path vb
+end
+
+/-! A renaming of type names keeps a type `Ty.okB`: it moves no label and no variable. -/
+
+mutual
+theorem nr_cnB : (τ : Ty) → cnB ((nr ρ).ty τ) = cnB τ
+  | .var _ => rfl
+  | .record r tl => by
+    simp only [Renaming.ty, cnB, nr_cnRowB r]
+    congr 2
+    exact nr_labs r
+  | .fn a b => by simp only [Renaming.ty, cnB, nr_cnB a, nr_cnB b]
+  | .con as t => by simp only [Renaming.ty, cnB, nr_cnListB as]
+theorem nr_cnRowB : (r : Row) → cnRowB ((nr ρ).row r) = cnRowB r
+  | [] => rfl
+  | (l, τ) :: rest => by simp only [Renaming.row, cnRowB, nr_cnB τ, nr_cnRowB rest]
+theorem nr_cnListB : (l : List Ty) → cnListB ((nr ρ).tys l) = cnListB l
+  | [] => rfl
+  | τ :: rest => by simp only [Renaming.tys, cnListB, nr_cnB τ, nr_cnListB rest]
+theorem nr_labs : (r : Row) → labs ((nr ρ).row r) = labs r
+  | [] => rfl
+  | (l, τ) :: rest => by simp only [Renaming.row, labs, List.map_cons]; exact congrArg _ (nr_labs rest)
+end
+
+theorem nr_okB (τ : Ty) : Ty.okB ((nr ρ).ty τ) = Ty.okB τ := by
+  simp only [Ty.okB, nr_cnB, nr_vars]
+
+theorem nr_nodesOkB (ns : List Node) : nodesOkB (nrNodes ρ ns) = nodesOkB ns := by
+  induction ns with
+  | nil => rfl
+  | cons n ns ih =>
+    simp only [nodesOkB, List.map_cons, List.all_cons] at ih ⊢
+    rw [ih, node_renameNames]
+    congr 1
+    induction n.tys with
+    | nil => rfl
+    | cons τ ts ih' => simp only [List.map_cons, List.all_cons, nr_okB, ih']
+
+theorem nr_okExpB (h : NR ρ) (e : AExp) : okExpB ((nr ρ).exp e) = okExpB e := by
+  rw [← nodesOkB_nodesExp ((nr ρ).ctx Inhabited.default) [], nr_nodesExp h, nr_nodesOkB, nodesOkB_nodesExp]
+
+theorem nr_okValBindB (h : NR ρ) (vb : AValBind) : okValBindB ((nr ρ).valBind vb) = okValBindB vb := by
+  rw [← nodesOkB_nodesValBind ((nr ρ).ctx Inhabited.default) [], nr_nodesValBind h, nr_nodesOkB,
+    nodesOkB_nodesValBind]
+
+theorem nr_checkExp (h : NR ρ) (C : Ctx) (e : AExp) : checkExp ((nr ρ).ctx C) ((nr ρ).exp e) = checkExp C e := by
+  simp only [checkExp, nr_checkExpS h, nr_okExpB h]
 
 end
 

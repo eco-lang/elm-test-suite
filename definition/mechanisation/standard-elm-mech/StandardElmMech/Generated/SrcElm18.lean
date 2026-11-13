@@ -4,6 +4,18 @@ import StandardElmMech.Src.Notation
 namespace StandardElm
 set_option maxRecDepth 100000
 
+/-- tests/elm/src/TypeMismatchRigidNumberAsFunctionTest.elm -/
+def s_elm_TypeMismatchRigidNumberAsFunctionTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchRigidNumberAsFunctionTest" [
+  Src.mdl (Src.hdr false "TypeMismatchRigidNumberAsFunctionTest" (.all))
+    []
+    [Src.val "f" (some (.fn (Src.tv "number") (Src.tv "number"))) [Src.pv "x"] (.lam [Src.pv "y"] (Src.v "y"))] ]
+
+/-- tests/elm/src/TypeMismatchRigidNumberAsMaybeTest.elm -/
+def s_elm_TypeMismatchRigidNumberAsMaybeTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchRigidNumberAsMaybeTest" [
+  Src.mdl (Src.hdr false "TypeMismatchRigidNumberAsMaybeTest" (.all))
+    []
+    [Src.val "f" (some (.fn (Src.tv "number") (Src.tv "number"))) [Src.pv "x"] (Src.app (Src.c "Just") [Src.v "x"])] ]
+
 /-- tests/elm/src/TypeMismatchRigidNumberAsRecordTest.elm -/
 def s_elm_TypeMismatchRigidNumberAsRecordTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchRigidNumberAsRecordTest" [
   Src.mdl (Src.hdr false "TypeMismatchRigidNumberAsRecordTest" (.all))
@@ -232,21 +244,11 @@ def s_elm_TypeMismatchTriplesDifferTest : Src.SProgram := Src.canonOrder <| Src.
     []
     [Src.val "x" (some (.tuple [Src.tc "Int" [], Src.tc "Int" [], Src.tc "Int" []])) [] (.tuple [Src.i 1, Src.i 2, Src.str "a"])] ]
 
-/-- tests/elm/src/TypeMismatchTupleAgainstAnAliasTest.elm -/
-def s_elm_TypeMismatchTupleAgainstAnAliasTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchTupleAgainstAnAliasTest" [
-  Src.mdl (Src.hdr false "TypeMismatchTupleAgainstAnAliasTest" (.all))
-    []
-    [.alias "N" [] (Src.tc "Int" []), Src.val "m" (some (Src.tc "N" [])) [] (Src.i 1), Src.val "y" none [] (.list [Src.v "m", .tuple [Src.i 1, Src.i 2]])] ]
-
-/-- tests/elm/src/TypeMismatchTupleComponentPatternTest.elm -/
-def s_elm_TypeMismatchTupleComponentPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchTupleComponentPatternTest" [
-  Src.mdl (Src.hdr false "TypeMismatchTupleComponentPatternTest" (.all))
-    []
-    [Src.val "x" none [] (.caseE (.tuple [Src.i 1, Src.i 2]) [(.tuple [.lit (.str "a"), Src.pv "b"], Src.i 1), (.wild, Src.i 2)])] ]
-
 /-- The programs of this shard, by test name. -/
 def srcShard_SrcElm18 : List (String × Src.SProgram) :=
-  [("TypeMismatchRigidNumberAsRecordTest", s_elm_TypeMismatchRigidNumberAsRecordTest),
+  [("TypeMismatchRigidNumberAsFunctionTest", s_elm_TypeMismatchRigidNumberAsFunctionTest),
+   ("TypeMismatchRigidNumberAsMaybeTest", s_elm_TypeMismatchRigidNumberAsMaybeTest),
+   ("TypeMismatchRigidNumberAsRecordTest", s_elm_TypeMismatchRigidNumberAsRecordTest),
    ("TypeMismatchRigidNumberAsRigidVarTest", s_elm_TypeMismatchRigidNumberAsRigidVarTest),
    ("TypeMismatchRigidNumberAsTupleTest", s_elm_TypeMismatchRigidNumberAsTupleTest),
    ("TypeMismatchRigidNumberAsUnitTest", s_elm_TypeMismatchRigidNumberAsUnitTest),
@@ -283,8 +285,6 @@ def srcShard_SrcElm18 : List (String × Src.SProgram) :=
    ("TypeMismatchStringRightOfTimesTest", s_elm_TypeMismatchStringRightOfTimesTest),
    ("TypeMismatchTailPatternTest", s_elm_TypeMismatchTailPatternTest),
    ("TypeMismatchThirdCaseBranchTest", s_elm_TypeMismatchThirdCaseBranchTest),
-   ("TypeMismatchTriplesDifferTest", s_elm_TypeMismatchTriplesDifferTest),
-   ("TypeMismatchTupleAgainstAnAliasTest", s_elm_TypeMismatchTupleAgainstAnAliasTest),
-   ("TypeMismatchTupleComponentPatternTest", s_elm_TypeMismatchTupleComponentPatternTest)]
+   ("TypeMismatchTriplesDifferTest", s_elm_TypeMismatchTriplesDifferTest)]
 
 end StandardElm

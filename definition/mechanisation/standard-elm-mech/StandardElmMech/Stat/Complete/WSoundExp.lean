@@ -241,13 +241,13 @@ theorem wAtExp_sound (fuel n0 : Nat) : ∀ (a : BAtExp) (C : Ctx) (st : WSt) (r 
     exact ⟨_, P1.weaken (cov_refl _) fun s _ c => by simpa [checkAtExp, sbAtExp, AAtExp.ty] using c⟩
 theorem wExp_sound (fuel n0 : Nat) : ∀ (e : BExp) (C : Ctx) (st : WSt) (r : Ty × AExp) (st' : WSt),
     SPre n0 C st → wExp fuel (rigidFrom n0) C e st = .ok r st' →
-    Post n0 C st st' [r.1] (fun s => checkExp (ctxSb s C) (sbExp s r.2) = true ∧ (sbExp s r.2).ty = sb s r.1)
+    Post n0 C st st' [r.1] (fun s => checkExpS (ctxSb s C) (sbExp s r.2) = true ∧ (sbExp s r.2).ty = sb s r.1)
   | .atexp a, C, st, r, st', hp, h => by
     simp only [wExp] at h
     obtain ⟨⟨τ1, a1⟩, st1, h1, k1⟩ := wbind_ok h; dsimp only at k1
     obtain ⟨K1, P1⟩ := wAtExp_sound fuel n0 a C st _ st1 hp h1
     obtain ⟨rfl, rfl⟩ := pure_ok' k1
-    exact ⟨_, P1.weaken (cov_refl _) fun s _ c => by simpa [checkExp, sbExp, AExp.ty] using c⟩
+    exact ⟨_, P1.weaken (cov_refl _) fun s _ c => by simpa [checkExpS, sbExp, AExp.ty] using c⟩
   | .app e a, C, st, r, st', hp, h => by
     simp only [wExp] at h
     obtain ⟨⟨τ1, ae⟩, st1, h1, k1⟩ := wbind_ok h; dsimp only at k1
@@ -272,7 +272,7 @@ theorem wExp_sound (fuel n0 : Nat) : ∀ (e : BExp) (C : Ctx) (st : WSt) (r : Ty
     simp only at c1 t1 c2 t2
     have hty : (sbExp s ae).ty = .fn (sbAtExp s aa).ty (sb s (.var (.fresh st2.n .any))) := by
       rw [t1, he, t2]; rfl
-    simp only [checkExp, sbExp, c1, c2, Bool.true_and, hty, decide_true, AExp.ty, Ty.cod, and_self]
+    simp only [checkExpS, sbExp, c1, c2, Bool.true_and, hty, decide_true, AExp.ty, Ty.cod, and_self]
   | .lam p e, C, st, r, st', hp, h => by
     simp only [wExp] at h
     obtain ⟨⟨τp, ap⟩, st1, h1, k1⟩ := wbind_ok h; dsimp only at k1
@@ -289,7 +289,7 @@ theorem wExp_sound (fuel n0 : Nat) : ∀ (e : BExp) (C : Ctx) (st : WSt) (r : Ty
       (fun v hv => ⟨τe, by simp, hv⟩)) fun s _ ⟨cp, ce, te⟩ => ?_⟩
     simp only at ce te
     rw [ctxSb_plusVE] at ce
-    simp only [checkExp, sbExp, cp, sbAtPat_ve, ce, Bool.and_self, AExp.ty, sbAtPat_ty, te, sb, true_and]
+    simp only [checkExpS, sbExp, cp, sbAtPat_ve, ce, Bool.and_self, AExp.ty, sbAtPat_ty, te, sb, true_and]
   | .caseE e m, C, st, r, st', hp, h => by
     simp only [wExp] at h
     obtain ⟨⟨τe, ae⟩, st1, h1, k1⟩ := wbind_ok h; dsimp only at k1
@@ -314,7 +314,7 @@ theorem wExp_sound (fuel n0 : Nat) : ∀ (e : BExp) (C : Ctx) (st : WSt) (r : Ty
     simp only at c1 t1 c2 t2
     have hty : (sbMatch s am).ty = .fn (sbExp s ae).ty (sb s (.var (.fresh st2.n .any))) := by
       rw [t2, he, t1]; rfl
-    simp only [checkExp, sbExp, c1, c2, Bool.true_and, hty, decide_true, AExp.ty, Ty.cod, and_self]
+    simp only [checkExpS, sbExp, c1, c2, Bool.true_and, hty, decide_true, AExp.ty, Ty.cod, and_self]
 theorem wExpOpt_sound (fuel n0 : Nat) : ∀ (e : Option BExp) (C : Ctx) (st : WSt) (r : Option Ty × Option AExp)
     (st' : WSt), SPre n0 C st → wExpOpt fuel (rigidFrom n0) C e st = .ok r st' →
     Post n0 C st st' r.1.toList (fun s => checkExpOpt (ctxSb s C) (sbExpOpt s r.2) = true ∧

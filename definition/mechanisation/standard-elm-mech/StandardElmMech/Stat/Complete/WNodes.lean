@@ -71,19 +71,19 @@ theorem sbExpRowOpt_row_chk (s : FSub) : ∀ (r : Option AExpRow) (C : Ctx), che
   | some r, C, h => by
     simp only [checkExpRowOpt] at h
     simp only [sbExpRowOpt, AExpRow.rowOpt, sbExpRow_row_chk s r C h]
-theorem sbExp_ty_chk (s : FSub) : ∀ (e : AExp) (C : Ctx), checkExp C e = true → (sbExp s e).ty = sb s e.ty
+theorem sbExp_ty_chk (s : FSub) : ∀ (e : AExp) (C : Ctx), checkExpS C e = true → (sbExp s e).ty = sb s e.ty
   | .atexp a, C, h => by
-    simp only [checkExp] at h
+    simp only [checkExpS] at h
     simp only [sbExp, AExp.ty, sbAtExp_ty_chk s a C h]
   | .app e a, C, h => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     obtain ⟨r, hr⟩ := fn_of_match h.2
     simp only [sbExp, AExp.ty, sbExp_ty_chk s e C h.1.1, hr, sb, Ty.cod]
   | .lam p e, C, h => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     simp only [sbExp, AExp.ty, sbAtPat_ty, sbExp_ty_chk s e _ h.2, sb]
   | .caseE e m, C, h => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     obtain ⟨r, hr⟩ := fn_of_match h.2
     simp only [sbExp, AExp.ty, sbMatch_ty_chk s m C h.1.2, hr, sb, Ty.cod]
 theorem sbExpOpt_ty_chk (s : FSub) : ∀ (e : Option AExp) (C : Ctx), checkExpOpt C e = true →

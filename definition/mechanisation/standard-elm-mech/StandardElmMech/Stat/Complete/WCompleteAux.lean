@@ -46,8 +46,7 @@ end
 /-- An annotation without type variables names no explicit variable. -/
 theorem newFor_nil {U' : List BVar} {ty : BTy} {CU : List BVar} (h : newForB U' ty CU = true)
     (hn : (bTyNames ty).isEmpty = true) : U' = [] := by
-  rw [newForB_iff] at h
-  obtain ⟨h1, h2, -⟩ := h
+  obtain ⟨h1, h2, -⟩ := newFor_of_newForB h
   rw [List.isEmpty_iff] at hn
   cases U' with
   | nil => rfl

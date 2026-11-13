@@ -12,6 +12,58 @@ import StandardElmMech.Stat.TestBasis
 namespace StandardElm
 set_option maxRecDepth 100000
 
+/-- tests/elm/src/TypeMismatchArgumentToAConstructorTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchArgumentToAConstructorTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchArgumentToAConstructorTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchArgumentToAnOperatorFunctionTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchArgumentToAnOperatorFunctionTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchArgumentToAnOperatorFunctionTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchBoolLeftOfAppendTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchBoolLeftOfAppendTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchBoolLeftOfAppendTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchBoolLeftOfMinusTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchBoolLeftOfMinusTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchBoolLeftOfMinusTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchBoolLeftOfPowerTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchBoolLeftOfPowerTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchBoolLeftOfPowerTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchBoolLeftOfTimesTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchBoolLeftOfTimesTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchBoolLeftOfTimesTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchBoolPatternTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchBoolPatternTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchBoolPatternTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchBoolRightOfAppendWithAStringTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchBoolRightOfAppendWithAStringTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchBoolRightOfAppendWithAStringTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchBoolRightOfPlusTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchBoolRightOfPlusTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchBoolRightOfPlusTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchBoolsComparedTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchBoolsComparedTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchBoolsComparedTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchCaseAsAnArgumentTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchCaseAsAnArgumentTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchCaseAsAnArgumentTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchCharUnderIntTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchCharUnderIntTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchCharUnderIntTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchClosedRecordWhereExtensibleTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchClosedRecordWhereExtensibleTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchClosedRecordWhereExtensibleTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
 /-- tests/elm/src/TypeMismatchCompappendAgainstARigidVarTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_TypeMismatchCompappendAgainstARigidVarTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchCompappendAgainstARigidVarTest :=
   Stat.not_legal_of_coreRefutes (by decide +kernel)
@@ -51,6 +103,14 @@ theorem refuse_elm_TypeMismatchConstructorPatternTest : ¬ Stat.LegalProgram Sta
 /-- tests/elm/src/TypeMismatchDestructureTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_TypeMismatchDestructureTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchDestructureTest :=
   Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchDifferentlyNamedComparableVarsTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchDifferentlyNamedComparableVarsTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchDifferentlyNamedComparableVarsTest :=
+  Stat.not_legal_of_wRefutes Stat.Btest_inv (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchDifferentlyNamedFlexVarsTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchDifferentlyNamedFlexVarsTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchDifferentlyNamedFlexVarsTest :=
+  Stat.not_legal_of_wRefutes Stat.Btest_inv (by decide +kernel)
 
 /-- tests/elm/src/TypeMismatchExtensibleRecordGivenAClosedOneTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_TypeMismatchExtensibleRecordGivenAClosedOneTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchExtensibleRecordGivenAClosedOneTest :=
@@ -110,66 +170,6 @@ theorem refuse_elm_TypeMismatchFloatRightOfTimesWithIntTest : ¬ Stat.LegalProgr
 
 /-- tests/elm/src/TypeMismatchFloatUnderIntTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_TypeMismatchFloatUnderIntTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchFloatUnderIntTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchFunctionInATypeArgumentTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchFunctionInATypeArgumentTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchFunctionInATypeArgumentTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchFunctionLeftOfGreaterThanTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchFunctionLeftOfGreaterThanTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchFunctionLeftOfGreaterThanTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIfBranchTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIfBranchTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIfBranchTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIfConditionIntTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIfConditionIntTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIfConditionIntTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIfUnderIntTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIfUnderIntTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIfUnderIntTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchImportedTypeNamedLikeAnAliasTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchImportedTypeNamedLikeAnAliasTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchImportedTypeNamedLikeAnAliasTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIntAgainstNumberAfterAMismatchTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIntAgainstNumberAfterAMismatchTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIntAgainstNumberAfterAMismatchTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIntRightOfAppendTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIntRightOfAppendTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIntRightOfAppendTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIntRightOfAppendWithAListTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIntRightOfAppendWithAListTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIntRightOfAppendWithAListTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIntRightOfDivideTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIntRightOfDivideTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIntRightOfDivideTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIntRightOfMinusWithFloatTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIntRightOfMinusWithFloatTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIntRightOfMinusWithFloatTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIntRightOfPlusWithFloatTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIntRightOfPlusWithFloatTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIntRightOfPlusWithFloatTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIntRightOfPowerWithFloatTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIntRightOfPowerWithFloatTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIntRightOfPowerWithFloatTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIntRightOfTimesWithFloatTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIntRightOfTimesWithFloatTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIntRightOfTimesWithFloatTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchIntWhereFloatTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchIntWhereFloatTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchIntWhereFloatTest :=
   Stat.not_legal_of_coreRefutes (by decide +kernel)
 
 end StandardElm

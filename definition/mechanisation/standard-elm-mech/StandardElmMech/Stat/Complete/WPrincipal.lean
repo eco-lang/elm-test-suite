@@ -8,9 +8,10 @@
   `PrincipalExistsCore` false (InstCounter.lean). Here an instance is taken with the instance
   lists left out (`stripExp`): the nodes are then the book's sentences, the type of each
   occurrence and of every other node, the U of its context and the schemes of its declarations.
-  The derivations compared are those without free `bnd` variables (`NoFreeBndExp`, as step 9's
-  `AModule.NoFreeBnd` for modules: `bnd` variables are the bound variables of canonical schemes,
-  and a derivation that uses one free has its closure capture it).
+  The derivations compared are all those step 9's checker accepts; it rejects a free `bnd`
+  variable at a node (`Ty.okB`), so every one is without (`noFreeBndExp_of_checkExp`: `bnd`
+  variables are the bound variables of canonical schemes, and a derivation that used one free
+  would have its closure capture it).
 
   *The statements* (`WRefutation`, `WCompleteness`, `WPrincipality`) are propositions here. The
   main induction L11 is WComplete.lean (with WCompletePat.lean for patterns); `WRefutation` is
@@ -107,11 +108,16 @@ end
 def NoFreeBndExp (C : Ctx) (a : AExp) : Prop :=
   ∀ n ∈ nodesExp C [] a, ∀ τ ∈ n.tys, ∀ v ∈ τ.vars, v.isBnd = false
 
+/-- Step 9's checker rejects a free `bnd` variable at a node (`Ty.okB`): every derivation it
+    accepts is one of those. -/
+theorem noFreeBndExp_of_checkExp {C : Ctx} {a : AExp} (h : checkExp C a = true) : NoFreeBndExp C a :=
+  fun n hn τ hτ => ((Ty.okB_iff τ).mp (okB_of_checkExp h n hn τ hτ)).2
+
 /-- `a'` is an instance of `a` (sec:static-core-principal), the instance lists left out. -/
 def InstanceOfB (C0 : Ctx) (a' a : AExp) : Prop := InstanceOf C0 (stripExp a') (stripExp a)
 
 def IsPrincipalB (C0 : Ctx) (a : AExp) : Prop :=
-  checkExp C0 a = true ∧ ∀ a', checkExp C0 a' = true → NoFreeBndExp C0 a' → a'.erase = a.erase →
+  checkExp C0 a = true ∧ ∀ a', checkExp C0 a' = true → a'.erase = a.erase →
     InstanceOfB C0 a' a
 
 /-- The root context is well formed for F_b: the bound variables of a scheme it binds are `bnd`
@@ -124,19 +130,19 @@ def RootOK (C0 : Ctx) : Prop :=
 
 /-! ## The statements (section 7, for F_c) -/
 
-/-- Refutation: if W fails, no derivation without free `bnd` variables exists (with step 9's
-    adequacy, `¬ ∃ τ, ElExp C0 e τ` for such derivations). The restriction is needed: a free
-    `bnd` variable is captured by a later closure, and such a derivation can type a phrase that
-    has no other derivation (`\y -> let f = \z -> y in (case f 'c' of 'x' -> 1, case f "s" of
-    "x" -> 2)` with `y : bnd 0`: `f` closes to `∀ bnd 0. bnd 0 -> bnd 0`). -/
+/-- Refutation: if W fails, no derivation exists (with step 9's adequacy, `¬ ∃ τ, ElExp C0 e τ`).
+    The checker's rejection of a free `bnd` variable is needed: such a variable is captured by a
+    later closure, and a derivation using one could type a phrase that has no other derivation
+    (`\y -> let f = \z -> y in (case f 'c' of 'x' -> 1, case f "s" of "x" -> 2)` with
+    `y : bnd 0`: `f` closes to `∀ bnd 0. bnd 0 -> bnd 0`). -/
 def WRefutation : Prop :=
   ∀ fuel C0 e, RootOK C0 → inferExpW fuel C0 e = .fail →
-    ¬ ∃ a', checkExp C0 a' = true ∧ NoFreeBndExp C0 a' ∧ a'.erase = e
+    ¬ ∃ a', checkExp C0 a' = true ∧ a'.erase = e
 
 /-- Completeness: if a derivation exists, W neither fails nor returns `internal`, and for some
     fuel it does not run out (so it returns `ok`, or `unsupported` outside F_c). -/
 def WCompleteness : Prop :=
-  ∀ C0 e, RootOK C0 → (∃ a', checkExp C0 a' = true ∧ NoFreeBndExp C0 a' ∧ a'.erase = e) →
+  ∀ C0 e, RootOK C0 → (∃ a', checkExp C0 a' = true ∧ a'.erase = e) →
     (∀ fuel, inferExpW fuel C0 e ≠ .fail ∧ inferExpW fuel C0 e ≠ .internal) ∧
     ∃ fuel, inferExpW fuel C0 e ≠ .outOfFuel
 

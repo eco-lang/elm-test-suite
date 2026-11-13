@@ -162,19 +162,19 @@ theorem walkExpRowOpt (hw : WalkHyp S S' ν r D) : (row : Option AExpRow) → �
     simp only [nodesExpRowOpt] at h
     exact .some (walkExpRow hw row row'' C C'' path he hc hc'' h)
 theorem walkExp (hw : WalkHyp S S' ν r D) : (e : AExp) → ∀ (e'' : AExp) (C C'' : Ctx) (path : List Nat),
-    e''.erase = e.erase → checkExp C e = true → checkExp C'' e'' = true →
+    e''.erase = e.erase → checkExpS C e = true → checkExpS C'' e'' = true →
     Rel3 S S' ν ν' D (nodesExp C path e) (nodesExp C'' path e'') → RExp r D e e''
   | .atexp a, e'', C, C'', path, he, hc, hc'', h => by
     cases e'' <;> simp [AExp.erase] at he
     rename_i a''
-    simp only [checkExp] at hc hc''
+    simp only [checkExpS] at hc hc''
     simp only [nodesExp, List.cons_append, List.singleton_append] at h
     exact .atexp (walkAtExp hw a a'' C C'' (path ++ [0]) he hc hc'' (h.mono (fun n hn => by simp [hn]) (fun n hn => by simp [hn])))
   | .app e a, e'', C, C'', path, he, hc, hc'', h => by
     cases e'' <;> simp [AExp.erase] at he
     rename_i f a''
     obtain ⟨he1, he2⟩ := he
-    simp only [checkExp, Bool.and_eq_true] at hc hc''
+    simp only [checkExpS, Bool.and_eq_true] at hc hc''
     simp only [nodesExp, List.cons_append, List.singleton_append] at h
     exact .app
       (walkExp hw e f C C'' (path ++ [0]) he1 hc.1.1 hc''.1.1 (h.mono (fun n hn => by simp [hn]) (fun n hn => by simp [hn])))
@@ -183,7 +183,7 @@ theorem walkExp (hw : WalkHyp S S' ν r D) : (e : AExp) → ∀ (e'' : AExp) (C 
     cases e'' <;> simp [AExp.erase] at he
     rename_i p'' f
     obtain ⟨he1, he2⟩ := he
-    simp only [checkExp, Bool.and_eq_true] at hc hc''
+    simp only [checkExpS, Bool.and_eq_true] at hc hc''
     simp only [nodesExp, List.cons_append, List.singleton_append] at h
     have hp := walkAtPat hw p p'' C.U C''.U (path ++ [0]) he1 (h.mono (fun n hn => by simp [hn]) (fun n hn => by simp [hn]))
     exact .lam he1 hp.2.1
@@ -192,7 +192,7 @@ theorem walkExp (hw : WalkHyp S S' ν r D) : (e : AExp) → ∀ (e'' : AExp) (C 
     cases e'' <;> simp [AExp.erase] at he
     rename_i f m''
     obtain ⟨he1, he2⟩ := he
-    simp only [checkExp, Bool.and_eq_true] at hc hc''
+    simp only [checkExpS, Bool.and_eq_true] at hc hc''
     simp only [nodesExp, List.cons_append, List.singleton_append] at h
     exact .caseE
       (walkExp hw e f C C'' (path ++ [0]) he1 hc.1.1 hc''.1.1 (h.mono (fun n hn => by simp [hn]) (fun n hn => by simp [hn])))

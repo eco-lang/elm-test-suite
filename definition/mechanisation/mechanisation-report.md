@@ -1,5 +1,70 @@
 # Mechanisation Report
 
+> **Update, 2026-11-13 (plan step 11, milestone (g): D11 discharged).** The hypothesis that the
+> inference's derivation is principal (D11, `[principal]`) is gone from every per-test theorem but
+> one. Module-level W now handles ports (as the annotated group `x : ty; x = x`, kept only when its
+> closed environment is the port rule's) and returns a derivation for 622 of the 623 legal programs.
+> For each translated test a theorem `wcheck_` has the kernel run W, Chapter 9's conditions, the
+> further restrictions and the specialisation, and `legal_of_W`, `ident_of_wCheck` and
+> `programSem_of_wCheck` give its `legal_`, `ident_` and `mean_` theorems without hypothesis;
+> `spec_` is unchanged, so compare-e2e still agrees (580 of 580). The exception is
+> CompilerIssue2281LongLineListTest, a list literal of 22,000 elements, on which compiled W gave no
+> result within two hours: its `legal_` keeps step 9's form under D11. StandardA96NumberFlagsTest is
+> refused (`not_legal_of_wMainVar`: W's `main` has a variable as its flags type, which every
+> principal derivation keeps and which no port type is), so all 286 compile-error tests are refused.
+> W costs two to four times step 9's inference in the kernel: 15 W checks over the memory budget use
+> `native_decide`, `spec_` of WideRecord40Test joins them, and the certificates take about 1 h 50 min
+> to build serially, peak 6.1 GB. The general properties `PrincipalExistsCore` and
+> `PrincipalExistsMod` are proved only from W's coverage; unconditionally they need the `internal`
+> clause of W's completeness (milestone (e)), W's coverage of what it answers `unsupported`
+> (pattern bindings in groups, ambiguous contexts, aliases with free variables), and bases and
+> contexts outside W's invariants. The two tests of ruling A98 had not been translated; the
+> translator resolved a built-in type name (`String`) before the module's own alias, against A98,
+> and now lets the module's types and aliases take the name first, so StandardA98TypeBeforeAliasTest
+> is translated (580 tests) and its mismatch twin is refused by the core refutation. Counts: 623
+> `legal_` (16 by `native_decide`, 1 under D11), 286 `refuse_`, 0 compile-error tests unrefused;
+> 580 `spec_` (5 native), 578 `mean_`, 580 `ident_`; 15,481 theorems (242 using `native_decide`), 0
+> axiom problems; run-examples 1,709 of 1,709; compare-e2e 580 of 580; measure-cores 201 refuted,
+> none of the 626 compile-success tests; measure-w: W refutes none of the 625 compile-success tests
+> it runs and gives a derivation for all 622 legal programs it runs; `scripts/check-hypotheses.lean`
+> lists 13 general lemmas and 2281's `legal_`; the certificates build in 93 min, peak 5.8 GB.
+
+> **Update, 2026-11-12 (plan step 11, milestone (f), modules and programs).** Module- and
+> program-level W (`MW.inferModuleW`, `MW.inferProgramW`, `Stat/Complete/Modules*.lean`) elaborates
+> a module's type declarations whole, as ruling A98 requires, and its top-level groups as one nested
+> `let` with milestone (e)'s W. Refutation (`inferModuleW_fail`, `inferProgramW_fail`,
+> `Stat.not_legal_of_wRefutes`) and principality (`inferModuleW_principal`,
+> `inferProgramW_principal`) are proved without hypotheses; since A98 every module is coherent, so
+> section 9's coherence conditions are not needed, and two solutions of the type declarations differ
+> by a bijection of type names (`types_bij`). The 15 inference tests the core refutation missed (the
+> six rigid-`let` tests, the four row tests, four tests of local type variables and
+> CompilerIssue2274) are refused by the kernel: 284 compile-error tests are refused, and only
+> StandardA96NumberFlagsTest (milestone (g)) is not. `lake exe measure-w` (`w-report.json`): W
+> refutes none of the 624 compile-success tests it can run (CompilerIssue2281LongLineListTest, a
+> list of 22,000 elements, is over the memory budget) and returns a derivation for 585 of the 622
+> legal programs; the 36 with ports are not yet handled. 14,804 theorems, 0 axiom problems;
+> run-examples unchanged (1,708 checks); compare-e2e 579 of 579; the certificates build in 818 s
+> with a peak of 6.3 GB.
+
+> **Update, 2026-11-12 (plan step 11, milestones (b) to (d), and step 9's checker made exact).**
+> Algorithm W is proved sound, refuting, complete, principal and terminating at expression level for
+> Hindley–Milner (milestone (b)), with type classes (c), and with records and rows (d, a separate
+> function `inferExpWD`, with a bridge to step 9's `IsPrincipal`). With the stronger constraint
+> solving of (b) to (d), the core refutation covers 200 of the 217 compile-error tests that need
+> inference (`coreRefutes`), unconditionally, and still none of the 625 that compile; 269
+> compile-error tests are refused in all, 16 not yet. Milestone (e), annotations:
+> `WE.inferExpWD` is sound, terminating, refuting and principal (`WE.wePrincipality`; its result is
+> principal in step 9's sense), and at expression level it refuses the six rigid-`let` tests by the
+> escape check; one clause of its completeness (it never stops with an internal error where a
+> derivation exists) is not yet proved. Step 9's checker now accepts exactly the book's derivations: every type
+> at every node has canonical rows and no free bound variable, and an annotation's new variables
+> are exactly those the book gives. This last point is an erratum to `sec:static-core-explicit`: a
+> new name stands for a row variable exactly when the annotation uses it as a record extension.
+> Before the erratum, `let f : a -> a; f x = x in f` had two incomparable derivations. The
+> hypotheses W's theorems carried for these conditions now follow from the checker and are gone.
+> No certificate changed: 622 `legal_`, 579 `spec_`, 577 `mean_`, 579 `ident_`; 14,540 theorems,
+> 0 axiom problems; run-examples unchanged (1,708 checks); compare-e2e 579 of 579.
+
 > **Update, 2026-11-12 (plan step 11, milestone (a), and the end of step 10).** Step 10 is
 > complete: the specialisation of a program is unique (`ident_of_spec'`, under D11 and a
 > decidable condition that a module's type names are distinct and its aliases ordered), and each of

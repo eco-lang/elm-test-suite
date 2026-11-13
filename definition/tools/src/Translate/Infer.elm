@@ -490,7 +490,8 @@ annotation env scope (Node _ ann) st =
             annotations env scope args st
                 |> Result.andThen
                     (\( targs, scope1, st1 ) ->
-                        if (List.isEmpty qual || List.member (String.join "." qual) [ "Basics", "List", "Maybe", "Result", "String", "Char" ]) && builtin name (List.length targs) then
+                        if ((List.isEmpty qual && not (Dict.member name env.modul.types || Dict.member name env.modul.aliases)) || List.member (String.join "." qual) [ "Basics", "List", "Maybe", "Result", "String", "Char" ]) && builtin name (List.length targs) then
+                            -- a local type or alias takes the name before the default imports (ruling A98)
                             Ok ( TCon name targs, scope1, st1 )
 
                         else if List.member ( String.join "." qual, name ) [ ( "", "Html" ), ( "Html", "Html" ), ( "VirtualDom", "Node" ) ] && List.length targs == 1 && not (Dict.member name env.modul.types || Dict.member name env.modul.aliases) then

@@ -4,6 +4,27 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/WideRecord33Test.elm -/
+def g_elm_WideRecord33Test : Program := {
+  name := "WideRecord33Test", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [("R", some ["f0000", "f0001", "f0002", "f0003", "f0004", "f0005", "f0006", "f0007", "f0008", "f0009", "f0010", "f0011", "f0012", "f0013", "f0014", "f0015", "f0016", "f0017", "f0018", "f0019", "f0020", "f0021", "f0022", "f0023", "f0024", "f0025", "f0026", "f0027", "f0028", "f0029", "f0030", "f0031", "f0032"])],
+  defs := [
+    .fn "make" [pv "base"] (recE [("f0000", .atexp (.paren (bin "+" (v "base") (i 999)))), ("f0001", .atexp (.paren (bin "-" (bin "+" (ap (v "toFloat") [v "base"]) (.atexp (.scon (.float 15 (-1))))) (.atexp (.scon (.intF 1)))))), ("f0002", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (.atexp (chA 'c')) (.atexp (chA '?'))))))), ("f0003", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (str "3s") (str "?")))))), ("f0004", .atexp (.paren (bin "==" (ap (v "modBy") [i 2, .atexp (.paren (bin "+" (v "base") (i 3)))]) (i 0)))), ("f0005", .atexp (.paren (bin "+" (v "base") (i 1004)))), ("f0006", .atexp (.paren (bin "-" (bin "+" (ap (v "toFloat") [v "base"]) (.atexp (.scon (.float 65 (-1))))) (.atexp (.scon (.intF 1)))))), ("f0007", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (.atexp (chA 'h')) (.atexp (chA '?'))))))), ("f0008", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (str "8s") (str "?")))))), ("f0009", .atexp (.paren (bin "==" (ap (v "modBy") [i 2, .atexp (.paren (bin "+" (v "base") (i 8)))]) (i 0)))), ("f0010", .atexp (.paren (bin "+" (v "base") (i 1009)))), ("f0011", .atexp (.paren (bin "-" (bin "+" (ap (v "toFloat") [v "base"]) (.atexp (.scon (.float 115 (-1))))) (.atexp (.scon (.intF 1)))))), ("f0012", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (.atexp (chA 'm')) (.atexp (chA '?'))))))), ("f0013", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (str "13s") (str "?")))))), ("f0014", .atexp (.paren (bin "==" (ap (v "modBy") [i 2, .atexp (.paren (bin "+" (v "base") (i 13)))]) (i 0)))), ("f0015", .atexp (.paren (bin "+" (v "base") (i 1014)))), ("f0016", .atexp (.paren (bin "-" (bin "+" (ap (v "toFloat") [v "base"]) (.atexp (.scon (.float 165 (-1))))) (.atexp (.scon (.intF 1)))))), ("f0017", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (.atexp (chA 'r')) (.atexp (chA '?'))))))), ("f0018", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (str "18s") (str "?")))))), ("f0019", .atexp (.paren (bin "==" (ap (v "modBy") [i 2, .atexp (.paren (bin "+" (v "base") (i 18)))]) (i 0)))), ("f0020", .atexp (.paren (bin "+" (v "base") (i 1019)))), ("f0021", .atexp (.paren (bin "-" (bin "+" (ap (v "toFloat") [v "base"]) (.atexp (.scon (.float 215 (-1))))) (.atexp (.scon (.intF 1)))))), ("f0022", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (.atexp (chA 'w')) (.atexp (chA '?'))))))), ("f0023", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (str "23s") (str "?")))))), ("f0024", .atexp (.paren (bin "==" (ap (v "modBy") [i 2, .atexp (.paren (bin "+" (v "base") (i 23)))]) (i 0)))), ("f0025", .atexp (.paren (bin "+" (v "base") (i 1024)))), ("f0026", .atexp (.paren (bin "-" (bin "+" (ap (v "toFloat") [v "base"]) (.atexp (.scon (.float 265 (-1))))) (.atexp (.scon (.intF 1)))))), ("f0027", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (.atexp (chA 'b')) (.atexp (chA '?'))))))), ("f0028", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (str "28s") (str "?")))))), ("f0029", .atexp (.paren (bin "==" (ap (v "modBy") [i 2, .atexp (.paren (bin "+" (v "base") (i 28)))]) (i 0)))), ("f0030", .atexp (.paren (bin "+" (v "base") (i 1029)))), ("f0031", .atexp (.paren (bin "-" (bin "+" (ap (v "toFloat") [v "base"]) (.atexp (.scon (.float 315 (-1))))) (.atexp (.scon (.intF 1)))))), ("f0032", .atexp (.paren (.atexp (.paren (ifte (bin "==" (v "base") (i 1)) (.atexp (chA 'g')) (.atexp (chA '?')))))))]),
+    .fn "viaPat" [precord ["f0000", "f0032"]] (tup2 (v "f0000") (v "f0032")),
+    .fn "upd" [pv "r"] (updE "r" [("f0032", .atexp (chA '!'))]),
+    .fn "main" [] (letDefs [.fn "base" [] (bin "-" (bin "+" (i 1) (.atexp (.paren (bin "-" (ap (qv "Char" "toCode") [.atexp (chA 'b')]) (ap (qv "Char" "toCode") [.atexp (chA 'a')]))))) (i 1)), .fn "r" [] (ap (v "make") [v "base"]), .pat pw (ap (qv "Debug" "log") [str "f0000", .atexp (.paren (.atexp (access (A (v "r")) "f0000")))]), .pat pw (ap (qv "Debug" "log") [str "f0031", .atexp (.paren (.atexp (access (A (v "r")) "f0031")))]), .pat pw (ap (qv "Debug" "log") [str "f0032", .atexp (.paren (.atexp (access (A (v "r")) "f0032")))]), .pat pw (ap (qv "Debug" "log") [str "pattern", .atexp (.paren (ap (v "viaPat") [v "r"]))]), .pat pw (ap (qv "Debug" "log") [str "update", .atexp (.paren (.atexp (access (.paren (ap (v "upd") [v "r"])) "f0032")))]), .pat pw (ap (qv "Debug" "log") [str "eq self", .atexp (.paren (bin "==" (v "r") (ap (v "make") [v "base"])))]), .pat pw (ap (qv "Debug" "log") [str "eq updated", .atexp (.paren (bin "==" (v "r") (ap (v "upd") [v "r"])))]), .pat pw (ap (qv "Debug" "log") [str "show", .atexp (.paren (v "r"))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "f0000: 1000" .int,
+    chk .check "f0031: 31.5" .float,
+    chk .check "f0032: 'g'" .char,
+    chk .check "pattern: (1000,'g')" .data,
+    chk .check "update: '!'" .char,
+    chk .check "eq self: True" .data,
+    chk .check "eq updated: False" .data,
+    chk .check "show: { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = \"3s\", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = \"8s\", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = \"13s\", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = \"18s\", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = \"23s\", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = \"28s\", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g' }" .data ] }
+
 /-- tests/elm/src/WideRecord40Test.elm -/
 def g_elm_WideRecord40Test : Program := {
   name := "WideRecord40Test", source := "tests/elm/src",
@@ -120,7 +141,8 @@ def g_elm_WrapperUnionFieldTest : Program := {
 
 /-- The programs of this shard. -/
 def shard_Elm11 : List Program :=
-  [g_elm_WideRecord40Test,
+  [g_elm_WideRecord33Test,
+   g_elm_WideRecord40Test,
    g_elm_WideRecordDecoder26Test,
    g_elm_WideRecordDecoder30Test,
    g_elm_WideRecordDecoder70Test,

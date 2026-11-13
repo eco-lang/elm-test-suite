@@ -134,26 +134,7 @@ end
 
 /-! ## Notation for phrases (sec:static-modules-rules) -/
 
-mutual
-/-- The names used as the extension variable of a record type expression. -/
-def bTyExtNames : BTy → List String
-  | .tyvar _ => []
-  | .record none => []
-  | .record (some row) => bTyRowExtNames row
-  | .openRecord r row => r :: bTyRowExtNames row
-  | .unit => []
-  | .tuple t1 t2 none => bTyExtNames t1 ++ bTyExtNames t2
-  | .tuple t1 t2 (some t3) => bTyExtNames t1 ++ bTyExtNames t2 ++ bTyExtNames t3
-  | .con _ args => bTyListExtNames args
-  | .fn t1 t2 => bTyExtNames t1 ++ bTyExtNames t2
-  | .paren t => bTyExtNames t
-def bTyRowExtNames : BTyRow → List String
-  | .field _ t none => bTyExtNames t
-  | .field _ t (some rest) => bTyExtNames t ++ bTyRowExtNames rest
-def bTyListExtNames : List BTy → List String
-  | [] => []
-  | t :: ts => bTyExtNames t ++ bTyListExtNames ts
-end
+/-! `bTyExtNames` (the names used as extension variables) is in Schemes.lean. -/
 
 /-- tyvarseq = tyrowvar(k): a row variable for a name used as an extension variable in the
     phrase, a type variable otherwise. -/

@@ -707,22 +707,22 @@ theorem sc_expRowOpt : (r : Option AExpRow) → (C : Ctx) → (Γ : Shape) → A
     simp only [checkExpRowOpt] at h
     simp only [AExpRow.eraseOpt, scExpRowOpt]
     exact sc_expRow r C Γ hA h
-theorem sc_exp : (a : AExp) → (C : Ctx) → (Γ : Shape) → Abs C Γ → checkExp C a = true →
+theorem sc_exp : (a : AExp) → (C : Ctx) → (Γ : Shape) → Abs C Γ → checkExpS C a = true →
     scExp Γ a.erase = true
   | .atexp a, C, Γ, hA, h => by
-    simp only [checkExp] at h
+    simp only [checkExpS] at h
     simp only [AExp.erase, scExp]
     exact sc_atExp a C Γ hA h
   | .app e a, C, Γ, hA, h => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     simp only [AExp.erase, scExp, Bool.and_eq_true]
     exact ⟨sc_exp e C Γ hA h.1.1, sc_atExp a C Γ hA h.1.2⟩
   | .lam p e, C, Γ, hA, h => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     simp only [AExp.erase, scExp, Bool.and_eq_true]
     exact ⟨sc_atPat C Γ hA p h.1, sc_exp e _ _ (abs_plusVE hA (keys_atPat p)) h.2⟩
   | .caseE e m, C, Γ, hA, h => by
-    simp only [checkExp, Bool.and_eq_true] at h
+    simp only [checkExpS, Bool.and_eq_true] at h
     simp only [AExp.erase, scExp, Bool.and_eq_true]
     exact ⟨sc_exp e C Γ hA h.1.1, sc_match m C Γ hA h.1.2⟩
 theorem sc_expOpt : (e : Option AExp) → (C : Ctx) → (Γ : Shape) → Abs C Γ → checkExpOpt C e = true →
@@ -987,6 +987,7 @@ theorem topSound : (a : ATopDec) → (C : Ctx) → (E : Env) → (PE : PortEnv) 
     split at h
     · rename_i hc
       simp only [Bool.and_eq_true, decide_eq_true_eq] at hc
+      replace hc := hc.1
       simp only [Option.some.injEq, Prod.mk.injEq] at h
       obtain ⟨rfl, rfl⟩ := h
       refine ⟨rfl, vesound_of_keysIn ?_⟩
@@ -1036,6 +1037,7 @@ theorem sc_top : (a : ATopDec) → (C : Ctx) → (Γ : Shape) → (E : Env) → 
     split at h
     · rename_i hc
       simp only [Bool.and_eq_true, decide_eq_true_eq] at hc
+      replace hc := hc.1
       simp only [ATopDec.erase, scTop]
       have hk : KeysIn VE (vbVars vb.erase) := hc.2 ▸ keys_valBind vb
       exact sc_valBind vb _ _ (abs_plusVE hA hk) hc.1

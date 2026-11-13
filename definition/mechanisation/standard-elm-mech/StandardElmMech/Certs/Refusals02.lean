@@ -5,10 +5,6 @@ import StandardElmMech.Generated.SrcElm05
 import StandardElmMech.Generated.SrcElm06
 import StandardElmMech.Generated.SrcElm07
 import StandardElmMech.Generated.SrcElm08
-import StandardElmMech.Generated.SrcElm10
-import StandardElmMech.Generated.SrcElm11
-import StandardElmMech.Generated.SrcElm12
-import StandardElmMech.Generated.SrcElm13
 import StandardElmMech.Generated.SynAll
 import StandardElmMech.Stat.RefuseAll
 import StandardElmMech.Stat.TestBasis
@@ -18,6 +14,38 @@ import StandardElmMech.Stat.TestBasis
 
 namespace StandardElm
 set_option maxRecDepth 100000
+
+/-- tests/elm/src/CompilerIssue2083ExtendCustomTypeFieldAccessCrashTest.elm (static-deterministic) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2083ExtendCustomTypeFieldAccessCrashTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2083ExtendCustomTypeFieldAccessCrashTest :=
+  Stat.not_legal_of_typesFailB (by decide +kernel)
+
+/-- tests/elm/src/CompilerIssue2097ExtensibleUnitArgCrashTest.elm (static-deterministic) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2097ExtensibleUnitArgCrashTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2097ExtensibleUnitArgCrashTest :=
+  Stat.not_legal_of_typesFailB (by decide +kernel)
+
+/-- tests/elm/src/CompilerIssue2100LetAnnotationRank2CrashTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2100LetAnnotationRank2CrashTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2100LetAnnotationRank2CrashTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/CompilerIssue2105ExtensibleFoldlCrashTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2105ExtensibleFoldlCrashTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2105ExtensibleFoldlCrashTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/CompilerIssue2106FoldlExtensibleRecordHangTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2106FoldlExtensibleRecordHangTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2106FoldlExtensibleRecordHangTest :=
+  Stat.not_legal_of_wRefutes Stat.Btest_inv (by decide +kernel)
+
+/-- tests/elm/src/CompilerIssue2108IfBranchExtensibleRecordHangTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2108IfBranchExtensibleRecordHangTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2108IfBranchExtensibleRecordHangTest :=
+  Stat.not_legal_of_wRefutes Stat.Btest_inv (by decide +kernel)
+
+/-- tests/elm/src/CompilerIssue2112CaseBranchInfiniteTypeHangTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2112CaseBranchInfiniteTypeHangTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2112CaseBranchInfiniteTypeHangTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/CompilerIssue2146RoseLambdaPatternCrashTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2146RoseLambdaPatternCrashTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2146RoseLambdaPatternCrashTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
 
 /-- tests/elm/src/CompilerIssue2148RecordUpdateFoldrCrashTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_CompilerIssue2148RecordUpdateFoldrCrashTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2148RecordUpdateFoldrCrashTest :=
@@ -55,9 +83,21 @@ theorem refuse_elm_CompilerIssue2214LensSetterArgumentOrderHangTest : ¬ Stat.Le
 theorem refuse_elm_CompilerIssue2241FoldMapInfiniteTypeHangTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2241FoldMapInfiniteTypeHangTest :=
   Stat.not_legal_of_coreRefutes (by decide +kernel)
 
+/-- tests/elm/src/CompilerIssue2274MutualRecursionTransmuteTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2274MutualRecursionTransmuteTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2274MutualRecursionTransmuteTest :=
+  Stat.not_legal_of_wRefutes Stat.Btest_inv (by decide +kernel)
+
 /-- tests/elm/src/CompilerIssue2295LambdaLetAnnotationCrashTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_CompilerIssue2295LambdaLetAnnotationCrashTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2295LambdaLetAnnotationCrashTest :=
   Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/CompilerIssue2296LetAnnotationFreeVarCrashTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2296LetAnnotationFreeVarCrashTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2296LetAnnotationFreeVarCrashTest :=
+  Stat.not_legal_of_wRefutes Stat.Btest_inv (by decide +kernel)
+
+/-- tests/elm/src/CompilerIssue2301InnerSkolemOuterVarCrashTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_CompilerIssue2301InnerSkolemOuterVarCrashTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2301InnerSkolemOuterVarCrashTest :=
+  Stat.not_legal_of_wRefutes Stat.Btest_inv (by decide +kernel)
 
 /-- tests/elm/src/CompilerIssue2338LambdaLetAnnotationTupleCrashTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_CompilerIssue2338LambdaLetAnnotationTupleCrashTest : ¬ Stat.LegalProgram Stat.Btest s_elm_CompilerIssue2338LambdaLetAnnotationTupleCrashTest :=
@@ -134,49 +174,5 @@ theorem refuse_elm_InfiniteTypeSelfAppliedArgumentOnBothSidesTest : ¬ Stat.Lega
 /-- tests/elm/src/InfixAssocRightConsAppendTest.elm (fixity-inference) [parse] [harness] [params] -/
 theorem refuse_elm_InfixAssocRightConsAppendTest : ¬ Stat.LegalProgram Stat.Btest s_elm_InfixAssocRightConsAppendTest :=
   Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/LetCycleThroughRecordLambdaTest.elm (syntactic) [parse] [harness] [params] -/
-theorem refuse_elm_LetCycleThroughRecordLambdaTest : ¬ Stat.LegalProgram Stat.Btest s_elm_LetCycleThroughRecordLambdaTest :=
-  Stat.not_legal_of_syn nosyn_elm_LetCycleThroughRecordLambdaTest
-
-/-- tests/elm/src/MissingPatternsAMissingListLengthTest.elm (further) [parse] [harness] [params] -/
-theorem refuse_elm_MissingPatternsAMissingListLengthTest : ¬ Stat.LegalProgram Stat.Btest s_elm_MissingPatternsAMissingListLengthTest :=
-  Stat.not_legal_of_furtherFailB (by decide +kernel)
-
-/-- tests/elm/src/MissingPatternsAMissingTupleShapeTest.elm (further) [parse] [harness] [params] -/
-theorem refuse_elm_MissingPatternsAMissingTupleShapeTest : ¬ Stat.LegalProgram Stat.Btest s_elm_MissingPatternsAMissingTupleShapeTest :=
-  Stat.not_legal_of_furtherFailB (by decide +kernel)
-
-/-- tests/elm/src/NameClashARecordFieldGivenTwiceTest.elm (syntactic) [parse] [harness] [params] -/
-theorem refuse_elm_NameClashARecordFieldGivenTwiceTest : ¬ Stat.LegalProgram Stat.Btest s_elm_NameClashARecordFieldGivenTwiceTest :=
-  Stat.not_legal_of_modsyn nosyn_elm_NameClashARecordFieldGivenTwiceTest
-
-/-- tests/elm/src/NameClashTwoArgumentsOfOneNameTest.elm (syntactic) [parse] [harness] [params] -/
-theorem refuse_elm_NameClashTwoArgumentsOfOneNameTest : ¬ Stat.LegalProgram Stat.Btest s_elm_NameClashTwoArgumentsOfOneNameTest :=
-  Stat.not_legal_of_modsyn nosyn_elm_NameClashTwoArgumentsOfOneNameTest
-
-/-- tests/elm/src/NameClashTwoLetBindingsOfOneNameTest.elm (syntactic) [parse] [harness] [params] -/
-theorem refuse_elm_NameClashTwoLetBindingsOfOneNameTest : ¬ Stat.LegalProgram Stat.Btest s_elm_NameClashTwoLetBindingsOfOneNameTest :=
-  Stat.not_legal_of_modsyn nosyn_elm_NameClashTwoLetBindingsOfOneNameTest
-
-/-- tests/elm/src/NamingErrorAnUnknownVariableTest.elm (static-deterministic) [parse] [harness] [params] -/
-theorem refuse_elm_NamingErrorAnUnknownVariableTest : ¬ Stat.LegalProgram Stat.Btest s_elm_NamingErrorAnUnknownVariableTest :=
-  Stat.not_legal_of_scopeFailB (by decide +kernel)
-
-/-- tests/elm/src/PortProblemCharPayloadTest.elm (static-deterministic) [parse] [harness] [params] -/
-theorem refuse_elm_PortProblemCharPayloadTest : ¬ Stat.LegalProgram Stat.Btest s_elm_PortProblemCharPayloadTest :=
-  Stat.not_legal_of_typesFailB (by decide +kernel)
-
-/-- tests/elm/src/QualifiedTypeNotExposedTest.elm (syntactic) [parse] [harness] [params] -/
-theorem refuse_elm_QualifiedTypeNotExposedTest : ¬ Stat.LegalProgram Stat.Btest s_elm_QualifiedTypeNotExposedTest :=
-  Stat.not_legal_of_syn nosyn_elm_QualifiedTypeNotExposedTest
-
-/-- tests/elm/src/RedundantPatternABranchAfterAWildcardTest.elm (further) [parse] [harness] [params] -/
-theorem refuse_elm_RedundantPatternABranchAfterAWildcardTest : ¬ Stat.LegalProgram Stat.Btest s_elm_RedundantPatternABranchAfterAWildcardTest :=
-  Stat.not_legal_of_furtherFailB (by decide +kernel)
-
-/-- tests/elm/src/ShadowingAnArgumentShadowingATopLevelValueTest.elm (syntactic) [parse] [harness] [params] -/
-theorem refuse_elm_ShadowingAnArgumentShadowingATopLevelValueTest : ¬ Stat.LegalProgram Stat.Btest s_elm_ShadowingAnArgumentShadowingATopLevelValueTest :=
-  Stat.not_legal_of_modsyn nosyn_elm_ShadowingAnArgumentShadowingATopLevelValueTest
 
 end StandardElm

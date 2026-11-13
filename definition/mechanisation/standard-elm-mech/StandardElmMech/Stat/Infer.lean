@@ -51,8 +51,7 @@ def lookupInst (C : Ctx) (lv : LongId) : Inf (List Ty × Ty) := do
 
 /-- The explicit variables an annotation makes new (G2-5): its names not explicit in C, each a row
     variable if used as an extension variable, a type variable otherwise. -/
-def annVars (CU : List BVar) (ty : BTy) : List BVar :=
-  seqVars ((dedupL (bTyNames ty)).filter fun s => s ∉ namesU CU) (bTyExtNames ty)
+def annVars (CU : List BVar) (ty : BTy) : List BVar := newU CU ty
 
 def zonkVE (s : InfState) (VE : ValEnv) : ValEnv :=
   VE.mapV fun p => (⟨p.1.bound, zonk s fuel0 p.1.body⟩, p.2)

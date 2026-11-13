@@ -12,6 +12,66 @@ import StandardElmMech.Stat.TestBasis
 namespace StandardElm
 set_option maxRecDepth 100000
 
+/-- tests/elm/src/TypeMismatchSelfAppliedArgumentAgainstARigidVarTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchSelfAppliedArgumentAgainstARigidVarTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchSelfAppliedArgumentAgainstARigidVarTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringAppendedToListTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringAppendedToListTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringAppendedToListTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringLeftOfConsTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringLeftOfConsTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringLeftOfConsTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringLeftOfDivideTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringLeftOfDivideTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringLeftOfDivideTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringLeftOfIntDivideTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringLeftOfIntDivideTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringLeftOfIntDivideTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringLeftOfLessThanTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringLeftOfLessThanTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringLeftOfLessThanTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringLeftOfPlusTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringLeftOfPlusTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringLeftOfPlusTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringRightOfAtLeastTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringRightOfAtLeastTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringRightOfAtLeastTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringRightOfAtMostTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringRightOfAtMostTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringRightOfAtMostTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringRightOfGreaterThanTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringRightOfGreaterThanTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringRightOfGreaterThanTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringRightOfMinusTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringRightOfMinusTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringRightOfMinusTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringRightOfNotEqualsTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringRightOfNotEqualsTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringRightOfNotEqualsTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringRightOfPlusTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringRightOfPlusTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringRightOfPlusTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringRightOfPowerTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringRightOfPowerTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringRightOfPowerTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchStringRightOfTimesTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchStringRightOfTimesTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchStringRightOfTimesTest :=
+  Stat.not_legal_of_coreRefutes (by decide +kernel)
+
 /-- tests/elm/src/TypeMismatchTailPatternTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_TypeMismatchTailPatternTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchTailPatternTest :=
   Stat.not_legal_of_coreRefutes (by decide +kernel)
@@ -48,9 +108,17 @@ theorem refuse_elm_TypeMismatchTwoAliasedRecordsTest : ¬ Stat.LegalProgram Stat
 theorem refuse_elm_TypeMismatchTwoArgumentLambdaWhereOneTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchTwoArgumentLambdaWhereOneTest :=
   Stat.not_legal_of_coreRefutes (by decide +kernel)
 
+/-- tests/elm/src/TypeMismatchTwoComparableVarsTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchTwoComparableVarsTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchTwoComparableVarsTest :=
+  Stat.not_legal_of_wRefutes Stat.Btest_inv (by decide +kernel)
+
 /-- tests/elm/src/TypeMismatchTwoExtensibleRecordsTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_TypeMismatchTwoExtensibleRecordsTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchTwoExtensibleRecordsTest :=
   Stat.not_legal_of_coreRefutes (by decide +kernel)
+
+/-- tests/elm/src/TypeMismatchTwoFlexibleRecordsTest.elm (inference) [parse] [harness] [params] -/
+theorem refuse_elm_TypeMismatchTwoFlexibleRecordsTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchTwoFlexibleRecordsTest :=
+  Stat.not_legal_of_wRefutes Stat.Btest_inv (by decide +kernel)
 
 /-- tests/elm/src/TypeMismatchTwoRigidVarsTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_TypeMismatchTwoRigidVarsTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchTwoRigidVarsTest :=
@@ -103,29 +171,5 @@ theorem refuse_elm_TypeMismatchUpdateOfANumberTest : ¬ Stat.LegalProgram Stat.B
 /-- tests/elm/src/TypeMismatchUpdateOfAnEmptyRecordTest.elm (inference) [parse] [harness] [params] -/
 theorem refuse_elm_TypeMismatchUpdateOfAnEmptyRecordTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchUpdateOfAnEmptyRecordTest :=
   Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeMismatchUpdateValueTest.elm (inference) [parse] [harness] [params] -/
-theorem refuse_elm_TypeMismatchUpdateValueTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeMismatchUpdateValueTest :=
-  Stat.not_legal_of_coreRefutes (by decide +kernel)
-
-/-- tests/elm/src/TypeParameterTwiceTest.elm (syntactic) [parse] [harness] [params] -/
-theorem refuse_elm_TypeParameterTwiceTest : ¬ Stat.LegalProgram Stat.Btest s_elm_TypeParameterTwiceTest :=
-  Stat.not_legal_of_syn nosyn_elm_TypeParameterTwiceTest
-
-/-- tests/elm/src/UnsafePatternAllDestructPatternsEdgeCaseCasesTest.elm (further) [parse] [harness] [params] -/
-theorem refuse_elm_UnsafePatternAllDestructPatternsEdgeCaseCasesTest : ¬ Stat.LegalProgram Stat.Btest s_elm_UnsafePatternAllDestructPatternsEdgeCaseCasesTest :=
-  Stat.not_legal_of_furtherFailB (by decide +kernel)
-
-/-- tests/elm/src/UnsafePatternDestructFixedListPatternLetDestructCasesTest.elm (further) [parse] [harness] [params] -/
-theorem refuse_elm_UnsafePatternDestructFixedListPatternLetDestructCasesTest : ¬ Stat.LegalProgram Stat.Btest s_elm_UnsafePatternDestructFixedListPatternLetDestructCasesTest :=
-  Stat.not_legal_of_furtherFailB (by decide +kernel)
-
-/-- tests/elm/src/UnsafePatternMixedNestedAliasesAsPatternCasesTest.elm (further) [parse] [harness] [params] -/
-theorem refuse_elm_UnsafePatternMixedNestedAliasesAsPatternCasesTest : ¬ Stat.LegalProgram Stat.Btest s_elm_UnsafePatternMixedNestedAliasesAsPatternCasesTest :=
-  Stat.not_legal_of_furtherFailB (by decide +kernel)
-
-/-- tests/elm/src/UnsafePatternTripleNestedPatternsPatternArgCasesTest.elm (further) [parse] [harness] [params] -/
-theorem refuse_elm_UnsafePatternTripleNestedPatternsPatternArgCasesTest : ¬ Stat.LegalProgram Stat.Btest s_elm_UnsafePatternTripleNestedPatternsPatternArgCasesTest :=
-  Stat.not_legal_of_furtherFailB (by decide +kernel)
 
 end StandardElm

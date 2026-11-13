@@ -14,6 +14,7 @@ open StandardElm.D
   g_elm_StandardA93MutualNumberDefaultTest
   g_elm_StandardA97NeverErrBranchTest
   g_elm_StandardA97SelfOnlyTypeTest
+  g_elm_StandardA98TypeBeforeAliasTest
   g_elm_StandardApplicationStrictTest
   g_elm_StandardCoreEvaluationExamplesTest
   g_elm_StandardLetStrictTest
@@ -49,7 +50,6 @@ open StandardElm.D
   g_elm_WideClosureSat26Test
   g_elm_WideCtorField24Test
   g_elm_WideCtorMixedTest
-  g_elm_WideRecord33Test
 
 /-- Every port of every program of this shard, its helper modules' included, has a canonical
     payload type (D7). -/

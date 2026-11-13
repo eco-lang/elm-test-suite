@@ -4,6 +4,18 @@ import StandardElmMech.Src.Notation
 namespace StandardElm
 set_option maxRecDepth 100000
 
+/-- tests/elm/src/TypeMismatchConsHeadAgainstAConsTailTest.elm -/
+def s_elm_TypeMismatchConsHeadAgainstAConsTailTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchConsHeadAgainstAConsTailTest" [
+  Src.mdl (Src.hdr false "TypeMismatchConsHeadAgainstAConsTailTest" (.all))
+    []
+    [Src.val "x" none [] (.caseE (.list [Src.i 1]) [(.cons (.lit (.int 1)) (.cons (.lit (.str "s")) (Src.pv "rest")), Src.i 1), (.wild, Src.i 2)])] ]
+
+/-- tests/elm/src/TypeMismatchConsedOntoABoolTest.elm -/
+def s_elm_TypeMismatchConsedOntoABoolTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchConsedOntoABoolTest" [
+  Src.mdl (Src.hdr false "TypeMismatchConsedOntoABoolTest" (.all))
+    []
+    [Src.val "x" none [] (Src.bin "::" (Src.i 1) (Src.c "True"))] ]
+
 /-- tests/elm/src/TypeMismatchConsedOntoAMaybeTest.elm -/
 def s_elm_TypeMismatchConsedOntoAMaybeTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchConsedOntoAMaybeTest" [
   Src.mdl (Src.hdr false "TypeMismatchConsedOntoAMaybeTest" (.all))
@@ -232,21 +244,11 @@ def s_elm_TypeMismatchListConsedOntoAListOfStringsTest : Src.SProgram := Src.can
     []
     [Src.val "x" none [] (Src.bin "::" (.list [Src.i 1]) (.list [Src.str "a"]))] ]
 
-/-- tests/elm/src/TypeMismatchListEntryPatternTest.elm -/
-def s_elm_TypeMismatchListEntryPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchListEntryPatternTest" [
-  Src.mdl (Src.hdr false "TypeMismatchListEntryPatternTest" (.all))
-    []
-    [Src.val "x" none [] (.caseE (.list [Src.i 1]) [(.list [.lit (.int 1), .lit (.str "a")], Src.i 1), (.wild, Src.i 2)])] ]
-
-/-- tests/elm/src/TypeMismatchListMultipliedTest.elm -/
-def s_elm_TypeMismatchListMultipliedTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "TypeMismatchListMultipliedTest" [
-  Src.mdl (Src.hdr false "TypeMismatchListMultipliedTest" (.all))
-    []
-    [Src.val "x" none [] (Src.bin "*" (.list [Src.i 1]) (Src.i 2))] ]
-
 /-- The programs of this shard, by test name. -/
 def srcShard_SrcElm16 : List (String × Src.SProgram) :=
-  [("TypeMismatchConsedOntoAMaybeTest", s_elm_TypeMismatchConsedOntoAMaybeTest),
+  [("TypeMismatchConsHeadAgainstAConsTailTest", s_elm_TypeMismatchConsHeadAgainstAConsTailTest),
+   ("TypeMismatchConsedOntoABoolTest", s_elm_TypeMismatchConsedOntoABoolTest),
+   ("TypeMismatchConsedOntoAMaybeTest", s_elm_TypeMismatchConsedOntoAMaybeTest),
    ("TypeMismatchConstructorPatternTest", s_elm_TypeMismatchConstructorPatternTest),
    ("TypeMismatchDestructureTest", s_elm_TypeMismatchDestructureTest),
    ("TypeMismatchDifferentlyNamedComparableVarsTest", s_elm_TypeMismatchDifferentlyNamedComparableVarsTest),
@@ -283,8 +285,6 @@ def srcShard_SrcElm16 : List (String × Src.SProgram) :=
    ("TypeMismatchIntWhereFloatTest", s_elm_TypeMismatchIntWhereFloatTest),
    ("TypeMismatchLambdaArgumentPatternTest", s_elm_TypeMismatchLambdaArgumentPatternTest),
    ("TypeMismatchLambdaCallAsAnArgumentTest", s_elm_TypeMismatchLambdaCallAsAnArgumentTest),
-   ("TypeMismatchListConsedOntoAListOfStringsTest", s_elm_TypeMismatchListConsedOntoAListOfStringsTest),
-   ("TypeMismatchListEntryPatternTest", s_elm_TypeMismatchListEntryPatternTest),
-   ("TypeMismatchListMultipliedTest", s_elm_TypeMismatchListMultipliedTest)]
+   ("TypeMismatchListConsedOntoAListOfStringsTest", s_elm_TypeMismatchListConsedOntoAListOfStringsTest)]
 
 end StandardElm

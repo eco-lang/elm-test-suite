@@ -10,6 +10,12 @@
   vacuous explicit variables before taking the canonical form. A type function is canonical when
   its parameters are `bnd 0 .. bnd (k-1)` in order, its type parameters of class any ("the class
   of a bound type variable of a type function has no significance").
+
+  Explicit type variables (erratum of 2026-11-12 to sec:static-core-explicit): the kind of an
+  annotation's new variable is fixed, a row variable when the annotation uses the name as the
+  extension of a record type (`{ r | ... }`), a type variable otherwise (`nameVar`). `NewFor` (the
+  relation's premise) says so; the checker's `newForB` asks for the one list `newU` that
+  represents the set (each name once, in the order of first occurrence).
 -/
 import StandardElmMech.Stat.Subst
 
@@ -154,36 +160,106 @@ def bTyListNames : List Src.BTy → List String
   | t :: ts => bTyNames t ++ bTyListNames ts
 end
 
-/-- U' is new for ty in C. -/
+mutual
+/-- The names used as the extension variable of a record type expression. -/
+def bTyExtNames : Src.BTy → List String
+  | .tyvar _ => []
+  | .record none => []
+  | .record (some row) => bTyRowExtNames row
+  | .openRecord r row => r :: bTyRowExtNames row
+  | .unit => []
+  | .tuple t1 t2 none => bTyExtNames t1 ++ bTyExtNames t2
+  | .tuple t1 t2 (some t3) => bTyExtNames t1 ++ bTyExtNames t2 ++ bTyExtNames t3
+  | .con _ args => bTyListExtNames args
+  | .fn t1 t2 => bTyExtNames t1 ++ bTyExtNames t2
+  | .paren t => bTyExtNames t
+def bTyRowExtNames : Src.BTyRow → List String
+  | .field _ t none => bTyExtNames t
+  | .field _ t (some rest) => bTyExtNames t ++ bTyRowExtNames rest
+def bTyListExtNames : List Src.BTy → List String
+  | [] => []
+  | t :: ts => bTyExtNames t ++ bTyListExtNames ts
+end
+
+theorem mem_dedupL {α : Type} [DecidableEq α] {x : α} : ∀ {l : List α}, x ∈ dedupL l ↔ x ∈ l
+  | [] => by simp [dedupL]
+  | y :: l => by
+    simp only [dedupL, List.mem_cons, List.mem_filter, mem_dedupL, decide_eq_true_eq, ne_eq]
+    constructor
+    · rintro (h | ⟨h, _⟩)
+      · exact .inl h
+      · exact .inr h
+    · rintro (h | h)
+      · exact .inl h
+      · by_cases e : x = y
+        · exact .inl e
+        · exact .inr ⟨h, e⟩
+
+/-- The variable a name of `tyvars ty` stands for (sec:static-core-explicit, erratum of
+    2026-11-12): a row variable when `ty` uses the name as the extension of a record type
+    (`{ r | ... }`), a type variable otherwise (A19, A36). -/
+def nameVar (ty : Src.BTy) (s : String) : BVar :=
+  if s ∈ bTyExtNames ty then .row (.named s) else .ty (.named s)
+
+/-- One variable for each name of `tyvars ty`, in the order of first occurrence. -/
+def newU0 (ty : Src.BTy) : List BVar := (dedupL (bTyNames ty)).map (nameVar ty)
+
+/-- The U' new for ty in a context whose explicit variables are U: the variables of the names of
+    `tyvars ty` that U does not name, in the order of first occurrence. -/
+def newU (U : List BVar) (ty : Src.BTy) : List BVar :=
+  (newU0 ty).filter fun v => match v.name? with
+    | some s => !decide (s ∈ namesU U)
+    | none => false
+
+/-- U' is new for ty in C: U' names exactly the names of `tyvars ty` that C does not, each name
+    standing for the variable of its kind (`nameVar`), and U of C ∪ U' is unambiguous. -/
 def NewFor (U' : List BVar) (ty : Src.BTy) (CU : List BVar) : Prop :=
   (∀ v ∈ U', v.isNamed = true) ∧
   (∀ s, s ∈ namesU U' ↔ s ∈ bTyNames ty ∧ s ∉ namesU CU) ∧
-  Unambiguous (CU ++ U')
+  Unambiguous (CU ++ U') ∧
+  (∀ v ∈ U', ∀ s, v.name? = some s → v = nameVar ty s)
 
+/-- The checker's form of `NewFor`: U' is the list `newU`, which represents the set. -/
 def newForB (U' : List BVar) (ty : Src.BTy) (CU : List BVar) : Bool :=
-  U'.all (·.isNamed) &&
-  (namesU U').all (fun s => decide (s ∈ bTyNames ty ∧ s ∉ namesU CU)) &&
-  (bTyNames ty).all (fun s => decide (s ∈ namesU CU ∨ s ∈ namesU U')) &&
-  decide (Unambiguous (CU ++ U'))
+  decide (U' = newU CU ty) && decide (Unambiguous (CU ++ U'))
 
-theorem newForB_iff (U' : List BVar) (ty : Src.BTy) (CU : List BVar) :
-    newForB U' ty CU = true ↔ NewFor U' ty CU := by
-  unfold newForB NewFor
-  simp only [Bool.and_eq_true, List.all_eq_true, decide_eq_true_eq]
-  constructor
-  · rintro ⟨⟨⟨h1, h2⟩, h3⟩, h4⟩
-    refine ⟨h1, fun s => ⟨fun hs => h2 s hs, fun ⟨ha, hb⟩ => ?_⟩, h4⟩
-    rcases h3 s ha with h | h
-    · exact absurd h hb
-    · exact h
-  · rintro ⟨h1, h2, h4⟩
-    refine ⟨⟨⟨h1, fun s hs => (h2 s).mp hs⟩, fun s hs => ?_⟩, h4⟩
-    by_cases hc : s ∈ namesU CU
-    · exact .inl hc
-    · exact .inr ((h2 s).mpr ⟨hs, hc⟩)
+theorem name?_nameVar (ty : Src.BTy) (s : String) : (nameVar ty s).name? = some s := by
+  unfold nameVar; split <;> rfl
 
-instance (U' : List BVar) (ty : Src.BTy) (CU : List BVar) : Decidable (NewFor U' ty CU) :=
-  decidable_of_iff _ (newForB_iff U' ty CU)
+theorem nameVar_named (ty : Src.BTy) (s : String) : (nameVar ty s).isNamed = true := by
+  unfold nameVar; split <;> rfl
+
+theorem mem_newU0 {ty : Src.BTy} {v : BVar} (h : v ∈ newU0 ty) : ∃ s ∈ bTyNames ty, v = nameVar ty s := by
+  simp only [newU0, List.mem_map] at h
+  obtain ⟨s, hs, rfl⟩ := h
+  exact ⟨s, mem_dedupL.mp hs, rfl⟩
+
+theorem mem_namesU {U : List BVar} {s : String} : s ∈ namesU U ↔ ∃ v ∈ U, v.name? = some s := by
+  simp only [namesU, List.mem_filterMap]
+
+theorem newFor_of_newForB {U' : List BVar} {ty : Src.BTy} {CU : List BVar} (h : newForB U' ty CU = true) :
+    NewFor U' ty CU := by
+  simp only [newForB, Bool.and_eq_true, decide_eq_true_eq] at h
+  obtain ⟨rfl, hu⟩ := h
+  refine ⟨fun v hv => ?_, fun s => ?_, hu, fun v hv s hs => ?_⟩
+  · obtain ⟨s, -, rfl⟩ := mem_newU0 (List.mem_filter.mp hv).1
+    exact nameVar_named ty s
+  · constructor
+    · intro hs
+      obtain ⟨v, hv, hvs⟩ := mem_namesU.mp hs
+      obtain ⟨hv0, hp⟩ := List.mem_filter.mp hv
+      obtain ⟨s', hs', rfl⟩ := mem_newU0 hv0
+      rw [name?_nameVar, Option.some.injEq] at hvs
+      subst hvs
+      simp only [name?_nameVar, Bool.not_eq_true', decide_eq_false_iff_not] at hp
+      exact ⟨hs', hp⟩
+    · rintro ⟨hs, hc⟩
+      refine mem_namesU.mpr ⟨nameVar ty s, List.mem_filter.mpr ⟨?_, ?_⟩, name?_nameVar ty s⟩
+      · exact List.mem_map.mpr ⟨s, mem_dedupL.mpr hs, rfl⟩
+      · simp only [name?_nameVar, Bool.not_eq_true', decide_eq_false_iff_not]; exact hc
+  · obtain ⟨s', -, rfl⟩ := mem_newU0 (List.mem_filter.mp hv).1
+    rw [name?_nameVar, Option.some.injEq] at hs
+    subst hs; rfl
 
 /-- The scheme an annotated binding gets: ∀U'.τ, canonical (no vacuous variable: closure is the
     only source of A93's). -/

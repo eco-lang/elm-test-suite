@@ -1,6 +1,6 @@
 {
   "generatedBy": "definition/tools/src/Translate.elm",
-  "toolsSha256": "335ec84b60472ab087b03917a70d0345d33a992794d5093823ee10d918fa1370",
+  "toolsSha256": "a86e3eef6f41ffc87a4ece1cdfb1b1d3eb56e2417616b6f7fe4e88a69b58e6a3",
   "tests": [
     {
       "project": "elm",
@@ -13410,6 +13410,53 @@
     },
     {
       "project": "elm",
+      "name": "StandardA98TypeBeforeAliasStringMismatchTest",
+      "sha256": "694a6ae50a011fdae56ef870d00a36dc0dc05c12ca74f5a61eb0f0e430ce6882",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA98TypeBeforeAliasStringMismatchTest.elm",
+          "sha256": "694a6ae50a011fdae56ef870d00a36dc0dc05c12ca74f5a61eb0f0e430ce6882"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm14",
+        "def": "s_elm_StandardA98TypeBeforeAliasStringMismatchTest",
+        "modules": [
+          "tests/elm/src/StandardA98TypeBeforeAliasStringMismatchTest.elm"
+        ]
+      },
+      "status": "refused",
+      "reason": "compile-error"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA98TypeBeforeAliasTest",
+      "sha256": "9326b0c0b8ccdcd521db00a9cd4c6c1fae167197ccc8508b2d49c36c6aca1702",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA98TypeBeforeAliasTest.elm",
+          "sha256": "9326b0c0b8ccdcd521db00a9cd4c6c1fae167197ccc8508b2d49c36c6aca1702"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm14",
+        "def": "s_elm_StandardA98TypeBeforeAliasTest",
+        "modules": [
+          "tests/elm/src/StandardA98TypeBeforeAliasTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm10",
+      "def": "g_elm_StandardA98TypeBeforeAliasTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA98TypeBeforeAliasTest.elm -/\ndef g_elm_StandardA98TypeBeforeAliasTest : Program := {\n  name := \"StandardA98TypeBeforeAliasTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [(\"T\", [(\"T\", 1)])],\n  aliases := [(\"String\", none)],\n  defs := [\n    .fn \"field\" [.paren (pcon \"T\" [pv \"n\"])] (bin \"+\" (v \"n\") (i 1)),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"field (T 3)\", .atexp (.paren (ap (v \"field\") [.atexp (.paren (ap (c \"T\") [i 3]))]))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"field (T 3): 4\" .int ] }"
+    },
+    {
+      "project": "elm",
       "name": "StandardApplicationStrictTest",
       "sha256": "e6b736cdf3d7bc830b35716409ed3171922e6c18f091fd623a7ffc9874ed1f2d",
       "sources": [
@@ -14191,7 +14238,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm14",
+        "shard": "SrcElm15",
         "def": "s_elm_TooManyArgsTooManyArgumentsToANullaryConstructorTest",
         "modules": [
           "tests/elm/src/TooManyArgsTooManyArgumentsToANullaryConstructorTest.elm"
@@ -14212,7 +14259,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm14",
+        "shard": "SrcElm15",
         "def": "s_elm_TooManyArgsTooManyArgumentsToAnOperatorTest",
         "modules": [
           "tests/elm/src/TooManyArgsTooManyArgumentsToAnOperatorTest.elm"
@@ -15097,7 +15144,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm15",
+        "shard": "SrcElm16",
         "def": "s_elm_TypeMismatchConsHeadAgainstAConsTailTest",
         "modules": [
           "tests/elm/src/TypeMismatchConsHeadAgainstAConsTailTest.elm"
@@ -15118,7 +15165,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm15",
+        "shard": "SrcElm16",
         "def": "s_elm_TypeMismatchConsedOntoABoolTest",
         "modules": [
           "tests/elm/src/TypeMismatchConsedOntoABoolTest.elm"
@@ -15937,7 +15984,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm16",
+        "shard": "SrcElm17",
         "def": "s_elm_TypeMismatchListEntryPatternTest",
         "modules": [
           "tests/elm/src/TypeMismatchListEntryPatternTest.elm"
@@ -15958,7 +16005,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm16",
+        "shard": "SrcElm17",
         "def": "s_elm_TypeMismatchListMultipliedTest",
         "modules": [
           "tests/elm/src/TypeMismatchListMultipliedTest.elm"
@@ -16777,7 +16824,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm17",
+        "shard": "SrcElm18",
         "def": "s_elm_TypeMismatchRigidNumberAsFunctionTest",
         "modules": [
           "tests/elm/src/TypeMismatchRigidNumberAsFunctionTest.elm"
@@ -16798,7 +16845,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm17",
+        "shard": "SrcElm18",
         "def": "s_elm_TypeMismatchRigidNumberAsMaybeTest",
         "modules": [
           "tests/elm/src/TypeMismatchRigidNumberAsMaybeTest.elm"
@@ -17617,7 +17664,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm18",
+        "shard": "SrcElm19",
         "def": "s_elm_TypeMismatchTupleAgainstAnAliasTest",
         "modules": [
           "tests/elm/src/TypeMismatchTupleAgainstAnAliasTest.elm"
@@ -17638,7 +17685,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm18",
+        "shard": "SrcElm19",
         "def": "s_elm_TypeMismatchTupleComponentPatternTest",
         "modules": [
           "tests/elm/src/TypeMismatchTupleComponentPatternTest.elm"
@@ -18438,7 +18485,7 @@
         ]
       },
       "status": "translated",
-      "shard": "Elm10",
+      "shard": "Elm11",
       "def": "g_elm_WideRecord33Test",
       "checks": 8,
       "kind": "view",
@@ -18551,7 +18598,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm19",
+        "shard": "SrcElm20",
         "def": "s_elm_WideRecordDecoder30Test",
         "modules": [
           "tests/elm/src/WideRecordDecoder30Test.elm"
@@ -18577,7 +18624,7 @@
       ],
       "src": {
         "status": "written",
-        "shard": "SrcElm19",
+        "shard": "SrcElm20",
         "def": "s_elm_WideRecordDecoder70Test",
         "modules": [
           "tests/elm/src/WideRecordDecoder70Test.elm"

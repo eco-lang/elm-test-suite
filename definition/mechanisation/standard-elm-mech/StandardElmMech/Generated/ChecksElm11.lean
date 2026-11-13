@@ -10,6 +10,7 @@ open StandardElm.D
     `#mod_program_theorems` (Theorems.lean): the program in module form, and every check as a
     statement about the log of its evaluation (`ViewChecks`), or `NoMeaning`. -/
 #mod_program_theorems
+  g_elm_WideRecord33Test
   g_elm_WideRecord40Test
   g_elm_WideRecordDecoder26Test
   g_elm_WideRecordDecoder30Test

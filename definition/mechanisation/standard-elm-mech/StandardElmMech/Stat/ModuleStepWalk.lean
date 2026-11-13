@@ -363,6 +363,7 @@ theorem walk (H : Hyps G G2 S S' ν ν' r r' D D' σ) {BT : List TyName} :
           have hcv := hcv0
           have hcv2 := hcv20
           simp only [Bool.and_eq_true, decide_eq_true_eq] at hcv hcv2
+          replace hcv := hcv.1; replace hcv2 := hcv2.1
           simp only [nodesTopDec, List.cons_append, List.singleton_append] at h h'
           have h3 := (h.mono (ms := nodesValBind (C1.plusVE VE) (path ++ [0]) vb)
             (ms'' := nodesValBind (C2.plusVE VE2) (path ++ [0]) vb2)

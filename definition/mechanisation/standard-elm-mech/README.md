@@ -131,7 +131,7 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `StandardElmMech/Stat/RefuseFurtherAgree.lean`, `Stat/RefuseFurther.lean` | Refusals by exhaustiveness and irredundancy, at every type a derivation can give the patterns (`useful_agree`, `furtherFailB`) |
 | `StandardElmMech/Stat/RefuseAll.lean` | The refusal deciders `certify` tries, and the refusals of step 8's syntactic restrictions for one-module programs and texts without `main` |
 | `StandardElmMech/Stat/CertPrint.lean` | Printing contexts and terms for `certify` |
-| `StandardElmMech/Certs/` | Written by `lake exe certify`: the contexts of the imports (`Contexts*.lean`), one `legal_<project>_<Test>` theorem per compile-success test (`Elm*.lean`, `ElmCore*.lean`, each shard importing the one before so that a build checks one at a time), and one `refuse_<project>_<Test>` theorem per refused compile-error test (`Refusals.lean`), and the end-to-end theorems `spec_`, `mean_` of each translated test (`EndToEnd*.lean`) |
+| `StandardElmMech/Certs/` | Written by `lake exe certify`: the contexts of the imports (`Contexts*.lean`), one `legal_<project>_<Test>` theorem per compile-success test (`Elm*.lean`, `ElmCore*.lean`, each shard importing the one before so that a build checks one at a time), and one `refuse_<project>_<Test>` theorem per refused compile-error test (`Refusals*.lean`), and the end-to-end theorems `wcheck_`, `legal_`, `spec_`, `mean_`, `ident_` of each translated test (`EndToEnd*.lean`) |
 | `StandardElmMech/SyntaxDecEq.lean` | Decidable equality of the reduced, module and bare syntaxes (written out: `deriving` refuses nested mutual types), for the kernel's comparisons of step 10 |
 | `StandardElmMech/Mod/Reduced.lean` | The reduced part of a program (modules, ports, flags type, kind): what the semantics reads, `Program.reduced` and `Prog.WorkerTest.reduced` |
 | `StandardElmMech/Stat/Specialise.lean` | Number specialisation (plan step 10, sec:dynamic-core-numbers) on annotated derivations: assignments, copy names, the `number` variables of a group, the copy loop (copies from the outside in), exposing items, the copies of the basis |
@@ -151,14 +151,20 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `StandardElmMech/Stat/JunkCounterexample.lean`, `Stat/ModuleStepCounterexample.lean`, `Stat/DupValuesCounterexample.lean` | Regression theorems for errors found on the way: type names no custom type is given are not generated (`mJ_instance`), a type environment cannot justify itself (`ModuleStepCE.regression`), and a module with two top-level bindings of one name |
 | `StandardElmMech/Stat/Complete/Term.lean`, `Classes.lean`, `Unify.lean`, `Core.lean`, `CoreLemmas.lean`, `CorePat.lean`, `CoreExp.lean`, `CoreComplete.lean`, `Examples.lean` | Step 11, milestone (a): unification over the full type language with its refutation theorem, a constraint generator proved complete for every derivation (`coreGen_complete`), and the unconditional refusal `not_legal_of_coreRefutes` |
 | `StandardElmMech/Stat/Complete/FSubst.lean`, `Mgu.lean`, `MguTerm.lean`, `W.lean`, `WPrincipal.lean`, `W*.lean`, `Canon.lean`, `Closure.lean`, `Fragment.lean`, `InstCounter.lean` | Step 11, milestone (b): substitutions, the most general unifier (`mgu_ok`, `mgu_fail`, termination), algorithm W for the Hindley–Milner fragment, sound (`inferExpW_sound`), refuting (`wRefutation`), principal (`wPrincipality`, `isPrincipalB_iff`), terminating (`inferExpW_terminates`) |
+| `StandardElmMech/Stat/Complete/RowAlg.lean`, `RSubst.lean`, `MguR*.lean`, `WD*.lean`, `MguRExamples.lean`, `WExamplesD.lean` | Step 11, milestone (d): rows as sorted lists with a total merge, substitutions of type and row variables (`rsb`, composition, canonicity = A23's definedness), unification with rows and lacks sets (`mguR_ok`, `mguR_fail`, `mguR_terminates`), W for records (`inferExpWD`: sound, terminating), step 9's substitution where defined is `rsb`, and is defined wherever `rsb` gives a canonical image (`apply_eq_rsb`, `apply_of_cn`, `gen_rsb`, `gen_of_rsb`), the main induction L11 with records, updates, record patterns and bound row variables (`wExp_completeD`), refutation (`wdRefutation : WDRefutation`), L12 (`inferExpWD_instance`), completeness but for its `internal` clause (`wdCompleteness_noFail`), principality (`wdPrincipality`, `isPrincipalD_iff`) |
+| `StandardElmMech/Stat/Complete/WE*.lean`, `NodesOk.lean`, `CheckedDeriv.lean` | Step 11, milestone (e): W for F_e in namespace `WE` (`WE.inferExpWD`): annotations naming type variables, nested and in groups, with W's explicit variables `newU` (a name used as a record extension is a row variable, any other a type variable), the annotated member's scheme in its group (polymorphic recursion), A21's scoping, A20's escape check after the group, A93's closure; sound by construction (`WE.inferExpWD_sound`), terminating (`WE.inferExpWD_terminates`), the main induction L11 (`WE.wExp_completeD`), refutation (`WE.weRefutation : WE.WERefutation`), completeness but for its `internal` clause (`WE.weCompleteness_noFail`), L12 (`WE.inferExpWD_instance`), principality (`WE.wePrincipality`; W's result is principal in step 9's sense, `WE.inferExpWD_principal`, `isPrincipalE_iff`), over every checked derivation (step 9's checker asks for canonical rows and no free `bnd`: `okExpB`, `canonExp_of_checkExp`, `noFreeBnd_of_checkModule`); unit examples and the six rigid-`let` tests at expression level (`WEExamples.lean`). The `internal` clause (L10 with the escape condition) is not proved |
+| `StandardElmMech/Stat/Complete/Modules.lean`, `ModulesCongr.lean`, `ModulesFail.lean`, `ModulesNodes.lean`, `ModulesPorts.lean`, `ModulesPrincipalExp.lean`, `ModulesPrincipal.lean`, `ModulesProgram.lean` | Step 11, milestone (f): module- and program-level W (`MW.inferModuleW`, `MW.inferProgramW`): type declarations whole (ruling A98), ports as annotated groups, top-level groups as one nested `let`; refutation (`inferModuleW_fail`, `inferProgramW_fail`, `Stat.not_legal_of_wRefutes`) and principality (`inferModuleW_principal`, `inferProgramW_principal`) without hypotheses; two solutions of the type declarations differ by a bijection of type names (`types_bij`) |
+| `StandardElmMech/Stat/Complete/Discharge.lean` | Step 11, milestone (g): `Stat.wCheck`, `legal_of_W`, `ident_of_wCheck`, `programSem_of_wCheck` (D11 discharged test by test), `not_legal_of_wMainVar` (A96's flags refusal), `principalExistsCore_of_covers`, `principalExistsMod_of_covers`, `d11For_of_agree` |
 | `CompareE2E.lean` | `lake exe compare-e2e`: Lean's end-to-end reduced program of every translated test against the translator's (`../e2e-report.json`) |
-| `Certify.lean` | `lake exe certify`: runs the inference compiled and writes `Certs/` and `../static-report.json`; `--check` compares. Lists the 9 tests whose kernel check breaks the memory budget (`staticBudgetNative`, proved by `native_decide`, `[native]`) |
+| `Certify.lean` | `lake exe certify`: runs the inference compiled and writes `Certs/` and `../static-report.json`; `--check` compares. Lists the tests whose kernel check breaks the memory budget, proved by `native_decide`, `[native]`: `wBudgetNative` (15 W checks), `staticBudgetNative` (now only `spec_`, 5), and `wSkip` (CompilerIssue2281LongLineListTest, which keeps step 9's conditional `legal_`) |
 | `CompareDerived.lean` | `lake exe compare-derived`: the derived forms of each translated program's source against the translator's module form |
 | `SynReport.lean` | `lake exe syn-report`: `../syntactic-report.json`, for each written program the restrictions it breaks |
 | `StandardElmMech/Generated/` | Written by the translator: the translated tests in shards (`Elm01.lean`, ..., `ElmCore01.lean`, ..., and the worker tests in `Worker01.lean`), `All.lean`, and per shard `Checks<Shard>.lean` with its program theorems `t_<project>_<Test>` |
 | `StandardElmMech/AllPrograms.lean` | `exampleShards` and `allPrograms`: the generated shards and `handPartial`, for the executables |
 | `StandardElmMech/Theorems.lean` | The command `#mod_program_theorems` (one theorem per program, in module form), `budgetNative`, the rulings stated directly, and theorems that D1 makes possible (`a43_one_unique`, `a51_one_choice`, `log_order_demo`) |
 | `scripts/check-axioms.lean` | `lake env lean scripts/check-axioms.lean`: every theorem's axioms |
+| `scripts/check-hypotheses.lean` | `lake env lean scripts/check-hypotheses.lean`: the theorems whose statement mentions `PrincipalExists`, `PrincipalExistsFor`, `InferPrincipalFor` or `D11For` (after step 11: 13 general lemmas and CompilerIssue2281LongLineListTest's `legal_`) |
+| `MeasureW.lean` | `lake exe measure-w`: step 11's W compiled on every test (`../w-report.json`): the compile-error tests it refutes, that it refutes no compile-success test, and on which legal programs it returns a derivation |
 | `scripts/measure-build.sh` | The memory of a clean build, as the plan's conventions define it |
 | `DumpPhrases.lean` | `lake exe dump-phrases`: every program's modules, to show a change to the derived forms changes none |
 | `Main.lean` | The `run-examples` executable |
@@ -207,29 +213,29 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 
 Every generated theorem's docstring names what it trusts besides Lean's kernel
 (plans/lean-full-definition.md, "The trust model"): `[parse]` (elm-syntax parses the test as Elm
-does), `[elab]` (the translator's elaboration and number specialisation; retired on 2026-11-12, by step 10, for the 579 tests with a `spec_` theorem), `[params]` (the
+does), `[elab]` (the translator's elaboration and number specialisation; retired on 2026-11-12, by step 10, for the 580 tests with a `spec_` theorem), `[params]` (the
 implementation parameters: IntRange and norm as eco's), `[harness]` (the harness's `Html.text`
 and the core library's interfaces, D2), `[principal]` (what the inference returns for the program
-is principal, D11: the hypothesis `InferPrincipalFor` of every `legal_` theorem; the `refuse_`
-theorems do not need it), and `[native]` (the Lean compiler, for a theorem proved by
+is principal, D11: the hypothesis `InferPrincipalFor`; retired on 2026-11-13, by step 11, for every
+test but CompilerIssue2281LongLineListTest, whose `legal_` theorem keeps it), and `[native]` (the Lean compiler, for a theorem proved by
 `native_decide`).
 
-* `legal_<project>_<Test>` (Certs/, 622 compile-success tests): under `InferPrincipalFor`, the
-  program as written is legal (`LegalProgram`: the syntactic restrictions, and Chapter 9's static
-  rules with each module elaborated by a principal derivation meeting the further restrictions).
-  The kernel runs the inference and the proved checker; 9 large programs by `native_decide`.
-* `spec_<project>_<Test>` (Certs/EndToEnd*.lean, 579 translated tests): Lean's pipeline from the
+* `legal_<project>_<Test>` (Certs/, 623 compile-success tests): the program as written is legal
+  (`LegalProgram`: the syntactic restrictions, and Chapter 9's static rules with each module
+  elaborated by a principal derivation meeting the further restrictions), without hypothesis
+  (`legal_of_W`, from a `wcheck_<project>_<Test>` theorem: the kernel runs step 11's proved
+  inference W, Chapter 9's conditions and the further restrictions); 16 large programs by
+  `native_decide`. CompilerIssue2281LongLineListTest keeps step 9's form, under `InferPrincipalFor`.
+* `spec_<project>_<Test>` (Certs/EndToEnd*.lean, 580 translated tests): Lean's pipeline from the
   source (derived forms, inference, the proved checker, number specialisation, erasure) gives the
   reduced program the translator wrote, so the theorems about it no longer rest on `[elab]`;
-  `mean_<project>_<Test>` (577; the other two stop at Debug.todo): under D11, the program has a
-  meaning by r:p-program with both premises.
-* `ident_<project>_<Test>` (579): under D11, the specialisation of the program is unique and is the
-  reduced program the translator wrote (`ident_of_spec'`).
-* `refuse_<project>_<Test>` (Certs/Refusals*.lean, 245 compile-error tests: 68 by steps 8 and 9, 176
-  by step 11's core refutation, 1 more by imports): the program is not
-  legal, for every derivation (31 by step 8's restrictions, 37 by the static semantics: scope,
-  constructor arity, imports, type expressions, ports, the type of `main`, exhaustiveness and
-  irredundancy).
+  `mean_<project>_<Test>` (578; the other two stop at Debug.todo): the program has a meaning by
+  r:p-program with both premises (`programSem_of_wCheck`, without hypothesis).
+* `ident_<project>_<Test>` (580): the specialisation of the program is unique and is the reduced
+  program the translator wrote (`ident_of_wCheck`, without hypothesis).
+* `refuse_<project>_<Test>` (Certs/Refusals*.lean, all 286 compile-error tests: 69 by steps 8 and
+  9 and imports, 201 by step 11's core refutation, 15 by module-level W, 1 by W's type of `main`):
+  the program is not legal, for every derivation.
 
 * `evExp_sound`: a value of the evaluator is a value of the book's relation `EvalExp`;
   `evExp_sound_l`: with its log, of the logged relation `EvalExpL`.

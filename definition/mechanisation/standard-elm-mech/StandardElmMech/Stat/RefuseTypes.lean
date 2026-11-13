@@ -679,10 +679,8 @@ theorem assigns_cover (P Q : String → Prop) [DecidablePred P] [DecidablePred Q
 
 theorem names_of_newFor {U' : List BVar} {ty : BTy} (h : newForB U' ty [] = true) (v : BVar) (s : String)
     (hv : v ∈ U') (hs : v.name? = some s) : s ∈ bTyNames ty := by
-  unfold newForB at h
-  simp only [Bool.and_eq_true, List.all_eq_true, decide_eq_true_eq] at h
   have hn : s ∈ namesU U' := List.mem_filterMap.mpr ⟨v, hv, hs⟩
-  exact (h.1.1.2 s hn).1
+  exact (((newFor_of_newForB h).2.1 s).mp hn).1
 
 /-- Every U' an annotation may have agrees, on named variables, with a candidate. -/
 theorem annCands_cover {U' : List BVar} {ty : BTy} (h : newForB U' ty [] = true) :
@@ -1323,7 +1321,7 @@ theorem ref : ∀ (a : ATopDec) (C : Ctx), Inv B f A C → refTop A a.erase = tr
     split
     · rename_i hc
       simp only [Bool.and_eq_true] at hc
-      have := vb_not_refuted hcol hAU (C' := C.plusVE VE) (fun lc => lookSim_plusVE VE (hI.look lc)) hI.U vb hc.1
+      have := vb_not_refuted hcol hAU (C' := C.plusVE VE) (fun lc => lookSim_plusVE VE (hI.look lc)) hI.U vb hc.1.1
       rw [hr] at this; cases this
     · rfl
   | .types TE VE db tbs, C, hI, hr => by
@@ -1457,10 +1455,10 @@ def forcedBadAt : BAtExp → Bool
 end
 
 mutual
-theorem forcedBad_sound : ∀ (C : Ctx) (e : AExp), checkExp C e = true → forcedBad e.erase = true →
+theorem forcedBad_sound : ∀ (C : Ctx) (e : AExp), checkExpS C e = true → forcedBad e.erase = true →
     badHeadB e.ty = true
   | C, .atexp a, h, hf => by
-    simp only [checkExp] at h
+    simp only [checkExpS] at h
     simp only [AExp.erase, forcedBad] at hf
     simp only [AExp.ty]
     exact forcedBadAt_sound C a h hf
@@ -1633,6 +1631,7 @@ theorem no_main : ∀ (a : ATopDec) (C : Ctx) (E : Env) (PE : PortEnv), noMain a
     split at h
     · rename_i hc
       simp only [Bool.and_eq_true, decide_eq_true_eq] at hc
+      replace hc := hc.1
       simp only [Option.some.injEq, Prod.mk.injEq] at h
       obtain ⟨rfl, rfl⟩ := h
       simp only [Env.ofVE, closGroup, FMap.mapV]
@@ -1676,6 +1675,7 @@ theorem main_bad : ∀ (a : ATopDec) (C : Ctx) (E : Env) (PE : PortEnv), Inv B f
     split at h
     · rename_i hc
       simp only [Bool.and_eq_true, decide_eq_true_eq] at hc
+      replace hc := hc.1
       simp only [Option.some.injEq, Prod.mk.injEq] at h
       obtain ⟨rfl, rfl⟩ := h
       obtain ⟨sch, hs, hb⟩ := vb_mainBad hcol hAU (C' := C.plusVE VE) (fun lc => lookSim_plusVE VE (hI.look lc))

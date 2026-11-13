@@ -1,6 +1,6 @@
 # Standard Elm mechanisation: example run
 
-Programs: 579 (38 workers), in 16 shards; checks: 1708.
+Programs: 580 (38 workers), in 16 shards; checks: 1709.
 
 ## Elm01
 
@@ -874,6 +874,7 @@ Elm09: 40 programs, 92 checks, 92 agree.
 | StandardA93MutualNumberDefaultTest | f 3 | 1 | 1 | agree | t_elm_StandardA93MutualNumberDefaultTest (native) |
 | StandardA97NeverErrBranchTest | value (Ok 3) | 3 | 3 | agree | t_elm_StandardA97NeverErrBranchTest |
 | StandardA97SelfOnlyTypeTest | fromResult (Ok 3) | 3 | 3 | agree | t_elm_StandardA97SelfOnlyTypeTest |
+| StandardA98TypeBeforeAliasTest | field (T 3) | 4 | 4 | agree | t_elm_StandardA98TypeBeforeAliasTest |
 | StandardApplicationStrictTest | before | () | () | agree (partial log) |  |
 | StandardApplicationStrictTest | app strict | (no value) | (no meaning) | agree | t_elm_StandardApplicationStrictTest |
 | StandardCoreEvaluationExamplesTest | as-pattern | (1,[1,2]) | (1,[1,2]) | agree | t_elm_StandardCoreEvaluationExamplesTest |
@@ -973,6 +974,13 @@ Elm09: 40 programs, 92 checks, 92 agree.
 | WideCtorMixedTest | eq self | True | True | agree | t_elm_WideCtorMixedTest |
 | WideCtorMixedTest | eq other | False | False | agree | t_elm_WideCtorMixedTest |
 | WideCtorMixedTest | show | W 1000 1.5 'c' "3s" True 1005 6.5 'h' "8s" False 1010 11.5 'm' "13s" True 1015 16.5 'r' "18s" False 1020 21.5 'w' "23s" True 1025 26.5 'b' "28s" False 1030 31.5 'g' "33s" True 1035 36.5 'l' "38s" False 1040 41.5 'q' "43s" True 1045 46.5 'v' "48s" False 1050 51.5 'a' "53s" True 1055 56.5 'f' "58s" False | W 1000 1.5 'c' "3s" True 1005 6.5 'h' "8s" False 1010 11.5 'm' "13s" True 1015 16.5 'r' "18s" False 1020 21.5 'w' "23s" True 1025 26.5 'b' "28s" False 1030 31.5 'g' "33s" True 1035 36.5 'l' "38s" False 1040 41.5 'q' "43s" True 1045 46.5 'v' "48s" False 1050 51.5 'a' "53s" True 1055 56.5 'f' "58s" False | agree | t_elm_WideCtorMixedTest |
+
+Elm10: 40 programs, 104 checks, 104 agree.
+
+## Elm11
+
+| Program | Label | Expected (CHECK) | Definition | Status | Theorem |
+|---|---|---|---|---|---|
 | WideRecord33Test | f0000 | 1000 | 1000 | agree | t_elm_WideRecord33Test |
 | WideRecord33Test | f0031 | 31.5 | 31.5 | agree | t_elm_WideRecord33Test |
 | WideRecord33Test | f0032 | 'g' | 'g' | agree | t_elm_WideRecord33Test |
@@ -981,13 +989,6 @@ Elm09: 40 programs, 92 checks, 92 agree.
 | WideRecord33Test | eq self | True | True | agree | t_elm_WideRecord33Test |
 | WideRecord33Test | eq updated | False | False | agree | t_elm_WideRecord33Test |
 | WideRecord33Test | show | { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = "3s", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = "8s", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = "13s", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = "18s", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = "23s", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = "28s", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g' } | { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = "3s", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = "8s", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = "13s", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = "18s", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = "23s", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = "28s", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g' } | agree | t_elm_WideRecord33Test |
-
-Elm10: 40 programs, 111 checks, 111 agree.
-
-## Elm11
-
-| Program | Label | Expected (CHECK) | Definition | Status | Theorem |
-|---|---|---|---|---|---|
 | WideRecord40Test | f0000 | 1000 | 1000 | agree | t_elm_WideRecord40Test |
 | WideRecord40Test | f0031 | 31.5 | 31.5 | agree | t_elm_WideRecord40Test |
 | WideRecord40Test | f0032 | 'g' | 'g' | agree | t_elm_WideRecord40Test |
@@ -1027,7 +1028,7 @@ Elm10: 40 programs, 111 checks, 111 agree.
 | WideRecordPatternTest | update pattern | 1029025 | 1029025 | agree | t_elm_WideRecordPatternTest |
 | WrapperUnionFieldTest | result | 7 | 7 | agree | t_elm_WrapperUnionFieldTest |
 
-Elm11: 6 programs, 38 checks, 38 agree.
+Elm11: 7 programs, 46 checks, 46 agree.
 
 ## ElmCore01
 
@@ -1822,4 +1823,4 @@ ElmCore04: 15 programs, 59 checks, 59 agree.
 
 Worker01: 38 programs, 123 checks, 123 agree.
 
-Total: 1708 checks, 1708 agree, 0 diverge (0 known); 1497 checks by decide +kernel, 209 by native_decide, in 579 program theorems.
+Total: 1709 checks, 1709 agree, 0 diverge (0 known); 1498 checks by decide +kernel, 209 by native_decide, in 580 program theorems.

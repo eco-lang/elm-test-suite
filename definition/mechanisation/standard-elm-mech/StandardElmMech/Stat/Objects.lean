@@ -472,4 +472,31 @@ def Ty.listWf : List Ty → Bool
   | τ :: rest => Ty.wf τ && Ty.listWf rest
 end
 
+/-- The labels of a row, in order. -/
+def labs (r : Row) : List Lab := r.map (·.1)
+
+mutual
+/-- Every row strictly sorted: rows are finite maps (the book's records), and a row is canonical
+    when its labels strictly increase (A23: then `Row.merge` detects every shared label). -/
+def cnB : Ty → Bool
+  | .var _ => true
+  | .record ρ _ => rowSorted (labs ρ) && cnRowB ρ
+  | .fn a b => cnB a && cnB b
+  | .con as _ => cnListB as
+def cnRowB : Row → Bool
+  | [] => true
+  | (_, τ) :: rest => cnB τ && cnRowB rest
+def cnListB : List Ty → Bool
+  | [] => true
+  | τ :: rest => cnB τ && cnListB rest
+end
+
+/-- A type a sentence of a derivation can have: canonical rows, and no `bnd` variable (those are
+    the bound variables of canonical schemes and type functions, never free). Step 9's checker
+    requires it of every type at a node of a derivation (`checkExp`). -/
+def Ty.okB (τ : Ty) : Bool := cnB τ && τ.vars.all fun v => !v.isBnd
+
+theorem Ty.okB_iff (τ : Ty) : τ.okB = true ↔ cnB τ = true ∧ ∀ v ∈ τ.vars, v.isBnd = false := by
+  simp [Ty.okB]
+
 end StandardElm.Stat

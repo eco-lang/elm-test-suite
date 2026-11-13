@@ -292,13 +292,13 @@ theorem wAtExp_complete (fuel n0 : Nat) : ∀ (a : BAtExp) (C C' : Ctx) (S' : FS
       exact outP_pure ⟨hn1, hi1, hok1, hokA1, T1, hF1, hty1, by simp only [sbAtExp, stripAtExp, hs1]⟩
     | _ => simp [AAtExp.erase] at he
 theorem wExp_complete (fuel n0 : Nat) : ∀ (e : BExp) (C C' : Ctx) (S' : FSub) (st : WSt) (a' : AExp),
-    Pre n0 C C' S' st → checkExp C' a' = true → a'.erase = e → NB (tysExp false a') →
+    Pre n0 C C' S' st → checkExpS C' a' = true → a'.erase = e → NB (tysExp false a') →
     OutP (EPost n0 st S' a') (wExp fuel (rigidFrom n0) C e st)
   | .atexp a, C, C', S', st, a', hp, hc, he, hnb => by
     cases a' with
     | atexp a'' =>
       simp only [AExp.erase, BExp.atexp.injEq] at he; subst he
-      simp only [checkExp] at hc
+      simp only [checkExpS] at hc
       simp only [tysExp] at hnb
       simp only [wExp]
       refine outP_bind (wAtExp_complete fuel n0 _ C C' S' st a'' hp hc rfl hnb) ?_
@@ -309,7 +309,7 @@ theorem wExp_complete (fuel n0 : Nat) : ∀ (e : BExp) (C C' : Ctx) (S' : FSub) 
     cases a' with
     | app e' a'' =>
       simp only [AExp.erase, BExp.app.injEq] at he; obtain ⟨rfl, rfl⟩ := he
-      simp only [checkExp, Bool.and_eq_true] at hc; obtain ⟨⟨hc1, hc2⟩, hc3⟩ := hc
+      simp only [checkExpS, Bool.and_eq_true] at hc; obtain ⟨⟨hc1, hc2⟩, hc3⟩ := hc
       obtain ⟨r, hr⟩ := fn_of_match hc3
       simp only [tysExp] at hnb; obtain ⟨hnb1, hnb2⟩ := NB.app hnb
       simp only [wExp]
@@ -344,7 +344,7 @@ theorem wExp_complete (fuel n0 : Nat) : ∀ (e : BExp) (C C' : Ctx) (S' : FSub) 
     cases a' with
     | lam p' e' =>
       simp only [AExp.erase, BExp.lam.injEq] at he; obtain ⟨rfl, rfl⟩ := he
-      simp only [checkExp, Bool.and_eq_true] at hc; obtain ⟨hc1, hc2⟩ := hc
+      simp only [checkExpS, Bool.and_eq_true] at hc; obtain ⟨hc1, hc2⟩ := hc
       simp only [tysExp] at hnb; obtain ⟨hnb1, hnb2⟩ := NB.app hnb
       simp only [wExp]
       refine outP_bind (wAtPat_complete fuel n0 _ C C' C' S' st p' hp (lkC_refl C') hc1 rfl hnb1) ?_
@@ -367,7 +367,7 @@ theorem wExp_complete (fuel n0 : Nat) : ∀ (e : BExp) (C C' : Ctx) (S' : FSub) 
     cases a' with
     | caseE e' m' =>
       simp only [AExp.erase, BExp.caseE.injEq] at he; obtain ⟨rfl, rfl⟩ := he
-      simp only [checkExp, Bool.and_eq_true] at hc; obtain ⟨⟨hc1, hc2⟩, hc3⟩ := hc
+      simp only [checkExpS, Bool.and_eq_true] at hc; obtain ⟨⟨hc1, hc2⟩, hc3⟩ := hc
       obtain ⟨r, hr⟩ := fn_of_match hc3
       simp only [tysExp] at hnb; obtain ⟨hnb1, hnb2⟩ := NB.app hnb
       simp only [wExp]

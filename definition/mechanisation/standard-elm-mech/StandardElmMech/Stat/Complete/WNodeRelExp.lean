@@ -96,7 +96,7 @@ theorem dec_head_rel {n0 n : Nat} {T : FSub} {U0 : List BVar} {C C' : Ctx} {VE :
   rw [sbScheme_mono] at hg
   exact closE_inst hok (fun a ha _ => hrel.ftv (fun _ _ h => h) hfx a ha) hnb (fun i c => hfx _ rfl) hcls t hg
 
-theorem tyS_exp {T : FSub} {C : Ctx} {e : AExp} (hc : checkExp C e = true) :
+theorem tyS_exp {T : FSub} {C : Ctx} {e : AExp} (hc : checkExpS C e = true) :
     (stripExp (sbExp T e)).ty = sb T (stripExp e).ty := by rw [stripExp_ty, stripExp_ty, sbExp_ty_chk T e C hc]
 theorem tyS_atexp {T : FSub} {C : Ctx} {a : AAtExp} (hc : checkAtExp C a = true) :
     (stripAtExp (sbAtExp T a)).ty = sb T (stripAtExp a).ty := by rw [stripAtExp_ty, stripAtExp_ty, sbAtExp_ty_chk T a C hc]
@@ -181,18 +181,18 @@ theorem nodesExpRowOpt_rel : ∀ (r : Option AExpRow) (C C' : Ctx) (path : List 
     F2 (NRel T U0) (nodesExpRowOpt C path (stripExpRowOpt r)) (nodesExpRowOpt C' path (stripExpRowOpt (sbExpRowOpt T r)))
   | none, _, _, _, _, _, _, _, _ => .nil
   | some r, C, C', path, hU, hc, hrel, hok, hnb => nodesExpRow_rel r C C' path hU hc hrel hok hnb
-theorem nodesExp_rel : ∀ (x : AExp) (C C' : Ctx) (path : List Nat), C.U = U0 → checkExp C x = true →
+theorem nodesExp_rel : ∀ (x : AExp) (C C' : Ctx) (path : List Nat), C.U = U0 → checkExpS C x = true →
     CtxRel (FtvRel T) (rigidFrom n0) C C' → OkA n (tysExp true x) → NBm T (tysExp false x) →
     F2 (NRel T U0) (nodesExp C path (stripExp x)) (nodesExp C' path (stripExp (sbExp T x)))
   | .atexp a, C, C', path, hU, hc, hrel, hok, hnb => by
     have hc' := hc
-    simp only [checkExp] at hc
+    simp only [checkExpS] at hc
     simp only [tysExp] at hok hnb
     exact forall2_append (.cons (nrel_mk hU (hrel.2.1.symm.trans hU) (by simp only [List.map_cons, List.map_nil, List.cons.injEq, and_true]; exact tyS_exp (T := T) hc') rfl) .nil)
       (nodesAtExp_rel a C C' _ hU hc hrel hok hnb)
   | .app e a, C, C', path, hU, hc, hrel, hok, hnb => by
     have hc' := hc
-    simp only [checkExp, Bool.and_eq_true] at hc
+    simp only [checkExpS, Bool.and_eq_true] at hc
     simp only [tysExp] at hok hnb
     obtain ⟨hok1, hok2⟩ := OkA.split hok; obtain ⟨hnb1, hnb2⟩ := NBm.app hnb
     exact forall2_append (forall2_append
@@ -200,7 +200,7 @@ theorem nodesExp_rel : ∀ (x : AExp) (C C' : Ctx) (path : List Nat), C.U = U0 �
       (nodesExp_rel e C C' _ hU hc.1.1 hrel hok1 hnb1)) (nodesAtExp_rel a C C' _ hU hc.1.2 hrel hok2 hnb2)
   | .lam p e, C, C', path, hU, hc, hrel, hok, hnb => by
     have hc' := hc
-    simp only [checkExp, Bool.and_eq_true] at hc
+    simp only [checkExpS, Bool.and_eq_true] at hc
     simp only [tysExp] at hok hnb
     obtain ⟨hok1, hok2⟩ := OkA.split hok; obtain ⟨-, hnb2⟩ := NBm.app hnb
     have hrel' : CtxRel (FtvRel T) (rigidFrom n0) (C.plusVE (stripAtPat p).ve)
@@ -213,7 +213,7 @@ theorem nodesExp_rel : ∀ (x : AExp) (C C' : Ctx) (path : List Nat), C.U = U0 �
       (nodesExp_rel e _ _ _ hU (by rw [stripAtPat_ve]; exact hc.2) hrel' hok2 hnb2)
   | .caseE e m, C, C', path, hU, hc, hrel, hok, hnb => by
     have hc' := hc
-    simp only [checkExp, Bool.and_eq_true] at hc
+    simp only [checkExpS, Bool.and_eq_true] at hc
     simp only [tysExp] at hok hnb
     obtain ⟨hok1, hok2⟩ := OkA.split hok; obtain ⟨hnb1, hnb2⟩ := NBm.app hnb
     exact forall2_append (forall2_append
@@ -271,7 +271,7 @@ theorem nodesValBind_rel : ∀ (vb : AValBind) (C C' : Ctx) (path : List Nat), C
     simp only [checkValBind, Bool.and_eq_true, decide_eq_true_eq] at hc
     simp only [tysValBind, List.cons_append, annMark, hann'.1, ↓reduceIte, List.nil_append] at hok hnb
     obtain ⟨hok1, hok2⟩ := OkA.split hok.tail; obtain ⟨hnb1, hnb2⟩ := NBm.app hnb.cons
-    have hce : checkExp C e = true := by have := hc.1.1.2; rwa [hann'.1, plusU_nil] at this
+    have hce : checkExpS C e = true := by have := hc.1.1.2; rwa [hann'.1, plusU_nil] at this
     have e1 : (stripValBind (sbValBind T (.var x ann τ e rest))).ve = sbVE T (stripValBind (.var x ann τ e rest)).ve := by
       rw [stripValBind_ve, stripValBind_ve, valbind_ve_sb T _ hann]
     have hn1 := nodesExp_rel e C C' (path ++ [0]) hU hce hrel hok1 hnb1

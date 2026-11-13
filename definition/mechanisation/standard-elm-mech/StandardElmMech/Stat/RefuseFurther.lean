@@ -551,29 +551,29 @@ theorem sRowOpt : ∀ (r : Option AExpRow) (C : Ctx), CtxInv C0 C → checkExpRo
     simp only [FurtherExpRowOpt] at hf
     simp only [AExpRow.eraseOpt, bsExpRowOpt] at hs
     exact sRow r C hinv hc hf s hs
-theorem sExp : ∀ (a : AExp) (C : Ctx), CtxInv C0 C → checkExp C a = true → FurtherExp tbl a →
+theorem sExp : ∀ (a : AExp) (C : Ctx), CtxInv C0 C → checkExpS C a = true → FurtherExp tbl a →
     ∀ s ∈ bsExp a.erase, SiteHolds tbl C0 s
   | .atexp a, C, hinv, hc, hf, s, hs => by
-    simp only [checkExp] at hc
+    simp only [checkExpS] at hc
     simp only [FurtherExp] at hf
     simp only [AExp.erase, bsExp] at hs
     exact sAtExp a C hinv hc hf s hs
   | .app e a, C, hinv, hc, hf, s, hs => by
-    simp only [checkExp, Bool.and_eq_true] at hc
+    simp only [checkExpS, Bool.and_eq_true] at hc
     simp only [FurtherExp] at hf
     simp only [AExp.erase, bsExp, List.mem_append] at hs
     rcases hs with hs | hs
     · exact sExp e C hinv hc.1.1 hf.1 s hs
     · exact sAtExp a C hinv hc.1.2 hf.2 s hs
   | .lam p e, C, hinv, hc, hf, s, hs => by
-    simp only [checkExp, Bool.and_eq_true] at hc
+    simp only [checkExpS, Bool.and_eq_true] at hc
     simp only [FurtherExp] at hf
     simp only [AExp.erase, bsExp, List.mem_cons] at hs
     rcases hs with rfl | hs
     · exact site_atpat hinv hc.1 hf.1
     · exact sExp e _ (ctxInv_plusVE (allV_atpat p) hinv) hc.2 hf.2 s hs
   | .caseE e m, C, hinv, hc, hf, s, hs => by
-    simp only [checkExp, Bool.and_eq_true] at hc
+    simp only [checkExpS, Bool.and_eq_true] at hc
     obtain ⟨⟨hce, hcm⟩, hty⟩ := hc
     simp only [FurtherExp] at hf
     simp only [AExp.erase, bsExp, List.mem_cons, List.mem_append] at hs
@@ -658,6 +658,7 @@ theorem sTop : ∀ (d : ATopDec) (C : Ctx) (E : Env) (PE : PortEnv), CtxInv C0 C
     split at h
     · rename_i hc
       simp only [Bool.and_eq_true, decide_eq_true_eq] at hc
+      replace hc := hc.1
       simp only [Option.some.injEq, Prod.mk.injEq] at h
       obtain ⟨rfl, rfl⟩ := h
       have hv : AllV VE := hc.2 ▸ allV_vb vb

@@ -9,11 +9,11 @@
       "further": 9,
       "fixity-inference": 1,
       "static-deterministic": 28,
-      "inference": 216
+      "inference": 217
     },
     "compileSuccess": {
       "B0": 39,
-      "harness": 540,
+      "harness": 541,
       "library": 34,
       "helper": 9,
       "outside": 3,
@@ -2822,6 +2822,32 @@
         "params"
       ],
       "title": "MISSING PATTERNS",
+      "override": null
+    },
+    {
+      "project": "elm",
+      "name": "StandardA98TypeBeforeAliasStringMismatchTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA98TypeBeforeAliasStringMismatchTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "rules": [
+        "r:sm-topdec-types",
+        "r:sm-topdec-seq",
+        "r:sm-datbind"
+      ],
+      "rule": "r:sm-topdec-types",
+      "class": "inference",
+      "subclass": null,
+      "step": 11,
+      "trust": [
+        "parse",
+        "harness"
+      ],
+      "title": "TYPE MISMATCH",
       "override": null
     },
     {
@@ -14979,6 +15005,23 @@
       "modules": [
         {
           "path": "tests/elm/src/StandardA97SelfOnlyTypeTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA98TypeBeforeAliasTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA98TypeBeforeAliasTest.elm",
           "parse": "ok"
         }
       ],

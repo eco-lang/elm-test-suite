@@ -1112,3 +1112,126 @@ At (g) also:
 6. **Milestone (g) depends on step 10.** The plan's dependencies say "11 needs 9". Milestones
    (a) to (f) do; (g) removes step 10's hypotheses and redefines the inference of step 10's
    pipeline, so it needs step 10.
+7. **Step 9's substitution does not always refuse a repeated label** (found 2026-11-12, milestone
+   (d)). A23 makes a substitution undefined where it would give a record a label twice. Step 9's
+   `Subst.apply` merges the bound row into the record with `Row.merge`, which catches a shared label
+   only where the two rows meet it head to head; on unsorted rows (which instance lists may hold)
+   merging `[a]` into `[c, a]` succeeds and gives `[a, c, a]`. The proofs of milestone (d) carry the
+   weaker definedness the encoding has (`MOK`, `Stat/Complete/WDNodeDef.lean`), so no theorem is
+   affected; the encoding should check disjointness (or keep rows sorted) to match A23.
+   (2026-11-12: step 9's checker now asks every type at every node to have sorted rows, so a
+   checked derivation never holds such a row; `Row.merge` itself and instance lists are
+   unchanged.)
+8. **Status of the milestones (2026-11-12).** (a) done: 200 of the 217 inference tests refuted
+   unconditionally (`coreRefutes`), none of the 625 compile-success tests. (b), (c), (d) done at
+   expression level: W for Hindley–Milner, with classes, and with records and rows is sound,
+   refuting, complete, principal (with a bridge to step 9's `IsPrincipal` over derivations without
+   free `bnd` variables and with canonical rows) and terminating; W with records is a separate
+   function `inferExpWD`. (e) under way (see item 10). Top-level annotations with type variables, module-level W,
+   the per-test refusals that need it, and (g) remain. Every module is coherent since ruling A98, so
+   section 9's coherence is not needed.
+9. **The kind of an explicit variable is not fixed by the rules** (found 2026-11-12, milestone (e)).
+   `sec:static-core-explicit` says that whether a name of `U'` stands for a type or a row variable
+   "is fixed by the rules for type expressions, which accept only variables of `U of C`". It is
+   fixed only for a name used as the extension variable of a record type (`{ r | ... }`, rule
+   `r:s-ty-openrecord`). A name used only as a type (`f : a -> a`) elaborates with `a` a type
+   variable (`r:s-ty-tyvar`) and with `a` a row variable (`r:s-ty-rowvar`, `{ | a } -> { | a }`), and
+   `f x = x` checks both ways; the two derivations are not instances of each other (an instance maps
+   a type variable to a type variable), so `let f : a -> a; f x = x in f` has no principal
+   derivation, and the order and repetitions of `U'` are free too (the checker records the list).
+   The book should say that a name of `tyvars ty` denotes a row variable exactly when it is used as
+   an extension variable in `ty` (A19/A36's convention); a nested annotation that uses an outer
+   name as an extension (`f : a -> Int` with an inner `{ a | foo : Int }`) is then refused. W takes
+   that reading (`WE.newU`). *Resolved (2026-11-12):* the book now says so (erratum in
+   `sec:static-core-explicit`), the relation's `NewFor` asks every name to stand for the variable
+   of its kind (`nameVar`), and step 9's checker asks for exactly `newU` (`newForB`); the checker
+   also asks every type of a derivation to have canonical rows and no free `bnd` (`okExpB`), so
+   the hypotheses `NoFreeBndExp`, `CanonExp` and `WE.CanonAnnExp` follow from `checkExp` and are
+   gone from every theorem of milestones (b) to (e) (`noFreeBndExp_of_checkExp`,
+   `canonExp_of_checkExp`, `WE.canonAnnExp_of_checkExp`, `Complete/CheckedDeriv.lean`).
+10. **Milestone (e) status (2026-11-12).** W for F_e (`WE.inferExpWD`, Stat/Complete/WE*.lean, in
+   namespace `WE` beside the (d) chain, which is unchanged): sound by construction, terminating,
+   the main induction L11, refutation (`WE.weRefutation`), completeness but for the `internal`
+   clause, and L12 (`WE.inferExpWD_instance`). Remaining: (i) principality in the form of
+   `WDPrincipality`, by porting WDNodeRelExp/WDNodeOk/WDPrincipality into namespace `WE.WDP`:
+   replace `NRelD T U0` (one `U` for every node) by a relation asking only that `T` fix each node's
+   `U` (inside an annotated member `U` is `U ∪ U'`); replace `AnnNilV` by "annotated members carry
+   W's variables and have types over named variables" (W's result has it: `WE.annMark true`
+   marks a type that is not); and prove `SchInstD T (closE A VE σ) (closE A' VE' σ)` for an
+   annotated member's scheme `σ` (the declaration node; `WE.closE_relAnn` is the `SchRelD` form,
+   used by the `let` case of L11); (ii) the `internal` clause, L10 relative to a derivation: the
+   escape condition under the final substitution (the (d) soundness chain's `DeadC` covers only
+   fresh variables, and the explicit variables are named). Fragment F_e: 216 of the 217
+   inference tests (12 beyond F_d; 17 of them not refuted by milestone (a)); at expression level W
+   refuses the six rigid-`let` tests (1639, 1839, 2001, 2077, 2296, 2301) by the escape check
+   (`WEExamples.lean`); their per-test refusals need module-level W (milestone (f)).
+   *Update (2026-11-12, later):* (i) is done. `WE.wePrincipality : WEPrincipality`, and
+   `WE.inferExpWD_principal` gives W's result principal in step 9's sense (`IsPrincipal`, via
+   `isPrincipalE_iff`), in WENodeRel.lean, WENodeRelExp.lean and WEPrincipality.lean (namespace
+   `WE.WDP`; the (d) chain unchanged). The node relation asks `T` to fix each node's `U` (`NRelE`;
+   inside an annotated member `U ∪ U'`, named, hence rigid); annotated members carry W's variables
+   over named variables (`AnnOKV`); an annotated member's scheme clause is `closE_instAnn`, from
+   `gen_rn_sub` (the derivation's closure generalises fewer of the scheme's variables, since a
+   variable free in W's context is free in the derivation's); a `let` body's contexts are related
+   by `closE_relAnnE`. (ii), the `internal` clause, remains: the (d) soundness chain does not port,
+   because its segment invariant `MovesD (Reach θ C n)` is false for F_e (in `let f : a -> a; f x
+   = x in f` W binds the fresh type of `x` to the explicit `a`, which the declaration's context does
+   not reach). L10 for F_e needs L6 as an invariant of the soundness induction (named variables in
+   the images of returned types are explicit in the context, kept by the escape checks), group
+   environments with annotated schemes in the closure commutation, and the escape condition under
+   the final substitution relative to a derivation. No test yield depends on it: a refusal needs
+   W's `.fail` (refutation, proved) and a positive theorem needs W's `.ok` (soundness and
+   principality, proved); the clause only says W never stops with `.internal` where a derivation
+   exists.
+11. **Milestone (f) status (2026-11-12).** Module- and program-level W (`MW.inferModuleW`,
+   `MW.inferProgramW`, Stat/Complete/Modules*.lean) elaborates a module's type declarations whole,
+   as ruling A98 requires (`solveTypes`, kept only if step 9's `checkTypes` accepts it and the
+   phrase is ordered), and its top-level groups as one nested `let` with milestone (e)'s W.
+   Refutation (`inferModuleW_fail`, `inferProgramW_fail`, `Stat.not_legal_of_wRefutes`) and
+   principality (`inferModuleW_principal`, `inferProgramW_principal`) are proved without
+   hypotheses. Differences from the statements above: no coherence hypotheses (every module is
+   coherent since A98, and `typesSplit` is gone, so `coherentIn`, `coherentProg` and
+   `topdecTypes_seq_coherent` are dropped); no `solveTypes_sound`/`solveTypes_complete` (soundness
+   is by construction through `checkTypes`; L14 is `types_bij`, two solutions differ by a bijection
+   of type names fixing the basis, from step 10's `Swap.extend_pairs` and `checkTypes_unique`);
+   module failure is stated as `NoDeriv` (no checked derivation). The 15 remaining inference tests
+   are refused by the kernel (`decide +kernel`), so 284 compile-error tests are refused and only
+   StandardA96NumberFlagsTest (milestone (g)) is not. `lake exe measure-w`
+   (`definition/mechanisation/w-report.json`): W refutes none of the 624 compile-success tests it
+   can run (CompilerIssue2281LongLineListTest, a list of 22,000 elements, exceeds the memory budget
+   even compiled) and returns `.ok` on 585 of the 622 legal programs. The 36 with ports return
+   `.unsupported`: ports are not yet in module-level W (to do for (g): a port as an annotated group
+   `x : ty; x = x` in the nested `let`, with lemmas that the group's closed scheme is the port
+   rule's).
+12. **Milestone (g) status (2026-11-13).** Ports are in module-level W as the annotated group
+   `x : ty; x = x`, kept only when its closed environment equals the port rule's (the port's node
+   is the same in every derivation: contexts at the top of a module are closed and `newForB` fixes
+   `U`; `ModulesPorts.lean`); where W fails on a module with a port it answers `.unsupported`, so
+   no refutation is claimed there (none is needed). W returns `.ok` on 621 of the 622 legal
+   programs; on CompilerIssue2281LongLineListTest (a list literal of 22,000 elements) compiled W
+   gave no result within two hours, so that test's `legal_` keeps step 9's form under D11 and is
+   the only per-test theorem tagged `[principal]` (`wSkip` in Certify.lean).
+   D11 is discharged per test without redefining step 9's inference (W's definitions import
+   `Principal`/`Ident`, so that would be an import cycle): `Stat.wCheck B s q` runs W, Chapter 9's
+   conditions, the further restrictions and the specialisation, and `legal_of_W`, `ident_of_wCheck`
+   and `programSem_of_wCheck` (`Stat/Complete/Discharge.lean`) give `legal_`, `ident_` and `mean_`
+   without hypothesis from a per-test `wcheck_X`. `spec_` is unchanged (step 9's pipeline), so
+   compare-e2e still agrees on 579. Differences from the statements above: no
+   `d11For_of_coherent` (the pipeline is not redefined; `d11For_of_agree` gives D11For wherever
+   step 9's inference returns W's result), and `principalExistsCore`/`principalExistsMod` are
+   proved only from W's coverage (`principalExistsCore_of_covers`, `principalExistsMod_of_covers`);
+   unconditional versions need the `internal` clause of item 10, W's coverage of what it answers
+   `.unsupported` (pattern bindings in groups, ambiguous contexts, aliases with free variables),
+   and bases and contexts outside `BasisInv`/`RootOKD`. A96's flags refusal:
+   `not_legal_of_wMainVar` (W's `main` is a worker whose flags type is a variable; every principal
+   derivation is W's up to a bijection of type names, `MStep.moduleStep`, which keeps a variable a
+   variable, and `Port` has no case for one; the view rule needs `τ Node`); 285 compile-error tests
+   refused, none left. Kernel cost: W costs two to four times step 9's inference, so the 15 W checks
+   over 6.3 GB use `native_decide` (`wBudgetNative`), and `spec_elm_WideRecord40Test` joins the
+   `spec_` natives (5); CertsAll takes about 1 h 50 min serially, peak 6.11 GB per shard.
+   `scripts/check-hypotheses.lean` lists 1 per-test theorem (2281's `legal_`) and 13 general
+   lemmas taking D11 as an argument. Afterwards the translator was found not to have written the
+   two tests of ruling A98, and to resolve a built-in type name before a module's own alias (against
+   A98); with that fixed (`Translate/Infer.elm`): 623 `legal_`, 286 `refuse_` (the A98 mismatch test
+   by the core refutation, 201), 580 `spec_`/`ident_`, 578 `mean_`; W gives a derivation for 622 of
+   the 623 legal programs.
