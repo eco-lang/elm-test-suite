@@ -26,8 +26,9 @@ the log, and writes `../example-run.md` (a table per shard) and
 `lake env lean scripts/check-axioms.lean` checks that every theorem uses only the standard axioms,
 and the axioms of `native_decide` only when tagged `[native]`. A build from clean takes about a
 minute and three quarters; its largest Lean process needs 3.2 GB and all of them together 10.4
-GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change to the tests, run the translator first
-(definition/tools/README.md).
+GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change to the tests, run the translator first, from the repository's root:
+`node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm`
+(definition/tools/README.md; the stack flag is needed by eco's parser, plans/eco-parser.md E12).
 
 ## Files
 
@@ -94,7 +95,7 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `StandardElmMech/Prog/Inv/` | The invariants of TaskOnErrorSucceedTest (under every host), PortIncomingRejectTest and StandardA88PortNonFiniteTest (under the echo host), each with its theorem `checkNot` |
 | `StandardElmMech/Prog/T1.lean` | Finding T1: an execution of StandardA81SleepBeyond32BitsTest the book allows that logs the line its CHECK-NOT forbids (`t1_a81_long_sleep_may_end`) |
 | `StandardElmMech/WorkerTheorems.lean` | The command `#worker_theorems` (one theorem per worker test, `Prog.holds_of_run` on a run of the scheduler) |
-| `StandardElmMech/Src/Syntax.lean` | The source syntax (plan step 8): every program elm-syntax parses, as written, with operator chains as elm-syntax groups them (`[parse]`) |
+| `StandardElmMech/Src/Syntax.lean` | The source syntax (plan step 8): every program eco's parser parses and the translator's front end does not refuse, as written, with operator chains as the front end groups them by `fig:core-fixities` (`[parse]`) |
 | `StandardElmMech/Src/Notation.lean` | Short constructors for the generated programs, and `canonOrder` (the modules in a topological order of imports, the main module last) |
 | `StandardElmMech/Src/Bare.lean` | The bare syntax: the phrase classes after the derived forms, with type expressions and annotations, constants unspecialised |
 | `StandardElmMech/Src/DerivedRows.lean` | Generated: the row functions of Appendix A over the bare syntax, from the same table as `Derived.lean` |
@@ -108,7 +109,7 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `StandardElmMech/Src/DerivesTo.lean` | The derived forms as the book states them, a relation (`DerivesE`, `DerivesTo`), and `derive_derivesTo` |
 | `StandardElmMech/Src/SynSet.lean` | The restrictions of the set of a program's modules (`SynOKSet`) and the refusals of every order |
 | `StandardElmMech/Src/SynCommand.lean` | The command `#syn_theorems` (one theorem per written program: it meets the restrictions, or breaks each of those it breaks) |
-| `StandardElmMech/Generated/Src*.lean`, `SynAll.lean` | Written by the translator: every `elm-spec` program elm-syntax parses, in the source syntax (`s_<project>_<Test>`), and their theorems (`syn_...`, `nosyn_...`) |
+| `StandardElmMech/Generated/Src*.lean`, `SynAll.lean` | Written by the translator: every `elm-spec` program eco's parser parses and the front end does not refuse, in the source syntax (`s_<project>_<Test>`), and their theorems (`syn_...`, `nosyn_...`) |
 | `StandardElmMech/Stat/Objects.lean` | The static semantic objects (plan step 9): type variables with their classes, row variables, type names, types, rows, schemes, type functions, environments, contexts, static bases |
 | `StandardElmMech/Stat/FMap.lean` | Finite maps for the static semantics (association lists, first occurrence wins), with their lemmas |
 | `StandardElmMech/Stat/Subst.lean` | Substitutions, the classes and their meets, admissible types (`Adm`, `adm_iff`, `adm_mono`) |
@@ -215,8 +216,11 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 ## What the theorems say
 
 Every generated theorem's docstring names what it trusts besides Lean's kernel
-(plans/lean-full-definition.md, "The trust model"): `[parse]` (elm-syntax parses the test as Elm
-does), `[elab]` (the translator's elaboration and number specialisation; retired on 2026-11-12, by step 10, for the 608 tests with a `spec_` theorem), `[params]` (the
+(plans/lean-full-definition.md, "The trust model"): `[parse]` (eco's parser, vendored at commit
+208a501, parses the test as Elm does; the translator's front end groups operators by
+`fig:core-fixities` and checks the restrictions on characters, tokens and layout; one known
+difference from Elm: eco rejects an integer constant that does not fit a double exactly, and no
+test has one), `[elab]` (the translator's elaboration and number specialisation; retired on 2026-11-12, by step 10, for the 608 tests with a `spec_` theorem), `[params]` (the
 implementation parameters: IntRange and norm as eco's), `[harness]` (the harness's `Html.text`
 and the core library's interfaces, D2), `[library]` (elm/core 1.0.5's Elm text is the meaning of
 the core library values the program uses, which the book does not bind: D2's harness assumption
@@ -279,8 +283,8 @@ test), and `[native]` (the Lean compiler, for a theorem proved by
   `viewChecks_every` makes the statement hold of every derivation's log. Proved by the kernel
   (`decide +kernel`), or by `native_decide` when tagged `[native]` (a value only the C library
   computes, a statement about the printed log, or the memory budget). Every theorem's doc
-  comment lists the program's source files and the trust it rests on: `[parse]` (elm-syntax's
-  parser), `[elab]` (the translator's names, types and number specialisation, until steps 9 and
+  comment lists the program's source files and the trust it rests on: `[parse]` (eco's parser
+  and the translator's front end), `[elab]` (the translator's names, types and number specialisation, until steps 9 and
   10), `[harness]` (the test basis's `Html`, decision D2, whose `text` is the constructor `node`
   of arity 1), `[params]` (the parameters of the dynamic basis that a test's values do not
   depend on) and, for a program that names a core library value (`Program.library`), `[library]`.

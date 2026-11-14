@@ -179,6 +179,35 @@ def g_elm_core_ContainerCompareCharTest : Program := {
     chk .check "tripleLtOp: True" .data,
     chk .check "listGtOp: True" .data ] }
 
+/-- tests/elm-core/src/ContainerCompareIntTest.elm -/
+def g_elm_core_ContainerCompareIntTest : Program := {
+  name := "ContainerCompareIntTest", source := "tests/elm-core/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "emptyInts" [] (listE []), .pat pw (ap (qv "Debug" "log") [str "pairLt", .atexp (.paren (ap (v "compare") [tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))), tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 3)))]))]), .pat pw (ap (qv "Debug" "log") [str "pairGt", .atexp (.paren (ap (v "compare") [tup2 (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 0))), tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 9)))]))]), .pat pw (ap (qv "Debug" "log") [str "pairEq", .atexp (.paren (ap (v "compare") [tup2 (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5))), tup2 (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))]))]), .pat pw (ap (qv "Debug" "log") [str "pairSecondDecides", .atexp (.paren (ap (v "compare") [tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))), tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 5)))]))]), .pat pw (ap (qv "Debug" "log") [str "pairNegFirst", .atexp (.paren (ap (v "compare") [tup2 (.atexp (neg (.scon (.intF 5)))) (.atexp (.scon (.intF 0))), tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 0)))]))]), .pat pw (ap (qv "Debug" "log") [str "pairNegSecond", .atexp (.paren (ap (v "compare") [tup2 (.atexp (.scon (.intF 0))) (.atexp (neg (.scon (.intF 1)))), tup2 (.atexp (.scon (.intF 0))) (.atexp (neg (.scon (.intF 5))))]))]), .pat pw (ap (qv "Debug" "log") [str "tripleFirstDecides", .atexp (.paren (ap (v "compare") [tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 9))) (.atexp (.scon (.intF 9))), tup3 (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))]))]), .pat pw (ap (qv "Debug" "log") [str "tripleThirdDecides", .atexp (.paren (ap (v "compare") [tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 5))), tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 4)))]))]), .pat pw (ap (qv "Debug" "log") [str "tripleEq", .atexp (.paren (ap (v "compare") [tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3))), tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))]))]), .pat pw (ap (qv "Debug" "log") [str "tripleNegMix", .atexp (.paren (ap (v "compare") [tup3 (.atexp (neg (.scon (.intF 1)))) (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 1))), tup3 (.atexp (.scon (.intF 0))) (.atexp (neg (.scon (.intF 1)))) (.atexp (.scon (.intF 1)))]))]), .pat pw (ap (qv "Debug" "log") [str "listLt", .atexp (.paren (ap (v "compare") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))], listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 3))]]))]), .pat pw (ap (qv "Debug" "log") [str "listShorterIsLess", .atexp (.paren (ap (v "compare") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))], listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 0))]]))]), .pat pw (ap (qv "Debug" "log") [str "listEq", .atexp (.paren (ap (v "compare") [listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))], listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]]))]), .pat pw (ap (qv "Debug" "log") [str "listEmptyIsLeast", .atexp (.paren (ap (v "compare") [v "emptyInts", listE [.atexp (neg (A (i 2147483648)))]]))]), .pat pw (ap (qv "Debug" "log") [str "listNegVsPos", .atexp (.paren (ap (v "compare") [listE [.atexp (neg (.scon (.intF 1))), .atexp (.scon (.intF 0))], listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 0))]]))]), .pat pw (ap (qv "Debug" "log") [str "pairLtOp", .atexp (.paren (bin "<" (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 3))))))]), .pat pw (ap (qv "Debug" "log") [str "pairGeOp", .atexp (.paren (bin ">=" (tup2 (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5)))) (tup2 (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 5))))))]), .pat pw (ap (qv "Debug" "log") [str "tripleLtOp", .atexp (.paren (bin "<" (tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))) (tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 4))))))]), .pat pw (ap (qv "Debug" "log") [str "listGtOp", .atexp (.paren (bin ">" (listE [.atexp (.scon (.intF 2)), .atexp (.scon (.intF 0))]) (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 9))])))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "pairLt: LT" .data,
+    chk .check "pairGt: GT" .data,
+    chk .check "pairEq: EQ" .data,
+    chk .check "pairSecondDecides: LT" .data,
+    chk .check "pairNegFirst: LT" .data,
+    chk .check "pairNegSecond: GT" .data,
+    chk .check "tripleFirstDecides: LT" .data,
+    chk .check "tripleThirdDecides: GT" .data,
+    chk .check "tripleEq: EQ" .data,
+    chk .check "tripleNegMix: LT" .data,
+    chk .check "listLt: LT" .data,
+    chk .check "listShorterIsLess: LT" .data,
+    chk .check "listEq: EQ" .data,
+    chk .check "listEmptyIsLeast: LT" .data,
+    chk .check "listNegVsPos: LT" .data,
+    chk .check "pairLtOp: True" .data,
+    chk .check "pairGeOp: True" .data,
+    chk .check "tripleLtOp: True" .data,
+    chk .check "listGtOp: True" .data ] }
+
 /-- tests/elm-core/src/ContainerEqualityCharTest.elm -/
 def g_elm_core_ContainerEqualityCharTest : Program := {
   name := "ContainerEqualityCharTest", source := "tests/elm-core/src",
@@ -228,6 +257,62 @@ def g_elm_core_ContainerEqualityCustomFloatTest : Program := {
     chk .check "triNaNMid: False" .data,
     chk .check "triMixedInf: True" .data,
     chk .check "mixedCtorDiff: False" .data ] }
+
+/-- tests/elm-core/src/ContainerEqualityFloatTest.elm -/
+def g_elm_core_ContainerEqualityFloatTest : Program := {
+  name := "ContainerEqualityFloatTest", source := "tests/elm-core/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "nan" [] (bin "/" (.atexp (.scon (.float 0 (-1)))) (.atexp (.scon (.float 0 (-1))))), .fn "posInf" [] (bin "/" (.atexp (.scon (.float 10 (-1)))) (.atexp (.scon (.float 0 (-1))))), .fn "negInf" [] (bin "/" (.atexp (neg (.scon (.float 10 (-1))))) (.atexp (.scon (.float 0 (-1))))), .fn "emptyFloats" [] (listE []), .pat pw (ap (qv "Debug" "log") [str "pairEqual", .atexp (.paren (bin "==" (tup2 (.atexp (.scon (.float 15 (-1)))) (.atexp (.scon (.float 25 (-1))))) (tup2 (.atexp (.scon (.float 15 (-1)))) (.atexp (.scon (.float 25 (-1)))))))]), .pat pw (ap (qv "Debug" "log") [str "pairFirstDiff", .atexp (.paren (bin "==" (tup2 (.atexp (.scon (.float 15 (-1)))) (.atexp (.scon (.float 25 (-1))))) (tup2 (.atexp (.scon (.float 16 (-1)))) (.atexp (.scon (.float 25 (-1)))))))]), .pat pw (ap (qv "Debug" "log") [str "pairSecondDiff", .atexp (.paren (bin "==" (tup2 (.atexp (.scon (.float 15 (-1)))) (.atexp (.scon (.float 25 (-1))))) (tup2 (.atexp (.scon (.float 15 (-1)))) (.atexp (.scon (.float 26 (-1)))))))]), .pat pw (ap (qv "Debug" "log") [str "pairNegZero", .atexp (.paren (bin "==" (tup2 (.atexp (.scon (.float 0 (-1)))) (.atexp (.scon (.float 10 (-1))))) (tup2 (.atexp (neg (.scon (.float 0 (-1))))) (.atexp (.scon (.float 10 (-1)))))))]), .pat pw (ap (qv "Debug" "log") [str "pairNaNFirst", .atexp (.paren (bin "==" (tup2 (v "nan") (.atexp (.scon (.float 10 (-1))))) (tup2 (v "nan") (.atexp (.scon (.float 10 (-1)))))))]), .pat pw (ap (qv "Debug" "log") [str "pairNaNSecond", .atexp (.paren (bin "==" (tup2 (.atexp (.scon (.float 10 (-1)))) (v "nan")) (tup2 (.atexp (.scon (.float 10 (-1)))) (v "nan"))))]), .pat pw (ap (qv "Debug" "log") [str "pairPosInf", .atexp (.paren (bin "==" (tup2 (v "posInf") (.atexp (.scon (.float 10 (-1))))) (tup2 (v "posInf") (.atexp (.scon (.float 10 (-1)))))))]), .pat pw (ap (qv "Debug" "log") [str "pairInfSignDiff", .atexp (.paren (bin "==" (tup2 (v "posInf") (.atexp (.scon (.float 10 (-1))))) (tup2 (v "negInf") (.atexp (.scon (.float 10 (-1)))))))]), .pat pw (ap (qv "Debug" "log") [str "tripleEqual", .atexp (.paren (bin "==" (tup3 (.atexp (.scon (.float 10 (-1)))) (.atexp (.scon (.float 20 (-1)))) (.atexp (.scon (.float 30 (-1))))) (tup3 (.atexp (.scon (.float 10 (-1)))) (.atexp (.scon (.float 20 (-1)))) (.atexp (.scon (.float 30 (-1)))))))]), .pat pw (ap (qv "Debug" "log") [str "tripleMidDiff", .atexp (.paren (bin "==" (tup3 (.atexp (.scon (.float 10 (-1)))) (.atexp (.scon (.float 20 (-1)))) (.atexp (.scon (.float 30 (-1))))) (tup3 (.atexp (.scon (.float 10 (-1)))) (.atexp (.scon (.float 90 (-1)))) (.atexp (.scon (.float 30 (-1)))))))]), .pat pw (ap (qv "Debug" "log") [str "tripleAllNegZero", .atexp (.paren (bin "==" (tup3 (.atexp (.scon (.float 0 (-1)))) (.atexp (neg (.scon (.float 0 (-1))))) (.atexp (.scon (.float 0 (-1))))) (tup3 (.atexp (neg (.scon (.float 0 (-1))))) (.atexp (.scon (.float 0 (-1)))) (.atexp (neg (.scon (.float 0 (-1))))))))]), .pat pw (ap (qv "Debug" "log") [str "tripleNaNMid", .atexp (.paren (bin "==" (tup3 (.atexp (.scon (.float 10 (-1)))) (v "nan") (.atexp (.scon (.float 30 (-1))))) (tup3 (.atexp (.scon (.float 10 (-1)))) (v "nan") (.atexp (.scon (.float 30 (-1)))))))]), .pat pw (ap (qv "Debug" "log") [str "tripleMixedInf", .atexp (.paren (bin "==" (tup3 (v "posInf") (v "negInf") (.atexp (.scon (.float 0 (-1))))) (tup3 (v "posInf") (v "negInf") (.atexp (neg (.scon (.float 0 (-1))))))))]), .pat pw (ap (qv "Debug" "log") [str "listEqual", .atexp (.paren (bin "==" (listE [.atexp (.scon (.float 10 (-1))), .atexp (.scon (.float 20 (-1))), .atexp (.scon (.float 30 (-1)))]) (listE [.atexp (.scon (.float 10 (-1))), .atexp (.scon (.float 20 (-1))), .atexp (.scon (.float 30 (-1)))])))]), .pat pw (ap (qv "Debug" "log") [str "listLenDiff", .atexp (.paren (bin "==" (listE [.atexp (.scon (.float 10 (-1))), .atexp (.scon (.float 20 (-1)))]) (listE [.atexp (.scon (.float 10 (-1))), .atexp (.scon (.float 20 (-1))), .atexp (.scon (.float 30 (-1)))])))]), .pat pw (ap (qv "Debug" "log") [str "listEmpty", .atexp (.paren (bin "==" (v "emptyFloats") (listE [])))]), .pat pw (ap (qv "Debug" "log") [str "listNegZero", .atexp (.paren (bin "==" (listE [.atexp (.scon (.float 0 (-1))), .atexp (neg (.scon (.float 0 (-1)))), .atexp (.scon (.float 0 (-1)))]) (listE [.atexp (neg (.scon (.float 0 (-1)))), .atexp (.scon (.float 0 (-1))), .atexp (neg (.scon (.float 0 (-1))))])))]), .pat pw (ap (qv "Debug" "log") [str "listNaN", .atexp (.paren (bin "==" (listE [.atexp (.scon (.float 10 (-1))), v "nan", .atexp (.scon (.float 30 (-1)))]) (listE [.atexp (.scon (.float 10 (-1))), v "nan", .atexp (.scon (.float 30 (-1)))])))]), .pat pw (ap (qv "Debug" "log") [str "listInfPair", .atexp (.paren (bin "==" (listE [v "posInf", v "negInf"]) (listE [v "posInf", v "negInf"])))]), .pat pw (ap (qv "Debug" "log") [str "listInfSignDiff", .atexp (.paren (bin "==" (listE [v "posInf", v "negInf"]) (listE [v "negInf", v "posInf"])))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "pairEqual: True" .data,
+    chk .check "pairFirstDiff: False" .data,
+    chk .check "pairSecondDiff: False" .data,
+    chk .check "pairNegZero: True" .data,
+    chk .check "pairNaNFirst: False" .data,
+    chk .check "pairNaNSecond: False" .data,
+    chk .check "pairPosInf: True" .data,
+    chk .check "pairInfSignDiff: False" .data,
+    chk .check "tripleEqual: True" .data,
+    chk .check "tripleMidDiff: False" .data,
+    chk .check "tripleAllNegZero: True" .data,
+    chk .check "tripleNaNMid: False" .data,
+    chk .check "tripleMixedInf: True" .data,
+    chk .check "listEqual: True" .data,
+    chk .check "listLenDiff: False" .data,
+    chk .check "listEmpty: True" .data,
+    chk .check "listNegZero: True" .data,
+    chk .check "listNaN: False" .data,
+    chk .check "listInfPair: True" .data,
+    chk .check "listInfSignDiff: False" .data ] }
+
+/-- tests/elm-core/src/ContainerEqualityIntTest.elm -/
+def g_elm_core_ContainerEqualityIntTest : Program := {
+  name := "ContainerEqualityIntTest", source := "tests/elm-core/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "emptyInts" [] (listE []), .pat pw (ap (qv "Debug" "log") [str "pairEqual", .atexp (.paren (bin "==" (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))))))]), .pat pw (ap (qv "Debug" "log") [str "pairFirstDiff", .atexp (.paren (bin "==" (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (tup2 (.atexp (.scon (.intF 3))) (.atexp (.scon (.intF 2))))))]), .pat pw (ap (qv "Debug" "log") [str "pairSecondDiff", .atexp (.paren (bin "==" (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 3))))))]), .pat pw (ap (qv "Debug" "log") [str "pairNegatives", .atexp (.paren (bin "==" (tup2 (.atexp (neg (.scon (.intF 7)))) (.atexp (neg (.scon (.intF 8))))) (tup2 (.atexp (neg (.scon (.intF 7)))) (.atexp (neg (.scon (.intF 8)))))))]), .pat pw (ap (qv "Debug" "log") [str "pairSignDiff", .atexp (.paren (bin "==" (tup2 (.atexp (neg (.scon (.intF 1)))) (.atexp (.scon (.intF 2)))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))))))]), .pat pw (ap (qv "Debug" "log") [str "pairZero", .atexp (.paren (bin "==" (tup2 (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0)))) (tup2 (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 0))))))]), .pat pw (ap (qv "Debug" "log") [str "tripleEqual", .atexp (.paren (bin "==" (tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))) (tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3))))))]), .pat pw (ap (qv "Debug" "log") [str "tripleMidDiff", .atexp (.paren (bin "==" (tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))) (.atexp (.scon (.intF 3)))) (tup3 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 9))) (.atexp (.scon (.intF 3))))))]), .pat pw (ap (qv "Debug" "log") [str "tripleSignMix", .atexp (.paren (bin "==" (tup3 (.atexp (neg (.scon (.intF 1)))) (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 1)))) (tup3 (.atexp (neg (.scon (.intF 1)))) (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 1))))))]), .pat pw (ap (qv "Debug" "log") [str "tripleMinMax", .atexp (.paren (bin "==" (tup3 (.atexp (neg (.scon (.intF 2147483648)))) (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 2147483647)))) (tup3 (.atexp (neg (.scon (.intF 2147483648)))) (.atexp (.scon (.intF 0))) (.atexp (.scon (.intF 2147483647))))))]), .pat pw (ap (qv "Debug" "log") [str "listEqual", .atexp (.paren (bin "==" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])))]), .pat pw (ap (qv "Debug" "log") [str "listLenDiff", .atexp (.paren (bin "==" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))]) (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))])))]), .pat pw (ap (qv "Debug" "log") [str "listPrefixExtra", .atexp (.paren (bin "==" (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]) (listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2))])))]), .pat pw (ap (qv "Debug" "log") [str "listEmpty", .atexp (.paren (bin "==" (v "emptyInts") (listE [])))]), .pat pw (ap (qv "Debug" "log") [str "listNegatives", .atexp (.paren (bin "==" (listE [.atexp (neg (.scon (.intF 3))), .atexp (neg (.scon (.intF 2))), .atexp (neg (.scon (.intF 1)))]) (listE [.atexp (neg (.scon (.intF 3))), .atexp (neg (.scon (.intF 2))), .atexp (neg (.scon (.intF 1)))])))]), .pat pw (ap (qv "Debug" "log") [str "listSignMix", .atexp (.paren (bin "==" (listE [.atexp (neg (.scon (.intF 1))), .atexp (.scon (.intF 0)), .atexp (.scon (.intF 1))]) (listE [.atexp (neg (.scon (.intF 1))), .atexp (.scon (.intF 0)), .atexp (.scon (.intF 1))])))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "pairEqual: True" .data,
+    chk .check "pairFirstDiff: False" .data,
+    chk .check "pairSecondDiff: False" .data,
+    chk .check "pairNegatives: True" .data,
+    chk .check "pairSignDiff: False" .data,
+    chk .check "pairZero: True" .data,
+    chk .check "tripleEqual: True" .data,
+    chk .check "tripleMidDiff: False" .data,
+    chk .check "tripleSignMix: True" .data,
+    chk .check "tripleMinMax: True" .data,
+    chk .check "listEqual: True" .data,
+    chk .check "listLenDiff: False" .data,
+    chk .check "listPrefixExtra: False" .data,
+    chk .check "listEmpty: True" .data,
+    chk .check "listNegatives: True" .data,
+    chk .check "listSignMix: True" .data ] }
 
 /-- tests/elm-core/src/ContainerEqualityRecordFloatTest.elm -/
 def g_elm_core_ContainerEqualityRecordFloatTest : Program := {
@@ -342,8 +427,11 @@ def shard_ElmCore_CompareI : List Program :=
    g_elm_core_CompilerIssue2362NanTupleEqualityTest,
    g_elm_core_CompositionTest,
    g_elm_core_ContainerCompareCharTest,
+   g_elm_core_ContainerCompareIntTest,
    g_elm_core_ContainerEqualityCharTest,
    g_elm_core_ContainerEqualityCustomFloatTest,
+   g_elm_core_ContainerEqualityFloatTest,
+   g_elm_core_ContainerEqualityIntTest,
    g_elm_core_ContainerEqualityRecordFloatTest,
    g_elm_core_ContainerEqualityStringTest,
    g_elm_core_ControlFlowBooleanWithNotTest,

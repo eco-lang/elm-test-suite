@@ -1,34 +1,31 @@
 module Translate.Convert exposing (Facts, ModuleSource, Problem, convertLibrary, convertProgram, facts)
 
-{-| From elm-syntax's tree of a test to the translator's representation (`Translate.Ir`): name
+{-| From eco's tree of a test to the translator's representation (`Translate.Ir`): name
 resolution against the program, its imports and E0, the exact text of literals, the extraction of
 `main`'s checks, and every reason the test is outside the fragment the Lean encoding covers
 (plans/elm-to-lean-translator.md, B.4 and B.5). The refusal reported is the one of the highest
 rank, and among those the first in the source.
 -}
 
+import Compiler.Core.Annotation as A
+import Compiler.Core.Snippet as Snippet
+import Compiler.IR.Source as Src
+import Compiler.Parse.Declaration as Decl
 import Dict exposing (Dict)
-import Elm.Syntax.Declaration as D
-import Elm.Syntax.Exposing as X
-import Elm.Syntax.Expression as E
-import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Import exposing (Import)
-import Elm.Syntax.Module as M
-import Elm.Syntax.Node as Node exposing (Node(..))
-import Elm.Syntax.Pattern as P
-import Elm.Syntax.Range exposing (Range)
-import Elm.Syntax.TypeAnnotation as T
 import Regex
 import Set exposing (Set)
 import Translate.Basis as Basis
 import Translate.Directives exposing (Directives)
+import Translate.Fixity as Fixity
 import Translate.Ir exposing (..)
 import Translate.Library as Library exposing (Library)
 import Translate.Literal as Literal
+import Translate.Parse as Parse exposing (Parsed, c1, c2, c2eol)
+import Translate.Region as Region exposing (Region)
 
 
 type alias Problem =
-    { rank : Int, code : String, at : Range }
+    { rank : Int, code : String, at : Region }
 
 
 {-| Ranks, in the order of B.4: effects, imports, constructs, basis, checks.
@@ -67,7 +64,7 @@ fresh st =
     ( st.next, { st | next = st.next + 1 } )
 
 
-problem : Int -> String -> Range -> St -> St
+problem : Int -> String -> Region -> St -> St
 problem rank code at st =
     { st | problems = { rank = rank, code = code, at = at } :: st.problems }
 
@@ -181,18 +178,17 @@ defaultConstructorModule k =
         "Basics"
 
 
-moduleName : List String -> String
-moduleName =
-    String.join "."
-
-
-readImports : Dict String ExportTable -> List (Node Import) -> St -> ( Imports, St )
+readImports : Dict String ExportTable -> List Parse.Import -> St -> ( Imports, St )
 readImports exports imports st0 =
     List.foldl
-        (\(Node range imp) ( acc, st ) ->
+        (\imp ( acc, st ) ->
             let
                 name =
-                    moduleName (Node.value imp.moduleName)
+                    imp.name
+
+                -- eco's import has no region: an import starts its line (plans/eco-parser.md, E10)
+                range =
+                    { start = { row = imp.row, column = 1 }, end = { row = imp.row, column = 1 } }
 
                 user =
                     Dict.get name exports
@@ -208,29 +204,29 @@ readImports exports imports st0 =
                         problem rankImport ("import:" ++ name) range st
 
                 withAlias =
-                    case imp.moduleAlias of
-                        Just (Node _ a) ->
-                            Dict.insert (moduleName a) name acc.alias
+                    case imp.alias of
+                        Just a ->
+                            Dict.insert a name acc.alias
 
                         Nothing ->
                             acc.alias
 
                 ( ( exposed, exposedCons ), open ) =
-                    case Maybe.map Node.value imp.exposingList of
-                        Just (X.All _) ->
+                    case imp.exposing_ of
+                        Just (Src.Open _ _) ->
                             ( ( acc.exposed, acc.exposedCons ), acc.open ++ [ name ] )
 
-                        Just (X.Explicit items) ->
+                        Just (Src.Explicit (A.At _ items)) ->
                             ( List.foldl
-                                (\(Node _ item) ( d, dc ) ->
+                                (\( _, item ) ( d, dc ) ->
                                     case item of
-                                        X.FunctionExpose f ->
+                                        Src.Lower (A.At _ f) ->
                                             ( Dict.insert f name d, dc )
 
-                                        X.InfixExpose _ ->
+                                        Src.Operator _ _ ->
                                             ( d, dc )
 
-                                        X.TypeOrAliasExpose t ->
+                                        Src.Upper (A.At _ t) ( _, Src.Private ) ->
                                             -- an exposed record alias brings its constructor
                                             case user |> Maybe.andThen (\u -> Dict.get t u.constructors) of
                                                 Just _ ->
@@ -239,21 +235,17 @@ readImports exports imports st0 =
                                                 Nothing ->
                                                     ( d, dc )
 
-                                        X.TypeExpose t ->
-                                            if t.open /= Nothing then
-                                                case user of
-                                                    Just u ->
-                                                        ( d
-                                                        , List.foldl (\k dc2 -> Dict.insert k name dc2)
-                                                            dc
-                                                            (Dict.get t.name u.typeCons |> Maybe.withDefault [])
-                                                        )
+                                        Src.Upper (A.At _ t) ( _, Src.Public _ ) ->
+                                            case user of
+                                                Just u ->
+                                                    ( d
+                                                    , List.foldl (\k dc2 -> Dict.insert k name dc2)
+                                                        dc
+                                                        (Dict.get t u.typeCons |> Maybe.withDefault [])
+                                                    )
 
-                                                    Nothing ->
-                                                        ( Dict.insert ("type:" ++ t.name) name d, dc )
-
-                                            else
-                                                ( d, dc )
+                                                Nothing ->
+                                                    ( Dict.insert ("type:" ++ t) name d, dc )
                                 )
                                 ( acc.exposed, acc.exposedCons )
                                 items
@@ -272,7 +264,7 @@ readImports exports imports st0 =
 {-| A qualified reference `m.x` (after alias expansion), lower case. A value of the core library
 that the translator evaluates (`Translate.Library`) is a value of the basis.
 -}
-qualifiedValue : Library -> String -> String -> Range -> St -> ( Name, St )
+qualifiedValue : Library -> String -> String -> Region -> St -> ( Name, St )
 qualifiedValue lib m x range st =
     if Basis.effectValue m x /= Nothing then
         -- a value of Platform, Cmd, Sub, Task or Process (plan step 5)
@@ -306,7 +298,7 @@ qualifiedValue lib m x range st =
 or `(..)`): the value `m.x`, kept unqualified as the source writes it (the module's imports resolve
 it, r:dm-import).
 -}
-unqualifiedValue : Library -> String -> String -> Range -> St -> ( Name, St )
+unqualifiedValue : Library -> String -> String -> Region -> St -> ( Name, St )
 unqualifiedValue lib m x range st =
     case qualifiedValue lib m x range st of
         ( Global m2 x2, st2 ) ->
@@ -316,7 +308,7 @@ unqualifiedValue lib m x range st =
             other
 
 
-qualifiedConstructor : String -> String -> Range -> St -> ( Name, St )
+qualifiedConstructor : String -> String -> Region -> St -> ( Name, St )
 qualifiedConstructor m k range st =
     if Set.member m effectModules then
         ( Global m k, problem rankEffects "effects" range st )
@@ -334,18 +326,14 @@ qualifiedConstructor m k range st =
         ( Global m k, problem rankBasis ("basis:" ++ m ++ "." ++ k) range st )
 
 
-expandAlias : Env -> List String -> String
-expandAlias env m =
-    let
-        name =
-            moduleName m
-    in
+expandAlias : Env -> String -> String
+expandAlias env name =
     Dict.get name env.imports.alias |> Maybe.withDefault name
 
 
 {-| A value of another module of the program, `m.x` (as written: qualified by `qual` or not).
 -}
-foreignValue : Env -> String -> Maybe String -> String -> Range -> St -> Maybe ( Name, St )
+foreignValue : Env -> String -> Maybe String -> String -> Region -> St -> Maybe ( Name, St )
 foreignValue env m qual x range st =
     Dict.get m env.exports
         |> Maybe.map
@@ -359,10 +347,12 @@ foreignValue env m qual x range st =
             )
 
 
-resolveValue : Env -> List String -> String -> Range -> St -> ( Name, St )
+{-| A value `qual.x` as written; `qual` is "" when it is unqualified.
+-}
+resolveValue : Env -> String -> String -> Region -> St -> ( Name, St )
 resolveValue env qual x range st =
-    if not (List.isEmpty qual) then
-        case foreignValue env (expandAlias env qual) (Just (moduleName qual)) x range st of
+    if qual /= "" then
+        case foreignValue env (expandAlias env qual) (Just qual) x range st of
             Just r ->
                 r
 
@@ -412,7 +402,7 @@ resolveValue env qual x range st =
 
 {-| A constructor of another module of the program, as written.
 -}
-foreignConstructor : Env -> String -> Maybe String -> String -> Range -> St -> Maybe ( Name, St )
+foreignConstructor : Env -> String -> Maybe String -> String -> Region -> St -> Maybe ( Name, St )
 foreignConstructor env m qual k range st =
     Dict.get m env.exports
         |> Maybe.map
@@ -426,10 +416,10 @@ foreignConstructor env m qual k range st =
             )
 
 
-resolveConstructor : Env -> List String -> String -> Range -> St -> ( Name, St )
+resolveConstructor : Env -> String -> String -> Region -> St -> ( Name, St )
 resolveConstructor env qual k range st =
-    if not (List.isEmpty qual) then
-        case foreignConstructor env (expandAlias env qual) (Just (moduleName qual)) k range st of
+    if qual /= "" then
+        case foreignConstructor env (expandAlias env qual) (Just qual) k range st of
             Just r ->
                 r
 
@@ -462,7 +452,7 @@ resolveConstructor env qual k range st =
         qualifiedConstructor (defaultConstructorModule k) k range st
 
 
-checkOperator : String -> Range -> St -> St
+checkOperator : String -> Region -> St -> St
 checkOperator op range st =
     if Set.member op operators then
         st
@@ -482,16 +472,24 @@ hasSurrogate s =
 
 {-| Converts a pattern, giving each variable it binds a fresh id. Returns the variables bound.
 -}
-pattern : Env -> Node P.Pattern -> St -> ( Pattern, List ( String, Int ), St )
-pattern env (Node range p) st =
+pattern : Env -> Src.Pattern -> St -> ( Pattern, List ( String, Int ), St )
+pattern env (A.At region p) st =
+    let
+        range =
+            Region.fromA region
+    in
     case p of
-        P.AllPattern ->
+        Src.PAnything _ ->
             ( PWild, [], st )
 
-        P.UnitPattern ->
+        Src.PUnit _ ->
             ( PUnit, [], st )
 
-        P.CharPattern c ->
+        Src.PChr text ->
+            let
+                c =
+                    Parse.charValue text
+            in
             ( PChar c
             , []
             , if hasSurrogate (String.fromChar c) then
@@ -501,42 +499,33 @@ pattern env (Node range p) st =
                 st
             )
 
-        P.StringPattern s ->
-            ( PStr s
+        Src.PStr text _ ->
+            let
+                v =
+                    Parse.stringValue text
+            in
+            ( PStr v
             , []
-            , if hasSurrogate s then
+            , if hasSurrogate v then
                 problem rankConstruct "construct:lone-surrogate" range st
 
               else
                 st
             )
 
-        P.IntPattern _ ->
-            ( PInt (Literal.normaliseDecimal (Literal.textAt env.source range)), [], st )
+        Src.PInt _ _ ->
+            ( PInt (intOf (Literal.textAt env.source range)), [], st )
 
-        P.HexPattern _ ->
-            ( PInt (Literal.decimalOfHex (Literal.textAt env.source range)), [], st )
-
-        P.FloatPattern _ ->
-            ( PWild, [], problem rankConstruct "construct:float-pattern" range st )
-
-        P.TuplePattern ps ->
+        Src.PTuple ( _, a ) ( _, b ) rest ->
             let
                 ( qs, bound, st1 ) =
-                    patterns env ps st
+                    patterns env (a :: b :: List.map c2 rest) st
             in
-            ( PTuple qs
-            , bound
-            , if List.length ps == 2 || List.length ps == 3 then
-                st1
+            ( PTuple qs, bound, st1 )
 
-              else
-                problem rankConstruct "construct:tuple-arity" range st1
-            )
-
-        P.RecordPattern fields ->
+        Src.PRecord fields ->
             List.foldr
-                (\(Node _ f) ( acc, bound, s ) ->
+                (\(A.At _ f) ( acc, bound, s ) ->
                     let
                         ( id, s1 ) =
                             fresh s
@@ -544,10 +533,10 @@ pattern env (Node range p) st =
                     ( ( f, id ) :: acc, ( f, id ) :: bound, s1 )
                 )
                 ( [], [], st )
-                fields
+                (Parse.recordPatternFields fields)
                 |> (\( fs, bound, s ) -> ( PRecord fs, bound, s ))
 
-        P.UnConsPattern a b ->
+        Src.PCons ( _, a ) ( _, b ) ->
             let
                 ( qa, ba, st1 ) =
                     pattern env a st
@@ -557,31 +546,27 @@ pattern env (Node range p) st =
             in
             ( PCons qa qb, ba ++ bb, st2 )
 
-        P.ListPattern ps ->
+        Src.PList ( _, ps ) ->
             let
                 ( qs, bound, st1 ) =
-                    patterns env ps st
+                    patterns env (List.map c2 ps) st
             in
             ( PList qs, bound, st1 )
 
-        P.VarPattern x ->
+        Src.PVar x ->
             let
                 ( id, st1 ) =
                     fresh st
             in
             ( PVar x id, [ ( x, id ) ], st1 )
 
-        P.NamedPattern ref args ->
-            let
-                ( name, st1 ) =
-                    resolveConstructor env ref.moduleName ref.name range st
+        Src.PCtor _ k args ->
+            constructorPattern env "" k args range st
 
-                ( qs, bound, st2 ) =
-                    patterns env args st1
-            in
-            ( PCon name qs, bound, st2 )
+        Src.PCtorQual _ qual k args ->
+            constructorPattern env qual k args range st
 
-        P.AsPattern inner (Node _ x) ->
+        Src.PAlias ( _, inner ) ( _, A.At _ x ) ->
             let
                 ( q, bound, st1 ) =
                     pattern env inner st
@@ -591,7 +576,7 @@ pattern env (Node range p) st =
             in
             ( PAs q x id, bound ++ [ ( x, id ) ], st2 )
 
-        P.ParenthesizedPattern inner ->
+        Src.PParens ( _, inner ) ->
             let
                 ( q, bound, st1 ) =
                     pattern env inner st
@@ -599,7 +584,30 @@ pattern env (Node range p) st =
             ( PParen q, bound, st1 )
 
 
-patterns : Env -> List (Node P.Pattern) -> St -> ( List Pattern, List ( String, Int ), St )
+constructorPattern : Env -> String -> String -> List (Src.C1 Src.Pattern) -> Region -> St -> ( Pattern, List ( String, Int ), St )
+constructorPattern env qual k args range st =
+    let
+        ( name, st1 ) =
+            resolveConstructor env qual k range st
+
+        ( qs, bound, st2 ) =
+            patterns env (List.map c1 args) st1
+    in
+    ( PCon name qs, bound, st2 )
+
+
+{-| An integer constant from its text, exactly: decimal or hexadecimal.
+-}
+intOf : String -> String
+intOf text =
+    if String.startsWith "0x" text || String.startsWith "0X" text then
+        Literal.decimalOfHex text
+
+    else
+        Literal.normaliseDecimal text
+
+
+patterns : Env -> List Src.Pattern -> St -> ( List Pattern, List ( String, Int ), St )
 patterns env ps st =
     List.foldl
         (\p ( acc, bound, s ) ->
@@ -622,39 +630,30 @@ bind bound env =
 -- EXPRESSIONS
 
 
-expr : Env -> Node E.Expression -> St -> ( Expr, St )
-expr env (Node range e) st =
+expr : Env -> Src.Expr -> St -> ( Expr, St )
+expr env (A.At region e) st =
+    let
+        range =
+            Region.fromA region
+    in
     case e of
-        E.UnitExpr ->
+        Src.Unit ->
             ( EUnit, st )
 
-        E.Application (f :: args) ->
+        Src.Call f a rest ->
             let
                 ( ef, st1 ) =
                     expr env f st
 
                 ( eargs, st2 ) =
-                    exprs env args st1
+                    exprs env (List.map c1 (a :: rest)) st1
             in
             ( EApp ef eargs, st2 )
 
-        E.Application [] ->
-            ( EUnit, problem rankConstruct "construct:empty-application" range st )
+        Src.Binops first rest last ->
+            chain env (Fixity.tree first rest last) st
 
-        E.OperatorApplication op _ l r ->
-            let
-                ( occ, st0 ) =
-                    fresh (checkOperator op range st)
-
-                ( el, st1 ) =
-                    expr env l st0
-
-                ( er, st2 ) =
-                    expr env r st1
-            in
-            ( EBinop occ op el er, st2 )
-
-        E.FunctionOrValue [ "Elm", "Kernel", "List" ] "cons" ->
+        Src.VarQual _ "Elm.Kernel.List" "cons" ->
             if env.textOfLibrary then
                 -- `cons = Elm.Kernel.List.cons` (List.elm): the list constructor, written `(::)`
                 -- (plans/library-elm-texts.md, L2)
@@ -667,71 +666,54 @@ expr env (Node range e) st =
             else
                 ( EUnit, problem rankBasis "basis:Elm.Kernel.List.cons" range st )
 
-        E.FunctionOrValue qual x ->
-            if env.textOfLibrary && List.take 2 qual == [ "Elm", "Kernel" ] then
-                -- a library text that names any other kernel value is refused (L2)
-                ( EUnit, problem rankBasis ("kernel:" ++ String.join "." qual ++ "." ++ x) range st )
+        Src.VarQual _ qual x ->
+            variable env qual x range st
 
-            else if String.left 1 x == String.toUpper (String.left 1 x) then
-                let
-                    ( name, st1 ) =
-                        resolveConstructor env qual x range st
-                in
-                ( ECon name, st1 )
+        Src.Var _ x ->
+            variable env "" x range st
 
-            else
-                let
-                    ( name, st1 ) =
-                        resolveValue env qual x range st
-
-                    ( occ, st2 ) =
-                        fresh st1
-                in
-                ( EVar occ name, st2 )
-
-        E.IfBlock c t f ->
+        Src.If ( _, ( ( _, c ), ( _, t ) ) ) rest ( _, f ) ->
             let
-                ( ec, st1 ) =
-                    expr env c st
+                ( arms, st1 ) =
+                    List.foldl
+                        (\( c_, t_ ) ( acc, s ) ->
+                            let
+                                ( ec, s1 ) =
+                                    expr env c_ s
 
-                ( et, st2 ) =
-                    expr env t st1
+                                ( et, s2 ) =
+                                    expr env t_ s1
+                            in
+                            ( acc ++ [ ( ec, et ) ], s2 )
+                        )
+                        ( [], st )
+                        (( c, t ) :: List.map (\( _, ( ( _, c_ ), ( _, t_ ) ) ) -> ( c_, t_ )) rest)
 
-                ( ef, st3 ) =
-                    expr env f st2
+                ( ef, st2 ) =
+                    expr env f st1
             in
             case ef of
-                EIf arms final ->
-                    ( EIf (( ec, et ) :: arms) final, st3 )
+                EIf moreArms final ->
+                    ( EIf (arms ++ moreArms) final, st2 )
 
                 _ ->
-                    ( EIf [ ( ec, et ) ] ef, st3 )
+                    ( EIf arms ef, st2 )
 
-        E.PrefixOperator op ->
+        Src.Op op ->
             let
                 ( occ, st1 ) =
                     fresh (checkOperator op range st)
             in
             ( EOp occ op, st1 )
 
-        E.Operator op ->
-            ( EOp 0 op, problem rankConstruct ("construct:operator:" ++ op) range st )
-
-        E.Integer _ ->
+        Src.Int _ _ ->
             let
                 ( id, st1 ) =
                     fresh st
             in
-            ( EInt id (Literal.normaliseDecimal (Literal.textAt env.source range)), st1 )
+            ( EInt id (intOf (Literal.textAt env.source range)), st1 )
 
-        E.Hex _ ->
-            let
-                ( id, st1 ) =
-                    fresh st
-            in
-            ( EInt id (Literal.decimalOfHex (Literal.textAt env.source range)), st1 )
-
-        E.Floatable _ ->
+        Src.Float _ _ ->
             case Literal.floatOf (Literal.textAt env.source range) of
                 Just f ->
                     ( EFloat f, st )
@@ -739,23 +721,31 @@ expr env (Node range e) st =
                 Nothing ->
                     ( EUnit, problem rankConstruct "construct:float-literal" range st )
 
-        E.Negation x ->
+        Src.Negate x ->
             let
                 ( ex, st1 ) =
                     expr env x st
             in
             ( ENeg ex, st1 )
 
-        E.Literal s ->
-            ( EStr s
-            , if hasSurrogate s then
+        Src.Str text _ ->
+            let
+                v =
+                    Parse.stringValue text
+            in
+            ( EStr v
+            , if hasSurrogate v then
                 problem rankConstruct "construct:lone-surrogate" range st
 
               else
                 st
             )
 
-        E.CharLiteral c ->
+        Src.Chr text ->
+            let
+                c =
+                    Parse.charValue text
+            in
             ( EChar c
             , if hasSurrogate (String.fromChar c) then
                 problem rankConstruct "construct:lone-surrogate" range st
@@ -764,43 +754,37 @@ expr env (Node range e) st =
                 st
             )
 
-        E.TupledExpression xs ->
+        Src.Tuple ( _, a ) ( _, b ) rest ->
             let
                 ( exs, st1 ) =
-                    exprs env xs st
+                    exprs env (a :: b :: List.map c2 rest) st
             in
-            ( ETuple exs
-            , if List.length xs == 2 || List.length xs == 3 then
-                st1
+            ( ETuple exs, st1 )
 
-              else
-                problem rankConstruct "construct:tuple-arity" range st1
-            )
-
-        E.ParenthesizedExpression x ->
+        Src.Parens ( _, x ) ->
             let
                 ( ex, st1 ) =
                     expr env x st
             in
             ( EParen ex, st1 )
 
-        E.LetExpression block ->
+        Src.Let defs _ body ->
             let
                 ( decls, inner, st1 ) =
-                    letDecls env block.declarations st
+                    letDecls env (List.map (c2 >> A.toValue) defs) st
 
-                ( body, st2 ) =
-                    expr inner block.expression st1
+                ( ebody, st2 ) =
+                    expr inner body st1
             in
-            ( ELet decls body, st2 )
+            ( ELet decls ebody, st2 )
 
-        E.CaseExpression block ->
+        Src.Case ( _, scrutinee ) branches ->
             let
-                ( scrutinee, st1 ) =
-                    expr env block.expression st
+                ( es, st1 ) =
+                    expr env scrutinee st
             in
             List.foldl
-                (\( p, b ) ( acc, s ) ->
+                (\( ( _, p ), ( _, b ) ) ( acc, s ) ->
                     let
                         ( q, bound, s1 ) =
                             pattern env p s
@@ -811,61 +795,112 @@ expr env (Node range e) st =
                     ( acc ++ [ ( q, eb ) ], s2 )
                 )
                 ( [], st1 )
-                block.cases
-                |> (\( rules, s ) -> ( ECase scrutinee rules, s ))
+                branches
+                |> (\( rules, s ) -> ( ECase es rules, s ))
 
-        E.LambdaExpression lambda ->
+        Src.Lambda ( _, args ) ( _, body ) ->
             let
                 ( ps, bound, st1 ) =
-                    patterns env lambda.args st
+                    patterns env (List.map c1 args) st
 
-                ( body, st2 ) =
-                    expr (bind bound env) lambda.expression st1
+                ( ebody, st2 ) =
+                    expr (bind bound env) body st1
             in
-            ( ELam ps body, st2 )
+            ( ELam ps ebody, st2 )
 
-        E.RecordExpr setters ->
+        Src.Record ( _, setters ) ->
             let
                 ( fields, st1 ) =
-                    setterList env setters st
+                    setterList env (List.map c2eol setters) st
             in
             ( ERecord fields, st1 )
 
-        E.ListExpr xs ->
+        Src.List items _ ->
             let
                 ( exs, st1 ) =
-                    exprs env xs st
+                    exprs env (List.map c2eol items) st
             in
             ( EList exs, st1 )
 
-        E.RecordAccess x (Node _ f) ->
+        Src.Access x (A.At _ f) ->
             let
                 ( ex, st1 ) =
                     expr env x st
             in
             ( EAccess ex f, st1 )
 
-        E.RecordAccessFunction f ->
-            ( EAccessor (String.dropLeft 1 f), st )
+        Src.Accessor f ->
+            ( EAccessor f, st )
 
-        E.RecordUpdateExpression (Node r x) setters ->
+        Src.Update ( _, A.At r record ) ( _, ( first, rest ) ) ->
+            case record of
+                Src.Var _ x ->
+                    let
+                        ( name, st1 ) =
+                            resolveValue env "" x (Region.fromA r) st
+
+                        ( occ, st2 ) =
+                            fresh st1
+
+                        ( fields, st3 ) =
+                            setterList env (List.map c2eol (first :: rest)) st2
+                    in
+                    ( EUpdate occ name fields, st3 )
+
+                _ ->
+                    -- eco's parser makes the record of an update a lower-case variable
+                    ( EUnit, problem rankConstruct "construct:record-update" range st )
+
+
+{-| A variable or constructor `qual.x` as written (`qual` "" when unqualified).
+-}
+variable : Env -> String -> String -> Region -> St -> ( Expr, St )
+variable env qual x range st =
+    if env.textOfLibrary && List.take 2 (String.split "." qual) == [ "Elm", "Kernel" ] then
+        -- a library text that names any other kernel value is refused (L2)
+        ( EUnit, problem rankBasis ("kernel:" ++ qual ++ "." ++ x) range st )
+
+    else if String.left 1 x == String.toUpper (String.left 1 x) then
+        let
+            ( name, st1 ) =
+                resolveConstructor env qual x range st
+        in
+        ( ECon name, st1 )
+
+    else
+        let
+            ( name, st1 ) =
+                resolveValue env qual x range st
+
+            ( occ, st2 ) =
+                fresh st1
+        in
+        ( EVar occ name, st2 )
+
+
+{-| An operator chain, grouped (`Translate.Fixity`): an operator applied to its two operands.
+-}
+chain : Env -> Fixity.Tree -> St -> ( Expr, St )
+chain env t st =
+    case t of
+        Fixity.Operand x ->
+            expr env x st
+
+        Fixity.Apply a ->
             let
-                ( name, st1 ) =
-                    resolveValue env [] x r st
+                ( occ, st0 ) =
+                    fresh (checkOperator a.op a.region st)
 
-                ( occ, st2 ) =
-                    fresh st1
+                ( el, st1 ) =
+                    chain env a.left st0
 
-                ( fields, st3 ) =
-                    setterList env setters st2
+                ( er, st2 ) =
+                    chain env a.right st1
             in
-            ( EUpdate occ name fields, st3 )
-
-        E.GLSLExpression _ ->
-            ( EUnit, problem rankConstruct "construct:glsl" range st )
+            ( EBinop occ a.op el er, st2 )
 
 
-exprs : Env -> List (Node E.Expression) -> St -> ( List Expr, St )
+exprs : Env -> List Src.Expr -> St -> ( List Expr, St )
 exprs env xs st =
     List.foldl
         (\x ( acc, s ) ->
@@ -879,10 +914,10 @@ exprs env xs st =
         xs
 
 
-setterList : Env -> List (Node E.RecordSetter) -> St -> ( List ( String, Expr ), St )
+setterList : Env -> List ( Src.C1 (A.Located String), Src.C1 Src.Expr ) -> St -> ( List ( String, Expr ), St )
 setterList env setters st =
     List.foldl
-        (\(Node _ ( Node _ f, x )) ( acc, s ) ->
+        (\( ( _, A.At _ f ), ( _, x ) ) ( acc, s ) ->
             let
                 ( ex, s1 ) =
                     expr env x s
@@ -893,25 +928,31 @@ setterList env setters st =
         setters
 
 
+{-| A function binding, at the top level or in a `let`: its name, parameters, body and annotation.
+-}
+type alias Fn =
+    { name : String, args : List Src.Pattern, body : Src.Expr, annotation : Maybe Src.Type }
+
+
 {-| The declarations of a `let` (or the top level): first every binder, so that the declarations
 may refer to each other, then each right-hand side.
 -}
-letDecls : Env -> List (Node E.LetDeclaration) -> St -> ( List Decl, Env, St )
+letDecls : Env -> List Src.Def -> St -> ( List Decl, Env, St )
 letDecls env declarations st =
     let
         -- binders first
         ( heads, st1 ) =
             List.foldl
-                (\(Node _ d) ( acc, s ) ->
+                (\d ( acc, s ) ->
                     case d of
-                        E.LetFunction f ->
+                        Src.Define (A.At _ name) args ( _, body ) tipe ->
                             let
                                 ( id, s1 ) =
                                     fresh s
                             in
-                            ( acc ++ [ FnHead f id ], s1 )
+                            ( acc ++ [ FnHead { name = name, args = List.map c1 args, body = body, annotation = Maybe.map (c1 >> c2) tipe } id ], s1 )
 
-                        E.LetDestructuring p x ->
+                        Src.Destruct p ( _, x ) ->
                             let
                                 ( q, bound, s1 ) =
                                     pattern env p s
@@ -927,7 +968,7 @@ letDecls env declarations st =
                     (\h ->
                         case h of
                             FnHead f id ->
-                                [ ( Node.value (Node.value f.declaration).name, id ) ]
+                                [ ( f.name, id ) ]
 
                             PatHead _ bound _ ->
                                 bound
@@ -952,8 +993,8 @@ letDecls env declarations st =
 
 
 type Head
-    = FnHead E.Function Int
-    | PatHead Pattern (List ( String, Int )) (Node E.Expression)
+    = FnHead Fn Int
+    | PatHead Pattern (List ( String, Int )) Src.Expr
 
 
 declOf : Env -> Head -> St -> ( Decl, St )
@@ -961,21 +1002,18 @@ declOf env h st =
     case h of
         FnHead f id ->
             let
-                impl =
-                    Node.value f.declaration
-
                 ( args, bound, st1 ) =
-                    patterns env impl.arguments st
+                    patterns env f.args st
 
                 ( body, st2 ) =
-                    expr (bind bound env) impl.expression st1
+                    expr (bind bound env) f.body st1
             in
             ( DFn
-                { name = Node.value impl.name
+                { name = f.name
                 , binder = id
                 , args = args
                 , body = body
-                , annotation = Maybe.map (Node.value >> .typeAnnotation) f.signature
+                , annotation = f.annotation
                 }
             , st2
             )
@@ -1024,7 +1062,7 @@ loggedLabels d =
 {-| A module of a test program, as read: its name, its file, its text and its tree.
 -}
 type alias ModuleSource =
-    { name : String, path : String, source : String, file : File }
+    { name : String, path : String, source : String, file : Parsed }
 
 
 {-| The program of a test whose modules are `sources` in program order (the test, its main module,
@@ -1051,11 +1089,11 @@ convertProgram lib directives sources =
                 (List.indexedMap Tuple.pair sources)
                 |> (\( ms, _, st ) -> ( ms, st ))
 
-        mainRange =
+        mainRegion =
             sources
                 |> List.reverse
                 |> List.head
-                |> Maybe.map (\ms -> Node.range ms.file.moduleDefinition)
+                |> Maybe.map (\ms -> Parse.headerRegion ms.file)
                 |> Maybe.withDefault { start = { row = 0, column = 0 }, end = { row = 0, column = 0 } }
 
         -- the labels some Debug.log of the program writes as its literal first argument
@@ -1073,7 +1111,7 @@ convertProgram lib directives sources =
                                 st
 
                             else
-                                problem rankChecks ("checks:unmatched:" ++ label) mainRange st
+                                problem rankChecks ("checks:unmatched:" ++ label) mainRegion st
 
                         Nothing ->
                             st
@@ -1109,32 +1147,28 @@ convertLibrary sources =
     ( modules, stEnd.problems |> List.sortBy (\p -> ( p.rank, p.at.start.row, p.at.start.column )) )
 
 
-exposingOf : X.Exposing -> ExposingIr
+exposingOf : Src.Exposing -> ExposingIr
 exposingOf x =
     case x of
-        X.All _ ->
+        Src.Open _ _ ->
             ExposeAll
 
-        X.Explicit items ->
+        Src.Explicit (A.At _ items) ->
             ExposeItems
                 (List.map
-                    (\(Node _ item) ->
+                    (\( _, item ) ->
                         case item of
-                            X.FunctionExpose f ->
+                            Src.Lower (A.At _ f) ->
                                 IVar f
 
-                            X.InfixExpose op ->
+                            Src.Operator _ op ->
                                 IOp op
 
-                            X.TypeOrAliasExpose t ->
+                            Src.Upper (A.At _ t) ( _, Src.Private ) ->
                                 IType t
 
-                            X.TypeExpose t ->
-                                if t.open /= Nothing then
-                                    IOpen t.name
-
-                                else
-                                    IType t.name
+                            Src.Upper (A.At _ t) ( _, Src.Public _ ) ->
+                                IOpen t
                     )
                     items
                 )
@@ -1172,6 +1206,63 @@ exposesConstructors x name =
             List.member (IOpen name) items
 
 
+{-| A top-level declaration as the converter reads it, with its region: from its doc comment, if
+it has one, to its end (as elm-syntax gave it).
+-}
+type TopDecl
+    = TopFn Region Fn
+    | TopType { name : String, params : List String, constructors : List ( String, List Src.Type ) }
+    | TopAlias Region { name : String, params : List String, annotation : Src.Type }
+    | TopPort { name : String, annotation : Src.Type }
+
+
+topDecls : Parsed -> List TopDecl
+topDecls file =
+    let
+        regionWithDoc doc r =
+            let
+                region =
+                    Region.fromA r
+            in
+            case doc of
+                Just (Src.Comment (Snippet.Snippet snip)) ->
+                    -- the snippet starts after `{-|`
+                    { region | start = { row = snip.offRow, column = snip.offCol - 3 } }
+
+                Nothing ->
+                    region
+    in
+    List.map
+        (\d ->
+            case d of
+                Decl.Value doc (A.At r (Src.Value v)) ->
+                    TopFn (regionWithDoc doc r)
+                        { name = A.toValue (c1 v.name)
+                        , args = List.map c1 v.args
+                        , body = c1 v.body
+                        , annotation = Maybe.map (c1 >> c2) v.tipe
+                        }
+
+                Decl.Union _ (A.At _ (Src.Union ( _, A.At _ name ) params first rest)) ->
+                    TopType
+                        { name = name
+                        , params = List.map (c1 >> A.toValue) params
+                        , constructors = List.map (\( _, ( A.At _ k, args ) ) -> ( k, List.map c1 args )) (first :: rest)
+                        }
+
+                Decl.Alias doc (A.At r (Src.Alias a)) ->
+                    TopAlias (regionWithDoc doc r)
+                        { name = A.toValue (c2 a.name)
+                        , params = List.map (c1 >> A.toValue) a.args
+                        , annotation = c1 a.tipe
+                        }
+
+                Decl.Port _ (Src.Port _ ( _, A.At _ name ) t) ->
+                    TopPort { name = name, annotation = t }
+        )
+        (Parse.declarations file)
+
+
 {-| One module: its representation, its export table, and the state after it.
 -}
 convertModule : { isMain : Bool, library : Library, textOfLibrary : Bool } -> Dict String ExportTable -> ModuleSource -> St -> ( ModuleIr, ExportTable, St )
@@ -1193,53 +1284,36 @@ convertModule mode exports ms st0 =
             else
                 ms.name ++ "."
 
-        moduleRange =
-            Node.range file.moduleDefinition
+        moduleRegion =
+            Parse.headerRegion file
 
         headerExposing =
-            case Node.value file.moduleDefinition of
-                M.NormalModule d ->
-                    exposingOf (Node.value d.exposingList)
+            exposingOf (Parse.exposing_ file)
 
-                M.PortModule d ->
-                    exposingOf (Node.value d.exposingList)
-
-                M.EffectModule d ->
-                    exposingOf (Node.value d.exposingList)
+        importList =
+            Parse.importsOf file
 
         writtenImports =
             List.map
-                (\(Node _ imp) ->
-                    { modid = moduleName (Node.value imp.moduleName)
-                    , alias = Maybe.map (Node.value >> moduleName) imp.moduleAlias
-                    , exposes = Maybe.map (Node.value >> exposingOf) imp.exposingList
+                (\imp ->
+                    { modid = imp.name
+                    , alias = imp.alias
+                    , exposes = Maybe.map exposingOf imp.exposing_
                     }
                 )
-                file.imports
-
-        st1 =
-            case Node.value file.moduleDefinition of
-                M.PortModule _ ->
-                    -- a port module: its ports are declarations of the module (plan step 3)
-                    st0
-
-                M.EffectModule _ ->
-                    problem rankEffects "effects" moduleRange st0
-
-                M.NormalModule _ ->
-                    st0
+                importList
 
         ( imports, st2 ) =
-            readImports exports file.imports st1
+            readImports exports importList st0
 
         declarations =
-            List.map (\(Node r d) -> ( r, d )) file.declarations
+            topDecls file
 
         customTypes =
             List.filterMap
-                (\( _, d ) ->
+                (\d ->
                     case d of
-                        D.CustomTypeDeclaration t ->
+                        TopType t ->
                             Just t
 
                         _ ->
@@ -1249,9 +1323,9 @@ convertModule mode exports ms st0 =
 
         aliasDecls =
             List.filterMap
-                (\( _, d ) ->
+                (\d ->
                     case d of
-                        D.AliasDeclaration a ->
+                        TopAlias _ a ->
                             Just a
 
                         _ ->
@@ -1261,25 +1335,21 @@ convertModule mode exports ms st0 =
 
         recordAliases =
             aliasDecls
-                |> List.filter
-                    (\a ->
-                        case Node.value a.typeAnnotation of
-                            T.Record _ ->
-                                True
-
-                            _ ->
-                                False
-                    )
-                |> List.map (.name >> Node.value)
+                |> List.filter (\a -> Parse.recordType a.annotation /= Nothing)
+                |> List.map .name
                 |> Set.fromList
 
         cons =
             List.concatMap
-                (\t -> List.map (\(Node _ c) -> ( Node.value c.name, List.length c.arguments )) t.constructors)
+                (\t -> List.map (\( k, args ) -> ( k, List.length args )) t.constructors)
                 customTypes
 
         -- a type so large that inference would exhaust the stack (a test of a compiler's limits)
-        tooLarge (Node r _) =
+        tooLarge (A.At region _) =
+            let
+                r =
+                    Region.fromA region
+            in
             if r.end.row == r.start.row then
                 r.end.column - r.start.column > 4000
 
@@ -1288,25 +1358,19 @@ convertModule mode exports ms st0 =
 
         st3 =
             List.foldl
-                (\( r, d ) s ->
+                (\d s ->
                     case d of
-                        D.PortDeclaration _ ->
-                            s
-
-                        D.InfixDeclaration _ ->
-                            problem rankConstruct "construct:infix-declaration" r s
-
-                        D.AliasDeclaration a ->
-                            if tooLarge a.typeAnnotation then
+                        TopAlias r a ->
+                            if tooLarge a.annotation then
                                 problem rankConstruct "construct:large-type" r s
 
                             else
                                 s
 
-                        D.FunctionDeclaration f ->
-                            case f.signature of
-                                Just (Node _ sig) ->
-                                    if tooLarge sig.typeAnnotation then
+                        TopFn r f ->
+                            case f.annotation of
+                                Just t ->
+                                    if tooLarge t then
                                         problem rankConstruct "construct:large-type" r s
 
                                     else
@@ -1318,14 +1382,14 @@ convertModule mode exports ms st0 =
                         _ ->
                             s
                 )
-                st2
+                (List.foldl (\(A.At r _) s -> problem rankConstruct "construct:infix-declaration" (Region.fromA r) s) st2 file.infixes)
                 declarations
 
         functions =
             List.filterMap
-                (\( r, d ) ->
+                (\d ->
                     case d of
-                        D.FunctionDeclaration f ->
+                        TopFn r f ->
                             Just ( r, f )
 
                         _ ->
@@ -1334,7 +1398,7 @@ convertModule mode exports ms st0 =
                 declarations
 
         isMainDecl ( _, f ) =
-            Node.value (Node.value f.declaration).name == "main"
+            f.name == "main"
 
         mainDecl =
             List.filter isMainDecl functions |> List.head
@@ -1342,18 +1406,6 @@ convertModule mode exports ms st0 =
         -- main is a top-level definition like any other (the module form, plan step 3)
         otherFunctions =
             functions
-
-        destructurings =
-            List.filterMap
-                (\( r, d ) ->
-                    case d of
-                        D.Destructuring p x ->
-                            Just ( r, p, x )
-
-                        _ ->
-                            Nothing
-                )
-                declarations
 
         envBase =
             { source = source
@@ -1381,37 +1433,25 @@ convertModule mode exports ms st0 =
                 ( [], st3 )
                 otherFunctions
 
-        ( topPatHeads, st5 ) =
-            List.foldl
-                (\( _, p, x ) ( acc, s ) ->
-                    let
-                        ( q, bound, s1 ) =
-                            pattern envBase p s
-                    in
-                    ( acc ++ [ PatHead q bound x ], s1 )
-                )
-                ( [], st4 )
-                destructurings
-
         allTopHeads =
-            topHeads ++ topPatHeads
+            topHeads
 
         -- the ports, each with a binding id: a port binds its name in the module
         ( portDecls, st5b ) =
             List.foldl
-                (\( _, d ) ( acc, s ) ->
+                (\d ( acc, s ) ->
                     case d of
-                        D.PortDeclaration sig ->
+                        TopPort pd ->
                             let
                                 ( id, s1 ) =
                                     fresh s
                             in
-                            ( acc ++ [ { name = Node.value sig.name, binder = id, annotation = sig.typeAnnotation } ], s1 )
+                            ( acc ++ [ { name = pd.name, binder = id, annotation = pd.annotation } ], s1 )
 
                         _ ->
                             ( acc, s )
                 )
-                ( [], st5 )
+                ( [], st4 )
                 declarations
 
         env =
@@ -1423,7 +1463,7 @@ convertModule mode exports ms st0 =
                                 (\h ->
                                     case h of
                                         FnHead f id ->
-                                            [ ( Node.value (Node.value f.declaration).name, id ) ]
+                                            [ ( f.name, id ) ]
 
                                         PatHead _ bound _ ->
                                             bound
@@ -1449,13 +1489,13 @@ convertModule mode exports ms st0 =
             case mainDecl of
                 Nothing ->
                     if isMain then
-                        problem rankConstruct "construct:main-shape" moduleRange st6
+                        problem rankConstruct "construct:main-shape" moduleRegion st6
 
                     else
                         st6
 
                 Just ( r, f ) ->
-                    if List.isEmpty (Node.value f.declaration).arguments then
+                    if List.isEmpty f.args then
                         st6
 
                     else
@@ -1463,7 +1503,7 @@ convertModule mode exports ms st0 =
 
         -- what the module exposes to the modules that import it
         ownTypes =
-            List.map (\t -> ( Node.value t.name, List.map (\(Node _ c) -> Node.value c.name) t.constructors )) customTypes
+            List.map (\t -> ( t.name, List.map Tuple.first t.constructors )) customTypes
 
         exportTable =
             { values =
@@ -1476,12 +1516,8 @@ convertModule mode exports ms st0 =
                                 (\h ->
                                     case h of
                                         FnHead f id ->
-                                            let
-                                                x =
-                                                    Node.value (Node.value f.declaration).name
-                                            in
-                                            if exposesValue headerExposing x then
-                                                Just ( x, id )
+                                            if exposesValue headerExposing f.name then
+                                                Just ( f.name, id )
 
                                             else
                                                 Nothing
@@ -1512,8 +1548,8 @@ convertModule mode exports ms st0 =
                     |> Dict.fromList
             , aliases =
                 aliasDecls
-                    |> List.filter (\a -> exposesType headerExposing (Node.value a.name))
-                    |> List.map (\a -> ( Node.value a.name, { params = List.map Node.value a.generics, annotation = a.typeAnnotation } ))
+                    |> List.filter (\a -> exposesType headerExposing a.name)
+                    |> List.map (\a -> ( a.name, { params = a.params, annotation = a.annotation } ))
                     |> Dict.fromList
             }
 
@@ -1569,13 +1605,7 @@ convertModule mode exports ms st0 =
     in
     ( { name = ms.name
       , path = ms.path
-      , isPort =
-            case Node.value file.moduleDefinition of
-                M.PortModule _ ->
-                    True
-
-                _ ->
-                    False
+      , isPort = Parse.isPortModule file
       , exposes = headerExposing
       , imports = writtenImports
       , prefix = prefix
@@ -1583,19 +1613,13 @@ convertModule mode exports ms st0 =
       , types =
             Dict.fromList
                 (List.map
-                    (\t ->
-                        ( Node.value t.name
-                        , { params = List.map Node.value t.generics
-                          , constructors = List.map (\(Node _ c) -> ( Node.value c.name, c.arguments )) t.constructors
-                          }
-                        )
-                    )
+                    (\t -> ( t.name, { params = t.params, constructors = t.constructors } ))
                     customTypes
                 )
       , aliases =
             Dict.fromList
                 (List.map
-                    (\a -> ( Node.value a.name, { params = List.map Node.value a.generics, annotation = a.typeAnnotation } ))
+                    (\a -> ( a.name, { params = a.params, annotation = a.annotation } ))
                     aliasDecls
                 )
       , importedTypes = importedTypes
@@ -1617,11 +1641,11 @@ type alias Facts =
     { uses : List String, imports : List String, worker : Bool, ports : Bool }
 
 
-facts : String -> File -> Facts
+facts : String -> Parsed -> Facts
 facts source file =
     let
         imports =
-            file.imports |> List.map (\(Node _ i) -> moduleName (Node.value i.moduleName))
+            Parse.importsOf file |> List.map .name
 
         qualified =
             Regex.find qualifiedRef source |> List.filterMap (\m -> List.head m.submatches |> Maybe.andThen identity)
@@ -1633,12 +1657,7 @@ facts source file =
             (imports ++ qualified) |> List.filter notDefault |> Set.fromList |> Set.toList
 
         ports =
-            case Node.value file.moduleDefinition of
-                M.PortModule _ ->
-                    True
-
-                _ ->
-                    False
+            Parse.isPortModule file
     in
     { uses = uses
     , imports = imports

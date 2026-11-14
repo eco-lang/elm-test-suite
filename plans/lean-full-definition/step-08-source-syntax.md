@@ -750,8 +750,8 @@ per-restriction `nosyn_..._<slug>`).
 
 ```
 site/node_modules/.bin/elm-pages run definition/tools/src/GenerateDerivedForms.elm
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
 (cd definition/tools && ../../site/node_modules/.bin/elm-test --compiler ../../site/node_modules/.bin/elm)
 export PATH=$HOME/.elan/bin:$PATH
 (cd definition/mechanisation/standard-elm-mech && lake build && lake exe run-examples)

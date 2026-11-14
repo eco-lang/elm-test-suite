@@ -7,36 +7,47 @@ module Translate.Literal exposing
     , textAt
     )
 
-{-| Literals from the source text: elm-syntax holds integer and float literals as JavaScript numbers,
-which lose precision beyond 2^53, so the translator reads each literal's text from the source by its
-range and works with the digits. Also: escaping for Lean string and char literals.
+{-| Literals from the source text: eco's parser holds integer and float literals as JavaScript numbers
+beside their text, and those lose precision beyond 2^53, so the translator reads each literal's text
+from the source by its region and works with the digits. Also: escaping for Lean string and char
+literals.
 -}
 
-import Elm.Syntax.Range exposing (Range)
+import Translate.Region exposing (Region)
 
 
-{-| The text of a node on one line of the source (rows and columns are 1-based). elm-syntax counts
-columns in characters (code points), and `String.slice` in UTF-16 code units, so the line is cut as
-a list of characters: an astral character earlier on the line would otherwise shift the cut.
+{-| The text of a region of the source (rows and columns are 1-based, the end just past the last
+character), across lines. Columns count characters (code points), and `String.slice` UTF-16 code
+units, so each line is cut as a list of characters: an astral character earlier on the line would
+otherwise shift the cut.
 -}
-textAt : String -> Range -> String
+textAt : String -> Region -> String
 textAt source range =
-    let
-        chars =
-            String.lines source
-                |> List.drop (range.start.row - 1)
-                |> List.head
-                |> Maybe.withDefault ""
-                |> String.toList
-                |> List.drop (range.start.column - 1)
-    in
-    (if range.end.row == range.start.row then
-        List.take (range.end.column - range.start.column) chars
+    String.lines source
+        |> List.drop (range.start.row - 1)
+        |> List.take (range.end.row - range.start.row + 1)
+        |> List.indexedMap
+            (\i line ->
+                let
+                    chars =
+                        String.toList line
 
-     else
-        chars
-    )
-        |> String.fromList
+                    upToEnd =
+                        if i == range.end.row - range.start.row then
+                            List.take (range.end.column - 1) chars
+
+                        else
+                            chars
+                in
+                (if i == 0 then
+                    List.drop (range.start.column - 1) upToEnd
+
+                 else
+                    upToEnd
+                )
+                    |> String.fromList
+            )
+        |> String.join "\n"
 
 
 normaliseDecimal : String -> String

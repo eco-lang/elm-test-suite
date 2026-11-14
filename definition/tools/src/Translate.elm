@@ -3,11 +3,14 @@ module Translate exposing (run)
 {-| Translates the `elm-spec` tests of `tests/` into Lean for the mechanisation of A Standard
 Definition of Elm? (plans/elm-to-lean-translator.md). Run from the repository's root:
 
-    site / node_modules /. bin / elm - pages run definition / tools / src / Translate.elm -- write
+    node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
 
-    site / node_modules /. bin / elm - pages run definition / tools / src / Translate.elm --check    -- compare only
+    node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
 
-    site / node_modules /. bin / elm - pages run definition / tools / src / Translate.elm --report-all-refusals FILE
+    node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --report-all-refusals FILE
+
+eco's parser recurses deeply: node's default stack is too small for some tests, hence the flag
+(plans/eco-parser.md, E12).
 
 It writes, under `definition/mechanisation/standard-elm-mech/StandardElmMech/Generated/`, one Lean
 file of programs per shard (a fixed alphabetical bucket of test names, `bucketOf`), `All.lean`, and
@@ -28,8 +31,6 @@ import Cli.Option as Option
 import Cli.OptionsParser as OptionsParser
 import Cli.Program as Program
 import Dict exposing (Dict)
-import Elm.Parser
-import Elm.Syntax.Node as Node
 import FatalError exposing (FatalError)
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -42,9 +43,12 @@ import Translate.Classify as Classify
 import Translate.ClassifyOverrides as ClassifyOverrides
 import Translate.Convert as Convert
 import Translate.Directives as Directives
+import Translate.FrontEnd as FrontEnd
 import Translate.Library as Library exposing (Library)
 import Translate.LibraryTexts as LibraryTexts
+import Translate.Parse as Parse
 import Translate.Pipeline as Pipeline exposing (Outcome(..))
+import Translate.Region as Region
 import Translate.Source as Source
 
 
@@ -679,8 +683,7 @@ run =
                     (\( ( allTests, sources, built ), entries ) ->
                         case options.reportAll of
                             Just path ->
-                                BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/src") Decode.string
-                                    |> BackendTask.allowFatal
+                                toolsSha256
                                     |> BackendTask.andThen
                                         (\toolsSha ->
                                             Script.log (summary entries)
@@ -699,7 +702,7 @@ run =
                             Nothing ->
                                 BackendTask.map5 (\a b c d e -> ( ( a, b ), ( c, d ), e ))
                                     (BackendTask.File.rawFile (mech ++ "StandardElmMech.lean") |> BackendTask.allowFatal)
-                                    (BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/src") Decode.string |> BackendTask.allowFatal)
+                                    toolsSha256
                                     bookLabelsTask
                                     (BackendTask.map2 Tuple.pair
                                         (BackendTask.File.jsonFile SB.basisDecoder staticBasisPath |> BackendTask.allowFatal)
@@ -745,6 +748,17 @@ run =
         )
 
 
+{-| The manifest's `toolsSha256`: the hash of the hashes of the translator's sources and of the
+parser it vendors (plans/eco-parser.md, E13).
+-}
+toolsSha256 : BackendTask FatalError String
+toolsSha256 =
+    BackendTask.map2 (\a b -> a ++ "\n" ++ b)
+        (BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/src") Decode.string |> BackendTask.allowFatal)
+        (BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/vendor") Decode.string |> BackendTask.allowFatal)
+        |> BackendTask.andThen (\both -> BackendTask.Custom.run "sha256Text" (Encode.string both) Decode.string |> BackendTask.allowFatal)
+
+
 {-| The library values of the test basis (decision D2 (b)): module, vendored file, values. The
 values are those the compile-success tests use (step 7's `library:` needs).
 -}
@@ -776,9 +790,9 @@ staticLibrary libs =
             "lib_" ++ String.replace "." "_" m
 
         one ( ( m, path, names ), src ) =
-            case Elm.Parser.parseToFile src of
-                Err _ ->
-                    Err (path ++ ": does not parse")
+            case Parse.parse src of
+                Err e ->
+                    Err (path ++ ": does not parse (" ++ e ++ ")")
 
                 Ok file ->
                     case Source.annotations { path = path, source = src } file names of
@@ -864,17 +878,31 @@ bookLabelsTask =
 
 
 {-| The modules of a test's program: the test, then every module it imports, transitively, that
-is a file of its project's sources (a visited set follows a cycle once).
+is a file of its project's sources (a visited set follows a cycle once). Each is parsed and, if it
+parses, checked by the front end (`Translate.FrontEnd`): its refusal is its parse failure (at its
+path, with `Parse.describe`'s text) or the front end's first (at `path:row:col`).
 -}
 programModules : Sources -> Test -> String -> List Classify.ModuleParse
 programModules sources t source =
     let
         parse name path text =
-            { path = path, name = name, file = Elm.Parser.parseToFile text |> Result.toMaybe }
+            case Parse.parse text of
+                Err detail ->
+                    { path = path, name = name, file = Nothing, refusal = Just { reason = "parse", at = path, detail = Just detail } }
+
+                Ok file ->
+                    { path = path
+                    , name = name
+                    , file = Just file
+                    , refusal =
+                        FrontEnd.check { path = path, source = text } file
+                            |> List.head
+                            |> Maybe.map (\r -> { reason = r.reason, at = path ++ ":" ++ Region.startText r.at, detail = Nothing })
+                    }
 
         importsOf m =
             m.file
-                |> Maybe.map (\f -> List.map (\(Node.Node _ i) -> String.join "." (nodeValue i.moduleName)) f.imports)
+                |> Maybe.map (\f -> List.map .name (Parse.importsOf f))
                 |> Maybe.withDefault []
 
         go queue visited acc =
@@ -902,11 +930,6 @@ programModules sources t source =
             parse t.name t.path source
     in
     go (importsOf first) (Set.singleton t.name) [ first ]
-
-
-nodeValue : Node.Node (List String) -> List String
-nodeValue (Node.Node _ v) =
-    v
 
 
 {-| The static classification of every `elm-spec` test (plans/lean-full-definition/step-07-classify.md):
@@ -976,7 +999,7 @@ classification labels basis basisSha allTests sources =
             order |> List.map (\k -> ( k, List.length (List.filter (\x -> key x == k) xs) ))
 
         errorOrder =
-            [ "parse-fail", "lexical-accepted", "syntactic", "further", "fixity-inference", "static-deterministic", "inference" ]
+            [ "parse-fail", "syntax-refused", "lexical-accepted", "syntactic", "further", "fixity-inference", "static-deterministic", "inference" ]
 
         successOrder =
             [ "B0", "harness", "library", "helper", "outside", "parse-fail" ]
@@ -1118,9 +1141,11 @@ sourceSyntax allTests sources =
                 sourceOf m =
                     Dict.get t.project sources |> Maybe.andThen (Dict.get m.name) |> Maybe.map .source |> Maybe.withDefault source
             in
-            case List.filter (\m -> m.file == Nothing) mods of
-                bad :: _ ->
-                    ( t, Err { reason = "parse", at = bad.path }, mods )
+            case List.filterMap .refusal mods of
+                refusal :: _ ->
+                    -- a module that does not parse, or that the front end refuses, is not written
+                    -- (plans/eco-parser.md, E7)
+                    ( t, Err refusal, mods )
 
                 [] ->
                     let
@@ -1130,6 +1155,7 @@ sourceSyntax allTests sources =
                     ( t
                     , Source.program { project = t.project, name = t.name, defName = defOf t }
                         (List.filterMap (\m -> m.file |> Maybe.map (\f -> { path = m.path, source = sourceOf m, file = f })) ordered)
+                        |> Result.mapError (\p -> { reason = p.reason, at = p.at, detail = Nothing })
                     , mods
                     )
 
@@ -1206,10 +1232,12 @@ sourceSyntax allTests sources =
 
                             Err problem ->
                                 Encode.object
-                                    [ ( "status", Encode.string "refused" )
-                                    , ( "reason", Encode.string problem.reason )
-                                    , ( "at", Encode.string problem.at )
-                                    ]
+                                    ([ ( "status", Encode.string "refused" )
+                                     , ( "reason", Encode.string problem.reason )
+                                     , ( "at", Encode.string problem.at )
+                                     ]
+                                        ++ (problem.detail |> Maybe.map (\d -> [ ( "detail", Encode.string d ) ]) |> Maybe.withDefault [])
+                                    )
                         )
                     )
                 |> Dict.fromList
@@ -1374,7 +1402,7 @@ refusalReport lib toolsSha sources allTests entries =
                     Pipeline.translateAllIn lib (lookupIn sources e.test.project) { project = e.test.project, name = e.test.name, defName = e.defName } e.source (Directives.read e.source)
 
                 factFields =
-                    case Elm.Parser.parseToFile e.source of
+                    case Parse.parse e.source of
                         Ok file ->
                             let
                                 f =

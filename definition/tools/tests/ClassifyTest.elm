@@ -4,13 +4,14 @@ module ClassifyTest exposing (suite)
 programs.
 -}
 
-import Elm.Parser
 import Expect
 import Set
 import StaticBasis.Json as SB
 import StaticBasis.Latex exposing (Ty(..))
 import Test exposing (Test, describe, test)
 import Translate.Classify as Classify
+import Translate.FrontEnd as FrontEnd
+import Translate.Parse as Parse
 
 
 labels : Set.Set String
@@ -20,7 +21,23 @@ labels =
 
 mod : String -> String -> Classify.ModuleParse
 mod name text =
-    { path = "tests/elm/src/" ++ name ++ ".elm", name = name, file = Elm.Parser.parseToFile text |> Result.toMaybe }
+    let
+        path =
+            "tests/elm/src/" ++ name ++ ".elm"
+    in
+    case Parse.parse text of
+        Ok file ->
+            { path = path
+            , name = name
+            , file = Just file
+            , refusal =
+                FrontEnd.check { path = path, source = text } file
+                    |> List.head
+                    |> Maybe.map (\r -> { reason = r.reason, at = path, detail = Nothing })
+            }
+
+        Err detail ->
+            { path = path, name = name, file = Nothing, refusal = Just { reason = "parse", at = path, detail = Just detail } }
 
 
 err : List String -> List Classify.ModuleParse -> Classify.ErrorRecord
@@ -66,7 +83,12 @@ suite : Test
 suite =
     describe "The static classification"
         [ test "a test whose helper does not parse is parse-fail" <|
-            \_ -> (err [ "elm-spec", "s-exp-app" ] [ okModule, mod "H" "no header here" ]).class |> Expect.equal "parse-fail"
+            \_ -> (err [ "elm-spec", "s-exp-app" ] [ okModule, mod "H" "module H exposing (..)\n\nx = 0x1G\n" ]).class |> Expect.equal "parse-fail"
+        , test "a helper without a header parses, and the front end refuses it" <|
+            \_ ->
+                err [ "elm-spec", "s-exp-app" ] [ okModule, mod "H" "no header here = 1\n" ]
+                    |> (\e -> ( e.parse, e.class, e.subclass ))
+                    |> Expect.equal ( True, "syntax-refused", Just "syntax:modules-header" )
         , test "a parsed test whose rule is trusted to the parser is lexical-accepted" <|
             \_ -> (err [ "elm-spec", "core-layout-rule" ] [ okModule ]).class |> Expect.equal "lexical-accepted"
         , test "a syntactic restriction, the non-book tags skipped" <|

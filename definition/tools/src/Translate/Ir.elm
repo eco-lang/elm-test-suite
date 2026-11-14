@@ -10,8 +10,8 @@ module Translate.Ir exposing
     , LineKind(..)
     , ModuleIr
     , Name(..)
-    , Payload(..)
     , Pattern(..)
+    , Payload(..)
     , TestProgram
     , anyDeclExpr
     , anyExpr
@@ -28,9 +28,8 @@ occurrence knows the binding it refers to, every binding has a unique id, every 
 an id by which inference records its type. Type annotations are kept, unconverted, for inference.
 -}
 
+import Compiler.IR.Source as Src
 import Dict exposing (Dict)
-import Elm.Syntax.Node exposing (Node)
-import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation)
 
 
 {-| A resolved name. `Local id name`: bound in the module (a pattern variable, a `let` or
@@ -108,7 +107,7 @@ type Pattern
 id, and its annotation if any), or a pattern binding.
 -}
 type Decl
-    = DFn { name : String, binder : Int, args : List Pattern, body : Expr, annotation : Maybe (Node TypeAnnotation) }
+    = DFn { name : String, binder : Int, args : List Pattern, body : Expr, annotation : Maybe Src.Type }
     | DPat Pattern Expr
 
 
@@ -194,7 +193,7 @@ type alias ExportTable =
     , constructors : Dict String String
     , typeCons : Dict String (List String)
     , types : Dict String String
-    , aliases : Dict String { params : List String, annotation : Node TypeAnnotation }
+    , aliases : Dict String { params : List String, annotation : Src.Type }
     }
 
 
@@ -213,11 +212,11 @@ type alias ModuleIr =
     , imports : List ImportIr
     , prefix : String
     , cons : List ( String, Int )
-    , types : Dict String { params : List String, constructors : List ( String, List (Node TypeAnnotation) ) }
-    , aliases : Dict String { params : List String, annotation : Node TypeAnnotation }
+    , types : Dict String { params : List String, constructors : List ( String, List Src.Type ) }
+    , aliases : Dict String { params : List String, annotation : Src.Type }
     , importedTypes : Dict String String
-    , importedAliases : Dict String { params : List String, annotation : Node TypeAnnotation }
-    , ports : List { name : String, binder : Int, annotation : Node TypeAnnotation }
+    , importedAliases : Dict String { params : List String, annotation : Src.Type }
+    , ports : List { name : String, binder : Int, annotation : Src.Type }
     , defs : List Decl
     }
 

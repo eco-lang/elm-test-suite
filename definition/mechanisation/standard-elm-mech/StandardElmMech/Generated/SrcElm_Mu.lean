@@ -142,24 +142,6 @@ def s_elm_ParenthesesTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "Pa
     [Src.imp "Html" none none]
     [Src.val "inner" (some (.fn (Src.tc "Maybe" [Src.tc "Maybe" [Src.tc "Int" []]]) (Src.tc "Int" []))) [Src.pv "m"] (.caseE (Src.v "m") [(Src.pc "Just" [.paren (Src.pc "Just" [Src.pv "n"])], Src.v "n"), (Src.pc "Just" [.paren (Src.pc "Nothing" [])], Src.i 0), (.paren (Src.pc "Nothing" []), .neg (Src.i 1))]), Src.val "doubleAll" (some (.fn (Src.tc "List" [Src.tc "Int" []]) (Src.tc "List" [Src.tc "Int" []]))) [Src.pv "xs"] (.caseE (Src.v "xs") [(.list [], .list []), (.cons (Src.pv "x") (Src.pv "rest"), Src.bin "::" (Src.app (.opVal "*") [Src.i 2, Src.v "x"]) (Src.app (Src.v "doubleAll") [Src.v "rest"]))]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "grouped", .paren (Src.bin "*" (.paren (Src.bin "+" (Src.i 1) (Src.i 2))) (Src.i 3))]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "ungrouped", .paren (Src.bin "+" (Src.i 1) (Src.bin "*" (Src.i 2) (Src.i 3)))]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "redundant", .paren (.paren (.paren (.paren (Src.i 5))))]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "nested pattern", .list [Src.app (Src.v "inner") [.paren (Src.app (Src.c "Just") [.paren (Src.app (Src.c "Just") [Src.i 3])])], Src.app (Src.v "inner") [.paren (Src.app (Src.c "Just") [Src.c "Nothing"])], Src.app (Src.v "inner") [Src.c "Nothing"]]]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "parenthesised types", .paren (Src.app (Src.v "doubleAll") [.list [Src.i 1, Src.i 2]])])] (Src.app (Src.qv "Html" "text") [Src.str "done"]))] ]
 
-/-- tests/elm/src/ParseErrorNumberBadHexDigitTest.elm -/
-def s_elm_ParseErrorNumberBadHexDigitTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "ParseErrorNumberBadHexDigitTest" [
-  Src.mdl (Src.hdr false "ParseErrorNumberBadHexDigitTest" (.all))
-    []
-    [Src.val "x" none [] (Src.app (Src.i 1) [Src.v "g"])] ]
-
-/-- tests/elm/src/ParseErrorNumberFractionThenLetterTest.elm -/
-def s_elm_ParseErrorNumberFractionThenLetterTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "ParseErrorNumberFractionThenLetterTest" [
-  Src.mdl (Src.hdr false "ParseErrorNumberFractionThenLetterTest" (.all))
-    []
-    [Src.val "x" none [] (Src.app (Src.fl 15 (-1)) [Src.v "a"])] ]
-
-/-- tests/elm/src/ParseErrorStringEscapeTooFewDigitsTest.elm -/
-def s_elm_ParseErrorStringEscapeTooFewDigitsTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "ParseErrorStringEscapeTooFewDigitsTest" [
-  Src.mdl (Src.hdr false "ParseErrorStringEscapeTooFewDigitsTest" (.all))
-    []
-    [Src.val "x" none [] (Src.str "A")] ]
-
 /-- tests/elm/src/PartialAppCaptureTypesTest.elm -/
 def s_elm_PartialAppCaptureTypesTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PartialAppCaptureTypesTest" [
   Src.mdl (Src.hdr false "PartialAppCaptureTypesTest" (.items [.var "main"]))
@@ -269,9 +251,6 @@ def srcShard_SrcElm_Mu : List (String × Src.SProgram) :=
    ("OutgoingPortTuple3Test", s_elm_OutgoingPortTuple3Test),
    ("PapEtaCtorProbe", s_elm_PapEtaCtorProbe),
    ("ParenthesesTest", s_elm_ParenthesesTest),
-   ("ParseErrorNumberBadHexDigitTest", s_elm_ParseErrorNumberBadHexDigitTest),
-   ("ParseErrorNumberFractionThenLetterTest", s_elm_ParseErrorNumberFractionThenLetterTest),
-   ("ParseErrorStringEscapeTooFewDigitsTest", s_elm_ParseErrorStringEscapeTooFewDigitsTest),
    ("PartialAppCaptureTypesTest", s_elm_PartialAppCaptureTypesTest),
    ("PartialAppChainTest", s_elm_PartialAppChainTest),
    ("PartialApplicationTest", s_elm_PartialApplicationTest),

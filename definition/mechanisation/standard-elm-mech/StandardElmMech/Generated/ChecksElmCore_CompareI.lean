@@ -21,8 +21,11 @@ open StandardElm.D
   g_elm_core_CompilerIssue2362NanTupleEqualityTest
   g_elm_core_CompositionTest
   g_elm_core_ContainerCompareCharTest
+  g_elm_core_ContainerCompareIntTest
   g_elm_core_ContainerEqualityCharTest
   g_elm_core_ContainerEqualityCustomFloatTest
+  g_elm_core_ContainerEqualityFloatTest
+  g_elm_core_ContainerEqualityIntTest
   g_elm_core_ContainerEqualityRecordFloatTest
   g_elm_core_ContainerEqualityStringTest
   g_elm_core_ControlFlowBooleanWithNotTest

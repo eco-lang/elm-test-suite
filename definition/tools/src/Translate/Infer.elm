@@ -22,13 +22,14 @@ the type of every check.
 
 -}
 
+import Compiler.Core.Annotation as A
+import Compiler.IR.Source as Src
 import Dict exposing (Dict)
-import Elm.Syntax.Node as Node exposing (Node(..))
-import Elm.Syntax.TypeAnnotation as T
 import Set exposing (Set)
 import Translate.Basis as Basis
 import Translate.Ir exposing (..)
 import Translate.Library as Library exposing (Library)
+import Translate.Parse as Parse
 import Translate.Types as Types exposing (Class(..), Scheme, Subst, Type(..))
 
 
@@ -460,8 +461,8 @@ classOfName name =
         Any
 
 
-annotation : Env -> Dict String Type -> Node T.TypeAnnotation -> St -> Result String ( Type, Dict String Type, St )
-annotation env scope (Node _ ann) st =
+annotation : Env -> Dict String Type -> Src.Type -> St -> Result String ( Type, Dict String Type, St )
+annotation env scope (A.At _ ann) st =
     let
         -- a type or alias that an import of another module of the program brings in
         imported visible targs scope1 st1 =
@@ -479,7 +480,7 @@ annotation env scope (Node _ ann) st =
                             Err ("unknown-type:" ++ visible)
     in
     case ann of
-        T.GenericType name ->
+        Src.TVar name ->
             case Dict.get name scope of
                 Just t ->
                     Ok ( t, scope, st )
@@ -491,66 +492,22 @@ annotation env scope (Node _ ann) st =
                     in
                     Ok ( t, Dict.insert name t scope, st1 )
 
-        T.Typed (Node _ ( qual, name )) args ->
-            annotations env scope args st
-                |> Result.andThen
-                    (\( targs, scope1, st1 ) ->
-                        if ((List.isEmpty qual && not (Dict.member name env.modul.types || Dict.member name env.modul.aliases)) || List.member (String.join "." qual) [ "Basics", "List", "Maybe", "Result", "String", "Char" ]) && builtin name (List.length targs) then
-                            -- a local type or alias takes the name before the default imports (ruling A98)
-                            Ok ( TCon name targs, scope1, st1 )
+        Src.TType _ name args ->
+            namedType env scope "" name (List.map Tuple.second args) st imported
 
-                        else if List.member ( String.join "." qual, name ) [ ( "", "Html" ), ( "Html", "Html" ), ( "VirtualDom", "Node" ) ] && List.length targs == 1 && not (Dict.member name env.modul.types || Dict.member name env.modul.aliases) then
-                            -- Html.Html is VirtualDom.Node (the harness, decision D2)
-                            Ok ( TCon "Node" targs, scope1, st1 )
+        Src.TTypeQual _ qual name args ->
+            namedType env scope qual name (List.map Tuple.second args) st imported
 
-                        else if not (Dict.member name env.modul.types || Dict.member name env.modul.aliases) && basisType (String.join "." qual) name (List.length targs) then
-                            -- a type of the basis's modules Platform, Cmd, Sub, Task, Process, Json,
-                            -- Array, Bytes (Process.Id is Platform.ProcessId)
-                            Ok
-                                ( TCon
-                                    (if name == "Id" then
-                                        "ProcessId"
-
-                                     else
-                                        name
-                                    )
-                                    targs
-                                , scope1
-                                , st1
-                                )
-
-                        else if not (List.isEmpty qual) then
-                            -- a type of another module of the program, qualified
-                            imported (String.join "." qual ++ "." ++ name) targs scope1 st1
-
-                        else
-                            case Dict.get name env.modul.aliases of
-                                Just alias ->
-                                    let
-                                        aliasScope =
-                                            Dict.fromList (List.map2 Tuple.pair alias.params targs)
-                                    in
-                                    annotation env aliasScope alias.annotation st1
-                                        |> Result.map (\( t, _, st2 ) -> ( t, scope1, st2 ))
-
-                                Nothing ->
-                                    if Dict.member name env.modul.types then
-                                        Ok ( TCon (env.modul.prefix ++ name) targs, scope1, st1 )
-
-                                    else
-                                        imported name targs scope1 st1
-                    )
-
-        T.Unit ->
+        Src.TUnit ->
             Ok ( TTuple [], scope, st )
 
-        T.Tupled ts ->
-            annotations env scope ts st |> Result.map (\( xs, s1, st1 ) -> ( TTuple xs, s1, st1 ))
+        Src.TTuple ( _, a ) ( _, b ) rest ->
+            annotations env scope (a :: b :: List.map Tuple.second rest) st |> Result.map (\( xs, s1, st1 ) -> ( TTuple xs, s1, st1 ))
 
-        T.Record fields ->
+        Src.TRecord fields _ ->
             recordFields env scope fields st |> Result.map (\( fs, s1, st1 ) -> ( TRecord fs Nothing, s1, st1 ))
 
-        T.GenericRecord (Node _ rowName) (Node _ fields) ->
+        Src.TRecordExt ( _, A.At _ rowName ) first rest _ ->
             let
                 ( rowType, scope1, st1 ) =
                     case Dict.get rowName scope of
@@ -564,7 +521,7 @@ annotation env scope (Node _ ann) st =
                             in
                             ( t, Dict.insert rowName t scope, s )
             in
-            recordFields env scope1 fields st1
+            recordFields env scope1 (first :: rest) st1
                 |> Result.map
                     (\( fs, s2, st2 ) ->
                         case rowType of
@@ -575,15 +532,81 @@ annotation env scope (Node _ ann) st =
                                 ( TRecord fs Nothing, s2, st2 )
                     )
 
-        T.FunctionTypeAnnotation a b ->
+        Src.TLambda ( _, a ) ( _, b ) ->
             annotation env scope a st
                 |> Result.andThen
                     (\( ta, s1, st1 ) ->
                         annotation env s1 b st1 |> Result.map (\( tb, s2, st2 ) -> ( TFun ta tb, s2, st2 ))
                     )
 
+        Src.TParens ( _, x ) ->
+            annotation env scope x st
 
-annotations : Env -> Dict String Type -> List (Node T.TypeAnnotation) -> St -> Result String ( List Type, Dict String Type, St )
+
+{-| A named type `qual.name` (`qual` "" when unqualified) applied to `args`. `imported` resolves a
+type or alias that an import of another module of the program brings in.
+-}
+namedType :
+    Env
+    -> Dict String Type
+    -> String
+    -> String
+    -> List Src.Type
+    -> St
+    -> (String -> List Type -> Dict String Type -> St -> Result String ( Type, Dict String Type, St ))
+    -> Result String ( Type, Dict String Type, St )
+namedType env scope qual name args st imported =
+    annotations env scope args st
+        |> Result.andThen
+            (\( targs, scope1, st1 ) ->
+                if ((qual == "" && not (Dict.member name env.modul.types || Dict.member name env.modul.aliases)) || List.member qual [ "Basics", "List", "Maybe", "Result", "String", "Char" ]) && builtin name (List.length targs) then
+                    -- a local type or alias takes the name before the default imports (ruling A98)
+                    Ok ( TCon name targs, scope1, st1 )
+
+                else if List.member ( qual, name ) [ ( "", "Html" ), ( "Html", "Html" ), ( "VirtualDom", "Node" ) ] && List.length targs == 1 && not (Dict.member name env.modul.types || Dict.member name env.modul.aliases) then
+                    -- Html.Html is VirtualDom.Node (the harness, decision D2)
+                    Ok ( TCon "Node" targs, scope1, st1 )
+
+                else if not (Dict.member name env.modul.types || Dict.member name env.modul.aliases) && basisType qual name (List.length targs) then
+                    -- a type of the basis's modules Platform, Cmd, Sub, Task, Process, Json,
+                    -- Array, Bytes (Process.Id is Platform.ProcessId)
+                    Ok
+                        ( TCon
+                            (if name == "Id" then
+                                "ProcessId"
+
+                             else
+                                name
+                            )
+                            targs
+                        , scope1
+                        , st1
+                        )
+
+                else if qual /= "" then
+                    -- a type of another module of the program, qualified
+                    imported (qual ++ "." ++ name) targs scope1 st1
+
+                else
+                    case Dict.get name env.modul.aliases of
+                        Just alias ->
+                            let
+                                aliasScope =
+                                    Dict.fromList (List.map2 Tuple.pair alias.params targs)
+                            in
+                            annotation env aliasScope alias.annotation st1
+                                |> Result.map (\( t, _, st2 ) -> ( t, scope1, st2 ))
+
+                        Nothing ->
+                            if Dict.member name env.modul.types then
+                                Ok ( TCon (env.modul.prefix ++ name) targs, scope1, st1 )
+
+                            else
+                                imported name targs scope1 st1
+            )
+
+
+annotations : Env -> Dict String Type -> List Src.Type -> St -> Result String ( List Type, Dict String Type, St )
 annotations env scope anns st =
     List.foldl
         (\a acc ->
@@ -595,10 +618,10 @@ annotations env scope anns st =
         anns
 
 
-recordFields : Env -> Dict String Type -> T.RecordDefinition -> St -> Result String ( Dict String Type, Dict String Type, St )
+recordFields : Env -> Dict String Type -> List (Src.C2 ( Src.C1 (A.Located String), Src.C1 Src.Type )) -> St -> Result String ( Dict String Type, Dict String Type, St )
 recordFields env scope fields st =
     List.foldl
-        (\(Node _ ( Node _ name, t )) acc ->
+        (\( _, ( ( _, A.At _ name ), ( _, t ) ) ) acc ->
             acc
                 |> Result.andThen
                     (\( fs, s, st1 ) -> annotation env s t st1 |> Result.map (\( tt, s2, st2 ) -> ( Dict.insert name tt fs, s2, st2 )))
@@ -670,8 +693,8 @@ aliasConstructorSchemes : Env -> ( Dict String Scheme, St ) -> Result String ( D
 aliasConstructorSchemes env start =
     Dict.foldl
         (\aliasName alias acc ->
-            case Node.value alias.annotation of
-                T.Record fields ->
+            case Parse.recordType alias.annotation of
+                Just fields ->
                     acc
                         |> Result.andThen
                             (\( d, st ) ->
@@ -700,12 +723,12 @@ aliasConstructorSchemes env start =
                                             )
                                             params
                                 in
-                                annotations env (Dict.fromList params) (List.map (\(Node _ ( _, t )) -> t) fields) st1
+                                annotations env (Dict.fromList params) (List.map (\( _, ( _, ( _, t ) ) ) -> t) fields) st1
                                     |> Result.map
                                         (\( targs, _, st2 ) ->
                                             let
                                                 labels =
-                                                    List.map (\(Node _ ( Node _ l, _ )) -> l) fields
+                                                    List.map (\( _, ( ( _, A.At _ l ), _ ) ) -> l) fields
 
                                                 record =
                                                     TRecord (Dict.fromList (List.map2 Tuple.pair labels targs)) Nothing
@@ -1525,7 +1548,7 @@ annotations `Generated/StaticLibrary.lean` writes as source syntax): each annota
 with no type of a module in scope but the basis's, and closed over all its variables, numbered
 -1, -2, ... in order of first occurrence (as the basis's schemes are, `Translate.Basis`).
 -}
-librarySchemes : List ( ( String, String ), Node T.TypeAnnotation ) -> Result String (List ( ( String, String ), Scheme ))
+librarySchemes : List ( ( String, String ), Src.Type ) -> Result String (List ( ( String, String ), Scheme ))
 librarySchemes entries =
     let
         st0 =

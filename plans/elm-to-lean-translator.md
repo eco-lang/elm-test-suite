@@ -83,8 +83,8 @@ Commands use the binaries the site installs, so no new npm package is needed:
 
 ```sh
 site/node_modules/.bin/elm-pages run definition/tools/src/GenerateDerivedForms.elm
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm            # write
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check    # compare only
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm            # write
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check    # compare only
 (cd definition/tools && ../../site/node_modules/.bin/elm-test --compiler ../../site/node_modules/.bin/elm)
 ```
 
@@ -821,7 +821,7 @@ Written by `Translate.elm`, deterministically:
 
 ## B.14 CI
 
-One step after the site data is built: `elm-pages run definition/tools/src/Translate.elm --check`,
+One step after the site data is built: `node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check`,
 its output appended to the job summary under "Lean translations", `continue-on-error: true`. It
 never fails the job. Lean is not built in CI.
 

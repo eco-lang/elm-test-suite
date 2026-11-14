@@ -9,13 +9,11 @@ inferred and specialised by the translator's own pipeline, exposing the values a
 refused, and so the whole library (`Err`).
 -}
 
-import Elm.Parser
-import Elm.Syntax.Declaration as Declaration
-import Elm.Syntax.Node as Node
 import Translate.Convert as Convert
 import Translate.Infer as Infer
 import Translate.Ir as Ir
 import Translate.Library as Library exposing (Library)
+import Translate.Parse as Parse
 import Translate.Specialise as Specialise
 import Translate.ToLean as ToLean
 
@@ -27,8 +25,8 @@ build texts =
             texts
                 |> List.map
                     (\( t, src ) ->
-                        Elm.Parser.parseToFile src
-                            |> Result.mapError (\_ -> t.path ++ ": does not parse")
+                        Parse.parse src
+                            |> Result.mapError (\e -> t.path ++ ": does not parse (" ++ e ++ ")")
                             |> Result.map (\file -> ( t, src, file ))
                     )
                 |> List.foldr (Result.map2 (::)) (Ok [])
@@ -37,20 +35,9 @@ build texts =
             t.values
                 |> List.map
                     (\x ->
-                        file.declarations
-                            |> List.filterMap
-                                (\(Node.Node _ d) ->
-                                    case d of
-                                        Declaration.FunctionDeclaration f ->
-                                            if Node.value (Node.value f.declaration).name == x then
-                                                f.signature |> Maybe.map (\(Node.Node _ sig) -> ( ( t.modul, x ), sig.typeAnnotation ))
-
-                                            else
-                                                Nothing
-
-                                        _ ->
-                                            Nothing
-                                )
+                        Parse.functions file
+                            |> List.filter (\f -> f.name == x)
+                            |> List.filterMap (\f -> f.annotation |> Maybe.map (\a -> ( ( t.modul, x ), a )))
                             |> List.head
                             |> Result.fromMaybe (t.path ++ ": " ++ x ++ " has no annotation")
                     )

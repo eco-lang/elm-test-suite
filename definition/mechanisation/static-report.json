@@ -4668,6 +4668,20 @@
    "mean": "mean_elm_core_ContainerEqualityRecordFloatTest",
    "legal": "legal_elm_core_ContainerEqualityRecordFloatTest",
    "ident": "ident_elm_core_ContainerEqualityRecordFloatTest"},
+  "elm-core/ContainerEqualityIntTest":
+  {"wcheck": "wcheck_elm_core_ContainerEqualityIntTest",
+   "spec": "spec_elm_core_ContainerEqualityIntTest",
+   "native": false,
+   "mean": "mean_elm_core_ContainerEqualityIntTest",
+   "legal": "legal_elm_core_ContainerEqualityIntTest",
+   "ident": "ident_elm_core_ContainerEqualityIntTest"},
+  "elm-core/ContainerEqualityFloatTest":
+  {"wcheck": "wcheck_elm_core_ContainerEqualityFloatTest",
+   "spec": "spec_elm_core_ContainerEqualityFloatTest",
+   "native": false,
+   "mean": "mean_elm_core_ContainerEqualityFloatTest",
+   "legal": "legal_elm_core_ContainerEqualityFloatTest",
+   "ident": "ident_elm_core_ContainerEqualityFloatTest"},
   "elm-core/ContainerEqualityCustomFloatTest":
   {"wcheck": "wcheck_elm_core_ContainerEqualityCustomFloatTest",
    "spec": "spec_elm_core_ContainerEqualityCustomFloatTest",
@@ -4682,6 +4696,13 @@
    "mean": "mean_elm_core_ContainerEqualityCharTest",
    "legal": "legal_elm_core_ContainerEqualityCharTest",
    "ident": "ident_elm_core_ContainerEqualityCharTest"},
+  "elm-core/ContainerCompareIntTest":
+  {"wcheck": "wcheck_elm_core_ContainerCompareIntTest",
+   "spec": "spec_elm_core_ContainerCompareIntTest",
+   "native": false,
+   "mean": "mean_elm_core_ContainerCompareIntTest",
+   "legal": "legal_elm_core_ContainerCompareIntTest",
+   "ident": "ident_elm_core_ContainerCompareIntTest"},
   "elm-core/ContainerCompareCharTest":
   {"wcheck": "wcheck_elm_core_ContainerCompareCharTest",
    "spec": "spec_elm_core_ContainerCompareCharTest",
@@ -4900,7 +4921,7 @@
    "legal": "legal_elm_core_BasicsClampTest",
    "ident": "ident_elm_core_BasicsClampTest"}},
  "summary":
- "static semantics: 622 legal (613 of one module, 9 of several), 0 without a theorem, 11 by native_decide, 0 conditional on D11",
+ "static semantics: 625 legal (616 of one module, 9 of several), 0 without a theorem, 11 by native_decide, 0 conditional on D11",
  "specNative":
  ["elm/WideClosureSat26Test",
   "elm/WideCtorMixedTest",
@@ -4927,9 +4948,9 @@
   "elm/WideRecordDecoder300Test",
   "elm/WideRecordDecoder30Test",
   "elm/WideRecordDecoder70Test"],
- "legal": 622,
+ "legal": 625,
  "generatedBy": "lake exe certify (Certify.lean)",
  "failed": [],
  "endToEnd":
- "end to end: 608 spec_ theorems (0 by native_decide, 7 from a wcheck_ by native_decide), 606 mean_ theorems, 608 ident_ theorems, 0 translated tests skipped",
+ "end to end: 611 spec_ theorems (0 by native_decide, 7 from a wcheck_ by native_decide), 609 mean_ theorems, 611 ident_ theorems, 0 translated tests skipped",
  "conditional": []}

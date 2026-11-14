@@ -5,16 +5,16 @@ conversion (names, fragment, checks), inference, number specialisation, printing
 -}
 
 import Dict
-import Elm.Parser
-import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Node as Node
 import Set exposing (Set)
 import Translate.Convert as Convert exposing (ModuleSource)
 import Translate.Directives as Directives exposing (Directives)
+import Translate.FrontEnd as FrontEnd
 import Translate.Infer as Infer
 import Translate.Ir as Ir exposing (Decl(..), Expr(..), Name(..), TestProgram, anyExpr)
 import Translate.Json as Json
 import Translate.Library as Library exposing (Library)
+import Translate.Parse as Parse exposing (Parsed)
+import Translate.Region as Region
 import Translate.Specialise as Specialise
 import Translate.ToLean as ToLean
 
@@ -68,19 +68,20 @@ basisModules =
 {-| The modules of a program in program order: depth-first post-order from the test, following
 each module's imports in the order written, a module after the modules it imports and once, the
 test last (<res:program-import-order>). An import of a module that is not among the project's
-sources is left to the converter, which refuses it (`import:M`). An import cycle is refused.
+sources is left to the converter, which refuses it (`import:M`). An import cycle is refused. A
+module that does not parse, or that the front end refuses (`Translate.FrontEnd`), is refused.
 -}
-resolve : Lookup -> ModuleSource -> Result String (List ModuleSource)
+resolve : Lookup -> ModuleSource -> Result Refusal (List ModuleSource)
 resolve lookup main =
     visit lookup [ main.name ] [] main
 
 
-visit : Lookup -> List String -> List ModuleSource -> ModuleSource -> Result String (List ModuleSource)
+visit : Lookup -> List String -> List ModuleSource -> ModuleSource -> Result Refusal (List ModuleSource)
 visit lookup stack acc ms =
     let
         imported =
-            ms.file.imports
-                |> List.map (\(Node.Node _ imp) -> String.join "." (Node.value imp.moduleName))
+            Parse.importsOf ms.file
+                |> List.map .name
                 |> List.filter (\m -> not (Set.member m basisModules))
     in
     List.foldl
@@ -92,7 +93,7 @@ visit lookup stack acc ms =
                             Ok done
 
                         else if List.member name stack then
-                            Err "import:cycle"
+                            Err { reason = "import:cycle", at = Nothing, detail = Nothing }
 
                         else
                             case lookup name of
@@ -100,17 +101,32 @@ visit lookup stack acc ms =
                                     Ok done
 
                                 Just helper ->
-                                    case Elm.Parser.parseToFile helper.source of
-                                        Err _ ->
-                                            Err "parse"
-
-                                        Ok file ->
-                                            visit lookup (name :: stack) done { name = name, path = helper.path, source = helper.source, file = file }
+                                    parseModule helper.path helper.source
+                                        |> Result.andThen (\file -> visit lookup (name :: stack) done { name = name, path = helper.path, source = helper.source, file = file })
                     )
         )
         (Ok acc)
         imported
         |> Result.map (\done -> done ++ [ ms ])
+
+
+{-| A module parsed and checked by the front end (plans/eco-parser.md, E7): a parse failure is
+refused as `parse`, with `Parse.describe`'s text; a module the front end refuses, with its reason,
+at `path:row:col`.
+-}
+parseModule : String -> String -> Result Refusal Parsed
+parseModule path source =
+    case Parse.parse source of
+        Err detail ->
+            Err { reason = "parse", at = Nothing, detail = Just detail }
+
+        Ok file ->
+            case FrontEnd.check { path = path, source = source } file of
+                r :: _ ->
+                    Err { reason = r.reason, at = Just (path ++ ":" ++ Region.startText r.at), detail = Nothing }
+
+                [] ->
+                    Ok file
 
 
 refuse : String -> Outcome
@@ -192,21 +208,21 @@ kernelTooLarge =
 
 parseAndTranslate : Library -> Lookup -> { project : String, name : String, defName : String } -> String -> Directives -> Outcome
 parseAndTranslate lib lookup info source directives =
-    case Elm.Parser.parseToFile source of
-        Err _ ->
-            refuse "parse"
+    case parseModule (mainPath info) source of
+        Err refusal ->
+            Refused refusal
 
         Ok file ->
             case resolve lookup (mainSource info source file) of
-                Err reason ->
-                    refuse reason
+                Err refusal ->
+                    Refused refusal
 
                 Ok sources ->
                     case Convert.convertProgram lib directives sources of
                         ( _, p :: _ ) ->
                             Refused
                                 { reason = p.code
-                                , at = Just (String.fromInt p.at.start.row ++ ":" ++ String.fromInt p.at.start.column)
+                                , at = Just (Region.startText p.at)
                                 , detail = Nothing
                                 }
 
@@ -334,9 +350,14 @@ refersTo binder e =
             False
 
 
-mainSource : { project : String, name : String, defName : String } -> String -> File -> ModuleSource
+mainSource : { project : String, name : String, defName : String } -> String -> Parsed -> ModuleSource
 mainSource info source file =
-    { name = info.name, path = "tests/" ++ info.project ++ "/src/" ++ info.name ++ ".elm", source = source, file = file }
+    { name = info.name, path = mainPath info, source = source, file = file }
+
+
+mainPath : { project : String, name : String, defName : String } -> String
+mainPath info =
+    "tests/" ++ info.project ++ "/src/" ++ info.name ++ ".elm"
 
 
 {-| A stage of the pipeline, for the report of all refusals (step 0 of
@@ -430,14 +451,16 @@ translateAllIn lib lookup info source directives =
     else
         fromDirectives
             ++ size
-            ++ (case Elm.Parser.parseToFile source of
-                    Err _ ->
-                        [ found StParse "parse" ]
+            ++ (case parseModule (mainPath info) source of
+                    Err refusal ->
+                        [ { stage = StParse, reason = refusal.reason, at = refusal.at, detail = refusal.detail } ]
 
                     Ok file0 ->
                         case resolve lookup (mainSource info source file0) of
-                            Err reason ->
-                                [ found StConvert reason ]
+                            Err refusal ->
+                                -- as before eco's parser: a refusal while the modules are resolved
+                                -- is reported at the converter's stage
+                                [ { stage = StConvert, reason = refusal.reason, at = refusal.at, detail = refusal.detail } ]
 
                             Ok sources ->
                                 afterResolution lib directives sources
@@ -457,7 +480,7 @@ afterResolution lib directives sources =
                 (\p ->
                     { stage = StConvert
                     , reason = p.code
-                    , at = Just (String.fromInt p.at.start.row ++ ":" ++ String.fromInt p.at.start.column)
+                    , at = Just (Region.startText p.at)
                     , detail = Nothing
                     }
                 )

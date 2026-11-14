@@ -1327,8 +1327,8 @@ Every positive theorem is under `InferPrincipalFor` (D11) and names `[parse] [ha
 
 ```
 site/node_modules/.bin/elm-pages run definition/tools/src/ExtractStaticBasis.elm --lean
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
 export PATH=$HOME/.elan/bin:$PATH
 (cd definition/mechanisation/standard-elm-mech && lake build)
 (cd definition/mechanisation/standard-elm-mech && lake exe certify && lake build && lake exe certify --check)

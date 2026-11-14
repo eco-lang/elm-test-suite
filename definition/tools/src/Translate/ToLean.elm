@@ -5,11 +5,11 @@ module Translate.ToLean exposing (libraryDef, programDef, workerDef)
 printed; a coercion is inserted where the position needs another class.
 -}
 
+import Compiler.Core.Annotation as A
 import Dict
-import Elm.Syntax.Node as Node exposing (Node(..))
-import Elm.Syntax.TypeAnnotation as TA
 import Translate.Ir exposing (..)
 import Translate.Literal as Literal
+import Translate.Parse as Parse
 import Translate.Specialise exposing (CheckKind(..))
 
 
@@ -491,11 +491,11 @@ moduleFields ports sep indent m =
         ++ listOf
             (List.map
                 (\( t, a ) ->
-                    case Node.value a.annotation of
-                        TA.Record fields ->
-                            "(" ++ str t ++ ", some " ++ listOf (List.map (\(Node _ ( Node _ l, _ )) -> str l) fields) ++ ")"
+                    case Parse.recordType a.annotation of
+                        Just fields ->
+                            "(" ++ str t ++ ", some " ++ listOf (List.map (\( _, ( ( _, A.At _ l ), _ ) ) -> str l) fields) ++ ")"
 
-                        _ ->
+                        Nothing ->
                             "(" ++ str t ++ ", none)"
                 )
                 (Dict.toList m.aliases)
@@ -512,7 +512,9 @@ moduleFields ports sep indent m =
                             (\pd ->
                                 case Dict.get pd.binder ports of
                                     Just ( out, payload ) ->
-                                        "(" ++ str pd.name ++ ", "
+                                        "("
+                                            ++ str pd.name
+                                            ++ ", "
                                             ++ (if out then
                                                     ".out"
 

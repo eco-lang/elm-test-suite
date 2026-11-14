@@ -431,13 +431,16 @@ The site also carries *A Standard Definition of Elm?*, a formal definition of th
 the initial basis (`/standard/basis/Basics/modBy`), the PDF, and the Lean proofs of its mechanisation
 (`/standard/proofs`, a page per theorem, read from `definition/mechanisation/` by
 `runner/mechanisation-data.js`). The examples of the mechanisation are the tests tagged `elm-spec`,
-translated into Lean by a program, `definition/tools/src/Translate.elm` (580 of the 941 today; the
+translated into Lean by a program, `definition/tools/src/Translate.elm` (611 of the 941 today; the
 others are listed with the reason they are not, from compile-error tests to library functions the
 encoding does not include). Every such test shows on its page its Lean translation, with the Lean
 evaluator's value for each check and the theorem that proves it, or why it is not translated; a
 translation made from an older version of its test is marked out of date. Lean is built when the
 mechanisation stage runs, not in CI; CI runs the translator with `--check` and reports in the job
-summary when the committed translations are behind the tests. The derived forms of Appendix A are
+summary when the committed translations are behind the tests. The translator parses with eco's
+parser, which it vendors, and runs from the repository's root as
+`node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm`
+(the parser recurses deeply). The derived forms of Appendix A are
 generated from one table into both the book's LaTeX and the Lean encoding,
 `definition/tools/src/GenerateDerivedForms.elm`. See
 [definition/tools/README.md](definition/tools/README.md) and

@@ -27,6 +27,12 @@ export async function sha256Tree(dir: string): Promise<string> {
   return hash.digest("hex");
 }
 
+/** The sha256 of a text, in hex: the manifest's toolsSha256 hashes the hashes of the translator's
+ *  sources and of the parser it vendors (plans/eco-parser.md, E13). */
+export async function sha256Text(text: string): Promise<string> {
+  return createHash("sha256").update(text).digest("hex");
+}
+
 /** Removes a file: a Generated file the translator no longer writes. */
 export async function removeFile(path: string): Promise<null> {
   unlinkSync(path);

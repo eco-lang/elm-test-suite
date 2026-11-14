@@ -12,7 +12,7 @@ they start with `StandardElmMech/`, which is
   `String`, `Char`, `Float` (IEEE binary64, reduced by the kernel for `+`, `-`, `*`, `/`,
   comparison; the C library functions `Float.floor`, `sin`, `pow`, ... only by `native_decide`).
 - The translator is Elm, run by elm-pages from the repository root:
-  `site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm` (writes),
+  `node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm` (writes),
   `... --check` (reports whether the Generated files are up to date). Its unit tests:
   `cd definition/tools && ../../site/node_modules/.bin/elm-test --compiler ../../site/node_modules/.bin/elm`.
 
@@ -90,8 +90,8 @@ Run from the repository root, in this order. Each step's specification states th
 outputs must show.
 
 ```
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
 (cd definition/tools && ../../site/node_modules/.bin/elm-test --compiler ../../site/node_modules/.bin/elm)
 export PATH=$HOME/.elan/bin:$PATH
 (cd definition/mechanisation/standard-elm-mech && lake build && lake exe run-examples)

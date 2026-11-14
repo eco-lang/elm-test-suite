@@ -8,11 +8,13 @@ Run them from the repository's root, with the `elm-pages` the site installs:
 
 ```sh
 site/node_modules/.bin/elm-pages run definition/tools/src/GenerateDerivedForms.elm
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm            # write
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check    # compare only
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm            # write
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check    # compare only
 ```
 
-and their tests from this folder:
+The translator needs the larger stack: eco's parser, which it vendors, recurses deeply, and one
+test overflows node's default stack (plans/eco-parser.md, E12). Without the flag the run stops
+partway, silently. Run the tests from this folder:
 
 ```sh
 ../../site/node_modules/.bin/elm-test --compiler ../../site/node_modules/.bin/elm
@@ -35,7 +37,15 @@ Translates the tests of `tests/` tagged `elm-spec` into Lean, for the mechanisat
 
 - `src/Translate/Directives.elm`: a test's `-- TAGS`, `-- CHECK`, `-- CHECK-NOT`, `-- EXIT` lines,
   and the directives that keep it out;
-- `src/Translate/Convert.elm`: from elm-syntax's tree to the translator's representation
+- `src/Translate/Parse.elm`: the one entry to eco's parser, vendored in `vendor/eco-parser/` (its
+  `VENDORED.md` names the commit and every edit; plans/eco-parser.md). Every module is parsed with it;
+- `src/Translate/Fixity.elm`: operator chains, which eco keeps flat, grouped by the book's Figure
+  `fig:core-fixities`; a chain `res:core-operator-chain` forbids is refused;
+- `src/Translate/FrontEnd.elm`: the restrictions on characters, tokens and layout that the tree lets
+  the translator see and Lean does not model (`syntax:*` refusals: operator chains, operators outside
+  the figure, tuples of more than three, a unit pattern with a gap, surrogate escapes, a module
+  without a header), checked on every module before anything reads its tree;
+- `src/Translate/Convert.elm`: from eco's tree to the translator's representation
   (`src/Translate/Ir.elm`): names resolved against the program, its imports and the names the Lean
   environment binds; literals read exactly from the source text; `main`'s checks; and every reason a
   test is outside the fragment, the most important reported;
@@ -66,4 +76,5 @@ characters) and `construct:large-computation` (a test of a compiler's limits nam
 `src/Translate/Pipeline.elm`, too many steps for the Lean evaluator). Then build
 the Lean project and run `lake exe run-examples` (see the mechanisation's README).
 
-`custom-backend-task.ts` computes the sha256s for the manifest.
+`custom-backend-task.ts` computes the sha256s for the manifest; its `toolsSha256` hashes
+`src/` and `vendor/` together.

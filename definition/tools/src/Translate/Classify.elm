@@ -17,7 +17,8 @@ module Translate.Classify exposing
 sections 2 and 3). Pure: `Translate.elm` reads the files and parses them.
 
 A compile-error test gets one class, by the first rule that applies: its program does not parse
-(`parse-fail`); its rule is a restriction trusted to the parser (`lexical-accepted`); a restriction
+(`parse-fail`); the translator's front end refuses it (`syntax-refused`, `Translate.FrontEnd`, with
+the reason as its subclass); its rule is a restriction trusted to the parser (`lexical-accepted`); a restriction
 decidable on a syntax tree (`syntactic`, step 8); exhaustiveness or irredundancy (`further`, step 9);
 the fixities (`fixity-inference`, step 11); a test the override table puts among those refused
 without inference (`static-deterministic`, step 9); otherwise `inference` (step 11).
@@ -28,25 +29,26 @@ outside ME0; its `basis` is the first of those that applies.
 
 -}
 
+import Compiler.Core.Annotation as A
+import Compiler.IR.Source as Src
+import Compiler.Parse.Declaration as Decl
 import Dict exposing (Dict)
-import Elm.Syntax.Declaration exposing (Declaration(..))
-import Elm.Syntax.Exposing exposing (Exposing(..), TopLevelExpose(..))
-import Elm.Syntax.Expression exposing (Expression(..), Function, LetDeclaration(..))
-import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Import exposing (Import)
-import Elm.Syntax.Node as Node exposing (Node(..))
-import Elm.Syntax.Pattern exposing (Pattern(..))
-import Elm.Syntax.Range
-import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
 import Set exposing (Set)
 import StaticBasis.Json as SB
 import Translate.ClassifyOverrides exposing (Override)
+import Translate.Fixity as Fixity
+import Translate.Parse as Parse exposing (Function, Parsed, c1, c2, c2eol)
 
 
-{-| A module of a test's program, by its path, parsed or not.
+{-| A module of a test's program, by its path, parsed or not; and why it is refused, if it is: it
+does not parse (`file` is `Nothing`), or the translator's front end refuses it (`Translate.FrontEnd`).
 -}
 type alias ModuleParse =
-    { path : String, name : String, file : Maybe File }
+    { path : String
+    , name : String
+    , file : Maybe Parsed
+    , refusal : Maybe { reason : String, at : String, detail : Maybe String }
+    }
 
 
 type alias ErrorRecord =
@@ -200,9 +202,24 @@ classifyError ctx t =
         isIn list =
             rule |> Maybe.map (\r -> List.member r list) |> Maybe.withDefault False
 
+        syntax =
+            t.modules
+                |> List.filterMap
+                    (\m ->
+                        if m.file /= Nothing then
+                            Maybe.map .reason m.refusal
+
+                        else
+                            Nothing
+                    )
+                |> List.head
+
         ( class, subclass ) =
             if not parses then
                 ( "parse-fail", Nothing )
+
+            else if syntax /= Nothing then
+                ( "syntax-refused", syntax )
 
             else if isIn trustedRules then
                 ( "lexical-accepted", Nothing )
@@ -267,7 +284,39 @@ type alias Imp =
     { mod : String, alias_ : Maybe String, exposing_ : Maybe Exposing }
 
 
-importsOf : List SB.DefaultImport -> File -> List Imp
+{-| An exposing list as the classification reads it: `(..)`, or the names of the values and types
+it lists.
+-}
+type Exposing
+    = All
+    | Explicit (List String)
+
+
+exposingOf : Src.Exposing -> Exposing
+exposingOf ex =
+    case ex of
+        Src.Open _ _ ->
+            All
+
+        Src.Explicit (A.At _ items) ->
+            Explicit
+                (List.filterMap
+                    (\( _, it ) ->
+                        case it of
+                            Src.Lower (A.At _ x) ->
+                                Just x
+
+                            Src.Upper (A.At _ x) _ ->
+                                Just x
+
+                            Src.Operator _ _ ->
+                                Nothing
+                    )
+                    items
+                )
+
+
+importsOf : List SB.DefaultImport -> Parsed -> List Imp
 importsOf defaults file =
     List.map
         (\d ->
@@ -276,27 +325,25 @@ importsOf defaults file =
             , exposing_ =
                 case d.exposing_ of
                     Just SB.ExposingAll ->
-                        Just (All Elm.Syntax.Range.emptyRange)
+                        Just All
 
                     Just (SB.ExposingItems items) ->
                         Just
                             (Explicit
-                                (List.map
+                                (List.filterMap
                                     (\it ->
-                                        Node Elm.Syntax.Range.emptyRange
-                                            (case it of
-                                                SB.ExpValue x ->
-                                                    FunctionExpose x
+                                        case it of
+                                            SB.ExpValue x ->
+                                                Just x
 
-                                                SB.ExpOp o ->
-                                                    InfixExpose o
+                                            SB.ExpOp _ ->
+                                                Nothing
 
-                                                SB.ExpType ty ->
-                                                    TypeOrAliasExpose ty
+                                            SB.ExpType ty ->
+                                                Just ty
 
-                                                SB.ExpTypeAll ty ->
-                                                    TypeExpose { name = ty, open = Just Elm.Syntax.Range.emptyRange }
-                                            )
+                                            SB.ExpTypeAll ty ->
+                                                Just ty
                                     )
                                     items
                                 )
@@ -308,13 +355,13 @@ importsOf defaults file =
         )
         defaults
         ++ List.map
-            (\(Node _ i) ->
-                { mod = String.join "." (Node.value i.moduleName)
-                , alias_ = i.moduleAlias |> Maybe.map (Node.value >> String.join ".")
-                , exposing_ = i.exposingList |> Maybe.map Node.value
+            (\i ->
+                { mod = i.name
+                , alias_ = i.alias
+                , exposing_ = i.exposing_ |> Maybe.map exposingOf
                 }
             )
-            file.imports
+            (Parse.importsOf file)
 
 
 {-| The names an interface binds: its values, its type constructors and their constructors.
@@ -343,13 +390,13 @@ emptyRefs =
     { qualified = [], unqualified = [], binders = Set.empty }
 
 
-addRef : List String -> String -> Refs -> Refs
+addRef : String -> String -> Refs -> Refs
 addRef mn x r =
-    if List.isEmpty mn then
+    if mn == "" then
         { r | unqualified = x :: r.unqualified }
 
     else
-        { r | qualified = ( String.join "." mn, x ) :: r.qualified }
+        { r | qualified = ( mn, x ) :: r.qualified }
 
 
 bind : String -> Refs -> Refs
@@ -357,115 +404,140 @@ bind x r =
     { r | binders = Set.insert x r.binders }
 
 
-exprRefs : Node Expression -> Refs -> Refs
-exprRefs (Node _ e) r =
+exprRefs : Src.Expr -> Refs -> Refs
+exprRefs (A.At _ e) r =
     case e of
-        Application es ->
-            List.foldl exprRefs r es
+        Src.Call f a rest ->
+            List.foldl exprRefs r (f :: List.map c1 (a :: rest))
 
-        OperatorApplication _ _ a b ->
-            exprRefs b (exprRefs a r)
+        Src.Binops first rest last ->
+            -- the operands in order, as the grouped chain visits them
+            List.foldl exprRefs r (List.map Tuple.first (first :: rest) ++ [ last ])
 
-        FunctionOrValue mn x ->
+        Src.Var _ x ->
+            addRef "" x r
+
+        Src.VarQual _ mn x ->
             addRef mn x r
 
-        IfBlock a b c ->
-            exprRefs c (exprRefs b (exprRefs a r))
+        Src.If ( _, ( ( _, c ), ( _, t ) ) ) rest ( _, els ) ->
+            exprRefs els
+                (List.foldl (\( _, ( ( _, c_ ), ( _, t_ ) ) ) acc -> exprRefs t_ (exprRefs c_ acc))
+                    (exprRefs t (exprRefs c r))
+                    rest
+                )
 
-        Negation a ->
+        Src.Negate a ->
             exprRefs a r
 
-        TupledExpression es ->
-            List.foldl exprRefs r es
+        Src.Tuple ( _, a ) ( _, b ) rest ->
+            List.foldl exprRefs r (a :: b :: List.map c2 rest)
 
-        ParenthesizedExpression a ->
+        Src.Parens ( _, a ) ->
             exprRefs a r
 
-        LetExpression lb ->
-            exprRefs lb.expression
+        Src.Let defs _ body ->
+            exprRefs body
                 (List.foldl
-                    (\(Node _ d) acc ->
+                    (\( _, A.At _ d ) acc ->
                         case d of
-                            LetFunction f ->
-                                functionRefs f acc
+                            Src.Define (A.At _ name) args ( _, b ) tipe ->
+                                functionRefs { name = name, args = List.map c1 args, body = b, annotation = Maybe.map (c1 >> c2) tipe } acc
 
-                            LetDestructuring p x ->
+                            Src.Destruct p ( _, x ) ->
                                 exprRefs x (patRefs p acc)
                     )
                     r
-                    lb.declarations
+                    defs
                 )
 
-        CaseExpression cb ->
-            List.foldl (\( p, x ) acc -> exprRefs x (patRefs p acc)) (exprRefs cb.expression r) cb.cases
+        Src.Case ( _, x ) branches ->
+            List.foldl (\( ( _, p ), ( _, b ) ) acc -> exprRefs b (patRefs p acc)) (exprRefs x r) branches
 
-        LambdaExpression l ->
-            exprRefs l.expression (List.foldl patRefs r l.args)
+        Src.Lambda ( _, args ) ( _, b ) ->
+            exprRefs b (List.foldl (c1 >> patRefs) r args)
 
-        RecordExpr setters ->
-            List.foldl (\(Node _ ( _, x )) acc -> exprRefs x acc) r setters
+        Src.Record ( _, setters ) ->
+            List.foldl (\( _, ( _, ( _, x ) ) ) acc -> exprRefs x acc) r setters
 
-        ListExpr es ->
-            List.foldl exprRefs r es
+        Src.List items _ ->
+            List.foldl (c2eol >> exprRefs) r items
 
-        RecordAccess a _ ->
+        Src.Access a _ ->
             exprRefs a r
 
-        RecordUpdateExpression (Node _ x) setters ->
-            List.foldl (\(Node _ ( _, v )) acc -> exprRefs v acc) (addRef [] x r) setters
+        Src.Update ( _, A.At _ record ) ( _, ( first, rest ) ) ->
+            List.foldl (\( _, ( _, ( _, v ) ) ) acc -> exprRefs v acc)
+                (case record of
+                    Src.Var _ x ->
+                        addRef "" x r
+
+                    _ ->
+                        exprRefs (A.At A.zero record) r
+                )
+                (first :: rest)
 
         _ ->
             r
 
 
-patRefs : Node Pattern -> Refs -> Refs
-patRefs (Node _ p) r =
+patRefs : Src.Pattern -> Refs -> Refs
+patRefs (A.At _ p) r =
     case p of
-        TuplePattern ps ->
-            List.foldl patRefs r ps
+        Src.PTuple ( _, a ) ( _, b ) rest ->
+            List.foldl patRefs r (a :: b :: List.map c2 rest)
 
-        RecordPattern fs ->
-            List.foldl (\(Node _ f) acc -> bind f acc) r fs
+        Src.PRecord fields ->
+            List.foldl (\(A.At _ f) acc -> bind f acc) r (Parse.recordPatternFields fields)
 
-        UnConsPattern a b ->
+        Src.PCons ( _, a ) ( _, b ) ->
             patRefs b (patRefs a r)
 
-        ListPattern ps ->
-            List.foldl patRefs r ps
+        Src.PList ( _, ps ) ->
+            List.foldl (c2 >> patRefs) r ps
 
-        VarPattern x ->
+        Src.PVar x ->
             bind x r
 
-        NamedPattern q ps ->
-            List.foldl patRefs (addRef q.moduleName q.name r) ps
+        Src.PCtor _ k args ->
+            List.foldl (c1 >> patRefs) (addRef "" k r) args
 
-        AsPattern a (Node _ x) ->
+        Src.PCtorQual _ mn k args ->
+            List.foldl (c1 >> patRefs) (addRef mn k r) args
+
+        Src.PAlias ( _, a ) ( _, A.At _ x ) ->
             bind x (patRefs a r)
 
-        ParenthesizedPattern a ->
+        Src.PParens ( _, a ) ->
             patRefs a r
 
         _ ->
             r
 
 
-typeRefs : Node TypeAnnotation -> Refs -> Refs
-typeRefs (Node _ t) r =
+typeRefs : Src.Type -> Refs -> Refs
+typeRefs (A.At _ t) r =
     case t of
-        Typed (Node _ ( mn, x )) args ->
-            List.foldl typeRefs (addRef mn x r) args
+        Src.TType _ x args ->
+            List.foldl (c1 >> typeRefs) (addRef "" x r) args
 
-        Tupled ts ->
-            List.foldl typeRefs r ts
+        Src.TTypeQual _ mn x args ->
+            List.foldl (c1 >> typeRefs) (addRef mn x r) args
 
-        Record fs ->
-            List.foldl (\(Node _ ( _, ft )) acc -> typeRefs ft acc) r fs
+        Src.TTuple ( _, a ) ( _, b ) rest ->
+            List.foldl typeRefs r (a :: b :: List.map c2eol rest)
 
-        GenericRecord _ (Node _ fs) ->
-            List.foldl (\(Node _ ( _, ft )) acc -> typeRefs ft acc) r fs
+        Src.TRecord fields _ ->
+            List.foldl (\( _, ( _, ( _, ft ) ) ) acc -> typeRefs ft acc) r fields
 
-        FunctionTypeAnnotation a b ->
+        Src.TRecordExt _ first rest _ ->
+            List.foldl (\( _, ( _, ( _, ft ) ) ) acc -> typeRefs ft acc) r (first :: rest)
+
+        Src.TLambda ( _, a ) ( _, b ) ->
             typeRefs b (typeRefs a r)
+
+        Src.TParens ( _, a ) ->
+            typeRefs a r
 
         _ ->
             r
@@ -474,79 +546,61 @@ typeRefs (Node _ t) r =
 functionRefs : Function -> Refs -> Refs
 functionRefs f r =
     let
-        impl =
-            Node.value f.declaration
-
         withSig =
-            case f.signature of
-                Just (Node _ s) ->
-                    typeRefs s.typeAnnotation r
+            case f.annotation of
+                Just t ->
+                    typeRefs t r
 
                 Nothing ->
                     r
     in
-    exprRefs impl.expression (List.foldl patRefs (bind (Node.value impl.name) withSig) impl.arguments)
+    exprRefs f.body (List.foldl patRefs (bind f.name withSig) f.args)
 
 
-moduleRefs : File -> Refs
+moduleRefs : Parsed -> Refs
 moduleRefs file =
     List.foldl
-        (\(Node _ d) acc ->
+        (\d acc ->
             case d of
-                FunctionDeclaration f ->
-                    functionRefs f acc
+                Decl.Value _ (A.At _ (Src.Value v)) ->
+                    functionRefs
+                        { name = A.toValue (c1 v.name)
+                        , args = List.map c1 v.args
+                        , body = c1 v.body
+                        , annotation = Maybe.map (c1 >> c2) v.tipe
+                        }
+                        acc
 
-                AliasDeclaration a ->
-                    typeRefs a.typeAnnotation (bind (Node.value a.name) acc)
+                Decl.Alias _ (A.At _ (Src.Alias a)) ->
+                    typeRefs (c1 a.tipe) (bind (A.toValue (c2 a.name)) acc)
 
-                CustomTypeDeclaration ty ->
+                Decl.Union _ (A.At _ (Src.Union ( _, A.At _ name ) _ first rest)) ->
                     List.foldl
-                        (\(Node _ c) acc2 -> List.foldl typeRefs (bind (Node.value c.name) acc2) c.arguments)
-                        (bind (Node.value ty.name) acc)
-                        ty.constructors
+                        (\( _, ( A.At _ k, args ) ) acc2 -> List.foldl (c1 >> typeRefs) (bind k acc2) args)
+                        (bind name acc)
+                        (first :: rest)
 
-                PortDeclaration s ->
-                    typeRefs s.typeAnnotation (bind (Node.value s.name) acc)
-
-                Destructuring p x ->
-                    exprRefs x (patRefs p acc)
-
-                _ ->
-                    acc
+                Decl.Port _ (Src.Port _ ( _, A.At _ name ) t) ->
+                    typeRefs t (bind name acc)
         )
         emptyRefs
-        file.declarations
+        (Parse.declarations file)
 
 
 exposes : Exposing -> String -> Bool
 exposes ex x =
     case ex of
-        All _ ->
+        All ->
             True
 
-        Explicit items ->
-            List.any
-                (\(Node _ it) ->
-                    case it of
-                        FunctionExpose y ->
-                            y == x
-
-                        TypeOrAliasExpose y ->
-                            y == x
-
-                        TypeExpose et ->
-                            et.name == x
-
-                        InfixExpose _ ->
-                            False
-                )
-                items
+        Explicit names ->
+            List.member x names
 
 
 exposesExplicitly : Exposing -> String -> Bool
 exposesExplicitly ex x =
     case ex of
-        All _ ->
+        All ->
             False
 
         Explicit _ ->
@@ -555,7 +609,7 @@ exposesExplicitly ex x =
 
 {-| What one module needs: `harness`, `library:M.x`, `outside:M` (helpers are added by the caller).
 -}
-moduleNeeds : SB.Basis -> Set String -> File -> List String
+moduleNeeds : SB.Basis -> Set String -> Parsed -> List String
 moduleNeeds basis helpers file =
     let
         imps =
@@ -565,8 +619,8 @@ moduleNeeds basis helpers file =
             interfaceNames basis m /= Nothing
 
         outside =
-            file.imports
-                |> List.map (\(Node _ i) -> String.join "." (Node.value i.moduleName))
+            Parse.importsOf file
+                |> List.map .name
                 |> List.filter (\m -> not (inME0 m) && not (Set.member m helpers))
                 |> List.map (\m -> "outside:" ++ m)
 
@@ -641,7 +695,7 @@ moduleNeeds basis helpers file =
 isAll : Exposing -> Bool
 isAll ex =
     case ex of
-        All _ ->
+        All ->
             True
 
         _ ->
@@ -651,53 +705,64 @@ isAll ex =
 {-| The shape of `main` in the main module: "view" (an application spine of `text`), "program"
 (of `Platform.worker`), or "other"; and whether it is annotated.
 -}
-mainShape : File -> ( String, Bool )
+mainShape : Parsed -> ( String, Bool )
 mainShape file =
-    file.declarations
-        |> List.filterMap
-            (\(Node _ d) ->
-                case d of
-                    FunctionDeclaration f ->
-                        if Node.value (Node.value f.declaration).name == "main" then
-                            Just ( shapeOf (Node.value f.declaration).expression, f.signature /= Nothing )
-
-                        else
-                            Nothing
-
-                    _ ->
-                        Nothing
-            )
+    Parse.functions file
+        |> List.filter (\f -> f.name == "main")
+        |> List.map (\f -> ( shapeOf f.body, f.annotation /= Nothing ))
         |> List.head
         |> Maybe.withDefault ( "other", False )
 
 
-shapeOf : Node Expression -> String
-shapeOf (Node _ e) =
+shapeOf : Src.Expr -> String
+shapeOf (A.At _ e) =
     case e of
-        Application (h :: _) ->
+        Src.Call h _ _ ->
             shapeOf h
 
-        ParenthesizedExpression a ->
+        Src.Parens ( _, a ) ->
             shapeOf a
 
-        OperatorApplication "<|" _ a _ ->
-            shapeOf a
+        Src.Binops first rest last ->
+            shapeOfChain (Fixity.tree first rest last)
 
-        OperatorApplication "|>" _ _ b ->
-            shapeOf b
+        Src.Var _ x ->
+            shapeOfName "" x
 
-        FunctionOrValue mn x ->
-            if x == "text" && (mn == [] || mn == [ "Html" ]) then
-                "view"
+        Src.VarQual _ mn x ->
+            shapeOfName mn x
 
-            else if x == "worker" && (mn == [ "Platform" ] || mn == []) then
-                "program"
+        _ ->
+            "other"
+
+
+shapeOfChain : Fixity.Tree -> String
+shapeOfChain t =
+    case t of
+        Fixity.Operand x ->
+            shapeOf x
+
+        Fixity.Apply a ->
+            if a.op == "<|" then
+                shapeOfChain a.left
+
+            else if a.op == "|>" then
+                shapeOfChain a.right
 
             else
                 "other"
 
-        _ ->
-            "other"
+
+shapeOfName : String -> String -> String
+shapeOfName mn x =
+    if x == "text" && (mn == "" || mn == "Html") then
+        "view"
+
+    else if x == "worker" && (mn == "Platform" || mn == "") then
+        "program"
+
+    else
+        "other"
 
 
 classifySuccess :

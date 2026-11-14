@@ -29,7 +29,9 @@ then restructured into independent shards by name, `spec_` derived from W's chec
 15 min by `scripts/verify.sh`; see step 11's "Issues
 with the plan", items 10 to 12, for what remains); D2 (b) completed on the dynamic side,
 2026-11-13: the core library's Elm texts evaluated in the test basis `Lib.Btest`, 28 more tests
-end to end, 608 ([library-elm-texts.md](library-elm-texts.md)).**
+end to end, 608 ([library-elm-texts.md](library-elm-texts.md)); 2026-11-14: eco's parser, vendored, replaces
+elm-syntax with the translator's front end for `[parse]` ([eco-parser.md](eco-parser.md)): 625 `legal_`,
+287 refused, 611 tests end to end.**
 
 This file is the plan: what is built, in what order, under which decisions, and how
 each step is accepted. Each step has an implementation specification in
@@ -77,7 +79,8 @@ rest of the book in two parts.
   is not legal, as far as the method of step 9 or step 11 reaches.
 
 After both parts these stay outside Lean: the concrete syntax (characters, tokens, layout, the
-grammar and the resolution of operator fixity), for which the parser elm-syntax stands in; the
+grammar and the resolution of operator fixity), for which eco's parser (vendored) and the
+translator's front end stand in ([eco-parser.md](eco-parser.md)); the
 values of `Bytes`; the platform's managers (`Random`, `Time`, `Http`); libraries outside the book;
 and Appendix E, which records implementations.
 
@@ -89,7 +92,7 @@ on, by the tags in brackets.
 
 | Trusted | Until | Tag |
 |---------|-------|-----|
-| elm-syntax parses the test as Elm does, and groups its operators by Figure `fig:core-fixities` | always | `[parse]` |
+| eco's parser, vendored at commit 208a501, parses the test as Elm does. The translator's front end groups operators by `fig:core-fixities` and checks the restrictions on characters, tokens and layout ([eco-parser.md](eco-parser.md), E14; one known difference from Elm: eco rejects an integer constant that does not fit a double exactly, which no test has) | always | `[parse]` |
 | The translator's elaboration: its number specialisation, its reduced syntax, the port payload types, the order of modules, the type of `main` | retired by step 10 for the 580 tests with an end-to-end theorem (`spec_`) (except that the meaning does not depend on the order of modules, which no step proves) | `[elab]` |
 | The harness basis: `Html.text` and the core library's interfaces, which the book does not bind (decision D2) | always (an assumption about the test harness, not about Elm) | `[harness]` |
 | The derivation the inference finds for each module of the test's program is principal (`InferPrincipalFor`, decision D11), so "the principal derivation" has a referent | retired by step 11 (2026-11-13) for every test | `[principal]` |
@@ -449,8 +452,9 @@ to step 7's classification (step 11).
 
 ## Out of scope
 
-Parsing, and so the compile-error tests elm-syntax cannot parse or that are lexical; the
-restrictions about characters, tokens and layout (`res:core-escape-unicode`,
+Parsing, and so the compile-error tests eco's parser rejects or the translator's front end refuses
+(plans/eco-parser.md; until 2026-11-14, elm-syntax); the restrictions about characters, tokens and
+layout (`res:core-escape-unicode`,
 `res:core-identifier-characters`, `res:core-constant-separated`, `res:core-adjacent-items`,
 `res:core-layout-rule`, `res:core-operator-chain`, `res:core-field-selection`,
 `res:core-annotation-placement`, `res:modules-header`); the platform's managers and primitives;

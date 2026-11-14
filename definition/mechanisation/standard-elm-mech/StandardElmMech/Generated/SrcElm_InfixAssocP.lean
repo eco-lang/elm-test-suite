@@ -34,18 +34,6 @@ def s_elm_InfixLastOperandAnyExprTest : Src.SProgram := Src.canonOrder <| Src.pr
     [Src.imp "Html" none none]
     [Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "if last", .paren (Src.bin "+" (Src.i 1) (.ifte [(Src.c "True", Src.i 2)] (Src.i 3)))]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "lambda last", .paren (Src.bin "|>" (Src.i 5) (.lam [Src.pv "n"] (Src.bin "*" (Src.v "n") (Src.i 2))))])] (Src.app (Src.qv "Html" "text") [Src.str "done"]))] ]
 
-/-- tests/elm/src/InfixMixedAssocComposeTest.elm -/
-def s_elm_InfixMixedAssocComposeTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "InfixMixedAssocComposeTest" [
-  Src.mdl (Src.hdr false "InfixMixedAssocComposeTest" (.items [.var "main"]))
-    [Src.imp "Html" none none]
-    [Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "composed", .paren (Src.app (.paren (Src.bin ">>" (Src.bin "<<" (Src.v "identity") (Src.v "identity")) (Src.v "identity"))) [Src.i 1])])] (Src.app (Src.qv "Html" "text") [Src.str "done"]))] ]
-
-/-- tests/elm/src/InfixMixedAssocPipesTest.elm -/
-def s_elm_InfixMixedAssocPipesTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "InfixMixedAssocPipesTest" [
-  Src.mdl (Src.hdr false "InfixMixedAssocPipesTest" (.items [.var "main"]))
-    [Src.imp "Html" none none]
-    [Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "piped", .paren (Src.bin "<|" (Src.bin "|>" (Src.i 1) (.opVal "+")) (Src.i 2))])] (Src.app (Src.qv "Html" "text") [Src.str "done"]))] ]
-
 /-- tests/elm/src/InfixNegatedOperandTest.elm -/
 def s_elm_InfixNegatedOperandTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "InfixNegatedOperandTest" [
   Src.mdl (Src.hdr false "InfixNegatedOperandTest" (.items [.var "main"]))
@@ -251,8 +239,6 @@ def srcShard_SrcElm_InfixAssocP : List (String × Src.SProgram) :=
    ("InfixAssocRightPowTest", s_elm_InfixAssocRightPowTest),
    ("InfixIfExtendsRightTest", s_elm_InfixIfExtendsRightTest),
    ("InfixLastOperandAnyExprTest", s_elm_InfixLastOperandAnyExprTest),
-   ("InfixMixedAssocComposeTest", s_elm_InfixMixedAssocComposeTest),
-   ("InfixMixedAssocPipesTest", s_elm_InfixMixedAssocPipesTest),
    ("InfixNegatedOperandTest", s_elm_InfixNegatedOperandTest),
    ("InfixNonAssocSeparatedLegalTest", s_elm_InfixNonAssocSeparatedLegalTest),
    ("InfixPrecAddOverConsTest", s_elm_InfixPrecAddOverConsTest),

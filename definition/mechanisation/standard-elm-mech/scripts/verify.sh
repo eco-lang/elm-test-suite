@@ -81,10 +81,10 @@ step() {
   printf '%-4s %-17s %s  [%ss, max RSS %s]\n' "$status" "$name" "${line:-(no summary; see $out)}" "$secs" "$(gb "$rss")"
 }
 
-# fast checks
+# fast checks (the translator runs with a larger stack: eco's parser recurses deeply, plans/eco-parser.md E12)
 if [ -x ../../../site/node_modules/.bin/elm-pages ]; then
   step translate-check 'grep -m1 "Lean translations" "$1"; grep -q "are up to date" "$1"' -- \
-    bash -c 'cd ../../.. && site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check'
+    bash -c 'cd ../../.. && node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check'
 fi
 step no-sorry-axiom 'n=$(wc -l < "$1"); echo "$n sorry/axiom declarations in the sources"; [ "$n" -eq 0 ]' -- \
   bash -c 'grep -rnE "^[[:space:]]*(private[[:space:]]+|protected[[:space:]]+)?axiom[[:space:]]|(:=|by|=>)[[:space:]]*sorry\b|^[[:space:]]*sorry\b" --include=*.lean StandardElmMech scripts *.lean; true'

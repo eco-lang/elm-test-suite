@@ -1,5 +1,30 @@
 # Mechanisation Report
 
+> **Update, 2026-11-14 (eco's parser replaces elm-syntax, plans/eco-parser.md).** The translator
+> parses every test with eco's parser (a port of Elm's own), vendored at eco-compiler commit
+> 208a501 in `definition/tools/vendor/eco-parser/` (12,219 lines; `VENDORED.md` lists every edit).
+> Its front end groups operator chains by `fig:core-fixities` and refuses, with a `syntax:*`
+> reason, what breaks a restriction on characters, tokens and layout that the tree now shows.
+> elm-syntax 7.3.9 rejected `[-3, -2]`, so the three Container tests (ContainerCompareIntTest,
+> ContainerEqualityFloatTest, ContainerEqualityIntTest) are now written, translated, proved legal
+> and proved end to end, all by the kernel. It accepted six compile-error tests whose error it lost
+> (two mixed-associativity chains, a unit pattern with a gap, three lexical errors); they are no
+> longer written. Each of the 26 compile-error tests without a refusal theorem is now rejected by
+> eco's parser (16) or refused by the front end (10); none keeps the class `lexical-accepted`. Every
+> other test's Lean text and manifest entry are unchanged. `[parse]` now reads: eco's parser parses
+> the test as Elm does; the front end groups operators and checks the restrictions on characters,
+> tokens and layout. The translator runs with `node --stack-size=4000`. Counts
+> (`scripts/verify.sh full`, 20 min 31 s wall after a rebuild of 138 modules; largest process
+> 6.19 GB, scope peak 8.37 GB):
+> - translator: 611 of the 941 `elm-spec` tests translated, 915 source programs written (26
+>   refused: parse 16, `syntax:*` 10); 880 meet the AST-decidable restrictions, 35 do not.
+> - `legal_`: 625 (11 by `native_decide`, as before), `refuse_`: 287, 0 conditional on D11.
+> - 611 `spec_`, 609 `mean_`, 611 `ident_`.
+> - run-examples: 1,803 of 1,803 checks agree; 1,563 by the kernel, 238 by `native_decide`, in 611
+>   program theorems.
+> - compare-e2e: 611 of 611.
+> - check-axioms: 15,680 theorems, 264 using `native_decide`, no axiom problems.
+
 > **Update, 2026-11-13 (the core library's Elm texts, plans/library-elm-texts.md).** The 28 tests
 > that were refused only for a library value (group D of untranslated-tests.md, less
 > LetNumberMap2Test, whose `List.map2` is a kernel value) are translated and proved end to end:

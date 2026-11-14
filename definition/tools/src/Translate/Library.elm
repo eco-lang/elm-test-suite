@@ -24,13 +24,14 @@ constructor, which the converter writes `(::)`.
 
 -}
 
+import Compiler.Core.Annotation as A
+import Compiler.IR.Source as Src
+import Compiler.Parse.Declaration as Decl
 import Dict exposing (Dict)
-import Elm.Syntax.Declaration exposing (Declaration(..))
-import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Node as Node exposing (Node(..))
 import Set exposing (Set)
 import Translate.Classify as Classify
 import Translate.Ir exposing (Decl(..), Expr(..), Name(..), TestProgram, anyExpr)
+import Translate.Parse as Parse exposing (Parsed)
 import Translate.Types exposing (Class(..), Scheme)
 
 
@@ -83,20 +84,11 @@ value their texts name unqualified, transitively, in the order the file declares
 binds locally is taken as naming the top-level value of that name too, if there is one; that can
 only keep a declaration that is not needed.
 -}
-closure : File -> List String -> List String
+closure : Parsed -> List String -> List String
 closure file values =
     let
         functions =
-            file.declarations
-                |> List.filterMap
-                    (\(Node _ d) ->
-                        case d of
-                            FunctionDeclaration f ->
-                                Just ( Node.value (Node.value f.declaration).name, f )
-
-                            _ ->
-                                Nothing
-                    )
+            Parse.functions file |> List.map (\f -> ( f.name, f ))
 
         byName =
             Dict.fromList functions
@@ -132,27 +124,28 @@ closure file values =
 closure only (no custom type: a module's constructors are ME0's already, by the default imports)
 and without its imports of `Elm.Kernel.*`. The texts themselves are not changed.
 -}
-textSource : File -> List String -> File
+textSource : Parsed -> List String -> Parsed
 textSource file values =
     let
         keep =
             Set.fromList (closure file values)
     in
     { file
-        | declarations =
-            file.declarations
+        | decls =
+            file.decls
                 |> List.filter
-                    (\(Node _ d) ->
+                    (\d ->
                         case d of
-                            FunctionDeclaration f ->
-                                Set.member (Node.value (Node.value f.declaration).name) keep
+                            Decl.Value _ (A.At _ (Src.Value v)) ->
+                                Set.member (A.toValue (Parse.c1 v.name)) keep
 
                             _ ->
                                 False
                     )
         , imports =
             file.imports
-                |> List.filter (\(Node _ i) -> List.take 2 (Node.value i.moduleName) /= [ "Elm", "Kernel" ])
+                |> List.filter (\(Src.Import ( _, A.At _ name ) _ _) -> List.take 2 (String.split "." name) /= [ "Elm", "Kernel" ])
+        , infixes = []
     }
 
 

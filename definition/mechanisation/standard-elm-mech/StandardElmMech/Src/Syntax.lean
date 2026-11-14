@@ -1,9 +1,11 @@
 /-
   A Standard Definition of Elm? Mechanisation: the source syntax, plan step 8.
 
-  Every program elm-syntax parses, as written (Figures fig:core-grammar-* and fig:grammar-modules),
-  with operator chains as elm-syntax groups them by the fixities of Figure fig:core-fixities (the
-  `[parse]` trust), type expressions, annotations, custom types, aliases, ports, headers and
+  Every program eco's parser parses and the translator's front end does not refuse, as written
+  (Figures fig:core-grammar-* and fig:grammar-modules), with operator chains as the front end groups
+  them by the fixities of Figure fig:core-fixities (the `[parse]` trust: eco's parser, vendored at
+  commit 208a501, parses the test as Elm does; the front end groups operators by fig:core-fixities
+  and checks the restrictions on characters, tokens and layout), type expressions, annotations, custom types, aliases, ports, headers and
   imports. Constants are kept as decoded, before number specialisation: an integer by its value
   before `norm`, a float as m × 10^e as written. No source positions are kept. Sequences are lists
   (nested inductives); every function over these types is structurally recursive, so that the
@@ -22,7 +24,7 @@ inductive SLit where
   | str (s : String)
   deriving Repr, DecidableEq, Inhabited
 
-/-- Type expressions as written (Figure fig:core-grammar-types); elm-syntax drops parentheses. -/
+/-- Type expressions as written (Figure fig:core-grammar-types); the translator drops parentheses. -/
 inductive STy where
   | var (a : String)
   | con (c : LongId) (args : List STy)
@@ -49,7 +51,8 @@ inductive SPat where
   deriving Repr, Inhabited
 
 mutual
-/-- Expressions as written; operator applications as elm-syntax groups them ([parse]). -/
+/-- Expressions as written; operator applications as the translator's front end groups them by
+    fig:core-fixities ([parse]). -/
 inductive SExp where
   | lit (l : SLit)
   | var (x : LongId)

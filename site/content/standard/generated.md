@@ -2,7 +2,7 @@ Each of these theorems states that a test program, evaluated by the rules of [Ch
 
 ## 1. The translator turns each test into Lean
 
-The translator, `definition/tools/src/Translate.elm`, reads every test tagged elm-spec. It parses the program with elm-syntax, resolves its names, works out the type of every number constant by the book's number specialisation, and prints each module of the program as a Lean syntax tree of the bare Core (the derived forms of Appendix A applied by `Derived.lean`), with its exposing list, imports, custom types and aliases. Each `-- CHECK: label: value` line of the test becomes a check on what the program logs. A test outside what the encoding covers is not translated, and its page says why. For example, the test ClosureCapture01Test
+The translator, `definition/tools/src/Translate.elm`, reads every test tagged elm-spec. It parses the program with eco's parser, a port of Elm's own vendored into the translator, groups each operator chain by the book's fixities (Figure fig:core-fixities) and refuses a program that breaks a restriction on characters, tokens and layout, resolves its names, works out the type of every number constant by the book's number specialisation, and prints each module of the program as a Lean syntax tree of the bare Core (the derived forms of Appendix A applied by `Derived.lean`), with its exposing list, imports, custom types and aliases. Each `-- CHECK: label: value` line of the test becomes a check on what the program logs. A test outside what the encoding covers is not translated, and its page says why. For example, the test ClosureCapture01Test
 
 ```
 unwrapLater w =

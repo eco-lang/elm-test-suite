@@ -3,8 +3,9 @@
   "staticBasisSha256": "a9156bbcd15700784eaa929c28e12310d1d9b46178e87378db0effe06663687a",
   "counts": {
     "compileError": {
-      "parse-fail": 18,
-      "lexical-accepted": 8,
+      "parse-fail": 16,
+      "syntax-refused": 10,
+      "lexical-accepted": 0,
       "syntactic": 32,
       "further": 9,
       "fixity-inference": 1,
@@ -13,11 +14,11 @@
     },
     "compileSuccess": {
       "B0": 39,
-      "harness": 540,
+      "harness": 543,
       "library": 34,
       "helper": 9,
       "outside": 3,
-      "parse-fail": 3
+      "parse-fail": 0
     }
   },
   "compileError": [
@@ -365,17 +366,17 @@
       "modules": [
         {
           "path": "tests/elm/src/BadTupleATupleOfFourTest.elm",
-          "parse": "fail"
+          "parse": "ok"
         }
       ],
-      "parse": "fail",
+      "parse": "ok",
       "rules": [
         "fig:core-grammar-expressions",
         "r:s-atexp-tuple"
       ],
       "rule": "fig:core-grammar-expressions",
-      "class": "parse-fail",
-      "subclass": null,
+      "class": "syntax-refused",
+      "subclass": "syntax:tuple-arity",
       "step": null,
       "trust": [],
       "title": "BAD TUPLE",
@@ -420,8 +421,8 @@
         "fig:core-escapes"
       ],
       "rule": "res:core-escape-unicode",
-      "class": "lexical-accepted",
-      "subclass": null,
+      "class": "syntax-refused",
+      "subclass": "syntax:core-escape-unicode",
       "step": null,
       "trust": [],
       "title": null,
@@ -2090,8 +2091,8 @@
         "fig:core-fixities"
       ],
       "rule": "res:core-operator-chain",
-      "class": "lexical-accepted",
-      "subclass": null,
+      "class": "syntax-refused",
+      "subclass": "syntax:core-operator-chain",
       "step": null,
       "trust": [],
       "title": null,
@@ -2112,8 +2113,8 @@
         "fig:core-fixities"
       ],
       "rule": "res:core-operator-chain",
-      "class": "lexical-accepted",
-      "subclass": null,
+      "class": "syntax-refused",
+      "subclass": "syntax:core-operator-chain",
       "step": null,
       "trust": [],
       "title": null,
@@ -2188,17 +2189,17 @@
       "modules": [
         {
           "path": "tests/elm/src/InfixNonAssocCompareTest.elm",
-          "parse": "fail"
+          "parse": "ok"
         }
       ],
-      "parse": "fail",
+      "parse": "ok",
       "rules": [
         "res:core-operator-chain",
         "fig:core-fixities"
       ],
       "rule": "res:core-operator-chain",
-      "class": "parse-fail",
-      "subclass": null,
+      "class": "syntax-refused",
+      "subclass": "syntax:core-operator-chain",
       "step": null,
       "trust": [],
       "title": null,
@@ -2210,17 +2211,17 @@
       "modules": [
         {
           "path": "tests/elm/src/InfixNonAssocEqTwiceTest.elm",
-          "parse": "fail"
+          "parse": "ok"
         }
       ],
-      "parse": "fail",
+      "parse": "ok",
       "rules": [
         "res:core-operator-chain",
         "fig:core-fixities"
       ],
       "rule": "res:core-operator-chain",
-      "class": "parse-fail",
-      "subclass": null,
+      "class": "syntax-refused",
+      "subclass": "syntax:core-operator-chain",
       "step": null,
       "trust": [],
       "title": null,
@@ -2330,16 +2331,16 @@
         },
         {
           "path": "tests/elm/src/ModuleHeaderMissingHelper.elm",
-          "parse": "fail"
+          "parse": "ok"
         }
       ],
-      "parse": "fail",
+      "parse": "ok",
       "rules": [
         "res:modules-header"
       ],
       "rule": "res:modules-header",
-      "class": "parse-fail",
-      "subclass": null,
+      "class": "syntax-refused",
+      "subclass": "syntax:modules-header",
       "step": null,
       "trust": [],
       "title": null,
@@ -2465,15 +2466,15 @@
       "modules": [
         {
           "path": "tests/elm/src/ParseErrorNumberBadHexDigitTest.elm",
-          "parse": "ok"
+          "parse": "fail"
         }
       ],
-      "parse": "ok",
+      "parse": "fail",
       "rules": [
         "res:core-constant-separated"
       ],
       "rule": "res:core-constant-separated",
-      "class": "lexical-accepted",
+      "class": "parse-fail",
       "subclass": null,
       "step": null,
       "trust": [],
@@ -2486,15 +2487,15 @@
       "modules": [
         {
           "path": "tests/elm/src/ParseErrorNumberFractionThenLetterTest.elm",
-          "parse": "ok"
+          "parse": "fail"
         }
       ],
-      "parse": "ok",
+      "parse": "fail",
       "rules": [
         "res:core-constant-separated"
       ],
       "rule": "res:core-constant-separated",
-      "class": "lexical-accepted",
+      "class": "parse-fail",
       "subclass": null,
       "step": null,
       "trust": [],
@@ -2507,16 +2508,16 @@
       "modules": [
         {
           "path": "tests/elm/src/ParseErrorStringEscapeTooFewDigitsTest.elm",
-          "parse": "ok"
+          "parse": "fail"
         }
       ],
-      "parse": "ok",
+      "parse": "fail",
       "rules": [
         "res:core-escape-unicode",
         "fig:core-escapes"
       ],
       "rule": "res:core-escape-unicode",
-      "class": "lexical-accepted",
+      "class": "parse-fail",
       "subclass": null,
       "step": null,
       "trust": [],
@@ -2718,8 +2719,8 @@
         "res:core-adjacent-items"
       ],
       "rule": "res:core-adjacent-items",
-      "class": "lexical-accepted",
-      "subclass": null,
+      "class": "syntax-refused",
+      "subclass": "syntax:core-adjacent-items",
       "step": null,
       "trust": [],
       "title": null,
@@ -2769,8 +2770,8 @@
         "fig:core-escapes"
       ],
       "rule": "res:core-escape-unicode",
-      "class": "lexical-accepted",
-      "subclass": null,
+      "class": "syntax-refused",
+      "subclass": "syntax:core-escape-unicode",
       "step": null,
       "trust": [],
       "title": null,
@@ -7587,16 +7588,16 @@
       "modules": [
         {
           "path": "tests/elm/src/UnknownOperatorAnUnknownOperatorTest.elm",
-          "parse": "fail"
+          "parse": "ok"
         }
       ],
-      "parse": "fail",
+      "parse": "ok",
       "rules": [
         "r:s-atexp-op"
       ],
       "rule": "r:s-atexp-op",
-      "class": "parse-fail",
-      "subclass": null,
+      "class": "syntax-refused",
+      "subclass": "syntax:operator",
       "step": null,
       "trust": [],
       "title": "UNKNOWN OPERATOR",
@@ -16369,12 +16370,14 @@
       "modules": [
         {
           "path": "tests/elm-core/src/ContainerCompareIntTest.elm",
-          "parse": "fail"
+          "parse": "ok"
         }
       ],
-      "parse": "fail",
-      "basis": "parse-fail",
-      "needs": [],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
       "main": "other",
       "mainAnnotated": false
     },
@@ -16418,12 +16421,14 @@
       "modules": [
         {
           "path": "tests/elm-core/src/ContainerEqualityFloatTest.elm",
-          "parse": "fail"
+          "parse": "ok"
         }
       ],
-      "parse": "fail",
-      "basis": "parse-fail",
-      "needs": [],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
       "main": "other",
       "mainAnnotated": false
     },
@@ -16433,12 +16438,14 @@
       "modules": [
         {
           "path": "tests/elm-core/src/ContainerEqualityIntTest.elm",
-          "parse": "fail"
+          "parse": "ok"
         }
       ],
-      "parse": "fail",
-      "basis": "parse-fail",
-      "needs": [],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
       "main": "other",
       "mainAnnotated": false
     },

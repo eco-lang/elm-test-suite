@@ -184,19 +184,19 @@ staticWords status =
             "expected to compile, written in Lean, but uses a module outside the test basis (Dict, Bitwise, Bytes), so it has no legality theorem"
 
         "success:parse" ->
-            "expected to compile, but not parsed by elm-syntax 7.3.9, so it is not in Lean"
+            "expected to compile, but not parsed by eco's parser, so it is not in Lean"
+
+        "success:syntax" ->
+            "expected to compile, but the translator's front end refuses it, so it is not in Lean"
 
         "refuse" ->
             "expected to be rejected: proved not legal"
 
         "error:parse" ->
-            "expected to be rejected, and elm-syntax 7.3.9 rejects it too (the error is a parse error), so it is not in Lean"
+            "expected to be rejected, and eco's parser rejects it too"
 
-        "error:surrogate" ->
-            "expected to be rejected for a surrogate escape, which the source syntax cannot hold, so it is not in Lean"
-
-        "error:lexical" ->
-            "expected to be rejected, but elm-syntax 7.3.9 accepts it and loses the error, so it has no refusal theorem"
+        "error:syntax" ->
+            "expected to be rejected, and the translator's front end refuses it: it breaks a restriction on characters, tokens and layout, which Lean does not model"
 
         "success:other" ->
             "expected to compile: no legality theorem"
@@ -223,7 +223,10 @@ reasonWords reason =
         "uses effects the encoding does not include"
 
     else if reason == "parse" then
-        "is not parsed by elm-syntax 7.3.9"
+        "is not parsed by eco's parser"
+
+    else if String.startsWith "syntax:" reason then
+        "is refused by the translator's front end: it breaks a restriction on characters, tokens and layout (" ++ after "syntax:" ++ ")"
 
     else if reason == "type" then
         "the translator's inference does not type it"

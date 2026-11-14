@@ -21,7 +21,7 @@ written inside the workspace, and the workspace has no `output/` folders.
 | `definition/mechanisation/` | 06 | The encoding, its README and example run, `mechanisation-report.md` |
 | `definition/audit/` | 07 | `audit-report.md`, `drafts/` |
 | `definition/typeset/` | 08 | `build-report.md`, `editions/` (PDFs of earlier editions), `build/` (rebuilt every time) |
-| `definition/tools/` | 03 and 06 (maintained, not a stage's output) | The Elm tools: `GenerateDerivedForms.elm` (Appendix A's tables and `Derived.lean`'s derived forms, from one table) and `Translate.elm` (the tests into Lean); run from the repository's root with `site/node_modules/.bin/elm-pages run definition/tools/src/<Script>.elm` |
+| `definition/tools/` | 03 and 06 (maintained, not a stage's output) | The Elm tools: `GenerateDerivedForms.elm` (Appendix A's tables and `Derived.lean`'s derived forms, from one table) and `Translate.elm` (the tests into Lean); run from the repository's root with `site/node_modules/.bin/elm-pages run definition/tools/src/<Script>.elm`, `Translate.elm` with `node --stack-size=4000` in front (the eco parser it vendors recurses deeply) |
 | `definition/` | 08 | `<slug>-<stamp>.pdf`, the PDF of the current edition |
 
 `definition/tex/` is the single copy of the book's text. The website

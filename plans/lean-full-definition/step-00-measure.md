@@ -43,7 +43,7 @@ None.
 `definition/tools/src/Translate.elm` gains a keyword option beside `--check`:
 
 ```
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm \
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm \
     --report-all-refusals definition/mechanisation/refusal-report.json
 ```
 
@@ -220,8 +220,8 @@ None.
 Run from the repository root:
 
 ```
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --report-all-refusals definition/mechanisation/refusal-report.json
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --report-all-refusals definition/mechanisation/refusal-report.json
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
 (cd definition/tools && ../../site/node_modules/.bin/elm-test --compiler ../../site/node_modules/.bin/elm)
 node runner/part1-inventory.js definition/mechanisation/refusal-report.json definition/mechanisation/refusal-annotations.json
 export PATH=$HOME/.elan/bin:$PATH

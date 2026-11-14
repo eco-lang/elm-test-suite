@@ -66,8 +66,8 @@ run from the repository root:
 ```
 site/node_modules/.bin/elm-pages run definition/tools/src/ExtractStaticBasis.elm
 site/node_modules/.bin/elm-pages run definition/tools/src/ExtractStaticBasis.elm --check
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --classify-static
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --classify-static
 ```
 
 `--classify-static` writes nothing: it prints the summary of section 3.3 and the list of tests per
@@ -573,9 +573,9 @@ Run from the repository root, in this order:
 ```
 site/node_modules/.bin/elm-pages run definition/tools/src/ExtractStaticBasis.elm
 site/node_modules/.bin/elm-pages run definition/tools/src/ExtractStaticBasis.elm --check
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
-site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --classify-static
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check
+node --stack-size=4000 site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --classify-static
 (cd definition/tools && ../../site/node_modules/.bin/elm-test --compiler ../../site/node_modules/.bin/elm)
 ```
 

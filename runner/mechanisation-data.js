@@ -188,9 +188,11 @@ function leanStaticStatus(t) {
     if (st && st.legal) return 'legal';
     if (st && st.refuse) return 'refuse';
     const side = error ? 'error' : 'success';
-    if (t.src && t.src.status === 'refused') return side + ':' + (t.src.reason === 'source:surrogate' ? 'surrogate' : 'parse');
+    // a program eco's parser rejects (`parse`), or the translator's front end refuses (`syntax:*`,
+    // a restriction on characters, tokens and layout, plans/eco-parser.md), is not written
+    if (t.src && t.src.status === 'refused') return side + ':' + (t.src.reason.startsWith('syntax:') ? 'syntax' : 'parse');
     const c = classification.get(key) || {};
-    if (error && c.class === 'lexical-accepted') return 'error:lexical';
+    if (error && c.class === 'syntax-refused') return 'error:syntax';
     if (!error && c.basis === 'outside') return 'success:outside';
     return side + ':other';
 }
@@ -327,7 +329,7 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
         }
         return [...by.entries()].map(([reason, l]) => ({ reason, count: l.length, tests: l }));
     };
-    const staticOrder = ['legal', 'success:outside', 'success:parse', 'success:other', 'refuse', 'error:parse', 'error:surrogate', 'error:lexical', 'error:other'];
+    const staticOrder = ['legal', 'success:outside', 'success:parse', 'success:syntax', 'success:other', 'refuse', 'error:parse', 'error:syntax', 'error:other'];
     const statics = group(tests, leanStaticStatus).sort((a, b) => staticOrder.indexOf(a.reason) - staticOrder.indexOf(b.reason));
     const successes = tests.filter((t) => !isError(t));
     const coverage = group(successes, (t) => (t.status === 'translated' ? 'translated' : reasonClass(t.reason)))

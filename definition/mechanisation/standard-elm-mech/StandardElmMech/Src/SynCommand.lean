@@ -12,8 +12,9 @@
   * for a text whose main module declares no `main` (a module tested alone), the same with
     `Src.ModulesSynOKSet`, every restriction but res:program-main.
 
-  Each by `decide +kernel`. Every theorem trusts the parser ([parse]): the source syntax is
-  elm-syntax's tree.
+  Each by `decide +kernel`. Every theorem trusts the parser ([parse]): the source syntax is the tree
+  of eco's parser (vendored at commit 208a501), its operator chains grouped by the translator's
+  front end by fig:core-fixities.
 -/
 import Lean
 import StandardElmMech.Src.Restrictions

@@ -202,12 +202,6 @@ def s_elm_SingleCtorPairUnitIntTest : Src.SProgram := Src.canonOrder <| Src.prog
     [Src.imp "Html" none (some (.items [.var "text"]))]
     [.custom "WrapUnit" [] [("WrapUnit", [.unit])], .custom "WrapInt" [] [("WrapInt", [Src.tc "Int" []])], Src.val "unwrapUnit" (some (.fn (Src.tc "WrapUnit" []) (.unit))) [Src.pv "w"] (.caseE (Src.v "w") [(Src.pc "WrapUnit" [Src.pv "u"], Src.v "u")]), Src.val "unwrapInt" (some (.fn (Src.tc "WrapInt" []) (Src.tc "Int" []))) [Src.pv "w"] (.caseE (Src.v "w") [(Src.pc "WrapInt" [Src.pv "n"], Src.v "n")]), Src.val "matchUnit" (some (.fn (.unit) (Src.tc "String" []))) [Src.pv "u"] (.letE [.fn "w" none [] (Src.app (Src.c "WrapUnit") [Src.v "u"])] (.caseE (Src.v "w") [(Src.pc "WrapUnit" [.wild], Src.str "got_unit")])), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "unwrap_unit", .paren (Src.app (Src.v "unwrapUnit") [.paren (Src.app (Src.c "WrapUnit") [.unit])])]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "unwrap_int", .paren (Src.app (Src.v "unwrapInt") [.paren (Src.app (Src.c "WrapInt") [Src.i 77])])]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "match_unit", .paren (Src.app (Src.v "matchUnit") [.unit])])] (Src.app (Src.v "text") [Src.str "done"]))] ]
 
-/-- tests/elm/src/StandardA1UnitPatternGapTest.elm -/
-def s_elm_StandardA1UnitPatternGapTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA1UnitPatternGapTest" [
-  Src.mdl (Src.hdr false "StandardA1UnitPatternGapTest" (.all))
-    [Src.imp "Html" none none]
-    [Src.val "f" (some (.fn (.unit) (Src.tc "Int" []))) [.unit] (Src.i 1), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "f ()", .paren (Src.app (Src.v "f") [.unit])])] (Src.app (Src.qv "Html" "text") [Src.str "done"]))] ]
-
 /-- tests/elm/src/StandardA56PrefixAndOrTest.elm -/
 def s_elm_StandardA56PrefixAndOrTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA56PrefixAndOrTest" [
   Src.mdl (Src.hdr false "StandardA56PrefixAndOrTest" (.items [.var "main"]))
@@ -285,7 +279,6 @@ def srcShard_SrcElm_RecordNarrow06 : List (String × Src.SProgram) :=
    ("SingleCtorPairStringBoolTest", s_elm_SingleCtorPairStringBoolTest),
    ("SingleCtorPairStringIntTest", s_elm_SingleCtorPairStringIntTest),
    ("SingleCtorPairUnitIntTest", s_elm_SingleCtorPairUnitIntTest),
-   ("StandardA1UnitPatternGapTest", s_elm_StandardA1UnitPatternGapTest),
    ("StandardA56PrefixAndOrTest", s_elm_StandardA56PrefixAndOrTest),
    ("StandardA72AbsentFlagsTest", s_elm_StandardA72AbsentFlagsTest),
    ("StandardA82MainInImportedModuleTest", s_elm_StandardA82MainInImportedModuleTest),

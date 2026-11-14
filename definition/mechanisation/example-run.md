@@ -1,6 +1,6 @@
 # Standard Elm mechanisation: example run
 
-Programs: 608 (38 workers), in 34 shards; checks: 1748.
+Programs: 611 (38 workers), in 34 shards; checks: 1803.
 
 ## ElmCore
 
@@ -145,6 +145,25 @@ ElmCore: 19 programs, 71 checks, 71 agree.
 | ContainerCompareCharTest | pairGeOp | True | True | agree | t_elm_core_ContainerCompareCharTest |
 | ContainerCompareCharTest | tripleLtOp | True | True | agree | t_elm_core_ContainerCompareCharTest |
 | ContainerCompareCharTest | listGtOp | True | True | agree | t_elm_core_ContainerCompareCharTest |
+| ContainerCompareIntTest | pairLt | LT | LT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | pairGt | GT | GT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | pairEq | EQ | EQ | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | pairSecondDecides | LT | LT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | pairNegFirst | LT | LT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | pairNegSecond | GT | GT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | tripleFirstDecides | LT | LT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | tripleThirdDecides | GT | GT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | tripleEq | EQ | EQ | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | tripleNegMix | LT | LT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | listLt | LT | LT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | listShorterIsLess | LT | LT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | listEq | EQ | EQ | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | listEmptyIsLeast | LT | LT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | listNegVsPos | LT | LT | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | pairLtOp | True | True | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | pairGeOp | True | True | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | tripleLtOp | True | True | agree | t_elm_core_ContainerCompareIntTest |
+| ContainerCompareIntTest | listGtOp | True | True | agree | t_elm_core_ContainerCompareIntTest |
 | ContainerEqualityCharTest | pairEqual | True | True | agree | t_elm_core_ContainerEqualityCharTest |
 | ContainerEqualityCharTest | pairFirstDiff | False | False | agree | t_elm_core_ContainerEqualityCharTest |
 | ContainerEqualityCharTest | pairSecondDiff | False | False | agree | t_elm_core_ContainerEqualityCharTest |
@@ -175,6 +194,42 @@ ElmCore: 19 programs, 71 checks, 71 agree.
 | ContainerEqualityCustomFloatTest | triNaNMid | False | False | agree | t_elm_core_ContainerEqualityCustomFloatTest |
 | ContainerEqualityCustomFloatTest | triMixedInf | True | True | agree | t_elm_core_ContainerEqualityCustomFloatTest |
 | ContainerEqualityCustomFloatTest | mixedCtorDiff | False | False | agree | t_elm_core_ContainerEqualityCustomFloatTest |
+| ContainerEqualityFloatTest | pairEqual | True | True | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | pairFirstDiff | False | False | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | pairSecondDiff | False | False | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | pairNegZero | True | True | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | pairNaNFirst | False | False | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | pairNaNSecond | False | False | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | pairPosInf | True | True | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | pairInfSignDiff | False | False | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | tripleEqual | True | True | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | tripleMidDiff | False | False | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | tripleAllNegZero | True | True | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | tripleNaNMid | False | False | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | tripleMixedInf | True | True | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | listEqual | True | True | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | listLenDiff | False | False | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | listEmpty | True | True | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | listNegZero | True | True | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | listNaN | False | False | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | listInfPair | True | True | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityFloatTest | listInfSignDiff | False | False | agree | t_elm_core_ContainerEqualityFloatTest |
+| ContainerEqualityIntTest | pairEqual | True | True | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | pairFirstDiff | False | False | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | pairSecondDiff | False | False | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | pairNegatives | True | True | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | pairSignDiff | False | False | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | pairZero | True | True | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | tripleEqual | True | True | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | tripleMidDiff | False | False | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | tripleSignMix | True | True | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | tripleMinMax | True | True | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | listEqual | True | True | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | listLenDiff | False | False | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | listPrefixExtra | False | False | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | listEmpty | True | True | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | listNegatives | True | True | agree | t_elm_core_ContainerEqualityIntTest |
+| ContainerEqualityIntTest | listSignMix | True | True | agree | t_elm_core_ContainerEqualityIntTest |
 | ContainerEqualityRecordFloatTest | recEqual | True | True | agree | t_elm_core_ContainerEqualityRecordFloatTest |
 | ContainerEqualityRecordFloatTest | recXDiff | False | False | agree | t_elm_core_ContainerEqualityRecordFloatTest |
 | ContainerEqualityRecordFloatTest | recYDiff | False | False | agree | t_elm_core_ContainerEqualityRecordFloatTest |
@@ -213,7 +268,7 @@ ElmCore: 19 programs, 71 checks, 71 agree.
 | CoreIssue1115NanEqualsLiteralZeroTest | 0 == nan | False | False | agree | t_elm_core_CoreIssue1115NanEqualsLiteralZeroTest |
 | CoreIssue1115NanEqualsLiteralZeroTest | nan == zero | False | False | agree | t_elm_core_CoreIssue1115NanEqualsLiteralZeroTest |
 
-ElmCore_CompareI: 19 programs, 128 checks, 128 agree.
+ElmCore_CompareI: 22 programs, 183 checks, 183 agree.
 
 ## ElmCore_CoreIssue115
 
@@ -1988,4 +2043,4 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 
 Worker01: 38 programs, 123 checks, 123 agree.
 
-Total: 1748 checks, 1748 agree, 0 diverge (0 known); 1508 checks by decide +kernel, 238 by native_decide, in 608 program theorems.
+Total: 1803 checks, 1803 agree, 0 diverge (0 known); 1563 checks by decide +kernel, 238 by native_decide, in 611 program theorems.

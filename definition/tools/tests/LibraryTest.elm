@@ -4,12 +4,12 @@ module LibraryTest exposing (suite)
 module's texts, the library modules it writes, and test programs that name library values.
 -}
 
-import Elm.Parser
 import Expect exposing (Expectation)
 import Test exposing (Test, describe, test)
 import Translate.Directives as Directives
 import Translate.Library as Library exposing (Library)
 import Translate.LibraryTexts as LibraryTexts
+import Translate.Parse as Parse
 import Translate.Pipeline as Pipeline exposing (Outcome(..))
 
 
@@ -182,7 +182,7 @@ suite =
         [ describe "closure"
             [ test "map needs foldr, cons, and through them foldl and reverse, in the file's order" <|
                 \_ ->
-                    case Elm.Parser.parseToFile listText of
+                    case Parse.parse listText of
                         Ok file ->
                             Expect.equal [ "cons", "map", "foldl", "foldr", "reverse" ] (Library.closure file [ "map" ])
 
@@ -190,7 +190,7 @@ suite =
                             Expect.fail "does not parse"
             , test "a value whose text names no other is alone" <|
                 \_ ->
-                    case Elm.Parser.parseToFile listText of
+                    case Parse.parse listText of
                         Ok file ->
                             Expect.equal [ "head" ] (Library.closure file [ "head" ])
 

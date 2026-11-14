@@ -272,6 +272,29 @@ theorem ident_elm_core_ContainerCompareCharTest :
   Stat.ident_of_wCheck wcheck_elm_core_ContainerCompareCharTest
 
 
+/-- tests/elm-core/src/ContainerCompareIntTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_core_ContainerCompareIntTest : Stat.wCheck Stat.Btest s_elm_core_ContainerCompareIntTest (some g_elm_core_ContainerCompareIntTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm-core/src/ContainerCompareIntTest.elm [parse] [harness] [params] -/
+theorem legal_elm_core_ContainerCompareIntTest : Stat.LegalProgram Stat.Btest s_elm_core_ContainerCompareIntTest :=
+  Stat.legal_of_W wcheck_elm_core_ContainerCompareIntTest
+
+/-- tests/elm-core/src/ContainerCompareIntTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_core_ContainerCompareIntTest : Stat.endToEndW Stat.Btest s_elm_core_ContainerCompareIntTest = .ok g_elm_core_ContainerCompareIntTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_core_ContainerCompareIntTest
+
+/-- tests/elm-core/src/ContainerCompareIntTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_core_ContainerCompareIntTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_ContainerCompareIntTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_core_ContainerCompareIntTest (Stat.value_of_viewChecks t_elm_core_ContainerCompareIntTest)
+
+/-- tests/elm-core/src/ContainerCompareIntTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_core_ContainerCompareIntTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_ContainerCompareIntTest) r → r = g_elm_core_ContainerCompareIntTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_core_ContainerCompareIntTest
+
+
 /-- tests/elm-core/src/ContainerEqualityCharTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
 theorem wcheck_elm_core_ContainerEqualityCharTest : Stat.wCheck Stat.Btest s_elm_core_ContainerEqualityCharTest (some g_elm_core_ContainerEqualityCharTest.reduced) = true :=
   Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
@@ -316,6 +339,52 @@ theorem mean_elm_core_ContainerEqualityCustomFloatTest :
 theorem ident_elm_core_ContainerEqualityCustomFloatTest :
     ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_ContainerEqualityCustomFloatTest) r → r = g_elm_core_ContainerEqualityCustomFloatTest.reduced :=
   Stat.ident_of_wCheck wcheck_elm_core_ContainerEqualityCustomFloatTest
+
+
+/-- tests/elm-core/src/ContainerEqualityFloatTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_core_ContainerEqualityFloatTest : Stat.wCheck Stat.Btest s_elm_core_ContainerEqualityFloatTest (some g_elm_core_ContainerEqualityFloatTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm-core/src/ContainerEqualityFloatTest.elm [parse] [harness] [params] -/
+theorem legal_elm_core_ContainerEqualityFloatTest : Stat.LegalProgram Stat.Btest s_elm_core_ContainerEqualityFloatTest :=
+  Stat.legal_of_W wcheck_elm_core_ContainerEqualityFloatTest
+
+/-- tests/elm-core/src/ContainerEqualityFloatTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_core_ContainerEqualityFloatTest : Stat.endToEndW Stat.Btest s_elm_core_ContainerEqualityFloatTest = .ok g_elm_core_ContainerEqualityFloatTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_core_ContainerEqualityFloatTest
+
+/-- tests/elm-core/src/ContainerEqualityFloatTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_core_ContainerEqualityFloatTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_ContainerEqualityFloatTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_core_ContainerEqualityFloatTest (Stat.value_of_viewChecks t_elm_core_ContainerEqualityFloatTest)
+
+/-- tests/elm-core/src/ContainerEqualityFloatTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_core_ContainerEqualityFloatTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_ContainerEqualityFloatTest) r → r = g_elm_core_ContainerEqualityFloatTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_core_ContainerEqualityFloatTest
+
+
+/-- tests/elm-core/src/ContainerEqualityIntTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_core_ContainerEqualityIntTest : Stat.wCheck Stat.Btest s_elm_core_ContainerEqualityIntTest (some g_elm_core_ContainerEqualityIntTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm-core/src/ContainerEqualityIntTest.elm [parse] [harness] [params] -/
+theorem legal_elm_core_ContainerEqualityIntTest : Stat.LegalProgram Stat.Btest s_elm_core_ContainerEqualityIntTest :=
+  Stat.legal_of_W wcheck_elm_core_ContainerEqualityIntTest
+
+/-- tests/elm-core/src/ContainerEqualityIntTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_core_ContainerEqualityIntTest : Stat.endToEndW Stat.Btest s_elm_core_ContainerEqualityIntTest = .ok g_elm_core_ContainerEqualityIntTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_core_ContainerEqualityIntTest
+
+/-- tests/elm-core/src/ContainerEqualityIntTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_core_ContainerEqualityIntTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_core_ContainerEqualityIntTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_core_ContainerEqualityIntTest (Stat.value_of_viewChecks t_elm_core_ContainerEqualityIntTest)
+
+/-- tests/elm-core/src/ContainerEqualityIntTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_core_ContainerEqualityIntTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_core_ContainerEqualityIntTest) r → r = g_elm_core_ContainerEqualityIntTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_core_ContainerEqualityIntTest
 
 
 /-- tests/elm-core/src/ContainerEqualityRecordFloatTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/

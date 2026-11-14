@@ -1,23 +1,20 @@
 module Translate.Source exposing (Problem, annotations, program)
 
 {-| The source syntax of a program in Lean (plans/lean-full-definition/step-08-source-syntax.md,
-"Translator changes"): the elm-syntax tree mapped directly, with no inference and no
-specialisation, so that compile-error tests are written too. Integer and float constants are read
-from the source text (elm-syntax holds them as JavaScript numbers); a character Lean cannot hold (a
-lone surrogate) and the forms outside the book's grammar are refused with a reason.
+"Translator changes"): eco's tree mapped directly, operator chains grouped by the book's fixities
+(`Translate.Fixity`), with no inference and no specialisation, so that compile-error tests are
+written too. Integer and float constants are read from the source text (eco holds them as
+JavaScript numbers beside their text). The front end (`Translate.FrontEnd`) has already refused the
+forms outside the book's grammar and the escapes Lean cannot hold.
 -}
 
-import Elm.Syntax.Declaration exposing (Declaration(..))
-import Elm.Syntax.Exposing exposing (Exposing(..), TopLevelExpose(..))
-import Elm.Syntax.Expression exposing (Expression(..), Function, LetDeclaration(..))
-import Elm.Syntax.File exposing (File)
-import Elm.Syntax.Import
-import Elm.Syntax.Module as M
-import Elm.Syntax.Node as Node exposing (Node(..))
-import Elm.Syntax.Pattern exposing (Pattern(..))
-import Elm.Syntax.Range exposing (Range)
-import Elm.Syntax.TypeAnnotation exposing (TypeAnnotation(..))
+import Compiler.Core.Annotation as A
+import Compiler.IR.Source as Src
+import Compiler.Parse.Declaration as Decl
+import Translate.Fixity as Fixity
 import Translate.Literal as Literal
+import Translate.Parse as Parse exposing (Parsed, c1, c2, c2eol)
+import Translate.Region as Region exposing (Region)
 
 
 type alias Problem =
@@ -32,7 +29,7 @@ type alias R a =
     Result Problem a
 
 
-fail : Ctx -> Range -> String -> R a
+fail : Ctx -> Region -> String -> R a
 fail ctx range reason =
     Err { reason = reason, at = ctx.path ++ ":" ++ String.fromInt range.start.row ++ ":" ++ String.fromInt range.start.column }
 
@@ -57,20 +54,10 @@ str =
     Literal.leanString
 
 
-isSurrogate : Char -> Bool
-isSurrogate c =
-    let
-        n =
-            Char.toCode c
-    in
-    -- a lone surrogate reaches Elm's Char.toCode as NaN, which no comparison holds of
-    not (n >= 0 && n <= 0x0010FFFF) || (n >= 0xD800 && n <= 0xDFFF)
-
-
 {-| The Lean text of a program: its modules (helpers first, the test last), wrapped in
 `Src.canonOrder`.
 -}
-program : { project : String, name : String, defName : String } -> List { path : String, source : String, file : File } -> R String
+program : { project : String, name : String, defName : String } -> List { path : String, source : String, file : Parsed } -> R String
 program info modules =
     modules
         |> List.map (\m -> moduleText { path = m.path, source = m.source } m.file)
@@ -91,95 +78,84 @@ program info modules =
             )
 
 
-moduleText : Ctx -> File -> R String
+moduleText : Ctx -> Parsed -> R String
 moduleText ctx file =
-    let
-        header =
-            case Node.value file.moduleDefinition of
-                M.NormalModule d ->
-                    Ok ( False, d.moduleName, d.exposingList )
+    case file.infixes of
+        (A.At r _) :: _ ->
+            fail ctx (Region.fromA r) "source:infix-declaration"
 
-                M.PortModule d ->
-                    Ok ( True, d.moduleName, d.exposingList )
-
-                M.EffectModule _ ->
-                    fail ctx (Node.range file.moduleDefinition) "source:effect-module"
-    in
-    header
-        |> Result.andThen
-            (\( isPort, Node _ name, Node _ ex ) ->
-                Result.map2
-                    (\imps decls ->
-                        "Src.mdl (Src.hdr "
-                            ++ (if isPort then
-                                    "true"
-
-                                else
-                                    "false"
-                               )
-                            ++ " "
-                            ++ str (String.join "." name)
-                            ++ " "
-                            ++ paren (exposingText ex)
-                            ++ ")\n    "
-                            ++ list imps
-                            ++ "\n    "
-                            ++ list decls
-                    )
-                    (combine (List.map (importText ctx) file.imports))
-                    (combine (List.map (declText ctx) file.declarations))
-            )
+        [] ->
+            moduleBody ctx file
 
 
-exposingText : Exposing -> String
+moduleBody : Ctx -> Parsed -> R String
+moduleBody ctx file =
+    Result.map2
+        (\imps decls ->
+            "Src.mdl (Src.hdr "
+                ++ (if Parse.isPortModule file then
+                        "true"
+
+                    else
+                        "false"
+                   )
+                ++ " "
+                ++ str (Parse.moduleName file |> Maybe.withDefault "Main")
+                ++ " "
+                ++ paren (exposingText (Parse.exposing_ file))
+                ++ ")\n    "
+                ++ list imps
+                ++ "\n    "
+                ++ list decls
+        )
+        (combine (List.map importText (Parse.importsOf file)))
+        (combine (List.map (declText ctx) (Parse.declarations file)))
+
+
+exposingText : Src.Exposing -> String
 exposingText ex =
     case ex of
-        All _ ->
+        Src.Open _ _ ->
             ".all"
 
-        Explicit items ->
+        Src.Explicit (A.At _ items) ->
             ".items "
                 ++ list
                     (List.map
-                        (\(Node _ it) ->
+                        (\( _, it ) ->
                             case it of
-                                InfixExpose o ->
+                                Src.Operator _ o ->
                                     ".op " ++ str o
 
-                                FunctionExpose x ->
+                                Src.Lower (A.At _ x) ->
                                     ".var " ++ str x
 
-                                TypeOrAliasExpose c ->
+                                Src.Upper (A.At _ c) ( _, Src.Private ) ->
                                     ".ty " ++ str c
 
-                                TypeExpose et ->
-                                    case et.open of
-                                        Just _ ->
-                                            ".tyAll " ++ str et.name
-
-                                        Nothing ->
-                                            ".ty " ++ str et.name
+                                Src.Upper (A.At _ c) ( _, Src.Public _ ) ->
+                                    ".tyAll " ++ str c
                         )
                         items
                     )
 
 
-importText : Ctx -> Node Elm.Syntax.Import.Import -> R String
-importText _ (Node _ i) =
+importText : Parse.Import -> R String
+importText i =
     Ok
         ("Src.imp "
-            ++ str (String.join "." (Node.value i.moduleName))
+            ++ str i.name
             ++ " "
-            ++ (case i.moduleAlias of
-                    Just (Node _ a) ->
-                        paren ("some " ++ str (String.join "." a))
+            ++ (case i.alias of
+                    Just a ->
+                        paren ("some " ++ str a)
 
                     Nothing ->
                         "none"
                )
             ++ " "
-            ++ (case i.exposingList of
-                    Just (Node _ ex) ->
+            ++ (case i.exposing_ of
+                    Just ex ->
                         paren ("some " ++ paren (exposingText ex))
 
                     Nothing ->
@@ -188,102 +164,92 @@ importText _ (Node _ i) =
         )
 
 
-declText : Ctx -> Node Declaration -> R String
-declText ctx (Node range d) =
+declText : Ctx -> Decl.Decl -> R String
+declText ctx d =
     case d of
-        FunctionDeclaration f ->
-            functionText ctx f |> Result.map (\r -> "Src.val " ++ str r.name ++ " " ++ r.ann ++ " " ++ r.params ++ " " ++ paren r.body)
+        Decl.Value _ (A.At _ (Src.Value v)) ->
+            functionText ctx
+                { name = A.toValue (c1 v.name)
+                , args = List.map c1 v.args
+                , body = c1 v.body
+                , annotation = Maybe.map (c1 >> c2) v.tipe
+                }
+                |> Result.map (\r -> "Src.val " ++ str r.name ++ " " ++ r.ann ++ " " ++ r.params ++ " " ++ paren r.body)
 
-        AliasDeclaration a ->
-            tyText ctx a.typeAnnotation
-                |> Result.map (\t -> ".alias " ++ str (Node.value a.name) ++ " " ++ list (List.map (Node.value >> str) a.generics) ++ " " ++ paren t)
+        Decl.Alias _ (A.At _ (Src.Alias a)) ->
+            tyText ctx (c1 a.tipe)
+                |> Result.map (\t -> ".alias " ++ str (A.toValue (c2 a.name)) ++ " " ++ list (List.map (c1 >> A.toValue >> str) a.args) ++ " " ++ paren t)
 
-        CustomTypeDeclaration ty ->
-            ty.constructors
+        Decl.Union _ (A.At _ (Src.Union ( _, A.At _ name ) params first rest)) ->
+            (first :: rest)
                 |> List.map
-                    (\(Node _ c) ->
-                        combine (List.map (tyText ctx) c.arguments)
-                            |> Result.map (\args -> paren (str (Node.value c.name) ++ ", " ++ list args))
+                    (\( _, ( A.At _ k, args ) ) ->
+                        combine (List.map (c1 >> tyText ctx) args)
+                            |> Result.map (\xs -> paren (str k ++ ", " ++ list xs))
                     )
                 |> combine
-                |> Result.map (\cs -> ".custom " ++ str (Node.value ty.name) ++ " " ++ list (List.map (Node.value >> str) ty.generics) ++ " " ++ list cs)
+                |> Result.map (\cs -> ".custom " ++ str name ++ " " ++ list (List.map (c1 >> A.toValue >> str) params) ++ " " ++ list cs)
 
-        PortDeclaration s ->
-            tyText ctx s.typeAnnotation |> Result.map (\t -> ".port " ++ str (Node.value s.name) ++ " " ++ paren t)
-
-        InfixDeclaration _ ->
-            fail ctx range "source:infix-declaration"
-
-        Destructuring p e ->
-            Result.map2 (\pt et -> ".value (.pat " ++ paren pt ++ " " ++ paren et ++ ")") (patText ctx p) (expText ctx e)
+        Decl.Port _ (Src.Port _ ( _, A.At _ name ) t) ->
+            tyText ctx t |> Result.map (\x -> ".port " ++ str name ++ " " ++ paren x)
 
 
 {-| A function binding: its name, annotation, parameters and body.
 -}
-functionText : Ctx -> Function -> R { name : String, ann : String, params : String, body : String }
+functionText : Ctx -> { name : String, args : List Src.Pattern, body : Src.Expr, annotation : Maybe Src.Type } -> R { name : String, ann : String, params : String, body : String }
 functionText ctx f =
     let
-        impl =
-            Node.value f.declaration
-
         ann =
-            case f.signature of
-                Just (Node _ s) ->
-                    tyText ctx s.typeAnnotation |> Result.map (\t -> paren ("some " ++ paren t))
+            case f.annotation of
+                Just t ->
+                    tyText ctx t |> Result.map (\x -> paren ("some " ++ paren x))
 
                 Nothing ->
                     Ok "none"
     in
-    Result.map3 (\a ps e -> { name = Node.value impl.name, ann = a, params = list ps, body = e })
+    Result.map3 (\a ps e -> { name = f.name, ann = a, params = list ps, body = e })
         ann
-        (combine (List.map (patText ctx) impl.arguments))
-        (expText ctx impl.expression)
+        (combine (List.map (patText ctx) f.args))
+        (expText ctx f.body)
 
 
-tyText : Ctx -> Node TypeAnnotation -> R String
-tyText ctx (Node range t) =
+tyText : Ctx -> Src.Type -> R String
+tyText ctx (A.At _ t) =
     case t of
-        GenericType a ->
+        Src.TVar a ->
             Ok ("Src.tv " ++ str a)
 
-        Typed (Node _ ( mn, name )) args ->
-            combine (List.map (tyText ctx) args)
-                |> Result.map
-                    (\as_ ->
-                        if List.isEmpty mn then
-                            "Src.tc " ++ str name ++ " " ++ list as_
+        Src.TType _ name args ->
+            combine (List.map (c1 >> tyText ctx) args)
+                |> Result.map (\as_ -> "Src.tc " ++ str name ++ " " ++ list as_)
 
-                        else
-                            "Src.tq " ++ str (String.join "." mn) ++ " " ++ str name ++ " " ++ list as_
-                    )
+        Src.TTypeQual _ mn name args ->
+            combine (List.map (c1 >> tyText ctx) args)
+                |> Result.map (\as_ -> "Src.tq " ++ str mn ++ " " ++ str name ++ " " ++ list as_)
 
-        Unit ->
+        Src.TUnit ->
             Ok ".unit"
 
-        Tupled [ one ] ->
-            tyText ctx one
+        Src.TParens ( _, inner ) ->
+            tyText ctx inner
 
-        Tupled ts ->
-            if List.length ts == 2 || List.length ts == 3 then
-                combine (List.map (tyText ctx) ts) |> Result.map (\xs -> ".tuple " ++ list xs)
+        Src.TTuple ( _, a ) ( _, b ) rest ->
+            combine (List.map (tyText ctx) (a :: b :: List.map c2eol rest)) |> Result.map (\xs -> ".tuple " ++ list xs)
 
-            else
-                fail ctx range "source:tuple-arity"
-
-        Record fs ->
+        Src.TRecord fs _ ->
             fieldsText ctx fs |> Result.map (\xs -> ".record " ++ xs)
 
-        GenericRecord (Node _ r) (Node _ fs) ->
-            fieldsText ctx fs |> Result.map (\xs -> ".ext " ++ str r ++ " " ++ xs)
+        Src.TRecordExt ( _, A.At _ r ) first rest _ ->
+            fieldsText ctx (first :: rest) |> Result.map (\xs -> ".ext " ++ str r ++ " " ++ xs)
 
-        FunctionTypeAnnotation a b ->
+        Src.TLambda ( _, a ) ( _, b ) ->
             Result.map2 (\x y -> ".fn " ++ paren x ++ " " ++ paren y) (tyText ctx a) (tyText ctx b)
 
 
-fieldsText : Ctx -> List (Node ( Node String, Node TypeAnnotation )) -> R String
+fieldsText : Ctx -> List (Src.C2 ( Src.C1 (A.Located String), Src.C1 Src.Type )) -> R String
 fieldsText ctx fs =
     fs
-        |> List.map (\(Node _ ( Node _ l, t )) -> tyText ctx t |> Result.map (\x -> paren (str l ++ ", " ++ x)))
+        |> List.map (\( _, ( ( _, A.At _ l ), ( _, t ) ) ) -> tyText ctx t |> Result.map (\x -> paren (str l ++ ", " ++ x)))
         |> combine
         |> Result.map list
 
@@ -292,16 +258,16 @@ fieldsText ctx fs =
 and a type expression of the source syntax (the library values of the test basis, plan step 9).
 A value without an annotation is an error.
 -}
-annotations : { path : String, source : String } -> File -> List String -> R String
+annotations : { path : String, source : String } -> Parsed -> List String -> R String
 annotations ctx file names =
     let
         sigs =
-            file.declarations
+            Parse.declarations file
                 |> List.filterMap
-                    (\(Node _ d) ->
+                    (\d ->
                         case d of
-                            FunctionDeclaration f ->
-                                f.signature |> Maybe.map (\(Node _ sig) -> ( Node.value sig.name, sig.typeAnnotation ))
+                            Decl.Value _ (A.At _ (Src.Value v)) ->
+                                v.tipe |> Maybe.map (\t -> ( A.toValue (c1 v.name), c2 (c1 t) ))
 
                             _ ->
                                 Nothing
@@ -323,7 +289,7 @@ annotations ctx file names =
 
 {-| An integer constant from its text: decimal or hexadecimal, exactly.
 -}
-intText : Ctx -> Range -> R String
+intText : Ctx -> Region -> R String
 intText ctx range =
     let
         text =
@@ -339,7 +305,7 @@ intText ctx range =
         Ok (Literal.normaliseDecimal text)
 
 
-floatText : Ctx -> Range -> R String
+floatText : Ctx -> Region -> R String
 floatText ctx range =
     case Literal.floatOf (Literal.textAt ctx.source range |> String.trim) of
         Just f ->
@@ -349,226 +315,200 @@ floatText ctx range =
             fail ctx range "source:float"
 
 
-charText : Ctx -> Range -> Char -> R String
-charText ctx range c =
-    if isSurrogate c then
-        fail ctx range "source:surrogate"
-
-    else
-        Ok (Literal.leanChar c)
-
-
-stringText : Ctx -> Range -> String -> R String
-stringText ctx range s =
-    if List.any isSurrogate (String.toList s) then
-        fail ctx range "source:surrogate"
-
-    else
-        Ok (str s)
-
-
-patText : Ctx -> Node Pattern -> R String
-patText ctx (Node range p) =
+patText : Ctx -> Src.Pattern -> R String
+patText ctx (A.At region p) =
+    let
+        range =
+            Region.fromA region
+    in
     case p of
-        AllPattern ->
+        Src.PAnything _ ->
             Ok ".wild"
 
-        UnitPattern ->
+        Src.PUnit _ ->
             Ok ".unit"
 
-        CharPattern c ->
-            charText ctx range c |> Result.map (\x -> ".lit (.char " ++ x ++ ")")
+        Src.PChr text ->
+            Ok (".lit (.char " ++ Literal.leanChar (Parse.charValue text) ++ ")")
 
-        StringPattern s ->
-            stringText ctx range s |> Result.map (\x -> ".lit (.str " ++ x ++ ")")
+        Src.PStr text _ ->
+            Ok (".lit (.str " ++ str (Parse.stringValue text) ++ ")")
 
-        IntPattern _ ->
+        Src.PInt _ _ ->
             intText ctx range |> Result.map (\n -> ".lit (.int " ++ n ++ ")")
 
-        HexPattern _ ->
-            intText ctx range |> Result.map (\n -> ".lit (.int " ++ n ++ ")")
+        Src.PTuple ( _, a ) ( _, b ) rest ->
+            combine (List.map (patText ctx) (a :: b :: List.map c2 rest)) |> Result.map (\xs -> ".tuple " ++ list xs)
 
-        FloatPattern _ ->
-            floatText ctx range |> Result.map (\x -> ".lit (.float " ++ x ++ ")")
+        Src.PRecord fields ->
+            Ok (".record " ++ list (List.map (A.toValue >> str) (Parse.recordPatternFields fields)))
 
-        TuplePattern ps ->
-            if List.length ps == 2 || List.length ps == 3 then
-                combine (List.map (patText ctx) ps) |> Result.map (\xs -> ".tuple " ++ list xs)
-
-            else
-                fail ctx range "source:tuple-arity"
-
-        RecordPattern fs ->
-            Ok (".record " ++ list (List.map (Node.value >> str) fs))
-
-        UnConsPattern a b ->
+        Src.PCons ( _, a ) ( _, b ) ->
             Result.map2 (\x y -> ".cons " ++ paren x ++ " " ++ paren y) (patText ctx a) (patText ctx b)
 
-        ListPattern ps ->
-            combine (List.map (patText ctx) ps) |> Result.map (\xs -> ".list " ++ list xs)
+        Src.PList ( _, ps ) ->
+            combine (List.map (c2 >> patText ctx) ps) |> Result.map (\xs -> ".list " ++ list xs)
 
-        VarPattern x ->
+        Src.PVar x ->
             Ok ("Src.pv " ++ str x)
 
-        NamedPattern q args ->
-            combine (List.map (patText ctx) args)
-                |> Result.map
-                    (\xs ->
-                        if List.isEmpty q.moduleName then
-                            "Src.pc " ++ str q.name ++ " " ++ list xs
+        Src.PCtor _ k args ->
+            combine (List.map (c1 >> patText ctx) args)
+                |> Result.map (\xs -> "Src.pc " ++ str k ++ " " ++ list xs)
 
-                        else
-                            "Src.pqc " ++ str (String.join "." q.moduleName) ++ " " ++ str q.name ++ " " ++ list xs
-                    )
+        Src.PCtorQual _ q k args ->
+            combine (List.map (c1 >> patText ctx) args)
+                |> Result.map (\xs -> "Src.pqc " ++ str q ++ " " ++ str k ++ " " ++ list xs)
 
-        AsPattern a (Node _ x) ->
+        Src.PAlias ( _, a ) ( _, A.At _ x ) ->
             patText ctx a |> Result.map (\y -> ".as " ++ paren y ++ " " ++ str x)
 
-        ParenthesizedPattern a ->
+        Src.PParens ( _, a ) ->
             patText ctx a |> Result.map (\y -> ".paren " ++ paren y)
 
 
-expText : Ctx -> Node Expression -> R String
-expText ctx (Node range e) =
+expText : Ctx -> Src.Expr -> R String
+expText ctx (A.At region e) =
     let
         sub =
             expText ctx
+
+        range =
+            Region.fromA region
     in
     case e of
-        UnitExpr ->
+        Src.Unit ->
             Ok ".unit"
 
-        Application (f :: args) ->
-            if List.isEmpty args then
-                sub f
+        Src.Call f a rest ->
+            Result.map2 (\x ys -> "Src.app " ++ paren x ++ " " ++ list ys) (sub f) (combine (List.map (c1 >> sub) (a :: rest)))
 
-            else
-                Result.map2 (\x ys -> "Src.app " ++ paren x ++ " " ++ list ys) (sub f) (combine (List.map sub args))
+        Src.Binops first rest last ->
+            chainText ctx (Fixity.tree first rest last)
 
-        Application [] ->
-            fail ctx range "source:empty-application"
+        Src.Var _ x ->
+            Ok (varText "" x)
 
-        OperatorApplication o _ l r ->
-            Result.map2 (\x y -> "Src.bin " ++ str o ++ " " ++ paren x ++ " " ++ paren y) (sub l) (sub r)
+        Src.VarQual _ mn x ->
+            Ok (varText mn x)
 
-        FunctionOrValue mn x ->
-            let
-                upper =
-                    String.left 1 x /= String.toLower (String.left 1 x)
-            in
-            Ok
-                (case ( List.isEmpty mn, upper ) of
-                    ( True, True ) ->
-                        "Src.c " ++ str x
-
-                    ( True, False ) ->
-                        "Src.v " ++ str x
-
-                    ( False, True ) ->
-                        "Src.qc " ++ str (String.join "." mn) ++ " " ++ str x
-
-                    ( False, False ) ->
-                        "Src.qv " ++ str (String.join "." mn) ++ " " ++ str x
+        Src.If ( _, ( ( _, c ), ( _, t ) ) ) rest ( _, els ) ->
+            Result.map2 (\as_ x -> ".ifte " ++ list as_ ++ " " ++ paren x)
+                (combine
+                    (List.map (\( c_, t_ ) -> Result.map2 (\x y -> paren (x ++ ", " ++ y)) (sub c_) (sub t_))
+                        (( c, t ) :: List.map (\( _, ( ( _, c_ ), ( _, t_ ) ) ) -> ( c_, t_ )) rest)
+                    )
                 )
+                (sub els)
 
-        IfBlock c t f ->
-            ifChain ctx [ ( c, t ) ] f
-
-        PrefixOperator o ->
+        Src.Op o ->
             Ok (".opVal " ++ str o)
 
-        Operator o ->
-            Ok (".opVal " ++ str o)
-
-        Integer _ ->
+        Src.Int _ _ ->
             intText ctx range |> Result.map (\n -> "Src.i " ++ n)
 
-        Hex _ ->
-            intText ctx range |> Result.map (\n -> "Src.i " ++ n)
-
-        Floatable _ ->
+        Src.Float _ _ ->
             floatText ctx range |> Result.map (\x -> "Src.fl " ++ x)
 
-        Negation a ->
+        Src.Negate a ->
             sub a |> Result.map (\x -> ".neg " ++ paren x)
 
-        Literal s ->
-            stringText ctx range s |> Result.map (\x -> "Src.str " ++ x)
+        Src.Str text _ ->
+            Ok ("Src.str " ++ str (Parse.stringValue text))
 
-        CharLiteral c ->
-            charText ctx range c |> Result.map (\x -> "Src.ch " ++ x)
+        Src.Chr text ->
+            Ok ("Src.ch " ++ Literal.leanChar (Parse.charValue text))
 
-        TupledExpression es ->
-            if List.length es == 2 || List.length es == 3 then
-                combine (List.map sub es) |> Result.map (\xs -> ".tuple " ++ list xs)
+        Src.Tuple ( _, a ) ( _, b ) rest ->
+            combine (List.map sub (a :: b :: List.map c2 rest)) |> Result.map (\xs -> ".tuple " ++ list xs)
 
-            else
-                fail ctx range "source:tuple-arity"
-
-        ParenthesizedExpression a ->
+        Src.Parens ( _, a ) ->
             sub a |> Result.map (\x -> ".paren " ++ paren x)
 
-        LetExpression lb ->
+        Src.Let defs _ body ->
             Result.map2 (\ds b -> ".letE " ++ list ds ++ " " ++ paren b)
                 (combine
                     (List.map
-                        (\(Node _ d) ->
+                        (\( _, A.At _ d ) ->
                             case d of
-                                LetFunction f ->
-                                    functionText ctx f |> Result.map (\r -> ".fn " ++ str r.name ++ " " ++ r.ann ++ " " ++ r.params ++ " " ++ paren r.body)
+                                Src.Define (A.At _ name) args ( _, b ) tipe ->
+                                    functionText ctx { name = name, args = List.map c1 args, body = b, annotation = Maybe.map (c1 >> c2) tipe }
+                                        |> Result.map (\r -> ".fn " ++ str r.name ++ " " ++ r.ann ++ " " ++ r.params ++ " " ++ paren r.body)
 
-                                LetDestructuring p x ->
+                                Src.Destruct p ( _, x ) ->
                                     Result.map2 (\pt xt -> ".pat " ++ paren pt ++ " " ++ paren xt) (patText ctx p) (sub x)
                         )
-                        lb.declarations
+                        defs
                     )
                 )
-                (sub lb.expression)
+                (sub body)
 
-        CaseExpression cb ->
-            Result.map2 (\x rs -> ".caseE " ++ paren x ++ " " ++ list rs)
-                (sub cb.expression)
-                (combine (List.map (\( p, x ) -> Result.map2 (\pt xt -> paren (pt ++ ", " ++ xt)) (patText ctx p) (sub x)) cb.cases))
+        Src.Case ( _, x ) branches ->
+            Result.map2 (\xt rs -> ".caseE " ++ paren xt ++ " " ++ list rs)
+                (sub x)
+                (combine (List.map (\( ( _, p ), ( _, b ) ) -> Result.map2 (\pt bt -> paren (pt ++ ", " ++ bt)) (patText ctx p) (sub b)) branches))
 
-        LambdaExpression l ->
-            Result.map2 (\ps b -> ".lam " ++ list ps ++ " " ++ paren b) (combine (List.map (patText ctx) l.args)) (sub l.expression)
+        Src.Lambda ( _, args ) ( _, b ) ->
+            Result.map2 (\ps bt -> ".lam " ++ list ps ++ " " ++ paren bt) (combine (List.map (c1 >> patText ctx) args)) (sub b)
 
-        RecordExpr setters ->
-            setterText ctx setters |> Result.map (\fs -> ".record " ++ fs)
+        Src.Record ( _, setters ) ->
+            setterText ctx (List.map c2eol setters) |> Result.map (\fs -> ".record " ++ fs)
 
-        ListExpr es ->
-            combine (List.map sub es) |> Result.map (\xs -> ".list " ++ list xs)
+        Src.List items _ ->
+            combine (List.map (c2eol >> sub) items) |> Result.map (\xs -> ".list " ++ list xs)
 
-        RecordAccess a (Node _ l) ->
+        Src.Access a (A.At _ l) ->
             sub a |> Result.map (\x -> ".access " ++ paren x ++ " " ++ str l)
 
-        RecordAccessFunction l ->
-            Ok (".accessor " ++ str (String.dropLeft 1 l))
+        Src.Accessor l ->
+            Ok (".accessor " ++ str l)
 
-        RecordUpdateExpression (Node _ x) setters ->
-            setterText ctx setters |> Result.map (\fs -> ".update " ++ str x ++ " " ++ fs)
+        Src.Update ( _, A.At _ record ) ( _, ( first, rest ) ) ->
+            case record of
+                Src.Var _ x ->
+                    setterText ctx (List.map c2eol (first :: rest)) |> Result.map (\fs -> ".update " ++ str x ++ " " ++ fs)
 
-        GLSLExpression _ ->
-            fail ctx range "source:glsl"
+                _ ->
+                    fail ctx range "source:record-update"
 
 
-setterText : Ctx -> List (Node ( Node String, Node Expression )) -> R String
+{-| A variable or constructor `mn.x` as written (`mn` "" when unqualified).
+-}
+varText : String -> String -> String
+varText mn x =
+    let
+        upper =
+            String.left 1 x /= String.toLower (String.left 1 x)
+    in
+    case ( mn == "", upper ) of
+        ( True, True ) ->
+            "Src.c " ++ str x
+
+        ( True, False ) ->
+            "Src.v " ++ str x
+
+        ( False, True ) ->
+            "Src.qc " ++ str mn ++ " " ++ str x
+
+        ( False, False ) ->
+            "Src.qv " ++ str mn ++ " " ++ str x
+
+
+{-| An operator chain, grouped by the book's fixities.
+-}
+chainText : Ctx -> Fixity.Tree -> R String
+chainText ctx t =
+    case t of
+        Fixity.Operand x ->
+            expText ctx x
+
+        Fixity.Apply a ->
+            Result.map2 (\x y -> "Src.bin " ++ str a.op ++ " " ++ paren x ++ " " ++ paren y) (chainText ctx a.left) (chainText ctx a.right)
+
+
+setterText : Ctx -> List ( Src.C1 (A.Located String), Src.C1 Src.Expr ) -> R String
 setterText ctx setters =
     setters
-        |> List.map (\(Node _ ( Node _ l, x )) -> expText ctx x |> Result.map (\y -> paren (str l ++ ", " ++ y)))
+        |> List.map (\( ( _, A.At _ l ), ( _, x ) ) -> expText ctx x |> Result.map (\y -> paren (str l ++ ", " ++ y)))
         |> combine
         |> Result.map list
-
-
-{-| The maximal chain of unparenthesised `if`s in else-branches.
--}
-ifChain : Ctx -> List ( Node Expression, Node Expression ) -> Node Expression -> R String
-ifChain ctx arms els =
-    case Node.value els of
-        IfBlock c t f ->
-            ifChain ctx (arms ++ [ ( c, t ) ]) f
-
-        _ ->
-            Result.map2 (\as_ e -> ".ifte " ++ list as_ ++ " " ++ paren e)
-                (combine (List.map (\( c, t ) -> Result.map2 (\x y -> paren (x ++ ", " ++ y)) (expText ctx c) (expText ctx t)) arms))
-                (expText ctx els)
