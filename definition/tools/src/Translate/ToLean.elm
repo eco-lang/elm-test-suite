@@ -1,4 +1,4 @@
-module Translate.ToLean exposing (programDef, workerDef)
+module Translate.ToLean exposing (libraryDef, programDef, workerDef)
 
 {-| Prints a specialised program as a Lean `TestProgram` in the helper notation of `Derived.lean`
 (plans/elm-to-lean-translator.md, B.9). Every printer returns the text and the class of what it
@@ -253,7 +253,7 @@ varName name =
             "qv " ++ str m ++ " " ++ str x
 
 
-{-| An operator of OT_dyn: `^@Float` is `^` at Float, marked by number specialisation.
+{-| An operator of OT\_dyn: `^@Float` is `^` at Float, marked by number specialisation.
 -}
 leanOp : String -> String
 leanOp op =
@@ -359,10 +359,10 @@ kindName k =
 
 
 {-| The Lean definition of a test program, `def <defName> : TestProgram := { ... }`, with a doc comment
-naming its source.
+naming its source; `library` is the core library values it names (plans/library-elm-texts.md).
 -}
-programDef : { defName : String, name : String, project : String } -> TestProgram -> List CheckKind -> Dict.Dict Int ( Bool, Payload ) -> Bool -> String
-programDef info program kinds ports native =
+programDef : { defName : String, name : String, project : String } -> TestProgram -> List CheckKind -> Dict.Dict Int ( Bool, Payload ) -> Bool -> List String -> String
+programDef info program kinds ports native library =
     let
         indent =
             "\n    "
@@ -386,7 +386,18 @@ programDef info program kinds ports native =
         ++ str info.name
         ++ ", source := "
         ++ str ("tests/" ++ info.project ++ "/src")
-        ++ (if native then ", native := true" else "")
+        ++ (if native then
+                ", native := true"
+
+            else
+                ""
+           )
+        ++ (if List.isEmpty library then
+                ""
+
+            else
+                ",\n  library := " ++ listOf (List.map str library)
+           )
         ++ (case main of
                 Just m ->
                     moduleFields ports "\n  " indent m
@@ -421,7 +432,31 @@ programDef info program kinds ports native =
                 kinds
             )
         ++ " ]"
-        ++ (if program.meaning then "" else ",\n  meaning := false")
+        ++ (if program.meaning then
+                ""
+
+            else
+                ",\n  meaning := false"
+           )
+        ++ " }"
+
+
+{-| The Lean definition of a library module (plans/library-elm-texts.md, step 1),
+`def <defName> : ModSrc := { ... }`, with a doc comment naming its file and its values.
+-}
+libraryDef : String -> ModuleIr -> String
+libraryDef defName m =
+    "/-- "
+        ++ m.path
+        ++ ": "
+        ++ String.join ", " (List.concatMap (declBinders >> List.map Tuple.first) m.defs)
+        ++ ". -/\ndef "
+        ++ defName
+        ++ " : ModSrc := {\n  name := "
+        ++ str m.name
+        ++ ", path := "
+        ++ str m.path
+        ++ moduleFields Dict.empty "\n  " "\n    " m
         ++ " }"
 
 
@@ -477,7 +512,16 @@ moduleFields ports sep indent m =
                             (\pd ->
                                 case Dict.get pd.binder ports of
                                     Just ( out, payload ) ->
-                                        "(" ++ str pd.name ++ ", " ++ (if out then ".out" else ".inn") ++ ", " ++ payloadLean payload ++ ")"
+                                        "(" ++ str pd.name ++ ", "
+                                            ++ (if out then
+                                                    ".out"
+
+                                                else
+                                                    ".inn"
+                                               )
+                                            ++ ", "
+                                            ++ payloadLean payload
+                                            ++ ")"
 
                                     Nothing ->
                                         "(" ++ str pd.name ++ ", .out, .unit)"
@@ -606,7 +650,9 @@ are null, A72) and its host; the checks are filled in by `#worker_theorems`.
 -}
 workerDef : { defName : String, name : String, project : String } -> Payload -> String -> Maybe ( String, String ) -> List String -> String
 workerDef info flagsType flags host checkNots =
-    "/-- The worker test of " ++ info.name ++ ". -/\ndef w"
+    "/-- The worker test of "
+        ++ info.name
+        ++ ". -/\ndef w"
         ++ String.dropLeft 1 info.defName
         ++ " : Prog.WorkerTest := {\n  prog := "
         ++ info.defName

@@ -11,25 +11,35 @@ open StandardElm.D
     statement about the log of its evaluation (`ViewChecks`), or `NoMeaning`. -/
 #mod_program_theorems
   g_elm_LetNestedTest
+  g_elm_LetNumberAndThenTest
   g_elm_LetNumberApplyToTest
+  g_elm_LetNumberAsPatternTest
+  g_elm_LetNumberBoxedSilentMiscompileTest
   g_elm_LetNumberCaseLetTest
   g_elm_LetNumberCaseTuple3Test
   g_elm_LetNumberClosureInRecordTest
+  g_elm_LetNumberContainerDualTest
   g_elm_LetNumberCustomTriple3Test
   g_elm_LetNumberCustomTypeTest
   g_elm_LetNumberDeepNestRecordTest
   g_elm_LetNumberDestructureTest
+  g_elm_LetNumberDualUseTest
   g_elm_LetNumberFloatArithCrashTest
+  g_elm_LetNumberFoldrTest
   g_elm_LetNumberFracRecordTest
   g_elm_LetNumberIfBranchTest
   g_elm_LetNumberIndirectCaptureTest
   g_elm_LetNumberIndirectDualTest
+  g_elm_LetNumberIndirectFoldlTest
   g_elm_LetNumberIndirectIdentityTest
   g_elm_LetNumberIndirectTopFnTest
   g_elm_LetNumberLetInLambdaTest
   g_elm_LetNumberListCaseTest
   g_elm_LetNumberListConsHeadTest
   g_elm_LetNumberListFixedTest
+  g_elm_LetNumberListOfClosuresTest
+  g_elm_LetNumberListOfMaybeTest
+  g_elm_LetNumberListOfRecordsTest
 
 /-- Every port of every program of this shard, its helper modules' included, has a canonical
     payload type (D7). -/

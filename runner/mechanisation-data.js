@@ -437,6 +437,9 @@ function writeMechanisation(out, ruleSlugs, writeJson) {
             flags: t.flags || null,
             native: !!t.native,
             dropped: t.dropped || [],
+            // the core library values the program uses, evaluated by their elm/core 1.0.5 text
+            // (plans/library-elm-texts.md; the theorems' tag [library])
+            library: t.library || [],
             // plan steps 9 and 10 (lake exe certify, ../static-report.json): the test's static
             // theorems and, for a translated test, its end-to-end theorems
             statics: staticOf(t.project + '/' + t.name),

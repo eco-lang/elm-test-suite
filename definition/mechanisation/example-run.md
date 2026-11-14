@@ -1,6 +1,6 @@
 # Standard Elm mechanisation: example run
 
-Programs: 580 (38 workers), in 34 shards; checks: 1709.
+Programs: 608 (38 workers), in 34 shards; checks: 1748.
 
 ## ElmCore
 
@@ -1351,23 +1351,41 @@ Elm_InfixPrecO: 20 programs, 46 checks, 46 agree.
 | Program | Label | Expected (CHECK) | Definition | Status | Theorem |
 |---|---|---|---|---|---|
 | LetNestedTest | nested | 30 | 30 | agree | t_elm_LetNestedTest |
+| LetNumberAndThenTest | andthen | 45 | 45 | agree | t_elm_LetNumberAndThenTest (native) |
 | LetNumberApplyToTest | applyTo | 45 | 45 | agree | t_elm_LetNumberApplyToTest (native) |
+| LetNumberAsPatternTest | aspat | 115 | 115 | agree | t_elm_LetNumberAsPatternTest (native) |
+| LetNumberBoxedSilentMiscompileTest | tuple | 45 | 45 | agree | t_elm_LetNumberBoxedSilentMiscompileTest (native) |
+| LetNumberBoxedSilentMiscompileTest | record | 45 | 45 | agree | t_elm_LetNumberBoxedSilentMiscompileTest (native) |
+| LetNumberBoxedSilentMiscompileTest | list | [45,60] | [45,60] | agree | t_elm_LetNumberBoxedSilentMiscompileTest (native) |
+| LetNumberBoxedSilentMiscompileTest | maybe | 45 | 45 | agree | t_elm_LetNumberBoxedSilentMiscompileTest (native) |
+| LetNumberBoxedSilentMiscompileTest | nested | [45] | [45] | agree | t_elm_LetNumberBoxedSilentMiscompileTest (native) |
 | LetNumberCaseLetTest | caselet | 45 | 45 | agree | t_elm_LetNumberCaseLetTest (native) |
 | LetNumberCaseTuple3Test | case-tuple3-int | 60 | 60 | agree | t_elm_LetNumberCaseTuple3Test (native) |
 | LetNumberCaseTuple3Test | case-tuple3-float | 61 | 61 | agree | t_elm_LetNumberCaseTuple3Test (native) |
 | LetNumberClosureInRecordTest | closrec | 45 | 45 | agree | t_elm_LetNumberClosureInRecordTest (native) |
+| LetNumberContainerDualTest | dual-int | 31 | 31 | agree | t_elm_LetNumberContainerDualTest (native) |
+| LetNumberContainerDualTest | dual-float | 45 | 45 | agree | t_elm_LetNumberContainerDualTest (native) |
 | LetNumberCustomTriple3Test | tri3 | 180 | 180 | agree | t_elm_LetNumberCustomTriple3Test (native) |
 | LetNumberCustomTypeTest | ctor | 45 | 45 | agree | t_elm_LetNumberCustomTypeTest (native) |
 | LetNumberDeepNestRecordTest | deeprec | 45 | 45 | agree | t_elm_LetNumberDeepNestRecordTest (native) |
 | LetNumberDestructureTest | destructure | 105 | 105 | agree | t_elm_LetNumberDestructureTest (native) |
+| LetNumberDualUseTest | scalar | 9 | 9 | agree | t_elm_LetNumberDualUseTest (native) |
+| LetNumberDualUseTest | listSum | 15 | 15 | agree | t_elm_LetNumberDualUseTest (native) |
+| LetNumberDualUseTest | tupleFirst | 3 | 3 | agree | t_elm_LetNumberDualUseTest (native) |
+| LetNumberDualUseTest | tupleCase | 5 | 5 | agree | t_elm_LetNumberDualUseTest (native) |
+| LetNumberDualUseTest | listHead | 3 | 3 | agree | t_elm_LetNumberDualUseTest (native) |
+| LetNumberDualUseTest | listTail | 5 | 5 | agree | t_elm_LetNumberDualUseTest (native) |
+| LetNumberDualUseTest | caseProduct | 5 | 5 | agree | t_elm_LetNumberDualUseTest (native) |
 | LetNumberFloatArithCrashTest | sqrt | 12 | 12 | agree | t_elm_LetNumberFloatArithCrashTest (native) |
 | LetNumberFloatArithCrashTest | add | 31 | 31 | agree | t_elm_LetNumberFloatArithCrashTest (native) |
 | LetNumberFloatArithCrashTest | div | 6 | 6 | agree | t_elm_LetNumberFloatArithCrashTest (native) |
 | LetNumberFloatArithCrashTest | pow | 8 | 8 | agree | t_elm_LetNumberFloatArithCrashTest (native) |
+| LetNumberFoldrTest | foldr | 105 | 105 | agree | t_elm_LetNumberFoldrTest (native) |
 | LetNumberFracRecordTest | frac | 34 | 34 | agree | t_elm_LetNumberFracRecordTest (native) |
 | LetNumberIfBranchTest | ifbr | 45 | 45 | agree | t_elm_LetNumberIfBranchTest (native) |
 | LetNumberIndirectCaptureTest | capture | 75 | 75 | agree | t_elm_LetNumberIndirectCaptureTest (native) |
 | LetNumberIndirectDualTest | dual | (31,45) | (31,45) | agree | t_elm_LetNumberIndirectDualTest (native) |
+| LetNumberIndirectFoldlTest | foldl | 4 | 4 | agree | t_elm_LetNumberIndirectFoldlTest (native) |
 | LetNumberIndirectIdentityTest | identity | 45 | 45 | agree | t_elm_LetNumberIndirectIdentityTest (native) |
 | LetNumberIndirectTopFnTest | topfn | 45 | 45 | agree | t_elm_LetNumberIndirectTopFnTest (native) |
 | LetNumberLetInLambdaTest | lamlet | 45 | 45 | agree | t_elm_LetNumberLetInLambdaTest (native) |
@@ -1375,8 +1393,11 @@ Elm_InfixPrecO: 20 programs, 46 checks, 46 agree.
 | LetNumberListCaseTest | list-case-float | 3 | 3 | agree | t_elm_LetNumberListCaseTest (native) |
 | LetNumberListConsHeadTest | listcons | 45 | 45 | agree | t_elm_LetNumberListConsHeadTest (native) |
 | LetNumberListFixedTest | listfixed | 105 | 105 | agree | t_elm_LetNumberListFixedTest (native) |
+| LetNumberListOfClosuresTest | listclos | [30,31] | [30,31] | agree | t_elm_LetNumberListOfClosuresTest (native) |
+| LetNumberListOfMaybeTest | listmaybe | [45,60] | [45,60] | agree | t_elm_LetNumberListOfMaybeTest (native) |
+| LetNumberListOfRecordsTest | listrec | [45,60] | [45,60] | agree | t_elm_LetNumberListOfRecordsTest (native) |
 
-Elm_LetN: 20 programs, 25 checks, 25 agree.
+Elm_LetN: 30 programs, 46 checks, 46 agree.
 
 ## Elm_LetNumberLo
 
@@ -1384,6 +1405,7 @@ Elm_LetN: 20 programs, 25 checks, 25 agree.
 |---|---|---|---|---|---|
 | LetNumberLogBaseTest | logbase | 2 | 2 | agree | t_elm_LetNumberLogBaseTest (native) |
 | LetNumberMaybeCaseDirectTest | maybedirect | 45 | 45 | agree | t_elm_LetNumberMaybeCaseDirectTest (native) |
+| LetNumberMaybeChainTest | chain | 15 | 15 | agree | t_elm_LetNumberMaybeChainTest (native) |
 | LetNumberMixedTupleSlotTest | mixedslot | 105 | 105 | agree | t_elm_LetNumberMixedTupleSlotTest (native) |
 | LetNumberMulFnTest | mulFn | 45 | 45 | agree | t_elm_LetNumberMulFnTest (native) |
 | LetNumberNegateTest | neg | 12 | 12 | agree | t_elm_LetNumberNegateTest (native) |
@@ -1393,8 +1415,12 @@ Elm_LetN: 20 programs, 25 checks, 25 agree.
 | LetNumberRecordDestructureTest | recdestr | 105 | 105 | agree | t_elm_LetNumberRecordDestructureTest (native) |
 | LetNumberRecordMultiFieldTest | multi | 105 | 105 | agree | t_elm_LetNumberRecordMultiFieldTest (native) |
 | LetNumberRecordToFnTest | rec2fn | 45 | 45 | agree | t_elm_LetNumberRecordToFnTest (native) |
+| LetNumberResultMapTest | result | 45 | 45 | agree | t_elm_LetNumberResultMapTest (native) |
 | LetNumberScaleFnTest | scale | 105 | 105 | agree | t_elm_LetNumberScaleFnTest (native) |
+| LetNumberSumMapTest | summap | 105 | 105 | agree | t_elm_LetNumberSumMapTest (native) |
+| LetNumberTupleBothTest | tupboth | 105 | 105 | agree | t_elm_LetNumberTupleBothTest (native) |
 | LetNumberTupleRecordNestTest | tuprec | 105 | 105 | agree | t_elm_LetNumberTupleRecordNestTest (native) |
+| LetNumberTupleSecondTest | tup2 | 45 | 45 | agree | t_elm_LetNumberTupleSecondTest (native) |
 | LetNumberTupleToFnTest | tup2fn | 105 | 105 | agree | t_elm_LetNumberTupleToFnTest (native) |
 | LetNumberUnionBranchTest | union | 145 | 145 | agree | t_elm_LetNumberUnionBranchTest (native) |
 | LetNumberWildcardSlotTest | wildslot | 120 | 120 | agree | t_elm_LetNumberWildcardSlotTest (native) |
@@ -1404,7 +1430,7 @@ Elm_LetN: 20 programs, 25 checks, 25 agree.
 | LetValueBindingTest | evaluated | 21 | 21 | agree | t_elm_LetValueBindingTest |
 | LetValueBindingTest | doubled | 42 | 42 | agree | t_elm_LetValueBindingTest |
 
-Elm_LetNumberLo: 20 programs, 21 checks, 21 agree.
+Elm_LetNumberLo: 25 programs, 26 checks, 26 agree.
 
 ## Elm_Li
 
@@ -1490,6 +1516,9 @@ Elm_Li: 19 programs, 34 checks, 34 agree.
 | NumberDestructFieldTest | maybe field | 5.5 | 5.5 | agree | t_elm_NumberDestructFieldTest |
 | NumberDestructFieldTest | nested | (3.5,4) | (3.5,4) | agree | t_elm_NumberDestructFieldTest |
 | NumberGenericAppCustom | numgenapp | 45 | 45 | agree | t_elm_NumberGenericAppCustom (native) |
+| NumberGenericAppList | numgenapp | 45 | 45 | agree | t_elm_NumberGenericAppList (native) |
+| NumberGenericAppMaybe | numgenapp | 45 | 45 | agree | t_elm_NumberGenericAppMaybe (native) |
+| NumberGenericAppTuple | numgenapp | 45 | 45 | agree | t_elm_NumberGenericAppTuple (native) |
 | PapEtaCtorProbe | final | { depth = 9, stats = { a = 2, b = 2, shape = 4 } } | { depth = 9, stats = { a = 2, b = 2, shape = 4 } } | agree | t_elm_PapEtaCtorProbe |
 | ParenthesesTest | grouped | 9 | 9 | agree | t_elm_ParenthesesTest |
 | ParenthesesTest | ungrouped | 7 | 7 | agree | t_elm_ParenthesesTest |
@@ -1502,7 +1531,7 @@ Elm_Li: 19 programs, 34 checks, 34 agree.
 | PartialAppCaptureTypesTest | string_cap | "hello" | "hello" | agree | t_elm_PartialAppCaptureTypesTest |
 | PartialAppCaptureTypesTest | combined | 3.5 | 3.5 | agree | t_elm_PartialAppCaptureTypesTest |
 
-Elm_M: 17 programs, 50 checks, 50 agree.
+Elm_M: 20 programs, 53 checks, 53 agree.
 
 ## Elm_PartialAppCh
 
@@ -1572,8 +1601,18 @@ Elm_PortEchoN: 13 programs, 15 checks, 15 agree.
 | RecordChainedUpdatesTest | testValue | { x = 10, y = 20 } | { x = 10, y = 20 } | agree | t_elm_RecordChainedUpdatesTest |
 | RecordCreateTest | record1 | { x = 1, y = 2 } | { x = 1, y = 2 } | agree | t_elm_RecordCreateTest |
 | RecordCreateTest | record2 | { age = 30, name = "Alice" } | { age = 30, name = "Alice" } | agree | t_elm_RecordCreateTest |
+| RecordNarrow01CapturesNonEmptyTest | uid | 1998 | 1998 | agree | t_elm_RecordNarrow01CapturesNonEmptyTest |
+| RecordNarrow02CapturesNothingTest | uid | 1998 | 1998 | agree | t_elm_RecordNarrow02CapturesNothingTest |
+| RecordNarrow03FullAnnotationTest | uid | 1998 | 1998 | agree | t_elm_RecordNarrow03FullAnnotationTest |
+| RecordNarrow04SingleFieldTest | uid | 1998 | 1998 | agree | t_elm_RecordNarrow04SingleFieldTest |
+| RecordNarrow05NoNestingTest | uid | 1998 | 1998 | agree | t_elm_RecordNarrow05NoNestingTest |
+| RecordNarrow06RowPolyAnnotationTest | uid | 1998 | 1998 | agree | t_elm_RecordNarrow06RowPolyAnnotationTest |
+| RecordNarrow08NoDestructureTest | lambdaId | LambdaId 999 | LambdaId 999 | agree | t_elm_RecordNarrow08NoDestructureTest |
+| RecordNarrow09DirectCallTest | uid | 999 | 999 | agree | t_elm_RecordNarrow09DirectCallTest |
+| RecordNarrow10TripleNestingTest | uid | 1998 | 1998 | agree | t_elm_RecordNarrow10TripleNestingTest |
 | RecordNestedAccessTest | deep | 42 | 42 | agree | t_elm_RecordNestedAccessTest |
 | RecordNestedAccessTest | chain | 99 | 99 | agree | t_elm_RecordNestedAccessTest |
+| RecordOpenNarrowFieldIndexTest | uid | 1998 | 1998 | agree | t_elm_RecordOpenNarrowFieldIndexTest |
 | RecordRowsTest | sum of fields | 3 | 3 | agree | t_elm_RecordRowsTest |
 | RecordRowsTest | label | "p" | "p" | agree | t_elm_RecordRowsTest |
 | RecordRowsTest | constructor order | (1,2) | (1,2) | agree | t_elm_RecordRowsTest |
@@ -1610,7 +1649,7 @@ Elm_PortEchoN: 13 programs, 15 checks, 15 agree.
 | SingleCtorPairBoolCharTest | match_false | "no" | "no" | agree | t_elm_SingleCtorPairBoolCharTest |
 | SingleCtorPairBoolCharTest | unwrap_char | 'x' | 'x' | agree | t_elm_SingleCtorPairBoolCharTest |
 
-Elm_RecordAccessorFunctionT: 20 programs, 44 checks, 44 agree.
+Elm_RecordAccessorFunctionT: 30 programs, 54 checks, 54 agree.
 
 ## Elm_SingleCtorPairBoolF
 
@@ -1949,4 +1988,4 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 
 Worker01: 38 programs, 123 checks, 123 agree.
 
-Total: 1709 checks, 1709 agree, 0 diverge (0 known); 1498 checks by decide +kernel, 209 by native_decide, in 580 program theorems.
+Total: 1748 checks, 1748 agree, 0 diverge (0 known); 1508 checks by decide +kernel, 238 by native_decide, in 608 program theorems.

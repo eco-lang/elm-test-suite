@@ -148,6 +148,7 @@ type alias Translation =
     , flags : Maybe String
     , native : Bool
     , dropped : List String
+    , library : List String
     , statics : Maybe Statics
     , staticStatus : String
     }
@@ -453,6 +454,7 @@ translationDecoder =
         |> andMap (Decode.oneOf [ Decode.field "flags" (Decode.nullable Decode.string), Decode.succeed Nothing ])
         |> andMap (Decode.oneOf [ Decode.field "native" Decode.bool, Decode.succeed False ])
         |> andMap (Decode.oneOf [ Decode.field "dropped" (Decode.list Decode.string), Decode.succeed [] ])
+        |> andMap (Decode.oneOf [ Decode.field "library" (Decode.list Decode.string), Decode.succeed [] ])
         |> andMap
             (Decode.oneOf
                 [ Decode.field "statics"

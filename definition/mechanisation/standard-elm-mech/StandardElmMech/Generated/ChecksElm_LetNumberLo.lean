@@ -12,6 +12,7 @@ open StandardElm.D
 #mod_program_theorems
   g_elm_LetNumberLogBaseTest
   g_elm_LetNumberMaybeCaseDirectTest
+  g_elm_LetNumberMaybeChainTest
   g_elm_LetNumberMixedTupleSlotTest
   g_elm_LetNumberMulFnTest
   g_elm_LetNumberNegateTest
@@ -21,8 +22,12 @@ open StandardElm.D
   g_elm_LetNumberRecordDestructureTest
   g_elm_LetNumberRecordMultiFieldTest
   g_elm_LetNumberRecordToFnTest
+  g_elm_LetNumberResultMapTest
   g_elm_LetNumberScaleFnTest
+  g_elm_LetNumberSumMapTest
+  g_elm_LetNumberTupleBothTest
   g_elm_LetNumberTupleRecordNestTest
+  g_elm_LetNumberTupleSecondTest
   g_elm_LetNumberTupleToFnTest
   g_elm_LetNumberUnionBranchTest
   g_elm_LetNumberWildcardSlotTest

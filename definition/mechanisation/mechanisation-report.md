@@ -1,5 +1,40 @@
 # Mechanisation Report
 
+> **Update, 2026-11-13 (the core library's Elm texts, plans/library-elm-texts.md).** The 28 tests
+> that were refused only for a library value (group D of untranslated-tests.md, less
+> LetNumberMap2Test, whose `List.map2` is a kernel value) are translated and proved end to end:
+> 608 tests now. The book leaves `List`, `Tuple`, `Maybe` and `Result` with empty or partial dynamic
+> interfaces. The tests name 12 of their values (`List.foldl`, `foldr`, `head`, `length`, `map`,
+> `sum`, `Maybe.andThen`, `map`, `withDefault`, `Result.map`, `Tuple.first`, `second`), each defined
+> in elm/core 1.0.5 by Elm text. The translator writes the closure of those texts as four modules
+> (`Generated/Library.lean`, through its own pipeline): the texts are unchanged, except that
+> `cons = Elm.Kernel.List.cons` is written `cons = (::)`. `List.sum`, whose scheme quantifies a
+> `number` variable, gets its default copy at Float and a copy `sum$Int`. Lean evaluates the
+> modules in order in ME0 by Chapter 7's rules (`Lib.libME`, with the derivations `libME_eval` from
+> the evaluator's soundness). The dynamic test basis with the library, `Lib.Btest = Btest libME`,
+> is the basis of every view program's `t_` theorem and of `mean_`'s dynamic premise (`DynOf`,
+> through `dynBasis`). Worker theorems keep `Btest []`, since no worker test names a library value.
+> A test may name a library value as a value of the basis, at the scheme of its annotation in the
+> vendored file. A use of `List.sum` at Int is `List.sum$Int`, in the translator and in Lean's
+> specialisation (`basisCopies` gains `("List", "sum")`). The `t_` and `mean_` theorems of a
+> program that names a library value are tagged `[library]`, a new entry of the trust table: D2's
+> harness assumption, extended from the library's static interfaces to its dynamic values.
+> 18 of the 28 are `[native]` because they use `round`; the 10 RecordNarrow tests are checked by the
+> kernel; none needed `native_decide` for the memory budget. A library module is evaluated only for
+> a program that looks up one of its values. The first build showed that `basisRefs` forced the
+> static List interface in every W check (0.4 GB and 1.8 s each, the largest shard at 6.58 GB), so
+> its entries no longer depend on the scheme lookup. Counts (`scripts/verify.sh full`, 28 min 7 s
+> wall after a rebuild of 189 modules; largest process 6.19 GB, scope peak 8.41 GB):
+> - translator: 608 of the 941 `elm-spec` tests translated, 918 source programs written.
+> - `legal_`: 622 (11 by `native_decide`), `refuse_`: 287, 0 conditional on D11.
+> - 608 `spec_`, 606 `mean_` (two tests stop at Debug.todo), 608 `ident_`.
+> - run-examples: 1,748 of 1,748 checks agree; 1,508 by the kernel, 238 by `native_decide`, in 608
+>   program theorems.
+> - compare-e2e: 608 of 608.
+> - check-axioms: 15,665 theorems, 264 using `native_decide`, no axiom problems.
+> - No theorem lost: the 28 tests gain `t_`, `wcheck_`, `spec_`, `mean_` and `ident_`, and their
+>   `legal_` moves from `Certs/Legal_*.lean` to their end-to-end shard.
+
 > **Update, 2026-11-13 (certificates restructured).** `Certs/` is now in fixed alphabetical
 > buckets of `project/Test` (the bounds are in `Certify.lean`), and no test shard imports another, so
 > a change to one test rewrites one certificate file. Lake 5 has no job flag; `LEAN_NUM_THREADS=K`

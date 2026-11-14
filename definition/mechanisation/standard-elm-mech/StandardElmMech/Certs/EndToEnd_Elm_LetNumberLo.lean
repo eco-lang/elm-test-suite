@@ -63,6 +63,29 @@ theorem ident_elm_LetNumberMaybeCaseDirectTest :
   Stat.ident_of_wCheck wcheck_elm_LetNumberMaybeCaseDirectTest
 
 
+/-- tests/elm/src/LetNumberMaybeChainTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_LetNumberMaybeChainTest : Stat.wCheck Stat.Btest s_elm_LetNumberMaybeChainTest (some g_elm_LetNumberMaybeChainTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/LetNumberMaybeChainTest.elm [parse] [harness] [params] -/
+theorem legal_elm_LetNumberMaybeChainTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberMaybeChainTest :=
+  Stat.legal_of_W wcheck_elm_LetNumberMaybeChainTest
+
+/-- tests/elm/src/LetNumberMaybeChainTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_LetNumberMaybeChainTest : Stat.endToEndW Stat.Btest s_elm_LetNumberMaybeChainTest = .ok g_elm_LetNumberMaybeChainTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_LetNumberMaybeChainTest
+
+/-- tests/elm/src/LetNumberMaybeChainTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] [library] [native] -/
+theorem mean_elm_LetNumberMaybeChainTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_LetNumberMaybeChainTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_LetNumberMaybeChainTest (Stat.value_of_viewChecks t_elm_LetNumberMaybeChainTest)
+
+/-- tests/elm/src/LetNumberMaybeChainTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_LetNumberMaybeChainTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_LetNumberMaybeChainTest) r → r = g_elm_LetNumberMaybeChainTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_LetNumberMaybeChainTest
+
+
 /-- tests/elm/src/LetNumberMixedTupleSlotTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
 theorem wcheck_elm_LetNumberMixedTupleSlotTest : Stat.wCheck Stat.Btest s_elm_LetNumberMixedTupleSlotTest (some g_elm_LetNumberMixedTupleSlotTest.reduced) = true :=
   Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
@@ -270,6 +293,29 @@ theorem ident_elm_LetNumberRecordToFnTest :
   Stat.ident_of_wCheck wcheck_elm_LetNumberRecordToFnTest
 
 
+/-- tests/elm/src/LetNumberResultMapTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_LetNumberResultMapTest : Stat.wCheck Stat.Btest s_elm_LetNumberResultMapTest (some g_elm_LetNumberResultMapTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/LetNumberResultMapTest.elm [parse] [harness] [params] -/
+theorem legal_elm_LetNumberResultMapTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberResultMapTest :=
+  Stat.legal_of_W wcheck_elm_LetNumberResultMapTest
+
+/-- tests/elm/src/LetNumberResultMapTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_LetNumberResultMapTest : Stat.endToEndW Stat.Btest s_elm_LetNumberResultMapTest = .ok g_elm_LetNumberResultMapTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_LetNumberResultMapTest
+
+/-- tests/elm/src/LetNumberResultMapTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] [library] [native] -/
+theorem mean_elm_LetNumberResultMapTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_LetNumberResultMapTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_LetNumberResultMapTest (Stat.value_of_viewChecks t_elm_LetNumberResultMapTest)
+
+/-- tests/elm/src/LetNumberResultMapTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_LetNumberResultMapTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_LetNumberResultMapTest) r → r = g_elm_LetNumberResultMapTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_LetNumberResultMapTest
+
+
 /-- tests/elm/src/LetNumberScaleFnTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
 theorem wcheck_elm_LetNumberScaleFnTest : Stat.wCheck Stat.Btest s_elm_LetNumberScaleFnTest (some g_elm_LetNumberScaleFnTest.reduced) = true :=
   Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
@@ -293,6 +339,52 @@ theorem ident_elm_LetNumberScaleFnTest :
   Stat.ident_of_wCheck wcheck_elm_LetNumberScaleFnTest
 
 
+/-- tests/elm/src/LetNumberSumMapTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_LetNumberSumMapTest : Stat.wCheck Stat.Btest s_elm_LetNumberSumMapTest (some g_elm_LetNumberSumMapTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/LetNumberSumMapTest.elm [parse] [harness] [params] -/
+theorem legal_elm_LetNumberSumMapTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberSumMapTest :=
+  Stat.legal_of_W wcheck_elm_LetNumberSumMapTest
+
+/-- tests/elm/src/LetNumberSumMapTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_LetNumberSumMapTest : Stat.endToEndW Stat.Btest s_elm_LetNumberSumMapTest = .ok g_elm_LetNumberSumMapTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_LetNumberSumMapTest
+
+/-- tests/elm/src/LetNumberSumMapTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] [library] [native] -/
+theorem mean_elm_LetNumberSumMapTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_LetNumberSumMapTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_LetNumberSumMapTest (Stat.value_of_viewChecks t_elm_LetNumberSumMapTest)
+
+/-- tests/elm/src/LetNumberSumMapTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_LetNumberSumMapTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_LetNumberSumMapTest) r → r = g_elm_LetNumberSumMapTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_LetNumberSumMapTest
+
+
+/-- tests/elm/src/LetNumberTupleBothTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_LetNumberTupleBothTest : Stat.wCheck Stat.Btest s_elm_LetNumberTupleBothTest (some g_elm_LetNumberTupleBothTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/LetNumberTupleBothTest.elm [parse] [harness] [params] -/
+theorem legal_elm_LetNumberTupleBothTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberTupleBothTest :=
+  Stat.legal_of_W wcheck_elm_LetNumberTupleBothTest
+
+/-- tests/elm/src/LetNumberTupleBothTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_LetNumberTupleBothTest : Stat.endToEndW Stat.Btest s_elm_LetNumberTupleBothTest = .ok g_elm_LetNumberTupleBothTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_LetNumberTupleBothTest
+
+/-- tests/elm/src/LetNumberTupleBothTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] [library] [native] -/
+theorem mean_elm_LetNumberTupleBothTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_LetNumberTupleBothTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_LetNumberTupleBothTest (Stat.value_of_viewChecks t_elm_LetNumberTupleBothTest)
+
+/-- tests/elm/src/LetNumberTupleBothTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_LetNumberTupleBothTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_LetNumberTupleBothTest) r → r = g_elm_LetNumberTupleBothTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_LetNumberTupleBothTest
+
+
 /-- tests/elm/src/LetNumberTupleRecordNestTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
 theorem wcheck_elm_LetNumberTupleRecordNestTest : Stat.wCheck Stat.Btest s_elm_LetNumberTupleRecordNestTest (some g_elm_LetNumberTupleRecordNestTest.reduced) = true :=
   Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
@@ -314,6 +406,29 @@ theorem mean_elm_LetNumberTupleRecordNestTest :
 theorem ident_elm_LetNumberTupleRecordNestTest :
     ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_LetNumberTupleRecordNestTest) r → r = g_elm_LetNumberTupleRecordNestTest.reduced :=
   Stat.ident_of_wCheck wcheck_elm_LetNumberTupleRecordNestTest
+
+
+/-- tests/elm/src/LetNumberTupleSecondTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_LetNumberTupleSecondTest : Stat.wCheck Stat.Btest s_elm_LetNumberTupleSecondTest (some g_elm_LetNumberTupleSecondTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/LetNumberTupleSecondTest.elm [parse] [harness] [params] -/
+theorem legal_elm_LetNumberTupleSecondTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberTupleSecondTest :=
+  Stat.legal_of_W wcheck_elm_LetNumberTupleSecondTest
+
+/-- tests/elm/src/LetNumberTupleSecondTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_LetNumberTupleSecondTest : Stat.endToEndW Stat.Btest s_elm_LetNumberTupleSecondTest = .ok g_elm_LetNumberTupleSecondTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_LetNumberTupleSecondTest
+
+/-- tests/elm/src/LetNumberTupleSecondTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] [library] [native] -/
+theorem mean_elm_LetNumberTupleSecondTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_LetNumberTupleSecondTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_LetNumberTupleSecondTest (Stat.value_of_viewChecks t_elm_LetNumberTupleSecondTest)
+
+/-- tests/elm/src/LetNumberTupleSecondTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_LetNumberTupleSecondTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_LetNumberTupleSecondTest) r → r = g_elm_LetNumberTupleSecondTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_LetNumberTupleSecondTest
 
 
 /-- tests/elm/src/LetNumberTupleToFnTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/

@@ -561,21 +561,28 @@ end
 
 /-- The values of the test basis written in Elm whose schemes quantify number variables
     (Appendix D: "Of the values of the basis written in Elm, only `abs` has a type scheme that
-    quantifies a variable of class number"). The core-library texts of D2 with `number` variables
-    (`List.sum`, ...) join when the dynamic test basis binds their copies (core-library.md; today
-    `Mod.Btest []` binds `abs$Int` only). Their variables are read from the static basis. -/
-def basisCopies : List (ModId × Var) := [("Basics", "abs")]
+    quantifies a variable of class number"), and the core-library texts of D2 with `number`
+    variables, whose copies the dynamic test basis `Lib.Btest` binds (plans/library-elm-texts.md,
+    L3: `List.sum` and `List.sum$Int`). Their variables are read from the static basis. -/
+def basisCopies : List (ModId × Var) := [("Basics", "abs"), ("List", "sum")]
 
-/-- The references of the basis table, from the schemes the static basis gives them. -/
+/-- The reference of an entry of the basis table, from the scheme the static basis gives it
+    (`plain` if it gives none). -/
+def basisRef (B : SBasis) (m : ModId) (x : Var) : Ref :=
+  match veFind B.ME m x with
+  | some (σ, _) =>
+    let V := σ.bound.filterMap fun v => match v with
+      | .ty α => if α.cls == .num then some α else none
+      | .row _ => none
+    Ref.basis V σ.body σ.bound
+  | none => .plain
+
+/-- The references of the basis table. The list's entries do not depend on the static basis, only
+    their references do, so that a reference is computed only for an occurrence of its name: the
+    kernel does not elaborate the library's interface of `List` for a program that does not use
+    `List.sum` (it cost every W check 0.4 GB and 1.8 s, 2026-11-13). -/
 def basisRefs (B : SBasis) : List ((ModId × Var) × Ref) :=
-  basisCopies.filterMap fun (m, x) =>
-    match veFind B.ME m x with
-    | some (σ, _) =>
-      let V := σ.bound.filterMap fun v => match v with
-        | .ty α => if α.cls == .num then some α else none
-        | .row _ => none
-      some ((m, x), Ref.basis V σ.body σ.bound)
-    | none => none
+  basisCopies.map fun (m, x) => ((m, x), basisRef B m x)
 
 /-- The variables the copies of a basis value bind, default first. -/
 def basisCopyNames (B : SBasis) (m : ModId) (x : Var) : Option (List Var) :=

@@ -6,10 +6,7 @@ import StandardElmMech.Certs.Ctx_83951108
 import StandardElmMech.Generated.SrcElm
 import StandardElmMech.Generated.SrcElm_CompilerIssue217
 import StandardElmMech.Generated.SrcElm_CustomTypeUnboundV
-import StandardElmMech.Generated.SrcElm_InfixAssocP
 import StandardElmMech.Generated.SrcElm_LetNumberAp
-import StandardElmMech.Generated.SrcElm_LetNumberRecordM
-import StandardElmMech.Generated.SrcElm_Mu
 import StandardElmMech.Stat.Complete.Discharge
 
 /-! The programs of this file are legal (plan step 9): each theorem runs W (plan step 11, milestone
@@ -36,84 +33,12 @@ theorem legal_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest : St
 theorem legal_elm_EtaExpandSeventeenArgumentAliasTest : Stat.LegalProgram Stat.Btest s_elm_EtaExpandSeventeenArgumentAliasTest :=
   Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_371f1d56_eq (by decide +kernel))
 
-/-- tests/elm/src/LetNumberAndThenTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberAndThenTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberAndThenTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
 /-- tests/elm/src/LetNumberArrayMapTest.elm [parse] [harness] [params] -/
 theorem legal_elm_LetNumberArrayMapTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberArrayMapTest :=
   Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_836c69b2_eq (by decide +kernel))
 
-/-- tests/elm/src/LetNumberAsPatternTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberAsPatternTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberAsPatternTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberBoxedSilentMiscompileTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberBoxedSilentMiscompileTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberBoxedSilentMiscompileTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberContainerDualTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberContainerDualTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberContainerDualTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberDualUseTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberDualUseTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberDualUseTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberFoldrTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberFoldrTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberFoldrTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberIndirectFoldlTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberIndirectFoldlTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberIndirectFoldlTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberListOfClosuresTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberListOfClosuresTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberListOfClosuresTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberListOfMaybeTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberListOfMaybeTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberListOfMaybeTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberListOfRecordsTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberListOfRecordsTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberListOfRecordsTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
 /-- tests/elm/src/LetNumberMap2Test.elm [parse] [harness] [params] -/
 theorem legal_elm_LetNumberMap2Test : Stat.LegalProgram Stat.Btest s_elm_LetNumberMap2Test :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberMaybeChainTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberMaybeChainTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberMaybeChainTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberResultMapTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberResultMapTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberResultMapTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberSumMapTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberSumMapTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberSumMapTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberTupleBothTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberTupleBothTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberTupleBothTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/LetNumberTupleSecondTest.elm [parse] [harness] [params] -/
-theorem legal_elm_LetNumberTupleSecondTest : Stat.LegalProgram Stat.Btest s_elm_LetNumberTupleSecondTest :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/NumberGenericAppList.elm [parse] [harness] [params] -/
-theorem legal_elm_NumberGenericAppList : Stat.LegalProgram Stat.Btest s_elm_NumberGenericAppList :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/NumberGenericAppMaybe.elm [parse] [harness] [params] -/
-theorem legal_elm_NumberGenericAppMaybe : Stat.LegalProgram Stat.Btest s_elm_NumberGenericAppMaybe :=
-  Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
-
-/-- tests/elm/src/NumberGenericAppTuple.elm [parse] [harness] [params] -/
-theorem legal_elm_NumberGenericAppTuple : Stat.LegalProgram Stat.Btest s_elm_NumberGenericAppTuple :=
   Stat.legal_of_W (q := none) (Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel))
 
 end StandardElm

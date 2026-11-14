@@ -69,9 +69,10 @@ def ME0 : ModEnv :=
 /-- D2 (a): the harness Html. `text` is the constructor value node# of arity 1. -/
 def I_HtmlHarness : Interface := .ofVE [("text", conv conNode)]
 
-/-- D2: the test basis. `lib` holds the core library's additions (core-library.md), empty until that
-    plan's steps; they extend the interfaces ME0 already has, component by component, and add the
-    modules it does not have. -/
+/-- D2: the test basis. `lib` holds the core library's additions (core-library.md): the view
+    programs' theorems use `Lib.Btest = Btest Lib.libME` (Lib/Library.lean,
+    plans/library-elm-texts.md), the worker theorems `Btest []`. They extend the interfaces ME0
+    already has, component by component, and add the modules it does not have. -/
 def btestStep (B : Basis) (p : ModId × Interface) : Basis :=
   match fmLookup B p.1 with
   | some I0 => fmPlus B [(p.1, I0.plus p.2)]

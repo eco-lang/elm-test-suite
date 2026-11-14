@@ -2,9 +2,12 @@ module Translate.Infer exposing
     ( Inferred
     , Occurrence
     , components
-    , payloadOf
     , freeLocals
     , infer
+    , inferLibrary
+    , inferWith
+    , librarySchemes
+    , payloadOf
     )
 
 {-| Type inference over a translated program (plans/elm-to-lean-translator.md, B.7): Hindley-Milner
@@ -25,6 +28,7 @@ import Elm.Syntax.TypeAnnotation as T
 import Set exposing (Set)
 import Translate.Basis as Basis
 import Translate.Ir exposing (..)
+import Translate.Library as Library exposing (Library)
 import Translate.Types as Types exposing (Class(..), Scheme, Subst, Type(..))
 
 
@@ -66,6 +70,7 @@ type alias Env =
     , annVars : Dict String Type
     , modul : ModuleIr
     , cons : Dict String Scheme
+    , library : Library
     }
 
 
@@ -731,10 +736,10 @@ nameScheme env name =
                 Basis.constructor x |> Result.fromMaybe ("unknown constructor " ++ x)
 
             else
-                Basis.value m x |> Result.fromMaybe ("unknown value " ++ m ++ "." ++ x)
+                basisValue env m x
 
         Exposed m x ->
-            Basis.value m x |> Result.fromMaybe ("unknown value " ++ m ++ "." ++ x)
+            basisValue env m x
 
         UserCon k ->
             Dict.get k env.cons |> Result.fromMaybe ("unknown constructor " ++ k)
@@ -744,6 +749,19 @@ nameScheme env name =
 
         ForeignCon f ->
             Dict.get f.key env.cons |> Result.fromMaybe ("unknown constructor " ++ f.key)
+
+
+{-| A value of the basis: a value of the core library at the scheme of its annotation
+(`librarySchemes`), or a value of E0.
+-}
+basisValue : Env -> String -> String -> Result String Scheme
+basisValue env m x =
+    case Library.scheme env.library m x of
+        Just scheme ->
+            Ok scheme
+
+        Nothing ->
+            Basis.value m x |> Result.fromMaybe ("unknown value " ++ m ++ "." ++ x)
 
 
 occurrence : Env -> Int -> Name -> St -> R Type
@@ -1388,18 +1406,15 @@ generalise env bound st =
 
 
 infer : TestProgram -> Result String Inferred
-infer program =
-    let
-        st0 =
-            { subst = Types.emptySubst
-            , literals = Dict.empty
-            , occurrences = Dict.empty
-            , groupKey = Dict.empty
-            , groupVars = Dict.empty
-            , logTypes = Dict.empty
-            , ports = Dict.empty
-            }
+infer =
+    inferWith Library.empty
 
+
+{-| The inference of a program that may name the values of the core library `lib`.
+-}
+inferWith : Library -> TestProgram -> Result String Inferred
+inferWith lib program =
+    let
         mainBinder =
             mainModule program
                 |> Maybe.map .defs
@@ -1418,30 +1433,10 @@ infer program =
                                 Nothing
                     )
                 |> List.head
-
-        -- the modules in program order, one substitution; the values and constructors of each
-        -- are in scope (by binding id and key) in the modules after it
-        inferModule m acc =
-            acc
-                |> Result.andThen
-                    (\( values, cons, st ) ->
-                        let
-                            env0 =
-                                { values = values, annVars = Dict.empty, modul = m, cons = cons }
-                        in
-                        constructorSchemes env0 st
-                            |> Result.andThen
-                                (\( own, st1 ) -> portSchemes { env0 | cons = Dict.union own cons } m st1)
-                            |> Result.andThen
-                                (\( env1, st1 ) ->
-                                    declarations env1 m.defs st1
-                                        |> Result.map (\( env2, st2 ) -> ( env2.values, env2.cons, st2 ))
-                                )
-                    )
     in
-    List.foldl inferModule (Ok ( Dict.empty, Dict.empty, st0 )) program.modules
+    inferModules lib program.modules
         |> Result.andThen
-            (\( values, _, st2 ) ->
+            (\( values, st2 ) ->
                 -- main must be a view: its type a Node (Html) of some message type
                 case mainBinder |> Maybe.andThen (\b -> Dict.get b values) of
                     Just scheme ->
@@ -1458,15 +1453,146 @@ infer program =
                     Nothing ->
                         Err "construct:main-shape"
             )
-        |> Result.map
-            (\( st4, flagsType ) ->
-                { subst = st4.subst
-                , literals = st4.literals
-                , occurrences = st4.occurrences
-                , groupKey = st4.groupKey
-                , groupVars = st4.groupVars
-                , logTypes = st4.logTypes
-                , ports = st4.ports
-                , flagsType = flagsType
-                }
-            )
+        |> Result.map (\( st4, flagsType ) -> inferred st4 flagsType)
+
+
+{-| The inference of the library modules' texts (plans/library-elm-texts.md, step 1): modules
+without a `main`, which name no library value.
+-}
+inferLibrary : List ModuleIr -> Result String Inferred
+inferLibrary modules =
+    inferModules Library.empty modules
+        |> Result.map (\( _, st ) -> inferred st Nothing)
+
+
+inferred : St -> Maybe Type -> Inferred
+inferred st flagsType =
+    { subst = st.subst
+    , literals = st.literals
+    , occurrences = st.occurrences
+    , groupKey = st.groupKey
+    , groupVars = st.groupVars
+    , logTypes = st.logTypes
+    , ports = st.ports
+    , flagsType = flagsType
+    }
+
+
+{-| The modules in program order, one substitution; the values and constructors of each are in
+scope (by binding id and key) in the modules after it. Returns the values' schemes.
+-}
+inferModules : Library -> List ModuleIr -> Result String ( Dict Int Scheme, St )
+inferModules lib modules =
+    let
+        st0 =
+            { subst = Types.emptySubst
+            , literals = Dict.empty
+            , occurrences = Dict.empty
+            , groupKey = Dict.empty
+            , groupVars = Dict.empty
+            , logTypes = Dict.empty
+            , ports = Dict.empty
+            }
+
+        inferModule m acc =
+            acc
+                |> Result.andThen
+                    (\( values, cons, st ) ->
+                        let
+                            env0 =
+                                { values = values, annVars = Dict.empty, modul = m, cons = cons, library = lib }
+                        in
+                        constructorSchemes env0 st
+                            |> Result.andThen
+                                (\( own, st1 ) -> portSchemes { env0 | cons = Dict.union own cons } m st1)
+                            |> Result.andThen
+                                (\( env1, st1 ) ->
+                                    declarations env1 m.defs st1
+                                        |> Result.map (\( env2, st2 ) -> ( env2.values, env2.cons, st2 ))
+                                )
+                    )
+    in
+    List.foldl inferModule (Ok ( Dict.empty, Dict.empty, st0 )) modules
+        |> Result.map (\( values, _, st ) -> ( values, st ))
+
+
+
+-- THE LIBRARY
+
+
+{-| The schemes of the library values from their annotations in the vendored files (the
+annotations `Generated/StaticLibrary.lean` writes as source syntax): each annotation elaborated
+with no type of a module in scope but the basis's, and closed over all its variables, numbered
+-1, -2, ... in order of first occurrence (as the basis's schemes are, `Translate.Basis`).
+-}
+librarySchemes : List ( ( String, String ), Node T.TypeAnnotation ) -> Result String (List ( ( String, String ), Scheme ))
+librarySchemes entries =
+    let
+        st0 =
+            { subst = Types.emptySubst
+            , literals = Dict.empty
+            , occurrences = Dict.empty
+            , groupKey = Dict.empty
+            , groupVars = Dict.empty
+            , logTypes = Dict.empty
+            , ports = Dict.empty
+            }
+
+        env =
+            { values = Dict.empty, annVars = Dict.empty, modul = noModule, cons = Dict.empty, library = Library.empty }
+
+        one ( key, ann ) =
+            annotation env Dict.empty ann st0
+                |> Result.mapError (\e -> Tuple.first key ++ "." ++ Tuple.second key ++ ": " ++ e)
+                |> Result.map
+                    (\( t, _, st1 ) ->
+                        let
+                            -- in order of first occurrence, then any row variable
+                            seq =
+                                Types.tyVarsSeq st1.subst t ++ Set.toList (Types.ftv st1.subst t)
+
+                            vars =
+                                List.foldl
+                                    (\v acc ->
+                                        if List.member v acc then
+                                            acc
+
+                                        else
+                                            acc ++ [ v ]
+                                    )
+                                    []
+                                    seq
+
+                            renumber =
+                                Dict.fromList (List.indexedMap (\i v -> ( v, TVar (negate (i + 1)) )) vars)
+                        in
+                        ( key
+                        , { quantified = List.indexedMap (\i v -> ( negate (i + 1), Types.classOf st1.subst v )) vars
+                          , t = substitute renumber t
+                          }
+                        )
+                    )
+    in
+    entries
+        |> List.map one
+        |> List.foldr (Result.map2 (::)) (Ok [])
+
+
+{-| A module with no types or aliases, in which an annotation of the library is elaborated.
+-}
+noModule : ModuleIr
+noModule =
+    { name = ""
+    , path = ""
+    , isPort = False
+    , exposes = ExposeAll
+    , imports = []
+    , prefix = ""
+    , cons = []
+    , types = Dict.empty
+    , aliases = Dict.empty
+    , importedTypes = Dict.empty
+    , importedAliases = Dict.empty
+    , ports = []
+    , defs = []
+    }

@@ -1,6 +1,10 @@
 # Plan: a Core Library page, specifying elm/core against the book
 
-**Status (2026-11-10): proposed.** Not started.
+**Status (2026-11-13): step 3 done, in the form of [library-elm-texts.md](library-elm-texts.md)**
+(decision D2 of [lean-full-definition.md](lean-full-definition.md)): the Elm texts of the 12 library
+values the tests name are values of the dynamic test basis, not a prelude added to each program,
+and 28 of the 29 tests of group D are translated and proved. The site pages (steps 1 and 2, and
+step 3's coverage table) are not started.
 
 ## Why
 

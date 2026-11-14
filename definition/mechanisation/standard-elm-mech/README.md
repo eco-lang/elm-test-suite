@@ -52,7 +52,7 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `StandardElmMech/Derived.lean` | Derived forms of Appendix A as functions, including the grouping of a let into components |
 | `StandardElmMech/Basis.lean` | E0: E0 of Appendix D modified by the environment the default imports give in ME0; the hand-stated rulings are evaluated in it |
 | `StandardElmMech/Show.lean` | Prints values as Elm's Debug.log does, a float as the shortest decimal that reads back as it (JavaScript's Number::toString, computed exactly with integers); also the string of `Debug.toString` |
-| `StandardElmMech/Examples.lean` | `Check` (a CHECK line as written, with the kind of the value logged under its label), `ModSrc` (a helper module) and `Program` (a test as the translator writes it: its main module's header, imports, types, aliases, ports and top-level definitions, `main` included, its helper modules, its CHECK lines, and whether it has a meaning); `handPartial`, the partial hand translations of tests the translator refuses |
+| `StandardElmMech/Examples.lean` | `Check` (a CHECK line as written, with the kind of the value logged under its label), `ModSrc` (a helper module) and `Program` (a test as the translator writes it: its main module's header, imports, types, aliases, ports and top-level definitions, `main` included, its helper modules, its CHECK lines, whether it has a meaning, and the core library values it names, `library`); `handPartial`, the partial hand translations of tests the translator refuses |
 | `StandardElmMech/Eff/PTy.lean` | Payload types (data until step 4 gives them their meaning) |
 | `StandardElmMech/Eff/Boundary.lean` | Boundary values (`BVal`, with arrays and objects in the list types `BArr`, `BObj`), JSON numbers as exact rationals (`jnum`, `isDecimal`), canonical values, JSON values (`isJson`), `mkObj`, the exact value of a float (`floatToRat?`, `dyadic`) and the float nearest a decimal (`ratToFloat`) |
 | `StandardElmMech/Eff/EncFn.lean` | `enc` and `dec`, Enc_τ and Dec_τ as structural functions on the payload type (plan decision D8) |
@@ -79,6 +79,8 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `StandardElmMech/Mod/Good.lean` | The property of interfaces (`Interface.Good`): ME0 and the harness have it (`ME0_good`), a top-level declaration with distinct bound names infers an interface with it (`EvalTopDec.good`), a header's exposing list keeps it (`EvalHeader.good`), and so does every interface a module puts in the basis (`EvalModule.good`) |
 | `StandardElmMech/Mod/A25.lean` | A25: the module `x = let f _ = x in f ()` has no meaning (`a25_no_value`, `a25_no_meaning`), by the loop of the evaluator forcing x's thunk (`a25_loop`) and completeness |
 | `StandardElmMech/Mod/Rulings.lean` | A82, A38 and A28 on programs written by hand |
+| `StandardElmMech/Lib/Library.lean` | The core library values written in Elm (plans/library-elm-texts.md): `libME`, the interfaces Chapter 7's rules give the library modules of `Generated/Library.lean`, evaluated in order in ME0 (`libME_eval`: each module's derivation by r:dm-module, from the evaluator's soundness); `Lib.Btest`, the dynamic test basis with the library (`Mod.Btest libME`), in which the view programs' theorems are stated. Only a value a program looks up is evaluated |
+| `StandardElmMech/Generated/Library.lean` | Written by the translator: the library modules `List`, `Maybe`, `Result`, `Tuple` (`libTexts`), the closure of the texts of the 12 values the tests name in elm/core 1.0.5, translated and specialised by its pipeline (`cons = Elm.Kernel.List.cons` written `(::)`; `sum` and its copy `sum$Int`) |
 | `StandardElmMech/Mod/Program.lean` | A test program in module form (plan step 3): Appendix A's derived form for modules (`Module.ofSource`: the custom types, the aliases, the ports, then the definitions in components), a program's modules in program order; `ViewChecks` and `NoMeaning` with their deciders proved sound; `viewChecks_every` |
 | `StandardElmMech/Prog/Objects.lean` | Chapter 9's objects of execution (plan step 5): port environments, processes, configurations, events, `SleepReady` |
 | `StandardElmMech/Prog/Dispatch.lean` | Dispatch (4 rules, `r_p_disp_*`) and the executable `dispatchFn` with fresh identifiers, sound |
@@ -134,11 +136,11 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `StandardElmMech/Certs/` | Written by `lake exe certify`: the context of each list of imports of a one-module program, with the lemma that the imports give it (`Ctx_<name>.lean`, `ctx_<name>_eq`; the name is a hash of the imports, so the file depends on them only), one `legal_<project>_<Test>` theorem per compile-success test the translator does not translate (`Legal_*.lean`), one `refuse_<project>_<Test>` theorem per refused compile-error test (`Refusals_*.lean`), and the end-to-end theorems `wcheck_`, `legal_`, `spec_`, `mean_`, `ident_` of each translated test (`EndToEnd_*.lean`). A test's shard is fixed by its name (alphabetical buckets of `project/Test` with fixed bounds, `bucketOf` in Certify.lean; `EndToEnd_Elm_CaseF.lean` holds the keys from `elm/CaseF` to the next bound), and no shard imports another (only the `Ctx_` files of its tests' imports), so adding or removing a test changes one shard and Lake rebuilds only the shards that change; `CertsAll.lean` imports them all |
 | `StandardElmMech/SyntaxDecEq.lean` | Decidable equality of the reduced, module and bare syntaxes (written out: `deriving` refuses nested mutual types), for the kernel's comparisons of step 10 |
 | `StandardElmMech/Mod/Reduced.lean` | The reduced part of a program (modules, ports, flags type, kind): what the semantics reads, `Program.reduced` and `Prog.WorkerTest.reduced` |
-| `StandardElmMech/Stat/Specialise.lean` | Number specialisation (plan step 10, sec:dynamic-core-numbers) on annotated derivations: assignments, copy names, the `number` variables of a group, the copy loop (copies from the outside in), exposing items, the copies of the basis |
+| `StandardElmMech/Stat/Specialise.lean` | Number specialisation (plan step 10, sec:dynamic-core-numbers) on annotated derivations: assignments, copy names, the `number` variables of a group, the copy loop (copies from the outside in), exposing items, the copies of the basis (`basisCopies`: `abs` and `List.sum`) |
 | `StandardElmMech/Stat/Erase.lean` | Type erasure: payload types (`toPTy`), the kind and flags of `main` (`mainKind`), custom types, aliases and ports |
 | `StandardElmMech/Stat/EndToEnd.lean`, `Stat/EndToEndIn.lean` | `endToEnd`: derived forms, inference, the proved checker, specialisation and erasure, from a source program to its reduced program; `endToEnd_of_ctx`, the same with a module's import context given (cheaper in the kernel) |
 | `StandardElmMech/Stat/CopyLoop.lean` | The copy loop terminates within 2^k + 1 rounds, makes the least set of copies closed under requests, at most 2^k (`copyLoop_fuel`, `copyLoop_least`, `copies_le_pow`) |
-| `StandardElmMech/Stat/Pipeline.lean` | `SpecOf`, `DynOf`, `ProgramSem` (r:p-program), `D11For`; copy names, payload types and `main` (`copyName_inj`, `toPTy_isSome_iff`, `mainKind_worker_iff`, `mainKind_view_iff`); the pipeline theorems (`specOf_of_endToEnd`, `programSem_of_legal`) |
+| `StandardElmMech/Stat/Pipeline.lean` | `SpecOf`, `DynOf` (in `Lib.Btest` for a view, `Mod.Btest []` for a worker: `dynBasis`), `ProgramSem` (r:p-program), `D11For`; copy names, payload types and `main` (`copyName_inj`, `toPTy_isSome_iff`, `mainKind_worker_iff`, `mainKind_view_iff`); the pipeline theorems (`specOf_of_endToEnd`, `programSem_of_legal`) |
 | `StandardElmMech/Stat/Rename.lean`, `Stat/RenameSyntax.lean` | Renamings of type variables, row variables and generated type names, of types, schemes and annotated derivations, for the invariance lemma (finding B1) |
 | `StandardElmMech/Stat/RenameObjects.lean`, `Stat/RenameSpecExp.lean`, `Stat/RenameSpec.lean`, `Stat/RenameReduce.lean`, `Stat/RenameExtend.lean` | The invariance lemma, first half: specialisation is invariant under renaming (`specExp_rename`, `reduceWith_rename`) |
 | `StandardElmMech/Stat/MutualInstance.lean`, `Stat/MutualWalk.lean`, `Stat/MutualWalkExp.lean`, `Stat/MutualModule.lean` | The invariance lemma, second half: two module derivations that are instances of each other in one basis differ by a renaming of their value items (`mutualInstanceMod_items`) |
@@ -161,14 +163,14 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 | `SynReport.lean` | `lake exe syn-report`: `../syntactic-report.json`, for each written program the restrictions it breaks |
 | `StandardElmMech/Generated/` | Written by the translator: the translated tests in shards that are fixed alphabetical buckets of `project/Test`, the same as the end-to-end certificates' (`Elm_CaseF.lean` holds `elm/CaseF...` up to the next bound, `ElmCore.lean` the first `elm-core` bucket, and the worker tests are in `Worker01.lean`), `All.lean`, and per shard `Checks<Shard>.lean` with its program theorems `t_<project>_<Test>`; the source programs in buckets of their own (`SrcElm_CharC.lean`, ..., `SrcAll.lean`), each with its syntactic theorems (`SynElm_CharC.lean`, ..., `SynAll.lean`). Adding a test changes its own bucket's files only; the translator removes the files it no longer writes |
 | `StandardElmMech/AllPrograms.lean` | `exampleShards` and `allPrograms`: the generated shards and `handPartial`, for the executables |
-| `StandardElmMech/Theorems.lean` | The command `#mod_program_theorems` (one theorem per program, in module form), `budgetNative`, the rulings stated directly, and theorems that D1 makes possible (`a43_one_unique`, `a51_one_choice`, `log_order_demo`) |
+| `StandardElmMech/Theorems.lean` | The command `#mod_program_theorems` (one theorem per program, in module form, in `Lib.Btest`; tagged `[library]` when the program names a core library value), `budgetNative`, the rulings stated directly, and theorems that D1 makes possible (`a43_one_unique`, `a51_one_choice`, `log_order_demo`) |
 | `scripts/check-axioms.lean` | `lake env lean scripts/check-axioms.lean`: every theorem's axioms |
 | `scripts/check-hypotheses.lean` | `lake env lean scripts/check-hypotheses.lean`: the theorems whose statement mentions `PrincipalExists`, `PrincipalExistsFor`, `InferPrincipalFor` or `D11For` (after step 11: 13 general lemmas, and no per-test theorem) |
 | `MeasureW.lean` | `lake exe measure-w`: step 11's W compiled on every test (`../w-report.json`): the compile-error tests it refutes, that it refutes no compile-success test, and on which legal programs it returns a derivation |
 | `scripts/measure-build.sh` | The memory of a clean build, as the plan's conventions define it |
 | `scripts/verify.sh` | `scripts/verify.sh quick` (certify, the build of `Certs/CertsAll` and the root, `certify --check`, the translator's `--check`, no `sorry`/`axiom`) or `full` (also run-examples, measure-cores, compare-e2e, check-axioms, measure-w, check-hypotheses, syn-report): one line per step, the wall time and the largest single process's resident set; runs itself in a systemd scope of 24 GB (`VERIFY_MEM`) with at most `K` (default 4) `lean` processes at once (`LEAN_NUM_THREADS`) |
 | `DumpPhrases.lean` | `lake exe dump-phrases`: every program's modules, to show a change to the derived forms changes none |
-| `Main.lean` | The `run-examples` executable |
+| `Main.lean` | The `run-examples` executable (view programs in `Lib.Btest`) |
 
 ## Encoding conventions
 
@@ -214,9 +216,12 @@ GB (`scripts/measure-build.sh`, 2026-11-11, after plan step 5). After a change t
 
 Every generated theorem's docstring names what it trusts besides Lean's kernel
 (plans/lean-full-definition.md, "The trust model"): `[parse]` (elm-syntax parses the test as Elm
-does), `[elab]` (the translator's elaboration and number specialisation; retired on 2026-11-12, by step 10, for the 580 tests with a `spec_` theorem), `[params]` (the
+does), `[elab]` (the translator's elaboration and number specialisation; retired on 2026-11-12, by step 10, for the 608 tests with a `spec_` theorem), `[params]` (the
 implementation parameters: IntRange and norm as eco's), `[harness]` (the harness's `Html.text`
-and the core library's interfaces, D2), `[principal]` (what the inference returns for the program
+and the core library's interfaces, D2), `[library]` (elm/core 1.0.5's Elm text is the meaning of
+the core library values the program uses, which the book does not bind: D2's harness assumption
+extended to the dynamic values; on the `t_` and `mean_` theorems of the 28 programs that name one,
+plans/library-elm-texts.md), `[principal]` (what the inference returns for the program
 is principal, D11: the hypothesis `InferPrincipalFor`; retired on 2026-11-13, by step 11, for every
 test), and `[native]` (the Lean compiler, for a theorem proved by
 `native_decide`).
@@ -228,14 +233,16 @@ test), and `[native]` (the Lean compiler, for a theorem proved by
   inference W, Chapter 9's conditions and the further restrictions, with the context of a
   one-module program's imports read from `Certs/Ctx_*.lean`, `wCheck_of_ctx`); 11 large programs by
   `native_decide`.
-* `spec_<project>_<Test>` (Certs/EndToEnd_*.lean, 580 translated tests): Lean's pipeline from the
+* `spec_<project>_<Test>` (Certs/EndToEnd_*.lean, 608 translated tests): Lean's pipeline from the
   source (`endToEndW`: derived forms, step 11's W, the proved checker, number specialisation,
   erasure) gives the reduced program the translator wrote, so the theorems about it no longer rest
   on `[elab]`; it follows from `wcheck_` (`endToEndW_of_wCheck`), so the kernel runs the inference
   and the specialisation once per test;
-  `mean_<project>_<Test>` (578; the other two stop at Debug.todo): the program has a meaning by
-  r:p-program with both premises (`programSem_of_wCheck`, without hypothesis).
-* `ident_<project>_<Test>` (580): the specialisation of the program is unique and is the reduced
+  `mean_<project>_<Test>` (606; the other two stop at Debug.todo): the program has a meaning by
+  r:p-program with both premises (`programSem_of_wCheck`, without hypothesis), its dynamic premise
+  (`DynOf`) in the test basis with the core library `Lib.Btest` for a view and `Btest []` for a
+  worker (`dynBasis`).
+* `ident_<project>_<Test>` (608): the specialisation of the program is unique and is the reduced
   program the translator wrote (`ident_of_wCheck`, without hypothesis).
 * `refuse_<project>_<Test>` (Certs/Refusals_*.lean, all 287 compile-error tests: 70 by steps 8 and
   9 and imports, 201 by step 11's core refutation, 15 by module-level W, 1 by W's type of `main`):
@@ -255,15 +262,16 @@ test), and `[native]` (the Lean compiler, for a theorem proved by
 * `t_<project>_<Test>` (generated, one per translated test): the test as the program it is, its
   modules (the helper modules it imports from its project's sources, each after the modules it
   imports, then the test) evaluated by the rules of Chapter 7 and Chapter 9 (r:p-dyn-module,
-  r:p-dyn-main) in the test basis `Btest []`. For a test that runs, `ViewChecks (Btest [])
-  g.modules [c1, ...]`: some derivation of the program has a log that meets every check, each a
+  r:p-dyn-main) in the test basis with the core library, `Lib.Btest` (`Btest libME`: ME0's
+  interfaces of `List`, `Maybe`, `Result` and `Tuple` extended by the values of 12 elm/core texts,
+  `libME_eval`). For a test that runs, `ViewChecks Lib.Btest g.modules [c1, ...]`: some derivation of the program has a log that meets every check, each a
   statement about the log (decision D9): `.has p`, an entry with the check's label and a value its
   CHECK line describes (`Expect`, a structural value: numbers, characters, strings, lists,
   tuples, records, constructor values, functions), or with the label alone for a CHECK line
   without a value; `.run ps`, consecutive entries, for a CHECK with its CHECK-NEXT lines; and
   `.printed r`, a regular expression the printed log matches, for a CHECK line with `{{...}}` or
-  a CHECK-SAME. CHECK-DAG is read as CHECK. For a test that stops at Debug.todo, `NoMeaning (Btest
-  []) g.modules` (`noMeaning_of_stuck`); the values it logs before it stops are reported by
+  a CHECK-SAME. CHECK-DAG is read as CHECK. For a test that stops at Debug.todo, `NoMeaning Lib.Btest
+  g.modules` (`noMeaning_of_stuck`); the values it logs before it stops are reported by
   `run-examples` and are not theorems.
   The log is the logged relations' (decision D4), in the order their rules fix, which is one of
   the orders the book allows (A57, A58): a statement about consecutive entries states that the
@@ -274,8 +282,8 @@ test), and `[native]` (the Lean compiler, for a theorem proved by
   comment lists the program's source files and the trust it rests on: `[parse]` (elm-syntax's
   parser), `[elab]` (the translator's names, types and number specialisation, until steps 9 and
   10), `[harness]` (the test basis's `Html`, decision D2, whose `text` is the constructor `node`
-  of arity 1) and `[params]` (the parameters of the dynamic basis that a test's values do not
-  depend on).
+  of arity 1), `[params]` (the parameters of the dynamic basis that a test's values do not
+  depend on) and, for a program that names a core library value (`Program.library`), `[library]`.
 * Chapter 8 (plan step 4): the 39 rules of tasks, encoding, decoding and messages are constructors;
   `enc_iff` and `dec_iff` make the book's Enc and Dec the structural functions `enc` and `dec`
   (decision D8); `taskRed_iff` and its corollaries prove the book's property of task reduction;

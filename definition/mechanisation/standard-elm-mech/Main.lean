@@ -1,6 +1,7 @@
 /-
   Runs every test program, in module form (plan step 3), through the evaluator of Chapter 7's
-  rules, with both choices of a member of APPLY, and compares, for each check, the value its label
+  rules in the test basis with the core library (`Lib.Btest`, plans/library-elm-texts.md), with
+  both choices of a member of APPLY, and compares, for each check, the value its label
   has in the log of the program's evaluation with the value the test expects (its CHECK line). A
   check that expects no value agrees when the program has no meaning (it stops at Debug.todo).
   Writes ../example-run.md (a table per shard and a summary) and ../example-run.json (one entry
@@ -81,8 +82,8 @@ def runShard (name : String) (ps : List Program) : List Row := Id.run do
   let mut rows : Array Row := #[]
   for p in ps do
     let mods := p.modules
-    let res0 := Mod.evProgram (.const false) fuel (Mod.Btest []) mods 0
-    let res1 := Mod.evProgram (.const true) fuel (Mod.Btest []) mods 0
+    let res0 := Mod.evProgram (.const false) fuel Lib.Btest mods 0
+    let res1 := Mod.evProgram (.const true) fuel Lib.Btest mods 0
     for ck in p.checks do
       -- the distinct values of the line in the logs, oracle false first
       let vs0 := lineValues ck res0

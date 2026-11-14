@@ -14,7 +14,8 @@
   - `EndToEnd_<Project>_<Bucket>.lean`: for each translated test, `wcheck_X` (W's derivation checked,
     with the reduced program the translator wrote: the one run of the inference and the
     specialisation in the kernel), and from it, all without hypothesis, `legal_X`, `spec_X` (Lean's
-    pipeline with W gives the reduced program), `mean_X` and `ident_X`;
+    pipeline with W gives the reduced program), `mean_X` (tagged `[library]` when the program names
+    a value of the core library, plans/library-elm-texts.md) and `ident_X`;
   - `CertsAll.lean`, importing them.
 
   The shards (plan step 11, after milestone (g)): a test's file is fixed by its name (`bucketOf`: the
@@ -491,7 +492,13 @@ def main (args : List String) : IO UInt32 := do
       s!"theorem wcheck_{suffix} : Stat.wCheck Stat.Btest {sdef} (some {rdef}.reduced) = true :=\n  {wtac}\n" ++
       s!"\n/-- tests/{p}/src/{n}.elm {wTags} -/\n" ++
       s!"theorem legal_{suffix} : Stat.LegalProgram Stat.Btest {sdef} :=\n  Stat.legal_of_W wcheck_{suffix}\n"
-    let meanTags := (if wNative || tNative || !inW then base ++ " [native]" else base) ++ condTag
+    -- mean_'s dynamic premise is in the test basis with the core library (`Stat.DynOf`): tagged
+    -- `[library]` when the program names a library value (the manifest's `library`)
+    let usesLib := match t.getObjValAs? (Array Json) "library" with
+      | .ok a => !a.isEmpty
+      | .error _ => false
+    let meanBase := if usesLib then base ++ " [library]" else base
+    let meanTags := (if wNative || tNative || !inW then meanBase ++ " [native]" else meanBase) ++ condTag
     let mean := if !meaning then "" else
       let tv := if kind == "view" then s!"Stat.value_of_viewChecks t_{suffix}"
         else

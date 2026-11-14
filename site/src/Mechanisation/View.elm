@@ -874,6 +874,14 @@ translationSection t =
                                     , Html.a [ Attr.href (proofHref Mechanisation.generatedSlug) ] [ Html.text "generated theorem" ]
                                     , Html.text ": some derivation of the program has a log that meets every check, or, for a test that stops at Debug.todo, the program has no meaning."
                                     ]
+                                        ++ (if List.isEmpty t.library then
+                                                []
+
+                                            else
+                                                Html.text " It uses values of the core library, which the book leaves outside the definition: "
+                                                    :: List.intersperse (Html.text ", ") (List.map code t.library)
+                                                    ++ [ Html.text ". Lean evaluates each by its Elm text in elm/core 1.0.5, so the theorems about this program also trust that text ([library])." ]
+                                           )
                                         ++ (if List.length t.sources > 1 then
                                                 [ Html.text " Its modules, in program order: "
                                                 , Html.text (String.join ", " t.sources)

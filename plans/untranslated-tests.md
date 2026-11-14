@@ -99,6 +99,15 @@ the book plus elm/core's Elm text. That text would be marked as library on the t
 [core-library.md](core-library.md) proposes this, with a Core Library section of the site that
 specifies elm/core against the book.
 
+**Update (2026-11-13): 28 of the 29 translated** ([library-elm-texts.md](library-elm-texts.md)).
+Not as top-level definitions of each program, but as values of the dynamic test basis
+(`Lib.Btest`): the translator writes the closure of elm/core 1.0.5's texts of `List.foldl`,
+`foldr`, `head`, `length`, `map`, `sum`, `Maybe.andThen`, `map`, `withDefault`, `Result.map`,
+`Tuple.first` and `second` as four library modules (`Generated/Library.lean`), and Lean evaluates
+them by Chapter 7's rules. Every test of this group but LetNumberMap2Test now has `t_`, `spec_`,
+`ident_` and `mean_` theorems, tagged `[library]`; 18 are `[native]` because they use `round`
+(none for the memory budget). LetNumberMap2Test stays out: `List.map2` is a kernel value.
+
 ## E. Debug.log as observable output (10)
 
 `checks:unmatched` (9): DebugLogLambdaBoundaryTest, DebugNumberAtFloatTest, CovEtaDebugLogTest,

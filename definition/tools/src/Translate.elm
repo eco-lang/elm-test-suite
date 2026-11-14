@@ -3,9 +3,11 @@ module Translate exposing (run)
 {-| Translates the `elm-spec` tests of `tests/` into Lean for the mechanisation of A Standard
 Definition of Elm? (plans/elm-to-lean-translator.md). Run from the repository's root:
 
-    site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm            -- write
-    site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --check    -- compare only
-    site/node_modules/.bin/elm-pages run definition/tools/src/Translate.elm --report-all-refusals FILE
+    site / node_modules /. bin / elm - pages run definition / tools / src / Translate.elm -- write
+
+    site / node_modules /. bin / elm - pages run definition / tools / src / Translate.elm --check    -- compare only
+
+    site / node_modules /. bin / elm - pages run definition / tools / src / Translate.elm --report-all-refusals FILE
 
 It writes, under `definition/mechanisation/standard-elm-mech/StandardElmMech/Generated/`, one Lean
 file of programs per shard (a fixed alphabetical bucket of test names, `bucketOf`), `All.lean`, and
@@ -40,6 +42,8 @@ import Translate.Classify as Classify
 import Translate.ClassifyOverrides as ClassifyOverrides
 import Translate.Convert as Convert
 import Translate.Directives as Directives
+import Translate.Library as Library exposing (Library)
+import Translate.LibraryTexts as LibraryTexts
 import Translate.Pipeline as Pipeline exposing (Outcome(..))
 import Translate.Source as Source
 
@@ -69,16 +73,43 @@ The buckets of the translated view programs (`Elm_*.lean` and `ChecksElm_*.lean`
 bounds of the end-to-end certificates (`e2eBounds` in Certify.lean), so that each certificate file
 imports the program and check files of its own bucket only; if the two lists differ, nothing is
 wrong but a change spreads to more files.
+
 -}
 viewBounds : List String
 viewBounds =
-    [ "elm-core/", "elm-core/CompareI", "elm-core/CoreIssue115", "elm-core/FloatD", "elm-core/FloatSu"
-    , "elm-core/NotEqualBoolP", "elm-core/StandardA42", "elm-core/TaskOnErrorS"
-    , "elm/", "elm/Ap", "elm/As", "elm/CaseF", "elm/CaseS", "elm/CharU", "elm/CombinatorL", "elm/CombinatorP"
-    , "elm/CombinatorSP", "elm/CompilerIssue22"
-    , "elm/CovTailRecPairParameters", "elm/EmbeddedNo", "elm/Fli", "elm/ImportE", "elm/InfixPrecO"
-    , "elm/LetN", "elm/LetNumberLo", "elm/Li", "elm/M", "elm/PartialAppCh", "elm/PortEchoN"
-    , "elm/RecordAccessorFunctionT", "elm/SingleCtorPairBoolF", "elm/StandardL", "elm/TailRecT"
+    [ "elm-core/"
+    , "elm-core/CompareI"
+    , "elm-core/CoreIssue115"
+    , "elm-core/FloatD"
+    , "elm-core/FloatSu"
+    , "elm-core/NotEqualBoolP"
+    , "elm-core/StandardA42"
+    , "elm-core/TaskOnErrorS"
+    , "elm/"
+    , "elm/Ap"
+    , "elm/As"
+    , "elm/CaseF"
+    , "elm/CaseS"
+    , "elm/CharU"
+    , "elm/CombinatorL"
+    , "elm/CombinatorP"
+    , "elm/CombinatorSP"
+    , "elm/CompilerIssue22"
+    , "elm/CovTailRecPairParameters"
+    , "elm/EmbeddedNo"
+    , "elm/Fli"
+    , "elm/ImportE"
+    , "elm/InfixPrecO"
+    , "elm/LetN"
+    , "elm/LetNumberLo"
+    , "elm/Li"
+    , "elm/M"
+    , "elm/PartialAppCh"
+    , "elm/PortEchoN"
+    , "elm/RecordAccessorFunctionT"
+    , "elm/SingleCtorPairBoolF"
+    , "elm/StandardL"
+    , "elm/TailRecT"
     ]
 
 
@@ -87,12 +118,30 @@ viewBounds =
 -}
 srcBounds : List String
 srcBounds =
-    [ "elm-core/", "elm-core/CoreIssue112", "elm-core/FloatS", "elm-core/StandardA41"
-    , "elm/", "elm/CaseCustomTypeT", "elm/CharC", "elm/CompilerIssue176", "elm/CompilerIssue217"
-    , "elm/CustomTypeUnboundV", "elm/Flo", "elm/InfixAssocP", "elm/LetNumberAp", "elm/LetNumberRecordM"
-    , "elm/Mu", "elm/PolyStepLoopFo", "elm/RecordNarrow06", "elm/StandardA9"
-    , "elm/TooManyArgsTooManyArgumentsToAN", "elm/TypeMismatchCon", "elm/TypeMismatchListE"
-    , "elm/TypeMismatchRigidNumberAsF", "elm/TypeMismatchTu", "elm/WideRecordDecoder30T"
+    [ "elm-core/"
+    , "elm-core/CoreIssue112"
+    , "elm-core/FloatS"
+    , "elm-core/StandardA41"
+    , "elm/"
+    , "elm/CaseCustomTypeT"
+    , "elm/CharC"
+    , "elm/CompilerIssue176"
+    , "elm/CompilerIssue217"
+    , "elm/CustomTypeUnboundV"
+    , "elm/Flo"
+    , "elm/InfixAssocP"
+    , "elm/LetNumberAp"
+    , "elm/LetNumberRecordM"
+    , "elm/Mu"
+    , "elm/PolyStepLoopFo"
+    , "elm/RecordNarrow06"
+    , "elm/StandardA9"
+    , "elm/TooManyArgsTooManyArgumentsToAN"
+    , "elm/TypeMismatchCon"
+    , "elm/TypeMismatchListE"
+    , "elm/TypeMismatchRigidNumberAsF"
+    , "elm/TypeMismatchTu"
+    , "elm/WideRecordDecoder30T"
     ]
 
 
@@ -142,7 +191,17 @@ bucketed bounds keyOf xs =
     List.sort bounds
         |> List.filterMap
             (\b ->
-                case List.filterMap (\( c, x ) -> if c == b then Just x else Nothing) tagged of
+                case
+                    List.filterMap
+                        (\( c, x ) ->
+                            if c == b then
+                                Just x
+
+                            else
+                                Nothing
+                        )
+                        tagged
+                of
                     [] ->
                         Nothing
 
@@ -236,8 +295,8 @@ defNameOf t =
     "g_" ++ String.replace "-" "_" t.project ++ "_" ++ t.name
 
 
-entry : Choices -> Sources -> Test -> BackendTask FatalError (Maybe Entry)
-entry choices sources t =
+entry : Library -> Choices -> Sources -> Test -> BackendTask FatalError (Maybe Entry)
+entry lib choices sources t =
     BackendTask.File.rawFile t.path
         |> BackendTask.allowFatal
         |> BackendTask.andThen
@@ -249,7 +308,7 @@ entry choices sources t =
                 if List.member "elm-spec" directives.tags && not directives.helper then
                     let
                         outcome =
-                            case Pipeline.translateWith (lookupIn sources t.project) { project = t.project, name = t.name, defName = defNameOf t } source directives of
+                            case Pipeline.translateIn lib (lookupIn sources t.project) { project = t.project, name = t.name, defName = defNameOf t } source directives of
                                 Translated tr ->
                                     case ( tr.kind, Dict.get (t.project ++ "/" ++ t.name) choices ) of
                                         ( "worker", Just fields ) ->
@@ -492,6 +551,12 @@ manifest toolsSha srcByTest entries =
                                         else
                                             [ ( "dropped", Encode.list Encode.string t.dropped ) ]
                                        )
+                                    ++ (if List.isEmpty t.library then
+                                            []
+
+                                        else
+                                            [ ( "library", Encode.list Encode.string t.library ) ]
+                                       )
                                     ++ [ ( "lean", Encode.string t.lean ) ]
 
                             Refused r ->
@@ -595,83 +660,89 @@ run =
             tests
                 |> BackendTask.andThen
                     (\ts ->
-                        BackendTask.map2 Tuple.pair
+                        BackendTask.map3 (\a b c -> ( a, b, c ))
                             (BackendTask.File.jsonFile Choices.decoder Choices.path |> BackendTask.allowFatal)
                             (readSources ts)
+                            libraryTextsTask
                             |> BackendTask.andThen
-                                (\( choices, sources ) ->
-                                    BackendTask.sequence (List.map (entry choices sources) ts)
-                                        |> BackendTask.map (\es -> ( ( ts, sources ), List.filterMap identity es ))
+                                (\( choices, sources, texts ) ->
+                                    case buildLibrary texts of
+                                        Err problem ->
+                                            BackendTask.fail (FatalError.fromString ("the library: " ++ problem))
+
+                                        Ok built ->
+                                            BackendTask.sequence (List.map (entry built.library choices sources) ts)
+                                                |> BackendTask.map (\es -> ( ( ts, sources, built ), List.filterMap identity es ))
                                 )
                     )
                 |> BackendTask.andThen
-                    (\( ( allTests, sources ), entries ) ->
-                      case options.reportAll of
-                        Just path ->
-                            BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/src") Decode.string
-                                |> BackendTask.allowFatal
-                                |> BackendTask.andThen
-                                    (\toolsSha ->
-                                        Script.log (summary entries)
-                                            |> BackendTask.andThen
-                                                (\_ ->
-                                                    let
-                                                        body =
-                                                            refusalReport toolsSha sources allTests entries
-                                                    in
-                                                    Script.log ("report: " ++ String.fromInt (String.length body) ++ " characters")
-                                                        |> BackendTask.andThen (\_ -> Script.writeFile { path = path, body = body } |> BackendTask.allowFatal)
-                                                )
-                                            |> BackendTask.andThen (\_ -> Script.log ("written: " ++ path))
+                    (\( ( allTests, sources, built ), entries ) ->
+                        case options.reportAll of
+                            Just path ->
+                                BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/src") Decode.string
+                                    |> BackendTask.allowFatal
+                                    |> BackendTask.andThen
+                                        (\toolsSha ->
+                                            Script.log (summary entries)
+                                                |> BackendTask.andThen
+                                                    (\_ ->
+                                                        let
+                                                            body =
+                                                                refusalReport built.library toolsSha sources allTests entries
+                                                        in
+                                                        Script.log ("report: " ++ String.fromInt (String.length body) ++ " characters")
+                                                            |> BackendTask.andThen (\_ -> Script.writeFile { path = path, body = body } |> BackendTask.allowFatal)
+                                                    )
+                                                |> BackendTask.andThen (\_ -> Script.log ("written: " ++ path))
+                                        )
+
+                            Nothing ->
+                                BackendTask.map5 (\a b c d e -> ( ( a, b ), ( c, d ), e ))
+                                    (BackendTask.File.rawFile (mech ++ "StandardElmMech.lean") |> BackendTask.allowFatal)
+                                    (BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/src") Decode.string |> BackendTask.allowFatal)
+                                    bookLabelsTask
+                                    (BackendTask.map2 Tuple.pair
+                                        (BackendTask.File.jsonFile SB.basisDecoder staticBasisPath |> BackendTask.allowFatal)
+                                        (sha256 staticBasisPath)
                                     )
+                                    libraryTask
+                                    |> BackendTask.andThen
+                                        (\( ( rootSource, toolsSha ), ( labels, ( basis, basisSha ) ), libs ) ->
+                                            let
+                                                cls =
+                                                    classification labels basis basisSha allTests sources
 
-                        Nothing ->
-                            BackendTask.map5 (\a b c d e -> ( ( a, b ), ( c, d ), e ))
-                                (BackendTask.File.rawFile (mech ++ "StandardElmMech.lean") |> BackendTask.allowFatal)
-                                (BackendTask.Custom.run "sha256Tree" (Encode.string "definition/tools/src") Decode.string |> BackendTask.allowFatal)
-                                bookLabelsTask
-                                (BackendTask.map2 Tuple.pair
-                                    (BackendTask.File.jsonFile SB.basisDecoder staticBasisPath |> BackendTask.allowFatal)
-                                    (sha256 staticBasisPath)
-                                )
-                                libraryTask
-                                |> BackendTask.andThen
-                                    (\( ( rootSource, toolsSha ), ( labels, ( basis, basisSha ) ), libs ) ->
-                                        let
-                                            cls =
-                                                classification labels basis basisSha allTests sources
+                                                src =
+                                                    sourceSyntax allTests sources
+                                            in
+                                            if options.classifyStatic then
+                                                Script.log (cls.summary ++ "\n" ++ cls.lists)
 
-                                            src =
-                                                sourceSyntax allTests sources
-                                        in
-                                        if options.classifyStatic then
-                                            Script.log (cls.summary ++ "\n" ++ cls.lists)
+                                            else
+                                                case Result.map2 Tuple.pair (outputs toolsSha src.byTest entries rootSource |> Result.mapError (\p -> "StandardElmMech.lean: " ++ p)) (staticLibrary libs) of
+                                                    Err problem ->
+                                                        BackendTask.fail (FatalError.fromString problem)
 
-                                        else
-                                            case Result.map2 Tuple.pair (outputs toolsSha src.byTest entries rootSource |> Result.mapError (\p -> "StandardElmMech.lean: " ++ p)) (staticLibrary libs) of
-                                                Err problem ->
-                                                    BackendTask.fail (FatalError.fromString problem)
+                                                    Ok ( files0, libFile ) ->
+                                                        let
+                                                            files =
+                                                                files0
+                                                                    ++ [ { path = classificationPath, body = cls.body } ]
+                                                                    ++ src.files
+                                                                    ++ [ libFile, built.file ]
+                                                        in
+                                                        Script.log (summary entries ++ "\n" ++ src.summary)
+                                                            |> BackendTask.andThen
+                                                                (\_ ->
+                                                                    if check then
+                                                                        compareAll files
 
-                                                Ok ( files0, libFile ) ->
-                                                    let
-                                                        files =
-                                                            files0
-                                                                ++ [ { path = classificationPath, body = cls.body } ]
-                                                                ++ src.files
-                                                                ++ [ libFile ]
-                                                    in
-                                                    Script.log (summary entries ++ "\n" ++ src.summary)
-                                                        |> BackendTask.andThen
-                                                            (\_ ->
-                                                                if check then
-                                                                    compareAll files
-
-                                                                else
-                                                                    writeAll files
-                                                            )
-                                    )
-                        )
-            )
+                                                                    else
+                                                                        writeAll files
+                                                                )
+                                        )
+                    )
+        )
 
 
 {-| The library values of the test basis (decision D2 (b)): module, vendored file, values. The
@@ -696,7 +767,8 @@ libraryTask =
         |> BackendTask.sequence
 
 
-{-| Generated/StaticLibrary.lean: the annotations of the library values, as source syntax. -}
+{-| Generated/StaticLibrary.lean: the annotations of the library values, as source syntax.
+-}
 staticLibrary : List ( ( String, String, List String ), String ) -> Result String Output
 staticLibrary libs =
     let
@@ -731,6 +803,35 @@ staticLibrary libs =
                         ++ "]\n\nend StandardElm.Stat\n"
                 }
             )
+
+
+{-| The library values the translator evaluates (plans/library-elm-texts.md, step 1): module, vendored
+file, values. Each is defined in elm/core 1.0.5 by Elm text that names only other Elm text, the
+book's basic values and `List.cons`. A test may name them; the dynamic test basis binds them to the
+values of their texts (`Lib.Btest`), which `Generated/Library.lean` holds as modules.
+-}
+evaluatedLibrary : List Library.Text
+evaluatedLibrary =
+    [ { modul = "List", path = "definition/library/elm-core-1.0.5/src/List.elm", values = [ "foldl", "foldr", "head", "length", "map", "sum" ] }
+    , { modul = "Maybe", path = "definition/library/elm-core-1.0.5/src/Maybe.elm", values = [ "andThen", "map", "withDefault" ] }
+    , { modul = "Result", path = "definition/library/elm-core-1.0.5/src/Result.elm", values = [ "map" ] }
+    , { modul = "Tuple", path = "definition/library/elm-core-1.0.5/src/Tuple.elm", values = [ "first", "second" ] }
+    ]
+
+
+libraryTextsTask : BackendTask FatalError (List ( Library.Text, String ))
+libraryTextsTask =
+    evaluatedLibrary
+        |> List.map (\t -> BackendTask.File.rawFile t.path |> BackendTask.allowFatal |> BackendTask.map (\src -> ( t, src )))
+        |> BackendTask.sequence
+
+
+{-| The library the tests may name and `Generated/Library.lean` (`LibraryTexts.build`).
+-}
+buildLibrary : List ( Library.Text, String ) -> Result String { library : Library, file : Output }
+buildLibrary texts =
+    LibraryTexts.build texts
+        |> Result.map (\b -> { library = b.library, file = { path = generatedDir ++ "Library.lean", body = header ++ b.lean } })
 
 
 staticBasisPath : String
@@ -1115,12 +1216,15 @@ sourceSyntax allTests sources =
 
         refusedReasons =
             results
-                |> List.filterMap (\( _, r, _ ) -> case r of
-                    Err problem ->
-                        Just problem.reason
+                |> List.filterMap
+                    (\( _, r, _ ) ->
+                        case r of
+                            Err problem ->
+                                Just problem.reason
 
-                    Ok _ ->
-                        Nothing)
+                            Ok _ ->
+                                Nothing
+                    )
 
         reasonCounts =
             refusedReasons
@@ -1252,8 +1356,8 @@ compareAll files =
 with the facts the inventory script needs: the modules a test uses beyond the default imports, its
 imports that name a module among its project's sources, and whether it is a worker or a port module.
 -}
-refusalReport : String -> Sources -> List Test -> List Entry -> String
-refusalReport toolsSha sources allTests entries =
+refusalReport : Library -> String -> Sources -> List Test -> List Entry -> String
+refusalReport lib toolsSha sources allTests entries =
     let
         encodeFound f =
             Encode.object
@@ -1267,7 +1371,7 @@ refusalReport toolsSha sources allTests entries =
         encodeEntry e =
             let
                 found =
-                    Pipeline.translateAllWith (lookupIn sources e.test.project) { project = e.test.project, name = e.test.name, defName = e.defName } e.source (Directives.read e.source)
+                    Pipeline.translateAllIn lib (lookupIn sources e.test.project) { project = e.test.project, name = e.test.name, defName = e.defName } e.source (Directives.read e.source)
 
                 factFields =
                     case Elm.Parser.parseToFile e.source of

@@ -1,4 +1,4 @@
-module Translate.Pipeline exposing (Found, Lookup, Outcome(..), Refusal, Stage(..), stageName, translate, translateAll, translateAllWith, translateWith)
+module Translate.Pipeline exposing (Found, Lookup, Outcome(..), Refusal, Stage(..), stageName, translate, translateAll, translateAllIn, translateAllWith, translateIn, translateWith)
 
 {-| One test, from source to Lean or to the reason it is not translated: directives, parsing,
 conversion (names, fragment, checks), inference, number specialisation, printing.
@@ -14,6 +14,7 @@ import Translate.Directives as Directives exposing (Directives)
 import Translate.Infer as Infer
 import Translate.Ir as Ir exposing (Decl(..), Expr(..), Name(..), TestProgram, anyExpr)
 import Translate.Json as Json
+import Translate.Library as Library exposing (Library)
 import Translate.Specialise as Specialise
 import Translate.ToLean as ToLean
 
@@ -43,6 +44,9 @@ type Outcome
 
         -- the patterns of the CHECK-NOT lines proved by hand (plan step 6)
         , checkNots : List String
+
+        -- the core library values the program names, `M.x` (plans/library-elm-texts.md)
+        , library : List String
         }
     | Refused Refusal
 
@@ -63,7 +67,7 @@ basisModules =
 
 {-| The modules of a program in program order: depth-first post-order from the test, following
 each module's imports in the order written, a module after the modules it imports and once, the
-test last (res:program-import-order). An import of a module that is not among the project's
+test last (<res:program-import-order>). An import of a module that is not among the project's
 sources is left to the converter, which refuses it (`import:M`). An import cycle is refused.
 -}
 resolve : Lookup -> ModuleSource -> Result String (List ModuleSource)
@@ -120,7 +124,14 @@ translate =
 
 
 translateWith : Lookup -> { project : String, name : String, defName : String } -> String -> Directives -> Outcome
-translateWith lookup info source directives0 =
+translateWith =
+    translateIn Library.empty
+
+
+{-| A test's translation when its program may name the values of the core library `lib`.
+-}
+translateIn : Library -> Lookup -> { project : String, name : String, defName : String } -> String -> Directives -> Outcome
+translateIn lib lookup info source directives0 =
     let
         directives =
             Directives.dropCheckNots info.name directives0
@@ -139,7 +150,7 @@ translateWith lookup info source directives0 =
                 refuse "construct:large-computation"
 
             else
-                parseAndTranslate lookup info source directives
+                parseAndTranslate lib lookup info source directives
 
 
 {-| A message of inference that is a reason of its own: `main` is not a view
@@ -179,8 +190,8 @@ kernelTooLarge =
     []
 
 
-parseAndTranslate : Lookup -> { project : String, name : String, defName : String } -> String -> Directives -> Outcome
-parseAndTranslate lookup info source directives =
+parseAndTranslate : Library -> Lookup -> { project : String, name : String, defName : String } -> String -> Directives -> Outcome
+parseAndTranslate lib lookup info source directives =
     case Elm.Parser.parseToFile source of
         Err _ ->
             refuse "parse"
@@ -191,7 +202,7 @@ parseAndTranslate lookup info source directives =
                     refuse reason
 
                 Ok sources ->
-                    case Convert.convertProgram directives sources of
+                    case Convert.convertProgram lib directives sources of
                         ( _, p :: _ ) ->
                             Refused
                                 { reason = p.code
@@ -200,7 +211,7 @@ parseAndTranslate lookup info source directives =
                                 }
 
                         ( program, [] ) ->
-                            case Infer.infer program of
+                            case Infer.inferWith lib program of
                                 Err message ->
                                     if isReason message then
                                         Refused { reason = message, at = Nothing, detail = Nothing }
@@ -209,7 +220,7 @@ parseAndTranslate lookup info source directives =
                                         Refused { reason = "type", at = Nothing, detail = Just message }
 
                                 Ok inferred ->
-                                    case Specialise.specialise program inferred of
+                                    case Specialise.specialiseWith lib program inferred of
                                         Err message ->
                                             if String.startsWith "basis:" message || String.startsWith "construct:" message then
                                                 Refused { reason = message, at = Nothing, detail = Nothing }
@@ -222,8 +233,11 @@ parseAndTranslate lookup info source directives =
                                                 native =
                                                     specialised.native || List.member info.name kernelTooLarge
 
+                                                library =
+                                                    Library.used lib program
+
                                                 programText =
-                                                    ToLean.programDef info specialised.program specialised.kinds specialised.ports native
+                                                    ToLean.programDef info specialised.program specialised.kinds specialised.ports native library
 
                                                 host =
                                                     echoHost specialised.program specialised.ports
@@ -264,6 +278,7 @@ parseAndTranslate lookup info source directives =
                                                 , flags = directives.flagsText
                                                 , dropped = directives.dropped
                                                 , checkNots = directives.checkNots
+                                                , library = library
                                                 }
 
 
@@ -378,7 +393,14 @@ translateAll =
 
 
 translateAllWith : Lookup -> { project : String, name : String, defName : String } -> String -> Directives -> List Found
-translateAllWith lookup info source directives =
+translateAllWith =
+    translateAllIn Library.empty
+
+
+{-| `translateAllWith` for a program that may name the values of the core library `lib`.
+-}
+translateAllIn : Library -> Lookup -> { project : String, name : String, defName : String } -> String -> Directives -> List Found
+translateAllIn lib lookup info source directives =
     let
         fromDirectives =
             List.map (found StDirectives) directives.refusals
@@ -418,17 +440,17 @@ translateAllWith lookup info source directives =
                                 [ found StConvert reason ]
 
                             Ok sources ->
-                                afterResolution directives sources
+                                afterResolution lib directives sources
                )
 
 
 {-| The refusals from conversion on, for a program whose modules are resolved.
 -}
-afterResolution : Directives -> List ModuleSource -> List Found
-afterResolution directives sources =
+afterResolution : Library -> Directives -> List ModuleSource -> List Found
+afterResolution lib directives sources =
     let
         ( program, problems ) =
-            Convert.convertProgram directives sources
+            Convert.convertProgram lib directives sources
 
         fromConvert =
             List.map
@@ -447,7 +469,7 @@ afterResolution directives sources =
 
     else
         fromConvert
-            ++ (case Infer.infer program of
+            ++ (case Infer.inferWith lib program of
                     Err message ->
                         if String.startsWith "unknown-type:" message || isReason message then
                             [ found StInfer message ]
@@ -456,7 +478,7 @@ afterResolution directives sources =
                             [ { stage = StInfer, reason = "type", at = Nothing, detail = Just message } ]
 
                     Ok inferred ->
-                        case Specialise.specialise program inferred of
+                        case Specialise.specialiseWith lib program inferred of
                             Err message ->
                                 if String.startsWith "basis:" message then
                                     [ found StSpecialise message ]

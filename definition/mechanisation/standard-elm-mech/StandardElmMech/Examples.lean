@@ -86,6 +86,10 @@ structure Program where
       printing), which the kernel cannot reduce: its checks are then decided
       by `native_decide` only. -/
   native : Bool := false
+  /-- The core library values the program names, `M.x` (plans/library-elm-texts.md): the values
+      the dynamic test basis `Lib.Btest` binds to the values of their elm/core texts. Its theorem
+      is tagged `[library]` when there is one. -/
+  library : List String := []
   /-- The main module's header's exposing list and its written imports. -/
   exposing : Mod.ExpList := .items [.var "main"]
   imports : List Mod.Import := [⟨"Html", "Html", some (.items [.var "text"])⟩]

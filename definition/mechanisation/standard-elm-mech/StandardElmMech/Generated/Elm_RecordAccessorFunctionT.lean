@@ -53,6 +53,114 @@ def g_elm_RecordCreateTest : Program := {
     chk .check "record1: { x = 1, y = 2 }" .data,
     chk .check "record2: { age = 30, name = \"Alice\" }" .data ] }
 
+/-- tests/elm/src/RecordNarrow01CapturesNonEmptyTest.elm -/
+def g_elm_RecordNarrow01CapturesNonEmptyTest : Program := {
+  name := "RecordNarrow01CapturesNonEmptyTest", source := "tests/elm/src",
+  library := ["List.foldl", "List.length", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("LambdaId", [("LambdaId", 1)])],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "innerVal" [] (recE [("lambdaId", ap (c "LambdaId") [i 999]), ("captures", listE [.atexp (.scon (.intF 1)), .atexp (.scon (.intF 2)), .atexp (.scon (.intF 3))]), ("params", listE []), ("closureKind", c "Nothing"), ("captureAbi", c "Nothing")]), .fn "outer1" [] (recE [("name", str "test1"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "outer2" [] (recE [("name", str "test2"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "members" [] (listE [tup2 (.atexp (.scon (.intF 0))) (v "outer1"), tup2 (.atexp (.scon (.intF 1))) (v "outer2")]), .fn "buildSibling" [pv "tup", pv "acc"] (letDefs [.fn "member" [] (ap (qv "Tuple" "second") [v "tup"]), .fn "inner" [] (.atexp (access (A (v "member")) "inner")), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "captures")]), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "params")]), .pat (.paren (pcon "LambdaId" [pv "uid"])) (.atexp (access (A (v "inner")) "lambdaId"))] (bin "+" (v "uid") (v "acc"))), .fn "result" [] (ap (qv "List" "foldl") [v "buildSibling", i 0, v "members"]), .pat pw (ap (qv "Debug" "log") [str "uid", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "uid: 1998" .int ] }
+
+/-- tests/elm/src/RecordNarrow02CapturesNothingTest.elm -/
+def g_elm_RecordNarrow02CapturesNothingTest : Program := {
+  name := "RecordNarrow02CapturesNothingTest", source := "tests/elm/src",
+  library := ["List.foldl", "List.length", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("LambdaId", [("LambdaId", 1)])],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "innerVal" [] (recE [("lambdaId", ap (c "LambdaId") [i 999]), ("captures", c "Nothing"), ("params", listE []), ("closureKind", c "Nothing"), ("captureAbi", c "Nothing")]), .fn "outer1" [] (recE [("name", str "test1"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "outer2" [] (recE [("name", str "test2"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "members" [] (listE [tup2 (.atexp (.scon (.intF 0))) (v "outer1"), tup2 (.atexp (.scon (.intF 1))) (v "outer2")]), .fn "buildSibling" [pv "tup", pv "acc"] (letDefs [.fn "member" [] (ap (qv "Tuple" "second") [v "tup"]), .fn "inner" [] (.atexp (access (A (v "member")) "inner")), .pat pw (caseOf (.atexp (access (A (v "inner")) "captures")) [(pcon "Just" [pw], .atexp (.scon (.intF 1))), (P (pcA "Nothing"), .atexp (.scon (.intF 0)))]), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "params")]), .pat (.paren (pcon "LambdaId" [pv "uid"])) (.atexp (access (A (v "inner")) "lambdaId"))] (bin "+" (v "uid") (v "acc"))), .fn "result" [] (ap (qv "List" "foldl") [v "buildSibling", i 0, v "members"]), .pat pw (ap (qv "Debug" "log") [str "uid", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "uid: 1998" .int ] }
+
+/-- tests/elm/src/RecordNarrow03FullAnnotationTest.elm -/
+def g_elm_RecordNarrow03FullAnnotationTest : Program := {
+  name := "RecordNarrow03FullAnnotationTest", source := "tests/elm/src",
+  library := ["List.foldl", "List.length", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("LambdaId", [("LambdaId", 1)])],
+  aliases := [("Inner", some ["lambdaId", "captures", "params", "closureKind", "captureAbi"]), ("Outer", some ["name", "inner", "body", "monoType"])],
+  defs := [
+    .fn "main" [] (letDefs [.fn "innerVal" [] (recE [("lambdaId", ap (c "LambdaId") [i 999]), ("captures", listE []), ("params", listE []), ("closureKind", c "Nothing"), ("captureAbi", c "Nothing")]), .fn "outer1" [] (recE [("name", str "test1"), ("inner", v "innerVal"), ("body", i 0), ("monoType", i 0)]), .fn "outer2" [] (recE [("name", str "test2"), ("inner", v "innerVal"), ("body", i 0), ("monoType", i 0)]), .fn "members" [] (listE [tup2 (i 0) (v "outer1"), tup2 (i 1) (v "outer2")]), .fn "buildSibling" [pv "tup", pv "acc"] (letDefs [.fn "member" [] (ap (qv "Tuple" "second") [v "tup"]), .fn "inner" [] (.atexp (access (A (v "member")) "inner")), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "captures")]), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "params")]), .pat (.paren (pcon "LambdaId" [pv "uid"])) (.atexp (access (A (v "inner")) "lambdaId"))] (bin "+" (v "uid") (v "acc"))), .fn "result" [] (ap (qv "List" "foldl") [v "buildSibling", i 0, v "members"]), .pat pw (ap (qv "Debug" "log") [str "uid", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "uid: 1998" .int ] }
+
+/-- tests/elm/src/RecordNarrow04SingleFieldTest.elm -/
+def g_elm_RecordNarrow04SingleFieldTest : Program := {
+  name := "RecordNarrow04SingleFieldTest", source := "tests/elm/src",
+  library := ["List.foldl", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("LambdaId", [("LambdaId", 1)])],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "innerVal" [] (recE [("lambdaId", ap (c "LambdaId") [i 999]), ("captures", listE []), ("params", listE []), ("closureKind", c "Nothing"), ("captureAbi", c "Nothing")]), .fn "outer1" [] (recE [("name", str "test1"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "outer2" [] (recE [("name", str "test2"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "members" [] (listE [tup2 (.atexp (.scon (.intF 0))) (v "outer1"), tup2 (.atexp (.scon (.intF 1))) (v "outer2")]), .fn "buildSibling" [pv "tup", pv "acc"] (letDefs [.fn "member" [] (ap (qv "Tuple" "second") [v "tup"]), .fn "inner" [] (.atexp (access (A (v "member")) "inner")), .pat (.paren (pcon "LambdaId" [pv "uid"])) (.atexp (access (A (v "inner")) "lambdaId"))] (bin "+" (v "uid") (v "acc"))), .fn "result" [] (ap (qv "List" "foldl") [v "buildSibling", i 0, v "members"]), .pat pw (ap (qv "Debug" "log") [str "uid", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "uid: 1998" .int ] }
+
+/-- tests/elm/src/RecordNarrow05NoNestingTest.elm -/
+def g_elm_RecordNarrow05NoNestingTest : Program := {
+  name := "RecordNarrow05NoNestingTest", source := "tests/elm/src",
+  library := ["List.foldl", "List.length", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("LambdaId", [("LambdaId", 1)])],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "innerVal" [] (recE [("lambdaId", ap (c "LambdaId") [i 999]), ("captures", listE []), ("params", listE []), ("closureKind", c "Nothing"), ("captureAbi", c "Nothing")]), .fn "members" [] (listE [tup2 (.atexp (.scon (.intF 0))) (v "innerVal"), tup2 (.atexp (.scon (.intF 1))) (v "innerVal")]), .fn "buildSibling" [pv "tup", pv "acc"] (letDefs [.fn "inner" [] (ap (qv "Tuple" "second") [v "tup"]), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "captures")]), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "params")]), .pat (.paren (pcon "LambdaId" [pv "uid"])) (.atexp (access (A (v "inner")) "lambdaId"))] (bin "+" (v "uid") (v "acc"))), .fn "result" [] (ap (qv "List" "foldl") [v "buildSibling", i 0, v "members"]), .pat pw (ap (qv "Debug" "log") [str "uid", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "uid: 1998" .int ] }
+
+/-- tests/elm/src/RecordNarrow06RowPolyAnnotationTest.elm -/
+def g_elm_RecordNarrow06RowPolyAnnotationTest : Program := {
+  name := "RecordNarrow06RowPolyAnnotationTest", source := "tests/elm/src",
+  library := ["List.foldl", "List.length", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("LambdaId", [("LambdaId", 1)])],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "innerVal" [] (recE [("lambdaId", ap (c "LambdaId") [i 999]), ("captures", listE []), ("params", listE []), ("closureKind", c "Nothing"), ("captureAbi", c "Nothing")]), .fn "outer1" [] (recE [("name", str "test1"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "outer2" [] (recE [("name", str "test2"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "members" [] (listE [tup2 (.atexp (.scon (.intF 0))) (v "outer1"), tup2 (.atexp (.scon (.intF 1))) (v "outer2")]), .fn "members$Int$Float$Float" [] (listE [tup2 (i 0) (v "outer1"), tup2 (i 1) (v "outer2")]), .fn "buildSibling" [pv "tup", pv "acc"] (letDefs [.fn "member" [] (ap (qv "Tuple" "second") [v "tup"]), .fn "inner" [] (.atexp (access (A (v "member")) "inner")), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "captures")]), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "params")]), .pat (.paren (pcon "LambdaId" [pv "uid"])) (.atexp (access (A (v "inner")) "lambdaId"))] (bin "+" (v "uid") (v "acc"))), .fn "result" [] (ap (qv "List" "foldl") [v "buildSibling", i 0, v "members$Int$Float$Float"]), .pat pw (ap (qv "Debug" "log") [str "uid", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "uid: 1998" .int ] }
+
+/-- tests/elm/src/RecordNarrow08NoDestructureTest.elm -/
+def g_elm_RecordNarrow08NoDestructureTest : Program := {
+  name := "RecordNarrow08NoDestructureTest", source := "tests/elm/src",
+  library := ["List.foldl", "List.length", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("LambdaId", [("LambdaId", 1)])],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "innerVal" [] (recE [("lambdaId", ap (c "LambdaId") [i 999]), ("captures", listE []), ("params", listE []), ("closureKind", c "Nothing"), ("captureAbi", c "Nothing")]), .fn "outer" [] (recE [("name", str "test"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "members" [] (listE [tup2 (.atexp (.scon (.intF 0))) (v "outer"), tup2 (.atexp (.scon (.intF 1))) (v "outer")]), .fn "buildSibling" [pv "tup", pv "acc"] (letDefs [.fn "member" [] (ap (qv "Tuple" "second") [v "tup"]), .fn "inner" [] (.atexp (access (A (v "member")) "inner")), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "captures")]), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "params")]), .pat pw (ap (qv "Debug" "log") [str "lambdaId", .atexp (access (A (v "inner")) "lambdaId")])] (bin "+" (v "acc") (.atexp (.scon (.intF 1))))), .fn "result" [] (ap (qv "List" "foldl") [v "buildSibling", .atexp (.scon (.intF 0)), v "members"]), .pat pw (ap (qv "Debug" "log") [str "count", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "lambdaId: LambdaId 999" .data ] }
+
+/-- tests/elm/src/RecordNarrow09DirectCallTest.elm -/
+def g_elm_RecordNarrow09DirectCallTest : Program := {
+  name := "RecordNarrow09DirectCallTest", source := "tests/elm/src",
+  library := ["List.length", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("LambdaId", [("LambdaId", 1)])],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "innerVal" [] (recE [("lambdaId", ap (c "LambdaId") [i 999]), ("captures", listE []), ("params", listE []), ("closureKind", c "Nothing"), ("captureAbi", c "Nothing")]), .fn "outer" [] (recE [("name", str "test"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "buildSibling" [pv "tup", pv "acc"] (letDefs [.fn "member" [] (ap (qv "Tuple" "second") [v "tup"]), .fn "inner" [] (.atexp (access (A (v "member")) "inner")), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "captures")]), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "params")]), .pat (.paren (pcon "LambdaId" [pv "uid"])) (.atexp (access (A (v "inner")) "lambdaId"))] (bin "+" (v "uid") (v "acc"))), .fn "result" [] (ap (v "buildSibling") [tup2 (.atexp (.scon (.intF 0))) (v "outer"), i 0]), .pat pw (ap (qv "Debug" "log") [str "uid", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "uid: 999" .int ] }
+
+/-- tests/elm/src/RecordNarrow10TripleNestingTest.elm -/
+def g_elm_RecordNarrow10TripleNestingTest : Program := {
+  name := "RecordNarrow10TripleNestingTest", source := "tests/elm/src",
+  library := ["List.foldl", "List.length", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("LambdaId", [("LambdaId", 1)])],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "innerVal" [] (recE [("lambdaId", ap (c "LambdaId") [i 999]), ("captures", listE []), ("params", listE []), ("closureKind", c "Nothing"), ("captureAbi", c "Nothing")]), .fn "midVal" [] (recE [("inner", v "innerVal"), ("midName", str "mid"), ("midTag", .atexp (.scon (.intF 0))), ("midSize", .atexp (.scon (.intF 0)))]), .fn "outerVal" [] (recE [("mid", v "midVal"), ("name", str "outer"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "members" [] (listE [tup2 (.atexp (.scon (.intF 0))) (v "outerVal"), tup2 (.atexp (.scon (.intF 1))) (v "outerVal")]), .fn "buildSibling" [pv "tup", pv "acc"] (letDefs [.fn "member" [] (ap (qv "Tuple" "second") [v "tup"]), .fn "inner" [] (.atexp (access (access (A (v "member")) "mid") "inner")), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "captures")]), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "params")]), .pat (.paren (pcon "LambdaId" [pv "uid"])) (.atexp (access (A (v "inner")) "lambdaId"))] (bin "+" (v "uid") (v "acc"))), .fn "result" [] (ap (qv "List" "foldl") [v "buildSibling", i 0, v "members"]), .pat pw (ap (qv "Debug" "log") [str "uid", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "uid: 1998" .int ] }
+
 /-- tests/elm/src/RecordNestedAccessTest.elm -/
 def g_elm_RecordNestedAccessTest : Program := {
   name := "RecordNestedAccessTest", source := "tests/elm/src",
@@ -64,6 +172,18 @@ def g_elm_RecordNestedAccessTest : Program := {
   checks := [
     chk .check "deep: 42" .float,
     chk .check "chain: 99" .float ] }
+
+/-- tests/elm/src/RecordOpenNarrowFieldIndexTest.elm -/
+def g_elm_RecordOpenNarrowFieldIndexTest : Program := {
+  name := "RecordOpenNarrowFieldIndexTest", source := "tests/elm/src",
+  library := ["List.foldl", "List.length", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("LambdaId", [("LambdaId", 1)])],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "innerVal" [] (recE [("lambdaId", ap (c "LambdaId") [i 999]), ("captures", listE []), ("params", listE []), ("closureKind", c "Nothing"), ("captureAbi", c "Nothing")]), .fn "outer1" [] (recE [("name", str "test1"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "outer2" [] (recE [("name", str "test2"), ("inner", v "innerVal"), ("body", .atexp (.scon (.intF 0))), ("monoType", .atexp (.scon (.intF 0)))]), .fn "members" [] (listE [tup2 (.atexp (.scon (.intF 0))) (v "outer1"), tup2 (.atexp (.scon (.intF 1))) (v "outer2")]), .fn "buildSibling" [pv "tup", pv "acc"] (letDefs [.fn "member" [] (ap (qv "Tuple" "second") [v "tup"]), .fn "inner" [] (.atexp (access (A (v "member")) "inner")), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "captures")]), .pat pw (ap (qv "List" "length") [.atexp (access (A (v "inner")) "params")]), .pat (.paren (pcon "LambdaId" [pv "uid"])) (.atexp (access (A (v "inner")) "lambdaId"))] (bin "+" (v "uid") (v "acc"))), .fn "result" [] (ap (qv "List" "foldl") [v "buildSibling", i 0, v "members"]), .pat pw (ap (qv "Debug" "log") [str "uid", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "uid: 1998" .int ] }
 
 /-- tests/elm/src/RecordRowsTest.elm -/
 def g_elm_RecordRowsTest : Program := {
@@ -273,7 +393,17 @@ def shard_Elm_RecordAccessorFunctionT : List Program :=
    g_elm_RecordChainedUpdateTest,
    g_elm_RecordChainedUpdatesTest,
    g_elm_RecordCreateTest,
+   g_elm_RecordNarrow01CapturesNonEmptyTest,
+   g_elm_RecordNarrow02CapturesNothingTest,
+   g_elm_RecordNarrow03FullAnnotationTest,
+   g_elm_RecordNarrow04SingleFieldTest,
+   g_elm_RecordNarrow05NoNestingTest,
+   g_elm_RecordNarrow06RowPolyAnnotationTest,
+   g_elm_RecordNarrow08NoDestructureTest,
+   g_elm_RecordNarrow09DirectCallTest,
+   g_elm_RecordNarrow10TripleNestingTest,
    g_elm_RecordNestedAccessTest,
+   g_elm_RecordOpenNarrowFieldIndexTest,
    g_elm_RecordRowsTest,
    g_elm_RecordUpdatePolyFieldTest,
    g_elm_RecordUpdateTest,

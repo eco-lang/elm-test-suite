@@ -367,6 +367,75 @@ theorem ident_elm_NumberGenericAppCustom :
   Stat.ident_of_wCheck wcheck_elm_NumberGenericAppCustom
 
 
+/-- tests/elm/src/NumberGenericAppList.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_NumberGenericAppList : Stat.wCheck Stat.Btest s_elm_NumberGenericAppList (some g_elm_NumberGenericAppList.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/NumberGenericAppList.elm [parse] [harness] [params] -/
+theorem legal_elm_NumberGenericAppList : Stat.LegalProgram Stat.Btest s_elm_NumberGenericAppList :=
+  Stat.legal_of_W wcheck_elm_NumberGenericAppList
+
+/-- tests/elm/src/NumberGenericAppList.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_NumberGenericAppList : Stat.endToEndW Stat.Btest s_elm_NumberGenericAppList = .ok g_elm_NumberGenericAppList.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_NumberGenericAppList
+
+/-- tests/elm/src/NumberGenericAppList.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] [library] [native] -/
+theorem mean_elm_NumberGenericAppList :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_NumberGenericAppList) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_NumberGenericAppList (Stat.value_of_viewChecks t_elm_NumberGenericAppList)
+
+/-- tests/elm/src/NumberGenericAppList.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_NumberGenericAppList :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_NumberGenericAppList) r → r = g_elm_NumberGenericAppList.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_NumberGenericAppList
+
+
+/-- tests/elm/src/NumberGenericAppMaybe.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_NumberGenericAppMaybe : Stat.wCheck Stat.Btest s_elm_NumberGenericAppMaybe (some g_elm_NumberGenericAppMaybe.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/NumberGenericAppMaybe.elm [parse] [harness] [params] -/
+theorem legal_elm_NumberGenericAppMaybe : Stat.LegalProgram Stat.Btest s_elm_NumberGenericAppMaybe :=
+  Stat.legal_of_W wcheck_elm_NumberGenericAppMaybe
+
+/-- tests/elm/src/NumberGenericAppMaybe.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_NumberGenericAppMaybe : Stat.endToEndW Stat.Btest s_elm_NumberGenericAppMaybe = .ok g_elm_NumberGenericAppMaybe.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_NumberGenericAppMaybe
+
+/-- tests/elm/src/NumberGenericAppMaybe.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] [library] [native] -/
+theorem mean_elm_NumberGenericAppMaybe :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_NumberGenericAppMaybe) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_NumberGenericAppMaybe (Stat.value_of_viewChecks t_elm_NumberGenericAppMaybe)
+
+/-- tests/elm/src/NumberGenericAppMaybe.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_NumberGenericAppMaybe :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_NumberGenericAppMaybe) r → r = g_elm_NumberGenericAppMaybe.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_NumberGenericAppMaybe
+
+
+/-- tests/elm/src/NumberGenericAppTuple.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_NumberGenericAppTuple : Stat.wCheck Stat.Btest s_elm_NumberGenericAppTuple (some g_elm_NumberGenericAppTuple.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/NumberGenericAppTuple.elm [parse] [harness] [params] -/
+theorem legal_elm_NumberGenericAppTuple : Stat.LegalProgram Stat.Btest s_elm_NumberGenericAppTuple :=
+  Stat.legal_of_W wcheck_elm_NumberGenericAppTuple
+
+/-- tests/elm/src/NumberGenericAppTuple.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_NumberGenericAppTuple : Stat.endToEndW Stat.Btest s_elm_NumberGenericAppTuple = .ok g_elm_NumberGenericAppTuple.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_NumberGenericAppTuple
+
+/-- tests/elm/src/NumberGenericAppTuple.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] [library] [native] -/
+theorem mean_elm_NumberGenericAppTuple :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_NumberGenericAppTuple) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_NumberGenericAppTuple (Stat.value_of_viewChecks t_elm_NumberGenericAppTuple)
+
+/-- tests/elm/src/NumberGenericAppTuple.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_NumberGenericAppTuple :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_NumberGenericAppTuple) r → r = g_elm_NumberGenericAppTuple.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_NumberGenericAppTuple
+
+
 /-- tests/elm/src/OutgoingPortTuple3KeepsRunningTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
 theorem wcheck_elm_OutgoingPortTuple3KeepsRunningTest : Stat.wCheck Stat.Btest s_elm_OutgoingPortTuple3KeepsRunningTest (some w_elm_OutgoingPortTuple3KeepsRunningTest.reduced) = true :=
   Stat.wCheck_of_ctx ctx_a55425dd_eq (by decide +kernel)

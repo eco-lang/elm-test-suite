@@ -1,10 +1,13 @@
 module Translate.Classify exposing
     ( ErrorRecord
     , ModuleParse
+    , Refs
     , SuccessRecord
     , bookLabels
     , classifyError
     , classifySuccess
+    , emptyRefs
+    , functionRefs
     , furtherRules
     , syntacticRules
     , trustedRules
@@ -22,6 +25,7 @@ without inference (`static-deterministic`, step 9); otherwise `inference` (step 
 A compile-success test records what it needs beyond the book's basis B0: its helper modules, the
 harness's `Html.text`, library values of modules of ME0 that Appendix C does not bind, and modules
 outside ME0; its `basis` is the first of those that applies.
+
 -}
 
 import Dict exposing (Dict)
@@ -112,9 +116,15 @@ bookLabels tex =
 -}
 trustedRules : List String
 trustedRules =
-    [ "res:core-escape-unicode", "res:core-identifier-characters", "res:core-constant-separated"
-    , "res:core-adjacent-items", "res:core-layout-rule", "res:core-operator-chain"
-    , "res:core-field-selection", "res:core-annotation-placement", "res:modules-header"
+    [ "res:core-escape-unicode"
+    , "res:core-identifier-characters"
+    , "res:core-constant-separated"
+    , "res:core-adjacent-items"
+    , "res:core-layout-rule"
+    , "res:core-operator-chain"
+    , "res:core-field-selection"
+    , "res:core-annotation-placement"
+    , "res:modules-header"
     ]
 
 
@@ -122,15 +132,33 @@ trustedRules =
 -}
 syntacticRules : List String
 syntacticRules =
-    [ "res:core-row-labels-distinct", "res:core-record-update-form", "res:core-binding-site-distinct"
-    , "res:core-no-shadowing", "res:core-no-float-pattern", "res:core-let-recursion"
-    , "res:modules-ports", "res:modules-import-alias", "res:modules-basics-qualifier"
-    , "res:modules-no-operator-exposing", "res:modules-header-exposing", "res:modules-exposing-distinct"
-    , "res:modules-no-top-pattern", "res:modules-values-distinct", "res:modules-types-distinct"
-    , "res:modules-constructors-distinct", "res:modules-no-shadowing", "res:modules-tyvarseq-distinct"
-    , "res:modules-custom-type-tyvars", "res:modules-alias-tyvars", "res:modules-alias-not-recursive"
-    , "res:modules-value-recursion", "res:modules-program", "res:program-modules-distinct"
-    , "res:program-import-order", "res:program-modules-reachable", "res:program-main"
+    [ "res:core-row-labels-distinct"
+    , "res:core-record-update-form"
+    , "res:core-binding-site-distinct"
+    , "res:core-no-shadowing"
+    , "res:core-no-float-pattern"
+    , "res:core-let-recursion"
+    , "res:modules-ports"
+    , "res:modules-import-alias"
+    , "res:modules-basics-qualifier"
+    , "res:modules-no-operator-exposing"
+    , "res:modules-header-exposing"
+    , "res:modules-exposing-distinct"
+    , "res:modules-no-top-pattern"
+    , "res:modules-values-distinct"
+    , "res:modules-types-distinct"
+    , "res:modules-constructors-distinct"
+    , "res:modules-no-shadowing"
+    , "res:modules-tyvarseq-distinct"
+    , "res:modules-custom-type-tyvars"
+    , "res:modules-alias-tyvars"
+    , "res:modules-alias-not-recursive"
+    , "res:modules-value-recursion"
+    , "res:modules-program"
+    , "res:program-modules-distinct"
+    , "res:program-import-order"
+    , "res:program-modules-reachable"
+    , "res:program-main"
     ]
 
 
@@ -139,7 +167,7 @@ furtherRules =
     [ "res:core-exhaustiveness", "res:core-irredundancy" ]
 
 
-{-| A tag t resolves to the first of r:t, res:t, t that is a label of the book.
+{-| A tag t resolves to the first of r:t, <res:t>, t that is a label of the book.
 -}
 resolveTag : Set String -> String -> Maybe String
 resolveTag labels t =

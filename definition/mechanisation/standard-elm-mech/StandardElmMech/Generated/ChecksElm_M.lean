@@ -24,6 +24,9 @@ open StandardElm.D
   g_elm_NonZeroArityRecursionTest
   g_elm_NumberDestructFieldTest
   g_elm_NumberGenericAppCustom
+  g_elm_NumberGenericAppList
+  g_elm_NumberGenericAppMaybe
+  g_elm_NumberGenericAppTuple
   g_elm_PapEtaCtorProbe
   g_elm_ParenthesesTest
   g_elm_PartialAppCaptureTypesTest

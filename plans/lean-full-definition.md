@@ -27,7 +27,9 @@ tests end to end (with the two tests of ruling A98, now translated), the general
 `PrincipalExistsCore`/`PrincipalExistsMod` proved only from W's coverage; the certificates
 then restructured into independent shards by name, `spec_` derived from W's check, built in
 15 min by `scripts/verify.sh`; see step 11's "Issues
-with the plan", items 10 to 12, for what remains).**
+with the plan", items 10 to 12, for what remains); D2 (b) completed on the dynamic side,
+2026-11-13: the core library's Elm texts evaluated in the test basis `Lib.Btest`, 28 more tests
+end to end, 608 ([library-elm-texts.md](library-elm-texts.md)).**
 
 This file is the plan: what is built, in what order, under which decisions, and how
 each step is accepted. Each step has an implementation specification in
@@ -91,6 +93,7 @@ on, by the tags in brackets.
 | The translator's elaboration: its number specialisation, its reduced syntax, the port payload types, the order of modules, the type of `main` | retired by step 10 for the 580 tests with an end-to-end theorem (`spec_`) (except that the meaning does not depend on the order of modules, which no step proves) | `[elab]` |
 | The harness basis: `Html.text` and the core library's interfaces, which the book does not bind (decision D2) | always (an assumption about the test harness, not about Elm) | `[harness]` |
 | The derivation the inference finds for each module of the test's program is principal (`InferPrincipalFor`, decision D11), so "the principal derivation" has a referent | retired by step 11 (2026-11-13) for every test | `[principal]` |
+| The core library's values: elm/core 1.0.5's Elm text is the meaning of the library values a program uses (`List.map`, `Tuple.first`, ...), which the book does not bind; D2's harness assumption extended from the static interfaces to the dynamic values ([library-elm-texts.md](library-elm-texts.md), L5) | always (an assumption about the test harness, not about Elm), for the theorems (`t_`, `mean_`) of a program that names one | `[library]` |
 | The Lean compiler, for a theorem proved by `native_decide` | always, for those theorems | `[native]` |
 | The implementation parameters: IntRange and norm as eco's (64-bit, wrapping), the empty platform (no managers, primitives or events), and the characters as Lean's `Char` | always (parameters of the definition, fixed by choice) | `[params]` |
 

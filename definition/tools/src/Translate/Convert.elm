@@ -1,4 +1,4 @@
-module Translate.Convert exposing (Facts, ModuleSource, Problem, convertProgram, facts)
+module Translate.Convert exposing (Facts, ModuleSource, Problem, convertLibrary, convertProgram, facts)
 
 {-| From elm-syntax's tree of a test to the translator's representation (`Translate.Ir`): name
 resolution against the program, its imports and E0, the exact text of literals, the extraction of
@@ -23,6 +23,7 @@ import Set exposing (Set)
 import Translate.Basis as Basis
 import Translate.Directives exposing (Directives)
 import Translate.Ir exposing (..)
+import Translate.Library as Library exposing (Library)
 import Translate.Literal as Literal
 
 
@@ -92,6 +93,11 @@ type alias Env =
     , imports : Imports
     , exports : Dict String ExportTable
     , prefix : String
+
+    -- the library values the program may name (plans/library-elm-texts.md); `textOfLibrary` when
+    -- the module is a library module's text, whose `Elm.Kernel.List.cons` is the list constructor
+    , library : Library
+    , textOfLibrary : Bool
     }
 
 
@@ -114,10 +120,43 @@ effectModules =
 -}
 basicsValues : Set String
 basicsValues =
-    Set.fromList [ "compare", "not", "xor", "modBy", "remainderBy", "negate", "min", "max", "clamp", "abs", "identity", "always", "isNaN", "isInfinite"
-        , "toFloat", "round", "floor", "ceiling", "truncate"
-        , "sqrt", "sin", "cos", "tan", "asin", "acos", "atan", "atan2", "e", "pi"
-        , "logBase", "degrees", "radians", "turns", "fromPolar", "toPolar", "never"
+    Set.fromList
+        [ "compare"
+        , "not"
+        , "xor"
+        , "modBy"
+        , "remainderBy"
+        , "negate"
+        , "min"
+        , "max"
+        , "clamp"
+        , "abs"
+        , "identity"
+        , "always"
+        , "isNaN"
+        , "isInfinite"
+        , "toFloat"
+        , "round"
+        , "floor"
+        , "ceiling"
+        , "truncate"
+        , "sqrt"
+        , "sin"
+        , "cos"
+        , "tan"
+        , "asin"
+        , "acos"
+        , "atan"
+        , "atan2"
+        , "e"
+        , "pi"
+        , "logBase"
+        , "degrees"
+        , "radians"
+        , "turns"
+        , "fromPolar"
+        , "toPolar"
+        , "never"
         ]
 
 
@@ -230,10 +269,11 @@ readImports exports imports st0 =
         imports
 
 
-{-| A qualified reference `m.x` (after alias expansion), lower case.
+{-| A qualified reference `m.x` (after alias expansion), lower case. A value of the core library
+that the translator evaluates (`Translate.Library`) is a value of the basis.
 -}
-qualifiedValue : String -> String -> Range -> St -> ( Name, St )
-qualifiedValue m x range st =
+qualifiedValue : Library -> String -> String -> Range -> St -> ( Name, St )
+qualifiedValue lib m x range st =
     if Basis.effectValue m x /= Nothing then
         -- a value of Platform, Cmd, Sub, Task or Process (plan step 5)
         ( Global m x, st )
@@ -254,6 +294,10 @@ qualifiedValue m x range st =
         -- the harness Html (decision D2)
         ( Global "Html" "text", st )
 
+    else if Library.member lib m x then
+        -- a value of the core library written in Elm (plans/library-elm-texts.md, L1)
+        ( Global m x, st )
+
     else
         ( Global m x, problem rankBasis ("basis:" ++ m ++ "." ++ x) range st )
 
@@ -262,9 +306,9 @@ qualifiedValue m x range st =
 or `(..)`): the value `m.x`, kept unqualified as the source writes it (the module's imports resolve
 it, r:dm-import).
 -}
-unqualifiedValue : String -> String -> Range -> St -> ( Name, St )
-unqualifiedValue m x range st =
-    case qualifiedValue m x range st of
+unqualifiedValue : Library -> String -> String -> Range -> St -> ( Name, St )
+unqualifiedValue lib m x range st =
+    case qualifiedValue lib m x range st of
         ( Global m2 x2, st2 ) ->
             ( Exposed m2 x2, st2 )
 
@@ -323,7 +367,7 @@ resolveValue env qual x range st =
                 r
 
             Nothing ->
-                qualifiedValue (expandAlias env qual) x range st
+                qualifiedValue env.library (expandAlias env qual) x range st
 
     else
         case Dict.get x env.locals of
@@ -343,7 +387,7 @@ resolveValue env qual x range st =
                             case Dict.get x env.imports.exposed of
                                 Just m ->
                                     foreignValue env m Nothing x range st
-                                        |> Maybe.withDefault (unqualifiedValue m x range st)
+                                        |> Maybe.withDefault (unqualifiedValue env.library m x range st)
 
                                 Nothing ->
                                     let
@@ -355,15 +399,15 @@ resolveValue env qual x range st =
                                     case userOpen of
                                         m :: _ ->
                                             foreignValue env m Nothing x range st
-                                                |> Maybe.withDefault (unqualifiedValue m x range st)
+                                                |> Maybe.withDefault (unqualifiedValue env.library m x range st)
 
                                         [] ->
                                             case List.filter (\m -> m /= "Basics" && not (Dict.member m env.exports)) env.imports.open of
                                                 m :: _ ->
-                                                    unqualifiedValue m x range st
+                                                    unqualifiedValue env.library m x range st
 
                                                 [] ->
-                                                    unqualifiedValue "Basics" x range st
+                                                    unqualifiedValue env.library "Basics" x range st
 
 
 {-| A constructor of another module of the program, as written.
@@ -610,8 +654,25 @@ expr env (Node range e) st =
             in
             ( EBinop occ op el er, st2 )
 
+        E.FunctionOrValue [ "Elm", "Kernel", "List" ] "cons" ->
+            if env.textOfLibrary then
+                -- `cons = Elm.Kernel.List.cons` (List.elm): the list constructor, written `(::)`
+                -- (plans/library-elm-texts.md, L2)
+                let
+                    ( occ, st1 ) =
+                        fresh st
+                in
+                ( EOp occ "::", st1 )
+
+            else
+                ( EUnit, problem rankBasis "basis:Elm.Kernel.List.cons" range st )
+
         E.FunctionOrValue qual x ->
-            if String.left 1 x == String.toUpper (String.left 1 x) then
+            if env.textOfLibrary && List.take 2 qual == [ "Elm", "Kernel" ] then
+                -- a library text that names any other kernel value is refused (L2)
+                ( EUnit, problem rankBasis ("kernel:" ++ String.join "." qual ++ "." ++ x) range st )
+
+            else if String.left 1 x == String.toUpper (String.left 1 x) then
                 let
                     ( name, st1 ) =
                         resolveConstructor env qual x range st
@@ -969,10 +1030,10 @@ type alias ModuleSource =
 {-| The program of a test whose modules are `sources` in program order (the test, its main module,
 last), whatever its problems, with every problem, sorted by rank, then position: the first, if
 any, is the refusal reported. Binding ids are unique across the program; each module is converted
-with the export tables of the modules before it.
+with the export tables of the modules before it. `lib` is the library values the program may name.
 -}
-convertProgram : Directives -> List ModuleSource -> ( TestProgram, List Problem )
-convertProgram directives sources =
+convertProgram : Library -> Directives -> List ModuleSource -> ( TestProgram, List Problem )
+convertProgram lib directives sources =
     let
         count =
             List.length sources
@@ -982,7 +1043,7 @@ convertProgram directives sources =
                 (\( i, ms ) ( acc, exports, st ) ->
                     let
                         ( m, table, st1 ) =
-                            convertModule exports (i == count - 1) ms st
+                            convertModule { isMain = i == count - 1, library = lib, textOfLibrary = False } exports ms st
                     in
                     ( acc ++ [ m ], Dict.insert ms.name table exports, st1 )
                 )
@@ -1023,6 +1084,29 @@ convertProgram directives sources =
     ( { modules = modules, checks = directives.lines, meaning = directives.meaning }
     , stChecked.problems |> List.sortBy (\p -> ( p.rank, p.at.start.row, p.at.start.column ))
     )
+
+
+{-| The texts of the library modules (plans/library-elm-texts.md, step 1), in order, each as
+`Translate.Library.textSource` gives it: no module is a main module, and each is converted with the
+export tables of the modules before it. Every problem is returned, sorted as for a program.
+-}
+convertLibrary : List ModuleSource -> ( List ModuleIr, List Problem )
+convertLibrary sources =
+    let
+        ( modules, stEnd ) =
+            List.foldl
+                (\ms ( acc, exports, st ) ->
+                    let
+                        ( m, table, st1 ) =
+                            convertModule { isMain = False, library = Library.empty, textOfLibrary = True } exports ms st
+                    in
+                    ( acc ++ [ m ], Dict.insert ms.name table exports, st1 )
+                )
+                ( [], Dict.empty, { next = 1, problems = [] } )
+                sources
+                |> (\( ms, _, st ) -> ( ms, st ))
+    in
+    ( modules, stEnd.problems |> List.sortBy (\p -> ( p.rank, p.at.start.row, p.at.start.column )) )
 
 
 exposingOf : X.Exposing -> ExposingIr
@@ -1090,9 +1174,12 @@ exposesConstructors x name =
 
 {-| One module: its representation, its export table, and the state after it.
 -}
-convertModule : Dict String ExportTable -> Bool -> ModuleSource -> St -> ( ModuleIr, ExportTable, St )
-convertModule exports isMain ms st0 =
+convertModule : { isMain : Bool, library : Library, textOfLibrary : Bool } -> Dict String ExportTable -> ModuleSource -> St -> ( ModuleIr, ExportTable, St )
+convertModule mode exports ms st0 =
     let
+        isMain =
+            mode.isMain
+
         source =
             ms.source
 
@@ -1277,6 +1364,8 @@ convertModule exports isMain ms st0 =
             , imports = imports
             , exports = exports
             , prefix = prefix
+            , library = mode.library
+            , textOfLibrary = mode.textOfLibrary
             }
 
         -- top-level binders
@@ -1331,15 +1420,15 @@ convertModule exports isMain ms st0 =
                     Dict.fromList
                         (List.map (\pd -> ( pd.name, pd.binder )) portDecls
                             ++ List.concatMap
-                            (\h ->
-                                case h of
-                                    FnHead f id ->
-                                        [ ( Node.value (Node.value f.declaration).name, id ) ]
+                                (\h ->
+                                    case h of
+                                        FnHead f id ->
+                                            [ ( Node.value (Node.value f.declaration).name, id ) ]
 
-                                    PatHead _ bound _ ->
-                                        bound
-                            )
-                            allTopHeads
+                                        PatHead _ bound _ ->
+                                            bound
+                                )
+                                allTopHeads
                         )
             }
 
@@ -1383,23 +1472,23 @@ convertModule exports isMain ms st0 =
                     |> List.map (\pd -> ( pd.name, pd.binder ))
                 )
                     ++ (topHeads
-                    |> List.filterMap
-                        (\h ->
-                            case h of
-                                FnHead f id ->
-                                    let
-                                        x =
-                                            Node.value (Node.value f.declaration).name
-                                    in
-                                    if exposesValue headerExposing x then
-                                        Just ( x, id )
+                            |> List.filterMap
+                                (\h ->
+                                    case h of
+                                        FnHead f id ->
+                                            let
+                                                x =
+                                                    Node.value (Node.value f.declaration).name
+                                            in
+                                            if exposesValue headerExposing x then
+                                                Just ( x, id )
 
-                                    else
-                                        Nothing
+                                            else
+                                                Nothing
 
-                                PatHead _ _ _ ->
-                                    Nothing
-                        )
+                                        PatHead _ _ _ ->
+                                            Nothing
+                                )
                        )
                     |> Dict.fromList
             , constructors =

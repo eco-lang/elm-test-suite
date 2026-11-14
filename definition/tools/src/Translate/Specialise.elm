@@ -1,4 +1,4 @@
-module Translate.Specialise exposing (CheckKind(..), Specialised, specialise)
+module Translate.Specialise exposing (CheckKind(..), Specialised, specialise, specialiseLibrary, specialiseWith)
 
 {-| Number specialisation (A Standard Definition of Elm?, sec:dynamic-core-numbers; rulings A87,
 A27, A93; plans/elm-to-lean-translator.md, B.8). Each declaration whose bindings quantify `number`
@@ -11,8 +11,10 @@ copies already made and its body.
 
 import Dict exposing (Dict)
 import Set exposing (Set)
+import Translate.Basis as Basis
 import Translate.Infer as Infer exposing (Inferred)
 import Translate.Ir exposing (..)
+import Translate.Library as Library exposing (Library)
 import Translate.Types as Types exposing (Class(..), Type(..))
 
 
@@ -94,6 +96,7 @@ type alias Ctx =
     { inferred : Inferred
     , rho : Dict Int Num
     , own : Dict Int Assignment
+    , library : Library
     }
 
 
@@ -147,39 +150,68 @@ occurrence ctx occ name =
         Foreign f ->
             -- a value of another module: renamed to its copy as a local one is, its qualifier kept
             declared ctx occ name f.binder f.name (\n -> Foreign { f | name = n })
+
         Global m x ->
-            basisOccurrence ctx occ name x (Global m)
+            basisOccurrence ctx occ name m x (Global m)
 
         Exposed m x ->
-            basisOccurrence ctx occ name x (Exposed m)
+            basisOccurrence ctx occ name m x (Exposed m)
 
         _ ->
             Ok ( name, [] )
 
 
-{-| An occurrence of a value of the basis: the Elm texts of the basis are specialised too, `abs`
-used at Int is its copy at Int (written as the source writes `abs`).
+{-| The `number` variables of a value of the basis written in Elm whose scheme quantifies them,
+in the scheme's order: `abs` (Appendix D) and the core library's (`List.sum`, decision L3). [] for
+any other value: it has no copies.
 -}
-basisOccurrence : Ctx -> Int -> Name -> String -> (String -> Name) -> Result String ( Name, List Request )
-basisOccurrence ctx occ name x rename =
-    if x == "abs" then
-        case Dict.get occ ctx.inferred.occurrences |> Maybe.andThen (.instance >> Dict.values >> List.head) of
-            Just t ->
-                resolve ctx t
-                    |> Result.map
-                        (\n ->
-                            if n == IntN then
-                                ( rename "abs$Int", [] )
-
-                            else
-                                ( name, [] )
-                        )
-
-            Nothing ->
-                Ok ( name, [] )
+basisCopied : Library -> String -> String -> List Int
+basisCopied lib m x =
+    if x == "abs" && (m == "" || m == "Basics") then
+        Basis.value m x
+            |> Maybe.map (.quantified >> List.filter (\( _, c ) -> c == Number) >> List.map Tuple.first)
+            |> Maybe.withDefault []
 
     else
-        Ok ( name, [] )
+        Library.copied lib m x
+
+
+{-| An occurrence of a value of the basis: the Elm texts of the basis and of the core library are
+specialised too, and a use of one whose scheme quantifies `number` variables at an assignment other
+than the default is its copy (`abs` used at Int is `abs$Int`, `List.sum` used at Int is
+`List.sum$Int`), written as the source writes the value.
+-}
+basisOccurrence : Ctx -> Int -> Name -> String -> String -> (String -> Name) -> Result String ( Name, List Request )
+basisOccurrence ctx occ name m x rename =
+    case basisCopied ctx.library m x of
+        [] ->
+            Ok ( name, [] )
+
+        vars ->
+            case Dict.get occ ctx.inferred.occurrences of
+                Just o ->
+                    vars
+                        |> List.map
+                            (\v ->
+                                case Dict.get v o.instance of
+                                    Just t ->
+                                        resolve ctx t |> Result.map (\n -> ( v, n ))
+
+                                    Nothing ->
+                                        Ok ( v, defaultNum )
+                            )
+                        |> combine
+                        |> Result.map
+                            (\a ->
+                                if isDefault a then
+                                    ( name, [] )
+
+                                else
+                                    ( rename (copyName x a), [] )
+                            )
+
+                Nothing ->
+                    Ok ( name, [] )
 
 
 {-| An occurrence of the variable `x` declared by binding `id`: the copy it refers to (`rename`
@@ -231,7 +263,7 @@ declared ctx occ name id x rename =
                 |> Result.map (\a -> ( rename (copyName x a), [ { group = g, assignment = a } ] ))
 
 
-{-| An operator, renamed `^@Float` when it is `^` at Float: the same operator of OT_dyn, marked
+{-| An operator, renamed `^@Float` when it is `^` at Float: the same operator of OT\_dyn, marked
 because its value, the C library's power, is one the Lean kernel cannot compute (`native`).
 -}
 operatorAt : Ctx -> Int -> String -> Result String String
@@ -457,7 +489,7 @@ scope ctx decls body =
                             vars =
                                 g |> Maybe.andThen (\k -> Dict.get k ctx.inferred.groupVars) |> Maybe.withDefault []
                         in
-                        { cmp = cmp, group = g, gid = Maybe.withDefault (-(n + 1)) g, default = List.map (\v -> ( v, defaultNum )) vars }
+                        { cmp = cmp, group = g, gid = Maybe.withDefault -(n + 1) g, default = List.map (\v -> ( v, defaultNum )) vars }
                     )
 
         local =
@@ -546,7 +578,16 @@ scope ctx decls body =
                                                     assignments =
                                                         Dict.get g needed
                                                             |> Maybe.withDefault [ grp.default ]
-                                                            |> List.sortBy (\a -> ( if isDefault a then 0 else 1, key a ))
+                                                            |> List.sortBy
+                                                                (\a ->
+                                                                    ( if isDefault a then
+                                                                        0
+
+                                                                      else
+                                                                        1
+                                                                    , key a
+                                                                    )
+                                                                )
                                                 in
                                                 List.concatMap (\a -> Dict.get ( g, key a ) made |> Maybe.withDefault []) assignments
                                             )
@@ -609,10 +650,17 @@ kindOf ctx t =
 
 
 specialise : TestProgram -> Inferred -> Result String Specialised
-specialise program inferred =
+specialise =
+    specialiseWith Library.empty
+
+
+{-| The specialisation of a program that may name the values of the core library `lib`.
+-}
+specialiseWith : Library -> TestProgram -> Inferred -> Result String Specialised
+specialiseWith lib program inferred =
     let
         ctx =
-            { inferred = inferred, rho = Dict.empty, own = Dict.empty }
+            { inferred = inferred, rho = Dict.empty, own = Dict.empty, library = lib }
 
         -- the kind of a line's value: the type at which its label is logged (the `a` of
         -- `Debug.log : String -> a -> a`), when every occurrence of the label agrees
@@ -698,7 +746,10 @@ specialise program inferred =
                                                         { imp | exposes = Maybe.map (withCopies names) imp.exposes }
 
                                                     Nothing ->
-                                                        imp
+                                                        -- a module of the basis: the copies the
+                                                        -- basis binds (`import List exposing (sum)`
+                                                        -- exposes `sum$Int` too)
+                                                        { imp | exposes = Maybe.map (withCopies (basisCopyNames lib imp.modid imp.exposes)) imp.exposes }
                                             )
                                             m.imports
                                 }
@@ -743,3 +794,103 @@ declExprs d =
 
         DPat _ x ->
             [ x ]
+
+
+{-| The copies a module of the basis binds of the values an exposing list names: every assignment
+of each copied value's `number` variables but the default, in the order of their keys.
+-}
+basisCopyNames : Library -> String -> Maybe ExposingIr -> List String
+basisCopyNames lib modid exposes =
+    case exposes of
+        Just (ExposeItems items) ->
+            items
+                |> List.concatMap
+                    (\item ->
+                        case item of
+                            IVar x ->
+                                allAssignments (basisCopied lib modid x)
+                                    |> List.filter (not << isDefault)
+                                    |> List.sortBy key
+                                    |> List.map (copyName x)
+
+                            _ ->
+                                []
+                    )
+
+        _ ->
+            []
+
+
+{-| Every assignment of the variables (2^n of them).
+-}
+allAssignments : List Int -> List Assignment
+allAssignments vars =
+    case vars of
+        [] ->
+            [ [] ]
+
+        v :: rest ->
+            allAssignments rest |> List.concatMap (\a -> [ ( v, FloatN ) :: a, ( v, IntN ) :: a ])
+
+
+{-| The specialisation of the library modules' texts (plans/library-elm-texts.md, L3): each top-level
+group whose bindings quantify `number` variables has its default copy and a copy for every other
+assignment, so that the module can expose them all (`sum` and `sum$Int`); the module exposes each
+value it exposes with its copies.
+-}
+specialiseLibrary : List ModuleIr -> Inferred -> Result String (List ModuleIr)
+specialiseLibrary modules inferred =
+    let
+        ctx =
+            { inferred = inferred, rho = Dict.empty, own = Dict.empty, library = Library.empty }
+
+        requests =
+            modules
+                |> List.concatMap .defs
+                |> List.concatMap declBinders
+                |> List.filterMap (\( _, id ) -> groupOf ctx id)
+                |> List.concatMap (\( g, vars ) -> List.map (\a -> { group = g, assignment = a }) (allAssignments vars))
+
+        go ms =
+            case ms of
+                [] ->
+                    Ok ( [], requests )
+
+                m :: rest ->
+                    scope ctx m.defs (\_ -> go rest)
+                        |> Result.map (\( ( defs, inner ), rs ) -> ( defs :: inner, rs ))
+    in
+    go modules
+        |> Result.map
+            (\( defsByModule, _ ) ->
+                List.map2
+                    (\m defs ->
+                        let
+                            names =
+                                List.concatMap declNames defs
+                        in
+                        { m
+                            | defs = defs
+                            , exposes =
+                                case m.exposes of
+                                    ExposeItems items ->
+                                        ExposeItems
+                                            (List.concatMap
+                                                (\item ->
+                                                    case item of
+                                                        IVar v ->
+                                                            IVar v :: List.map IVar (List.filter (String.startsWith (v ++ "$")) names)
+
+                                                        _ ->
+                                                            [ item ]
+                                                )
+                                                items
+                                            )
+
+                                    other ->
+                                        other
+                        }
+                    )
+                    modules
+                    defsByModule
+            )

@@ -68,11 +68,11 @@ theorem GlobRel.append : ∀ {g g' h h' : List ((ModId × Var) × Ref)}, GlobRel
 theorem basisRefs_closed (B : SBasis) : ∀ e ∈ basisRefs B, e.2.Closed := by
   intro e he
   unfold basisRefs at he
-  obtain ⟨⟨m, x⟩, _, he⟩ := List.mem_filterMap.mp he
-  simp only at he
-  split at he
-  · cases he
-    intro v hv
+  obtain ⟨⟨m, x⟩, _, he⟩ := List.mem_map.mp he
+  subst he
+  simp only [basisRef]
+  split
+  · intro v hv
     simp only [List.mem_filterMap] at hv
     obtain ⟨w, hw, e⟩ := hv
     cases w with
@@ -82,7 +82,7 @@ theorem basisRefs_closed (B : SBasis) : ∀ e ∈ basisRefs B, e.2.Closed := by
         subst e; exact hw
       · simp [hc] at e
     | row _ => simp at e
-  · cases he
+  · trivial
 
 /-! ## Top-level items and groups -/
 

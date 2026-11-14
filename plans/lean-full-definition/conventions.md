@@ -29,6 +29,7 @@ each with its own namespace under `StandardElm`:
 | `StandardElmMech/Prog/` | `StandardElm.Prog` | Chapter 9's executions, the scheduler, the host model, invariants | 5, 6 |
 | `StandardElmMech/Src/` | `StandardElm.Src` | Source syntax, derived forms, the syntactic restrictions | 8 |
 | `StandardElmMech/Stat/` | `StandardElm.Stat` | Chapters 4, 5 and 9 (static), Appendix C, annotated phrases, the checker, inference, the pattern decider, completeness | 9, 10, 11 |
+| `StandardElmMech/Lib/` | `StandardElm.Lib` | The core library's Elm texts evaluated (`libME`, `Lib.Btest`; [library-elm-texts.md](../library-elm-texts.md)) | — |
 | `StandardElmMech/Generated/` | `StandardElm` | Written by the translator only | all |
 | `StandardElmMech/Certs/` | `StandardElm.Stat` | Written by `lake exe certify` only: the annotated phrases (typing certificates) that step 9's unverified inference produces, which the kernel then checks | 9, 10 |
 

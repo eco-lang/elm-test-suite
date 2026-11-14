@@ -198,6 +198,42 @@ def g_elm_NumberGenericAppCustom : Program := {
   checks := [
     chk .check "numgenapp: 45" .int ] }
 
+/-- tests/elm/src/NumberGenericAppList.elm -/
+def g_elm_NumberGenericAppList : Program := {
+  name := "NumberGenericAppList", source := "tests/elm/src", native := true,
+  library := ["List.head", "Maybe.withDefault"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "n" [] (ap (qv "Maybe" "withDefault") [.atexp (.scon (.intF 0)), .atexp (.paren (ap (qv "List" "head") [listE [.atexp (.scon (.intF 30))]]))]), .pat pw (ap (qv "Debug" "log") [str "numgenapp", .atexp (.paren (ap (v "round") [.atexp (.paren (bin "*" (.atexp (.scon (.float 15 (-1)))) (v "n")))]))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "numgenapp: 45" .int ] }
+
+/-- tests/elm/src/NumberGenericAppMaybe.elm -/
+def g_elm_NumberGenericAppMaybe : Program := {
+  name := "NumberGenericAppMaybe", source := "tests/elm/src", native := true,
+  library := ["Maybe.withDefault"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "n" [] (ap (qv "Maybe" "withDefault") [.atexp (.scon (.intF 0)), .atexp (.paren (ap (c "Just") [.atexp (.scon (.intF 30))]))]), .pat pw (ap (qv "Debug" "log") [str "numgenapp", .atexp (.paren (ap (v "round") [.atexp (.paren (bin "*" (.atexp (.scon (.float 15 (-1)))) (v "n")))]))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "numgenapp: 45" .int ] }
+
+/-- tests/elm/src/NumberGenericAppTuple.elm -/
+def g_elm_NumberGenericAppTuple : Program := {
+  name := "NumberGenericAppTuple", source := "tests/elm/src", native := true,
+  library := ["Tuple.first"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "n" [] (ap (qv "Tuple" "first") [tup2 (.atexp (.scon (.intF 30))) (str "x")]), .pat pw (ap (qv "Debug" "log") [str "numgenapp", .atexp (.paren (ap (v "round") [.atexp (.paren (bin "*" (.atexp (.scon (.float 15 (-1)))) (v "n")))]))])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "numgenapp: 45" .int ] }
+
 /-- tests/elm/src/PapEtaCtorProbe.elm -/
 def g_elm_PapEtaCtorProbe : Program := {
   name := "PapEtaCtorProbe", source := "tests/elm/src",
@@ -265,6 +301,9 @@ def shard_Elm_M : List Program :=
    g_elm_NonZeroArityRecursionTest,
    g_elm_NumberDestructFieldTest,
    g_elm_NumberGenericAppCustom,
+   g_elm_NumberGenericAppList,
+   g_elm_NumberGenericAppMaybe,
+   g_elm_NumberGenericAppTuple,
    g_elm_PapEtaCtorProbe,
    g_elm_ParenthesesTest,
    g_elm_PartialAppCaptureTypesTest]

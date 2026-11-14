@@ -31,6 +31,7 @@ import StandardElmMech.Mod.Good
 import StandardElmMech.Mod.A25
 import StandardElmMech.Mod.Rulings
 import StandardElmMech.Mod.Program
+import StandardElmMech.Lib.Library
 import StandardElmMech.Eff.PTy
 import StandardElmMech.Eff.Boundary
 import StandardElmMech.Eff.EncFn

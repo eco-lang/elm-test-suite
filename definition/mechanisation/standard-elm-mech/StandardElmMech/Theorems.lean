@@ -3,12 +3,14 @@
   Machine-checked statements that the definition derives the examples' values.
 
   * `t_<project>_<Test>`: one theorem per translated test program, in module form (plan step 3):
-    the program's modules, evaluated by Chapter 7's rules in the test basis `Btest []`, have a
-    derivation whose log meets every check (`ViewChecks`, Mod/Program.lean), or, for a test that
-    stops at Debug.todo, no meaning (`NoMeaning`). Proved by `decide +kernel` on the decider (the
-    kernel itself runs the evaluator), or by `native_decide` for a program that uses a value only
-    the C library computes (`Program.native`) or that the memory budget moves (`budgetNative`);
-    such a theorem is tagged `[native]`. The command `#mod_program_theorems` below generates them;
+    the program's modules, evaluated by Chapter 7's rules in the test basis with the core library
+    `Lib.Btest` (plans/library-elm-texts.md, L4), have a derivation whose log meets every check
+    (`ViewChecks`, Mod/Program.lean), or, for a test that stops at Debug.todo, no meaning
+    (`NoMeaning`). Proved by `decide +kernel` on the decider (the kernel itself runs the evaluator),
+    or by `native_decide` for a program that uses a value only the C library computes
+    (`Program.native`) or that the memory budget moves (`budgetNative`); such a theorem is tagged
+    `[native]`. The theorem of a program that names a core library value (`Program.library`) is
+    tagged `[library]`. The command `#mod_program_theorems` below generates them;
     each shard of the translated tests runs it in its own file (Generated/Checks<Shard>.lean).
   * Hand-stated theorems for the rulings A42, A43, A44, A48, A49 and A51, and theorems that D1 (the
     oracle evaluator and `nostuck`) makes possible: a value that is the only one, and a phrase with
@@ -17,6 +19,7 @@
 import Lean
 import StandardElmMech.Checks
 import StandardElmMech.Mod.Program
+import StandardElmMech.Lib.Library
 
 namespace StandardElm
 open StandardElm.D
@@ -167,12 +170,13 @@ def LogCheck.toLean : LogCheck → String
 
 open Lean Elab Command in
 /-- `#mod_program_theorems g1 g2 ...` emits, for each test program `g`, in module form (its modules
-    `g.modules`, evaluated by r:p-dyn-module and r:p-dyn-main in the test basis `Btest []`):
-    * `t_<project>_<Name> : NoMeaning (Btest []) g.modules` when the test expects the program to
+    `g.modules`, evaluated by r:p-dyn-module and r:p-dyn-main in the test basis `Lib.Btest`):
+    * `t_<project>_<Name> : NoMeaning Lib.Btest g.modules` when the test expects the program to
       stop (EXIT 1 with CHECK-NOT lines: it stops at Debug.todo), by `noMeaning_sound`;
-    * otherwise `t_<project>_<Name> : ViewChecks (Btest []) g.modules [checks]`, by
+    * otherwise `t_<project>_<Name> : ViewChecks Lib.Btest g.modules [checks]`, by
       `viewChecks_sound` with the constant oracle that meets every check;
-    by `decide +kernel`, or `native_decide` when `g.proofNative`. -/
+    by `decide +kernel`, or `native_decide` when `g.proofNative`; tagged `[library]` when
+    `g.library` is not empty. -/
 elab "#mod_program_theorems " gs:ident* : command => do
   let mut kernel : Nat := 0
   let mut native : Nat := 0
@@ -184,22 +188,22 @@ elab "#mod_program_theorems " gs:ident* : command => do
     let nat := p.proofNative
     let tac := if nat then "native_decide" else "decide +kernel"
     if nat then native := native + 1 else kernel := kernel + 1
-    let tag := if nat then " [native]" else ""
+    let tag := (if p.library.isEmpty then "" else " [library]") ++ (if nat then " [native]" else "")
     -- the kernel's reduction of a program that logs many values nests deeper than the default
     -- limit (512); 1024 suffices for every test (2026-11-11)
     let doc := s!"set_option maxRecDepth 2048 in\n/-- {p.source}/{p.name}.elm [parse] [elab] [harness] [params]{tag} -/\n"
     let stx ←
       if !p.meaning then
-        pure s!"{doc}theorem t_{p.project}_{p.name} : Mod.NoMeaning (Mod.Btest []) {g}.modules :=\n  Mod.noMeaning_sound (by {tac})"
+        pure s!"{doc}theorem t_{p.project}_{p.name} : Mod.NoMeaning Lib.Btest {g}.modules :=\n  Mod.noMeaning_sound (by {tac})"
       else
         match toLogChecks p.checks with
         | none => throwError "#mod_program_theorems: {p.name}: a check whose value cannot be stated"
         | some cs =>
           let csL := ", ".intercalate (cs.map LogCheck.toLean)
-          let ok (b : Bool) : Bool := Mod.viewChecksB (.const b) (Mod.Btest []) p.modules cs
+          let ok (b : Bool) : Bool := Mod.viewChecksB (.const b) Lib.Btest p.modules cs
           let orc := if ok false then "false" else if ok true then "true" else "none"
           if orc == "none" then throwError "#mod_program_theorems: {p.name}: neither constant oracle meets the checks"
-          pure s!"{doc}theorem t_{p.project}_{p.name} : Mod.ViewChecks (Mod.Btest []) {g}.modules [{csL}] :=\n  Mod.viewChecks_sound (o := .const {orc}) (by {tac})"
+          pure s!"{doc}theorem t_{p.project}_{p.name} : Mod.ViewChecks Lib.Btest {g}.modules [{csL}] :=\n  Mod.viewChecks_sound (o := .const {orc}) (by {tac})"
     match Parser.runParserCategory (← getEnv) `command stx with
     | .ok cmd => elabCommand cmd
     | .error err => throwError "#mod_program_theorems: {p.name}: {err}"

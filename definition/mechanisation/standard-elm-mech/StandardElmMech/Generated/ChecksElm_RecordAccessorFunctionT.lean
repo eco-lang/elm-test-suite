@@ -14,7 +14,17 @@ open StandardElm.D
   g_elm_RecordChainedUpdateTest
   g_elm_RecordChainedUpdatesTest
   g_elm_RecordCreateTest
+  g_elm_RecordNarrow01CapturesNonEmptyTest
+  g_elm_RecordNarrow02CapturesNothingTest
+  g_elm_RecordNarrow03FullAnnotationTest
+  g_elm_RecordNarrow04SingleFieldTest
+  g_elm_RecordNarrow05NoNestingTest
+  g_elm_RecordNarrow06RowPolyAnnotationTest
+  g_elm_RecordNarrow08NoDestructureTest
+  g_elm_RecordNarrow09DirectCallTest
+  g_elm_RecordNarrow10TripleNestingTest
   g_elm_RecordNestedAccessTest
+  g_elm_RecordOpenNarrowFieldIndexTest
   g_elm_RecordRowsTest
   g_elm_RecordUpdatePolyFieldTest
   g_elm_RecordUpdateTest

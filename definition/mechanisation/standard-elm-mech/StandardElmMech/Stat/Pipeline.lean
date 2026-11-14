@@ -12,6 +12,7 @@
 -/
 import StandardElmMech.Stat.EndToEndIn
 import StandardElmMech.Stat.CopyLoop
+import StandardElmMech.Lib.Library
 
 namespace StandardElm.Stat
 open StandardElm (Var Lab ModId)
@@ -27,8 +28,15 @@ def D11For (B : SBasis) (p : BProgram) : Prop := InferPrincipalFor B p
 def SpecOf (B : SBasis) (p : BProgram) (r : Mod.Reduced) : Prop :=
   ∃ a, PrincipalProgDeriv B p a ∧ reduceProgram B a = .ok r
 
+/-- Part I's dynamic test basis for a program of each kind (plans/library-elm-texts.md, L4): a view
+    is evaluated in the test basis with the core library, `Lib.Btest`; a worker in `Mod.Btest []`,
+    as the worker theorems state its executions (no worker test names a library value). -/
+def dynBasis : Mod.ProgKind → Mod.Basis
+  | .view => Lib.Btest
+  | .worker => Mod.Btest []
+
 /-- ⊢_DYN (r:p-dyn-module, r:p-dyn-main) on the reduced part of a program, in Part I's test basis. -/
-def DynOf (r : Mod.Reduced) (v : Val) : Prop := Mod.EvalProgram (Mod.Btest []) r.modules v
+def DynOf (r : Mod.Reduced) (v : Val) : Prop := Mod.EvalProgram (dynBasis r.kind) r.modules v
 
 /-- B_stat ⊢_STAT program ⇒ (τ, PE): step 9's `ElProgram` on the program's modules. -/
 abbrev StatProgram (B : SBasis) (p : BProgram) (τ : Ty) (PE : PortEnv) : Prop :=
@@ -496,7 +504,7 @@ theorem value_of_holds {w : Prog.WorkerTest} (h : w.Holds) :
   obtain ⟨lg, ⟨r, lm, K0, ls, π, hs, he, -⟩, -⟩ := h
   exact ⟨_, he.forget⟩
 
-theorem dynOf_view {g : Program} {v : Val} : DynOf g.reduced v ↔ Mod.EvalProgram (Mod.Btest []) g.modules v :=
+theorem dynOf_view {g : Program} {v : Val} : DynOf g.reduced v ↔ Mod.EvalProgram Lib.Btest g.modules v :=
   Iff.rfl
 
 theorem dynOf_worker {w : Prog.WorkerTest} {v : Val} :

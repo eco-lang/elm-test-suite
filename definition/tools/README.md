@@ -47,7 +47,13 @@ Translates the tests of `tests/` tagged `elm-spec` into Lean, for the mechanisat
   whose result only the C library computes (round, floor, ceiling, truncate, the elementary
   functions, `^` at Float, `Debug.toString`), whose checks Lean then proves by `native_decide`
   only;
-- `src/Translate/ToLean.elm`: printing in the helper notation of `Derived.lean`.
+- `src/Translate/ToLean.elm`: printing in the helper notation of `Derived.lean`;
+- `src/Translate/Library.elm`, `LibraryTexts.elm`: the core library values the translator evaluates
+  (`evaluatedLibrary` in `src/Translate.elm`: 12 values of `List`, `Maybe`, `Result`, `Tuple`,
+  plans/library-elm-texts.md). A test may name them as values of the basis, at the schemes of their
+  annotations in the vendored elm/core 1.0.5; the closure of their texts is translated by the same
+  pipeline into `Generated/Library.lean`, `List.sum` with its copy `sum$Int`, and a program that
+  names one records it (`library := [...]`, and in the manifest).
 
 It writes `definition/mechanisation/standard-elm-mech/StandardElmMech/Generated/` (the programs, in
 shards that are fixed alphabetical buckets of `project/Test`, `All.lean`, one file of theorems per

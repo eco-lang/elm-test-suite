@@ -26,6 +26,18 @@ def g_elm_LetNumberMaybeCaseDirectTest : Program := {
   checks := [
     chk .check "maybedirect: 45" .int ] }
 
+/-- tests/elm/src/LetNumberMaybeChainTest.elm -/
+def g_elm_LetNumberMaybeChainTest : Program := {
+  name := "LetNumberMaybeChainTest", source := "tests/elm/src", native := true,
+  library := ["Maybe.map", "Maybe.withDefault"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "m" [] (ap (c "Just") [.atexp (.scon (.intF 30))]), .fn "result" [] (bin "|>" (bin "|>" (bin "|>" (v "m") (ap (qv "Maybe" "map") [.atexp (.paren (lams [pv "x"] (bin "*" (.atexp (.scon (.float 15 (-1)))) (v "x"))))])) (ap (qv "Maybe" "map") [.atexp (.paren (lams [pv "x"] (ap (v "round") [.atexp (.paren (bin "/" (v "x") (.atexp (.scon (.intF 3)))))])))])) (ap (qv "Maybe" "withDefault") [i 0])), .pat pw (ap (qv "Debug" "log") [str "chain", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "chain: 15" .int ] }
+
 /-- tests/elm/src/LetNumberMixedTupleSlotTest.elm -/
 def g_elm_LetNumberMixedTupleSlotTest : Program := {
   name := "LetNumberMixedTupleSlotTest", source := "tests/elm/src", native := true,
@@ -127,6 +139,18 @@ def g_elm_LetNumberRecordToFnTest : Program := {
   checks := [
     chk .check "rec2fn: 45" .int ] }
 
+/-- tests/elm/src/LetNumberResultMapTest.elm -/
+def g_elm_LetNumberResultMapTest : Program := {
+  name := "LetNumberResultMapTest", source := "tests/elm/src", native := true,
+  library := ["Result.map"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "res" [] (ap (c "Ok") [.atexp (.scon (.intF 30))]), .fn "mapped" [] (ap (qv "Result" "map") [.atexp (.paren (lams [pv "x"] (ap (v "round") [.atexp (.paren (bin "*" (v "x") (.atexp (.scon (.float 15 (-1))))))]))), v "res"]), .fn "result" [] (caseOf (v "mapped") [(pcon "Ok" [pv "v"], v "v"), (pcon "Err" [pw], i 0)]), .pat pw (ap (qv "Debug" "log") [str "result", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "result: 45" .int ] }
+
 /-- tests/elm/src/LetNumberScaleFnTest.elm -/
 def g_elm_LetNumberScaleFnTest : Program := {
   name := "LetNumberScaleFnTest", source := "tests/elm/src", native := true,
@@ -139,6 +163,30 @@ def g_elm_LetNumberScaleFnTest : Program := {
   checks := [
     chk .check "scale: 105" .int ] }
 
+/-- tests/elm/src/LetNumberSumMapTest.elm -/
+def g_elm_LetNumberSumMapTest : Program := {
+  name := "LetNumberSumMapTest", source := "tests/elm/src", native := true,
+  library := ["List.map", "List.sum"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "xs" [] (listE [.atexp (.scon (.intF 30)), .atexp (.scon (.intF 40))]), .fn "result" [] (ap (v "round") [.atexp (.paren (ap (qv "List" "sum") [.atexp (.paren (ap (qv "List" "map") [.atexp (.paren (lams [pv "x"] (bin "*" (v "x") (.atexp (.scon (.float 15 (-1))))))), v "xs"]))]))]), .pat pw (ap (qv "Debug" "log") [str "summap", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "summap: 105" .int ] }
+
+/-- tests/elm/src/LetNumberTupleBothTest.elm -/
+def g_elm_LetNumberTupleBothTest : Program := {
+  name := "LetNumberTupleBothTest", source := "tests/elm/src", native := true,
+  library := ["Tuple.first", "Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "p" [] (tup2 (.atexp (.scon (.intF 30))) (.atexp (.scon (.intF 40)))), .fn "result" [] (bin "+" (ap (v "round") [.atexp (.paren (bin "*" (ap (qv "Tuple" "first") [v "p"]) (.atexp (.scon (.float 15 (-1))))))]) (ap (v "round") [.atexp (.paren (bin "*" (ap (qv "Tuple" "second") [v "p"]) (.atexp (.scon (.float 15 (-1))))))])), .pat pw (ap (qv "Debug" "log") [str "tupboth", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "tupboth: 105" .int ] }
+
 /-- tests/elm/src/LetNumberTupleRecordNestTest.elm -/
 def g_elm_LetNumberTupleRecordNestTest : Program := {
   name := "LetNumberTupleRecordNestTest", source := "tests/elm/src", native := true,
@@ -149,6 +197,18 @@ def g_elm_LetNumberTupleRecordNestTest : Program := {
     .fn "main" [] (letDefs [.fn "result" [] (caseOf (tup2 (recE [("lo", .atexp (.scon (.intF 30)))]) (.atexp (.scon (.intF 40)))) [(P (ptup2 (P (pv "r")) (P (pv "c"))), bin "+" (ap (v "round") [.atexp (.paren (bin "*" (.atexp (access (A (v "r")) "lo")) (.atexp (.scon (.float 15 (-1))))))]) (ap (v "round") [.atexp (.paren (bin "*" (v "c") (.atexp (.scon (.float 15 (-1))))))]))]), .pat pw (ap (qv "Debug" "log") [str "tuprec", v "result"])] (ap (v "text") [str "done"])) ],
   checks := [
     chk .check "tuprec: 105" .int ] }
+
+/-- tests/elm/src/LetNumberTupleSecondTest.elm -/
+def g_elm_LetNumberTupleSecondTest : Program := {
+  name := "LetNumberTupleSecondTest", source := "tests/elm/src", native := true,
+  library := ["Tuple.second"],
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "main" [] (letDefs [.fn "p" [] (tup2 (.atexp (.scon (.intF 99))) (.atexp (.scon (.intF 30)))), .fn "result" [] (ap (v "round") [.atexp (.paren (bin "*" (ap (qv "Tuple" "second") [v "p"]) (.atexp (.scon (.float 15 (-1))))))]), .pat pw (ap (qv "Debug" "log") [str "tup2", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "tup2: 45" .int ] }
 
 /-- tests/elm/src/LetNumberTupleToFnTest.elm -/
 def g_elm_LetNumberTupleToFnTest : Program := {
@@ -235,6 +295,7 @@ def g_elm_LetValueBindingTest : Program := {
 def shard_Elm_LetNumberLo : List Program :=
   [g_elm_LetNumberLogBaseTest,
    g_elm_LetNumberMaybeCaseDirectTest,
+   g_elm_LetNumberMaybeChainTest,
    g_elm_LetNumberMixedTupleSlotTest,
    g_elm_LetNumberMulFnTest,
    g_elm_LetNumberNegateTest,
@@ -244,8 +305,12 @@ def shard_Elm_LetNumberLo : List Program :=
    g_elm_LetNumberRecordDestructureTest,
    g_elm_LetNumberRecordMultiFieldTest,
    g_elm_LetNumberRecordToFnTest,
+   g_elm_LetNumberResultMapTest,
    g_elm_LetNumberScaleFnTest,
+   g_elm_LetNumberSumMapTest,
+   g_elm_LetNumberTupleBothTest,
    g_elm_LetNumberTupleRecordNestTest,
+   g_elm_LetNumberTupleSecondTest,
    g_elm_LetNumberTupleToFnTest,
    g_elm_LetNumberUnionBranchTest,
    g_elm_LetNumberWildcardSlotTest,
