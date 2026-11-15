@@ -136,7 +136,7 @@ partial def atPat : AAtPat → String
   | .record row τ => paren (".record " ++ opt patRow row ++ " " ++ ty τ)
   | .paren p => paren (".paren " ++ pat p)
 partial def patRow : APatRow → String
-  | .field l τ rest => paren (".field " ++ q l ++ " " ++ ty τ ++ " " ++ opt patRow rest)
+  | .field l x τ rest => paren (".field " ++ q l ++ " " ++ q x ++ " " ++ ty τ ++ " " ++ opt patRow rest)
 partial def pat : APat → String
   | .atpat a => paren (".atpat " ++ atPat a)
   | .con lc inst args τ => paren (".con " ++ longId lc ++ " " ++ list ty inst ++ " " ++ list atPat args ++ " " ++ ty τ)

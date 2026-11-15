@@ -125,7 +125,7 @@ theorem cg_atPat (hl : ∀ lv, C.lookupVal lv = D.lookupVal lv) : ∀ p : AAtPat
   | .record row _ => by simp only [checkAtPat, cg_patRowOpt hl row]
   | .paren p => by simp only [checkAtPat, cg_pat hl p]
 theorem cg_patRow (hl : ∀ lv, C.lookupVal lv = D.lookupVal lv) : ∀ r : APatRow, checkPatRow C r = checkPatRow D r
-  | .field _ _ rest => by simp only [checkPatRow, cg_patRowOpt hl rest]
+  | .field _ _ _ rest => by simp only [checkPatRow, cg_patRowOpt hl rest]
 theorem cg_patRowOpt (hl : ∀ lv, C.lookupVal lv = D.lookupVal lv) :
     ∀ r : Option APatRow, checkPatRowOpt C r = checkPatRowOpt D r
   | none => rfl

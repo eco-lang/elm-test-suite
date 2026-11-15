@@ -1,6 +1,6 @@
 {
   "generatedBy": "definition/tools/src/Translate.elm",
-  "toolsSha256": "0a1345c021fe45009209a105638b29a4a89c486e8a6676f5f8f3068b0538dc6e",
+  "toolsSha256": "5e14eed680c0a476d9d14eada487a6485d349a6ab57948012badaf67f16e32ed",
   "tests": [
     {
       "project": "elm",
@@ -4516,9 +4516,13 @@
           "tests/elm/src/CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.elm"
         ]
       },
-      "status": "refused",
-      "reason": "number",
-      "detail": "a record pattern binding that needs a copy at Float"
+      "status": "translated",
+      "shard": "Elm_CompilerIssue22",
+      "def": "g_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.elm -/\ndef g_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest : Program := {\n  name := \"CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest\", source := \"tests/elm/src\",\n  exposing := .all, imports := [⟨\"Basics\", \"Basics\", some .all⟩, ⟨\"Char\", \"Char\", some (.items [.tycon \"Char\"])⟩, ⟨\"List\", \"List\", some (.items [.op \"::\"])⟩, ⟨\"Maybe\", \"Maybe\", some (.items [.opened \"Maybe\"])⟩, ⟨\"Platform.Cmd\", \"Cmd\", some (.items [.tycon \"Cmd\"])⟩, ⟨\"Platform.Sub\", \"Sub\", some (.items [.tycon \"Sub\"])⟩, ⟨\"String\", \"String\", some (.items [.tycon \"String\"])⟩, ⟨\"Html\", \"Html\", none⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"applyAll\" [pv \"fs\", pv \"acc\"] (caseOf (v \"fs\") [(P (listP []), v \"acc\"), (.cons (P (pv \"fn\")) (P (pv \"rest\")), ap (v \"applyAll\") [v \"rest\", .atexp (.paren (ap (v \"fn\") [v \"acc\"]))])]),\n    .fn \"testValue\" [] (letDefs [.pat (ptup2 (P (pv \"f\")) (P (pv \"g\"))) (tup2 (lams [pv \"x\"] (bin \"+\" (v \"x\") (.atexp (.scon (.intF 1))))) (lams [pv \"x\"] (bin \"*\" (v \"x\") (.atexp (.scon (.intF 2)))))), .pat (ptup2 (P (pv \"f$Float$Int\")) (P (pv \"g$Float$Int\"))) (tup2 (lams [pv \"x\"] (bin \"+\" (v \"x\") (i 1))) (lams [pv \"x\"] (bin \"*\" (v \"x\") (.atexp (.scon (.intF 2)))))), .pat (ptup2 (P (pv \"f$Int$Float\")) (P (pv \"g$Int$Float\"))) (tup2 (lams [pv \"x\"] (bin \"+\" (v \"x\") (.atexp (.scon (.intF 1))))) (lams [pv \"x\"] (bin \"*\" (v \"x\") (i 2)))), .pat (precord [(\"h\", \"h\")]) (recE [(\"h\", lams [pv \"x\"] (bin \"-\" (v \"x\") (.atexp (.scon (.intF 3)))))]), .pat (precord [(\"h\", \"h$Int\")]) (recE [(\"h\", lams [pv \"x\"] (bin \"-\" (v \"x\") (i 3)))]), .fn \"fs\" [] (listE [v \"f\", v \"g\", v \"h\"]), .fn \"fs$Int\" [] (listE [v \"f$Float$Int\", v \"g$Int$Float\", v \"h$Int\"])] (ap (v \"applyAll\") [v \"fs$Int\", i 5])),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (qv \"Html\" \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 9\" .int ] }"
     },
     {
       "project": "elm",
@@ -5226,7 +5230,7 @@
       "checks": 1,
       "kind": "view",
       "native": false,
-      "lean": "/-- tests/elm/src/EdgeCaseAllDestructPatternsTest.elm -/\ndef g_elm_EdgeCaseAllDestructPatternsTest : Program := {\n  name := \"EdgeCaseAllDestructPatternsTest\", source := \"tests/elm/src\",\n  exposing := .all, imports := [⟨\"Basics\", \"Basics\", some .all⟩, ⟨\"List\", \"List\", some .all⟩, ⟨\"Html\", \"Html\", none⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (ptup2 (P (pv \"a\")) (P (pv \"b\"))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))), .pat (precord [\"x\"]) (recE [(\"x\", .atexp (.scon (.intF 3)))]), .pat (ptup2 (P (pv \"h\")) (P (pv \"t\"))) (caseOf (listE [.atexp (.scon (.intF 4)), .atexp (.scon (.intF 5))]) [(.cons (P (pv \"y\")) (P (pv \"ys\")), tup2 (v \"y\") (v \"ys\")), (P (listP []), tup2 (.atexp (.scon (.intF 0))) (listE []))]), .pat (.paren (.as (P (pv \"v\")) \"w\")) (.atexp (.scon (.intF 6)))] (listE [v \"a\", v \"x\", v \"h\", v \"v\"])),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (qv \"Html\" \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: [1,3,4,6]\" .data ] }"
+      "lean": "/-- tests/elm/src/EdgeCaseAllDestructPatternsTest.elm -/\ndef g_elm_EdgeCaseAllDestructPatternsTest : Program := {\n  name := \"EdgeCaseAllDestructPatternsTest\", source := \"tests/elm/src\",\n  exposing := .all, imports := [⟨\"Basics\", \"Basics\", some .all⟩, ⟨\"List\", \"List\", some .all⟩, ⟨\"Html\", \"Html\", none⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (ptup2 (P (pv \"a\")) (P (pv \"b\"))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))), .pat (precord [(\"x\", \"x\")]) (recE [(\"x\", .atexp (.scon (.intF 3)))]), .pat (ptup2 (P (pv \"h\")) (P (pv \"t\"))) (caseOf (listE [.atexp (.scon (.intF 4)), .atexp (.scon (.intF 5))]) [(.cons (P (pv \"y\")) (P (pv \"ys\")), tup2 (v \"y\") (v \"ys\")), (P (listP []), tup2 (.atexp (.scon (.intF 0))) (listE []))]), .pat (.paren (.as (P (pv \"v\")) \"w\")) (.atexp (.scon (.intF 6)))] (listE [v \"a\", v \"x\", v \"h\", v \"v\"])),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (qv \"Html\" \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: [1,3,4,6]\" .data ] }"
     },
     {
       "project": "elm",
@@ -7656,7 +7660,7 @@
       "checks": 3,
       "kind": "view",
       "native": false,
-      "lean": "/-- tests/elm/src/LambdaPatternArgTest.elm -/\ndef g_elm_LambdaPatternArgTest : Program := {\n  name := \"LambdaPatternArgTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"main\" [] (letDefs [.fn \"swap\" [] (lams [ptup2 (P (pv \"x\")) (P (pv \"y\"))] (tup2 (v \"y\") (v \"x\"))), .fn \"getX\" [] (lams [precord [\"x\"]] (v \"x\")), .fn \"mixed\" [] (lams [pv \"a\", ptup2 (P (pv \"b\")) (P (pv \"c\")), pw] (v \"b\")), .pat pw (ap (qv \"Debug\" \"log\") [str \"swap\", .atexp (.paren (ap (v \"swap\") [tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"getX\", .atexp (.paren (ap (v \"getX\") [recE [(\"x\", .atexp (.scon (.intF 42)))]]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"mixed\", .atexp (.paren (ap (v \"mixed\") [.atexp (.scon (.intF 1)), tup2 (str \"b\") (.atexp (.scon (.intF 2))), .atexp (.scon (.intF 3))]))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"swap: (2,1)\" .data,\n    chk .check \"getX: 42\" .float,\n    chk .check \"mixed: \\\"b\\\"\" .string ] }"
+      "lean": "/-- tests/elm/src/LambdaPatternArgTest.elm -/\ndef g_elm_LambdaPatternArgTest : Program := {\n  name := \"LambdaPatternArgTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"main\" [] (letDefs [.fn \"swap\" [] (lams [ptup2 (P (pv \"x\")) (P (pv \"y\"))] (tup2 (v \"y\") (v \"x\"))), .fn \"getX\" [] (lams [precord [(\"x\", \"x\")]] (v \"x\")), .fn \"mixed\" [] (lams [pv \"a\", ptup2 (P (pv \"b\")) (P (pv \"c\")), pw] (v \"b\")), .pat pw (ap (qv \"Debug\" \"log\") [str \"swap\", .atexp (.paren (ap (v \"swap\") [tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"getX\", .atexp (.paren (ap (v \"getX\") [recE [(\"x\", .atexp (.scon (.intF 42)))]]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"mixed\", .atexp (.paren (ap (v \"mixed\") [.atexp (.scon (.intF 1)), tup2 (str \"b\") (.atexp (.scon (.intF 2))), .atexp (.scon (.intF 3))]))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"swap: (2,1)\" .data,\n    chk .check \"getX: 42\" .float,\n    chk .check \"mixed: \\\"b\\\"\" .string ] }"
     },
     {
       "project": "elm",
@@ -7880,7 +7884,7 @@
       "checks": 4,
       "kind": "view",
       "native": false,
-      "lean": "/-- tests/elm/src/LetDestructRecordTest.elm -/\ndef g_elm_LetDestructRecordTest : Program := {\n  name := \"LetDestructRecordTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"main\" [] (letDefs [.pat (precord [\"x\"]) (recE [(\"x\", .atexp (.scon (.intF 42)))]), .pat (precord [\"a\", \"b\"]) (recE [(\"a\", .atexp (.scon (.intF 1))), (\"b\", .atexp (.scon (.intF 2)))]), .pat (precord [\"p\", \"r\"]) (recE [(\"p\", .atexp (.scon (.intF 1))), (\"q\", .atexp (.scon (.intF 2))), (\"r\", .atexp (.scon (.intF 3)))]), .pat (ptup2 (P (precord [\"s\"])) (P (pv \"t\"))) (tup2 (recE [(\"s\", .atexp (.scon (.intF 1)))]) (.atexp (.scon (.intF 2)))), .pat pw (ap (qv \"Debug\" \"log\") [str \"single\", v \"x\"]), .pat pw (ap (qv \"Debug\" \"log\") [str \"multi\", .atexp (.paren (bin \"+\" (v \"a\") (v \"b\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"partial\", .atexp (.paren (bin \"+\" (v \"p\") (v \"r\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"mixed\", .atexp (.paren (bin \"+\" (v \"s\") (v \"t\")))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"single: 42\" .float,\n    chk .check \"multi: 3\" .float,\n    chk .check \"partial: 4\" .float,\n    chk .check \"mixed: 3\" .float ] }"
+      "lean": "/-- tests/elm/src/LetDestructRecordTest.elm -/\ndef g_elm_LetDestructRecordTest : Program := {\n  name := \"LetDestructRecordTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"main\" [] (letDefs [.pat (precord [(\"x\", \"x\")]) (recE [(\"x\", .atexp (.scon (.intF 42)))]), .pat (precord [(\"a\", \"a\"), (\"b\", \"b\")]) (recE [(\"a\", .atexp (.scon (.intF 1))), (\"b\", .atexp (.scon (.intF 2)))]), .pat (precord [(\"p\", \"p\"), (\"r\", \"r\")]) (recE [(\"p\", .atexp (.scon (.intF 1))), (\"q\", .atexp (.scon (.intF 2))), (\"r\", .atexp (.scon (.intF 3)))]), .pat (ptup2 (P (precord [(\"s\", \"s\")])) (P (pv \"t\"))) (tup2 (recE [(\"s\", .atexp (.scon (.intF 1)))]) (.atexp (.scon (.intF 2)))), .pat pw (ap (qv \"Debug\" \"log\") [str \"single\", v \"x\"]), .pat pw (ap (qv \"Debug\" \"log\") [str \"multi\", .atexp (.paren (bin \"+\" (v \"a\") (v \"b\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"partial\", .atexp (.paren (bin \"+\" (v \"p\") (v \"r\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"mixed\", .atexp (.paren (bin \"+\" (v \"s\") (v \"t\")))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"single: 42\" .float,\n    chk .check \"multi: 3\" .float,\n    chk .check \"partial: 4\" .float,\n    chk .check \"mixed: 3\" .float ] }"
     },
     {
       "project": "elm",
@@ -9118,7 +9122,7 @@
       "checks": 1,
       "kind": "view",
       "native": true,
-      "lean": "/-- tests/elm/src/LetNumberRecordDestructureTest.elm -/\ndef g_elm_LetNumberRecordDestructureTest : Program := {\n  name := \"LetNumberRecordDestructureTest\", source := \"tests/elm/src\", native := true,\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"main\" [] (letDefs [.pat (precord [\"lo\", \"hi\"]) (recE [(\"lo\", .atexp (.scon (.intF 30))), (\"hi\", .atexp (.scon (.intF 40)))]), .fn \"result\" [] (bin \"+\" (ap (v \"round\") [.atexp (.paren (bin \"*\" (v \"lo\") (.atexp (.scon (.float 15 (-1))))))]) (ap (v \"round\") [.atexp (.paren (bin \"*\" (v \"hi\") (.atexp (.scon (.float 15 (-1))))))])), .pat pw (ap (qv \"Debug\" \"log\") [str \"recdestr\", v \"result\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"recdestr: 105\" .int ] }"
+      "lean": "/-- tests/elm/src/LetNumberRecordDestructureTest.elm -/\ndef g_elm_LetNumberRecordDestructureTest : Program := {\n  name := \"LetNumberRecordDestructureTest\", source := \"tests/elm/src\", native := true,\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"main\" [] (letDefs [.pat (precord [(\"lo\", \"lo\"), (\"hi\", \"hi\")]) (recE [(\"lo\", .atexp (.scon (.intF 30))), (\"hi\", .atexp (.scon (.intF 40)))]), .fn \"result\" [] (bin \"+\" (ap (v \"round\") [.atexp (.paren (bin \"*\" (v \"lo\") (.atexp (.scon (.float 15 (-1))))))]) (ap (v \"round\") [.atexp (.paren (bin \"*\" (v \"hi\") (.atexp (.scon (.float 15 (-1))))))])), .pat pw (ap (qv \"Debug\" \"log\") [str \"recdestr\", v \"result\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"recdestr: 105\" .int ] }"
     },
     {
       "project": "elm",
@@ -12825,7 +12829,7 @@
       "checks": 4,
       "kind": "view",
       "native": false,
-      "lean": "/-- tests/elm/src/RecordRowsTest.elm -/\ndef g_elm_RecordRowsTest : Program := {\n  name := \"RecordRowsTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", none⟩],\n  types := [],\n  aliases := [(\"Point\", some [\"y\", \"x\"])],\n  defs := [\n    .fn \"sumFields\" [precord [\"x\", \"y\"]] (bin \"+\" (v \"x\") (v \"y\")),\n    .fn \"labelOf\" [precord [\"label\"]] (v \"label\"),\n    .fn \"five\" [.unit] (i 5),\n    .fn \"main\" [] (letDefs [.fn \"r\" [] (recE [(\"x\", .atexp (.scon (.intF 1))), (\"y\", .atexp (.scon (.intF 2))), (\"label\", str \"p\")]), .fn \"r$Int$Int\" [] (recE [(\"x\", i 1), (\"y\", i 2), (\"label\", str \"p\")]), .pat pw (ap (qv \"Debug\" \"log\") [str \"sum of fields\", .atexp (.paren (ap (v \"sumFields\") [v \"r$Int$Int\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"label\", .atexp (.paren (ap (v \"labelOf\") [v \"r$Int$Int\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"constructor order\", .atexp (.paren (letDefs [.fn \"p\" [] (ap (c \"Point\") [i 1, i 2])] (tup2 (.atexp (access (A (v \"p\")) \"y\")) (.atexp (access (A (v \"p\")) \"x\")))))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"unit\", .atexp (.paren (ap (v \"five\") [.atexp .unit]))])] (ap (qv \"Html\" \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"sum of fields: 3\" .int,\n    chk .check \"label: \\\"p\\\"\" .string,\n    chk .check \"constructor order: (1,2)\" .data,\n    chk .check \"unit: 5\" .int ] }"
+      "lean": "/-- tests/elm/src/RecordRowsTest.elm -/\ndef g_elm_RecordRowsTest : Program := {\n  name := \"RecordRowsTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", none⟩],\n  types := [],\n  aliases := [(\"Point\", some [\"y\", \"x\"])],\n  defs := [\n    .fn \"sumFields\" [precord [(\"x\", \"x\"), (\"y\", \"y\")]] (bin \"+\" (v \"x\") (v \"y\")),\n    .fn \"labelOf\" [precord [(\"label\", \"label\")]] (v \"label\"),\n    .fn \"five\" [.unit] (i 5),\n    .fn \"main\" [] (letDefs [.fn \"r\" [] (recE [(\"x\", .atexp (.scon (.intF 1))), (\"y\", .atexp (.scon (.intF 2))), (\"label\", str \"p\")]), .fn \"r$Int$Int\" [] (recE [(\"x\", i 1), (\"y\", i 2), (\"label\", str \"p\")]), .pat pw (ap (qv \"Debug\" \"log\") [str \"sum of fields\", .atexp (.paren (ap (v \"sumFields\") [v \"r$Int$Int\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"label\", .atexp (.paren (ap (v \"labelOf\") [v \"r$Int$Int\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"constructor order\", .atexp (.paren (letDefs [.fn \"p\" [] (ap (c \"Point\") [i 1, i 2])] (tup2 (.atexp (access (A (v \"p\")) \"y\")) (.atexp (access (A (v \"p\")) \"x\")))))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"unit\", .atexp (.paren (ap (v \"five\") [.atexp .unit]))])] (ap (qv \"Html\" \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"sum of fields: 3\" .int,\n    chk .check \"label: \\\"p\\\"\" .string,\n    chk .check \"constructor order: (1,2)\" .data,\n    chk .check \"unit: 5\" .int ] }"
     },
     {
       "project": "elm",
@@ -13924,6 +13928,330 @@
       "kind": "view",
       "native": false,
       "lean": "/-- tests/elm/src/StandardA98TypeBeforeAliasTest.elm -/\ndef g_elm_StandardA98TypeBeforeAliasTest : Program := {\n  name := \"StandardA98TypeBeforeAliasTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [(\"T\", [(\"T\", 1)])],\n  aliases := [(\"String\", none)],\n  defs := [\n    .fn \"field\" [.paren (pcon \"T\" [pv \"n\"])] (bin \"+\" (v \"n\") (i 1)),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"field (T 3)\", .atexp (.paren (ap (v \"field\") [.atexp (.paren (ap (c \"T\") [i 3]))]))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"field (T 3): 4\" .int ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternAsTest",
+      "sha256": "5f5934fe13abe04180d6f4b66d1dc5c552c11a5b1900aa3b378213deef7e7054",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternAsTest.elm",
+          "sha256": "5f5934fe13abe04180d6f4b66d1dc5c552c11a5b1900aa3b378213deef7e7054"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternAsTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternAsTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternAsTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternAsTest.elm -/\ndef g_elm_StandardA99RecordPatternAsTest : Program := {\n  name := \"StandardA99RecordPatternAsTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (.paren (.as (P (precord [(\"n\", \"n\")])) \"r\")) (recE [(\"n\", .atexp (.scon (.intF 7)))]), .pat (.paren (.as (P (precord [(\"n\", \"n$Int\")])) \"r$Int\")) (recE [(\"n\", i 7)])] (tup2 (bin \"//\" (v \"n$Int\") (i 2)) (bin \"/\" (.atexp (access (A (v \"r\")) \"n\")) (.atexp (.scon (.intF 2)))))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: (3,3.5)\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternBothTest",
+      "sha256": "4bd3a57f8d9ca7ba506d08e70c01e1fae98d5d08cc1c588952e59698f9326a76",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternBothTest.elm",
+          "sha256": "4bd3a57f8d9ca7ba506d08e70c01e1fae98d5d08cc1c588952e59698f9326a76"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternBothTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternBothTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternBothTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternBothTest.elm -/\ndef g_elm_StandardA99RecordPatternBothTest : Program := {\n  name := \"StandardA99RecordPatternBothTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (precord [(\"n\", \"n\")]) (recE [(\"n\", .atexp (.scon (.intF 7)))]), .pat (precord [(\"n\", \"n$Int\")]) (recE [(\"n\", i 7)])] (tup2 (bin \"//\" (v \"n$Int\") (i 2)) (bin \"/\" (v \"n\") (.atexp (.scon (.intF 2)))))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: (3,3.5)\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternDependentTest",
+      "sha256": "38468b0db9a34402658459c3abbc55d0ad912f659c0df72306388f606b0c70b7",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternDependentTest.elm",
+          "sha256": "38468b0db9a34402658459c3abbc55d0ad912f659c0df72306388f606b0c70b7"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternDependentTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternDependentTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternDependentTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternDependentTest.elm -/\ndef g_elm_StandardA99RecordPatternDependentTest : Program := {\n  name := \"StandardA99RecordPatternDependentTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (precord [(\"n\", \"n\")]) (recE [(\"n\", .atexp (.scon (.intF 7)))]), .pat (precord [(\"n\", \"n$Int\")]) (recE [(\"n\", i 7)]), .fn \"m\" [] (bin \"+\" (v \"n\") (.atexp (.scon (.intF 2)))), .fn \"m$Int\" [] (bin \"+\" (v \"n$Int\") (i 2))] (tup2 (bin \"//\" (v \"m$Int\") (i 2)) (bin \"/\" (v \"m\") (.atexp (.scon (.intF 2)))))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: (4,4.5)\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternFloatTest",
+      "sha256": "1671899df7d4071858242bef5d268556211a20545503311c630f7f133b3c6892",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternFloatTest.elm",
+          "sha256": "1671899df7d4071858242bef5d268556211a20545503311c630f7f133b3c6892"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternFloatTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternFloatTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternFloatTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternFloatTest.elm -/\ndef g_elm_StandardA99RecordPatternFloatTest : Program := {\n  name := \"StandardA99RecordPatternFloatTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (precord [(\"n\", \"n\")]) (recE [(\"n\", .atexp (.scon (.intF 7)))])] (bin \"/\" (v \"n\") (.atexp (.scon (.intF 2))))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 3.5\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternFunctionTest",
+      "sha256": "51b0ffeae5af6897e104e669fad7f438fad50ca667eea752b17eb7a24fa3f6e7",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternFunctionTest.elm",
+          "sha256": "51b0ffeae5af6897e104e669fad7f438fad50ca667eea752b17eb7a24fa3f6e7"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternFunctionTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternFunctionTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternFunctionTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternFunctionTest.elm -/\ndef g_elm_StandardA99RecordPatternFunctionTest : Program := {\n  name := \"StandardA99RecordPatternFunctionTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (precord [(\"h\", \"h\")]) (recE [(\"h\", lams [pv \"x\"] (bin \"-\" (v \"x\") (.atexp (.scon (.intF 3)))))]), .pat (precord [(\"h\", \"h$Int\")]) (recE [(\"h\", lams [pv \"x\"] (bin \"-\" (v \"x\") (i 3)))])] (tup2 (ap (v \"h$Int\") [i 5]) (ap (v \"h\") [.atexp (.scon (.float 25 (-1)))]))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: (2,-0.5)\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternInTopCopyTest",
+      "sha256": "5567ef2f2c4437a052202fd10e336afde3daf973d825bd0abce4881e11468b15",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm",
+          "sha256": "5567ef2f2c4437a052202fd10e336afde3daf973d825bd0abce4881e11468b15"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternInTopCopyTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternInTopCopyTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm -/\ndef g_elm_StandardA99RecordPatternInTopCopyTest : Program := {\n  name := \"StandardA99RecordPatternInTopCopyTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"v\" [] (letDefs [.pat (precord [(\"n\", \"n\")]) (recE [(\"n\", .atexp (.scon (.intF 6)))])] (v \"n\")),\n    .fn \"v$Int\" [] (letDefs [.pat (precord [(\"n\", \"n\")]) (recE [(\"n\", .atexp (.scon (.intF 6)))]), .pat (precord [(\"n\", \"n$Int\")]) (recE [(\"n\", i 6)])] (v \"n$Int\")),\n    .fn \"testValue\" [] (tup2 (bin \"//\" (v \"v$Int\") (i 4)) (bin \"/\" (v \"v\") (.atexp (.scon (.intF 4))))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: (1,1.5)\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternInTupleTest",
+      "sha256": "c74386b112dfb779ec7ac048f8de7ad4d1db0116ac89cd5b0337127d2eca157a",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternInTupleTest.elm",
+          "sha256": "c74386b112dfb779ec7ac048f8de7ad4d1db0116ac89cd5b0337127d2eca157a"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternInTupleTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternInTupleTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternInTupleTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternInTupleTest.elm -/\ndef g_elm_StandardA99RecordPatternInTupleTest : Program := {\n  name := \"StandardA99RecordPatternInTupleTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (ptup2 (P (precord [(\"p\", \"p\")])) (P (pv \"q\"))) (tup2 (recE [(\"p\", .atexp (.scon (.intF 9)))]) (.atexp (.scon (.intF 4)))), .pat (ptup2 (P (precord [(\"p\", \"p$Float$Int\")])) (P (pv \"q$Float$Int\"))) (tup2 (recE [(\"p\", i 9)]) (.atexp (.scon (.intF 4)))), .pat (ptup2 (P (precord [(\"p\", \"p$Int$Float\")])) (P (pv \"q$Int$Float\"))) (tup2 (recE [(\"p\", .atexp (.scon (.intF 9)))]) (i 4))] (tup2 (bin \"//\" (v \"p$Float$Int\") (v \"q$Int$Float\")) (bin \"/\" (v \"p\") (v \"q\")))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: (2,2.25)\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternIntTest",
+      "sha256": "933d06f624463a62ebc0dd133dd8b2139d397f553d10464c304de8b0fa7a70a3",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternIntTest.elm",
+          "sha256": "933d06f624463a62ebc0dd133dd8b2139d397f553d10464c304de8b0fa7a70a3"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternIntTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternIntTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternIntTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternIntTest.elm -/\ndef g_elm_StandardA99RecordPatternIntTest : Program := {\n  name := \"StandardA99RecordPatternIntTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (precord [(\"n\", \"n\")]) (recE [(\"n\", .atexp (.scon (.intF 7)))]), .pat (precord [(\"n\", \"n$Int\")]) (recE [(\"n\", i 7)])] (bin \"//\" (v \"n$Int\") (i 2))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 3\" .int ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternLambdaTest",
+      "sha256": "7537871cff2ec0b53778167fed75f207dbab822807c09188634997686e57291e",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternLambdaTest.elm",
+          "sha256": "7537871cff2ec0b53778167fed75f207dbab822807c09188634997686e57291e"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternLambdaTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternLambdaTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternLambdaTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternLambdaTest.elm -/\ndef g_elm_StandardA99RecordPatternLambdaTest : Program := {\n  name := \"StandardA99RecordPatternLambdaTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (ptup2 (P (pv \"f\")) (P (pv \"k\"))) (tup2 (lams [precord [(\"m\", \"m\")]] (bin \"+\" (v \"m\") (.atexp (.scon (.intF 1))))) (.atexp (.scon (.intF 2)))), .pat (ptup2 (P (pv \"f$Float$Int\")) (P (pv \"k$Float$Int\"))) (tup2 (lams [precord [(\"m\", \"m\")]] (bin \"+\" (v \"m\") (i 1))) (.atexp (.scon (.intF 2)))), .pat (ptup2 (P (pv \"f$Int$Float\")) (P (pv \"k$Int$Float\"))) (tup2 (lams [precord [(\"m\", \"m\")]] (bin \"+\" (v \"m\") (.atexp (.scon (.intF 1))))) (i 2))] (tup2 (ap (v \"f$Float$Int\") [recE [(\"m\", bin \"//\" (v \"k$Int$Float\") (i 1))]]) (ap (v \"f\") [recE [(\"m\", .atexp (.scon (.float 25 (-1))))]]))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: (3,3.5)\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternRowPunRejectedTest",
+      "sha256": "150aa0cf0a065062982f6b971808ed7de030cddd3d43a4a280acafe16b14e8aa",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternRowPunRejectedTest.elm",
+          "sha256": "150aa0cf0a065062982f6b971808ed7de030cddd3d43a4a280acafe16b14e8aa"
+        }
+      ],
+      "src": {
+        "status": "refused",
+        "reason": "parse",
+        "at": "tests/elm/src/StandardA99RecordPatternRowPunRejectedTest.elm",
+        "detail": "19:13 Declarations DeclDef DeclDefBody"
+      },
+      "status": "refused",
+      "reason": "compile-error"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternRowRenameRejectedTest",
+      "sha256": "904f3df50f88d4399602c34ef8e5d01de7781f75340c1f3c08a21639679dbfe9",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternRowRenameRejectedTest.elm",
+          "sha256": "904f3df50f88d4399602c34ef8e5d01de7781f75340c1f3c08a21639679dbfe9"
+        }
+      ],
+      "src": {
+        "status": "refused",
+        "reason": "parse",
+        "at": "tests/elm/src/StandardA99RecordPatternRowRenameRejectedTest.elm",
+        "detail": "19:13 Declarations DeclDef DeclDefBody"
+      },
+      "status": "refused",
+      "reason": "compile-error"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternSharedVariableTest",
+      "sha256": "ec84d80eae56237425972809adadbaec88354e35e7b7a8227beaa5cd21d4c68e",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm",
+          "sha256": "ec84d80eae56237425972809adadbaec88354e35e7b7a8227beaa5cd21d4c68e"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternSharedVariableTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternSharedVariableTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm -/\ndef g_elm_StandardA99RecordPatternSharedVariableTest : Program := {\n  name := \"StandardA99RecordPatternSharedVariableTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (precord [(\"a\", \"a\"), (\"b\", \"b\")]) (ap (.atexp (.paren (lams [pv \"x\"] (recE [(\"a\", v \"x\"), (\"b\", v \"x\")])))) [.atexp (.scon (.intF 5))]), .pat (precord [(\"a\", \"a$Int\"), (\"b\", \"b$Int\")]) (ap (.atexp (.paren (lams [pv \"x\"] (recE [(\"a\", v \"x\"), (\"b\", v \"x\")])))) [i 5])] (tup2 (bin \"//\" (v \"a$Int\") (i 2)) (bin \"/\" (v \"b\") (.atexp (.scon (.intF 2)))))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: (2,2.5)\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternTwoVariablesTest",
+      "sha256": "ab10092e0ac62a46fe1c49860fd15f273f84f9950e08232f35efac4d3c82cc98",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm",
+          "sha256": "ab10092e0ac62a46fe1c49860fd15f273f84f9950e08232f35efac4d3c82cc98"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA99RecordPatternTwoVariablesTest",
+        "modules": [
+          "tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_SingleCtorPairBoolF",
+      "def": "g_elm_StandardA99RecordPatternTwoVariablesTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm -/\ndef g_elm_StandardA99RecordPatternTwoVariablesTest : Program := {\n  name := \"StandardA99RecordPatternTwoVariablesTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (precord [(\"a\", \"a\"), (\"b\", \"b\")]) (recE [(\"a\", .atexp (.scon (.intF 5))), (\"b\", .atexp (.scon (.intF 3)))]), .pat (precord [(\"a\", \"a$Float$Int\"), (\"b\", \"b$Float$Int\")]) (recE [(\"a\", i 5), (\"b\", .atexp (.scon (.intF 3)))]), .pat (precord [(\"a\", \"a$Int$Float\"), (\"b\", \"b$Int$Float\")]) (recE [(\"a\", .atexp (.scon (.intF 5))), (\"b\", i 3)])] (tup2 (tup2 (bin \"//\" (v \"a$Float$Int\") (i 2)) (bin \"/\" (v \"b\") (.atexp (.scon (.intF 2))))) (tup2 (bin \"/\" (v \"a\") (.atexp (.scon (.intF 2)))) (bin \"//\" (v \"b$Int$Float\") (i 2))))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: ((2,1.5),(2.5,1))\" .data ] }"
     },
     {
       "project": "elm",
@@ -18922,7 +19250,7 @@
       "checks": 8,
       "kind": "view",
       "native": false,
-      "lean": "/-- tests/elm/src/WideRecord33Test.elm -/\ndef g_elm_WideRecord33Test : Program := {\n  name := \"WideRecord33Test\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [(\"R\", some [\"f0000\", \"f0001\", \"f0002\", \"f0003\", \"f0004\", \"f0005\", \"f0006\", \"f0007\", \"f0008\", \"f0009\", \"f0010\", \"f0011\", \"f0012\", \"f0013\", \"f0014\", \"f0015\", \"f0016\", \"f0017\", \"f0018\", \"f0019\", \"f0020\", \"f0021\", \"f0022\", \"f0023\", \"f0024\", \"f0025\", \"f0026\", \"f0027\", \"f0028\", \"f0029\", \"f0030\", \"f0031\", \"f0032\"])],\n  defs := [\n    .fn \"make\" [pv \"base\"] (recE [(\"f0000\", .atexp (.paren (bin \"+\" (v \"base\") (i 999)))), (\"f0001\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 15 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0002\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'c')) (.atexp (chA '?'))))))), (\"f0003\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"3s\") (str \"?\")))))), (\"f0004\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 3)))]) (i 0)))), (\"f0005\", .atexp (.paren (bin \"+\" (v \"base\") (i 1004)))), (\"f0006\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 65 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0007\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'h')) (.atexp (chA '?'))))))), (\"f0008\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"8s\") (str \"?\")))))), (\"f0009\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 8)))]) (i 0)))), (\"f0010\", .atexp (.paren (bin \"+\" (v \"base\") (i 1009)))), (\"f0011\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 115 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0012\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'm')) (.atexp (chA '?'))))))), (\"f0013\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"13s\") (str \"?\")))))), (\"f0014\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 13)))]) (i 0)))), (\"f0015\", .atexp (.paren (bin \"+\" (v \"base\") (i 1014)))), (\"f0016\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 165 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0017\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'r')) (.atexp (chA '?'))))))), (\"f0018\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"18s\") (str \"?\")))))), (\"f0019\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 18)))]) (i 0)))), (\"f0020\", .atexp (.paren (bin \"+\" (v \"base\") (i 1019)))), (\"f0021\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 215 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0022\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'w')) (.atexp (chA '?'))))))), (\"f0023\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"23s\") (str \"?\")))))), (\"f0024\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 23)))]) (i 0)))), (\"f0025\", .atexp (.paren (bin \"+\" (v \"base\") (i 1024)))), (\"f0026\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 265 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0027\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'b')) (.atexp (chA '?'))))))), (\"f0028\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"28s\") (str \"?\")))))), (\"f0029\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 28)))]) (i 0)))), (\"f0030\", .atexp (.paren (bin \"+\" (v \"base\") (i 1029)))), (\"f0031\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 315 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0032\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'g')) (.atexp (chA '?')))))))]),\n    .fn \"viaPat\" [precord [\"f0000\", \"f0032\"]] (tup2 (v \"f0000\") (v \"f0032\")),\n    .fn \"upd\" [pv \"r\"] (updE \"r\" [(\"f0032\", .atexp (chA '!'))]),\n    .fn \"main\" [] (letDefs [.fn \"base\" [] (bin \"-\" (bin \"+\" (i 1) (.atexp (.paren (bin \"-\" (ap (qv \"Char\" \"toCode\") [.atexp (chA 'b')]) (ap (qv \"Char\" \"toCode\") [.atexp (chA 'a')]))))) (i 1)), .fn \"r\" [] (ap (v \"make\") [v \"base\"]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0000\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0000\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0031\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0031\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0032\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0032\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"pattern\", .atexp (.paren (ap (v \"viaPat\") [v \"r\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"update\", .atexp (.paren (.atexp (access (.paren (ap (v \"upd\") [v \"r\"])) \"f0032\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"eq self\", .atexp (.paren (bin \"==\" (v \"r\") (ap (v \"make\") [v \"base\"])))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"eq updated\", .atexp (.paren (bin \"==\" (v \"r\") (ap (v \"upd\") [v \"r\"])))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"show\", .atexp (.paren (v \"r\"))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"f0000: 1000\" .int,\n    chk .check \"f0031: 31.5\" .float,\n    chk .check \"f0032: 'g'\" .char,\n    chk .check \"pattern: (1000,'g')\" .data,\n    chk .check \"update: '!'\" .char,\n    chk .check \"eq self: True\" .data,\n    chk .check \"eq updated: False\" .data,\n    chk .check \"show: { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = \\\"3s\\\", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = \\\"8s\\\", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = \\\"13s\\\", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = \\\"18s\\\", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = \\\"23s\\\", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = \\\"28s\\\", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g' }\" .data ] }"
+      "lean": "/-- tests/elm/src/WideRecord33Test.elm -/\ndef g_elm_WideRecord33Test : Program := {\n  name := \"WideRecord33Test\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [(\"R\", some [\"f0000\", \"f0001\", \"f0002\", \"f0003\", \"f0004\", \"f0005\", \"f0006\", \"f0007\", \"f0008\", \"f0009\", \"f0010\", \"f0011\", \"f0012\", \"f0013\", \"f0014\", \"f0015\", \"f0016\", \"f0017\", \"f0018\", \"f0019\", \"f0020\", \"f0021\", \"f0022\", \"f0023\", \"f0024\", \"f0025\", \"f0026\", \"f0027\", \"f0028\", \"f0029\", \"f0030\", \"f0031\", \"f0032\"])],\n  defs := [\n    .fn \"make\" [pv \"base\"] (recE [(\"f0000\", .atexp (.paren (bin \"+\" (v \"base\") (i 999)))), (\"f0001\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 15 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0002\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'c')) (.atexp (chA '?'))))))), (\"f0003\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"3s\") (str \"?\")))))), (\"f0004\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 3)))]) (i 0)))), (\"f0005\", .atexp (.paren (bin \"+\" (v \"base\") (i 1004)))), (\"f0006\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 65 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0007\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'h')) (.atexp (chA '?'))))))), (\"f0008\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"8s\") (str \"?\")))))), (\"f0009\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 8)))]) (i 0)))), (\"f0010\", .atexp (.paren (bin \"+\" (v \"base\") (i 1009)))), (\"f0011\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 115 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0012\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'm')) (.atexp (chA '?'))))))), (\"f0013\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"13s\") (str \"?\")))))), (\"f0014\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 13)))]) (i 0)))), (\"f0015\", .atexp (.paren (bin \"+\" (v \"base\") (i 1014)))), (\"f0016\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 165 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0017\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'r')) (.atexp (chA '?'))))))), (\"f0018\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"18s\") (str \"?\")))))), (\"f0019\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 18)))]) (i 0)))), (\"f0020\", .atexp (.paren (bin \"+\" (v \"base\") (i 1019)))), (\"f0021\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 215 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0022\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'w')) (.atexp (chA '?'))))))), (\"f0023\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"23s\") (str \"?\")))))), (\"f0024\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 23)))]) (i 0)))), (\"f0025\", .atexp (.paren (bin \"+\" (v \"base\") (i 1024)))), (\"f0026\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 265 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0027\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'b')) (.atexp (chA '?'))))))), (\"f0028\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"28s\") (str \"?\")))))), (\"f0029\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 28)))]) (i 0)))), (\"f0030\", .atexp (.paren (bin \"+\" (v \"base\") (i 1029)))), (\"f0031\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 315 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0032\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'g')) (.atexp (chA '?')))))))]),\n    .fn \"viaPat\" [precord [(\"f0000\", \"f0000\"), (\"f0032\", \"f0032\")]] (tup2 (v \"f0000\") (v \"f0032\")),\n    .fn \"upd\" [pv \"r\"] (updE \"r\" [(\"f0032\", .atexp (chA '!'))]),\n    .fn \"main\" [] (letDefs [.fn \"base\" [] (bin \"-\" (bin \"+\" (i 1) (.atexp (.paren (bin \"-\" (ap (qv \"Char\" \"toCode\") [.atexp (chA 'b')]) (ap (qv \"Char\" \"toCode\") [.atexp (chA 'a')]))))) (i 1)), .fn \"r\" [] (ap (v \"make\") [v \"base\"]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0000\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0000\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0031\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0031\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0032\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0032\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"pattern\", .atexp (.paren (ap (v \"viaPat\") [v \"r\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"update\", .atexp (.paren (.atexp (access (.paren (ap (v \"upd\") [v \"r\"])) \"f0032\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"eq self\", .atexp (.paren (bin \"==\" (v \"r\") (ap (v \"make\") [v \"base\"])))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"eq updated\", .atexp (.paren (bin \"==\" (v \"r\") (ap (v \"upd\") [v \"r\"])))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"show\", .atexp (.paren (v \"r\"))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"f0000: 1000\" .int,\n    chk .check \"f0031: 31.5\" .float,\n    chk .check \"f0032: 'g'\" .char,\n    chk .check \"pattern: (1000,'g')\" .data,\n    chk .check \"update: '!'\" .char,\n    chk .check \"eq self: True\" .data,\n    chk .check \"eq updated: False\" .data,\n    chk .check \"show: { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = \\\"3s\\\", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = \\\"8s\\\", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = \\\"13s\\\", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = \\\"18s\\\", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = \\\"23s\\\", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = \\\"28s\\\", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g' }\" .data ] }"
     },
     {
       "project": "elm",
@@ -18948,7 +19276,7 @@
       "checks": 9,
       "kind": "view",
       "native": false,
-      "lean": "/-- tests/elm/src/WideRecord40Test.elm -/\ndef g_elm_WideRecord40Test : Program := {\n  name := \"WideRecord40Test\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [(\"R\", some [\"f0000\", \"f0001\", \"f0002\", \"f0003\", \"f0004\", \"f0005\", \"f0006\", \"f0007\", \"f0008\", \"f0009\", \"f0010\", \"f0011\", \"f0012\", \"f0013\", \"f0014\", \"f0015\", \"f0016\", \"f0017\", \"f0018\", \"f0019\", \"f0020\", \"f0021\", \"f0022\", \"f0023\", \"f0024\", \"f0025\", \"f0026\", \"f0027\", \"f0028\", \"f0029\", \"f0030\", \"f0031\", \"f0032\", \"f0033\", \"f0034\", \"f0035\", \"f0036\", \"f0037\", \"f0038\", \"f0039\"])],\n  defs := [\n    .fn \"make\" [pv \"base\"] (recE [(\"f0000\", .atexp (.paren (bin \"+\" (v \"base\") (i 999)))), (\"f0001\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 15 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0002\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'c')) (.atexp (chA '?'))))))), (\"f0003\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"3s\") (str \"?\")))))), (\"f0004\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 3)))]) (i 0)))), (\"f0005\", .atexp (.paren (bin \"+\" (v \"base\") (i 1004)))), (\"f0006\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 65 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0007\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'h')) (.atexp (chA '?'))))))), (\"f0008\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"8s\") (str \"?\")))))), (\"f0009\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 8)))]) (i 0)))), (\"f0010\", .atexp (.paren (bin \"+\" (v \"base\") (i 1009)))), (\"f0011\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 115 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0012\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'm')) (.atexp (chA '?'))))))), (\"f0013\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"13s\") (str \"?\")))))), (\"f0014\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 13)))]) (i 0)))), (\"f0015\", .atexp (.paren (bin \"+\" (v \"base\") (i 1014)))), (\"f0016\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 165 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0017\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'r')) (.atexp (chA '?'))))))), (\"f0018\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"18s\") (str \"?\")))))), (\"f0019\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 18)))]) (i 0)))), (\"f0020\", .atexp (.paren (bin \"+\" (v \"base\") (i 1019)))), (\"f0021\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 215 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0022\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'w')) (.atexp (chA '?'))))))), (\"f0023\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"23s\") (str \"?\")))))), (\"f0024\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 23)))]) (i 0)))), (\"f0025\", .atexp (.paren (bin \"+\" (v \"base\") (i 1024)))), (\"f0026\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 265 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0027\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'b')) (.atexp (chA '?'))))))), (\"f0028\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"28s\") (str \"?\")))))), (\"f0029\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 28)))]) (i 0)))), (\"f0030\", .atexp (.paren (bin \"+\" (v \"base\") (i 1029)))), (\"f0031\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 315 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0032\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'g')) (.atexp (chA '?'))))))), (\"f0033\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"33s\") (str \"?\")))))), (\"f0034\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 33)))]) (i 0)))), (\"f0035\", .atexp (.paren (bin \"+\" (v \"base\") (i 1034)))), (\"f0036\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 365 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0037\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'l')) (.atexp (chA '?'))))))), (\"f0038\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"38s\") (str \"?\")))))), (\"f0039\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 38)))]) (i 0))))]),\n    .fn \"viaPat\" [precord [\"f0000\", \"f0039\"]] (tup2 (v \"f0000\") (v \"f0039\")),\n    .fn \"upd\" [pv \"r\"] (updE \"r\" [(\"f0039\", ap (v \"not\") [.atexp (access (A (v \"r\")) \"f0039\")])]),\n    .fn \"main\" [] (letDefs [.fn \"base\" [] (bin \"-\" (bin \"+\" (i 1) (.atexp (.paren (bin \"-\" (ap (qv \"Char\" \"toCode\") [.atexp (chA 'b')]) (ap (qv \"Char\" \"toCode\") [.atexp (chA 'a')]))))) (i 1)), .fn \"r\" [] (ap (v \"make\") [v \"base\"]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0000\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0000\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0031\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0031\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0032\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0032\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0039\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0039\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"pattern\", .atexp (.paren (ap (v \"viaPat\") [v \"r\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"update\", .atexp (.paren (.atexp (access (.paren (ap (v \"upd\") [v \"r\"])) \"f0039\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"eq self\", .atexp (.paren (bin \"==\" (v \"r\") (ap (v \"make\") [v \"base\"])))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"eq updated\", .atexp (.paren (bin \"==\" (v \"r\") (ap (v \"upd\") [v \"r\"])))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"show\", .atexp (.paren (v \"r\"))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"f0000: 1000\" .int,\n    chk .check \"f0031: 31.5\" .float,\n    chk .check \"f0032: 'g'\" .char,\n    chk .check \"f0039: False\" .data,\n    chk .check \"pattern: (1000,False)\" .data,\n    chk .check \"update: True\" .data,\n    chk .check \"eq self: True\" .data,\n    chk .check \"eq updated: False\" .data,\n    chk .check \"show: { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = \\\"3s\\\", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = \\\"8s\\\", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = \\\"13s\\\", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = \\\"18s\\\", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = \\\"23s\\\", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = \\\"28s\\\", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g', f0033 = \\\"33s\\\", f0034 = True, f0035 = 1035, f0036 = 36.5, f0037 = 'l', f0038 = \\\"38s\\\", f0039 = False }\" .data ] }"
+      "lean": "/-- tests/elm/src/WideRecord40Test.elm -/\ndef g_elm_WideRecord40Test : Program := {\n  name := \"WideRecord40Test\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [(\"R\", some [\"f0000\", \"f0001\", \"f0002\", \"f0003\", \"f0004\", \"f0005\", \"f0006\", \"f0007\", \"f0008\", \"f0009\", \"f0010\", \"f0011\", \"f0012\", \"f0013\", \"f0014\", \"f0015\", \"f0016\", \"f0017\", \"f0018\", \"f0019\", \"f0020\", \"f0021\", \"f0022\", \"f0023\", \"f0024\", \"f0025\", \"f0026\", \"f0027\", \"f0028\", \"f0029\", \"f0030\", \"f0031\", \"f0032\", \"f0033\", \"f0034\", \"f0035\", \"f0036\", \"f0037\", \"f0038\", \"f0039\"])],\n  defs := [\n    .fn \"make\" [pv \"base\"] (recE [(\"f0000\", .atexp (.paren (bin \"+\" (v \"base\") (i 999)))), (\"f0001\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 15 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0002\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'c')) (.atexp (chA '?'))))))), (\"f0003\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"3s\") (str \"?\")))))), (\"f0004\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 3)))]) (i 0)))), (\"f0005\", .atexp (.paren (bin \"+\" (v \"base\") (i 1004)))), (\"f0006\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 65 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0007\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'h')) (.atexp (chA '?'))))))), (\"f0008\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"8s\") (str \"?\")))))), (\"f0009\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 8)))]) (i 0)))), (\"f0010\", .atexp (.paren (bin \"+\" (v \"base\") (i 1009)))), (\"f0011\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 115 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0012\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'm')) (.atexp (chA '?'))))))), (\"f0013\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"13s\") (str \"?\")))))), (\"f0014\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 13)))]) (i 0)))), (\"f0015\", .atexp (.paren (bin \"+\" (v \"base\") (i 1014)))), (\"f0016\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 165 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0017\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'r')) (.atexp (chA '?'))))))), (\"f0018\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"18s\") (str \"?\")))))), (\"f0019\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 18)))]) (i 0)))), (\"f0020\", .atexp (.paren (bin \"+\" (v \"base\") (i 1019)))), (\"f0021\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 215 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0022\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'w')) (.atexp (chA '?'))))))), (\"f0023\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"23s\") (str \"?\")))))), (\"f0024\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 23)))]) (i 0)))), (\"f0025\", .atexp (.paren (bin \"+\" (v \"base\") (i 1024)))), (\"f0026\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 265 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0027\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'b')) (.atexp (chA '?'))))))), (\"f0028\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"28s\") (str \"?\")))))), (\"f0029\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 28)))]) (i 0)))), (\"f0030\", .atexp (.paren (bin \"+\" (v \"base\") (i 1029)))), (\"f0031\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 315 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0032\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'g')) (.atexp (chA '?'))))))), (\"f0033\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"33s\") (str \"?\")))))), (\"f0034\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 33)))]) (i 0)))), (\"f0035\", .atexp (.paren (bin \"+\" (v \"base\") (i 1034)))), (\"f0036\", .atexp (.paren (bin \"-\" (bin \"+\" (ap (v \"toFloat\") [v \"base\"]) (.atexp (.scon (.float 365 (-1))))) (.atexp (.scon (.intF 1)))))), (\"f0037\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (.atexp (chA 'l')) (.atexp (chA '?'))))))), (\"f0038\", .atexp (.paren (.atexp (.paren (ifte (bin \"==\" (v \"base\") (i 1)) (str \"38s\") (str \"?\")))))), (\"f0039\", .atexp (.paren (bin \"==\" (ap (v \"modBy\") [i 2, .atexp (.paren (bin \"+\" (v \"base\") (i 38)))]) (i 0))))]),\n    .fn \"viaPat\" [precord [(\"f0000\", \"f0000\"), (\"f0039\", \"f0039\")]] (tup2 (v \"f0000\") (v \"f0039\")),\n    .fn \"upd\" [pv \"r\"] (updE \"r\" [(\"f0039\", ap (v \"not\") [.atexp (access (A (v \"r\")) \"f0039\")])]),\n    .fn \"main\" [] (letDefs [.fn \"base\" [] (bin \"-\" (bin \"+\" (i 1) (.atexp (.paren (bin \"-\" (ap (qv \"Char\" \"toCode\") [.atexp (chA 'b')]) (ap (qv \"Char\" \"toCode\") [.atexp (chA 'a')]))))) (i 1)), .fn \"r\" [] (ap (v \"make\") [v \"base\"]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0000\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0000\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0031\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0031\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0032\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0032\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"f0039\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f0039\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"pattern\", .atexp (.paren (ap (v \"viaPat\") [v \"r\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"update\", .atexp (.paren (.atexp (access (.paren (ap (v \"upd\") [v \"r\"])) \"f0039\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"eq self\", .atexp (.paren (bin \"==\" (v \"r\") (ap (v \"make\") [v \"base\"])))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"eq updated\", .atexp (.paren (bin \"==\" (v \"r\") (ap (v \"upd\") [v \"r\"])))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"show\", .atexp (.paren (v \"r\"))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"f0000: 1000\" .int,\n    chk .check \"f0031: 31.5\" .float,\n    chk .check \"f0032: 'g'\" .char,\n    chk .check \"f0039: False\" .data,\n    chk .check \"pattern: (1000,False)\" .data,\n    chk .check \"update: True\" .data,\n    chk .check \"eq self: True\" .data,\n    chk .check \"eq updated: False\" .data,\n    chk .check \"show: { f0000 = 1000, f0001 = 1.5, f0002 = 'c', f0003 = \\\"3s\\\", f0004 = True, f0005 = 1005, f0006 = 6.5, f0007 = 'h', f0008 = \\\"8s\\\", f0009 = False, f0010 = 1010, f0011 = 11.5, f0012 = 'm', f0013 = \\\"13s\\\", f0014 = True, f0015 = 1015, f0016 = 16.5, f0017 = 'r', f0018 = \\\"18s\\\", f0019 = False, f0020 = 1020, f0021 = 21.5, f0022 = 'w', f0023 = \\\"23s\\\", f0024 = True, f0025 = 1025, f0026 = 26.5, f0027 = 'b', f0028 = \\\"28s\\\", f0029 = False, f0030 = 1030, f0031 = 31.5, f0032 = 'g', f0033 = \\\"33s\\\", f0034 = True, f0035 = 1035, f0036 = 36.5, f0037 = 'l', f0038 = \\\"38s\\\", f0039 = False }\" .data ] }"
     },
     {
       "project": "elm",
@@ -19052,7 +19380,7 @@
       "checks": 6,
       "kind": "view",
       "native": false,
-      "lean": "/-- tests/elm/src/WideRecordPatternTest.elm -/\ndef g_elm_WideRecordPatternTest : Program := {\n  name := \"WideRecordPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [(\"R\", some [\"f00\", \"f01\", \"f02\", \"f03\", \"f04\", \"f05\", \"f06\", \"f07\", \"f08\", \"f09\", \"f10\", \"f11\", \"f12\", \"f13\", \"f14\", \"f15\", \"f16\", \"f17\", \"f18\", \"f19\", \"f20\", \"f21\", \"f22\", \"f23\", \"f24\", \"f25\", \"f26\", \"f27\"])],\n  defs := [\n    .fn \"make\" [pv \"base\"] (recE [(\"f00\", bin \"+\" (v \"base\") (i 999)), (\"f01\", bin \"+\" (v \"base\") (i 1000)), (\"f02\", bin \"+\" (v \"base\") (i 1001)), (\"f03\", bin \"+\" (v \"base\") (i 1002)), (\"f04\", bin \"+\" (v \"base\") (i 1003)), (\"f05\", bin \"+\" (v \"base\") (i 1004)), (\"f06\", bin \"+\" (v \"base\") (i 1005)), (\"f07\", bin \"+\" (v \"base\") (i 1006)), (\"f08\", bin \"+\" (v \"base\") (i 1007)), (\"f09\", bin \"+\" (v \"base\") (i 1008)), (\"f10\", bin \"+\" (v \"base\") (i 1009)), (\"f11\", bin \"+\" (v \"base\") (i 1010)), (\"f12\", bin \"+\" (v \"base\") (i 1011)), (\"f13\", bin \"+\" (v \"base\") (i 1012)), (\"f14\", bin \"+\" (v \"base\") (i 1013)), (\"f15\", bin \"+\" (v \"base\") (i 1014)), (\"f16\", bin \"+\" (v \"base\") (i 1015)), (\"f17\", bin \"+\" (v \"base\") (i 1016)), (\"f18\", bin \"+\" (v \"base\") (i 1017)), (\"f19\", bin \"+\" (v \"base\") (i 1018)), (\"f20\", bin \"+\" (v \"base\") (i 1019)), (\"f21\", bin \"+\" (v \"base\") (i 1020)), (\"f22\", bin \"+\" (v \"base\") (i 1021)), (\"f23\", bin \"+\" (v \"base\") (i 1022)), (\"f24\", bin \"+\" (v \"base\") (i 1023)), (\"f25\", bin \"+\" (v \"base\") (i 1024)), (\"f26\", bin \"+\" (v \"base\") (i 1025)), (\"f27\", bin \"+\" (v \"base\") (i 1026))]),\n    .fn \"viaPat\" [precord [\"f27\", \"f25\"]] (bin \"+\" (bin \"*\" (v \"f27\") (i 1000)) (v \"f25\")),\n    .fn \"upd\" [pv \"r\"] (updE \"r\" [(\"f27\", bin \"+\" (.atexp (access (A (v \"r\")) \"f27\")) (i 1)), (\"f26\", i 7)]),\n    .fn \"main\" [] (letDefs [.fn \"base\" [] (bin \"-\" (bin \"+\" (i 1) (.atexp (.paren (bin \"-\" (ap (qv \"Char\" \"toCode\") [.atexp (chA 'b')]) (ap (qv \"Char\" \"toCode\") [.atexp (chA 'a')]))))) (i 1)), .fn \"r\" [] (ap (v \"make\") [v \"base\"]), .pat pw (ap (qv \"Debug\" \"log\") [str \"access f27\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f27\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"access f25\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f25\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"pattern\", .atexp (.paren (ap (v \"viaPat\") [v \"r\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"update f27\", .atexp (.paren (.atexp (access (.paren (ap (v \"upd\") [v \"r\"])) \"f27\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"update f26\", .atexp (.paren (.atexp (access (.paren (ap (v \"upd\") [v \"r\"])) \"f26\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"update pattern\", .atexp (.paren (ap (v \"viaPat\") [.atexp (.paren (ap (v \"upd\") [v \"r\"]))]))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"access f27: 1027\" .int,\n    chk .check \"access f25: 1025\" .int,\n    chk .check \"pattern: 1028025\" .int,\n    chk .check \"update f27: 1028\" .int,\n    chk .check \"update f26: 7\" .int,\n    chk .check \"update pattern: 1029025\" .int ] }"
+      "lean": "/-- tests/elm/src/WideRecordPatternTest.elm -/\ndef g_elm_WideRecordPatternTest : Program := {\n  name := \"WideRecordPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [(\"R\", some [\"f00\", \"f01\", \"f02\", \"f03\", \"f04\", \"f05\", \"f06\", \"f07\", \"f08\", \"f09\", \"f10\", \"f11\", \"f12\", \"f13\", \"f14\", \"f15\", \"f16\", \"f17\", \"f18\", \"f19\", \"f20\", \"f21\", \"f22\", \"f23\", \"f24\", \"f25\", \"f26\", \"f27\"])],\n  defs := [\n    .fn \"make\" [pv \"base\"] (recE [(\"f00\", bin \"+\" (v \"base\") (i 999)), (\"f01\", bin \"+\" (v \"base\") (i 1000)), (\"f02\", bin \"+\" (v \"base\") (i 1001)), (\"f03\", bin \"+\" (v \"base\") (i 1002)), (\"f04\", bin \"+\" (v \"base\") (i 1003)), (\"f05\", bin \"+\" (v \"base\") (i 1004)), (\"f06\", bin \"+\" (v \"base\") (i 1005)), (\"f07\", bin \"+\" (v \"base\") (i 1006)), (\"f08\", bin \"+\" (v \"base\") (i 1007)), (\"f09\", bin \"+\" (v \"base\") (i 1008)), (\"f10\", bin \"+\" (v \"base\") (i 1009)), (\"f11\", bin \"+\" (v \"base\") (i 1010)), (\"f12\", bin \"+\" (v \"base\") (i 1011)), (\"f13\", bin \"+\" (v \"base\") (i 1012)), (\"f14\", bin \"+\" (v \"base\") (i 1013)), (\"f15\", bin \"+\" (v \"base\") (i 1014)), (\"f16\", bin \"+\" (v \"base\") (i 1015)), (\"f17\", bin \"+\" (v \"base\") (i 1016)), (\"f18\", bin \"+\" (v \"base\") (i 1017)), (\"f19\", bin \"+\" (v \"base\") (i 1018)), (\"f20\", bin \"+\" (v \"base\") (i 1019)), (\"f21\", bin \"+\" (v \"base\") (i 1020)), (\"f22\", bin \"+\" (v \"base\") (i 1021)), (\"f23\", bin \"+\" (v \"base\") (i 1022)), (\"f24\", bin \"+\" (v \"base\") (i 1023)), (\"f25\", bin \"+\" (v \"base\") (i 1024)), (\"f26\", bin \"+\" (v \"base\") (i 1025)), (\"f27\", bin \"+\" (v \"base\") (i 1026))]),\n    .fn \"viaPat\" [precord [(\"f27\", \"f27\"), (\"f25\", \"f25\")]] (bin \"+\" (bin \"*\" (v \"f27\") (i 1000)) (v \"f25\")),\n    .fn \"upd\" [pv \"r\"] (updE \"r\" [(\"f27\", bin \"+\" (.atexp (access (A (v \"r\")) \"f27\")) (i 1)), (\"f26\", i 7)]),\n    .fn \"main\" [] (letDefs [.fn \"base\" [] (bin \"-\" (bin \"+\" (i 1) (.atexp (.paren (bin \"-\" (ap (qv \"Char\" \"toCode\") [.atexp (chA 'b')]) (ap (qv \"Char\" \"toCode\") [.atexp (chA 'a')]))))) (i 1)), .fn \"r\" [] (ap (v \"make\") [v \"base\"]), .pat pw (ap (qv \"Debug\" \"log\") [str \"access f27\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f27\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"access f25\", .atexp (.paren (.atexp (access (A (v \"r\")) \"f25\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"pattern\", .atexp (.paren (ap (v \"viaPat\") [v \"r\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"update f27\", .atexp (.paren (.atexp (access (.paren (ap (v \"upd\") [v \"r\"])) \"f27\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"update f26\", .atexp (.paren (.atexp (access (.paren (ap (v \"upd\") [v \"r\"])) \"f26\")))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"update pattern\", .atexp (.paren (ap (v \"viaPat\") [.atexp (.paren (ap (v \"upd\") [v \"r\"]))]))])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"access f27: 1027\" .int,\n    chk .check \"access f25: 1025\" .int,\n    chk .check \"pattern: 1028025\" .int,\n    chk .check \"update f27: 1028\" .int,\n    chk .check \"update f26: 7\" .int,\n    chk .check \"update pattern: 1029025\" .int ] }"
     },
     {
       "project": "elm",

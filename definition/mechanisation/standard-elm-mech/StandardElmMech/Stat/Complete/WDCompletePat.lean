@@ -257,7 +257,7 @@ theorem outP_unifyArgsD {fuel n0 : Nat} : ∀ (l1 l2 : List Ty) (st : WDSt) (T :
 
 theorem rsbRow_rowOpt (s : RSub) : ∀ r : Option APatRow, rsbRow s (APatRow.rowOpt r) = APatRow.rowOpt (rsbPatRowOpt s r)
   | none => rfl
-  | some (.field l τ rest) => by
+  | some (.field l x τ rest) => by
     simp only [APatRow.rowOpt, APatRow.row, rsbPatRowOpt, rsbPatRow, rsbRow_modifyD, rsbRow, rsbRow_rowOpt s rest]
 
 theorem isRecordTy_spec {τ : Ty} (h : isRecordTy τ = true) : ∃ ρ tl, τ = .record ρ tl := by
@@ -280,8 +280,8 @@ mutual
 theorem wdPatRow_complete (fuel n0 : Nat) : ∀ (r : BPatRow) (st : WDSt) (S' : RSub) (r' : APatRow),
     SInvD n0 st → FixR (rigidFromD n0) S' → AbsR S' st.θ → r'.erase = r →
     OutPD (RPost n0 st S' r') (wdPatRow fuel (rigidFromD n0) r st)
-  | .field l rest, st, S', .field l' τ' rest', hi, hfx, hab, he => by
-    simp only [APatRow.erase, BPatRow.field.injEq] at he; obtain ⟨rfl, rfl⟩ := he
+  | .field l x rest, st, S', .field l' x' τ' rest', hi, hfx, hab, he => by
+    simp only [APatRow.erase, BPatRow.field.injEq] at he; obtain ⟨rfl, rfl, rfl⟩ := he
     simp only [wdPatRow]
     refine outP_freshVD ?_
     have hF0 : FoundD n0 S' st.n { st with n := st.n + 1 } (ext1D S' st.n τ') := found_ext1CD' hi hfx hab (Adm.any _)

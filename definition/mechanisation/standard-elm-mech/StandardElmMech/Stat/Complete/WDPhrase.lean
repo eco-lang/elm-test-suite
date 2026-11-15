@@ -42,7 +42,7 @@ theorem tysAtPat_sbD (s : RSub) : ∀ p : AAtPat, tysAtPat (rsbAtPat s p) = (tys
   | .record r _ => by simp only [rsbAtPat, tysAtPat, tysPatRowOpt_sbD s r, List.map_cons]
   | .paren p => by simp only [rsbAtPat, tysAtPat, tysPat_sbD s p]
 theorem tysPatRow_sbD (s : RSub) : ∀ r : APatRow, tysPatRow (rsbPatRow s r) = (tysPatRow r).map (rsb s)
-  | .field _ _ rest => by simp only [rsbPatRow, tysPatRow, tysPatRowOpt_sbD s rest, List.map_cons]
+  | .field _ _ _ rest => by simp only [rsbPatRow, tysPatRow, tysPatRowOpt_sbD s rest, List.map_cons]
 theorem tysPatRowOpt_sbD (s : RSub) : ∀ r : Option APatRow, tysPatRowOpt (rsbPatRowOpt s r) = (tysPatRowOpt r).map (rsb s)
   | none => rfl
   | some r => by simp only [rsbPatRowOpt, tysPatRowOpt, tysPatRow_sbD s r]
@@ -144,7 +144,7 @@ theorem rsbAtPat_congrD {s t : RSub} : ∀ p : AAtPat, AgreeOnD s t (tysAtPat p)
 theorem rsbPatRowOpt_congrD {s t : RSub} : ∀ r : Option APatRow, AgreeOnD s t (tysPatRowOpt r) →
     rsbPatRowOpt s r = rsbPatRowOpt t r
   | none, _ => rfl
-  | some (.field l τ rest), h => by
+  | some (.field l x τ rest), h => by
     simp only [tysPatRowOpt, tysPatRow] at h
     obtain ⟨h1, h2⟩ := AgreeOnD.cons h
     simp only [rsbPatRowOpt, rsbPatRow, h1, rsbPatRowOpt_congrD rest h2]

@@ -742,12 +742,19 @@ with the fields it names.
 
 \rulegroup{Pattern Rows}{\jdg{C}{\patrow}{(\VE, \varrho)}}
 
-\defnrule[r:s-patrow]{\var = \lab \premsep \opt{\jdg{C}{\patrow}{(\VE, \varrho)}}}{\jdg{C}{\lab\ \opt{\kw{,}\ \patrow}}{(\{\var \mapsto (\tau, \isv)\}\opt{{}+\VE},\ \{\lab \mapsto \tau\}\opt{{}+\varrho})}}
+\defnrule[r:s-patrow]{\opt{\jdg{C}{\patrow}{(\VE, \varrho)}}}{\jdg{C}{\lab\ \kw{=}\ \var\ \opt{\kw{,}\ \patrow}}{(\{\var \mapsto (\tau, \isv)\}\opt{{}+\VE},\ \{\lab \mapsto \tau\}\opt{{}+\varrho})}}
 
 \begin{rulecomments}
-\rcomment{r:s-patrow} A field of a record pattern binds the variable spelt as its
-label. The syntactic restrictions ensure $\lab \notin \Dom\varrho$, and hence
-$\var \notin \Dom\VE$.
+\rcomment{r:s-patrow} A field of a record pattern binds the variable of its
+row to the type of the field. In a program the row is written as a label
+alone, whose equivalent form $\lab\ \kw{=}\ \var$ has $\var = \lab$
+(Appendix~\ref{ch:appendix-derived-forms}); a copy made by number
+specialisation gives $\var$ a new name and keeps $\lab$
+(Section~\ref{sec:dynamic-core-numbers}). % A99
+The syntactic restrictions ensure $\lab \notin \Dom\varrho$. That
+$\var \notin \Dom\VE$ follows, in a program, from the restriction that a
+binding site binds no variable twice, and in a copy from the distinct new
+names it gives.
 \end{rulecomments}
 
 \rulegroup{Patterns}{\jdg{C}{\pat}{(\VE, \tau)}}

@@ -336,11 +336,11 @@ def matchPatOpt (o : Oracle) : Nat → Env → Option Val → Option Pat → Nat
 
 def matchPatRow (o : Oracle) : Nat → Env → Record → PatRow → Nat → Res ValEnv
   | 0, _, _, _, k => ⟨.outOfFuel, [], k⟩
-  | n+1, E, r, .field l rest, k =>
+  | n+1, E, r, .field l x rest, k =>
     match fmLookup r l with
     | some v =>
       match matchPatRowOpt o n E r rest k with
-      | ⟨.value VE, l1, k1⟩ => ⟨.value (fmPlus [(l, v)] VE), l1, k1⟩
+      | ⟨.value VE, l1, k1⟩ => ⟨.value (fmPlus [(x, v)] VE), l1, k1⟩
       | ⟨.stuck, l1, k1⟩ => ⟨.stuck, l1, k1⟩
       | ⟨.outOfFuel, l1, k1⟩ => ⟨.outOfFuel, l1, k1⟩
     | none => ⟨.stuck, [], k⟩

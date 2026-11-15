@@ -192,8 +192,8 @@ def g_elm_RecordRowsTest : Program := {
   types := [],
   aliases := [("Point", some ["y", "x"])],
   defs := [
-    .fn "sumFields" [precord ["x", "y"]] (bin "+" (v "x") (v "y")),
-    .fn "labelOf" [precord ["label"]] (v "label"),
+    .fn "sumFields" [precord [("x", "x"), ("y", "y")]] (bin "+" (v "x") (v "y")),
+    .fn "labelOf" [precord [("label", "label")]] (v "label"),
     .fn "five" [.unit] (i 5),
     .fn "main" [] (letDefs [.fn "r" [] (recE [("x", .atexp (.scon (.intF 1))), ("y", .atexp (.scon (.intF 2))), ("label", str "p")]), .fn "r$Int$Int" [] (recE [("x", i 1), ("y", i 2), ("label", str "p")]), .pat pw (ap (qv "Debug" "log") [str "sum of fields", .atexp (.paren (ap (v "sumFields") [v "r$Int$Int"]))]), .pat pw (ap (qv "Debug" "log") [str "label", .atexp (.paren (ap (v "labelOf") [v "r$Int$Int"]))]), .pat pw (ap (qv "Debug" "log") [str "constructor order", .atexp (.paren (letDefs [.fn "p" [] (ap (c "Point") [i 1, i 2])] (tup2 (.atexp (access (A (v "p")) "y")) (.atexp (access (A (v "p")) "x")))))]), .pat pw (ap (qv "Debug" "log") [str "unit", .atexp (.paren (ap (v "five") [.atexp .unit]))])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [

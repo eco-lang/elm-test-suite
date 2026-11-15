@@ -225,8 +225,10 @@ class of an occurrence of an identifier in a Core phrase is determined thus:
 \item At the start of a component of a record expression, record update,
   record type or record pattern, and immediately after the \kw{.} of a field
   selection or field accessor (Appendix~\ref{ch:appendix-derived-forms}), a
-  lower identifier is a record label. A record label that forms a component of
-  a record pattern is also a variable, bound by that pattern.
+  lower identifier is a record label. A record label that forms a whole
+  component of a record pattern, the derived pattern row of
+  Appendix~\ref{ch:appendix-derived-forms}, is also a variable, bound by that
+  pattern. % A99
 \item Elsewhere, a lower identifier is a variable and an upper identifier is a
   constructor.
 \end{enumerate}
@@ -422,7 +424,8 @@ parsing.
 Many syntactic forms of Elm have a meaning that is given by translation into a
 smaller set of forms, called the \emph{bare language}. Among them are infixed
 application, negation, conditional expressions, list expressions with
-elements, list patterns with elements, field selection and field accessors,
+elements, list patterns with elements, pattern rows written as a label alone,
+field selection and field accessors,
 lambda expressions and function bindings with parameters beyond the first,
 and \kw{let} expressions with several definitions. These derived forms, and
 their equivalent forms in the bare language, are given in
@@ -548,7 +551,7 @@ and in their interpretation:
 \galt{\kw{\kwlb}\ \opt{\patrow}\ \kw{\kwrb}}{record}
 \galt{\kw{(}\ \pat\ \kw{)}}{parentheses}
 \noalign{\smallskip}
-\gprod{\patrow}{\lab\ \opt{\kw{,}\ \patrow}}{pattern row}
+\gprod{\patrow}{\lab\ \kw{=}\ \var\ \opt{\kw{,}\ \patrow}}{pattern row}
 \noalign{\smallskip}
 \gprod{\pat}{\atpat}{atomic}
 \galt{\longcon\ \atpat_1\ \cdots\ \atpat_n}{constructed pattern ($n \geq 1$)}
@@ -593,6 +596,14 @@ not a phrase of the language.
 \begin{itemize}
 \item\citelabel{res:core-row-labels-distinct} No expression row, pattern row or type-expression row may contain the
   same \lab{} twice. This applies to the expression row of a record update.
+\item\citelabel{res:core-pattern-row-label-only} No pattern row of a program has the form
+  $\lab\ \kw{=}\ \var$: a program writes each component of a record pattern as
+  a label alone, the derived form of
+  Appendix~\ref{ch:appendix-derived-forms}, whose equivalent form
+  $\lab\ \kw{=}\ \var$ binds the variable spelt as the label. The bare form
+  exists so that number specialisation (Chapter~\ref{ch:dynamic-core}) can
+  give the variable of a row a new name while keeping its label.
+  % A99
 \item\citelabel{res:core-record-update-form} In a record update $\kw{\kwlb}\ \var\ \kw{|}\ \exprow\ \kw{\kwrb}$ the
   item before \kw{|} is a variable that is not qualified, and at least one
   expression row follows \kw{|}; the grammar gives this shape, and an
@@ -609,9 +620,12 @@ not a phrase of the language.
   % A4
 \end{itemize}
 
-\emph{Patterns and bound variables.} The variables \emph{bound} by a pattern
-are the variables that occur in it, the labels of its pattern rows, and the
-variables after its occurrences of \kw{as}. A \emph{binding site} is one of
+\emph{Patterns and bound variables.} The \emph{variable of a pattern row} is
+the \var{} of a row $\lab\ \kw{=}\ \var$ and, for a row written as a label
+alone (Appendix~\ref{ch:appendix-derived-forms}), the variable spelt as its
+label. The variables \emph{bound} by a pattern are the variables that occur in
+it outside its pattern rows, the variables of its pattern rows, and the
+variables after its occurrences of \kw{as}. % A99 A \emph{binding site} is one of
 the following: the parameters of a lambda expression, taken together; the
 parameters of a function binding, taken together; the pattern of a match
 rule; the pattern of a destructuring binding; and the definitions of one

@@ -1128,7 +1128,7 @@ pattern env p st =
             let
                 ( typed, st1 ) =
                     List.foldl
-                        (\( f, id ) ( acc, s ) ->
+                        (\( f, _, id ) ( acc, s ) ->
                             let
                                 ( t, s1 ) =
                                     fresh Any s
@@ -1342,7 +1342,11 @@ component env decls st0 =
                                                     (\( ( tp, pBound ), stA ) ->
                                                         expr envIn x stA
                                                             |> Result.andThen (\( tx, stB ) -> unify tp tx stB)
-                                                            |> Result.map (\stC -> ( bound ++ pBound, stC ))
+                                                            -- the pattern's binders in the order of its value
+                                                            -- environment, as Lean's `APat.ve` lists them
+                                                            -- (`VE1 + VE2` puts VE2's first): the reverse of
+                                                            -- their order in the source (Choices, item 2)
+                                                            |> Result.map (\stC -> ( bound ++ List.reverse pBound, stC ))
                                                     )
                                 )
                     )

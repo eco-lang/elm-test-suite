@@ -7,9 +7,10 @@
   decidable by instances that the kernel reduces (lists, `Nodup`, bounded quantifiers, and
   `Graph.Plus` through its proved decider), so its decider is `decide`, and `decR_iff` is
   `decide_eq_true_iff`. `ModuleOK` is the conjunction of the 22 module restrictions, `ProgramOK`
-  of the five program restrictions, `SynOK` of both. The nine restrictions about characters,
-  tokens and layout (`res:core-escape-unicode`, ..., `res:modules-header`) are trusted to the
-  parser ([parse]) and are not stated.
+  of the five program restrictions, `SynOK` of both. Ten restrictions are trusted to the parser
+  ([parse]) and are not stated: the nine about characters, tokens and layout
+  (`res:core-escape-unicode`, ..., `res:modules-header`), and `res:core-pattern-row-label-only`
+  (A99), which the source syntax cannot break, since its record patterns are lists of labels.
 -/
 import StandardElmMech.Src.Traverse
 import StandardElmMech.Src.Graph

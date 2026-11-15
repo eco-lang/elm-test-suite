@@ -639,11 +639,48 @@ theorem spec_copy_bound :
 def s_spec_record_pattern_copy : Src.SProgram := single "SpecRecordPatternCopy"
   [showMain (.letE [.pat (.record ["x"]) (.record [("x", i 1)])] (idiv (v "x") (i 2)))]
 
-/-- A record pattern binds the variables spelt as its labels, so a copy of a declaration by a
-    record pattern cannot bind new variables (Issues, item 4): `x` is used at Int, its copy at Int
-    is needed, and the specialisation refuses the program. -/
+/-- A copy of a destructuring binding with a record pattern (ruling A99, which closes step 10's
+    Issues, item 4): `x` is used at Int, so the binding has its default copy `{ x = x } = { x = 1 }`
+    at Float and the copy at Int `{ x = x$Int } = { x = 1 }`, which binds the new variable `x$Int`
+    to the same field `x`; the use refers to the copy at Int. -/
 theorem spec_record_pattern_copy :
-    endToEnd Btest s_spec_record_pattern_copy = .error (.spec (.recordPatternCopy "x")) := by
+    onOk (fun r => rhs r "Main" "main") (endToEnd Btest s_spec_record_pattern_copy) =
+    some (some
+      (StandardElm.Exp.app
+         (StandardElm.Exp.atexp (StandardElm.AtExp.var { qual := none, id := "text" }))
+         (StandardElm.AtExp.paren
+           (StandardElm.Exp.app
+             (StandardElm.Exp.atexp (StandardElm.AtExp.var { qual := some "Debug", id := "toString" }))
+             (StandardElm.AtExp.paren
+               (StandardElm.Exp.atexp
+                 (StandardElm.AtExp.letE
+                   (StandardElm.Dec.val
+                     (StandardElm.ValBind.pat
+                       (StandardElm.AtPat.record (some (StandardElm.PatRow.field "x" "x" none)))
+                       (StandardElm.Exp.atexp
+                         (StandardElm.AtExp.record
+                           (some (StandardElm.ExpRow.field
+                              "x"
+                              (StandardElm.Exp.atexp (StandardElm.AtExp.scon (StandardElm.SCon.intF 1)))
+                              none))))))
+                   (StandardElm.Exp.atexp
+                     (StandardElm.AtExp.letE
+                       (StandardElm.Dec.val
+                         (StandardElm.ValBind.pat
+                           (StandardElm.AtPat.record (some (StandardElm.PatRow.field "x" "x$Int" none)))
+                           (StandardElm.Exp.atexp
+                             (StandardElm.AtExp.record
+                               (some (StandardElm.ExpRow.field
+                                  "x"
+                                  (StandardElm.Exp.atexp (StandardElm.AtExp.scon (StandardElm.SCon.int 1)))
+                                  none))))))
+                       (StandardElm.Exp.app
+                         (StandardElm.Exp.app
+                           (StandardElm.Exp.atexp (StandardElm.AtExp.op "//"))
+                           (StandardElm.AtExp.paren
+                             (StandardElm.Exp.atexp (StandardElm.AtExp.var { qual := none, id := "x$Int" }))))
+                         (StandardElm.AtExp.paren
+                           (StandardElm.Exp.atexp (StandardElm.AtExp.scon (StandardElm.SCon.int 2)))))))))))))) := by
   decide +kernel
 
 end StandardElm.Stat

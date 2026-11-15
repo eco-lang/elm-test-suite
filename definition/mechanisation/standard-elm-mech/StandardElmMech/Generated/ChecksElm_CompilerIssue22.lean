@@ -20,6 +20,7 @@ open StandardElm.D
   g_elm_CovForeignTypesTest
   g_elm_CovLambdaBoundaryCaseBoundaryInARecursiveValueTest
   g_elm_CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest
+  g_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest
   g_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest
   g_elm_CovPatternSplitTupleAndConstructorParametersMatchedByCaseTest
   g_elm_CovPortIncomingArrayTest

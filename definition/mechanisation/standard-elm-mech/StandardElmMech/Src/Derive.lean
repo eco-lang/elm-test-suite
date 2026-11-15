@@ -23,9 +23,11 @@ def tyRow : List (Lab × BTy) → Option BTyRow
   | [] => none
   | (l, t) :: rest => some (.field l t (tyRow rest))
 
+/-- Each row written as a label alone is the derived form of `lab = var` with the variable spelt
+    as the label (df:pattern-row-label, A99). -/
 def patRow : List Lab → Option BPatRow
   | [] => none
-  | l :: rest => some (.field l (patRow rest))
+  | l :: rest => some (.field l l (patRow rest))
 
 def expRow : List (Lab × BExp) → Option BExpRow
   | [] => none

@@ -58,6 +58,72 @@ def s_elm_StandardA98TypeBeforeAliasTest : Src.SProgram := Src.canonOrder <| Src
     [Src.imp "Html" none (some (.items [.var "text"]))]
     [.custom "T" [] [("T", [Src.tc "String" []])], .alias "String" [] (Src.tc "Int" []), Src.val "field" (some (.fn (Src.tc "T" []) (Src.tc "Int" []))) [.paren (Src.pc "T" [Src.pv "n"])] (Src.bin "+" (Src.v "n") (Src.i 1)), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "field (T 3)", .paren (Src.app (Src.v "field") [.paren (Src.app (Src.c "T") [Src.i 3])])])] (Src.app (Src.v "text") [Src.str "done"]))] ]
 
+/-- tests/elm/src/StandardA99RecordPatternAsTest.elm -/
+def s_elm_StandardA99RecordPatternAsTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternAsTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternAsTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (.tuple [Src.tc "Int" [], Src.tc "Float" []])) [] (.letE [.pat (.paren (.as (.record ["n"]) "r")) (.record [("n", Src.i 7)])] (.tuple [Src.bin "//" (Src.v "n") (Src.i 2), Src.bin "/" (.access (Src.v "r") "n") (Src.i 2)])), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/StandardA99RecordPatternBothTest.elm -/
+def s_elm_StandardA99RecordPatternBothTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternBothTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternBothTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (.tuple [Src.tc "Int" [], Src.tc "Float" []])) [] (.letE [.pat (.record ["n"]) (.record [("n", Src.i 7)])] (.tuple [Src.bin "//" (Src.v "n") (Src.i 2), Src.bin "/" (Src.v "n") (Src.i 2)])), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/StandardA99RecordPatternDependentTest.elm -/
+def s_elm_StandardA99RecordPatternDependentTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternDependentTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternDependentTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (.tuple [Src.tc "Int" [], Src.tc "Float" []])) [] (.letE [.pat (.record ["n"]) (.record [("n", Src.i 7)]), .fn "m" none [] (Src.bin "+" (Src.v "n") (Src.i 2))] (.tuple [Src.bin "//" (Src.v "m") (Src.i 2), Src.bin "/" (Src.v "m") (Src.i 2)])), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/StandardA99RecordPatternFloatTest.elm -/
+def s_elm_StandardA99RecordPatternFloatTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternFloatTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternFloatTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (Src.tc "Float" [])) [] (.letE [.pat (.record ["n"]) (.record [("n", Src.i 7)])] (Src.bin "/" (Src.v "n") (Src.i 2))), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/StandardA99RecordPatternFunctionTest.elm -/
+def s_elm_StandardA99RecordPatternFunctionTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternFunctionTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternFunctionTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (.tuple [Src.tc "Int" [], Src.tc "Float" []])) [] (.letE [.pat (.record ["h"]) (.record [("h", .lam [Src.pv "x"] (Src.bin "-" (Src.v "x") (Src.i 3)))])] (.tuple [Src.app (Src.v "h") [Src.i 5], Src.app (Src.v "h") [Src.fl 25 (-1)]])), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm -/
+def s_elm_StandardA99RecordPatternInTopCopyTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternInTopCopyTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternInTopCopyTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "v" none [] (.letE [.pat (.record ["n"]) (.record [("n", Src.i 6)])] (Src.v "n")), Src.val "testValue" (some (.tuple [Src.tc "Int" [], Src.tc "Float" []])) [] (.tuple [Src.bin "//" (Src.v "v") (Src.i 4), Src.bin "/" (Src.v "v") (Src.i 4)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/StandardA99RecordPatternInTupleTest.elm -/
+def s_elm_StandardA99RecordPatternInTupleTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternInTupleTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternInTupleTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (.tuple [Src.tc "Int" [], Src.tc "Float" []])) [] (.letE [.pat (.tuple [.record ["p"], Src.pv "q"]) (.tuple [.record [("p", Src.i 9)], Src.i 4])] (.tuple [Src.bin "//" (Src.v "p") (Src.v "q"), Src.bin "/" (Src.v "p") (Src.v "q")])), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/StandardA99RecordPatternIntTest.elm -/
+def s_elm_StandardA99RecordPatternIntTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternIntTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternIntTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (Src.tc "Int" [])) [] (.letE [.pat (.record ["n"]) (.record [("n", Src.i 7)])] (Src.bin "//" (Src.v "n") (Src.i 2))), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/StandardA99RecordPatternLambdaTest.elm -/
+def s_elm_StandardA99RecordPatternLambdaTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternLambdaTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternLambdaTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (.tuple [Src.tc "Int" [], Src.tc "Float" []])) [] (.letE [.pat (.tuple [Src.pv "f", Src.pv "k"]) (.tuple [.lam [.record ["m"]] (Src.bin "+" (Src.v "m") (Src.i 1)), Src.i 2])] (.tuple [Src.app (Src.v "f") [.record [("m", Src.bin "//" (Src.v "k") (Src.i 1))]], Src.app (Src.v "f") [.record [("m", Src.fl 25 (-1))]]])), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm -/
+def s_elm_StandardA99RecordPatternSharedVariableTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternSharedVariableTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternSharedVariableTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (.tuple [Src.tc "Int" [], Src.tc "Float" []])) [] (.letE [.pat (.record ["a", "b"]) (Src.app (.paren (.lam [Src.pv "x"] (.record [("a", Src.v "x"), ("b", Src.v "x")]))) [Src.i 5])] (.tuple [Src.bin "//" (Src.v "a") (Src.i 2), Src.bin "/" (Src.v "b") (Src.i 2)])), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm -/
+def s_elm_StandardA99RecordPatternTwoVariablesTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA99RecordPatternTwoVariablesTest" [
+  Src.mdl (Src.hdr false "StandardA99RecordPatternTwoVariablesTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (.tuple [.tuple [Src.tc "Int" [], Src.tc "Float" []], .tuple [Src.tc "Float" [], Src.tc "Int" []]])) [] (.letE [.pat (.record ["a", "b"]) (.record [("a", Src.i 5), ("b", Src.i 3)])] (.tuple [.tuple [Src.bin "//" (Src.v "a") (Src.i 2), Src.bin "/" (Src.v "b") (Src.i 2)], .tuple [Src.bin "/" (Src.v "a") (Src.i 2), Src.bin "//" (Src.v "b") (Src.i 2)]])), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
 /-- tests/elm/src/StandardApplicationStrictTest.elm -/
 def s_elm_StandardApplicationStrictTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardApplicationStrictTest" [
   Src.mdl (Src.hdr false "StandardApplicationStrictTest" (.items [.var "main"]))
@@ -255,6 +321,17 @@ def srcShard_SrcElm_StandardA9 : List (String × Src.SProgram) :=
    ("StandardA97SelfOnlyTypeTest", s_elm_StandardA97SelfOnlyTypeTest),
    ("StandardA98TypeBeforeAliasStringMismatchTest", s_elm_StandardA98TypeBeforeAliasStringMismatchTest),
    ("StandardA98TypeBeforeAliasTest", s_elm_StandardA98TypeBeforeAliasTest),
+   ("StandardA99RecordPatternAsTest", s_elm_StandardA99RecordPatternAsTest),
+   ("StandardA99RecordPatternBothTest", s_elm_StandardA99RecordPatternBothTest),
+   ("StandardA99RecordPatternDependentTest", s_elm_StandardA99RecordPatternDependentTest),
+   ("StandardA99RecordPatternFloatTest", s_elm_StandardA99RecordPatternFloatTest),
+   ("StandardA99RecordPatternFunctionTest", s_elm_StandardA99RecordPatternFunctionTest),
+   ("StandardA99RecordPatternInTopCopyTest", s_elm_StandardA99RecordPatternInTopCopyTest),
+   ("StandardA99RecordPatternInTupleTest", s_elm_StandardA99RecordPatternInTupleTest),
+   ("StandardA99RecordPatternIntTest", s_elm_StandardA99RecordPatternIntTest),
+   ("StandardA99RecordPatternLambdaTest", s_elm_StandardA99RecordPatternLambdaTest),
+   ("StandardA99RecordPatternSharedVariableTest", s_elm_StandardA99RecordPatternSharedVariableTest),
+   ("StandardA99RecordPatternTwoVariablesTest", s_elm_StandardA99RecordPatternTwoVariablesTest),
    ("StandardApplicationStrictTest", s_elm_StandardApplicationStrictTest),
    ("StandardCoreEvaluationExamplesTest", s_elm_StandardCoreEvaluationExamplesTest),
    ("StandardLetStrictTest", s_elm_StandardLetStrictTest),

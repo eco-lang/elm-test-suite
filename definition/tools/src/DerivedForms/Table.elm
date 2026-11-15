@@ -233,6 +233,15 @@ rows =
                 , whenEmpty = Nothing
                 }
       }
+    , { label = "df:pattern-row-label"
+      , block = PatternRows
+      , derived = [ M (Plain Lab), Raw "\\ \\opt{\\kw{,}\\ \\patrow}" ]
+      , equivalent =
+            Computed
+                [ Raw "\\lab\\ \\kw{=}\\ \\var\\ \\opt{\\kw{,}\\ \\patrow}\n       \\qquad (\\text{$\\var$ spelt as $\\lab$})" ]
+      , condition = NoCondition
+      , lean = HandWritten "Derived.lean: precord; Src/Derive.lean: patRow"
+      }
     , { label = "df:function-binding"
       , block = ValueBindings
       , derived =

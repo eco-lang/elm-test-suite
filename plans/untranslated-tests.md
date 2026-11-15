@@ -75,6 +75,16 @@ logs nothing: it would translate with no checks, so there is nothing to gain unl
   forms allow. Worth checking first whether the book's number specialisation says how such a
   binding is copied: if it does not, that is a finding about the book.
 
+**Update (2026-11-15): settled in the book, by ruling A99 ([record-pattern-rows.md](record-pattern-rows.md)).**
+It was a finding about the book: number specialisation asked for a copy no record pattern could
+write. The bare pattern row is now `lab = var`, `{ h }` is the derived form of `{ h = h }`, and a
+copy renames the row's variable and keeps its label. LetNumberRecordDestructureTest (used only at
+Float, the default copy) already translated; CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest
+(its record binding used at Int) and the eleven StandardA99RecordPattern*Test programs that compile
+are now translated and proved, and the two that Elm rejects (`{ n = m }` and `{ n = n }` written in
+a program) are compile-error tests of the new restriction core-pattern-row-label-only. No `elm-spec`
+test is refused for `number` any more.
+
 ## D. Library functions written in Elm (28)
 
 `basis:Tuple.second` (11), `Tuple.first` (5), `List.map` (3), `List.sum` (2),

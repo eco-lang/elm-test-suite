@@ -6,14 +6,16 @@
 %   numbering); every equivalent form closed under B4; fresh identifiers
 %   stated (none).
 % - ECONOMICAL: if, else-if chains, &&, ||, negation, lists, the field
-%   accessor, field access, list patterns, lambdas with several patterns, function
-%   definitions, let with several definitions and the order of module
-%   declarations carry no rules of their own.
+%   accessor, field access, list patterns, pattern rows written as a label,
+%   lambdas with several patterns, function definitions, let with several
+%   definitions and the order of module declarations carry no rules of their
+%   own.
 % - FAITHFUL: A56 (infixed && and || are conditionals, the operator values
 %   are strict); A16, A30 as amended (every module has a header, so no
 %   derived form supplies one); A57, A58 (order among independent components is not
 %   significant); A26 (restrictions apply to definitions as written); A4
-%   (field access); D5 (accessor and access through record patterns).
+%   (field access); D5 (accessor and access through record patterns); A99
+%   (a pattern row written as a label alone stands for lab = var).
 \chapter{Derived Forms}\label{ch:appendix-derived-forms}
 
 Several derived forms are provided in the Core and in Modules; they are
@@ -76,8 +78,11 @@ field accessor, a \kw{.} begins a field accessor
 application of $\kw{.}\lab_1$ to $\kw{.}\lab_2$.
 % A4
 In the equivalent form of the field accessor $\kw{.}\lab$, the record pattern
-$\kw{\kwlb}\ \lab\ \kw{\kwrb}$ binds the variable spelt as the label $\lab$,
-and the body of the lambda is that variable. % D5
+$\kw{\kwlb}\ \lab\ \kw{=}\ \lab\ \kw{\kwrb}$ binds the variable spelt as the
+label $\lab$, and the body of the lambda is that variable. The pattern row is
+written in the bare syntax, $\lab\ \kw{=}\ \var$ with $\var$ spelt as $\lab$,
+since the pattern row written as a label alone is a derived form of a later
+figure. % D5, A99, B4
 
 An annotation $\var\ \kw{:}\ \ty$ and the definition of $\var$ that follows it
 (Chapter~\ref{ch:syntax-core}) are written together, here as in the bare
@@ -110,8 +115,9 @@ derived forms have already been rewritten.
 
 No equivalent form introduces a new identifier, so no table carries a note of
 fresh identifiers. % B5
-The only variable bound by an equivalent form is the one bound by the
-equivalent form of $\kw{.}\lab$, which is spelt as the label.
+The only variables bound by equivalent forms are the one bound by the
+equivalent form of $\kw{.}\lab$ and the one bound by the equivalent form of a
+pattern row written as a label alone; each is spelt as its label.
 
 \begin{figure}[htbp]
 \centering
@@ -166,7 +172,7 @@ equivalent form of $\kw{.}\lab$, which is spelt as the label.
        \qquad (n\geq 1)}
 \hline
 \dform{\citelabel{df:field-accessor}\kw{.}\lab}
-      {\kw{(}\kw{\textbackslash}\kw{\kwlb}\ \lab\ \kw{\kwrb}\ \kw{->}\ \lab\kw{)}}
+      {\kw{(}\kw{\textbackslash}\kw{\kwlb}\ \lab\ \kw{=}\ \lab\ \kw{\kwrb}\ \kw{->}\ \lab\kw{)}}
 \hline
 \dform{\citelabel{df:field-selection}\atexp\kw{.}\lab}
       {\kw{(}\kw{.}\lab\ \atexp\kw{)}}
@@ -187,7 +193,17 @@ equivalent form of $\kw{.}\lab$, which is spelt as the label.
        \quad (n\geq 1)}
 \end{derivedforms}
 % END GENERATED derived-forms:AtomicPatterns
-\caption{Derived forms of Patterns}
+
+\bigskip
+\par\noindent\textbf{Pattern Rows}\ \patrow\par\smallskip
+% BEGIN GENERATED derived-forms:PatternRows (definition/tools/src/GenerateDerivedForms.elm); edit the table, not this
+\begin{derivedforms}
+\dform{\citelabel{df:pattern-row-label}\lab\ \opt{\kw{,}\ \patrow}}
+      {\lab\ \kw{=}\ \var\ \opt{\kw{,}\ \patrow}
+       \qquad (\text{$\var$ spelt as $\lab$})}
+\end{derivedforms}
+% END GENERATED derived-forms:PatternRows
+\caption{Derived forms of Patterns and Pattern Rows}
 \label{fig:appendix-derived-forms-patterns}
 \end{figure}
 
@@ -201,6 +217,12 @@ In the equivalent form for list patterns, each \kw{::} is the bare pattern
 $\pat\ \kw{::}\ \pat$, the parentheses make the result an atomic pattern,
 and for $n=1$ the equivalent form is $\kw{(}\pat_1\ \kw{::}\ \kw{[ ]}\kw{)}$.
 % Audit Y8: the list-pattern row is given directly, without recursion (B4).
+In the row for pattern rows, $\var$ is the variable spelt as $\lab$: the
+pattern \kw{\kwlb\ h, n \kwrb} stands for \kw{\kwlb\ h = h, n = n \kwrb}. A
+program writes every pattern row in this derived form
+(Section~\ref{sec:syntax-core-restrictions}); only the copies of number
+specialisation (Section~\ref{sec:dynamic-core-numbers}) have pattern rows
+whose variable is spelt otherwise. % A99
 
 \begin{figure}[htbp]
 \centering
@@ -282,9 +304,9 @@ first two forms may carry an annotation $\kw{:}\ \ty$ after $\var$:
       & \text{those of}\ \atpat & \expm
   \end{array}
 \]
-The variables bound by a pattern are its variable patterns, the variables
-spelt as the labels of its record patterns, and the variables following \kw{as}
-in it.
+The variables bound by a pattern are its variable patterns, the variables of
+its pattern rows (Section~\ref{sec:syntax-core-restrictions}), and the
+variables following \kw{as} in it.
 A definition $\valbind_i$ \emph{refers to} a definition $\valbind_j$ if a
 variable bound by $\valbind_j$ occurs free in the right-hand side of
 $\valbind_i$; $j=i$ is allowed. Two definitions are in the same

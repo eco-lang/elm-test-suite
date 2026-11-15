@@ -7,7 +7,8 @@
 %   the same right-hand label; every row of the derived forms tables of
 %   Appendix A (infixed application, conditional, conditional chain, &&, ||,
 %   lambda with several patterns, negation, list expression, field accessor,
-%   field selection, list pattern, function binding, let with several
+%   field selection, list pattern, pattern row written as a label (A99),
+%   function binding, let with several
 %   definitions, module body as written) appears as an
 %   alternative of its phrase class, marked with a dagger (B6).
 % - FAITHFUL: precedence, layout and restrictions kept by reference to
@@ -148,7 +149,8 @@ expression may be the argument of an application.
 \galt{\kw{\kwlb}\ \opt{\patrow}\ \kw{\kwrb}}{record}
 \galt{\kw{(}\ \pat\ \kw{)}}{parentheses}
 \noalign{\smallskip}
-\gprod{\patrow}{\lab\ \opt{\kw{,}\ \patrow}}{pattern row}
+\gprod{\patrow}{\lab\ \kw{=}\ \var\ \opt{\kw{,}\ \patrow}}{pattern row}
+\galt{\lab\ \opt{\kw{,}\ \patrow}}{label as variable\fgderived}
 \noalign{\smallskip}
 \gprod{\pat}{\atpat}{atomic}
 \galt{\longcon\ \atpat_1\ \cdots\ \atpat_n}{constructed pattern ($n \geq 1$)}

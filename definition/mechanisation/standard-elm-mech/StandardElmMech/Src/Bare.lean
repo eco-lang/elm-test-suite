@@ -32,7 +32,7 @@ mutual
     | tuple (p1 p2 : BPat) (p3 : Option BPat) | nil | record (row : Option BPatRow)
     | paren (p : BPat)
   inductive BPatRow where
-    | field (l : Lab) (rest : Option BPatRow)
+    | field (l : Lab) (x : Var) (rest : Option BPatRow)
   inductive BPat where
     | atpat (a : BAtPat) | con (lc : LongId) (args : List BAtPat)
     | cons (p1 p2 : BPat) | as (p : BPat) (x : Var)

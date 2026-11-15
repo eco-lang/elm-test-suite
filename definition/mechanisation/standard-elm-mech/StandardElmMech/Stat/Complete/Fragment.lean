@@ -60,7 +60,7 @@ def summAtPat : BAtPat → Summ
   | .paren p => summPat p
 def summPatRowOpt : Option BPatRow → List String
   | none => []
-  | some (.field l rest) => l :: summPatRowOpt rest
+  | some (.field _ x rest) => x :: summPatRowOpt rest
 def summPat : BPat → Summ
   | .atpat a => summAtPat a
   | .con lc args => { occs := [lc] } ++ summAtPats args

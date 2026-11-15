@@ -227,11 +227,11 @@ theorem walkAtPat (hw : WalkHyp S S' ν r D) : (p : AAtPat) → ∀ (p'' : AAtPa
 theorem walkPatRow (hw : WalkHyp S S' ν r D) : (row : APatRow) → ∀ (row'' : APatRow) (U U'' : List BVar)
     (path : List Nat), row''.erase = row.erase → Rel3 S S' ν ν' D (nodesPatRow U path row) (nodesPatRow U'' path row'') →
     VeOK r D row.ve row''.ve
-  | .field l τ rest, row'', U, U'', path, he, h => by
+  | .field l x τ rest, row'', U, U'', path, he, h => by
     cases row'' with
-    | field l'' τ'' rest'' =>
+    | field l'' x'' τ'' rest'' =>
       simp [APatRow.erase] at he
-      obtain ⟨rfl, he2⟩ := he
+      obtain ⟨rfl, rfl, he2⟩ := he
       simp only [nodesPatRow, List.cons_append, List.singleton_append] at h
       obtain ⟨e1, _, d1, _⟩ := h.head_ty hw
       subst e1

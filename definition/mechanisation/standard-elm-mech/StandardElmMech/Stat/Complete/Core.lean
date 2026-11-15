@@ -446,7 +446,7 @@ def penvAt (p : Path) : BAtPat → FMap Var GInfo
   | .paren q => penv (0 :: p) q
   | .wild | .scon _ | .con _ | .unit | .nil => []
 def penvRow (p : Path) : BPatRow → FMap Var GInfo
-  | .field l rest => FMap.modify [(l, .mono (.mv (0 :: p)))] (penvRowOpt (1 :: p) rest)
+  | .field _ x rest => FMap.modify [(x, .mono (.mv (0 :: p)))] (penvRowOpt (1 :: p) rest)
 def penvRowOpt (p : Path) : Option BPatRow → FMap Var GInfo
   | none => []
   | some r => penvRow p r
@@ -466,7 +466,7 @@ end
 mutual
 /-- The row of a record pattern: one metavariable per field. -/
 def prow (p : Path) : BPatRow → List (Lab × T)
-  | .field l rest => rmod [(l, .mv (0 :: p))] (prowOpt (1 :: p) rest)
+  | .field l _ rest => rmod [(l, .mv (0 :: p))] (prowOpt (1 :: p) rest)
 def prowOpt (p : Path) : Option BPatRow → List (Lab × T)
   | none => []
   | some r => prow p r
@@ -740,8 +740,8 @@ def rdAtPat : AAtPat → Path → Ty
   | .paren p, 0 :: q => rdPat p q
   | _, _ => default
 def rdPatRow : APatRow → Path → Ty
-  | .field _ τ _, [0] => hN τ
-  | .field _ _ rest, 1 :: q => rdPatRowOpt rest q
+  | .field _ _ τ _, [0] => hN τ
+  | .field _ _ _ rest, 1 :: q => rdPatRowOpt rest q
   | _, _ => default
 def rdPatRowOpt : Option APatRow → Path → Ty
   | none, _ => default

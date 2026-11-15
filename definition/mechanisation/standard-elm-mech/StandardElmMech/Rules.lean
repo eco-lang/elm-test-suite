@@ -189,11 +189,12 @@ inductive MatchAtPat : Env → Val → AtPat → VEF → Prop where
 
 /-- Pattern Rows: E, r ⊢ patrow ⇒ VE/FAIL -/
 inductive MatchPatRow : Env → Record → PatRow → ValEnv → Prop where
-  /-- r:d-patrow-field: lab [, patrow] ⇒ {lab ↦ r(lab)} [+ VE].
+  /-- r:d-patrow-field: lab = var [, patrow] ⇒ {var ↦ r(lab)} [+ VE].
       r(lab) is written as the premise `fmLookup r lab = some v`. -/
-  | r_d_patrow_field (E : Env) (r : Record) (l : Lab) (rest : Option PatRow) (v : Val) (VE : ValEnv) :
+  | r_d_patrow_field (E : Env) (r : Record) (l : Lab) (x : Var) (rest : Option PatRow) (v : Val)
+      (VE : ValEnv) :
       fmLookup r l = some v → MatchPatRowOpt E r rest VE →
-      MatchPatRow E r (.field l rest) (fmPlus [(l, v)] VE)
+      MatchPatRow E r (.field l x rest) (fmPlus [(x, v)] VE)
 
 /-- Patterns: E, v ⊢ pat ⇒ VE/FAIL -/
 inductive MatchPat : Env → Val → Pat → VEF → Prop where

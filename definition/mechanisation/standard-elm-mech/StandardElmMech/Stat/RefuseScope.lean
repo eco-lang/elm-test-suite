@@ -75,7 +75,7 @@ def atPatVars : BAtPat → List String
   | .paren p => patVars p
   | .wild | .scon _ | .con _ | .unit | .nil => []
 def patRowVars : BPatRow → List String
-  | .field l rest => l :: patRowVarsOpt rest
+  | .field _ x rest => x :: patRowVarsOpt rest
 def patRowVarsOpt : Option BPatRow → List String
   | none => []
   | some r => patRowVars r
@@ -494,7 +494,7 @@ theorem keys_atPat : (p : AAtPat) → KeysIn p.ve (atPatVars p.erase)
     simp only [AAtPat.ve, AAtPat.erase, atPatVars]
     exact keys_pat p
 theorem keys_patRow : (r : APatRow) → KeysIn r.ve (patRowVars r.erase)
-  | .field l _ rest => by
+  | .field l x _ rest => by
     simp only [APatRow.ve, APatRow.erase, patRowVars]
     refine keysIn_modify (keysIn_single (by simp)) ?_
     exact keysIn_mono (keys_patRowOpt rest) (by intro x hx; simp [hx])

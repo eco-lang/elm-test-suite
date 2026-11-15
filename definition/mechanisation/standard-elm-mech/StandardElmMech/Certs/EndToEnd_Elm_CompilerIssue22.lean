@@ -276,6 +276,29 @@ theorem ident_elm_CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest :
   Stat.ident_of_wCheck wcheck_elm_CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest
 
 
+/-- tests/elm/src/CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest : Stat.wCheck Stat.Btest s_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest (some g_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_060311d8_eq (by decide +kernel)
+
+/-- tests/elm/src/CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.elm [parse] [harness] [params] -/
+theorem legal_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest : Stat.LegalProgram Stat.Btest s_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest :=
+  Stat.legal_of_W wcheck_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest
+
+/-- tests/elm/src/CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest : Stat.endToEndW Stat.Btest s_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest = .ok g_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest
+
+/-- tests/elm/src/CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest (Stat.value_of_viewChecks t_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest)
+
+/-- tests/elm/src/CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest) r → r = g_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest
+
+
 /-- tests/elm/src/CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
 theorem wcheck_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest : Stat.wCheck Stat.Btest s_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest (some g_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest.reduced) = true :=
   Stat.wCheck_of_ctx ctx_060311d8_eq (by decide +kernel)

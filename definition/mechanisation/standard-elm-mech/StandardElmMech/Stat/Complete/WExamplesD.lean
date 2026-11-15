@@ -19,7 +19,7 @@ def tyOfD : WRes → Option Ty
   | _ => none
 
 def recE (fs : List (String × BExp)) : BExp := .atexp (.record (fs.foldr (fun p r => some (.field p.1 p.2 r)) none))
-def recP (ls : List String) : BAtPat := .record (ls.foldr (fun l r => some (.field l r)) none)
+def recP (ls : List String) : BAtPat := .record (ls.foldr (fun l r => some (.field l l r)) none)
 /-- Field selection `e.l`, as its derived form `(\{l} -> l) e`. -/
 def sel (e : BAtExp) (l : String) : BExp := .app (.atexp (.paren (.lam (recP [l]) (ev l)))) e
 def rv (x : String) : BAtExp := .var ⟨none, x⟩

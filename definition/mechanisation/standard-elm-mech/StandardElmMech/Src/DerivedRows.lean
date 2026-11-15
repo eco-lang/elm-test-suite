@@ -35,9 +35,9 @@ where
 def neg (a : BAtExp) : BAtExp :=
   .paren (.app (.atexp (.var basicsNegate)) a)
 
-/-- Row ".lab" (df:field-accessor): `(\{ lab } -> lab)`. -/
+/-- Row ".lab" (df:field-accessor): `(\{ lab = lab } -> lab)`. -/
 def accessor (l : Lab) : BAtExp :=
-  .paren (.lam (.record (some (.field l none))) (.atexp (.var ⟨none, l⟩)))
+  .paren (.lam (.record (some (.field l l none))) (.atexp (.var ⟨none, l⟩)))
 
 /-- Row "[pat1, ..., patn]" (df:list-pattern): `(pat1 :: (pat2 :: ... (patn :: [ ])...)) (n >= 1)`. -/
 def listP (ps : List BPat) : BAtPat :=

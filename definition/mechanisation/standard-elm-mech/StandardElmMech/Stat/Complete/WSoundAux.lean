@@ -61,7 +61,7 @@ theorem checkAtPat_lkC {C1 C2 : Ctx} (h : LkC C1 C2) : ∀ p : AAtPat, checkAtPa
     exact ⟨⟨checkPatRowOpt_lkC h row hc.1.1, hc.1.2⟩, hc.2⟩
   | .paren p, hc => by simp only [checkAtPat] at hc ⊢; exact checkPat_lkC h p hc
 theorem checkPatRow_lkC {C1 C2 : Ctx} (h : LkC C1 C2) : ∀ r : APatRow, checkPatRow C1 r = true → checkPatRow C2 r = true
-  | .field _ _ rest, hc => by simp only [checkPatRow] at hc ⊢; exact checkPatRowOpt_lkC h rest hc
+  | .field _ _ _ rest, hc => by simp only [checkPatRow] at hc ⊢; exact checkPatRowOpt_lkC h rest hc
 theorem checkPatRowOpt_lkC {C1 C2 : Ctx} (h : LkC C1 C2) :
     ∀ r : Option APatRow, checkPatRowOpt C1 r = true → checkPatRowOpt C2 r = true
   | none, _ => rfl

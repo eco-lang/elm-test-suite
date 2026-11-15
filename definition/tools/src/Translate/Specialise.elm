@@ -435,11 +435,8 @@ renamePattern a p =
                     go inner |> Result.map PParen
 
                 PRecord fields ->
-                    if isDefault a then
-                        Ok (PRecord fields)
-
-                    else
-                        Err "a record pattern binding that needs a copy at Float"
+                    -- each row keeps its label and binds the copy's variable (lab = var, A99)
+                    Ok (PRecord (List.map (\( l, x, id ) -> ( l, copyName x a, id )) fields))
 
                 _ ->
                     Ok q

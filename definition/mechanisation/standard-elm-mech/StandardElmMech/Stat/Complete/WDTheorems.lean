@@ -80,14 +80,14 @@ theorem cnNodesAtPat (U : List BVar) (path : List Nat) : ∀ p : AAtPat, (∀ τ
 theorem cnNodesPatRowOpt (U : List BVar) (path : List Nat) : ∀ r : Option APatRow, (∀ τ ∈ tysPatRowOpt r, cnB τ = true) →
     CnNodes (nodesPatRowOpt U path r)
   | none, _ => fun _ h => nomatch h
-  | some (.field l τ0 rest), h => by
+  | some (.field l x τ0 rest), h => by
     simp only [nodesPatRowOpt, nodesPatRow]
     refine (CnNodes.single fun τ hτ => ?_).app (cnNodesPatRowOpt U _ rest fun τ hτ => h τ (by
       simp only [tysPatRowOpt, tysPatRow, List.mem_cons]; exact .inr hτ))
     simp only [List.mem_append, List.mem_singleton, List.mem_map] at hτ
     rcases hτ with rfl | ⟨p, hp, rfl⟩
     · exact h _ (by simp [tysPatRowOpt, tysPatRow])
-    · exact h _ (mem_rowOpt_tys (r := some (.field l τ0 rest)) hp)
+    · exact h _ (mem_rowOpt_tys (r := some (.field l x τ0 rest)) hp)
 theorem cnNodesPat (U : List BVar) (path : List Nat) : ∀ p : APat, (∀ τ ∈ tysPat p, cnB τ = true) →
     CnNodes (nodesPat U path p)
   | .atpat a, h => by

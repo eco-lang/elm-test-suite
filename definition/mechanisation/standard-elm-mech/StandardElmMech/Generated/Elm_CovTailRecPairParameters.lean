@@ -209,7 +209,7 @@ def g_elm_EdgeCaseAllDestructPatternsTest : Program := {
   types := [],
   aliases := [],
   defs := [
-    .fn "testValue" [] (letDefs [.pat (ptup2 (P (pv "a")) (P (pv "b"))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))), .pat (precord ["x"]) (recE [("x", .atexp (.scon (.intF 3)))]), .pat (ptup2 (P (pv "h")) (P (pv "t"))) (caseOf (listE [.atexp (.scon (.intF 4)), .atexp (.scon (.intF 5))]) [(.cons (P (pv "y")) (P (pv "ys")), tup2 (v "y") (v "ys")), (P (listP []), tup2 (.atexp (.scon (.intF 0))) (listE []))]), .pat (.paren (.as (P (pv "v")) "w")) (.atexp (.scon (.intF 6)))] (listE [v "a", v "x", v "h", v "v"])),
+    .fn "testValue" [] (letDefs [.pat (ptup2 (P (pv "a")) (P (pv "b"))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))), .pat (precord [("x", "x")]) (recE [("x", .atexp (.scon (.intF 3)))]), .pat (ptup2 (P (pv "h")) (P (pv "t"))) (caseOf (listE [.atexp (.scon (.intF 4)), .atexp (.scon (.intF 5))]) [(.cons (P (pv "y")) (P (pv "ys")), tup2 (v "y") (v "ys")), (P (listP []), tup2 (.atexp (.scon (.intF 0))) (listE []))]), .pat (.paren (.as (P (pv "v")) "w")) (.atexp (.scon (.intF 6)))] (listE [v "a", v "x", v "h", v "v"])),
     .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
   checks := [
     chk .check "testValue: [1,3,4,6]" .data ] }

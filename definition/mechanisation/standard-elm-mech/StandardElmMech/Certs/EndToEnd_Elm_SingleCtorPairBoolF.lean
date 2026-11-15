@@ -459,6 +459,259 @@ theorem ident_elm_StandardA98TypeBeforeAliasTest :
   Stat.ident_of_wCheck wcheck_elm_StandardA98TypeBeforeAliasTest
 
 
+/-- tests/elm/src/StandardA99RecordPatternAsTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternAsTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternAsTest (some g_elm_StandardA99RecordPatternAsTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternAsTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternAsTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternAsTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternAsTest
+
+/-- tests/elm/src/StandardA99RecordPatternAsTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternAsTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternAsTest = .ok g_elm_StandardA99RecordPatternAsTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternAsTest
+
+/-- tests/elm/src/StandardA99RecordPatternAsTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternAsTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternAsTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternAsTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternAsTest)
+
+/-- tests/elm/src/StandardA99RecordPatternAsTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternAsTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternAsTest) r → r = g_elm_StandardA99RecordPatternAsTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternAsTest
+
+
+/-- tests/elm/src/StandardA99RecordPatternBothTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternBothTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternBothTest (some g_elm_StandardA99RecordPatternBothTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternBothTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternBothTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternBothTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternBothTest
+
+/-- tests/elm/src/StandardA99RecordPatternBothTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternBothTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternBothTest = .ok g_elm_StandardA99RecordPatternBothTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternBothTest
+
+/-- tests/elm/src/StandardA99RecordPatternBothTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternBothTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternBothTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternBothTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternBothTest)
+
+/-- tests/elm/src/StandardA99RecordPatternBothTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternBothTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternBothTest) r → r = g_elm_StandardA99RecordPatternBothTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternBothTest
+
+
+/-- tests/elm/src/StandardA99RecordPatternDependentTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternDependentTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternDependentTest (some g_elm_StandardA99RecordPatternDependentTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternDependentTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternDependentTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternDependentTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternDependentTest
+
+/-- tests/elm/src/StandardA99RecordPatternDependentTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternDependentTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternDependentTest = .ok g_elm_StandardA99RecordPatternDependentTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternDependentTest
+
+/-- tests/elm/src/StandardA99RecordPatternDependentTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternDependentTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternDependentTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternDependentTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternDependentTest)
+
+/-- tests/elm/src/StandardA99RecordPatternDependentTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternDependentTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternDependentTest) r → r = g_elm_StandardA99RecordPatternDependentTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternDependentTest
+
+
+/-- tests/elm/src/StandardA99RecordPatternFloatTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternFloatTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternFloatTest (some g_elm_StandardA99RecordPatternFloatTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternFloatTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternFloatTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternFloatTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternFloatTest
+
+/-- tests/elm/src/StandardA99RecordPatternFloatTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternFloatTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternFloatTest = .ok g_elm_StandardA99RecordPatternFloatTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternFloatTest
+
+/-- tests/elm/src/StandardA99RecordPatternFloatTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternFloatTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternFloatTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternFloatTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternFloatTest)
+
+/-- tests/elm/src/StandardA99RecordPatternFloatTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternFloatTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternFloatTest) r → r = g_elm_StandardA99RecordPatternFloatTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternFloatTest
+
+
+/-- tests/elm/src/StandardA99RecordPatternFunctionTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternFunctionTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternFunctionTest (some g_elm_StandardA99RecordPatternFunctionTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternFunctionTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternFunctionTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternFunctionTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternFunctionTest
+
+/-- tests/elm/src/StandardA99RecordPatternFunctionTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternFunctionTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternFunctionTest = .ok g_elm_StandardA99RecordPatternFunctionTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternFunctionTest
+
+/-- tests/elm/src/StandardA99RecordPatternFunctionTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternFunctionTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternFunctionTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternFunctionTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternFunctionTest)
+
+/-- tests/elm/src/StandardA99RecordPatternFunctionTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternFunctionTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternFunctionTest) r → r = g_elm_StandardA99RecordPatternFunctionTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternFunctionTest
+
+
+/-- tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternInTopCopyTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternInTopCopyTest (some g_elm_StandardA99RecordPatternInTopCopyTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternInTopCopyTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternInTopCopyTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternInTopCopyTest
+
+/-- tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternInTopCopyTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternInTopCopyTest = .ok g_elm_StandardA99RecordPatternInTopCopyTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternInTopCopyTest
+
+/-- tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternInTopCopyTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternInTopCopyTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternInTopCopyTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternInTopCopyTest)
+
+/-- tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternInTopCopyTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternInTopCopyTest) r → r = g_elm_StandardA99RecordPatternInTopCopyTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternInTopCopyTest
+
+
+/-- tests/elm/src/StandardA99RecordPatternInTupleTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternInTupleTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternInTupleTest (some g_elm_StandardA99RecordPatternInTupleTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternInTupleTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternInTupleTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternInTupleTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternInTupleTest
+
+/-- tests/elm/src/StandardA99RecordPatternInTupleTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternInTupleTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternInTupleTest = .ok g_elm_StandardA99RecordPatternInTupleTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternInTupleTest
+
+/-- tests/elm/src/StandardA99RecordPatternInTupleTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternInTupleTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternInTupleTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternInTupleTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternInTupleTest)
+
+/-- tests/elm/src/StandardA99RecordPatternInTupleTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternInTupleTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternInTupleTest) r → r = g_elm_StandardA99RecordPatternInTupleTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternInTupleTest
+
+
+/-- tests/elm/src/StandardA99RecordPatternIntTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternIntTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternIntTest (some g_elm_StandardA99RecordPatternIntTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternIntTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternIntTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternIntTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternIntTest
+
+/-- tests/elm/src/StandardA99RecordPatternIntTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternIntTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternIntTest = .ok g_elm_StandardA99RecordPatternIntTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternIntTest
+
+/-- tests/elm/src/StandardA99RecordPatternIntTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternIntTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternIntTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternIntTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternIntTest)
+
+/-- tests/elm/src/StandardA99RecordPatternIntTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternIntTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternIntTest) r → r = g_elm_StandardA99RecordPatternIntTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternIntTest
+
+
+/-- tests/elm/src/StandardA99RecordPatternLambdaTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternLambdaTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternLambdaTest (some g_elm_StandardA99RecordPatternLambdaTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternLambdaTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternLambdaTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternLambdaTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternLambdaTest
+
+/-- tests/elm/src/StandardA99RecordPatternLambdaTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternLambdaTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternLambdaTest = .ok g_elm_StandardA99RecordPatternLambdaTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternLambdaTest
+
+/-- tests/elm/src/StandardA99RecordPatternLambdaTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternLambdaTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternLambdaTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternLambdaTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternLambdaTest)
+
+/-- tests/elm/src/StandardA99RecordPatternLambdaTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternLambdaTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternLambdaTest) r → r = g_elm_StandardA99RecordPatternLambdaTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternLambdaTest
+
+
+/-- tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternSharedVariableTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternSharedVariableTest (some g_elm_StandardA99RecordPatternSharedVariableTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternSharedVariableTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternSharedVariableTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternSharedVariableTest
+
+/-- tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternSharedVariableTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternSharedVariableTest = .ok g_elm_StandardA99RecordPatternSharedVariableTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternSharedVariableTest
+
+/-- tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternSharedVariableTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternSharedVariableTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternSharedVariableTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternSharedVariableTest)
+
+/-- tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternSharedVariableTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternSharedVariableTest) r → r = g_elm_StandardA99RecordPatternSharedVariableTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternSharedVariableTest
+
+
+/-- tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_StandardA99RecordPatternTwoVariablesTest : Stat.wCheck Stat.Btest s_elm_StandardA99RecordPatternTwoVariablesTest (some g_elm_StandardA99RecordPatternTwoVariablesTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm [parse] [harness] [params] -/
+theorem legal_elm_StandardA99RecordPatternTwoVariablesTest : Stat.LegalProgram Stat.Btest s_elm_StandardA99RecordPatternTwoVariablesTest :=
+  Stat.legal_of_W wcheck_elm_StandardA99RecordPatternTwoVariablesTest
+
+/-- tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_StandardA99RecordPatternTwoVariablesTest : Stat.endToEndW Stat.Btest s_elm_StandardA99RecordPatternTwoVariablesTest = .ok g_elm_StandardA99RecordPatternTwoVariablesTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_StandardA99RecordPatternTwoVariablesTest
+
+/-- tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_StandardA99RecordPatternTwoVariablesTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternTwoVariablesTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_StandardA99RecordPatternTwoVariablesTest (Stat.value_of_viewChecks t_elm_StandardA99RecordPatternTwoVariablesTest)
+
+/-- tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_StandardA99RecordPatternTwoVariablesTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_StandardA99RecordPatternTwoVariablesTest) r → r = g_elm_StandardA99RecordPatternTwoVariablesTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_StandardA99RecordPatternTwoVariablesTest
+
+
 /-- tests/elm/src/StandardApplicationStrictTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
 theorem wcheck_elm_StandardApplicationStrictTest : Stat.wCheck Stat.Btest s_elm_StandardApplicationStrictTest (some g_elm_StandardApplicationStrictTest.reduced) = true :=
   Stat.wCheck_of_ctx ctx_484bb009_eq (by decide +kernel)

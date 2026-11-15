@@ -57,7 +57,7 @@ def rsbAtPat (s : RSub) : AAtPat → AAtPat
   | .record row τ => .record (rsbPatRowOpt s row) (rsb s τ)
   | .paren p => .paren (rsbPat s p)
 def rsbPatRow (s : RSub) : APatRow → APatRow
-  | .field l τ rest => .field l (rsb s τ) (rsbPatRowOpt s rest)
+  | .field l x τ rest => .field l x (rsb s τ) (rsbPatRowOpt s rest)
 def rsbPatRowOpt (s : RSub) : Option APatRow → Option APatRow
   | none => none
   | some r => some (rsbPatRow s r)
@@ -232,10 +232,10 @@ def wdAtPat (C : Ctx) : BAtPat → WDM (Ty × AAtPat)
     pure (τ, .record ar τ)
   | .paren p => do let (τ, a) ← wdPat C p; pure (τ, .paren a)
 def wdPatRow : BPatRow → WDM APatRow
-  | .field l rest => do
+  | .field l x rest => do
     let α ← freshVD
     let r ← wdPatRowOpt rest
-    pure (.field l α r)
+    pure (.field l x α r)
 def wdPatRowOpt : Option BPatRow → WDM (Option APatRow)
   | none => pure none
   | some r => do let a ← wdPatRow r; pure (some a)

@@ -3,7 +3,7 @@
   "staticBasisSha256": "a9156bbcd15700784eaa929c28e12310d1d9b46178e87378db0effe06663687a",
   "counts": {
     "compileError": {
-      "parse-fail": 16,
+      "parse-fail": 18,
       "syntax-refused": 10,
       "lexical-accepted": 0,
       "syntactic": 32,
@@ -14,7 +14,7 @@
     },
     "compileSuccess": {
       "B0": 52,
-      "harness": 540,
+      "harness": 551,
       "library": 28,
       "helper": 9,
       "outside": 0,
@@ -2872,6 +2872,48 @@
         "harness"
       ],
       "title": "TYPE MISMATCH",
+      "override": null
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternRowPunRejectedTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternRowPunRejectedTest.elm",
+          "parse": "fail"
+        }
+      ],
+      "parse": "fail",
+      "rules": [
+        "res:core-pattern-row-label-only"
+      ],
+      "rule": "res:core-pattern-row-label-only",
+      "class": "parse-fail",
+      "subclass": null,
+      "step": null,
+      "trust": [],
+      "title": "UNFINISHED RECORD PATTERN",
+      "override": null
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternRowRenameRejectedTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternRowRenameRejectedTest.elm",
+          "parse": "fail"
+        }
+      ],
+      "parse": "fail",
+      "rules": [
+        "res:core-pattern-row-label-only"
+      ],
+      "rule": "res:core-pattern-row-label-only",
+      "class": "parse-fail",
+      "subclass": null,
+      "step": null,
+      "trust": [],
+      "title": "UNFINISHED RECORD PATTERN",
       "override": null
     },
     {
@@ -15093,6 +15135,193 @@
       "modules": [
         {
           "path": "tests/elm/src/StandardA98TypeBeforeAliasTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternAsTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternAsTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternBothTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternBothTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternDependentTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternDependentTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternFloatTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternFloatTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternFunctionTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternFunctionTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternInTopCopyTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternInTupleTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternInTupleTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternIntTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternIntTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternLambdaTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternLambdaTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternSharedVariableTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "StandardA99RecordPatternTwoVariablesTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm",
           "parse": "ok"
         }
       ],

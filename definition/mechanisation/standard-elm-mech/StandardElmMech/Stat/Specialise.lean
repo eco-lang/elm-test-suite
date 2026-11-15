@@ -233,7 +233,7 @@ def Scope.ref (Γ : Scope) (lv : LongId) : Ref :=
   | some q => Γ.globalRef (some q) lv.id
 
 inductive SpecError where
-  | notANumber | unresolved (x : String) | recordPatternCopy (x : String)
+  | notANumber | unresolved (x : String)
   | missingBasisCopy (m : ModId) (x : Var) | copyFuel | portType | mainShape
   | noModule (m : ModId)
   deriving DecidableEq, Repr
@@ -354,14 +354,11 @@ def patSCon : SLit → SCon
 
 /-! ## Patterns -/
 
-def APatRow.firstLabel : Option APatRow → String
-  | some (.field l _ _) => l
-  | none => ""
-
 mutual
 /-- A pattern without its types; in the copy of a pattern binding at assignment `a`, each variable
-    renamed to `copyName x a` (the default copy keeps the names). A record pattern binds the
-    variables spelt as its labels and cannot be renamed (Issues, item 4). -/
+    renamed to `copyName x a` (the default copy keeps the names). The variable of a record
+    pattern's row is renamed like any other and its label kept (ruling A99, which closes step 10's
+    Issues, item 4). -/
 def erAtPat (a : Assignment) : AAtPat → Except SpecError AtPat
   | .wild _ => .ok .wild
   | .scon sc _ => .ok (.scon (patSCon sc))
@@ -374,17 +371,15 @@ def erAtPat (a : Assignment) : AAtPat → Except SpecError AtPat
     let q3 ← erPatOpt a p3
     pure (.tuple q1 q2 q3)
   | .nil _ => .ok .nil
-  | .record row _ =>
-    if a.isDefault then .ok (.record (erPatRowOpt row))
-    else .error (.recordPatternCopy (APatRow.firstLabel row))
+  | .record row _ => .ok (.record (erPatRowOpt a row))
   | .paren p => do
     let q ← erPat a p
     pure (.paren q)
-def erPatRow : APatRow → PatRow
-  | .field l _ rest => .field l (erPatRowOpt rest)
-def erPatRowOpt : Option APatRow → Option PatRow
+def erPatRow (a : Assignment) : APatRow → PatRow
+  | .field l x _ rest => .field l (copyName x a) (erPatRowOpt a rest)
+def erPatRowOpt (a : Assignment) : Option APatRow → Option PatRow
   | none => none
-  | some r => some (erPatRow r)
+  | some r => some (erPatRow a r)
 def erPat (a : Assignment) : APat → Except SpecError Pat
   | .atpat p => do
     let q ← erAtPat a p

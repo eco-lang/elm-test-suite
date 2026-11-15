@@ -68,7 +68,7 @@ theorem subB_mrg {A X : Row} (h : Sorted (mrg A X)) : Row.subB A (mrg A X) = tru
 
 mutual
 theorem checkPatRow_true (C : Ctx) : ∀ r : APatRow, checkPatRow C r = true
-  | .field _ _ rest => by simp only [checkPatRow]; exact checkPatRowOpt_true C rest
+  | .field _ _ _ rest => by simp only [checkPatRow]; exact checkPatRowOpt_true C rest
 theorem checkPatRowOpt_true (C : Ctx) : ∀ r : Option APatRow, checkPatRowOpt C r = true
   | none => rfl
   | some r => by simp only [checkPatRowOpt]; exact checkPatRow_true C r
@@ -92,7 +92,7 @@ theorem wdPatRowOpt_sound (fuel n0 : Nat) {L : LongId → Option Scheme} {C : Ct
   | none, st, ar, st', hp, h => by
     simp only [wdPatRowOpt] at h; obtain ⟨rfl, rfl⟩ := pure_okD h
     exact PostK.start hp
-  | some (.field l rest), st, ar, st', hp, h => by
+  | some (.field l x rest), st, ar, st', hp, h => by
     simp only [wdPatRowOpt, wdPatRow] at h
     obtain ⟨a, st1, h1, h⟩ := wdbind_ok h
     obtain ⟨α, st2, h2, h3⟩ := wdbind_ok h1

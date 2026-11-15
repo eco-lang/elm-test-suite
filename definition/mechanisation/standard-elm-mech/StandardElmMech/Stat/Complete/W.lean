@@ -58,7 +58,7 @@ def sbAtPat (s : FSub) : AAtPat → AAtPat
   | .record row τ => .record (sbPatRowOpt s row) (sb s τ)
   | .paren p => .paren (sbPat s p)
 def sbPatRow (s : FSub) : APatRow → APatRow
-  | .field l τ rest => .field l (sb s τ) (sbPatRowOpt s rest)
+  | .field l x τ rest => .field l x (sb s τ) (sbPatRowOpt s rest)
 def sbPatRowOpt (s : FSub) : Option APatRow → Option APatRow
   | none => none
   | some r => some (sbPatRow s r)

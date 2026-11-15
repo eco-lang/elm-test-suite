@@ -76,7 +76,7 @@ theorem cn_atpat_ve : ∀ (p : AAtPat), (∀ τ ∈ tysAtPat p, cnB τ = true) �
 theorem cn_patRowOpt_ve : ∀ (r : Option APatRow), (∀ τ ∈ tysPatRowOpt r, cnB τ = true) →
     ∀ q ∈ APatRow.veOpt r, cnB q.2.1.body = true
   | none, _, q, h => by simp [APatRow.veOpt] at h
-  | some (.field l τ rest), hc, q, h => by
+  | some (.field l x τ rest), hc, q, h => by
     simp only [APatRow.veOpt, APatRow.ve] at h
     rcases mem_modify h with h | h
     · simp only [List.mem_singleton] at h; subst h
@@ -159,7 +159,7 @@ theorem rsbAtPat_ve_strip (T : RSub) (p : AAtPat) : (stripAtPat (rsbAtPat T p)).
 theorem rsbPatRowOpt_rowOpt (T : RSub) : ∀ r : Option APatRow,
     APatRow.rowOpt (rsbPatRowOpt T r) = rsbRow T (APatRow.rowOpt r)
   | none => rfl
-  | some (.field l τ rest) => by
+  | some (.field l x τ rest) => by
     simp only [rsbPatRowOpt, rsbPatRow, APatRow.rowOpt, APatRow.row, rsbPatRowOpt_rowOpt T rest, rsbRow_modifyD]; rfl
 
 theorem tupleTy_rsbOpt (s : RSub) (τ1 τ2 : Ty) (τ3 : Option Ty) :
@@ -209,7 +209,7 @@ theorem nodesAtPat_relD (T : RSub) (U0 : List BVar) : ∀ (p : AAtPat) (path : L
 theorem nodesPatRowOpt_relD (T : RSub) (U0 : List BVar) : ∀ (r : Option APatRow) (path : List Nat), CnT T (tysPatRowOpt r) →
     F2 (NRelD T U0) (nodesPatRowOpt U0 path r) (nodesPatRowOpt U0 path (rsbPatRowOpt T r))
   | none, _, _ => .nil
-  | some (.field l τ rest), path, hcn => by
+  | some (.field l x τ rest), path, hcn => by
     have hcn' := hcn
     simp only [tysPatRowOpt, tysPatRow] at hcn'
     exact forall2_append (.cons (nrelD_mk rfl rfl (by

@@ -102,6 +102,7 @@ type Block
     = Expressions
     | AtomicExpressions
     | AtomicPatterns
+    | PatternRows
     | ValueBindings
     | Declarations
     | TopLevelDeclarations
@@ -118,6 +119,9 @@ blockName block =
 
         AtomicPatterns ->
             "AtomicPatterns"
+
+        PatternRows ->
+            "PatternRows"
 
         ValueBindings ->
             "ValueBindings"

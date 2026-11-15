@@ -292,7 +292,7 @@ pattern p =
             ( AtPat, ".unit" )
 
         PRecord fields ->
-            ( AtPat, "precord " ++ listOf (List.map (Tuple.first >> str) fields) )
+            ( AtPat, "precord " ++ listOf (List.map (\( l, x, _ ) -> "(" ++ str l ++ ", " ++ str x ++ ")") fields) )
 
         PCons a b ->
             ( Pat, ".cons " ++ paren (as_ Pat (pattern a)) ++ " " ++ paren (as_ Pat (pattern b)) )

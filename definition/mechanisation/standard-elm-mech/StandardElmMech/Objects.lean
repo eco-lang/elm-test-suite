@@ -304,7 +304,7 @@ mutual
     | none => []
     | some r => boundPatRow r
   def boundPatRow : PatRow → List Var
-    | .field l r => l :: boundPatRowOpt r
+    | .field _ x r => x :: boundPatRowOpt r
   def boundPat : Pat → List Var
     | .atpat a => boundAtPat a
     | .con _ args => boundAtPats args

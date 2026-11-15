@@ -42,9 +42,9 @@ where
 def neg (a : AtExp) : AtExp :=
   .paren (.app (.atexp (.var basicsNegate)) a)
 
-/-- Row ".lab" (df:field-accessor): `(\{ lab } -> lab)`. -/
+/-- Row ".lab" (df:field-accessor): `(\{ lab = lab } -> lab)`. -/
 def accessor (l : Lab) : AtExp :=
-  .paren (.lam (.record (some (.field l none))) (.atexp (.var ⟨none, l⟩)))
+  .paren (.lam (.record (some (.field l l none))) (.atexp (.var ⟨none, l⟩)))
 
 /-- Row "[pat1, ..., patn]" (df:list-pattern): `(pat1 :: (pat2 :: ... (patn :: [ ])...)) (n >= 1)`. -/
 def listP (ps : List Pat) : AtPat :=
@@ -165,11 +165,12 @@ def PA : Pat → AtPat
   | p => .paren p
 def ptup2 (a b : Pat) : AtPat := .tuple a b none
 def ptup3 (a b c : Pat) : AtPat := .tuple a b (some c)
-def precord (ls : List Lab) : AtPat := .record (rowOf ls)
+/-- A record pattern from its rows, each a label and the variable it binds (`lab = var`, A99). -/
+def precord (ls : List (Lab × Var)) : AtPat := .record (rowOf ls)
 where
-  rowOf : List Lab → Option PatRow
+  rowOf : List (Lab × Var) → Option PatRow
     | [] => none
-    | l :: rest => some (.field l (rowOf rest))
+    | (l, x) :: rest => some (.field l x (rowOf rest))
 /-! ## Definitions and the grouping of a let (sec:appendix-derived-forms-let) -/
 
 /-- A definition as written: `var atpat1 ... atpatm = exp` (m >= 0), or

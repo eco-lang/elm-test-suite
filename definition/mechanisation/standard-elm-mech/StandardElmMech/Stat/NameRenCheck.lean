@@ -124,7 +124,7 @@ theorem nr_atPat_ve (h : NR ρ) : (p : AAtPat) → ((nr ρ).atPat p).ve = (nr ρ
   | .record row _ => by simp only [Renaming.atPat, AAtPat.ve]; exact nr_patRowOpt_ve h row
   | .paren p => by simp only [Renaming.atPat, AAtPat.ve]; exact nr_pat_ve h p
 theorem nr_patRow_ve (h : NR ρ) : (r : APatRow) → ((nr ρ).patRow r).ve = (nr ρ).valEnv r.ve
-  | .field l τ rest => by
+  | .field l x τ rest => by
     simp only [Renaming.patRow, APatRow.ve, nr_patRowOpt_ve h rest, ← nr_valEnv_modify]; rfl
 theorem nr_patRowOpt_ve (h : NR ρ) : (r : Option APatRow) → APatRow.veOpt ((nr ρ).patRowOpt r) = (nr ρ).valEnv (APatRow.veOpt r)
   | none => rfl
@@ -146,7 +146,7 @@ end
 
 mutual
 theorem nr_patRow_row : (r : APatRow) → ((nr ρ).patRow r).row = (nr ρ).row r.row
-  | .field l τ rest => by
+  | .field l x τ rest => by
     simp only [Renaming.patRow, APatRow.row, nr_patRowOpt_row rest, ← nr_rowModify]; rfl
 theorem nr_patRowOpt_row : (r : Option APatRow) → APatRow.rowOpt ((nr ρ).patRowOpt r) = (nr ρ).row (APatRow.rowOpt r)
   | none => rfl
@@ -243,7 +243,7 @@ theorem nr_checkAtPat (h : NR ρ) (C : Ctx) : (p : AAtPat) → checkAtPat ((nr �
       nr_recordRow, nr_subB h]
   | .paren p => by simp only [Renaming.atPat, checkAtPat]; exact nr_checkPat h C p
 theorem nr_checkPatRow (h : NR ρ) (C : Ctx) : (r : APatRow) → checkPatRow ((nr ρ).ctx C) ((nr ρ).patRow r) = checkPatRow C r
-  | .field _ _ rest => by simp only [Renaming.patRow, checkPatRow]; exact nr_checkPatRowOpt h C rest
+  | .field _ _ _ rest => by simp only [Renaming.patRow, checkPatRow]; exact nr_checkPatRowOpt h C rest
 theorem nr_checkPatRowOpt (h : NR ρ) (C : Ctx) : (r : Option APatRow) →
     checkPatRowOpt ((nr ρ).ctx C) ((nr ρ).patRowOpt r) = checkPatRowOpt C r
   | none => rfl
@@ -439,8 +439,8 @@ theorem nr_nodesAtPat (h : NR ρ) (U : List BVar) (path : List Nat) : (p : AAtPa
       nr_nodesPat h, nr_pat_ty h, nr_pat_ve h, nr_veSchemes]
 theorem nr_nodesPatRow (h : NR ρ) (U : List BVar) (path : List Nat) : (r : APatRow) →
     nodesPatRow U path ((nr ρ).patRow r) = nrNodes ρ (nodesPatRow U path r)
-  | .field l τ rest => by
-    have e1 := nr_patRow_row (ρ := ρ) (.field l τ rest)
+  | .field l x τ rest => by
+    have e1 := nr_patRow_row (ρ := ρ) (.field l x τ rest)
     simp only [Renaming.patRow] at e1
     simp only [Renaming.patRow, nodesPatRow, List.map_append, List.map_cons, List.map_nil, nrNode_mk,
       nr_nodesPatRowOpt h, e1, nr_row_map, List.map_map]

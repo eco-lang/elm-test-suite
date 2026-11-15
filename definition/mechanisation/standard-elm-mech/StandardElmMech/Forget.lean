@@ -103,8 +103,8 @@ theorem MatchAtPatL.forget : ∀ {x0 x1 x2 x3 x4}, MatchAtPatL x0 x1 x2 x3 x4 �
   | _, _, _, _, _, .r_d_atpat_paren_l E v p r l1 h0 =>
     .r_d_atpat_paren E v p r (MatchPatL.forget h0)
 theorem MatchPatRowL.forget : ∀ {x0 x1 x2 x3 x4}, MatchPatRowL x0 x1 x2 x3 x4 → MatchPatRow x0 x1 x2 x3
-  | _, _, _, _, _, .r_d_patrow_field_l E r l rest v VE l1 h0 h1 =>
-    .r_d_patrow_field E r l rest v VE h0 (MatchPatRowOptL.forget h1)
+  | _, _, _, _, _, .r_d_patrow_field_l E r l x rest v VE l1 h0 h1 =>
+    .r_d_patrow_field E r l x rest v VE h0 (MatchPatRowOptL.forget h1)
 theorem MatchPatL.forget : ∀ {x0 x1 x2 x3 x4}, MatchPatL x0 x1 x2 x3 x4 → MatchPat x0 x1 x2 x3
   | _, _, _, _, _, .r_d_pat_atpat_l E v a r l1 h0 =>
     .r_d_pat_atpat E v a r (MatchAtPatL.forget h0)
@@ -280,9 +280,9 @@ theorem MatchAtPat.lift : ∀ {x0 x1 x2 x3}, MatchAtPat x0 x1 x2 x3 → ∃ l, M
     let ⟨l1, h0l⟩ := MatchPat.lift h0
     ⟨_, .r_d_atpat_paren_l E v p r l1 h0l⟩
 theorem MatchPatRow.lift : ∀ {x0 x1 x2 x3}, MatchPatRow x0 x1 x2 x3 → ∃ l, MatchPatRowL x0 x1 x2 x3 l
-  | _, _, _, _, .r_d_patrow_field E r l rest v VE h0 h1 =>
+  | _, _, _, _, .r_d_patrow_field E r l x rest v VE h0 h1 =>
     let ⟨l1, h1l⟩ := MatchPatRowOpt.lift h1
-    ⟨_, .r_d_patrow_field_l E r l rest v VE l1 h0 h1l⟩
+    ⟨_, .r_d_patrow_field_l E r l x rest v VE l1 h0 h1l⟩
 theorem MatchPat.lift : ∀ {x0 x1 x2 x3}, MatchPat x0 x1 x2 x3 → ∃ l, MatchPatL x0 x1 x2 x3 l
   | _, _, _, _, .r_d_pat_atpat E v a r h0 =>
     let ⟨l1, h0l⟩ := MatchAtPat.lift h0

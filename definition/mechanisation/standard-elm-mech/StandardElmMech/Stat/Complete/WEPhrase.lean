@@ -251,7 +251,7 @@ theorem rsbAtPat_congrD {s t : RSub} : ∀ p : AAtPat, AgreeOnD s t (tysAtPat p)
 theorem rsbPatRowOpt_congrD {s t : RSub} : ∀ r : Option APatRow, AgreeOnD s t (tysPatRowOpt r) →
     rsbPatRowOpt s r = rsbPatRowOpt t r
   | none, _ => rfl
-  | some (.field l τ rest), h => by
+  | some (.field l x τ rest), h => by
     simp only [tysPatRowOpt, tysPatRow] at h
     obtain ⟨h1, h2⟩ := AgreeOnD.cons h
     simp only [rsbPatRowOpt, rsbPatRow, h1, rsbPatRowOpt_congrD rest h2]

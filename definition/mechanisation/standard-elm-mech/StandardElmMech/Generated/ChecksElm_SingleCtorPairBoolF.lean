@@ -25,6 +25,17 @@ open StandardElm.D
   g_elm_StandardA97NeverErrBranchTest
   g_elm_StandardA97SelfOnlyTypeTest
   g_elm_StandardA98TypeBeforeAliasTest
+  g_elm_StandardA99RecordPatternAsTest
+  g_elm_StandardA99RecordPatternBothTest
+  g_elm_StandardA99RecordPatternDependentTest
+  g_elm_StandardA99RecordPatternFloatTest
+  g_elm_StandardA99RecordPatternFunctionTest
+  g_elm_StandardA99RecordPatternInTopCopyTest
+  g_elm_StandardA99RecordPatternInTupleTest
+  g_elm_StandardA99RecordPatternIntTest
+  g_elm_StandardA99RecordPatternLambdaTest
+  g_elm_StandardA99RecordPatternSharedVariableTest
+  g_elm_StandardA99RecordPatternTwoVariablesTest
   g_elm_StandardApplicationStrictTest
   g_elm_StandardCoreEvaluationExamplesTest
 

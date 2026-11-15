@@ -340,11 +340,12 @@ def AtPat.decEq : (a b : AtPat) → Decidable (a = b)
   | .paren _, .nil
   | .paren _, .record _ => isFalse (by intro e; cases e)
 def PatRow.decEq : (a b : PatRow) → Decidable (a = b)
-  | .field x0 x1, .field y0 y1 =>
-    match _root_.decEq x0 y0, PatRow.decEqOpt x1 y1 with
-    | isTrue h0, isTrue h1 => isTrue (by subst h0; subst h1; rfl)
-    | isFalse h0, _ => isFalse (by intro e; cases e; exact h0 rfl)
-    | _, isFalse h1 => isFalse (by intro e; cases e; exact h1 rfl)
+  | .field x0 x1 x2, .field y0 y1 y2 =>
+    match _root_.decEq x0 y0, _root_.decEq x1 y1, PatRow.decEqOpt x2 y2 with
+    | isTrue h0, isTrue h1, isTrue h2 => isTrue (by subst h0; subst h1; subst h2; rfl)
+    | isFalse h0, _, _ => isFalse (by intro e; cases e; exact h0 rfl)
+    | _, isFalse h1, _ => isFalse (by intro e; cases e; exact h1 rfl)
+    | _, _, isFalse h2 => isFalse (by intro e; cases e; exact h2 rfl)
 def Pat.decEq : (a b : Pat) → Decidable (a = b)
   | .atpat x0, .atpat y0 =>
     match AtPat.decEq x0 y0 with
@@ -764,11 +765,12 @@ def BAtPat.decEq : (a b : BAtPat) → Decidable (a = b)
   | .paren _, .nil
   | .paren _, .record _ => isFalse (by intro e; cases e)
 def BPatRow.decEq : (a b : BPatRow) → Decidable (a = b)
-  | .field x0 x1, .field y0 y1 =>
-    match _root_.decEq x0 y0, BPatRow.decEqOpt x1 y1 with
-    | isTrue h0, isTrue h1 => isTrue (by subst h0; subst h1; rfl)
-    | isFalse h0, _ => isFalse (by intro e; cases e; exact h0 rfl)
-    | _, isFalse h1 => isFalse (by intro e; cases e; exact h1 rfl)
+  | .field x0 x1 x2, .field y0 y1 y2 =>
+    match _root_.decEq x0 y0, _root_.decEq x1 y1, BPatRow.decEqOpt x2 y2 with
+    | isTrue h0, isTrue h1, isTrue h2 => isTrue (by subst h0; subst h1; subst h2; rfl)
+    | isFalse h0, _, _ => isFalse (by intro e; cases e; exact h0 rfl)
+    | _, isFalse h1, _ => isFalse (by intro e; cases e; exact h1 rfl)
+    | _, _, isFalse h2 => isFalse (by intro e; cases e; exact h2 rfl)
 def BPat.decEq : (a b : BPat) → Decidable (a = b)
   | .atpat x0, .atpat y0 =>
     match BAtPat.decEq x0 y0 with

@@ -34,7 +34,7 @@ theorem shAtPat : ∀ (x : AAtPat) (p : List Nat), nodesAtPat U (r ++ p) x = (no
   | .paren q, p => by simp only [nodesAtPat, List.map_append, List.append_assoc, shPat q]; rfl
   | .wild _, _ | .scon _ _, _ | .var _ _, _ | .con _ _ _, _ | .unit, _ | .nil _, _ => rfl
 theorem shPatRow : ∀ (x : APatRow) (p : List Nat), nodesPatRow U (r ++ p) x = (nodesPatRow U p x).map (Node.pre r)
-  | .field _ _ rest, p => by
+  | .field _ _ _ rest, p => by
     simp only [nodesPatRow, List.map_append, List.append_assoc, shPatRowOpt rest]; rfl
 theorem shPatRowOpt : ∀ (x : Option APatRow) (p : List Nat),
     nodesPatRowOpt U (r ++ p) x = (nodesPatRowOpt U p x).map (Node.pre r)

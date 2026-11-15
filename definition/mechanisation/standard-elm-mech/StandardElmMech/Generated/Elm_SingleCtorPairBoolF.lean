@@ -235,6 +235,140 @@ def g_elm_StandardA98TypeBeforeAliasTest : Program := {
   checks := [
     chk .check "field (T 3): 4" .int ] }
 
+/-- tests/elm/src/StandardA99RecordPatternAsTest.elm -/
+def g_elm_StandardA99RecordPatternAsTest : Program := {
+  name := "StandardA99RecordPatternAsTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (.paren (.as (P (precord [("n", "n")])) "r")) (recE [("n", .atexp (.scon (.intF 7)))]), .pat (.paren (.as (P (precord [("n", "n$Int")])) "r$Int")) (recE [("n", i 7)])] (tup2 (bin "//" (v "n$Int") (i 2)) (bin "/" (.atexp (access (A (v "r")) "n")) (.atexp (.scon (.intF 2)))))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: (3,3.5)" .data ] }
+
+/-- tests/elm/src/StandardA99RecordPatternBothTest.elm -/
+def g_elm_StandardA99RecordPatternBothTest : Program := {
+  name := "StandardA99RecordPatternBothTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (precord [("n", "n")]) (recE [("n", .atexp (.scon (.intF 7)))]), .pat (precord [("n", "n$Int")]) (recE [("n", i 7)])] (tup2 (bin "//" (v "n$Int") (i 2)) (bin "/" (v "n") (.atexp (.scon (.intF 2)))))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: (3,3.5)" .data ] }
+
+/-- tests/elm/src/StandardA99RecordPatternDependentTest.elm -/
+def g_elm_StandardA99RecordPatternDependentTest : Program := {
+  name := "StandardA99RecordPatternDependentTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (precord [("n", "n")]) (recE [("n", .atexp (.scon (.intF 7)))]), .pat (precord [("n", "n$Int")]) (recE [("n", i 7)]), .fn "m" [] (bin "+" (v "n") (.atexp (.scon (.intF 2)))), .fn "m$Int" [] (bin "+" (v "n$Int") (i 2))] (tup2 (bin "//" (v "m$Int") (i 2)) (bin "/" (v "m") (.atexp (.scon (.intF 2)))))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: (4,4.5)" .data ] }
+
+/-- tests/elm/src/StandardA99RecordPatternFloatTest.elm -/
+def g_elm_StandardA99RecordPatternFloatTest : Program := {
+  name := "StandardA99RecordPatternFloatTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (precord [("n", "n")]) (recE [("n", .atexp (.scon (.intF 7)))])] (bin "/" (v "n") (.atexp (.scon (.intF 2))))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 3.5" .float ] }
+
+/-- tests/elm/src/StandardA99RecordPatternFunctionTest.elm -/
+def g_elm_StandardA99RecordPatternFunctionTest : Program := {
+  name := "StandardA99RecordPatternFunctionTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (precord [("h", "h")]) (recE [("h", lams [pv "x"] (bin "-" (v "x") (.atexp (.scon (.intF 3)))))]), .pat (precord [("h", "h$Int")]) (recE [("h", lams [pv "x"] (bin "-" (v "x") (i 3)))])] (tup2 (ap (v "h$Int") [i 5]) (ap (v "h") [.atexp (.scon (.float 25 (-1)))]))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: (2,-0.5)" .data ] }
+
+/-- tests/elm/src/StandardA99RecordPatternInTopCopyTest.elm -/
+def g_elm_StandardA99RecordPatternInTopCopyTest : Program := {
+  name := "StandardA99RecordPatternInTopCopyTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "v" [] (letDefs [.pat (precord [("n", "n")]) (recE [("n", .atexp (.scon (.intF 6)))])] (v "n")),
+    .fn "v$Int" [] (letDefs [.pat (precord [("n", "n")]) (recE [("n", .atexp (.scon (.intF 6)))]), .pat (precord [("n", "n$Int")]) (recE [("n", i 6)])] (v "n$Int")),
+    .fn "testValue" [] (tup2 (bin "//" (v "v$Int") (i 4)) (bin "/" (v "v") (.atexp (.scon (.intF 4))))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: (1,1.5)" .data ] }
+
+/-- tests/elm/src/StandardA99RecordPatternInTupleTest.elm -/
+def g_elm_StandardA99RecordPatternInTupleTest : Program := {
+  name := "StandardA99RecordPatternInTupleTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (ptup2 (P (precord [("p", "p")])) (P (pv "q"))) (tup2 (recE [("p", .atexp (.scon (.intF 9)))]) (.atexp (.scon (.intF 4)))), .pat (ptup2 (P (precord [("p", "p$Float$Int")])) (P (pv "q$Float$Int"))) (tup2 (recE [("p", i 9)]) (.atexp (.scon (.intF 4)))), .pat (ptup2 (P (precord [("p", "p$Int$Float")])) (P (pv "q$Int$Float"))) (tup2 (recE [("p", .atexp (.scon (.intF 9)))]) (i 4))] (tup2 (bin "//" (v "p$Float$Int") (v "q$Int$Float")) (bin "/" (v "p") (v "q")))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: (2,2.25)" .data ] }
+
+/-- tests/elm/src/StandardA99RecordPatternIntTest.elm -/
+def g_elm_StandardA99RecordPatternIntTest : Program := {
+  name := "StandardA99RecordPatternIntTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (precord [("n", "n")]) (recE [("n", .atexp (.scon (.intF 7)))]), .pat (precord [("n", "n$Int")]) (recE [("n", i 7)])] (bin "//" (v "n$Int") (i 2))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 3" .int ] }
+
+/-- tests/elm/src/StandardA99RecordPatternLambdaTest.elm -/
+def g_elm_StandardA99RecordPatternLambdaTest : Program := {
+  name := "StandardA99RecordPatternLambdaTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (ptup2 (P (pv "f")) (P (pv "k"))) (tup2 (lams [precord [("m", "m")]] (bin "+" (v "m") (.atexp (.scon (.intF 1))))) (.atexp (.scon (.intF 2)))), .pat (ptup2 (P (pv "f$Float$Int")) (P (pv "k$Float$Int"))) (tup2 (lams [precord [("m", "m")]] (bin "+" (v "m") (i 1))) (.atexp (.scon (.intF 2)))), .pat (ptup2 (P (pv "f$Int$Float")) (P (pv "k$Int$Float"))) (tup2 (lams [precord [("m", "m")]] (bin "+" (v "m") (.atexp (.scon (.intF 1))))) (i 2))] (tup2 (ap (v "f$Float$Int") [recE [("m", bin "//" (v "k$Int$Float") (i 1))]]) (ap (v "f") [recE [("m", .atexp (.scon (.float 25 (-1))))]]))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: (3,3.5)" .data ] }
+
+/-- tests/elm/src/StandardA99RecordPatternSharedVariableTest.elm -/
+def g_elm_StandardA99RecordPatternSharedVariableTest : Program := {
+  name := "StandardA99RecordPatternSharedVariableTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (precord [("a", "a"), ("b", "b")]) (ap (.atexp (.paren (lams [pv "x"] (recE [("a", v "x"), ("b", v "x")])))) [.atexp (.scon (.intF 5))]), .pat (precord [("a", "a$Int"), ("b", "b$Int")]) (ap (.atexp (.paren (lams [pv "x"] (recE [("a", v "x"), ("b", v "x")])))) [i 5])] (tup2 (bin "//" (v "a$Int") (i 2)) (bin "/" (v "b") (.atexp (.scon (.intF 2)))))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: (2,2.5)" .data ] }
+
+/-- tests/elm/src/StandardA99RecordPatternTwoVariablesTest.elm -/
+def g_elm_StandardA99RecordPatternTwoVariablesTest : Program := {
+  name := "StandardA99RecordPatternTwoVariablesTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (precord [("a", "a"), ("b", "b")]) (recE [("a", .atexp (.scon (.intF 5))), ("b", .atexp (.scon (.intF 3)))]), .pat (precord [("a", "a$Float$Int"), ("b", "b$Float$Int")]) (recE [("a", i 5), ("b", .atexp (.scon (.intF 3)))]), .pat (precord [("a", "a$Int$Float"), ("b", "b$Int$Float")]) (recE [("a", .atexp (.scon (.intF 5))), ("b", i 3)])] (tup2 (tup2 (bin "//" (v "a$Float$Int") (i 2)) (bin "/" (v "b") (.atexp (.scon (.intF 2))))) (tup2 (bin "/" (v "a") (.atexp (.scon (.intF 2)))) (bin "//" (v "b$Int$Float") (i 2))))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: ((2,1.5),(2.5,1))" .data ] }
+
 /-- tests/elm/src/StandardApplicationStrictTest.elm -/
 def g_elm_StandardApplicationStrictTest : Program := {
   name := "StandardApplicationStrictTest", source := "tests/elm/src",
@@ -291,6 +425,17 @@ def shard_Elm_SingleCtorPairBoolF : List Program :=
    g_elm_StandardA97NeverErrBranchTest,
    g_elm_StandardA97SelfOnlyTypeTest,
    g_elm_StandardA98TypeBeforeAliasTest,
+   g_elm_StandardA99RecordPatternAsTest,
+   g_elm_StandardA99RecordPatternBothTest,
+   g_elm_StandardA99RecordPatternDependentTest,
+   g_elm_StandardA99RecordPatternFloatTest,
+   g_elm_StandardA99RecordPatternFunctionTest,
+   g_elm_StandardA99RecordPatternInTopCopyTest,
+   g_elm_StandardA99RecordPatternInTupleTest,
+   g_elm_StandardA99RecordPatternIntTest,
+   g_elm_StandardA99RecordPatternLambdaTest,
+   g_elm_StandardA99RecordPatternSharedVariableTest,
+   g_elm_StandardA99RecordPatternTwoVariablesTest,
    g_elm_StandardApplicationStrictTest,
    g_elm_StandardCoreEvaluationExamplesTest]
 

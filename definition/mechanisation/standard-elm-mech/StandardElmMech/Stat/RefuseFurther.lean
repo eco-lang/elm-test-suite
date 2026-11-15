@@ -244,7 +244,7 @@ theorem allV_atpat : ∀ a : AAtPat, AllV a.ve
   | .record row _ => allV_rowOpt row
   | .paren p => allV_pat p
 theorem allV_row : ∀ r : APatRow, AllV r.ve
-  | .field _ _ rest => allV_modify allV_single (allV_rowOpt rest)
+  | .field _ _ _ rest => allV_modify allV_single (allV_rowOpt rest)
 theorem allV_rowOpt : ∀ r : Option APatRow, AllV (APatRow.veOpt r)
   | none => allV_nil
   | some r => allV_row r

@@ -415,23 +415,23 @@ theorem erAtPat_congr (a : Assignment) : (p : AAtPat) → ∀ p' : AAtPat, p'.er
     simp only [erAtPat, erPat_congr a p1 _ h1, erPat_congr a p2 _ h2, erPatOpt_congr a p3 _ h3]
   | .record row _, p', h => by
     cases p' <;> simp [AAtPat.erase] at h
-    simp only [erAtPat, erPatRowOpt_congr row _ h, firstLabel_congr row _ h]
+    simp only [erAtPat, erPatRowOpt_congr a row _ h]
   | .paren q, p', h => by
     cases p' <;> simp [AAtPat.erase] at h
     simp only [erAtPat, erPat_congr a q _ h]
-theorem erPatRow_congr : (row : APatRow) → ∀ row' : APatRow, row'.erase = row.erase → erPatRow row' = erPatRow row
-  | .field l _ rest, row', h => by
+theorem erPatRow_congr (a : Assignment) : (row : APatRow) → ∀ row' : APatRow, row'.erase = row.erase → erPatRow a row' = erPatRow a row
+  | .field l x _ rest, row', h => by
     cases row' with
-    | field l' _ rest' =>
+    | field l' x' _ rest' =>
       simp [APatRow.erase] at h
-      obtain ⟨h1, h2⟩ := h
-      simp only [erPatRow, erPatRowOpt_congr rest _ h2, h1]
-theorem erPatRowOpt_congr : (row : Option APatRow) → ∀ row' : Option APatRow,
-    APatRow.eraseOpt row' = APatRow.eraseOpt row → erPatRowOpt row' = erPatRowOpt row
+      obtain ⟨h1, h2, h3⟩ := h
+      simp only [erPatRow, erPatRowOpt_congr a rest _ h3, h1, h2]
+theorem erPatRowOpt_congr (a : Assignment) : (row : Option APatRow) → ∀ row' : Option APatRow,
+    APatRow.eraseOpt row' = APatRow.eraseOpt row → erPatRowOpt a row' = erPatRowOpt a row
   | none, row', h => by cases row' <;> simp [APatRow.eraseOpt] at h; rfl
   | some row, row', h => by
     cases row' <;> simp [APatRow.eraseOpt] at h
-    simp only [erPatRowOpt, erPatRow_congr row _ h]
+    simp only [erPatRowOpt, erPatRow_congr a row _ h]
 theorem erPat_congr (a : Assignment) : (p : APat) → ∀ p' : APat, p'.erase = p.erase → erPat a p' = erPat a p
   | .atpat q, p', h => by
     cases p' <;> simp [APat.erase] at h
@@ -461,17 +461,6 @@ theorem erAtPatList_congr (a : Assignment) : (ps : List AAtPat) → ∀ ps' : Li
     cases ps' <;> simp [AAtPat.eraseList] at h
     obtain ⟨h1, h2⟩ := h
     simp only [erAtPatList, erAtPat_congr a q _ h1, erAtPatList_congr a qs _ h2]
-theorem firstLabel_congr : (row : Option APatRow) → ∀ row' : Option APatRow,
-    APatRow.eraseOpt row' = APatRow.eraseOpt row → APatRow.firstLabel row' = APatRow.firstLabel row
-  | none, row', h => by cases row' <;> simp [APatRow.eraseOpt] at h; rfl
-  | some (.field l _ _), row', h => by
-    cases row' with
-    | none => simp [APatRow.eraseOpt] at h
-    | some row' =>
-      cases row' with
-      | field l' _ _ =>
-        simp [APatRow.eraseOpt, APatRow.erase] at h
-        simp only [APatRow.firstLabel, h.1]
 end
 
 end StandardElm.Stat

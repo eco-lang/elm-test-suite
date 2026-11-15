@@ -1,5 +1,33 @@
 # Mechanisation Report
 
+> **Update, 2026-11-15 (record pattern rows; ruling A99, plans/record-pattern-rows.md).** Number
+> specialisation asked for a copy of `{ h } = e` at Int that binds a new variable to field `h`, which
+> no record pattern could write (step 10, Issues, item 4). The bare pattern row is now `lab = var`;
+> `{ h }` is the derived form `df:pattern-row-label` of `{ h = h }`, a new restriction
+> `core-pattern-row-label-only` keeps every program to the derived form (Elm rejects `{ n = m }` and
+> `{ n = n }`), and a copy renames a row's variable and keeps its label.
+> - Lean: `PatRow.field l x rest`, `BPatRow` and `APatRow` likewise; `r:s-patrow` and
+>   `r:d-patrow-field` bind `x`; `precord` takes label and variable pairs; Forget, NoStuck and
+>   Completeness regenerated; `erPatRow` takes the assignment, and `SpecError.recordPatternCopy`,
+>   `APatRow.firstLabel` and `firstLabel_congr` are gone; `spec_record_pattern_copy` now states the
+>   copy at Int (`{ x = x$Int }`). The new restriction is trusted to the parser (ten such).
+> - Translator: `Ir.PRecord` rows carry a label and a variable; `renamePattern` renames the variable.
+>   A finding on the way: a destructuring binding's `number` variables are ordered as Lean's
+>   `APat.ve` lists the bindings (the reverse of source order), which the translator now follows.
+> - Tests: thirteen StandardA99RecordPattern*Test, all passing on the four compilers; eleven are
+>   translated and proved, two are compile-error tests of the restriction.
+>   CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest is now translated too, and no
+>   `elm-spec` test is refused for `number`.
+>
+> Counts (`scripts/verify.sh full`):
+> - translator: 640 of the 955 `elm-spec` tests translated, 927 source programs written (28
+>   refused); 895 meet the AST-decidable restrictions, 32 do not.
+> - 640 legal (7 by `native_decide`), 287 refused, 0 conditional on D11; 640 `spec_`, 638 `mean_`,
+>   640 `ident_`; compare-e2e: 640 of 640 agree.
+> - run-examples: 1,847 of 1,847 checks agree, in 640 program theorems.
+> - check-axioms: 15,850 theorems, 0 problems; measure-w: W refutes none of the 640
+>   compile-success tests.
+
 > **Update, 2026-11-15 (pipe tests; plans/host-pipe-tests.md).** The test driver can now send
 > boundary values in on a port and check what the program sends out: `-- HOST-SEND: <port> <value>`
 > lines, and CHECK lines `<port> sent: <value>` (JSON, plus byte sequences written

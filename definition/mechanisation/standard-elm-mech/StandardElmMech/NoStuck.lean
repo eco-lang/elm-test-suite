@@ -414,7 +414,7 @@ theorem MatchAtPatL.nostuck : ∀ {x0 x1 x2 x3 x4}, MatchAtPatL x0 x1 x2 x3 x4 �
 theorem MatchPatRowL.nostuck : ∀ {x0 x1 x2 x3 x4}, MatchPatRowL x0 x1 x2 x3 x4 →
     ∀ (o : Oracle) (n k : Nat) r, matchPatRow o n x0 x1 x2 k = r →
       r.out = .outOfFuel ∨ k < r.next ∨ r = ⟨.value x3, x4, k⟩
-  | _, _, _, _, _, .r_d_patrow_field_l E r l rest v VE l1 h0 h1 => by
+  | _, _, _, _, _, .r_d_patrow_field_l E r l x rest v VE l1 h0 h1 => by
       intro oo n k res h
       cases n with
       | zero => subst h; simp [matchPatRow]

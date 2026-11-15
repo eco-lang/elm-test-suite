@@ -49,7 +49,7 @@ def Renaming.atPat (r : Renaming) : AAtPat → AAtPat
   | .record row τ => .record (r.patRowOpt row) (r.ty τ)
   | .paren p => .paren (r.pat p)
 def Renaming.patRow (r : Renaming) : APatRow → APatRow
-  | .field l τ rest => .field l (r.ty τ) (r.patRowOpt rest)
+  | .field l x τ rest => .field l x (r.ty τ) (r.patRowOpt rest)
 def Renaming.patRowOpt (r : Renaming) : Option APatRow → Option APatRow
   | none => none
   | some row => some (r.patRow row)
@@ -133,7 +133,7 @@ theorem erase_atPat (r : Renaming) : (p : AAtPat) → (r.atPat p).erase = p.eras
   | .record row _ => by simp only [Renaming.atPat, AAtPat.erase, erase_patRowOpt r row]
   | .paren p => by simp only [Renaming.atPat, AAtPat.erase, erase_pat r p]
 theorem erase_patRow (r : Renaming) : (row : APatRow) → (r.patRow row).erase = row.erase
-  | .field l _ rest => by simp only [Renaming.patRow, APatRow.erase, erase_patRowOpt r rest]
+  | .field l x _ rest => by simp only [Renaming.patRow, APatRow.erase, erase_patRowOpt r rest]
 theorem erase_patRowOpt (r : Renaming) : (row : Option APatRow) →
     APatRow.eraseOpt (r.patRowOpt row) = APatRow.eraseOpt row
   | none => rfl

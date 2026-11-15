@@ -674,6 +674,83 @@
    "mean": null,
    "legal": "legal_elm_StandardApplicationStrictTest",
    "ident": "ident_elm_StandardApplicationStrictTest"},
+  "elm/StandardA99RecordPatternTwoVariablesTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternTwoVariablesTest",
+   "spec": "spec_elm_StandardA99RecordPatternTwoVariablesTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternTwoVariablesTest",
+   "legal": "legal_elm_StandardA99RecordPatternTwoVariablesTest",
+   "ident": "ident_elm_StandardA99RecordPatternTwoVariablesTest"},
+  "elm/StandardA99RecordPatternSharedVariableTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternSharedVariableTest",
+   "spec": "spec_elm_StandardA99RecordPatternSharedVariableTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternSharedVariableTest",
+   "legal": "legal_elm_StandardA99RecordPatternSharedVariableTest",
+   "ident": "ident_elm_StandardA99RecordPatternSharedVariableTest"},
+  "elm/StandardA99RecordPatternLambdaTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternLambdaTest",
+   "spec": "spec_elm_StandardA99RecordPatternLambdaTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternLambdaTest",
+   "legal": "legal_elm_StandardA99RecordPatternLambdaTest",
+   "ident": "ident_elm_StandardA99RecordPatternLambdaTest"},
+  "elm/StandardA99RecordPatternIntTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternIntTest",
+   "spec": "spec_elm_StandardA99RecordPatternIntTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternIntTest",
+   "legal": "legal_elm_StandardA99RecordPatternIntTest",
+   "ident": "ident_elm_StandardA99RecordPatternIntTest"},
+  "elm/StandardA99RecordPatternInTupleTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternInTupleTest",
+   "spec": "spec_elm_StandardA99RecordPatternInTupleTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternInTupleTest",
+   "legal": "legal_elm_StandardA99RecordPatternInTupleTest",
+   "ident": "ident_elm_StandardA99RecordPatternInTupleTest"},
+  "elm/StandardA99RecordPatternInTopCopyTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternInTopCopyTest",
+   "spec": "spec_elm_StandardA99RecordPatternInTopCopyTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternInTopCopyTest",
+   "legal": "legal_elm_StandardA99RecordPatternInTopCopyTest",
+   "ident": "ident_elm_StandardA99RecordPatternInTopCopyTest"},
+  "elm/StandardA99RecordPatternFunctionTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternFunctionTest",
+   "spec": "spec_elm_StandardA99RecordPatternFunctionTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternFunctionTest",
+   "legal": "legal_elm_StandardA99RecordPatternFunctionTest",
+   "ident": "ident_elm_StandardA99RecordPatternFunctionTest"},
+  "elm/StandardA99RecordPatternFloatTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternFloatTest",
+   "spec": "spec_elm_StandardA99RecordPatternFloatTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternFloatTest",
+   "legal": "legal_elm_StandardA99RecordPatternFloatTest",
+   "ident": "ident_elm_StandardA99RecordPatternFloatTest"},
+  "elm/StandardA99RecordPatternDependentTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternDependentTest",
+   "spec": "spec_elm_StandardA99RecordPatternDependentTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternDependentTest",
+   "legal": "legal_elm_StandardA99RecordPatternDependentTest",
+   "ident": "ident_elm_StandardA99RecordPatternDependentTest"},
+  "elm/StandardA99RecordPatternBothTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternBothTest",
+   "spec": "spec_elm_StandardA99RecordPatternBothTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternBothTest",
+   "legal": "legal_elm_StandardA99RecordPatternBothTest",
+   "ident": "ident_elm_StandardA99RecordPatternBothTest"},
+  "elm/StandardA99RecordPatternAsTest":
+  {"wcheck": "wcheck_elm_StandardA99RecordPatternAsTest",
+   "spec": "spec_elm_StandardA99RecordPatternAsTest",
+   "native": false,
+   "mean": "mean_elm_StandardA99RecordPatternAsTest",
+   "legal": "legal_elm_StandardA99RecordPatternAsTest",
+   "ident": "ident_elm_StandardA99RecordPatternAsTest"},
   "elm/StandardA98TypeBeforeAliasTest":
   {"wcheck": "wcheck_elm_StandardA98TypeBeforeAliasTest",
    "spec": "spec_elm_StandardA98TypeBeforeAliasTest",
@@ -2945,9 +3022,15 @@
    "legal": "legal_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest",
    "ident": "ident_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest"},
   "elm/CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest":
-  {"native": false,
+  {"wcheck":
+   "wcheck_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest",
+   "spec": "spec_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest",
+   "native": false,
+   "mean": "mean_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest",
    "legal":
-   "legal_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest"},
+   "legal_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest",
+   "ident":
+   "ident_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest"},
   "elm/CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest":
   {"wcheck": "wcheck_elm_CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest",
    "spec": "spec_elm_CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest",
@@ -5013,7 +5096,7 @@
    "legal": "legal_elm_core_BasicsClampTest",
    "ident": "ident_elm_core_BasicsClampTest"}},
  "summary":
- "static semantics: 629 legal (620 of one module, 9 of several), 0 without a theorem, 7 by native_decide, 0 conditional on D11",
+ "static semantics: 640 legal (631 of one module, 9 of several), 0 without a theorem, 7 by native_decide, 0 conditional on D11",
  "specNative":
  ["elm/WideClosureSat26Test",
   "elm/WideCtorMixedTest",
@@ -5023,7 +5106,7 @@
   "elm/WideRecordDecoder30Test",
   "elm/WideRecordDecoder70Test"],
  "shards":
- "shards: 70 (28 Ctx_, 1 Legal_, 8 Refusals_, 33 EndToEnd_); no shard imports another but for the Ctx_ files of its tests' imports",
+ "shards: 69 (28 Ctx_, 0 Legal_, 8 Refusals_, 33 EndToEnd_); no shard imports another but for the Ctx_ files of its tests' imports",
  "refusedSummary":
  "refused: 287 (Stat.not_legal_of_wMainVar_test 1, Stat.not_legal_of_typesFailB 13, Stat.not_legal_of_scopeFailB 6, Stat.not_legal_of_wRefutes Stat.Btest_inv 15, Stat.not_legal_of_coreRefutes 201, Stat.not_legal_of_modsyn 9, Stat.not_legal_of_furtherFailB 9, Stat.not_legal_of_mainFailB 8, Stat.not_legal_of_syn 23, Stat.not_legal_of_imports 2), 0 not refused",
  "refused": 287,
@@ -5036,9 +5119,9 @@
   "elm/WideRecordDecoder26Test",
   "elm/WideRecordDecoder30Test",
   "elm/WideRecordDecoder70Test"],
- "legal": 629,
+ "legal": 640,
  "generatedBy": "lake exe certify (Certify.lean)",
  "failed": [],
  "endToEnd":
- "end to end: 628 spec_ theorems (0 by native_decide, 7 from a wcheck_ by native_decide), 626 mean_ theorems, 628 ident_ theorems, 0 translated tests skipped",
+ "end to end: 640 spec_ theorems (0 by native_decide, 7 from a wcheck_ by native_decide), 638 mean_ theorems, 640 ident_ theorems, 0 translated tests skipped",
  "conditional": []}

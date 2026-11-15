@@ -181,7 +181,7 @@ theorem nodesAtPat_pd (U : List BVar) : ∀ (x : AAtPat) (path : List Nat), PGoo
   | .paren p, path => (pg_step (pg_head rfl) (nodesPat_pd U p _)).good
 theorem nodesPatRowOpt_pd (U : List BVar) : ∀ (r : Option APatRow) (path : List Nat), PGood path (nodesPatRowOpt U path r)
   | none, path => pgood_nil path
-  | some (.field _ _ rest), path => (pg_step (pg_head rfl) (nodesPatRowOpt_pd U rest _)).good
+  | some (.field _ _ _ rest), path => (pg_step (pg_head rfl) (nodesPatRowOpt_pd U rest _)).good
 theorem nodesPat_pd (U : List BVar) : ∀ (x : APat) (path : List Nat), PGood path (nodesPat U path x)
   | .atpat a, path => (pg_step (pg_head rfl) (nodesAtPat_pd U a _)).good
   | .con _ _ args _, path => pg_args (pg_head rfl) (nodesAtPats_pd U args path 0)

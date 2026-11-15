@@ -170,7 +170,8 @@ raw ctx side t =
             Ok ( atomic side, ".nil" )
 
         TRecordPat1 r ->
-            name ctx r |> Result.map (\n -> ( AtPat, ".record (some (.field " ++ n ++ " none))" ))
+            -- the bare pattern row lab = var, with the variable spelt as the label (A99)
+            name ctx r |> Result.map (\n -> ( AtPat, ".record (some (.field " ++ n ++ " " ++ n ++ " none))" ))
 
         TPatCons p q ->
             Result.map2 (\pt qt -> ( Pat, ".cons " ++ paren pt ++ " " ++ paren qt ))

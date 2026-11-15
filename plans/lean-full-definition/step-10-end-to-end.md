@@ -166,7 +166,10 @@ The book leaves these open; each is fixed here, with the reason.
    `Float`) of the `i`th variable, and the default copy binds `x`. Reason: the order is invariant
    under renaming (the invariance lemma needs it), and the names are the translator's today when
    a declaration has one variable (all but three tests). The translator changes to this order
-   (Translator changes, item 1).
+   (Translator changes, item 1). The bindings of a destructuring binding are in the order of its
+   pattern's value environment (`APat.ve`), in which `VE₁ + VE₂` lists `VE₂`'s variables first, so
+   the reverse of their order in the source; the translator follows it since 2026-11-15
+   (plans/record-pattern-rows.md, Findings, item 1).
 3. **A93's vacuous variables are Float at every occurrence.** At an occurrence of `x`, a variable
    of the declaration that `x`'s scheme quantifies but its body does not mention is assigned
    Float, whatever the annotated phrase records as its instance. Reason: the instance of a
@@ -413,9 +416,8 @@ mutual
   def specMatch  (ρ : NumEnv) (Γ : Scope) : AnnMatch  → Except SpecError (Spec Match)
   def specMRule  (ρ : NumEnv) (Γ : Scope) : AnnMRule  → Except SpecError (Spec MRule)
   /-- The copy of one group at assignment a: its members as definitions, each binding
-      `copyName x a` (a pattern binding renames the variables of its pattern; a record pattern,
-      whose variables are spelt as labels, cannot be renamed: `recordPatternCopy` unless a is
-      the default). -/
+      `copyName x a` (a pattern binding renames the variables of its pattern, the variables of
+      its record patterns' rows included, keeping their labels: ruling A99). -/
   def specGroupCopy (ρ : NumEnv) (Γ : Scope) (a : Assignment) : AnnValBind
       → Except SpecError (Spec (List D.Def))
 end
@@ -867,7 +869,7 @@ ruling (conventions, "Rulings").
 | `spec_main_kinds` | a view `main`; a worker with flags `()`; one with flags `Int` by annotation | `(view, unit)`, `(worker, unit)`, `(worker, int)` |
 | `spec_copy_bound` | a declaration with three `number` variables used at all eight assignments | eight copies, default first |
 | `spec_rename_invariant` | the annotated program of `spec_exposing`, renamed by a concrete `r` | equal reductions (an instance of `reduceProgram_rename`) |
-| `spec_record_pattern_copy` | `let { x } = { x = 1 } in x // 2` | `.error (.recordPatternCopy "x")` (Issues, item 4) |
+| `spec_record_pattern_copy` | `let { x } = { x = 1 } in x // 2` | the copy at Int binds `x$Int` to field `x` (Issues, item 4, closed by A99) |
 
 ## Translator changes
 
@@ -1065,6 +1067,10 @@ an assumption).
    label (`r:s-patrow`), so the copy cannot be written. The translator refuses it today; Lean's
    specialisation returns `recordPatternCopy`. The book should allow a copy to bind the label's
    variable under a new name (a new form of pattern row) or exempt such bindings.
+   **Closed (2026-11-15) by ruling A99** (plans/record-pattern-rows.md): the bare pattern row is
+   `lab = var`, the row written as a label alone is its derived form, and a copy renames the
+   row's variable and keeps its label. `recordPatternCopy` is gone from Lean and the refusal from
+   the translator.
 5. **The instance of an A93 vacuous variable is not part of a derivation** (for the ambiguity
    log, with A93). `sec:dynamic-core-numbers` refers each occurrence to "the copy for the instance
    at which that occurrence was elaborated", but a vacuous bound variable's image is a witness

@@ -101,7 +101,7 @@ end
 
 theorem cn_patrowopt_row : ∀ r : Option APatRow, (∀ τ ∈ tysPatRowOpt r, cnB τ = true) → CnRow (APatRow.rowOpt r)
   | none, _ => cnRow_nil
-  | some (.field l τ rest), h => by
+  | some (.field l _ τ rest), h => by
     simp only [tysPatRowOpt, tysPatRow, List.mem_cons] at h
     exact cnRow_modify1 (h τ (.inl rfl)) (cn_patrowopt_row rest fun x hx => h x (.inr hx))
 

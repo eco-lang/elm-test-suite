@@ -387,7 +387,9 @@ Each specification ends with its own checks. Every step also passes these
 - **B7. Copies in the reduced syntax.** Number specialisation replaces a declaration by copies,
   but the book does not say where the copies stand in the declaration sequence when they refer to
   one another, nor how a destructuring binding is copied (its variables are spelt as labels in a
-  record pattern). Step 10 regroups copies by Appendix A's order and states the choice.
+  record pattern). Step 10 regroups copies by Appendix A's order and states the choice. The second
+  half is settled by ruling A99 (2026-11-15, plans/record-pattern-rows.md): a pattern row is
+  `lab = var`, and a copy renames its variable.
 - **B8. The instance of a vacuous `number` variable.** By A93 a binding quantifies the `number`
   variables of its group that its own type does not mention, and an occurrence assigns them; no
   sentence of a derivation records that assignment, so the principal derivation does not fix it.

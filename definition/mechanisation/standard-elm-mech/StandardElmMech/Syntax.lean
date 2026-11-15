@@ -93,9 +93,10 @@ mutual
     | nil                                           -- [ ]
     | record (row : Option PatRow)                  -- { [patrow] }
     | paren (p : Pat)                               -- ( pat )
-  /-- PatRow: `lab [, patrow]`. -/
+  /-- PatRow: `lab = var [, patrow]` (ruling A99; the row `lab [, patrow]` is a derived form,
+      Derived.lean). -/
   inductive PatRow where
-    | field (l : Lab) (rest : Option PatRow)
+    | field (l : Lab) (x : Var) (rest : Option PatRow)
   /-- Pat: patterns. -/
   inductive Pat where
     | atpat (a : AtPat)                             -- atomic

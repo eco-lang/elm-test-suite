@@ -63,7 +63,7 @@ theorem mem_modify1 {l : Lab} {τ : Ty} {ρ : Row} {x : Lab × Ty} (h : x ∈ Ro
 
 theorem mem_rowOpt_tys : ∀ {r : Option APatRow} {p : Lab × Ty}, p ∈ APatRow.rowOpt r → p.2 ∈ tysPatRowOpt r
   | none, _, h => by cases h
-  | some (.field l τ rest), p, h => by
+  | some (.field l x τ rest), p, h => by
     simp only [APatRow.rowOpt, APatRow.row] at h
     simp only [tysPatRowOpt, tysPatRow, List.mem_cons]
     rcases mem_modify1 h with rfl | h
@@ -238,14 +238,14 @@ theorem pNodesAtPat (hP : TyClosed P) (U : List BVar) (path : List Nat) : ∀ p 
 theorem pNodesPatRowOpt (hP : TyClosed P) (U : List BVar) (path : List Nat) : ∀ r : Option APatRow, (∀ τ ∈ tysPatRowOpt r, P τ) →
     PNodes P (nodesPatRowOpt U path r)
   | none, _ => fun _ h => nomatch h
-  | some (.field l τ0 rest), h => by
+  | some (.field l x τ0 rest), h => by
     simp only [nodesPatRowOpt, nodesPatRow]
     refine (PNodes.single fun τ hτ => ?_).app (pNodesPatRowOpt hP U _ rest fun τ hτ => h τ (by
       simp only [tysPatRowOpt, tysPatRow, List.mem_cons]; exact .inr hτ))
     simp only [List.mem_append, List.mem_singleton, List.mem_map] at hτ
     rcases hτ with rfl | ⟨p, hp, rfl⟩
     · exact h _ (by simp [tysPatRowOpt, tysPatRow])
-    · exact h _ (mem_rowOpt_tys (r := some (.field l τ0 rest)) hp)
+    · exact h _ (mem_rowOpt_tys (r := some (.field l x τ0 rest)) hp)
 theorem pNodesPat (hP : TyClosed P) (U : List BVar) (path : List Nat) : ∀ p : APat, (∀ τ ∈ tysPat p, P τ) →
     PNodes P (nodesPat U path p)
   | .atpat a, h => by

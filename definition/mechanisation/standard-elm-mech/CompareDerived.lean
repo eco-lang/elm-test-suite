@@ -43,7 +43,7 @@ mutual
     | .paren p => s!"({rP p})"
   partial def rPRow : Option PatRow → String
     | none => ""
-    | some (.field l r) => l ++ (if r.isSome then ", " else "") ++ rPRow r
+    | some (.field l x r) => l ++ " = " ++ x ++ (if r.isSome then ", " else "") ++ rPRow r
   partial def rP : Pat → String
     | .atpat a => rAP a
     | .con c as => s!"{showLong c} {" ".intercalate (as.map rAP)}"
@@ -106,7 +106,7 @@ mutual
     | .paren p => s!"({bP p})"
   partial def bPRow : Option BPatRow → String
     | none => ""
-    | some (.field l r) => l ++ (if r.isSome then ", " else "") ++ bPRow r
+    | some (.field l x r) => l ++ " = " ++ x ++ (if r.isSome then ", " else "") ++ bPRow r
   partial def bP : BPat → String
     | .atpat a => bAP a
     | .con c as => s!"{showLong c} {" ".intercalate (as.map bAP)}"

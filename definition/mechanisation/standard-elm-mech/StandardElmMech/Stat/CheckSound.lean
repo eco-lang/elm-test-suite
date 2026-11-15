@@ -69,7 +69,7 @@ theorem checkAtPat_sound (C : Ctx) : (p : AAtPat) → checkAtPat C p = true → 
     simp only [AAtPat.erase, AAtPat.ve, AAtPat.ty]
     exact .r_s_atpat_paren (checkPat_sound C p h)
 theorem checkPatRow_sound (C : Ctx) : (r : APatRow) → checkPatRow C r = true → ElPatRow C r.erase r.ve r.row
-  | .field l τ rest, h => by
+  | .field l x τ rest, h => by
     simp only [checkPatRow] at h
     simp only [APatRow.erase, APatRow.ve, APatRow.row]
     exact .r_s_patrow (checkPatRowOpt_sound C rest h)

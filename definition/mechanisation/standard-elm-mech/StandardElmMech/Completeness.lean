@@ -560,7 +560,7 @@ theorem MatchAtPatL.complete : ∀ {x0 x1 x2 x3 x4}, MatchAtPatL x0 x1 x2 x3 x4 
 theorem MatchPatRowL.complete : ∀ {x0 x1 x2 x3 x4}, MatchPatRowL x0 x1 x2 x3 x4 →
     ∃ (L : List Bool) (n : Nat), ∀ (oo : Oracle) (k m : Nat), n ≤ m → Agrees oo k L →
       matchPatRow oo m x0 x1 x2 k = ⟨.value x3, x4, k + L.length⟩
-  | _, _, _, _, _, .r_d_patrow_field_l E r l rest v VE l1 h0 h1 => by
+  | _, _, _, _, _, .r_d_patrow_field_l E r l x rest v VE l1 h0 h1 => by
       obtain ⟨L0, n0, c0⟩ := MatchPatRowOptL.complete h1
       refine ⟨L0, n0 + 1, ?_⟩
       intro oo k m hm hag

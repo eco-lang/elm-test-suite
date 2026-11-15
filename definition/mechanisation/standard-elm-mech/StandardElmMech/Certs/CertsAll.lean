@@ -27,7 +27,6 @@ import StandardElmMech.Certs.Ctx_ce3df582
 import StandardElmMech.Certs.Ctx_d535a6ed
 import StandardElmMech.Certs.Ctx_f5735765
 import StandardElmMech.Certs.Ctx_fc7b748f
-import StandardElmMech.Certs.Legal_Elm
 import StandardElmMech.Certs.Refusals_Elm
 import StandardElmMech.Certs.Refusals_Elm_CompilerIssue208
 import StandardElmMech.Certs.Refusals_Elm_L

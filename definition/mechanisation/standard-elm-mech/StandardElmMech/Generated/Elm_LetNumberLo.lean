@@ -124,7 +124,7 @@ def g_elm_LetNumberRecordDestructureTest : Program := {
   types := [],
   aliases := [],
   defs := [
-    .fn "main" [] (letDefs [.pat (precord ["lo", "hi"]) (recE [("lo", .atexp (.scon (.intF 30))), ("hi", .atexp (.scon (.intF 40)))]), .fn "result" [] (bin "+" (ap (v "round") [.atexp (.paren (bin "*" (v "lo") (.atexp (.scon (.float 15 (-1))))))]) (ap (v "round") [.atexp (.paren (bin "*" (v "hi") (.atexp (.scon (.float 15 (-1))))))])), .pat pw (ap (qv "Debug" "log") [str "recdestr", v "result"])] (ap (v "text") [str "done"])) ],
+    .fn "main" [] (letDefs [.pat (precord [("lo", "lo"), ("hi", "hi")]) (recE [("lo", .atexp (.scon (.intF 30))), ("hi", .atexp (.scon (.intF 40)))]), .fn "result" [] (bin "+" (ap (v "round") [.atexp (.paren (bin "*" (v "lo") (.atexp (.scon (.float 15 (-1))))))]) (ap (v "round") [.atexp (.paren (bin "*" (v "hi") (.atexp (.scon (.float 15 (-1))))))])), .pat pw (ap (qv "Debug" "log") [str "recdestr", v "result"])] (ap (v "text") [str "done"])) ],
   checks := [
     chk .check "recdestr: 105" .int ] }
 

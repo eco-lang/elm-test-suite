@@ -150,7 +150,8 @@ term ctx t =
             kw "[ ]"
 
         TRecordPat1 r ->
-            kw "\\kwlb" ++ "\\ " ++ ref ctx.idx r ++ "\\ " ++ kw "\\kwrb"
+            -- the bare pattern row lab = var, with the variable spelt as the label (A99)
+            kw "\\kwlb" ++ "\\ " ++ ref ctx.idx r ++ "\\ " ++ kw "=" ++ "\\ " ++ ref ctx.idx r ++ "\\ " ++ kw "\\kwrb"
 
         TPatCons p q ->
             term ctx p ++ "\\ " ++ kw "::" ++ "\\ " ++ term ctx q

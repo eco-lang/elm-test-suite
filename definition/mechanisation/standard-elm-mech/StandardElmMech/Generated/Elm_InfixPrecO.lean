@@ -109,7 +109,7 @@ def g_elm_LambdaPatternArgTest : Program := {
   types := [],
   aliases := [],
   defs := [
-    .fn "main" [] (letDefs [.fn "swap" [] (lams [ptup2 (P (pv "x")) (P (pv "y"))] (tup2 (v "y") (v "x"))), .fn "getX" [] (lams [precord ["x"]] (v "x")), .fn "mixed" [] (lams [pv "a", ptup2 (P (pv "b")) (P (pv "c")), pw] (v "b")), .pat pw (ap (qv "Debug" "log") [str "swap", .atexp (.paren (ap (v "swap") [tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))]))]), .pat pw (ap (qv "Debug" "log") [str "getX", .atexp (.paren (ap (v "getX") [recE [("x", .atexp (.scon (.intF 42)))]]))]), .pat pw (ap (qv "Debug" "log") [str "mixed", .atexp (.paren (ap (v "mixed") [.atexp (.scon (.intF 1)), tup2 (str "b") (.atexp (.scon (.intF 2))), .atexp (.scon (.intF 3))]))])] (ap (v "text") [str "done"])) ],
+    .fn "main" [] (letDefs [.fn "swap" [] (lams [ptup2 (P (pv "x")) (P (pv "y"))] (tup2 (v "y") (v "x"))), .fn "getX" [] (lams [precord [("x", "x")]] (v "x")), .fn "mixed" [] (lams [pv "a", ptup2 (P (pv "b")) (P (pv "c")), pw] (v "b")), .pat pw (ap (qv "Debug" "log") [str "swap", .atexp (.paren (ap (v "swap") [tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))]))]), .pat pw (ap (qv "Debug" "log") [str "getX", .atexp (.paren (ap (v "getX") [recE [("x", .atexp (.scon (.intF 42)))]]))]), .pat pw (ap (qv "Debug" "log") [str "mixed", .atexp (.paren (ap (v "mixed") [.atexp (.scon (.intF 1)), tup2 (str "b") (.atexp (.scon (.intF 2))), .atexp (.scon (.intF 3))]))])] (ap (v "text") [str "done"])) ],
   checks := [
     chk .check "swap: (2,1)" .data,
     chk .check "getX: 42" .float,
@@ -197,7 +197,7 @@ def g_elm_LetDestructRecordTest : Program := {
   types := [],
   aliases := [],
   defs := [
-    .fn "main" [] (letDefs [.pat (precord ["x"]) (recE [("x", .atexp (.scon (.intF 42)))]), .pat (precord ["a", "b"]) (recE [("a", .atexp (.scon (.intF 1))), ("b", .atexp (.scon (.intF 2)))]), .pat (precord ["p", "r"]) (recE [("p", .atexp (.scon (.intF 1))), ("q", .atexp (.scon (.intF 2))), ("r", .atexp (.scon (.intF 3)))]), .pat (ptup2 (P (precord ["s"])) (P (pv "t"))) (tup2 (recE [("s", .atexp (.scon (.intF 1)))]) (.atexp (.scon (.intF 2)))), .pat pw (ap (qv "Debug" "log") [str "single", v "x"]), .pat pw (ap (qv "Debug" "log") [str "multi", .atexp (.paren (bin "+" (v "a") (v "b")))]), .pat pw (ap (qv "Debug" "log") [str "partial", .atexp (.paren (bin "+" (v "p") (v "r")))]), .pat pw (ap (qv "Debug" "log") [str "mixed", .atexp (.paren (bin "+" (v "s") (v "t")))])] (ap (v "text") [str "done"])) ],
+    .fn "main" [] (letDefs [.pat (precord [("x", "x")]) (recE [("x", .atexp (.scon (.intF 42)))]), .pat (precord [("a", "a"), ("b", "b")]) (recE [("a", .atexp (.scon (.intF 1))), ("b", .atexp (.scon (.intF 2)))]), .pat (precord [("p", "p"), ("r", "r")]) (recE [("p", .atexp (.scon (.intF 1))), ("q", .atexp (.scon (.intF 2))), ("r", .atexp (.scon (.intF 3)))]), .pat (ptup2 (P (precord [("s", "s")])) (P (pv "t"))) (tup2 (recE [("s", .atexp (.scon (.intF 1)))]) (.atexp (.scon (.intF 2)))), .pat pw (ap (qv "Debug" "log") [str "single", v "x"]), .pat pw (ap (qv "Debug" "log") [str "multi", .atexp (.paren (bin "+" (v "a") (v "b")))]), .pat pw (ap (qv "Debug" "log") [str "partial", .atexp (.paren (bin "+" (v "p") (v "r")))]), .pat pw (ap (qv "Debug" "log") [str "mixed", .atexp (.paren (bin "+" (v "s") (v "t")))])] (ap (v "text") [str "done"])) ],
   checks := [
     chk .check "single: 42" .float,
     chk .check "multi: 3" .float,

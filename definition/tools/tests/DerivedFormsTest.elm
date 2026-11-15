@@ -28,8 +28,8 @@ rowNamed label =
 suite : Test
 suite =
     describe "Appendix A as data"
-        [ test "the table has the book's 14 rows" <|
-            \_ -> List.length Table.rows |> Expect.equal 14
+        [ test "the table has the book's 15 rows" <|
+            \_ -> List.length Table.rows |> Expect.equal 15
         , test "df:infix prints as the book's row" <|
             \_ ->
                 ToLatex.row rows (rowNamed "df:infix")

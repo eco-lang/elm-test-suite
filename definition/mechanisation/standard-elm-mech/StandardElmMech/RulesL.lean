@@ -175,10 +175,10 @@ inductive MatchAtPatL : Env → Val → AtPat → VEF → Log → Prop where
 
 inductive MatchPatRowL : Env → Record → PatRow → ValEnv → Log → Prop where
   /-- r:d-patrow-field -/
-  | r_d_patrow_field_l (E : Env) (r : Record) (l : Lab) (rest : Option PatRow) (v : Val) (VE : ValEnv)
-      (l1 : Log) :
+  | r_d_patrow_field_l (E : Env) (r : Record) (l : Lab) (x : Var) (rest : Option PatRow) (v : Val)
+      (VE : ValEnv) (l1 : Log) :
       fmLookup r l = some v → MatchPatRowOptL E r rest VE l1 →
-      MatchPatRowL E r (.field l rest) (fmPlus [(l, v)] VE) l1
+      MatchPatRowL E r (.field l x rest) (fmPlus [(x, v)] VE) l1
 
 inductive MatchPatL : Env → Val → Pat → VEF → Log → Prop where
   /-- r:d-pat-atpat -/

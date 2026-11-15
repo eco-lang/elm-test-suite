@@ -22,7 +22,7 @@ theorem veBodies_map (T : FSub) (VE : ValEnv) : (sbVE T VE).map (·.2.1.body) = 
 
 theorem sbPatRowOpt_rowOpt (T : FSub) : ∀ r : Option APatRow, APatRow.rowOpt (sbPatRowOpt T r) = sbRow T (APatRow.rowOpt r)
   | none => rfl
-  | some (.field l τ rest) => by
+  | some (.field l x τ rest) => by
     simp only [sbPatRowOpt, sbPatRow, APatRow.rowOpt, APatRow.row, sbPatRowOpt_rowOpt T rest, sbRow_modify]; rfl
 
 mutual
@@ -51,7 +51,7 @@ theorem nodesAtPat_rel (T : FSub) (U0 : List BVar) : ∀ (p : AAtPat) (path : Li
 theorem nodesPatRowOpt_rel (T : FSub) (U0 : List BVar) : ∀ (r : Option APatRow) (path : List Nat),
     F2 (NRel T U0) (nodesPatRowOpt U0 path r) (nodesPatRowOpt U0 path (sbPatRowOpt T r))
   | none, _ => .nil
-  | some (.field l τ rest), path =>
+  | some (.field l x τ rest), path =>
     forall2_append (.cons (nrel_mk rfl rfl (by
         show [sb T τ] ++ (Row.modify [(l, sb T τ)] (APatRow.rowOpt (sbPatRowOpt T rest))).map (·.2) = _
         rw [sbPatRowOpt_rowOpt, show ([(l, sb T τ)] : Row) = sbRow T [(l, τ)] from rfl, ← sbRow_modify, sbRow_eq]

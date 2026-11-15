@@ -1,6 +1,6 @@
 # Standard Elm mechanisation: example run
 
-Programs: 628 (52 workers), in 34 shards; checks: 1835.
+Programs: 640 (52 workers), in 34 shards; checks: 1847.
 
 ## ElmCore
 
@@ -1128,6 +1128,7 @@ Elm_CombinatorSP: 20 programs, 26 checks, 26 agree.
 | CovForeignTypesTest | CovForeignTypesTest | 42 | 42 | agree | t_elm_CovForeignTypesTest |
 | CovLambdaBoundaryCaseBoundaryInARecursiveValueTest | testValue | 4 | 4 | agree | t_elm_CovLambdaBoundaryCaseBoundaryInARecursiveValueTest |
 | CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest | testValue | 4 | 4 | agree | t_elm_CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest |
+| CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest | testValue | 9 | 9 | agree | t_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest |
 | CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest | testValue | 14 | 14 | agree | t_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest |
 | CovPatternSplitTupleAndConstructorParametersMatchedByCaseTest | testValue | <function> | <function> | agree | t_elm_CovPatternSplitTupleAndConstructorParametersMatchedByCaseTest (native) |
 | CovPortIncomingArrayTest | testValue | 1 | 1 | agree | t_elm_CovPortIncomingArrayTest |
@@ -1138,7 +1139,7 @@ Elm_CombinatorSP: 20 programs, 26 checks, 26 agree.
 | CovPortOutgoingUnitTest | testValue | 1 | 1 | agree | t_elm_CovPortOutgoingUnitTest |
 | CovTailRecPairParameterPassedUnchangedLetBoundAndRebuiltTest | testValue | <function> | <function> | agree | t_elm_CovTailRecPairParameterPassedUnchangedLetBoundAndRebuiltTest |
 
-Elm_CompilerIssue22: 19 programs, 24 checks, 24 agree.
+Elm_CompilerIssue22: 20 programs, 25 checks, 25 agree.
 
 ## Elm_CovTailRecPairParameters
 
@@ -1754,6 +1755,17 @@ Elm_RecordAccessorFunctionT: 30 programs, 54 checks, 54 agree.
 | StandardA97NeverErrBranchTest | value (Ok 3) | 3 | 3 | agree | t_elm_StandardA97NeverErrBranchTest |
 | StandardA97SelfOnlyTypeTest | fromResult (Ok 3) | 3 | 3 | agree | t_elm_StandardA97SelfOnlyTypeTest |
 | StandardA98TypeBeforeAliasTest | field (T 3) | 4 | 4 | agree | t_elm_StandardA98TypeBeforeAliasTest |
+| StandardA99RecordPatternAsTest | testValue | (3,3.5) | (3,3.5) | agree | t_elm_StandardA99RecordPatternAsTest |
+| StandardA99RecordPatternBothTest | testValue | (3,3.5) | (3,3.5) | agree | t_elm_StandardA99RecordPatternBothTest |
+| StandardA99RecordPatternDependentTest | testValue | (4,4.5) | (4,4.5) | agree | t_elm_StandardA99RecordPatternDependentTest |
+| StandardA99RecordPatternFloatTest | testValue | 3.5 | 3.5 | agree | t_elm_StandardA99RecordPatternFloatTest |
+| StandardA99RecordPatternFunctionTest | testValue | (2,-0.5) | (2,-0.5) | agree | t_elm_StandardA99RecordPatternFunctionTest |
+| StandardA99RecordPatternInTopCopyTest | testValue | (1,1.5) | (1,1.5) | agree | t_elm_StandardA99RecordPatternInTopCopyTest |
+| StandardA99RecordPatternInTupleTest | testValue | (2,2.25) | (2,2.25) | agree | t_elm_StandardA99RecordPatternInTupleTest |
+| StandardA99RecordPatternIntTest | testValue | 3 | 3 | agree | t_elm_StandardA99RecordPatternIntTest |
+| StandardA99RecordPatternLambdaTest | testValue | (3,3.5) | (3,3.5) | agree | t_elm_StandardA99RecordPatternLambdaTest |
+| StandardA99RecordPatternSharedVariableTest | testValue | (2,2.5) | (2,2.5) | agree | t_elm_StandardA99RecordPatternSharedVariableTest |
+| StandardA99RecordPatternTwoVariablesTest | testValue | ((2,1.5),(2.5,1)) | ((2,1.5),(2.5,1)) | agree | t_elm_StandardA99RecordPatternTwoVariablesTest |
 | StandardApplicationStrictTest | before | () | () | agree (partial log) |  |
 | StandardApplicationStrictTest | app strict | (no value) | (no meaning) | agree | t_elm_StandardApplicationStrictTest |
 | StandardCoreEvaluationExamplesTest | as-pattern | (1,[1,2]) | (1,[1,2]) | agree | t_elm_StandardCoreEvaluationExamplesTest |
@@ -1772,7 +1784,7 @@ Elm_RecordAccessorFunctionT: 30 programs, 54 checks, 54 agree.
 | StandardCoreEvaluationExamplesTest | compare strings | LT | LT | agree | t_elm_StandardCoreEvaluationExamplesTest |
 | StandardCoreEvaluationExamplesTest | accessor | 7 | 7 | agree | t_elm_StandardCoreEvaluationExamplesTest |
 
-Elm_SingleCtorPairBoolF: 17 programs, 58 checks, 58 agree.
+Elm_SingleCtorPairBoolF: 28 programs, 69 checks, 69 agree.
 
 ## Elm_StandardL
 
@@ -2075,4 +2087,4 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 
 Worker01: 52 programs, 152 checks, 152 agree.
 
-Total: 1835 checks, 1835 agree, 0 diverge (0 known); 1594 checks by decide +kernel, 239 by native_decide, in 628 program theorems.
+Total: 1847 checks, 1847 agree, 0 diverge (0 known); 1606 checks by decide +kernel, 239 by native_decide, in 640 program theorems.

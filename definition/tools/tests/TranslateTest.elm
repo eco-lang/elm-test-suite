@@ -267,8 +267,8 @@ suite =
                 \_ ->
                     translatedContaining [ "chk .check \"x: 1\"" ]
                         ("module T exposing (main)\n-- TAGS: elm-spec\n-- CHECK: x: 1\nimport Html exposing (text)\nmain =\n    let\n        _ = 1 |> Debug.log \"x\"\n    in\n    text \"done\"\n")
-            , test "a record pattern binding needed at Int (its variables are the fields, so they cannot be renamed for a copy)" <|
-                \_ -> refusedWith "number" (simple "" [ ( "x", "let { a } = { a = 1 } in a // 2", "0" ) ])
+            , test "a record pattern binding needed at Int: the copy keeps the label and renames the row's variable (A99)" <|
+                \_ -> translatedContaining [ "precord [(\"a\", \"a$Int\")]", "precord [(\"a\", \"a\")]", "v \"a$Int\"" ] (simple "" [ ( "x", "let { a } = { a = 1 } in a // 2", "0" ) ])
             , test "a program that does not type" <|
                 \_ -> refusedWith "type" (simple "" [ ( "x", "1 + \"a\"", "1" ) ])
             , test "a program too large" <|
@@ -414,8 +414,8 @@ suite =
                         , "ap (v \"myfun$Int\")"
                         ]
                         (simple "myfun : number -> number\nmyfun x =\n    x ^ -1" [ ( "x", "myfun (2 // 1)", "0" ), ( "y", "myfun 2", "0.5" ) ])
-            , test "a pattern binding used at Float is copied, every variable renamed (one word per number variable: a, then b)" <|
-                \_ -> translatedContaining [ ".pat (ptup2 (P (pv \"a$Float$Int\")) (P (pv \"b$Float$Int\")))", "v \"a$Float$Int\"" ] (simple "" [ ( "x", "let ( a, b ) = ( 1, 2 ) in a / 2 + toFloat (b // 1)", "2.5" ) ])
+            , test "a pattern binding used at Float is copied, every variable renamed (one word per number variable, in the order of the pattern's value environment: b, then a)" <|
+                \_ -> translatedContaining [ ".pat (ptup2 (P (pv \"a$Int$Float\")) (P (pv \"b$Int$Float\")))", "v \"b$Int$Float\"" ] (simple "" [ ( "x", "let ( a, b ) = ( 1, 2 ) in a / 2 + toFloat (b // 1)", "2.5" ) ])
             , test "isNaN and isInfinite are values of E0" <|
                 \_ -> translatedContaining [ "ap (v \"isNaN\")", "ap (v \"isInfinite\")" ] (simple "" [ ( "x", "isNaN (0 / 0)", "True" ), ( "y", "isInfinite (1 / 0)", "True" ) ])
             , test "++ is the operator of append, at String and at List" <|

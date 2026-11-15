@@ -226,7 +226,7 @@ theorem sbAtPat_sb (s t : FSub) : ∀ p : AAtPat, sbAtPat t (sbAtPat s p) = sbAt
   | .tuple p1 p2 p3 => by simp only [sbAtPat, sbPat_sb s t p1, sbPat_sb s t p2, sbPatOpt_sb s t p3]
   | .paren p => by simp only [sbAtPat, sbPat_sb s t p]
 theorem sbPatRow_sb (s t : FSub) : ∀ r : APatRow, sbPatRow t (sbPatRow s r) = sbPatRow (comp t s) r
-  | .field _ _ rest => by simp only [sbPatRow, sb_sb, sbPatRowOpt_sb s t rest]
+  | .field _ _ _ rest => by simp only [sbPatRow, sb_sb, sbPatRowOpt_sb s t rest]
 theorem sbPatRowOpt_sb (s t : FSub) : ∀ r : Option APatRow, sbPatRowOpt t (sbPatRowOpt s r) = sbPatRowOpt (comp t s) r
   | none => rfl
   | some r => by simp only [sbPatRowOpt, sbPatRow_sb s t r]
@@ -360,7 +360,7 @@ theorem sbAtPat_ve (s : FSub) : ∀ p : AAtPat, (sbAtPat s p).ve = sbVE s p.ve
     simp only [sbAtPat, AAtPat.ve, sbPat_ve s p1, sbPat_ve s p2, sbPatOpt_ve s p3, sbVE_modify]
   | .paren p => by simp only [sbAtPat, AAtPat.ve, sbPat_ve s p]
 theorem sbPatRow_ve (s : FSub) : ∀ r : APatRow, (sbPatRow s r).ve = sbVE s r.ve
-  | .field _ _ rest => by simp only [sbPatRow, APatRow.ve, sbPatRowOpt_ve s rest, sbVE_modify]; rfl
+  | .field _ _ _ rest => by simp only [sbPatRow, APatRow.ve, sbPatRowOpt_ve s rest, sbVE_modify]; rfl
 theorem sbPatRowOpt_ve (s : FSub) : ∀ r : Option APatRow, APatRow.veOpt (sbPatRowOpt s r) = sbVE s (APatRow.veOpt r)
   | none => rfl
   | some r => by simp only [sbPatRowOpt, APatRow.veOpt, sbPatRow_ve s r]

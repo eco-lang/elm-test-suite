@@ -42,7 +42,7 @@ theorem rsbAtPat_eraseD (s : RSub) : ∀ p : AAtPat, (rsbAtPat s p).erase = p.er
   | .paren p => by simp only [rsbAtPat, AAtPat.erase, rsbPat_eraseD s p]
 theorem rsbPatRowOpt_eraseD (s : RSub) : ∀ r : Option APatRow, APatRow.eraseOpt (rsbPatRowOpt s r) = APatRow.eraseOpt r
   | none => rfl
-  | some (.field _ _ rest) => by
+  | some (.field _ _ _ rest) => by
     simp only [rsbPatRowOpt, rsbPatRow, APatRow.eraseOpt, APatRow.erase, rsbPatRowOpt_eraseD s rest]
 theorem rsbPat_eraseD (s : RSub) : ∀ p : APat, (rsbPat s p).erase = p.erase
   | .atpat a => by simp only [rsbPat, APat.erase, rsbAtPat_eraseD s a]

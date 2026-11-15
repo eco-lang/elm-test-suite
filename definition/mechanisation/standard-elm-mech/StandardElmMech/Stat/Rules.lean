@@ -87,11 +87,11 @@ inductive ElAtPat : Ctx → BAtPat → ValEnv → Ty → Prop where
       ElAtPat C (.record row) VE τ
   /-- r:s-atpat-paren -/
   | r_s_atpat_paren : ElPat C p VE τ → ElAtPat C (.paren p) VE τ
-/-- C ⊢ patrow ⇒ (VE, ρ); the variable is the one spelt as the label. -/
+/-- C ⊢ patrow ⇒ (VE, ρ); the row `lab = var` binds its variable (A99). -/
 inductive ElPatRow : Ctx → BPatRow → ValEnv → Row → Prop where
   /-- r:s-patrow -/
   | r_s_patrow : ElPatRowOpt C rest VE ρ →
-      ElPatRow C (.field l rest) (FMap.modify [(l, (mono τ, .v))] VE) (Row.modify [(l, τ)] ρ)
+      ElPatRow C (.field l x rest) (FMap.modify [(x, (mono τ, .v))] VE) (Row.modify [(l, τ)] ρ)
 /-- C ⊢ pat ⇒ (VE, τ) -/
 inductive ElPat : Ctx → BPat → ValEnv → Ty → Prop where
   /-- r:s-pat-atpat -/

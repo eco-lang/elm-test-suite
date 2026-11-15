@@ -530,7 +530,9 @@ pattern env (A.At region p) st =
                         ( id, s1 ) =
                             fresh s
                     in
-                    ( ( f, id ) :: acc, ( f, id ) :: bound, s1 )
+                    -- a row written as a label alone binds the variable spelt as the label
+                    -- (df:pattern-row-label, A99)
+                    ( ( f, f, id ) :: acc, ( f, id ) :: bound, s1 )
                 )
                 ( [], [], st )
                 (Parse.recordPatternFields fields)

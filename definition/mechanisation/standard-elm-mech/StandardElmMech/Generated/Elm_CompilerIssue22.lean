@@ -147,6 +147,19 @@ def g_elm_CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest : Program := {
   checks := [
     chk .check "testValue: 4" .int ] }
 
+/-- tests/elm/src/CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest.elm -/
+def g_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest : Program := {
+  name := "CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest", source := "tests/elm/src",
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"Char", "Char", some (.items [.tycon "Char"])⟩, ⟨"List", "List", some (.items [.op "::"])⟩, ⟨"Maybe", "Maybe", some (.items [.opened "Maybe"])⟩, ⟨"Platform.Cmd", "Cmd", some (.items [.tycon "Cmd"])⟩, ⟨"Platform.Sub", "Sub", some (.items [.tycon "Sub"])⟩, ⟨"String", "String", some (.items [.tycon "String"])⟩, ⟨"Html", "Html", none⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "applyAll" [pv "fs", pv "acc"] (caseOf (v "fs") [(P (listP []), v "acc"), (.cons (P (pv "fn")) (P (pv "rest")), ap (v "applyAll") [v "rest", .atexp (.paren (ap (v "fn") [v "acc"]))])]),
+    .fn "testValue" [] (letDefs [.pat (ptup2 (P (pv "f")) (P (pv "g"))) (tup2 (lams [pv "x"] (bin "+" (v "x") (.atexp (.scon (.intF 1))))) (lams [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))))), .pat (ptup2 (P (pv "f$Float$Int")) (P (pv "g$Float$Int"))) (tup2 (lams [pv "x"] (bin "+" (v "x") (i 1))) (lams [pv "x"] (bin "*" (v "x") (.atexp (.scon (.intF 2)))))), .pat (ptup2 (P (pv "f$Int$Float")) (P (pv "g$Int$Float"))) (tup2 (lams [pv "x"] (bin "+" (v "x") (.atexp (.scon (.intF 1))))) (lams [pv "x"] (bin "*" (v "x") (i 2)))), .pat (precord [("h", "h")]) (recE [("h", lams [pv "x"] (bin "-" (v "x") (.atexp (.scon (.intF 3)))))]), .pat (precord [("h", "h$Int")]) (recE [("h", lams [pv "x"] (bin "-" (v "x") (i 3)))]), .fn "fs" [] (listE [v "f", v "g", v "h"]), .fn "fs$Int" [] (listE [v "f$Float$Int", v "g$Int$Float", v "h$Int"])] (ap (v "applyAll") [v "fs$Int", i 5])),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 9" .int ] }
+
 /-- tests/elm/src/CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest.elm -/
 def g_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest : Program := {
   name := "CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest", source := "tests/elm/src",
@@ -283,6 +296,7 @@ def shard_Elm_CompilerIssue22 : List Program :=
    g_elm_CovForeignTypesTest,
    g_elm_CovLambdaBoundaryCaseBoundaryInARecursiveValueTest,
    g_elm_CovLambdaBoundaryCaseBoundaryUnderAFunctionAliasTest,
+   g_elm_CovLambdaSetFunctionsDestructuredFromTuplesAndRecordsTest,
    g_elm_CovLambdaSetFunctionsInRecordsTuplesAndMaybeTest,
    g_elm_CovPatternSplitTupleAndConstructorParametersMatchedByCaseTest,
    g_elm_CovPortIncomingArrayTest,

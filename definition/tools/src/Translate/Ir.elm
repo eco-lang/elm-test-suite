@@ -94,7 +94,7 @@ type Pattern
     | PStr String
     | PInt String
     | PTuple (List Pattern)
-    | PRecord (List ( String, Int ))
+    | PRecord (List ( String, String, Int )) -- each row: its label, its variable, the variable's id (lab = var, A99)
     | PCons Pattern Pattern
     | PList (List Pattern)
     | PVar String Int
@@ -265,7 +265,7 @@ patternBinders p =
             List.concatMap patternBinders ps
 
         PRecord fs ->
-            fs
+            List.map (\( _, x, id ) -> ( x, id )) fs
 
         PCons a b ->
             patternBinders a ++ patternBinders b

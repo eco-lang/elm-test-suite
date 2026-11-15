@@ -96,7 +96,7 @@ theorem nr_inv_atPat (hl : ∀ t, (nr b).tnApply ((nr a).tnApply t) = t) : (p : 
   | .record row _ => by simp [Renaming.atPat, nr_inv_ty hl, nr_inv_patRowOpt hl row]
   | .paren p => by simp [Renaming.atPat, nr_inv_pat hl p]
 theorem nr_inv_patRow (hl : ∀ t, (nr b).tnApply ((nr a).tnApply t) = t) : (r : APatRow) → (nr b).patRow ((nr a).patRow r) = r
-  | .field _ _ rest => by simp [Renaming.patRow, nr_inv_ty hl, nr_inv_patRowOpt hl rest]
+  | .field _ _ _ rest => by simp [Renaming.patRow, nr_inv_ty hl, nr_inv_patRowOpt hl rest]
 theorem nr_inv_patRowOpt (hl : ∀ t, (nr b).tnApply ((nr a).tnApply t) = t) : (r : Option APatRow) →
     (nr b).patRowOpt ((nr a).patRowOpt r) = r
   | none => rfl

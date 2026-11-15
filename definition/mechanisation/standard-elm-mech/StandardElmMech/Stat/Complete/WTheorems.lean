@@ -64,7 +64,7 @@ theorem tysAtPat_nodes (U : List BVar) (path : List Nat) : ∀ p : AAtPat, ∀ �
 theorem tysPatRowOpt_nodes (U : List BVar) (path : List Nat) : ∀ r : Option APatRow, ∀ τ ∈ tysPatRowOpt r,
     τ ∈ NTys (nodesPatRowOpt U path r)
   | none, τ, h => by simp [tysPatRowOpt] at h
-  | some (.field l τ0 rest), τ, h => by
+  | some (.field l x τ0 rest), τ, h => by
     simp only [tysPatRowOpt, tysPatRow, List.mem_cons] at h
     rcases h with rfl | h
     · close_head

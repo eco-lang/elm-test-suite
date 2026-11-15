@@ -45,7 +45,7 @@ inductive AAtPat where
   | record (row : Option APatRow) (τ : Ty)
   | paren (p : APat)
 inductive APatRow where
-  | field (l : Lab) (τ : Ty) (rest : Option APatRow)
+  | field (l : Lab) (x : Var) (τ : Ty) (rest : Option APatRow)
 inductive APat where
   | atpat (a : AAtPat)
   | con (lc : LongId) (inst : List Ty) (args : List AAtPat) (τ : Ty)
@@ -68,7 +68,7 @@ def AAtPat.erase : AAtPat → BAtPat
   | .record row _ => .record (APatRow.eraseOpt row)
   | .paren p => .paren (APat.erase p)
 def APatRow.erase : APatRow → BPatRow
-  | .field l _ rest => .field l (APatRow.eraseOpt rest)
+  | .field l x _ rest => .field l x (APatRow.eraseOpt rest)
 def APatRow.eraseOpt : Option APatRow → Option BPatRow
   | none => none
   | some r => some (APatRow.erase r)
@@ -113,7 +113,7 @@ def AAtPat.ve : AAtPat → ValEnv
   | .paren p => APat.ve p
   | _ => []
 def APatRow.ve : APatRow → ValEnv
-  | .field l τ rest => FMap.modify [(l, (mono τ, .v))] (APatRow.veOpt rest)
+  | .field _ x τ rest => FMap.modify [(x, (mono τ, .v))] (APatRow.veOpt rest)
 def APatRow.veOpt : Option APatRow → ValEnv
   | none => []
   | some r => APatRow.ve r
@@ -132,7 +132,7 @@ end
 
 mutual
 def APatRow.row : APatRow → Row
-  | .field l τ rest => Row.modify [(l, τ)] (APatRow.rowOpt rest)
+  | .field l _ τ rest => Row.modify [(l, τ)] (APatRow.rowOpt rest)
 def APatRow.rowOpt : Option APatRow → Row
   | none => []
   | some r => APatRow.row r
@@ -296,7 +296,7 @@ def nodesAtPat (U : List BVar) (path : List Nat) : AAtPat → List Node
   | .paren p => [⟨path, U, [p.ty], veSchemes p.ve⟩] ++ nodesPat U (path ++ [0]) p
   | a => [⟨path, U, [a.ty] ++ a.ve.map (·.2.1.body), []⟩]
 def nodesPatRow (U : List BVar) (path : List Nat) : APatRow → List Node
-  | .field l τ rest => [⟨path, U, [τ] ++ (APatRow.row (.field l τ rest)).map (·.2), []⟩] ++ nodesPatRowOpt U (path ++ [0]) rest
+  | .field l x τ rest => [⟨path, U, [τ] ++ (APatRow.row (.field l x τ rest)).map (·.2), []⟩] ++ nodesPatRowOpt U (path ++ [0]) rest
 def nodesPatRowOpt (U : List BVar) (path : List Nat) : Option APatRow → List Node
   | none => []
   | some r => nodesPatRow U path r
@@ -385,7 +385,7 @@ def okAtPatB : AAtPat → Bool
   | .unit => tUnitTy.okB
   | .nil τ => τ.okB
 def okPatRowB : APatRow → Bool
-  | .field l τ rest => τ.okB && ((APatRow.row (.field l τ rest)).map (·.2)).all Ty.okB && okPatRowOptB rest
+  | .field l x τ rest => τ.okB && ((APatRow.row (.field l x τ rest)).map (·.2)).all Ty.okB && okPatRowOptB rest
 def okPatRowOptB : Option APatRow → Bool
   | none => true
   | some r => okPatRowB r
@@ -466,7 +466,7 @@ theorem nodesOkB_nodesAtPat (U : List BVar) (path : List Nat) : ∀ p : AAtPat, 
     simp only [nodesAtPat, okAtPatB]; nodes_ok_simp
     rw [nodesOkB_nodesPat U _ p]
 theorem nodesOkB_nodesPatRow (U : List BVar) (path : List Nat) : ∀ r : APatRow, nodesOkB (nodesPatRow U path r) = okPatRowB r
-  | .field l τ rest => by
+  | .field l x τ rest => by
     simp only [nodesPatRow, okPatRowB]; nodes_ok_simp
     rw [nodesOkB_nodesPatRowOpt U _ rest]
 theorem nodesOkB_nodesPatRowOpt (U : List BVar) (path : List Nat) : ∀ r : Option APatRow,
@@ -605,7 +605,7 @@ def checkAtPat (C : Ctx) : AAtPat → Bool
   | .record row τ => checkPatRowOpt C row && isRecordTy τ && (Row.subB (APatRow.rowOpt row) (recordRow τ))
   | .paren p => checkPat C p
 def checkPatRow (C : Ctx) : APatRow → Bool
-  | .field _ _ rest => checkPatRowOpt C rest
+  | .field _ _ _ rest => checkPatRowOpt C rest
 def checkPatRowOpt (C : Ctx) : Option APatRow → Bool
   | none => true
   | some r => checkPatRow C r

@@ -101,12 +101,12 @@ def inferAtPat : Nat → Ctx → BAtPat → Inf AAtPat
     | .paren p => return .paren (← inferPat f C p)
 def inferPatRow : Nat → BPatRow → Inf APatRow
   | 0, _ => throw "fuel"
-  | f + 1, .field l rest => do
+  | f + 1, .field l x rest => do
     let τ ← freshTy .any
     let arest ← match rest with
       | none => pure none
       | some r => some <$> inferPatRow f r
-    return .field l τ arest
+    return .field l x τ arest
 def inferPat : Nat → Ctx → BPat → Inf APat
   | 0, _, _ => throw "fuel"
   | f + 1, C, p =>
@@ -290,7 +290,7 @@ def zAtPat : AAtPat → AAtPat
   | .record row τ => .record (zPatRowOpt row) (zt s τ)
   | .paren p => .paren (zPat p)
 def zPatRow : APatRow → APatRow
-  | .field l τ rest => .field l (zt s τ) (zPatRowOpt rest)
+  | .field l x τ rest => .field l x (zt s τ) (zPatRowOpt rest)
 def zPatRowOpt : Option APatRow → Option APatRow
   | none => none
   | some r => some (zPatRow r)

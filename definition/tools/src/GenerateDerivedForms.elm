@@ -38,7 +38,7 @@ barePath =
 
 blocks : List Block
 blocks =
-    [ Expressions, AtomicExpressions, AtomicPatterns, ValueBindings, Declarations, TopLevelDeclarations ]
+    [ Expressions, AtomicExpressions, AtomicPatterns, PatternRows, ValueBindings, Declarations, TopLevelDeclarations ]
 
 
 {-| The new text of the appendix: each block's region replaced by its table.

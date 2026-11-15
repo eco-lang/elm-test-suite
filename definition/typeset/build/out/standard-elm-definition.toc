@@ -5,8 +5,8 @@
 \contentsline {section}{\numberline {2.2}Special Constants}{4}{section.2.2}%
 \contentsline {section}{\numberline {2.3}Comments}{6}{section.2.3}%
 \contentsline {section}{\numberline {2.4}Identifiers}{6}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Lexical Analysis}{7}{section.2.5}%
-\contentsline {section}{\numberline {2.6}Layout}{8}{section.2.6}%
+\contentsline {section}{\numberline {2.5}Lexical Analysis}{8}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Layout}{9}{section.2.6}%
 \contentsline {section}{\numberline {2.7}Infixed Operators}{10}{section.2.7}%
 \contentsline {section}{\numberline {2.8}Derived Forms}{11}{section.2.8}%
 \contentsline {section}{\numberline {2.9}Grammar}{11}{section.2.9}%
@@ -46,7 +46,7 @@
 \contentsline {section}{\numberline {6.4}Compound Objects}{58}{section.6.4}%
 \contentsline {section}{\numberline {6.5}Basic Values}{59}{section.6.5}%
 \contentsline {section}{\numberline {6.6}Function Closures}{60}{section.6.6}%
-\contentsline {section}{\numberline {6.7}Inference Rules}{60}{section.6.7}%
+\contentsline {section}{\numberline {6.7}Inference Rules}{61}{section.6.7}%
 \contentsline {chapter}{\numberline {7}Dynamic Semantics for Modules}{69}{chapter.7}%
 \contentsline {section}{\numberline {7.1}Reduced Syntax}{69}{section.7.1}%
 \contentsline {section}{\numberline {7.2}Compound Objects}{70}{section.7.2}%
@@ -74,7 +74,7 @@
 \contentsline {section}{\numberline {9.5}Observable Behaviour}{105}{section.9.5}%
 \contentsline {section}{\numberline {9.6}Views and Other Programs}{105}{section.9.6}%
 \contentsline {chapter}{\numberline {A}Derived Forms}{107}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Grouping the Definitions of a Let}{108}{section.A.1}%
+\contentsline {section}{\numberline {A.1}Grouping the Definitions of a Let}{110}{section.A.1}%
 \contentsline {section}{\numberline {A.2}Grouping the Declarations of a Module}{111}{section.A.2}%
 \contentsline {chapter}{\numberline {B}Full Grammar}{113}{appendix.B}%
 \contentsline {chapter}{\numberline {C}The Initial Static Basis}{118}{appendix.C}%

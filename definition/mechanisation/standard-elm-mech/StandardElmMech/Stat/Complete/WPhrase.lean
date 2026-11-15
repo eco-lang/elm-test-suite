@@ -26,7 +26,7 @@ def tysAtPat : AAtPat → List Ty
   | .record row τ => τ :: tysPatRowOpt row
   | .paren p => tysPat p
 def tysPatRow : APatRow → List Ty
-  | .field _ τ rest => τ :: tysPatRowOpt rest
+  | .field _ _ τ rest => τ :: tysPatRowOpt rest
 def tysPatRowOpt : Option APatRow → List Ty
   | none => []
   | some r => tysPatRow r
@@ -118,7 +118,7 @@ theorem tysAtPat_sb (s : FSub) : ∀ p : AAtPat, tysAtPat (sbAtPat s p) = (tysAt
   | .record r _ => by simp only [sbAtPat, tysAtPat, tysPatRowOpt_sb s r, List.map_cons]
   | .paren p => by simp only [sbAtPat, tysAtPat, tysPat_sb s p]
 theorem tysPatRow_sb (s : FSub) : ∀ r : APatRow, tysPatRow (sbPatRow s r) = (tysPatRow r).map (sb s)
-  | .field _ _ rest => by simp only [sbPatRow, tysPatRow, tysPatRowOpt_sb s rest, List.map_cons]
+  | .field _ _ _ rest => by simp only [sbPatRow, tysPatRow, tysPatRowOpt_sb s rest, List.map_cons]
 theorem tysPatRowOpt_sb (s : FSub) : ∀ r : Option APatRow, tysPatRowOpt (sbPatRowOpt s r) = (tysPatRowOpt r).map (sb s)
   | none => rfl
   | some r => by simp only [sbPatRowOpt, tysPatRowOpt, tysPatRow_sb s r]
@@ -278,7 +278,7 @@ theorem sbAtPat_congr {s t : FSub} : ∀ p : AAtPat, AgreeOn s t (tysAtPat p) �
 theorem sbPatRowOpt_congr {s t : FSub} : ∀ r : Option APatRow, AgreeOn s t (tysPatRowOpt r) →
     sbPatRowOpt s r = sbPatRowOpt t r
   | none, _ => rfl
-  | some (.field l τ rest), h => by
+  | some (.field l x τ rest), h => by
     simp only [tysPatRowOpt, tysPatRow] at h
     obtain ⟨h1, h2⟩ := AgreeOn.cons h
     simp only [sbPatRowOpt, sbPatRow, h1, sbPatRowOpt_congr rest h2]
@@ -476,7 +476,7 @@ theorem atpat_ve : ∀ (p : AAtPat), ∀ q ∈ p.ve, PEnt (tysAtPat p) q
   | .paren p, q, h => by simp only [AAtPat.ve] at h; simpa [tysAtPat] using pat_ve p q h
 theorem patRowOpt_ve : ∀ (r : Option APatRow), ∀ q ∈ APatRow.veOpt r, PEnt (tysPatRowOpt r) q
   | none, q, h => by simp [APatRow.veOpt] at h
-  | some (.field l τ rest), q, h => by
+  | some (.field l x τ rest), q, h => by
     simp only [APatRow.veOpt, APatRow.ve] at h
     rcases mem_modify h with h | h
     · simp only [List.mem_singleton] at h; subst h

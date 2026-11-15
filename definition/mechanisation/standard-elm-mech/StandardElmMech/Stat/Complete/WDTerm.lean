@@ -205,7 +205,7 @@ theorem wdPatOpt_stable (C : Ctx) : ∀ (p : Option BPat) (st : WDSt), StableAtD
   | some p, st => by
     simp only [wdPatOpt]; exact stableD_bind (wdPat_stable C p st) fun _ _ => stableD_pure _ _
 theorem wdPatRow_stable : ∀ (r : BPatRow) (st : WDSt), StableAtD (fun k => wdPatRow k R r) st
-  | .field _ rest, st => by
+  | .field _ _ rest, st => by
     simp only [wdPatRow]
     exact stableD_bind (stableD_freshV st) fun _ st1 => stableD_bind (wdPatRowOpt_stable rest st1) fun _ _ =>
       stableD_pure _ _

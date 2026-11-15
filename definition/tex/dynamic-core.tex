@@ -90,6 +90,18 @@ replaced by the following copies of it:
   variables at which the program uses the declaration, the copies binding
   distinct new variables.
 \end{itemize}
+A copy renames the variables the declaration binds, the variables of its
+pattern rows among them (Section~\ref{sec:syntax-core-restrictions}), and
+never a label: the copy at $\tInt$ of the destructuring binding
+\kw{\kwlb\ h \kwrb\ = \kwlb\ h = \textbackslash x -> x - 3 \kwrb}, whose
+equivalent form is \kw{\kwlb\ h = h \kwrb\ = \ldots}, is
+\kw{\kwlb\ h = $\mathtt{h}'$ \kwrb\ = \ldots}, which binds a new variable
+$\mathtt{h}'$ to the field \kw{h} of the same record. A copy is not written
+in a program, so the syntactic restrictions do not judge it; it keeps every
+property they give a program, except that the variable of a pattern row need
+not be spelt as its label, which the restriction on pattern rows requires
+only of a program.
+% A99
 Each occurrence of a variable the declaration binds is made to refer to the
 copy for the instance at which that occurrence was elaborated. Every binding
 of a declaration quantifies all the variables of class $\knum$ of the
@@ -691,11 +703,13 @@ pattern matches a record with any further fields.
 
 \defnrule[r:d-patrow-field]
   {\lab\in\Dom r\premsep\opt{\jdgv{E}{r}{\patrow}{\VE}}}
-  {\jdgv{E}{r}{\lab\ \opt{\kw{,}\ \patrow}}{\{\lab\mapsto r(\lab)\}\opt{+\,\VE}}}
+  {\jdgv{E}{r}{\lab\ \kw{=}\ \var\ \opt{\kw{,}\ \patrow}}{\{\var\mapsto r(\lab)\}\opt{+\,\VE}}}
 
 \begin{rulecomments}
-\rcomment{r:d-patrow-field} In the result, $\lab$ stands for the variable
-spelt as the label, which the pattern row binds. The side condition
+\rcomment{r:d-patrow-field} The pattern row binds its variable to the field
+$\lab$ of $r$; in a row written as a label alone the variable is spelt as the
+label (Appendix~\ref{ch:appendix-derived-forms}). % A99
+The side condition
 $\lab\in\Dom r$ makes the rule apply exactly when $r$ has the field; by
 elaboration it always holds, since a record of the type the pattern requires
 has every field the pattern row names. Hence a pattern row cannot fail, and

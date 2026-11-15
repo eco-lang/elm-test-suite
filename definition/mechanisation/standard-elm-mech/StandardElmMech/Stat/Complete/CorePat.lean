@@ -89,7 +89,7 @@ theorem adm_num_of_lit {n : Nat} {τ : Ty} (h : genAt (typeOf (.int n)) [τ] τ 
 mutual
 theorem prow_ok : (r : APatRow) → ∀ {p : Path}, (∀ q, ν (q.reverse ++ p) = rdPatRow r q) →
     T.evRow ν (prow p r.erase) = hNRow r.row
-  | .field l τ rest, p, hr => by
+  | .field l x τ rest, p, hr => by
     simp only [APatRow.erase, prow, APatRow.row, evRow_rmod]
     rw [prowOpt_ok rest (child 1 hr (fun q => rfl)), hNRow_modify, modify_eq_rmod]
     simp only [T.evRow, hNRow, T.ev, (slot hr (0))]
@@ -127,7 +127,7 @@ theorem penvAt_rel : (a : AAtPat) → ∀ {p : Path}, (∀ q, ν (q.reverse ++ p
     exact penv_rel q0 (child 0 hr (fun q => rfl))
 theorem penvRow_rel : (r : APatRow) → ∀ {p : Path}, (∀ q, ν (q.reverse ++ p) = rdPatRow r q) →
     RelL ν (penvRow p r.erase) r.ve
-  | .field l τ rest, p, hr => by
+  | .field l x τ rest, p, hr => by
     simp only [APatRow.erase, penvRow, APatRow.ve]
     exact RelL.modify (RelL.single (gok_mono_mv ((slot hr (0))))) (penvRowOpt_rel rest (child 1 hr (fun q => rfl)))
 theorem penvRowOpt_rel : (r : Option APatRow) → ∀ {p : Path}, (∀ q, ν (q.reverse ++ p) = rdPatRowOpt r q) →
