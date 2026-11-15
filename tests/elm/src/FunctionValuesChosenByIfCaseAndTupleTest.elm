@@ -16,10 +16,7 @@ through these choices, including a `chooseA` result passed into `chooseB`:
 -- CHECK: testValue: 38
 
 import Basics exposing (..)
-import Bitwise exposing (..)
 import Bytes exposing (..)
-import Bytes.Decode exposing (..)
-import Bytes.Encode exposing (..)
 import Char exposing (..)
 import Html exposing (text)
 import List exposing (..)

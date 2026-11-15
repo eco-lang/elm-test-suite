@@ -2,9 +2,16 @@ module ArrayEqAfterPushTest exposing (main)
 
 {-| An `Array` built by `Array.push` from empty is equal under `==` to `Array.initialize` of the
 same elements, for lengths 96, 128 and 160.
+
+Tagged `elm-unspecced`: `Array.initialize`, `Array.empty` and `Array.push` are library functions
+of `Array`, which A Standard Definition of Elm? puts outside the definition (Appendix C, Library
+functions). Within the definition an array reaches a program only through a port or its flags,
+and equality of arrays is checked by `ArrayEqualityFlagsTest`; this test checks that elm/core's
+arrays compare equal whatever their internal shape.
+
 -}
 
--- TAGS: elm-spec, b:Basics.eq, b:Array.Array
+-- TAGS: elm-unspecced
 -- CHECK: push96: True
 -- CHECK: push128: True
 -- CHECK: push160: True

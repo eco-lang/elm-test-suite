@@ -1,91 +1,70 @@
 port module PortEchoJsonValueTest exposing (main)
 
-{-| A JSON `Value` sent out through a port comes back unchanged through an incoming
-port, for each of four sample values.
+{-| JSON `Value`s received as flags are sent out through a port as they are, and come back
+through an incoming port decoded at a concrete type.
 
-The program assumes a host that passes every value sent out on the `echoOut`
-port straight back in on the `echoIn` port; without one, nothing after `init`
-is logged. It sends the values in `values` one at a time, sending the next only
-after the previous one has come back, logs each value received as JSON text
-from `Encode.encode 0`, logs `"done"` after the last one, and then drops its subscription.
+The program assumes a host that passes every value sent out on the `echoOut` port straight back
+in on the `echoIn` port; without one, nothing after `init` is logged.
 
-The values are an object holding an array of mixed JSON values and a string, a
-JSON string, a JSON number (2.5), and `null`.
+The flags are a JSON object whose four fields are decoded at `Json.Encode.Value`: an object
+holding an array and a string, a JSON string, a JSON number (2.5), and `null`. Every JSON value
+decodes at `Value`, unchanged. `init` sends the four out together, as a triple whose last
+component is a pair, and a `Value` is sent as the JSON value it is, so the host receives
+`[{"a":[1,2,null],"b":"x"},"plain",[2.5,null]]`. That comes back on `echoIn`, decoded at a
+type that reads every part: a record, a string, and a pair of a `Float` and a `Maybe Int`. The
+program logs it and drops its subscription.
+
+A Standard Definition of Elm? gives `Value` no functions within the definition, and does not fix
+what `Debug.log` prints for one, so the Values are observed through the type they decode at.
 
 -}
 
 -- TAGS: elm-spec, e-enc-value, e-dec-value
--- CHECK: PortEchoJsonValueTest got: "{\"a\":[1,true,null],\"b\":\"x\"}"
--- CHECK: PortEchoJsonValueTest got: "\"plain\""
--- CHECK: PortEchoJsonValueTest got: "2.5"
--- CHECK: PortEchoJsonValueTest got: "null"
--- CHECK: PortEchoJsonValueTest: "done"
+-- FLAGS: {"obj":{"a":[1,2,null],"b":"x"},"str":"plain","num":2.5,"nul":null}
+-- CHECK: PortEchoJsonValueTest got: ({ a = [Just 1,Just 2,Nothing], b = "x" },"plain",(2.5,Nothing))
 
-import Json.Encode as Encode
+import Json.Encode exposing (Value)
 import Platform
 
 
-port echoOut : Encode.Value -> Cmd msg
+port echoOut : ( Value, Value, ( Value, Value ) ) -> Cmd msg
 
 
-port echoIn : (Encode.Value -> msg) -> Sub msg
+port echoIn : (( { a : List (Maybe Int), b : String }, String, ( Float, Maybe Int ) ) -> msg) -> Sub msg
 
 
-values : List (Encode.Value)
-values =
-    [ Encode.object [ ( "a", Encode.list identity [ Encode.int 1, Encode.bool True, Encode.null ] ), ( "b", Encode.string "x" ) ]
-    , Encode.string "plain"
-    , Encode.float 2.5
-    , Encode.null
-    ]
+type alias Flags =
+    { obj : Value, str : Value, num : Value, nul : Value }
 
 
 type Msg
-    = Got (Encode.Value)
+    = Got ( { a : List (Maybe Int), b : String }, String, ( Float, Maybe Int ) )
 
 
-type alias Model =
-    { remaining : List (Encode.Value), done : Bool }
+init : Flags -> ( Bool, Cmd Msg )
+init flags =
+    ( False, echoOut ( flags.obj, flags.str, ( flags.num, flags.nul ) ) )
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    case values of
-        first :: rest ->
-            ( { remaining = rest, done = False }, echoOut first )
-
-        [] ->
-            ( { remaining = [], done = True }, Cmd.none )
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update (Got v) model =
+update : Msg -> Bool -> ( Bool, Cmd Msg )
+update (Got v) _ =
     let
         _ =
-            Debug.log "PortEchoJsonValueTest got" (Encode.encode 0 v)
+            Debug.log "PortEchoJsonValueTest got" v
     in
-    case model.remaining of
-        next :: rest ->
-            ( { model | remaining = rest }, echoOut next )
-
-        [] ->
-            let
-                _ =
-                    Debug.log "PortEchoJsonValueTest" "done"
-            in
-            ( { model | done = True }, Cmd.none )
+    ( True, Cmd.none )
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    if model.done then
+subscriptions : Bool -> Sub Msg
+subscriptions done =
+    if done then
         Sub.none
 
     else
         echoIn Got
 
 
-main : Program () Model Msg
+main : Program Flags Bool Msg
 main =
     Platform.worker
         { init = init

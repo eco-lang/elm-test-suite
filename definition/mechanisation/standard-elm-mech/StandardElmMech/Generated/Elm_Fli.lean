@@ -161,6 +161,21 @@ def g_elm_FunctionValueChoiceTest : Program := {
     chk .check "chooseC else: (4,3)" .data,
     chk .check "chooseC sum: 17" .int ] }
 
+/-- tests/elm/src/FunctionValuesChosenByIfCaseAndTupleTest.elm -/
+def g_elm_FunctionValuesChosenByIfCaseAndTupleTest : Program := {
+  name := "FunctionValuesChosenByIfCaseAndTupleTest", source := "tests/elm/src",
+  exposing := .all, imports := [⟨"Basics", "Basics", some .all⟩, ⟨"Bytes", "Bytes", some .all⟩, ⟨"Char", "Char", some .all⟩, ⟨"Html", "Html", some (.items [.var "text"])⟩, ⟨"List", "List", some .all⟩, ⟨"Maybe", "Maybe", some .all⟩, ⟨"String", "String", some .all⟩, ⟨"Tuple", "Tuple", some .all⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "chooseC" [pv "n", pv "f", pv "g"] (ifte (bin ">" (v "n") (i 0)) (tup2 (v "f") (v "g")) (tup2 (v "g") (v "f"))),
+    .fn "chooseB" [pv "n", pv "f"] (caseOf (v "n") [(P (pint 0), v "f"), (P (pint 1), ap (v "identity") [v "f"]), (P (pint 2), letDefs [.fn "k" [] (v "f")] (v "k")), (P pw, lams [pv "x"] (bin "+" (ap (v "f") [v "x"]) (i 1)))]),
+    .fn "chooseA" [pv "n", pv "f", pv "g"] (ifChain [(bin ">" (v "n") (i 10), v "f"), (bin ">" (v "n") (i 5), v "g"), (bin ">" (v "n") (i 2), v "f")] (letDefs [.fn "h" [] (v "f")] (v "h"))),
+    .fn "testValue" [] (letDefs [.pat (ptup2 (P (pv "p")) (P (pv "q"))) (ap (v "chooseC") [i 1, .atexp (.paren (lams [pv "x"] (bin "+" (v "x") (i 1)))), .atexp (.paren (lams [pv "x"] (bin "*" (v "x") (i 2))))])] (bin "+" (bin "+" (bin "+" (bin "+" (bin "+" (ap (v "chooseA") [i 3, .atexp (.paren (lams [pv "x"] (bin "+" (v "x") (i 1)))), .atexp (.paren (lams [pv "x"] (bin "-" (v "x") (i 1)))), i 4]) (ap (v "chooseA") [i 12, v "negate", v "abs$Int", i 5])) (ap (v "chooseB") [i 2, .atexp (.paren (lams [pv "x"] (bin "*" (v "x") (i 3)))), i 6])) (ap (v "chooseB") [i 1, .atexp (.paren (ap (v "chooseA") [i 7, v "p", v "q"])), i 7])) (ap (v "p") [i 1])) (ap (v "q") [i 2]))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (qv "Html" "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 38" .int ] }
+
 /-- tests/elm/src/HOParamApplyTwoTest.elm -/
 def g_elm_HOParamApplyTwoTest : Program := {
   name := "HOParamApplyTwoTest", source := "tests/elm/src",
@@ -330,6 +345,7 @@ def shard_Elm_Fli : List Program :=
    g_elm_FunctionMultiArgTest,
    g_elm_FunctionUnannotatedCompappendTest,
    g_elm_FunctionValueChoiceTest,
+   g_elm_FunctionValuesChosenByIfCaseAndTupleTest,
    g_elm_HOParamApplyTwoTest,
    g_elm_HelloTest,
    g_elm_HeteroClosureIntFloatTest,

@@ -108,6 +108,11 @@ them by Chapter 7's rules. Every test of this group but LetNumberMap2Test now ha
 `ident_` and `mean_` theorems, tagged `[library]`; 18 are `[native]` because they use `round`
 (none for the memory budget). LetNumberMap2Test stays out: `List.map2` is a kernel value.
 
+**Update (2026-11-14): LetNumberMap2Test is no longer `elm-spec`.** It keeps `List.map2` as a
+test of a `number` literal crossing a kernel function, untagged; `LetNumberLocalMap2Test`, new and
+`elm-spec`, checks the same typing with a `map2` written in the program, and is translated and
+proved.
+
 ## E. Debug.log as observable output (10)
 
 `checks:unmatched` (9): DebugLogLambdaBoundaryTest, DebugNumberAtFloatTest, CovEtaDebugLogTest,
@@ -157,6 +162,25 @@ ImportExposingItemsTest), `import:CompilerIssue2119View`, `import:CompilerIssue2
 are not in it (Appendix C). FunctionValuesChosenByIfCaseAndTupleTest might be rewritten without
 Bitwise, if Bitwise is incidental to it.
 
+**Update (2026-11-14): none of the five is an untranslated `elm-spec` test now.** Each test was
+asked what in the book it checks, and whether it could check that within the basis:
+- FunctionValuesChosenByIfCaseAndTupleTest: Bitwise, Bytes.Decode and Bytes.Encode were unused
+  imports; they are removed, and the test is translated and proved.
+- DictMapStagedCaptureTest: it checks a staged application inside a two-argument lambda, which
+  needs no `Dict`. The dictionary is now a list of pairs with a `mapValues` written in the program,
+  and `String.length` is replaced by an Int; translated and proved.
+- ArrayAppendCanonicalTest, ArrayEqAfterPushTest, LetNumberArrayMapTest: within the basis an array
+  reaches a program only through its flags or a port, so arrays of different construction cannot
+  be compared, and the `number` typing is checked by the `LetNumber` tests over lists. They are
+  tagged `elm-unspecced` instead, without book tags. `ArrayEqualityFlagsTest`, new and
+  `elm-spec`, checks the equality of arrays with arrays received as flags (`b:Basics.eq`,
+  `b:Array.Array`, `fig:dynamic-basis-eq`); `b:Array.Array` is also named by
+  `CovPortIncomingArrayTest` and `PortEncodingPortWithArrayTest`, which declare ports of arrays.
+
+PortEchoArrayStringTest (group J) built its arrays with `Array.empty` and
+`Array.fromList`; it stays as an untagged test that needs only the port echo, and
+`PortEchoArrayStringFlagsTest`, new and `elm-spec`, sends arrays received as flags.
+
 ## I. Size (7): not usefully
 
 `construct:large-program` (CompilerIssue2281LongLineListTest, WideClosureArity300Test,
@@ -182,6 +206,16 @@ elm/core. Possible, but a project the size of the current mechanisation.
 [lean-full-definition.md](lean-full-definition.md) (Part I) plans it. Two of the `CHECK-NOT` tests,
 ProcessKillRunnableTest and StandardA81SleepBeyond32BitsTest, check more than the book requires:
 the book allows the line they forbid (that plan, "Findings of Part I").
+
+**Update (2026-11-14): the two port tests that called library functions.** PortEchoJsonValueTest
+now takes its Values as flags at `Json.Encode.Value` (`e-dec-value`), sends them out as they are
+(`e-enc-value`), and logs them as they come back decoded at a record, a string and a pair; Elm
+prints a Value as `<internals>`, so a Value cannot be logged itself. It is translated and proved.
+StandardA92BytesPortTest stays `elm-spec` and untranslated, as the only test of `e-enc-bytes` and
+`e-dec-bytes`: within the basis no program can make a `Bytes` value. The new
+StandardA92BytesPortDeclarationTest checks the static half of ruling A92 (`Port(Bytes)`, with
+`b:Bytes.Bytes`) and is translated and proved; Elm 0.19.1 to 0.19.3 reject it, and Lamdera 1.5.0
+accepts it.
 
 ## K. Compile errors (308)
 

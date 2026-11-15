@@ -5,6 +5,29 @@ import StandardElmMech.Prog.Worker
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/ArrayEqualityFlagsTest.elm -/
+def g_elm_ArrayEqualityFlagsTest : Program := {
+  name := "ArrayEqualityFlagsTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Array", "Array", some (.items [.tycon "Array"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [],
+  aliases := [("Flags", some ["a", "b", "c", "d"])],
+  defs := [
+    .fn "init" [pv "flags"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "same", .atexp (.paren (bin "==" (.atexp (access (A (v "flags")) "a")) (.atexp (access (A (v "flags")) "b"))))]), .pat pw (ap (qv "Debug" "log") [str "differentElement", .atexp (.paren (bin "==" (.atexp (access (A (v "flags")) "a")) (.atexp (access (A (v "flags")) "c"))))]), .pat pw (ap (qv "Debug" "log") [str "differentLength", .atexp (.paren (bin "==" (.atexp (access (A (v "flags")) "a")) (.atexp (access (A (v "flags")) "d"))))]), .pat pw (ap (qv "Debug" "log") [str "notEqualSame", .atexp (.paren (bin "/=" (.atexp (access (A (v "flags")) "a")) (.atexp (access (A (v "flags")) "b"))))])] (tup2 (.atexp .unit) (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", lams [pw, pv "model"] (tup2 (v "model") (qv "Cmd" "none"))), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "same: True" .data,
+    chk .check "differentElement: False" .data,
+    chk .check "differentLength: False" .data,
+    chk .check "notEqualSame: False" .data ] }
+
+/-- The worker test of ArrayEqualityFlagsTest. -/
+def w_elm_ArrayEqualityFlagsTest : Prog.WorkerTest := {
+  prog := g_elm_ArrayEqualityFlagsTest,
+  flagsType := (.record (.cons "a" (.array .int) (.cons "b" (.array .int) (.cons "c" (.array .int) (.cons "d" (.array .int) .nil))))),
+  flags := (Eff.BVal.mkObj [("a", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0))), (.num (Eff.jnum (3) (0)))])), ("b", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0))), (.num (Eff.jnum (3) (0)))])), ("c", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0))), (.num (Eff.jnum (4) (0)))])), ("d", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))]))]),
+  host := .none,
+  checks := [] }
+
 /-- tests/elm/src/CoreIssue1141UnusedPortCallBreaksSubscriptionTest.elm -/
 def g_elm_CoreIssue1141UnusedPortCallBreaksSubscriptionTest : Program := {
   name := "CoreIssue1141UnusedPortCallBreaksSubscriptionTest", source := "tests/elm/src",
@@ -172,6 +195,31 @@ def w_elm_PortAliasEchoTest : Prog.WorkerTest := {
   host := .echo "echoOut" "echoIn",
   checks := [] }
 
+/-- tests/elm/src/PortEchoArrayStringFlagsTest.elm -/
+def g_elm_PortEchoArrayStringFlagsTest : Program := {
+  name := "PortEchoArrayStringFlagsTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Array", "Array", some (.items [.tycon "Array"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [("Model", some ["remaining", "done"])],
+  ports := [("echoOut", .out, (.array .string)), ("echoIn", .inn, (.array .string))],
+  defs := [
+    .fn "init" [pv "values"] (caseOf (v "values") [(.cons (P (pv "first")) (P (pv "rest")), tup2 (recE [("remaining", v "rest"), ("done", c "False")]) (ap (v "echoOut") [v "first"])), (P (listP []), tup2 (recE [("remaining", listE []), ("done", c "True")]) (qv "Cmd" "none"))]),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "PortEchoArrayStringFlagsTest got", v "v"])] (caseOf (.atexp (access (A (v "model")) "remaining")) [(.cons (P (pv "next")) (P (pv "rest")), tup2 (updE "model" [("remaining", v "rest")]) (ap (v "echoOut") [v "next"])), (P (listP []), letDefs [.pat pw (ap (qv "Debug" "log") [str "PortEchoArrayStringFlagsTest", str "done"])] (tup2 (updE "model" [("done", c "True")]) (qv "Cmd" "none")))])),
+    .fn "subscriptions" [pv "model"] (ifte (.atexp (access (A (v "model")) "done")) (qv "Sub" "none") (ap (v "echoIn") [c "Got"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [
+    chk .check "PortEchoArrayStringFlagsTest got: Array.fromList []" .data,
+    chk .check "PortEchoArrayStringFlagsTest got: Array.fromList [\"a\",\"b\",\"c\"]" .data,
+    chk .check "PortEchoArrayStringFlagsTest: \"done\"" .string ] }
+
+/-- The worker test of PortEchoArrayStringFlagsTest. -/
+def w_elm_PortEchoArrayStringFlagsTest : Prog.WorkerTest := {
+  prog := g_elm_PortEchoArrayStringFlagsTest,
+  flagsType := (.list (.array .string)),
+  flags := (Eff.BVal.array [(Eff.BVal.array []), (Eff.BVal.array [(.str "a"), (.str "b"), (.str "c")])]),
+  host := .echo "echoOut" "echoIn",
+  checks := [] }
+
 /-- tests/elm/src/PortEchoBoolTest.elm -/
 def g_elm_PortEchoBoolTest : Program := {
   name := "PortEchoBoolTest", source := "tests/elm/src",
@@ -226,6 +274,29 @@ def w_elm_PortEchoFloatTest : Prog.WorkerTest := {
   prog := g_elm_PortEchoFloatTest,
   flagsType := .unit,
   flags := .null,
+  host := .echo "echoOut" "echoIn",
+  checks := [] }
+
+/-- tests/elm/src/PortEchoJsonValueTest.elm -/
+def g_elm_PortEchoJsonValueTest : Program := {
+  name := "PortEchoJsonValueTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Json.Encode", "Json.Encode", some (.items [.tycon "Value"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [("Flags", some ["obj", "str", "num", "nul"])],
+  ports := [("echoOut", .out, (.tuple3 .value .value (.tuple2 .value .value))), ("echoIn", .inn, (.tuple3 (.record (.cons "a" (.list (.maybe .int)) (.cons "b" .string .nil))) .string (.tuple2 .float (.maybe .int))))],
+  defs := [
+    .fn "init" [pv "flags"] (tup2 (c "False") (ap (v "echoOut") [tup3 (.atexp (access (A (v "flags")) "obj")) (.atexp (access (A (v "flags")) "str")) (tup2 (.atexp (access (A (v "flags")) "num")) (.atexp (access (A (v "flags")) "nul")))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pw] (letDefs [.pat pw (ap (qv "Debug" "log") [str "PortEchoJsonValueTest got", v "v"])] (tup2 (c "True") (qv "Cmd" "none"))),
+    .fn "subscriptions" [pv "done"] (ifte (v "done") (qv "Sub" "none") (ap (v "echoIn") [c "Got"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [
+    chk .check "PortEchoJsonValueTest got: ({ a = [Just 1,Just 2,Nothing], b = \"x\" },\"plain\",(2.5,Nothing))" .data ] }
+
+/-- The worker test of PortEchoJsonValueTest. -/
+def w_elm_PortEchoJsonValueTest : Prog.WorkerTest := {
+  prog := g_elm_PortEchoJsonValueTest,
+  flagsType := (.record (.cons "nul" .value (.cons "num" .value (.cons "obj" .value (.cons "str" .value .nil))))),
+  flags := (Eff.BVal.mkObj [("obj", (Eff.BVal.mkObj [("a", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0))), .null])), ("b", (.str "x"))])), ("str", (.str "plain")), ("num", (.num (Eff.jnum (25) (-1)))), ("nul", .null)]),
   host := .echo "echoOut" "echoIn",
   checks := [] }
 
@@ -526,6 +597,27 @@ def w_elm_StandardA88PortNonFiniteTest : Prog.WorkerTest := {
   flags := .null,
   host := .echo "echoOut" "echoIn",
   checkNots := ["Just"],
+  checks := [] }
+
+/-- tests/elm/src/StandardA92BytesPortDeclarationTest.elm -/
+def g_elm_StandardA92BytesPortDeclarationTest : Program := {
+  name := "StandardA92BytesPortDeclarationTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Bytes", "Bytes", some (.items [.tycon "Bytes"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [],
+  aliases := [],
+  ports := [("echoOut", .out, .bytes), ("echoIn", .inn, .bytes)],
+  defs := [
+    .fn "init" [pw] (letDefs [.pat pw (ap (qv "Debug" "log") [str "declared", c "True"])] (tup2 (.atexp .unit) (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", lams [pw, pv "model"] (tup2 (v "model") (qv "Cmd" "none"))), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "declared: True" .data ] }
+
+/-- The worker test of StandardA92BytesPortDeclarationTest. -/
+def w_elm_StandardA92BytesPortDeclarationTest : Prog.WorkerTest := {
+  prog := g_elm_StandardA92BytesPortDeclarationTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
   checks := [] }
 
 /-- tests/elm-core/src/CmdMapComposeTest.elm -/
@@ -952,15 +1044,18 @@ def w_elm_core_TimerEffectTest : Prog.WorkerTest := {
 
 /-- The worker tests of this shard. -/
 def shard_Worker01 : List Prog.WorkerTest :=
-  [w_elm_CoreIssue1141UnusedPortCallBreaksSubscriptionTest,
+  [w_elm_ArrayEqualityFlagsTest,
+   w_elm_CoreIssue1141UnusedPortCallBreaksSubscriptionTest,
    w_elm_FlagsRecordTest,
    w_elm_ListLiteralDebugLogKindTest,
    w_elm_NoImportsTest,
    w_elm_OutgoingPortTuple3KeepsRunningTest,
    w_elm_OutgoingPortTuple3Test,
    w_elm_PortAliasEchoTest,
+   w_elm_PortEchoArrayStringFlagsTest,
    w_elm_PortEchoBoolTest,
    w_elm_PortEchoFloatTest,
+   w_elm_PortEchoJsonValueTest,
    w_elm_PortEchoListIntTest,
    w_elm_PortEchoMaybeIntTest,
    w_elm_PortEchoNestedTest,
@@ -973,6 +1068,7 @@ def shard_Worker01 : List Prog.WorkerTest :=
    w_elm_StandardA72AbsentFlagsTest,
    w_elm_StandardA88PortNegativeZeroTest,
    w_elm_StandardA88PortNonFiniteTest,
+   w_elm_StandardA92BytesPortDeclarationTest,
    w_elm_core_CmdMapComposeTest,
    w_elm_core_CoreIssue1110PortDeclarationOrderTest,
    w_elm_core_CoreIssue1154PortSubscribedWithCmdTest,

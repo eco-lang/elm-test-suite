@@ -23,6 +23,7 @@ open StandardElm.D
   g_elm_DeepEqualityTest
   g_elm_DeepNestStressTest
   g_elm_DestructCaptureTest
+  g_elm_DictMapStagedCaptureTest
   g_elm_EdgeCaseAllDestructPatternsTest
   g_elm_EitherTypeTest
   g_elm_EmbeddedEmptyStringCaptureTest

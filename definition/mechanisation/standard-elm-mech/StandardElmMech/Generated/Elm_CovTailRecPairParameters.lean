@@ -188,6 +188,20 @@ def g_elm_DestructCaptureTest : Program := {
   checks := [
     chk .check "captured: 56" .int ] }
 
+/-- tests/elm/src/DictMapStagedCaptureTest.elm -/
+def g_elm_DictMapStagedCaptureTest : Program := {
+  name := "DictMapStagedCaptureTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "makeAdder" [pv "width"] (lams [pv "value"] (bin "+" (v "width") (v "value"))),
+    .fn "mapValues" [pv "f", pv "pairs"] (caseOf (v "pairs") [(P (listP []), listE []), (.cons (P (ptup2 (P (pv "k")) (P (pv "v")))) (P (pv "rest")), bin "::" (tup2 (v "k") (ap (v "f") [v "k", v "v"])) (ap (v "mapValues") [v "f", v "rest"]))]),
+    .fn "mapTupleDict" [pv "alter", pv "dict"] (ap (v "mapValues") [.atexp (.paren (lams [pw, ptup2 (P (pv "width")) (P (pv "value"))] (tup2 (v "width") (ap (v "alter") [v "width", v "value"])))), v "dict"]),
+    .fn "main" [] (letDefs [.fn "d" [] (listE [tup2 (str "a") (tup2 (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 10)))), tup2 (str "b") (tup2 (.atexp (.scon (.intF 7))) (.atexp (.scon (.intF 20))))]), .fn "d$Int$Int" [] (listE [tup2 (str "a") (tup2 (i 5) (i 10)), tup2 (str "b") (tup2 (i 7) (i 20))]), .fn "result" [] (ap (v "mapTupleDict") [v "makeAdder", v "d$Int$Int"]), .pat pw (ap (qv "Debug" "log") [str "result", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "result: [(\"a\",(5,15)),(\"b\",(7,27))]" .data ] }
+
 /-- tests/elm/src/EdgeCaseAllDestructPatternsTest.elm -/
 def g_elm_EdgeCaseAllDestructPatternsTest : Program := {
   name := "EdgeCaseAllDestructPatternsTest", source := "tests/elm/src",
@@ -295,6 +309,7 @@ def shard_Elm_CovTailRecPairParameters : List Program :=
    g_elm_DeepEqualityTest,
    g_elm_DeepNestStressTest,
    g_elm_DestructCaptureTest,
+   g_elm_DictMapStagedCaptureTest,
    g_elm_EdgeCaseAllDestructPatternsTest,
    g_elm_EitherTypeTest,
    g_elm_EmbeddedEmptyStringCaptureTest,

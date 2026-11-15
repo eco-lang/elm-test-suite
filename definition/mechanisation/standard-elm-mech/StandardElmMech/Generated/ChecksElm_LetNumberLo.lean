@@ -10,6 +10,7 @@ open StandardElm.D
     `#mod_program_theorems` (Theorems.lean): the program in module form, and every check as a
     statement about the log of its evaluation (`ViewChecks`), or `NoMeaning`. -/
 #mod_program_theorems
+  g_elm_LetNumberLocalMap2Test
   g_elm_LetNumberLogBaseTest
   g_elm_LetNumberMaybeCaseDirectTest
   g_elm_LetNumberMaybeChainTest

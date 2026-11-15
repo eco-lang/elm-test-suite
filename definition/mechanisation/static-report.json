@@ -718,6 +718,13 @@
    "mean": "mean_elm_StandardA93MutualNumberDefaultTest",
    "legal": "legal_elm_StandardA93MutualNumberDefaultTest",
    "ident": "ident_elm_StandardA93MutualNumberDefaultTest"},
+  "elm/StandardA92BytesPortDeclarationTest":
+  {"wcheck": "wcheck_elm_StandardA92BytesPortDeclarationTest",
+   "spec": "spec_elm_StandardA92BytesPortDeclarationTest",
+   "native": false,
+   "mean": "mean_elm_StandardA92BytesPortDeclarationTest",
+   "legal": "legal_elm_StandardA92BytesPortDeclarationTest",
+   "ident": "ident_elm_StandardA92BytesPortDeclarationTest"},
   "elm/StandardA91BasicsAliasTest":
   {"refuse": "refuse_elm_StandardA91BasicsAliasTest"},
   "elm/StandardA88PortNonFiniteTest":
@@ -1195,7 +1202,12 @@
    "legal": "legal_elm_PortEchoListIntTest",
    "ident": "ident_elm_PortEchoListIntTest"},
   "elm/PortEchoJsonValueTest":
-  {"native": false, "legal": "legal_elm_PortEchoJsonValueTest"},
+  {"wcheck": "wcheck_elm_PortEchoJsonValueTest",
+   "spec": "spec_elm_PortEchoJsonValueTest",
+   "native": false,
+   "mean": "mean_elm_PortEchoJsonValueTest",
+   "legal": "legal_elm_PortEchoJsonValueTest",
+   "ident": "ident_elm_PortEchoJsonValueTest"},
   "elm/PortEchoFloatTest":
   {"wcheck": "wcheck_elm_PortEchoFloatTest",
    "spec": "spec_elm_PortEchoFloatTest",
@@ -1210,8 +1222,13 @@
    "mean": "mean_elm_PortEchoBoolTest",
    "legal": "legal_elm_PortEchoBoolTest",
    "ident": "ident_elm_PortEchoBoolTest"},
-  "elm/PortEchoArrayStringTest":
-  {"native": false, "legal": "legal_elm_PortEchoArrayStringTest"},
+  "elm/PortEchoArrayStringFlagsTest":
+  {"wcheck": "wcheck_elm_PortEchoArrayStringFlagsTest",
+   "spec": "spec_elm_PortEchoArrayStringFlagsTest",
+   "native": false,
+   "mean": "mean_elm_PortEchoArrayStringFlagsTest",
+   "legal": "legal_elm_PortEchoArrayStringFlagsTest",
+   "ident": "ident_elm_PortEchoArrayStringFlagsTest"},
   "elm/PortAliasEchoTest":
   {"wcheck": "wcheck_elm_PortAliasEchoTest",
    "spec": "spec_elm_PortAliasEchoTest",
@@ -1813,8 +1830,6 @@
    "mean": "mean_elm_LetNumberMaybeCaseDirectTest",
    "legal": "legal_elm_LetNumberMaybeCaseDirectTest",
    "ident": "ident_elm_LetNumberMaybeCaseDirectTest"},
-  "elm/LetNumberMap2Test":
-  {"native": false, "legal": "legal_elm_LetNumberMap2Test"},
   "elm/LetNumberLogBaseTest":
   {"wcheck": "wcheck_elm_LetNumberLogBaseTest",
    "spec": "spec_elm_LetNumberLogBaseTest",
@@ -1822,6 +1837,13 @@
    "mean": "mean_elm_LetNumberLogBaseTest",
    "legal": "legal_elm_LetNumberLogBaseTest",
    "ident": "ident_elm_LetNumberLogBaseTest"},
+  "elm/LetNumberLocalMap2Test":
+  {"wcheck": "wcheck_elm_LetNumberLocalMap2Test",
+   "spec": "spec_elm_LetNumberLocalMap2Test",
+   "native": true,
+   "mean": "mean_elm_LetNumberLocalMap2Test",
+   "legal": "legal_elm_LetNumberLocalMap2Test",
+   "ident": "ident_elm_LetNumberLocalMap2Test"},
   "elm/LetNumberListOfRecordsTest":
   {"wcheck": "wcheck_elm_LetNumberListOfRecordsTest",
    "spec": "spec_elm_LetNumberListOfRecordsTest",
@@ -2011,8 +2033,6 @@
    "mean": "mean_elm_LetNumberAsPatternTest",
    "legal": "legal_elm_LetNumberAsPatternTest",
    "ident": "ident_elm_LetNumberAsPatternTest"},
-  "elm/LetNumberArrayMapTest":
-  {"native": false, "legal": "legal_elm_LetNumberArrayMapTest"},
   "elm/LetNumberApplyToTest":
   {"wcheck": "wcheck_elm_LetNumberApplyToTest",
    "spec": "spec_elm_LetNumberApplyToTest",
@@ -2421,6 +2441,13 @@
    "mean": "mean_elm_HOParamApplyTwoTest",
    "legal": "legal_elm_HOParamApplyTwoTest",
    "ident": "ident_elm_HOParamApplyTwoTest"},
+  "elm/FunctionValuesChosenByIfCaseAndTupleTest":
+  {"wcheck": "wcheck_elm_FunctionValuesChosenByIfCaseAndTupleTest",
+   "spec": "spec_elm_FunctionValuesChosenByIfCaseAndTupleTest",
+   "native": false,
+   "mean": "mean_elm_FunctionValuesChosenByIfCaseAndTupleTest",
+   "legal": "legal_elm_FunctionValuesChosenByIfCaseAndTupleTest",
+   "ident": "ident_elm_FunctionValuesChosenByIfCaseAndTupleTest"},
   "elm/FunctionValueChoiceTest":
   {"wcheck": "wcheck_elm_FunctionValueChoiceTest",
    "spec": "spec_elm_FunctionValueChoiceTest",
@@ -2675,6 +2702,13 @@
    "mean": "mean_elm_EdgeCaseAllDestructPatternsTest",
    "legal": "legal_elm_EdgeCaseAllDestructPatternsTest",
    "ident": "ident_elm_EdgeCaseAllDestructPatternsTest"},
+  "elm/DictMapStagedCaptureTest":
+  {"wcheck": "wcheck_elm_DictMapStagedCaptureTest",
+   "spec": "spec_elm_DictMapStagedCaptureTest",
+   "native": false,
+   "mean": "mean_elm_DictMapStagedCaptureTest",
+   "legal": "legal_elm_DictMapStagedCaptureTest",
+   "ident": "ident_elm_DictMapStagedCaptureTest"},
   "elm/DestructCaptureTest":
   {"wcheck": "wcheck_elm_DestructCaptureTest",
    "spec": "spec_elm_DestructCaptureTest",
@@ -3750,10 +3784,13 @@
    "mean": "mean_elm_AstralCharCasePatternTest",
    "legal": "legal_elm_AstralCharCasePatternTest",
    "ident": "ident_elm_AstralCharCasePatternTest"},
-  "elm/ArrayEqAfterPushTest":
-  {"native": false, "legal": "legal_elm_ArrayEqAfterPushTest"},
-  "elm/ArrayAppendCanonicalTest":
-  {"native": false, "legal": "legal_elm_ArrayAppendCanonicalTest"},
+  "elm/ArrayEqualityFlagsTest":
+  {"wcheck": "wcheck_elm_ArrayEqualityFlagsTest",
+   "spec": "spec_elm_ArrayEqualityFlagsTest",
+   "native": false,
+   "mean": "mean_elm_ArrayEqualityFlagsTest",
+   "legal": "legal_elm_ArrayEqualityFlagsTest",
+   "ident": "ident_elm_ArrayEqualityFlagsTest"},
   "elm/AppendTypeSplitTest":
   {"wcheck": "wcheck_elm_AppendTypeSplitTest",
    "spec": "spec_elm_AppendTypeSplitTest",
@@ -4921,7 +4958,7 @@
    "legal": "legal_elm_core_BasicsClampTest",
    "ident": "ident_elm_core_BasicsClampTest"}},
  "summary":
- "static semantics: 625 legal (616 of one module, 9 of several), 0 without a theorem, 11 by native_decide, 0 conditional on D11",
+ "static semantics: 626 legal (617 of one module, 9 of several), 0 without a theorem, 11 by native_decide, 0 conditional on D11",
  "specNative":
  ["elm/WideClosureSat26Test",
   "elm/WideCtorMixedTest",
@@ -4931,7 +4968,7 @@
   "elm/WideRecordDecoder30Test",
   "elm/WideRecordDecoder70Test"],
  "shards":
- "shards: 77 (28 Ctx_, 8 Legal_, 8 Refusals_, 33 EndToEnd_); no shard imports another but for the Ctx_ files of its tests' imports",
+ "shards: 77 (29 Ctx_, 7 Legal_, 8 Refusals_, 33 EndToEnd_); no shard imports another but for the Ctx_ files of its tests' imports",
  "refusedSummary":
  "refused: 287 (Stat.not_legal_of_wMainVar_test 1, Stat.not_legal_of_typesFailB 13, Stat.not_legal_of_scopeFailB 6, Stat.not_legal_of_wRefutes Stat.Btest_inv 15, Stat.not_legal_of_coreRefutes 201, Stat.not_legal_of_modsyn 9, Stat.not_legal_of_furtherFailB 9, Stat.not_legal_of_mainFailB 8, Stat.not_legal_of_syn 23, Stat.not_legal_of_imports 2), 0 not refused",
  "refused": 287,
@@ -4948,9 +4985,9 @@
   "elm/WideRecordDecoder300Test",
   "elm/WideRecordDecoder30Test",
   "elm/WideRecordDecoder70Test"],
- "legal": 625,
+ "legal": 626,
  "generatedBy": "lake exe certify (Certify.lean)",
  "failed": [],
  "endToEnd":
- "end to end: 611 spec_ theorems (0 by native_decide, 7 from a wcheck_ by native_decide), 609 mean_ theorems, 611 ident_ theorems, 0 translated tests skipped",
+ "end to end: 618 spec_ theorems (0 by native_decide, 7 from a wcheck_ by native_decide), 616 mean_ theorems, 618 ident_ theorems, 0 translated tests skipped",
  "conditional": []}

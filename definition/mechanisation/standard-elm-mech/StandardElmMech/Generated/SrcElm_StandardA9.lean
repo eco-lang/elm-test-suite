@@ -10,6 +10,12 @@ def s_elm_StandardA91BasicsAliasTest : Src.SProgram := Src.canonOrder <| Src.pro
     [Src.imp "Dict" (some "Basics") none, Src.imp "Html" none none]
     [Src.val "main" none [] (Src.app (Src.qv "Html" "text") [.paren (.ifte [(Src.bin "<" (Src.i 1) (Src.i 2), Src.str "yes")] (Src.str "no"))])] ]
 
+/-- tests/elm/src/StandardA92BytesPortDeclarationTest.elm -/
+def s_elm_StandardA92BytesPortDeclarationTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA92BytesPortDeclarationTest" [
+  Src.mdl (Src.hdr true "StandardA92BytesPortDeclarationTest" (.items [.var "main"]))
+    [Src.imp "Bytes" none (some (.items [.ty "Bytes"])), Src.imp "Platform" none none]
+    [.port "echoOut" (.fn (Src.tc "Bytes" []) (Src.tc "Cmd" [Src.tv "msg"])), .port "echoIn" (.fn (.fn (Src.tc "Bytes" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tv "msg"]]))) [.wild] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "declared", Src.c "True"])] (.tuple [.unit, Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tv "msg"])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", .lam [.wild, Src.pv "model"] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
 /-- tests/elm/src/StandardA92BytesPortTest.elm -/
 def s_elm_StandardA92BytesPortTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA92BytesPortTest" [
   Src.mdl (Src.hdr true "StandardA92BytesPortTest" (.items [.var "main"]))
@@ -247,6 +253,7 @@ def s_elm_TooManyArgsTooManyArgumentsToALocalTest : Src.SProgram := Src.canonOrd
 /-- The programs of this shard, by test name. -/
 def srcShard_SrcElm_StandardA9 : List (String × Src.SProgram) :=
   [("StandardA91BasicsAliasTest", s_elm_StandardA91BasicsAliasTest),
+   ("StandardA92BytesPortDeclarationTest", s_elm_StandardA92BytesPortDeclarationTest),
    ("StandardA92BytesPortTest", s_elm_StandardA92BytesPortTest),
    ("StandardA93MutualNumberDefaultTest", s_elm_StandardA93MutualNumberDefaultTest),
    ("StandardA96NumberFlagsTest", s_elm_StandardA96NumberFlagsTest),

@@ -2,8 +2,8 @@
   A Standard Definition of Elm? Mechanisation: what a check of a test states (plan decision D9).
 
   * `Expect`: the value a CHECK line states, structurally: Ints, floats as Elm prints them, numbers of
-    either kind, characters, strings, (), constructor values with arguments, lists, tuples, records
-    (the labels as a set), functions. `Expect.holds x v` is decided by `Expect.check`.
+    either kind, characters, strings, (), constructor values with arguments (arrays among them),
+    lists, tuples, records (the labels as a set), functions. `Expect.holds x v` is decided by `Expect.check`.
   * `CheckStmt`: what a CHECK line states of a value: one the line describes, or none.
   * The log statements (`EntryPat`, `LogCheck`, `ExpChecks`): what a check says of the log of a
     logged derivation (step 3 of the plan states every check of a test program this way; the let
@@ -117,7 +117,13 @@ partial def value (cs : List Char) : Option (Expect × List Char) :=
     let (w, rest') := rest.span (· != '>')
     if String.ofList w == "function" then some (.fn, rest'.drop 1) else none
   | c :: _ =>
-    if c.isUpper then
+    if String.ofList (cs.take 15) == "Array.fromList " then
+      -- an array, printed as Elm/JS prints it: the constructor `arr#` of Appendix D (Arrays)
+      -- applied to the list of its elements, which `Expect.check` compares as any constructor
+      match value (cs.drop 15) with
+      | some (.list es, rest) => some (.con conArr.name [.list es], rest)
+      | _ => none
+    else if c.isUpper then
       let (w, rest) := cs.span (fun c => c.isAlphanum || c == '_')
       args (String.ofList w) [] rest
     else

@@ -10,12 +10,6 @@ def s_elm_LetNumberApplyToTest : Src.SProgram := Src.canonOrder <| Src.prog "elm
     [Src.imp "Html" none (some (.items [.var "text"]))]
     [Src.val "applyTo" (some (.fn (.fn (Src.tv "a") (Src.tv "b")) (.fn (Src.tv "a") (Src.tv "b")))) [Src.pv "f", Src.pv "x"] (Src.app (Src.v "f") [Src.v "x"]), Src.val "main" none [] (.letE [.fn "n" none [] (Src.i 30), .fn "result" none [] (Src.app (Src.v "round") [.paren (Src.app (Src.v "applyTo") [.paren (.lam [Src.pv "x"] (Src.bin "*" (Src.v "x") (Src.fl 15 (-1)))), Src.v "n"])]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "applyTo", Src.v "result"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
 
-/-- tests/elm/src/LetNumberArrayMapTest.elm -/
-def s_elm_LetNumberArrayMapTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "LetNumberArrayMapTest" [
-  Src.mdl (Src.hdr false "LetNumberArrayMapTest" (.items [.var "main"]))
-    [Src.imp "Array" none none, Src.imp "Html" none (some (.items [.var "text"]))]
-    [Src.val "main" none [] (.letE [.fn "arr" none [] (Src.app (Src.qv "Array" "fromList") [.list [Src.i 30, Src.i 40]]), .fn "result" none [] (Src.app (Src.qv "Array" "toList") [.paren (Src.app (Src.qv "Array" "map") [.paren (.lam [Src.pv "x"] (Src.app (Src.v "round") [.paren (Src.bin "*" (Src.v "x") (Src.fl 15 (-1)))])), Src.v "arr"])]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "array", Src.v "result"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
-
 /-- tests/elm/src/LetNumberAsPatternTest.elm -/
 def s_elm_LetNumberAsPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "LetNumberAsPatternTest" [
   Src.mdl (Src.hdr false "LetNumberAsPatternTest" (.items [.var "main"]))
@@ -178,17 +172,17 @@ def s_elm_LetNumberListOfRecordsTest : Src.SProgram := Src.canonOrder <| Src.pro
     [Src.imp "Html" none (some (.items [.var "text"]))]
     [Src.val "main" none [] (.letE [.fn "rs" none [] (.list [.record [("n", Src.i 30)], .record [("n", Src.i 40)]]), .fn "result" none [] (Src.app (Src.qv "List" "map") [.paren (.lam [Src.pv "r"] (Src.app (Src.v "round") [.paren (Src.bin "*" (.access (Src.v "r") "n") (Src.fl 15 (-1)))])), Src.v "rs"]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "listrec", Src.v "result"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
 
+/-- tests/elm/src/LetNumberLocalMap2Test.elm -/
+def s_elm_LetNumberLocalMap2Test : Src.SProgram := Src.canonOrder <| Src.prog "elm" "LetNumberLocalMap2Test" [
+  Src.mdl (Src.hdr false "LetNumberLocalMap2Test" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "map2" (some (.fn (.fn (Src.tv "a") (.fn (Src.tv "b") (Src.tv "c"))) (.fn (Src.tc "List" [Src.tv "a"]) (.fn (Src.tc "List" [Src.tv "b"]) (Src.tc "List" [Src.tv "c"]))))) [Src.pv "f", Src.pv "xs", Src.pv "ys"] (.caseE (.tuple [Src.v "xs", Src.v "ys"]) [(.tuple [.cons (Src.pv "x") (Src.pv "xrest"), .cons (Src.pv "y") (Src.pv "yrest")], Src.bin "::" (Src.app (Src.v "f") [Src.v "x", Src.v "y"]) (Src.app (Src.v "map2") [Src.v "f", Src.v "xrest", Src.v "yrest"])), (.wild, .list [])]), Src.val "main" none [] (.letE [.fn "xs" none [] (.list [Src.i 30, Src.i 40]), .fn "result" none [] (Src.app (Src.v "map2") [.paren (.lam [Src.pv "x", Src.pv "y"] (Src.app (Src.v "round") [.paren (Src.bin "+" (Src.bin "*" (Src.v "x") (Src.fl 15 (-1))) (Src.v "y"))])), Src.v "xs", .list [Src.fl 0 (-1), Src.fl 0 (-1)]]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "map2", Src.v "result"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
 /-- tests/elm/src/LetNumberLogBaseTest.elm -/
 def s_elm_LetNumberLogBaseTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "LetNumberLogBaseTest" [
   Src.mdl (Src.hdr false "LetNumberLogBaseTest" (.items [.var "main"]))
     [Src.imp "Html" none (some (.items [.var "text"]))]
     [Src.val "main" none [] (.letE [.fn "n" none [] (Src.i 100), .fn "result" none [] (Src.app (Src.v "round") [.paren (Src.app (Src.v "logBase") [Src.i 10, Src.v "n"])]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "logbase", Src.v "result"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
-
-/-- tests/elm/src/LetNumberMap2Test.elm -/
-def s_elm_LetNumberMap2Test : Src.SProgram := Src.canonOrder <| Src.prog "elm" "LetNumberMap2Test" [
-  Src.mdl (Src.hdr false "LetNumberMap2Test" (.items [.var "main"]))
-    [Src.imp "Html" none (some (.items [.var "text"]))]
-    [Src.val "main" none [] (.letE [.fn "xs" none [] (.list [Src.i 30, Src.i 40]), .fn "result" none [] (Src.app (Src.qv "List" "map2") [.paren (.lam [Src.pv "x", Src.pv "y"] (Src.app (Src.v "round") [.paren (Src.bin "+" (Src.bin "*" (Src.v "x") (Src.fl 15 (-1))) (Src.v "y"))])), Src.v "xs", .list [Src.fl 0 (-1), Src.fl 0 (-1)]]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "map2", Src.v "result"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
 
 /-- tests/elm/src/LetNumberMaybeCaseDirectTest.elm -/
 def s_elm_LetNumberMaybeCaseDirectTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "LetNumberMaybeCaseDirectTest" [
@@ -247,7 +241,6 @@ def s_elm_LetNumberRecordDestructureTest : Src.SProgram := Src.canonOrder <| Src
 /-- The programs of this shard, by test name. -/
 def srcShard_SrcElm_LetNumberAp : List (String × Src.SProgram) :=
   [("LetNumberApplyToTest", s_elm_LetNumberApplyToTest),
-   ("LetNumberArrayMapTest", s_elm_LetNumberArrayMapTest),
    ("LetNumberAsPatternTest", s_elm_LetNumberAsPatternTest),
    ("LetNumberBoxedSilentMiscompileTest", s_elm_LetNumberBoxedSilentMiscompileTest),
    ("LetNumberCaseLetTest", s_elm_LetNumberCaseLetTest),
@@ -275,8 +268,8 @@ def srcShard_SrcElm_LetNumberAp : List (String × Src.SProgram) :=
    ("LetNumberListOfClosuresTest", s_elm_LetNumberListOfClosuresTest),
    ("LetNumberListOfMaybeTest", s_elm_LetNumberListOfMaybeTest),
    ("LetNumberListOfRecordsTest", s_elm_LetNumberListOfRecordsTest),
+   ("LetNumberLocalMap2Test", s_elm_LetNumberLocalMap2Test),
    ("LetNumberLogBaseTest", s_elm_LetNumberLogBaseTest),
-   ("LetNumberMap2Test", s_elm_LetNumberMap2Test),
    ("LetNumberMaybeCaseDirectTest", s_elm_LetNumberMaybeCaseDirectTest),
    ("LetNumberMaybeChainTest", s_elm_LetNumberMaybeChainTest),
    ("LetNumberMixedTupleSlotTest", s_elm_LetNumberMixedTupleSlotTest),

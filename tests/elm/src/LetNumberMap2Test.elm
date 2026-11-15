@@ -7,9 +7,13 @@ The list is let-bound with type `List number`. Inside the `List.map2` lambda
 each element is multiplied by `1.5` and added to an element of `[ 0.0, 0.0 ]`,
 which makes it a `Float`.
 
+`List.map2` is a library function written in elm/core's kernel code, outside A Standard
+Definition of Elm? (Appendix C, Library functions), so this test is not tagged `elm-spec`: it
+keeps a `number` literal crossing a two-argument kernel function. `LetNumberLocalMap2Test` checks
+the same typing with a `map2` written in the program.
+
 -}
 
--- TAGS: elm-spec, s-dec-group, s-atexp-scon, d-atexp-scon
 -- CHECK: map2: [45,60]
 
 import Html exposing (text)

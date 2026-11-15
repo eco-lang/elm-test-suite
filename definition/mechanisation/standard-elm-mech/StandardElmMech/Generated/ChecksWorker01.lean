@@ -13,6 +13,7 @@ open StandardElm.D
     `#worker_theorems` (WorkerTheorems.lean): some execution the book allows, under the test's
     host, has a log that meets every check (`Prog.WorkerTest.Holds`). -/
 #worker_theorems
+  w_elm_ArrayEqualityFlagsTest
   w_elm_CoreIssue1141UnusedPortCallBreaksSubscriptionTest
   w_elm_FlagsRecordTest
   w_elm_ListLiteralDebugLogKindTest
@@ -20,8 +21,10 @@ open StandardElm.D
   w_elm_OutgoingPortTuple3KeepsRunningTest
   w_elm_OutgoingPortTuple3Test
   w_elm_PortAliasEchoTest
+  w_elm_PortEchoArrayStringFlagsTest
   w_elm_PortEchoBoolTest
   w_elm_PortEchoFloatTest
+  w_elm_PortEchoJsonValueTest
   w_elm_PortEchoListIntTest
   w_elm_PortEchoMaybeIntTest
   w_elm_PortEchoNestedTest
@@ -34,6 +37,7 @@ open StandardElm.D
   w_elm_StandardA72AbsentFlagsTest
   w_elm_StandardA88PortNegativeZeroTest
   w_elm_StandardA88PortNonFiniteTest
+  w_elm_StandardA92BytesPortDeclarationTest
   w_elm_core_CmdMapComposeTest
   w_elm_core_CoreIssue1110PortDeclarationOrderTest
   w_elm_core_CoreIssue1154PortSubscribedWithCmdTest

@@ -7,9 +7,15 @@ The first half holds `0` to `n // 2 - 1` and the second `n // 2` to `n - 1`, so 
 hold the same elements in the same order and each line should log `True`. Lengths 96 and 160
 are multiples of 32 that are not powers of two.
 
+Tagged `elm-unspecced`: `Array.initialize` and `Array.append` are library functions of `Array`,
+which A Standard Definition of Elm? puts outside the definition (Appendix C, Library functions).
+Within the definition an array reaches a program only through a port or its flags, and equality
+of arrays is checked by `ArrayEqualityFlagsTest`; this test checks that elm/core's arrays compare
+equal whatever their internal shape.
+
 -}
 
--- TAGS: elm-spec, b:Basics.eq, b:Array.Array
+-- TAGS: elm-unspecced
 -- CHECK: append32: True
 -- CHECK: append64: True
 -- CHECK: append96: True

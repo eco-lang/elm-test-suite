@@ -4,6 +4,18 @@ import StandardElmMech.Examples
 namespace StandardElm
 open StandardElm.D
 
+/-- tests/elm/src/LetNumberLocalMap2Test.elm -/
+def g_elm_LetNumberLocalMap2Test : Program := {
+  name := "LetNumberLocalMap2Test", source := "tests/elm/src", native := true,
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "map2" [pv "f", pv "xs", pv "ys"] (caseOf (tup2 (v "xs") (v "ys")) [(P (ptup2 (.cons (P (pv "x")) (P (pv "xrest"))) (.cons (P (pv "y")) (P (pv "yrest")))), bin "::" (ap (v "f") [v "x", v "y"]) (ap (v "map2") [v "f", v "xrest", v "yrest"])), (P pw, listE [])]),
+    .fn "main" [] (letDefs [.fn "xs" [] (listE [.atexp (.scon (.intF 30)), .atexp (.scon (.intF 40))]), .fn "result" [] (ap (v "map2") [.atexp (.paren (lams [pv "x", pv "y"] (ap (v "round") [.atexp (.paren (bin "+" (bin "*" (v "x") (.atexp (.scon (.float 15 (-1))))) (v "y")))]))), v "xs", listE [.atexp (.scon (.float 0 (-1))), .atexp (.scon (.float 0 (-1)))]]), .pat pw (ap (qv "Debug" "log") [str "map2", v "result"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "map2: [45,60]" .data ] }
+
 /-- tests/elm/src/LetNumberLogBaseTest.elm -/
 def g_elm_LetNumberLogBaseTest : Program := {
   name := "LetNumberLogBaseTest", source := "tests/elm/src", native := true,
@@ -293,7 +305,8 @@ def g_elm_LetValueBindingTest : Program := {
 
 /-- The programs of this shard. -/
 def shard_Elm_LetNumberLo : List Program :=
-  [g_elm_LetNumberLogBaseTest,
+  [g_elm_LetNumberLocalMap2Test,
+   g_elm_LetNumberLogBaseTest,
    g_elm_LetNumberMaybeCaseDirectTest,
    g_elm_LetNumberMaybeChainTest,
    g_elm_LetNumberMixedTupleSlotTest,

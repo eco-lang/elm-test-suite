@@ -13,11 +13,11 @@
       "inference": 217
     },
     "compileSuccess": {
-      "B0": 39,
-      "harness": 543,
-      "library": 34,
+      "B0": 43,
+      "harness": 546,
+      "library": 28,
       "helper": 9,
-      "outside": 3,
+      "outside": 1,
       "parse-fail": 0
     }
   },
@@ -7877,44 +7877,18 @@
     },
     {
       "project": "elm",
-      "name": "ArrayAppendCanonicalTest",
+      "name": "ArrayEqualityFlagsTest",
       "modules": [
         {
-          "path": "tests/elm/src/ArrayAppendCanonicalTest.elm",
+          "path": "tests/elm/src/ArrayEqualityFlagsTest.elm",
           "parse": "ok"
         }
       ],
       "parse": "ok",
-      "basis": "library",
-      "needs": [
-        "library:Array.initialize",
-        "library:Array.append",
-        "harness"
-      ],
-      "main": "other",
-      "mainAnnotated": false
-    },
-    {
-      "project": "elm",
-      "name": "ArrayEqAfterPushTest",
-      "modules": [
-        {
-          "path": "tests/elm/src/ArrayEqAfterPushTest.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "library",
-      "needs": [
-        "library:Array.initialize",
-        "library:List.range",
-        "library:Array.empty",
-        "library:Array.push",
-        "library:List.foldl",
-        "harness"
-      ],
-      "main": "other",
-      "mainAnnotated": false
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
     },
     {
       "project": "elm",
@@ -10200,10 +10174,8 @@
         }
       ],
       "parse": "ok",
-      "basis": "outside",
+      "basis": "harness",
       "needs": [
-        "outside:Dict",
-        "library:String.length",
         "harness"
       ],
       "main": "other",
@@ -10851,11 +10823,8 @@
         }
       ],
       "parse": "ok",
-      "basis": "outside",
+      "basis": "harness",
       "needs": [
-        "outside:Bitwise",
-        "outside:Bytes.Decode",
-        "outside:Bytes.Encode",
         "harness"
       ],
       "main": "other",
@@ -11808,26 +11777,6 @@
     },
     {
       "project": "elm",
-      "name": "LetNumberArrayMapTest",
-      "modules": [
-        {
-          "path": "tests/elm/src/LetNumberArrayMapTest.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "library",
-      "needs": [
-        "library:Array.map",
-        "library:Array.toList",
-        "library:Array.fromList",
-        "harness"
-      ],
-      "main": "other",
-      "mainAnnotated": false
-    },
-    {
-      "project": "elm",
       "name": "LetNumberAsPatternTest",
       "modules": [
         {
@@ -12303,10 +12252,10 @@
     },
     {
       "project": "elm",
-      "name": "LetNumberLogBaseTest",
+      "name": "LetNumberLocalMap2Test",
       "modules": [
         {
-          "path": "tests/elm/src/LetNumberLogBaseTest.elm",
+          "path": "tests/elm/src/LetNumberLocalMap2Test.elm",
           "parse": "ok"
         }
       ],
@@ -12320,17 +12269,16 @@
     },
     {
       "project": "elm",
-      "name": "LetNumberMap2Test",
+      "name": "LetNumberLogBaseTest",
       "modules": [
         {
-          "path": "tests/elm/src/LetNumberMap2Test.elm",
+          "path": "tests/elm/src/LetNumberLogBaseTest.elm",
           "parse": "ok"
         }
       ],
       "parse": "ok",
-      "basis": "library",
+      "basis": "harness",
       "needs": [
-        "library:List.map2",
         "harness"
       ],
       "main": "other",
@@ -13751,19 +13699,16 @@
     },
     {
       "project": "elm",
-      "name": "PortEchoArrayStringTest",
+      "name": "PortEchoArrayStringFlagsTest",
       "modules": [
         {
-          "path": "tests/elm/src/PortEchoArrayStringTest.elm",
+          "path": "tests/elm/src/PortEchoArrayStringFlagsTest.elm",
           "parse": "ok"
         }
       ],
       "parse": "ok",
-      "basis": "library",
-      "needs": [
-        "library:Array.fromList",
-        "library:Array.empty"
-      ],
+      "basis": "B0",
+      "needs": [],
       "main": "program",
       "mainAnnotated": true
     },
@@ -13807,17 +13752,8 @@
         }
       ],
       "parse": "ok",
-      "basis": "library",
-      "needs": [
-        "library:Json.Encode.encode",
-        "library:Json.Encode.null",
-        "library:Json.Encode.float",
-        "library:Json.Encode.string",
-        "library:Json.Encode.bool",
-        "library:Json.Encode.int",
-        "library:Json.Encode.list",
-        "library:Json.Encode.object"
-      ],
+      "basis": "B0",
+      "needs": [],
       "main": "program",
       "mainAnnotated": true
     },
@@ -14943,6 +14879,21 @@
       "modules": [
         {
           "path": "tests/elm/src/StandardA88PortNonFiniteTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "StandardA92BytesPortDeclarationTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/StandardA92BytesPortDeclarationTest.elm",
           "parse": "ok"
         }
       ],

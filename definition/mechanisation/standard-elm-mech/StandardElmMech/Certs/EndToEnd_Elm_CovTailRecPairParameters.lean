@@ -318,6 +318,29 @@ theorem ident_elm_DestructCaptureTest :
   Stat.ident_of_wCheck wcheck_elm_DestructCaptureTest
 
 
+/-- tests/elm/src/DictMapStagedCaptureTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_DictMapStagedCaptureTest : Stat.wCheck Stat.Btest s_elm_DictMapStagedCaptureTest (some g_elm_DictMapStagedCaptureTest.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/DictMapStagedCaptureTest.elm [parse] [harness] [params] -/
+theorem legal_elm_DictMapStagedCaptureTest : Stat.LegalProgram Stat.Btest s_elm_DictMapStagedCaptureTest :=
+  Stat.legal_of_W wcheck_elm_DictMapStagedCaptureTest
+
+/-- tests/elm/src/DictMapStagedCaptureTest.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_DictMapStagedCaptureTest : Stat.endToEndW Stat.Btest s_elm_DictMapStagedCaptureTest = .ok g_elm_DictMapStagedCaptureTest.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_DictMapStagedCaptureTest
+
+/-- tests/elm/src/DictMapStagedCaptureTest.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] -/
+theorem mean_elm_DictMapStagedCaptureTest :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_DictMapStagedCaptureTest) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_DictMapStagedCaptureTest (Stat.value_of_viewChecks t_elm_DictMapStagedCaptureTest)
+
+/-- tests/elm/src/DictMapStagedCaptureTest.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_DictMapStagedCaptureTest :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_DictMapStagedCaptureTest) r → r = g_elm_DictMapStagedCaptureTest.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_DictMapStagedCaptureTest
+
+
 /-- tests/elm/src/EdgeCaseAllDestructPatternsTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
 theorem wcheck_elm_EdgeCaseAllDestructPatternsTest : Stat.wCheck Stat.Btest s_elm_EdgeCaseAllDestructPatternsTest (some g_elm_EdgeCaseAllDestructPatternsTest.reduced) = true :=
   Stat.wCheck_of_ctx ctx_01125022_eq (by decide +kernel)

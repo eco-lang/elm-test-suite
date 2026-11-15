@@ -11,9 +11,13 @@ after the previous one has come back, logs each value received, logs
 
 The values are an empty array and a three-element array.
 
+The arrays are built by the program with `Array.empty` and `Array.fromList`, library functions
+outside A Standard Definition of Elm? (Appendix C, Library functions), so this test is not
+tagged `elm-spec`: it needs only the port echo, not flags. `PortEchoArrayStringFlagsTest` checks
+the same round trip with arrays received as flags.
+
 -}
 
--- TAGS: elm-spec, e-enc-array, e-dec-array, e-enc-string, e-dec-string
 -- CHECK: PortEchoArrayStringTest got: Array.fromList []
 -- CHECK: PortEchoArrayStringTest got: Array.fromList ["a","b","c"]
 -- CHECK: PortEchoArrayStringTest: "done"

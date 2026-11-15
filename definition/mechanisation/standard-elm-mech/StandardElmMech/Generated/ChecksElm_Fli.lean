@@ -19,6 +19,7 @@ open StandardElm.D
   g_elm_FunctionMultiArgTest
   g_elm_FunctionUnannotatedCompappendTest
   g_elm_FunctionValueChoiceTest
+  g_elm_FunctionValuesChosenByIfCaseAndTupleTest
   g_elm_HOParamApplyTwoTest
   g_elm_HelloTest
   g_elm_HeteroClosureIntFloatTest

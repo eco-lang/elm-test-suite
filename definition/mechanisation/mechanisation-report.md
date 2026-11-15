@@ -1,5 +1,36 @@
 # Mechanisation Report
 
+> **Update, 2026-11-14 (the `elm-spec` tests that left the basis; plans/untranslated-tests.md,
+> groups H and J).** Each `elm-spec` test that used a module or library function outside the
+> book's basis was asked what it checks, and whether it could check that within the basis:
+> - FunctionValuesChosenByIfCaseAndTupleTest loses three unused imports (Bitwise, Bytes.Decode,
+>   Bytes.Encode); DictMapStagedCaptureTest keeps its dictionary as a list of pairs with its own
+>   `mapValues`, and an Int for `String.length`. Both are translated and proved.
+> - LetNumberMap2Test and PortEchoArrayStringTest lose `elm-spec` and stay as implementation tests;
+>   LetNumberLocalMap2Test (its own `map2`) and PortEchoArrayStringFlagsTest (its arrays from
+>   flags) check the same rules within the basis, and are translated and proved.
+> - LetNumberArrayMapTest, ArrayAppendCanonicalTest and ArrayEqAfterPushTest are tagged
+>   `elm-unspecced`: an array reaches a program only through flags or a port. The new
+>   ArrayEqualityFlagsTest checks equality on arrays from flags (`b:Basics.eq`, `b:Basics.neq`,
+>   `b:Array.Array`, `fig:dynamic-basis-eq`).
+> - PortEchoJsonValueTest takes its Values as flags and logs them decoded at a concrete type
+>   coming back. StandardA92BytesPortTest stays untranslated (the only test of `e-enc-bytes` and
+>   `e-dec-bytes`); the new StandardA92BytesPortDeclarationTest checks `Port(Bytes)`.
+>
+> `Checks.lean`'s reader of a CHECK value now reads Elm's `Array.fromList [...]` as the constructor
+> `arr#` of Appendix D applied to the list. Counts (`scripts/verify.sh full`, 8 min 59 s wall;
+> largest process 6.05 GB, scope peak 7.77 GB):
+> - translator: 618 of the 940 `elm-spec` tests translated, 914 source programs written (26
+>   refused, as before); 881 meet the AST-decidable restrictions, 33 do not.
+> - `legal_`: 626 (11 by `native_decide`), `refuse_`: 287, 0 conditional on D11. Of the 627
+>   compile-success tests, only StandardA92BytesPortTest has none: it imports modules outside the
+>   test basis.
+> - 618 `spec_`, 616 `mean_`, 618 `ident_`.
+> - run-examples: 1,815 of 1,815 checks agree; 1,574 by the kernel, 239 by `native_decide`, in 618
+>   program theorems.
+> - compare-e2e: 618 of 618.
+> - check-axioms: 15,714 theorems, 266 using `native_decide`, no axiom problems.
+
 > **Update, 2026-11-14 (eco's parser replaces elm-syntax, plans/eco-parser.md).** The translator
 > parses every test with eco's parser (a port of Elm's own), vendored at eco-compiler commit
 > 208a501 in `definition/tools/vendor/eco-parser/` (12,219 lines; `VENDORED.md` lists every edit).

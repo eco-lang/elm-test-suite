@@ -362,47 +362,31 @@
     },
     {
       "project": "elm",
-      "name": "ArrayAppendCanonicalTest",
-      "sha256": "9a36133a9d835f677c4c591a2992eb79d494a60e72311220610b9536fa0ac8c0",
+      "name": "ArrayEqualityFlagsTest",
+      "sha256": "fd074cf0327fed2fbe190a278a9e577b4f7b01093e0b65cefbed67d987852548",
       "sources": [
         {
-          "path": "tests/elm/src/ArrayAppendCanonicalTest.elm",
-          "sha256": "9a36133a9d835f677c4c591a2992eb79d494a60e72311220610b9536fa0ac8c0"
+          "path": "tests/elm/src/ArrayEqualityFlagsTest.elm",
+          "sha256": "fd074cf0327fed2fbe190a278a9e577b4f7b01093e0b65cefbed67d987852548"
         }
       ],
       "src": {
         "status": "written",
         "shard": "SrcElm",
-        "def": "s_elm_ArrayAppendCanonicalTest",
+        "def": "s_elm_ArrayEqualityFlagsTest",
         "modules": [
-          "tests/elm/src/ArrayAppendCanonicalTest.elm"
+          "tests/elm/src/ArrayEqualityFlagsTest.elm"
         ]
       },
-      "status": "refused",
-      "reason": "basis:Array.initialize",
-      "at": "30:5"
-    },
-    {
-      "project": "elm",
-      "name": "ArrayEqAfterPushTest",
-      "sha256": "910b6279dcb57cb49ea4232a278bd2bf22df8c9bdebed0d1308f25558e878cd0",
-      "sources": [
-        {
-          "path": "tests/elm/src/ArrayEqAfterPushTest.elm",
-          "sha256": "910b6279dcb57cb49ea4232a278bd2bf22df8c9bdebed0d1308f25558e878cd0"
-        }
-      ],
-      "src": {
-        "status": "written",
-        "shard": "SrcElm",
-        "def": "s_elm_ArrayEqAfterPushTest",
-        "modules": [
-          "tests/elm/src/ArrayEqAfterPushTest.elm"
-        ]
-      },
-      "status": "refused",
-      "reason": "basis:Array.push",
-      "at": "18:16"
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_ArrayEqualityFlagsTest",
+      "checks": 4,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": "{\"a\":[1,2,3],\"b\":[1,2,3],\"c\":[1,2,4],\"d\":[1,2]}",
+      "lean": "/-- tests/elm/src/ArrayEqualityFlagsTest.elm -/\ndef g_elm_ArrayEqualityFlagsTest : Program := {\n  name := \"ArrayEqualityFlagsTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Array\", \"Array\", some (.items [.tycon \"Array\"])⟩, ⟨\"Platform\", \"Platform\", none⟩],\n  types := [],\n  aliases := [(\"Flags\", some [\"a\", \"b\", \"c\", \"d\"])],\n  defs := [\n    .fn \"init\" [pv \"flags\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"same\", .atexp (.paren (bin \"==\" (.atexp (access (A (v \"flags\")) \"a\")) (.atexp (access (A (v \"flags\")) \"b\"))))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"differentElement\", .atexp (.paren (bin \"==\" (.atexp (access (A (v \"flags\")) \"a\")) (.atexp (access (A (v \"flags\")) \"c\"))))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"differentLength\", .atexp (.paren (bin \"==\" (.atexp (access (A (v \"flags\")) \"a\")) (.atexp (access (A (v \"flags\")) \"d\"))))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"notEqualSame\", .atexp (.paren (bin \"/=\" (.atexp (access (A (v \"flags\")) \"a\")) (.atexp (access (A (v \"flags\")) \"b\"))))])] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", lams [pw, pv \"model\"] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"same: True\" .data,\n    chk .check \"differentElement: False\" .data,\n    chk .check \"differentLength: False\" .data,\n    chk .check \"notEqualSame: False\" .data ] }\n\n/-- The worker test of ArrayEqualityFlagsTest. -/\ndef w_elm_ArrayEqualityFlagsTest : Prog.WorkerTest := {\n  prog := g_elm_ArrayEqualityFlagsTest,\n  flagsType := (.record (.cons \"a\" (.array .int) (.cons \"b\" (.array .int) (.cons \"c\" (.array .int) (.cons \"d\" (.array .int) .nil))))),\n  flags := (Eff.BVal.mkObj [(\"a\", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0))), (.num (Eff.jnum (3) (0)))])), (\"b\", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0))), (.num (Eff.jnum (3) (0)))])), (\"c\", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0))), (.num (Eff.jnum (4) (0)))])), (\"d\", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))]))]),\n  host := .none,\n  checks := [] }"
     },
     {
       "project": "elm",
@@ -4591,11 +4575,11 @@
     {
       "project": "elm",
       "name": "CovPortIncomingArrayTest",
-      "sha256": "b0ee6eb8fd9e9310d569706330e366085e260a52c7b7b32038d11a64b87f8871",
+      "sha256": "b105899a1478dcdd705e2f8a26405b2a142f54963a315dd6a8c12644269bb59d",
       "sources": [
         {
           "path": "tests/elm/src/CovPortIncomingArrayTest.elm",
-          "sha256": "b0ee6eb8fd9e9310d569706330e366085e260a52c7b7b32038d11a64b87f8871"
+          "sha256": "b105899a1478dcdd705e2f8a26405b2a142f54963a315dd6a8c12644269bb59d"
         }
       ],
       "src": {
@@ -5195,11 +5179,11 @@
     {
       "project": "elm",
       "name": "DictMapStagedCaptureTest",
-      "sha256": "0234697d62aa87eb9ff59863c3853c1813a25ba7e67d8f2cfe41d10913289e57",
+      "sha256": "a1f1739178107e841fdc5be9bf4f93315cd6c87ae29ab4b7b68aea19d2d9aaa0",
       "sources": [
         {
           "path": "tests/elm/src/DictMapStagedCaptureTest.elm",
-          "sha256": "0234697d62aa87eb9ff59863c3853c1813a25ba7e67d8f2cfe41d10913289e57"
+          "sha256": "a1f1739178107e841fdc5be9bf4f93315cd6c87ae29ab4b7b68aea19d2d9aaa0"
         }
       ],
       "src": {
@@ -5210,9 +5194,13 @@
           "tests/elm/src/DictMapStagedCaptureTest.elm"
         ]
       },
-      "status": "refused",
-      "reason": "import:Dict",
-      "at": "17:1"
+      "status": "translated",
+      "shard": "Elm_CovTailRecPairParameters",
+      "def": "g_elm_DictMapStagedCaptureTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/DictMapStagedCaptureTest.elm -/\ndef g_elm_DictMapStagedCaptureTest : Program := {\n  name := \"DictMapStagedCaptureTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"makeAdder\" [pv \"width\"] (lams [pv \"value\"] (bin \"+\" (v \"width\") (v \"value\"))),\n    .fn \"mapValues\" [pv \"f\", pv \"pairs\"] (caseOf (v \"pairs\") [(P (listP []), listE []), (.cons (P (ptup2 (P (pv \"k\")) (P (pv \"v\")))) (P (pv \"rest\")), bin \"::\" (tup2 (v \"k\") (ap (v \"f\") [v \"k\", v \"v\"])) (ap (v \"mapValues\") [v \"f\", v \"rest\"]))]),\n    .fn \"mapTupleDict\" [pv \"alter\", pv \"dict\"] (ap (v \"mapValues\") [.atexp (.paren (lams [pw, ptup2 (P (pv \"width\")) (P (pv \"value\"))] (tup2 (v \"width\") (ap (v \"alter\") [v \"width\", v \"value\"])))), v \"dict\"]),\n    .fn \"main\" [] (letDefs [.fn \"d\" [] (listE [tup2 (str \"a\") (tup2 (.atexp (.scon (.intF 5))) (.atexp (.scon (.intF 10)))), tup2 (str \"b\") (tup2 (.atexp (.scon (.intF 7))) (.atexp (.scon (.intF 20))))]), .fn \"d$Int$Int\" [] (listE [tup2 (str \"a\") (tup2 (i 5) (i 10)), tup2 (str \"b\") (tup2 (i 7) (i 20))]), .fn \"result\" [] (ap (v \"mapTupleDict\") [v \"makeAdder\", v \"d$Int$Int\"]), .pat pw (ap (qv \"Debug\" \"log\") [str \"result\", v \"result\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"result: [(\\\"a\\\",(5,15)),(\\\"b\\\",(7,27))]\" .data ] }"
     },
     {
       "project": "elm",
@@ -6182,11 +6170,11 @@
     {
       "project": "elm",
       "name": "FunctionValuesChosenByIfCaseAndTupleTest",
-      "sha256": "51f6d3222402617469fea29232a7bb095aae41dab21cc5b51695dfc500d0d985",
+      "sha256": "3e5ce03193f13281950f8ae1740537943f970ce23fe28d50f4875f74f85b122e",
       "sources": [
         {
           "path": "tests/elm/src/FunctionValuesChosenByIfCaseAndTupleTest.elm",
-          "sha256": "51f6d3222402617469fea29232a7bb095aae41dab21cc5b51695dfc500d0d985"
+          "sha256": "3e5ce03193f13281950f8ae1740537943f970ce23fe28d50f4875f74f85b122e"
         }
       ],
       "src": {
@@ -6197,9 +6185,13 @@
           "tests/elm/src/FunctionValuesChosenByIfCaseAndTupleTest.elm"
         ]
       },
-      "status": "refused",
-      "reason": "import:Bitwise",
-      "at": "19:1"
+      "status": "translated",
+      "shard": "Elm_Fli",
+      "def": "g_elm_FunctionValuesChosenByIfCaseAndTupleTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/FunctionValuesChosenByIfCaseAndTupleTest.elm -/\ndef g_elm_FunctionValuesChosenByIfCaseAndTupleTest : Program := {\n  name := \"FunctionValuesChosenByIfCaseAndTupleTest\", source := \"tests/elm/src\",\n  exposing := .all, imports := [⟨\"Basics\", \"Basics\", some .all⟩, ⟨\"Bytes\", \"Bytes\", some .all⟩, ⟨\"Char\", \"Char\", some .all⟩, ⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩, ⟨\"List\", \"List\", some .all⟩, ⟨\"Maybe\", \"Maybe\", some .all⟩, ⟨\"String\", \"String\", some .all⟩, ⟨\"Tuple\", \"Tuple\", some .all⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"chooseC\" [pv \"n\", pv \"f\", pv \"g\"] (ifte (bin \">\" (v \"n\") (i 0)) (tup2 (v \"f\") (v \"g\")) (tup2 (v \"g\") (v \"f\"))),\n    .fn \"chooseB\" [pv \"n\", pv \"f\"] (caseOf (v \"n\") [(P (pint 0), v \"f\"), (P (pint 1), ap (v \"identity\") [v \"f\"]), (P (pint 2), letDefs [.fn \"k\" [] (v \"f\")] (v \"k\")), (P pw, lams [pv \"x\"] (bin \"+\" (ap (v \"f\") [v \"x\"]) (i 1)))]),\n    .fn \"chooseA\" [pv \"n\", pv \"f\", pv \"g\"] (ifChain [(bin \">\" (v \"n\") (i 10), v \"f\"), (bin \">\" (v \"n\") (i 5), v \"g\"), (bin \">\" (v \"n\") (i 2), v \"f\")] (letDefs [.fn \"h\" [] (v \"f\")] (v \"h\"))),\n    .fn \"testValue\" [] (letDefs [.pat (ptup2 (P (pv \"p\")) (P (pv \"q\"))) (ap (v \"chooseC\") [i 1, .atexp (.paren (lams [pv \"x\"] (bin \"+\" (v \"x\") (i 1)))), .atexp (.paren (lams [pv \"x\"] (bin \"*\" (v \"x\") (i 2))))])] (bin \"+\" (bin \"+\" (bin \"+\" (bin \"+\" (bin \"+\" (ap (v \"chooseA\") [i 3, .atexp (.paren (lams [pv \"x\"] (bin \"+\" (v \"x\") (i 1)))), .atexp (.paren (lams [pv \"x\"] (bin \"-\" (v \"x\") (i 1)))), i 4]) (ap (v \"chooseA\") [i 12, v \"negate\", v \"abs$Int\", i 5])) (ap (v \"chooseB\") [i 2, .atexp (.paren (lams [pv \"x\"] (bin \"*\" (v \"x\") (i 3)))), i 6])) (ap (v \"chooseB\") [i 1, .atexp (.paren (ap (v \"chooseA\") [i 7, v \"p\", v \"q\"])), i 7])) (ap (v \"p\") [i 1])) (ap (v \"q\") [i 2]))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (qv \"Html\" \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 38\" .int ] }"
     },
     {
       "project": "elm",
@@ -8126,28 +8118,6 @@
     },
     {
       "project": "elm",
-      "name": "LetNumberArrayMapTest",
-      "sha256": "9655610ff2c2e1c621241642d51dd5bc283b5874f71ba3674f63f2f9b1a7d522",
-      "sources": [
-        {
-          "path": "tests/elm/src/LetNumberArrayMapTest.elm",
-          "sha256": "9655610ff2c2e1c621241642d51dd5bc283b5874f71ba3674f63f2f9b1a7d522"
-        }
-      ],
-      "src": {
-        "status": "written",
-        "shard": "SrcElm_LetNumberAp",
-        "def": "s_elm_LetNumberArrayMapTest",
-        "modules": [
-          "tests/elm/src/LetNumberArrayMapTest.elm"
-        ]
-      },
-      "status": "refused",
-      "reason": "basis:Array.fromList",
-      "at": "18:13"
-    },
-    {
-      "project": "elm",
       "name": "LetNumberAsPatternTest",
       "sha256": "ab47cae93d692ba16392d37f708b06a87e76b1004be01cab0a45b9a2ac4fba8e",
       "sources": [
@@ -8884,6 +8854,32 @@
     },
     {
       "project": "elm",
+      "name": "LetNumberLocalMap2Test",
+      "sha256": "cd83fe036b373ea5c0b62a08d08cb4514b3a43d8daf0773f57eb431ec5424da2",
+      "sources": [
+        {
+          "path": "tests/elm/src/LetNumberLocalMap2Test.elm",
+          "sha256": "cd83fe036b373ea5c0b62a08d08cb4514b3a43d8daf0773f57eb431ec5424da2"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberAp",
+        "def": "s_elm_LetNumberLocalMap2Test",
+        "modules": [
+          "tests/elm/src/LetNumberLocalMap2Test.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_LetNumberLo",
+      "def": "g_elm_LetNumberLocalMap2Test",
+      "checks": 1,
+      "kind": "view",
+      "native": true,
+      "lean": "/-- tests/elm/src/LetNumberLocalMap2Test.elm -/\ndef g_elm_LetNumberLocalMap2Test : Program := {\n  name := \"LetNumberLocalMap2Test\", source := \"tests/elm/src\", native := true,\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"map2\" [pv \"f\", pv \"xs\", pv \"ys\"] (caseOf (tup2 (v \"xs\") (v \"ys\")) [(P (ptup2 (.cons (P (pv \"x\")) (P (pv \"xrest\"))) (.cons (P (pv \"y\")) (P (pv \"yrest\")))), bin \"::\" (ap (v \"f\") [v \"x\", v \"y\"]) (ap (v \"map2\") [v \"f\", v \"xrest\", v \"yrest\"])), (P pw, listE [])]),\n    .fn \"main\" [] (letDefs [.fn \"xs\" [] (listE [.atexp (.scon (.intF 30)), .atexp (.scon (.intF 40))]), .fn \"result\" [] (ap (v \"map2\") [.atexp (.paren (lams [pv \"x\", pv \"y\"] (ap (v \"round\") [.atexp (.paren (bin \"+\" (bin \"*\" (v \"x\") (.atexp (.scon (.float 15 (-1))))) (v \"y\")))]))), v \"xs\", listE [.atexp (.scon (.float 0 (-1))), .atexp (.scon (.float 0 (-1)))]]), .pat pw (ap (qv \"Debug\" \"log\") [str \"map2\", v \"result\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"map2: [45,60]\" .data ] }"
+    },
+    {
+      "project": "elm",
       "name": "LetNumberLogBaseTest",
       "sha256": "d50f25f97090c20df09fa1a250e5998671b94cebeff9bf9728d7912d2ec1e33e",
       "sources": [
@@ -8907,28 +8903,6 @@
       "kind": "view",
       "native": true,
       "lean": "/-- tests/elm/src/LetNumberLogBaseTest.elm -/\ndef g_elm_LetNumberLogBaseTest : Program := {\n  name := \"LetNumberLogBaseTest\", source := \"tests/elm/src\", native := true,\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"main\" [] (letDefs [.fn \"n\" [] (.atexp (.scon (.intF 100))), .fn \"result\" [] (ap (v \"round\") [.atexp (.paren (ap (v \"logBase\") [.atexp (.scon (.intF 10)), v \"n\"]))]), .pat pw (ap (qv \"Debug\" \"log\") [str \"logbase\", v \"result\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"logbase: 2\" .int ] }"
-    },
-    {
-      "project": "elm",
-      "name": "LetNumberMap2Test",
-      "sha256": "52f214165cb7e9d674441c283f97558f131eb667f61533348b090c17e436fbea",
-      "sources": [
-        {
-          "path": "tests/elm/src/LetNumberMap2Test.elm",
-          "sha256": "52f214165cb7e9d674441c283f97558f131eb667f61533348b090c17e436fbea"
-        }
-      ],
-      "src": {
-        "status": "written",
-        "shard": "SrcElm_LetNumberAp",
-        "def": "s_elm_LetNumberMap2Test",
-        "modules": [
-          "tests/elm/src/LetNumberMap2Test.elm"
-        ]
-      },
-      "status": "refused",
-      "reason": "basis:List.map2",
-      "at": "24:13"
     },
     {
       "project": "elm",
@@ -11367,25 +11341,31 @@
     },
     {
       "project": "elm",
-      "name": "PortEchoArrayStringTest",
-      "sha256": "01840e9b270e3028e7301bb31545666116d90e5b21f72dbc3ac8af90234b5ad1",
+      "name": "PortEchoArrayStringFlagsTest",
+      "sha256": "26fcb4fefd9c13de225185c48ec4d145739554dab15b2945484a5edb848d476b",
       "sources": [
         {
-          "path": "tests/elm/src/PortEchoArrayStringTest.elm",
-          "sha256": "01840e9b270e3028e7301bb31545666116d90e5b21f72dbc3ac8af90234b5ad1"
+          "path": "tests/elm/src/PortEchoArrayStringFlagsTest.elm",
+          "sha256": "26fcb4fefd9c13de225185c48ec4d145739554dab15b2945484a5edb848d476b"
         }
       ],
       "src": {
         "status": "written",
         "shard": "SrcElm_PolyStepLoopFo",
-        "def": "s_elm_PortEchoArrayStringTest",
+        "def": "s_elm_PortEchoArrayStringFlagsTest",
         "modules": [
-          "tests/elm/src/PortEchoArrayStringTest.elm"
+          "tests/elm/src/PortEchoArrayStringFlagsTest.elm"
         ]
       },
-      "status": "refused",
-      "reason": "basis:Array.empty",
-      "at": "33:7"
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_PortEchoArrayStringFlagsTest",
+      "checks": 3,
+      "kind": "worker",
+      "native": false,
+      "host": "echo",
+      "flags": "[[],[\"a\",\"b\",\"c\"]]",
+      "lean": "/-- tests/elm/src/PortEchoArrayStringFlagsTest.elm -/\ndef g_elm_PortEchoArrayStringFlagsTest : Program := {\n  name := \"PortEchoArrayStringFlagsTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Array\", \"Array\", some (.items [.tycon \"Array\"])⟩, ⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [(\"Model\", some [\"remaining\", \"done\"])],\n  ports := [(\"echoOut\", .out, (.array .string)), (\"echoIn\", .inn, (.array .string))],\n  defs := [\n    .fn \"init\" [pv \"values\"] (caseOf (v \"values\") [(.cons (P (pv \"first\")) (P (pv \"rest\")), tup2 (recE [(\"remaining\", v \"rest\"), (\"done\", c \"False\")]) (ap (v \"echoOut\") [v \"first\"])), (P (listP []), tup2 (recE [(\"remaining\", listE []), (\"done\", c \"True\")]) (qv \"Cmd\" \"none\"))]),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"PortEchoArrayStringFlagsTest got\", v \"v\"])] (caseOf (.atexp (access (A (v \"model\")) \"remaining\")) [(.cons (P (pv \"next\")) (P (pv \"rest\")), tup2 (updE \"model\" [(\"remaining\", v \"rest\")]) (ap (v \"echoOut\") [v \"next\"])), (P (listP []), letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"PortEchoArrayStringFlagsTest\", str \"done\"])] (tup2 (updE \"model\" [(\"done\", c \"True\")]) (qv \"Cmd\" \"none\")))])),\n    .fn \"subscriptions\" [pv \"model\"] (ifte (.atexp (access (A (v \"model\")) \"done\")) (qv \"Sub\" \"none\") (ap (v \"echoIn\") [c \"Got\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", v \"subscriptions\")]]) ],\n  checks := [\n    chk .check \"PortEchoArrayStringFlagsTest got: Array.fromList []\" .data,\n    chk .check \"PortEchoArrayStringFlagsTest got: Array.fromList [\\\"a\\\",\\\"b\\\",\\\"c\\\"]\" .data,\n    chk .check \"PortEchoArrayStringFlagsTest: \\\"done\\\"\" .string ] }\n\n/-- The worker test of PortEchoArrayStringFlagsTest. -/\ndef w_elm_PortEchoArrayStringFlagsTest : Prog.WorkerTest := {\n  prog := g_elm_PortEchoArrayStringFlagsTest,\n  flagsType := (.list (.array .string)),\n  flags := (Eff.BVal.array [(Eff.BVal.array []), (Eff.BVal.array [(.str \"a\"), (.str \"b\"), (.str \"c\")])]),\n  host := .echo \"echoOut\" \"echoIn\",\n  checks := [] }"
     },
     {
       "project": "elm",
@@ -11446,11 +11426,11 @@
     {
       "project": "elm",
       "name": "PortEchoJsonValueTest",
-      "sha256": "74ef4a7a3749d47f9768ec72bffbba94bcc2cff976df313c97b632046f25115a",
+      "sha256": "b5466ee56dd7ede3b56e94efbdf12a8ebc447f8369a9a4bf9be46883e62b0148",
       "sources": [
         {
           "path": "tests/elm/src/PortEchoJsonValueTest.elm",
-          "sha256": "74ef4a7a3749d47f9768ec72bffbba94bcc2cff976df313c97b632046f25115a"
+          "sha256": "b5466ee56dd7ede3b56e94efbdf12a8ebc447f8369a9a4bf9be46883e62b0148"
         }
       ],
       "src": {
@@ -11461,9 +11441,15 @@
           "tests/elm/src/PortEchoJsonValueTest.elm"
         ]
       },
-      "status": "refused",
-      "reason": "basis:Json.Encode.object",
-      "at": "36:7"
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_PortEchoJsonValueTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "echo",
+      "flags": "{\"obj\":{\"a\":[1,2,null],\"b\":\"x\"},\"str\":\"plain\",\"num\":2.5,\"nul\":null}",
+      "lean": "/-- tests/elm/src/PortEchoJsonValueTest.elm -/\ndef g_elm_PortEchoJsonValueTest : Program := {\n  name := \"PortEchoJsonValueTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Json.Encode\", \"Json.Encode\", some (.items [.tycon \"Value\"])⟩, ⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [(\"Flags\", some [\"obj\", \"str\", \"num\", \"nul\"])],\n  ports := [(\"echoOut\", .out, (.tuple3 .value .value (.tuple2 .value .value))), (\"echoIn\", .inn, (.tuple3 (.record (.cons \"a\" (.list (.maybe .int)) (.cons \"b\" .string .nil))) .string (.tuple2 .float (.maybe .int))))],\n  defs := [\n    .fn \"init\" [pv \"flags\"] (tup2 (c \"False\") (ap (v \"echoOut\") [tup3 (.atexp (access (A (v \"flags\")) \"obj\")) (.atexp (access (A (v \"flags\")) \"str\")) (tup2 (.atexp (access (A (v \"flags\")) \"num\")) (.atexp (access (A (v \"flags\")) \"nul\")))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pw] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"PortEchoJsonValueTest got\", v \"v\"])] (tup2 (c \"True\") (qv \"Cmd\" \"none\"))),\n    .fn \"subscriptions\" [pv \"done\"] (ifte (v \"done\") (qv \"Sub\" \"none\") (ap (v \"echoIn\") [c \"Got\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", v \"subscriptions\")]]) ],\n  checks := [\n    chk .check \"PortEchoJsonValueTest got: ({ a = [Just 1,Just 2,Nothing], b = \\\"x\\\" },\\\"plain\\\",(2.5,Nothing))\" .data ] }\n\n/-- The worker test of PortEchoJsonValueTest. -/\ndef w_elm_PortEchoJsonValueTest : Prog.WorkerTest := {\n  prog := g_elm_PortEchoJsonValueTest,\n  flagsType := (.record (.cons \"nul\" .value (.cons \"num\" .value (.cons \"obj\" .value (.cons \"str\" .value .nil))))),\n  flags := (Eff.BVal.mkObj [(\"obj\", (Eff.BVal.mkObj [(\"a\", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0))), .null])), (\"b\", (.str \"x\"))])), (\"str\", (.str \"plain\")), (\"num\", (.num (Eff.jnum (25) (-1)))), (\"nul\", .null)]),\n  host := .echo \"echoOut\" \"echoIn\",\n  checks := [] }"
     },
     {
       "project": "elm",
@@ -11900,11 +11886,11 @@
     {
       "project": "elm",
       "name": "PortEncodingPortWithArrayTest",
-      "sha256": "de06df74a91f98ce3714b15c34e03111341ffe50b95d719878d26324ff54b509",
+      "sha256": "266aa2d211ac0e534c4ab2fe76eef04662e736499b9b6e2c2762389830f85f48",
       "sources": [
         {
           "path": "tests/elm/src/PortEncodingPortWithArrayTest.elm",
-          "sha256": "de06df74a91f98ce3714b15c34e03111341ffe50b95d719878d26324ff54b509"
+          "sha256": "266aa2d211ac0e534c4ab2fe76eef04662e736499b9b6e2c2762389830f85f48"
         }
       ],
       "src": {
@@ -13485,6 +13471,34 @@
       },
       "status": "refused",
       "reason": "compile-error"
+    },
+    {
+      "project": "elm",
+      "name": "StandardA92BytesPortDeclarationTest",
+      "sha256": "e56f8552f5cd193e632d911a8c81e304fe5061ae3f9c43ed265fc2417b1bc85a",
+      "sources": [
+        {
+          "path": "tests/elm/src/StandardA92BytesPortDeclarationTest.elm",
+          "sha256": "e56f8552f5cd193e632d911a8c81e304fe5061ae3f9c43ed265fc2417b1bc85a"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_StandardA9",
+        "def": "s_elm_StandardA92BytesPortDeclarationTest",
+        "modules": [
+          "tests/elm/src/StandardA92BytesPortDeclarationTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_StandardA92BytesPortDeclarationTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/StandardA92BytesPortDeclarationTest.elm -/\ndef g_elm_StandardA92BytesPortDeclarationTest : Program := {\n  name := \"StandardA92BytesPortDeclarationTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Bytes\", \"Bytes\", some (.items [.tycon \"Bytes\"])⟩, ⟨\"Platform\", \"Platform\", none⟩],\n  types := [],\n  aliases := [],\n  ports := [(\"echoOut\", .out, .bytes), (\"echoIn\", .inn, .bytes)],\n  defs := [\n    .fn \"init\" [pw] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"declared\", c \"True\"])] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", lams [pw, pv \"model\"] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"declared: True\" .data ] }\n\n/-- The worker test of StandardA92BytesPortDeclarationTest. -/\ndef w_elm_StandardA92BytesPortDeclarationTest : Prog.WorkerTest := {\n  prog := g_elm_StandardA92BytesPortDeclarationTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
     },
     {
       "project": "elm",

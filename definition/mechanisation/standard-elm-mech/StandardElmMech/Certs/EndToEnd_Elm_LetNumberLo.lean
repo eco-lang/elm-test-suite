@@ -17,6 +17,29 @@ namespace StandardElm
 set_option maxRecDepth 100000
 
 
+/-- tests/elm/src/LetNumberLocalMap2Test.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
+theorem wcheck_elm_LetNumberLocalMap2Test : Stat.wCheck Stat.Btest s_elm_LetNumberLocalMap2Test (some g_elm_LetNumberLocalMap2Test.reduced) = true :=
+  Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)
+
+/-- tests/elm/src/LetNumberLocalMap2Test.elm [parse] [harness] [params] -/
+theorem legal_elm_LetNumberLocalMap2Test : Stat.LegalProgram Stat.Btest s_elm_LetNumberLocalMap2Test :=
+  Stat.legal_of_W wcheck_elm_LetNumberLocalMap2Test
+
+/-- tests/elm/src/LetNumberLocalMap2Test.elm: Lean's pipeline with W (derived forms, W, the checks, specialisation and erasure) gives the translator's reduced program [parse] [harness] [params] -/
+theorem spec_elm_LetNumberLocalMap2Test : Stat.endToEndW Stat.Btest s_elm_LetNumberLocalMap2Test = .ok g_elm_LetNumberLocalMap2Test.reduced :=
+  Stat.endToEndW_of_wCheck wcheck_elm_LetNumberLocalMap2Test
+
+/-- tests/elm/src/LetNumberLocalMap2Test.elm: r:p-program with both premises, in the test basis [parse] [harness] [params] [native] -/
+theorem mean_elm_LetNumberLocalMap2Test :
+    ∃ τ PE v, Stat.ProgramSem Stat.Btest (Stat.bareOf s_elm_LetNumberLocalMap2Test) (τ, PE, v) :=
+  Stat.programSem_of_wCheck wcheck_elm_LetNumberLocalMap2Test (Stat.value_of_viewChecks t_elm_LetNumberLocalMap2Test)
+
+/-- tests/elm/src/LetNumberLocalMap2Test.elm: the specialisation of the program is unique, and is the reduced program the translator wrote [parse] [harness] [params] -/
+theorem ident_elm_LetNumberLocalMap2Test :
+    ∀ r, Stat.SpecOf Stat.Btest (Stat.bareOf s_elm_LetNumberLocalMap2Test) r → r = g_elm_LetNumberLocalMap2Test.reduced :=
+  Stat.ident_of_wCheck wcheck_elm_LetNumberLocalMap2Test
+
+
 /-- tests/elm/src/LetNumberLogBaseTest.elm: W's derivation of the program (plan step 11, principal) passes Chapter 9's conditions and the further restrictions, and specialisation and erasure give the translator's reduced program [parse] [harness] [params] -/
 theorem wcheck_elm_LetNumberLogBaseTest : Stat.wCheck Stat.Btest s_elm_LetNumberLogBaseTest (some g_elm_LetNumberLogBaseTest.reduced) = true :=
   Stat.wCheck_of_ctx ctx_83951108_eq (by decide +kernel)

@@ -1,6 +1,6 @@
 # Standard Elm mechanisation: example run
 
-Programs: 611 (38 workers), in 34 shards; checks: 1803.
+Programs: 618 (42 workers), in 34 shards; checks: 1815.
 
 ## ElmCore
 
@@ -1175,6 +1175,7 @@ Elm_CompilerIssue22: 19 programs, 24 checks, 24 agree.
 | DeepNestStressTest | nested_record | 1 | 1 | agree | t_elm_DeepNestStressTest |
 | DeepNestStressTest | nested_let | 10 | 10 | agree | t_elm_DeepNestStressTest |
 | DestructCaptureTest | captured | 56 | 56 | agree | t_elm_DestructCaptureTest |
+| DictMapStagedCaptureTest | result | [("a",(5,15)),("b",(7,27))] | [("a",(5,15)),("b",(7,27))] | agree | t_elm_DictMapStagedCaptureTest |
 | EdgeCaseAllDestructPatternsTest | testValue | [1,3,4,6] | [1,3,4,6] | agree | t_elm_EdgeCaseAllDestructPatternsTest |
 | EitherTypeTest | left | 42 | 42 | agree | t_elm_EitherTypeTest |
 | EitherTypeTest | right | 0 | 0 | agree | t_elm_EitherTypeTest |
@@ -1192,7 +1193,7 @@ Elm_CompilerIssue22: 19 programs, 24 checks, 24 agree.
 | EmbeddedNilInCustomTypeTest | len | 0 | 0 | agree | t_elm_EmbeddedNilInCustomTypeTest |
 | EmbeddedNilRecursiveTest | result | [2,4,6] | [2,4,6] | agree | t_elm_EmbeddedNilRecursiveTest |
 
-Elm_CovTailRecPairParameters: 20 programs, 47 checks, 47 agree.
+Elm_CovTailRecPairParameters: 21 programs, 48 checks, 48 agree.
 
 ## Elm_EmbeddedNo
 
@@ -1282,6 +1283,7 @@ Elm_EmbeddedNo: 19 programs, 35 checks, 35 agree.
 | FunctionValueChoiceTest | chooseC then | 7 | 7 | agree | t_elm_FunctionValueChoiceTest |
 | FunctionValueChoiceTest | chooseC else | (4,3) | (4,3) | agree | t_elm_FunctionValueChoiceTest |
 | FunctionValueChoiceTest | chooseC sum | 17 | 17 | agree | t_elm_FunctionValueChoiceTest |
+| FunctionValuesChosenByIfCaseAndTupleTest | testValue | 38 | 38 | agree | t_elm_FunctionValuesChosenByIfCaseAndTupleTest |
 | HOParamApplyTwoTest | result | 1 | 1 | agree | t_elm_HOParamApplyTwoTest |
 | HelloTest | HelloTest | "hello" | "hello" | agree | t_elm_HelloTest |
 | HeteroClosureIntFloatTest | hetero_true | 13 | 13 | agree | t_elm_HeteroClosureIntFloatTest (native) |
@@ -1302,7 +1304,7 @@ Elm_EmbeddedNo: 19 programs, 35 checks, 35 agree.
 | HoleyAliasTwoParamsTest | rbox | RBox { first = 7, second = 2.5 } | RBox { first = 7, second = 2.5 } | agree | t_elm_HoleyAliasTwoParamsTest |
 | ImportClosedTypeOpenItemTest | closed | 9 | 9 | agree | t_elm_ImportClosedTypeOpenItemTest |
 
-Elm_Fli: 20 programs, 61 checks, 61 agree.
+Elm_Fli: 21 programs, 62 checks, 62 agree.
 
 ## Elm_ImportE
 
@@ -1458,6 +1460,7 @@ Elm_LetN: 30 programs, 46 checks, 46 agree.
 
 | Program | Label | Expected (CHECK) | Definition | Status | Theorem |
 |---|---|---|---|---|---|
+| LetNumberLocalMap2Test | map2 | [45,60] | [45,60] | agree | t_elm_LetNumberLocalMap2Test (native) |
 | LetNumberLogBaseTest | logbase | 2 | 2 | agree | t_elm_LetNumberLogBaseTest (native) |
 | LetNumberMaybeCaseDirectTest | maybedirect | 45 | 45 | agree | t_elm_LetNumberMaybeCaseDirectTest (native) |
 | LetNumberMaybeChainTest | chain | 15 | 15 | agree | t_elm_LetNumberMaybeChainTest (native) |
@@ -1485,7 +1488,7 @@ Elm_LetN: 30 programs, 46 checks, 46 agree.
 | LetValueBindingTest | evaluated | 21 | 21 | agree | t_elm_LetValueBindingTest |
 | LetValueBindingTest | doubled | 42 | 42 | agree | t_elm_LetValueBindingTest |
 
-Elm_LetNumberLo: 25 programs, 26 checks, 26 agree.
+Elm_LetNumberLo: 26 programs, 27 checks, 27 agree.
 
 ## Elm_Li
 
@@ -1917,6 +1920,10 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 
 | Program | Label | Expected (CHECK) | Definition | Status | Theorem |
 |---|---|---|---|---|---|
+| ArrayEqualityFlagsTest | same | True | True | agree | t_elm_ArrayEqualityFlagsTest |
+| ArrayEqualityFlagsTest | differentElement | False | False | agree | t_elm_ArrayEqualityFlagsTest |
+| ArrayEqualityFlagsTest | differentLength | False | False | agree | t_elm_ArrayEqualityFlagsTest |
+| ArrayEqualityFlagsTest | notEqualSame | False | False | agree | t_elm_ArrayEqualityFlagsTest |
 | CoreIssue1141UnusedPortCallBreaksSubscriptionTest | got | "hello" | "hello" | agree | t_elm_CoreIssue1141UnusedPortCallBreaksSubscriptionTest |
 | FlagsRecordTest | FlagsRecordTest label | "native-flags" | "native-flags" | agree | t_elm_FlagsRecordTest |
 | FlagsRecordTest | FlagsRecordTest count | 43 | 43 | agree | t_elm_FlagsRecordTest |
@@ -1939,6 +1946,9 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 | OutgoingPortTuple3Test | OutgoingPortTuple3Test | "sent" | "sent" | agree | t_elm_OutgoingPortTuple3Test |
 | PortAliasEchoTest | PortAliasEchoTest got | { n = 42, s = "hi" } | { n = 42, s = "hi" } | agree | t_elm_PortAliasEchoTest |
 | PortAliasEchoTest | PortAliasEchoTest done | "ok" | "ok" | agree | t_elm_PortAliasEchoTest |
+| PortEchoArrayStringFlagsTest | PortEchoArrayStringFlagsTest got | Array.fromList [] | Array.fromList [] or Array.fromList ["a","b","c"] | agree | t_elm_PortEchoArrayStringFlagsTest |
+| PortEchoArrayStringFlagsTest | PortEchoArrayStringFlagsTest got | Array.fromList ["a","b","c"] | Array.fromList [] or Array.fromList ["a","b","c"] | agree | t_elm_PortEchoArrayStringFlagsTest |
+| PortEchoArrayStringFlagsTest | PortEchoArrayStringFlagsTest | "done" | "done" | agree | t_elm_PortEchoArrayStringFlagsTest |
 | PortEchoBoolTest | PortEchoBoolTest got | True | True or False | agree | t_elm_PortEchoBoolTest |
 | PortEchoBoolTest | PortEchoBoolTest got | False | True or False | agree | t_elm_PortEchoBoolTest |
 | PortEchoBoolTest | PortEchoBoolTest | "done" | "done" | agree | t_elm_PortEchoBoolTest |
@@ -1950,6 +1960,7 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 | PortEchoFloatTest | PortEchoFloatTest got | -1e-7 | 0 or 1.5 or -0.25 or 0.1 or 30000000000 or -1e-7 or 123456.789 | agree | t_elm_PortEchoFloatTest |
 | PortEchoFloatTest | PortEchoFloatTest got | 123456.789 | 0 or 1.5 or -0.25 or 0.1 or 30000000000 or -1e-7 or 123456.789 | agree | t_elm_PortEchoFloatTest |
 | PortEchoFloatTest | PortEchoFloatTest | "done" | "done" | agree | t_elm_PortEchoFloatTest |
+| PortEchoJsonValueTest | PortEchoJsonValueTest got | ({ a = [Just 1,Just 2,Nothing], b = "x" },"plain",(2.5,Nothing)) | ({ a = [Just 1,Just 2,Nothing], b = "x" },"plain",(2.5,Nothing)) | agree | t_elm_PortEchoJsonValueTest |
 | PortEchoListIntTest | PortEchoListIntTest got | [] | [] or [1,2,3] or [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20] | agree | t_elm_PortEchoListIntTest |
 | PortEchoListIntTest | PortEchoListIntTest got | [1,2,3] | [] or [1,2,3] or [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20] | agree | t_elm_PortEchoListIntTest |
 | PortEchoListIntTest | PortEchoListIntTest got | [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20] | [] or [1,2,3] or [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20] | agree | t_elm_PortEchoListIntTest |
@@ -1986,6 +1997,7 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 | StandardA88PortNonFiniteTest | got | Nothing | Nothing or Nothing | agree | t_elm_StandardA88PortNonFiniteTest |
 | StandardA88PortNonFiniteTest | got | Nothing | Nothing or Nothing | agree | t_elm_StandardA88PortNonFiniteTest |
 | StandardA88PortNonFiniteTest | Just | (no value) | (not logged) | agree | t_elm_StandardA88PortNonFiniteTest (native) |
+| StandardA92BytesPortDeclarationTest | declared | True | True | agree | t_elm_StandardA92BytesPortDeclarationTest |
 | CmdMapComposeTest | message | "x then g then f" | "x then g then f" | agree | t_elm_core_CmdMapComposeTest |
 | CoreIssue1110PortDeclarationOrderTest | got | "hello" | "hello" | agree | t_elm_core_CoreIssue1110PortDeclarationOrderTest |
 | CoreIssue1154PortSubscribedWithCmdTest | got | "hello" | "hello" | agree | t_elm_core_CoreIssue1154PortSubscribedWithCmdTest |
@@ -2041,6 +2053,6 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 | TimerEffectTest | TimerEffectTest | "fired 5" | "fired 1" or "fired 2" or "fired 3" or "fired 4" or "fired 5" or "done" | agree | t_elm_core_TimerEffectTest (native) |
 | TimerEffectTest | TimerEffectTest | "done" | "fired 1" or "fired 2" or "fired 3" or "fired 4" or "fired 5" or "done" | agree | t_elm_core_TimerEffectTest (native) |
 
-Worker01: 38 programs, 123 checks, 123 agree.
+Worker01: 42 programs, 132 checks, 132 agree.
 
-Total: 1803 checks, 1803 agree, 0 diverge (0 known); 1563 checks by decide +kernel, 238 by native_decide, in 611 program theorems.
+Total: 1815 checks, 1815 agree, 0 diverge (0 known); 1574 checks by decide +kernel, 239 by native_decide, in 618 program theorems.

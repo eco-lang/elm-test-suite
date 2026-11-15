@@ -37,3 +37,28 @@ same shape; check them in the same pass.
 | Test | Elm today | The book |
 |------|-----------|----------|
 | CompilerIssue2274MutualRecursionTransmuteTest | 0.19.1 infers `f : a -> b -> c`, accepts the program, and `eraseType` turns a String into an Int | `f : a -> b -> b`, so `eraseType : a -> b` is too general: a TYPE MISMATCH (the test expects this; Elm fails it) |
+
+## `elm-spec` tests that leave the basis
+
+Reviewed on 2026-11-14: the `elm-spec` tests that use a module or library function outside the
+book's basis, asked whether they could check what they check within it. Seven were resolved then
+(see untranslated-tests.md, group H), and the two below were done the same day as far as the basis
+allows (group J of that file): PortEchoJsonValueTest as its correction says, with the sample
+`[1,2,null]` for the mixed array; StandardA92BytesPortTest kept, beside a new
+StandardA92BytesPortDeclarationTest for the static half. The round trip of bytes still needs the
+host below.
+
+| Test | What it checks | Why it leaves the basis | Possible correction |
+|------|----------------|-------------------------|---------------------|
+| PortEchoJsonValueTest | `e-enc-value`, `e-dec-value`: a JSON `Value` crosses a port as it is | builds its Values with `Json.Encode` and prints them with `Json.Encode.encode`. Within the basis a Value comes only from flags or a port, and neither `Debug.log` nor `==` can observe it portably: Elm 0.19.1 prints a Value as `<internals>` (Lean prints JSON text), and its `==` on Values is not the book's (below) | take the Values from flags typed `Value`, send them out on `echoOut : Value -> Cmd msg`, and receive them on an `echoIn` of a concrete type (a record, a tuple), logging the typed result; the mixed array `[1,true,null]` would become a sample that some Elm type decodes |
+| StandardA92BytesPortTest | ruling A92: `Port(Bytes)`, and the `e-enc-bytes`/`e-dec-bytes` round trip | builds and reads its bytes with `Bytes.Encode` and `Bytes.Decode`. Within the basis no program can make a `Bytes` value: flags are JSON, and `Dec_Bytes` is undefined at every JSON value | split it: a static test that declares the two ports and logs a constant (in the basis, and still rejected by Elm 0.19.1); and, for the round trip, a host that sends a byte sequence on `echoIn` at start (a new directive in `runner/run.js` and in Lean's echo host), the program logging the value (`<3 bytes>` in both) and `received == sent` |
+
+## Elm's `==` on JSON values is not the book's
+
+Found during that review, with a scratch program on Elm 0.19.1 (no test checks it yet). The book's
+equality (Appendix D, Figure "Equality of Values", clause 4) makes two objects of boundary values
+equal only when they have the same set of keys. Elm 0.19.1 gives `True` for `{"a":…,"b":"x"} ==
+{"a":…,"b":"x","c":1}` (its `_Utils_eqHelp` walks the keys of the left object only), and another
+comparison of Values received through a port crashed with a `TypeError` inside `_Utils_eqHelp`. A
+test with Values from flags would record this as an `elm19-bug`, if the book's clause is meant to
+hold of `Json.Encode.Value`.
