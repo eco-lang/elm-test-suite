@@ -14,6 +14,6 @@ Lean proves {{legal}} programs legal (a theorem `legal_<project>_<Test>`) and {{
 
 ### Evaluation: the reduced program
 
-Of the {{compileSuccess}} tests whose program compiles, {{translated}} are translated into a reduced program the evaluator runs. The rest are not, for one of the reasons below. A test that expects a compile error has no meaning to run, so it has no reduced program. A value or module of the basis that the encoding does not include keeps a test out until the encoding includes it.
+{{evaluated}} A test that expects a compile error has no meaning to run, so it has no reduced program.
 
 <slot name="evaluation"></slot>

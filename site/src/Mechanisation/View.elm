@@ -107,6 +107,7 @@ listPage idx mech intro =
                         , ( "translated", n (translatedCount mech) )
                         , ( "total", n mech.coverage.total )
                         , ( "compileSuccess", n mech.coverage.compileSuccess )
+                        , ( "evaluated", evaluatedSentence mech )
                         , ( "checks", n checks.checks )
                         , ( "agree", n checks.agree )
                         , ( "diverge"
@@ -132,6 +133,29 @@ listPage idx mech intro =
                , Render.licence idx
                ]
         )
+
+
+{-| What the evaluator runs: every test whose program compiles, or all but some, with why. -}
+evaluatedSentence : Mechanisation.Index -> String
+evaluatedSentence mech =
+    let
+        compiles =
+            mech.coverage.compileSuccess
+
+        translated =
+            translatedCount mech
+    in
+    if translated >= compiles then
+        "Every one of the " ++ String.fromInt compiles ++ " tests whose program compiles is translated into a reduced program the evaluator runs."
+
+    else
+        "Of the "
+            ++ String.fromInt compiles
+            ++ " tests whose program compiles, "
+            ++ String.fromInt translated
+            ++ " are translated into a reduced program the evaluator runs; the other "
+            ++ String.fromInt (compiles - translated)
+            ++ " use a value or module of the basis that the encoding does not yet include, as the table below shows."
 
 
 translatedCount : Mechanisation.Index -> Int
