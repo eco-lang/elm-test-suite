@@ -8,9 +8,17 @@ values while the program builds large lists before reading them.
 that the two counts add to 200000 and that `w1.p ++ w2.a` is `"pa"`. A local
 `length` counts the lists.
 
+A Standard Definition of Elm? places no bound on the resources evaluation uses, and an
+implementation that stops for lack of them is outside the definition (Appendix,
+Implementation-Dependent Details, Resource Limits). The book's result for this program is the one
+the test expects, but a compiler that runs out of stack or memory on it does not contradict the
+book, so the test is tagged `elm-unspecced`: it checks an implementation's resources.
+
+<https://elm-test-suite.netlify.app/standard/appendix-implementation#sec-appendix-implementation-limits>
+
 -}
 
--- TAGS: elm-spec, d-atexp-record, d-atpat-record, d-patrow-field
+-- TAGS: elm-unspecced
 -- CHECK: WideRecordGcBitmap: 200000
 -- CHECK: WideRecordGcBitmapTag: "pa"
 

@@ -4,12 +4,6 @@ import StandardElmMech.Src.Notation
 namespace StandardElm
 set_option maxRecDepth 100000
 
-/-- tests/elm-core/src/CoreIssue1123NestedCmdBatchStackOverflowTest.elm -/
-def s_elm_core_CoreIssue1123NestedCmdBatchStackOverflowTest : Src.SProgram := Src.canonOrder <| Src.prog "elm-core" "CoreIssue1123NestedCmdBatchStackOverflowTest" [
-  Src.mdl (Src.hdr false "CoreIssue1123NestedCmdBatchStackOverflowTest" (.items [.var "main"]))
-    [Src.imp "Task" none none]
-    [Src.val "nest" (some (.fn (Src.tc "Int" []) (.fn (Src.tc "Cmd" [Src.tc "Int" []]) (Src.tc "Cmd" [Src.tc "Int" []])))) [Src.pv "depth", Src.pv "acc"] (.ifte [(Src.bin "<=" (Src.v "depth") (Src.i 0), Src.v "acc")] (Src.app (Src.v "nest") [.paren (Src.bin "-" (Src.v "depth") (Src.i 1)), .paren (Src.app (Src.qv "Cmd" "batch") [.list [Src.v "acc", Src.qv "Cmd" "none"]])])), Src.val "nested" (some (.fn (Src.tc "Int" []) (Src.tc "Cmd" [Src.tc "Int" []]))) [Src.pv "depth"] (Src.app (Src.v "nest") [Src.v "depth", .paren (Src.app (Src.qv "Task" "perform") [Src.v "identity", .paren (Src.app (Src.qv "Task" "succeed") [Src.i 1])])]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Int" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.app (Src.v "nested") [Src.i 100000]])), ("update", .lam [Src.pv "msg", Src.pv "model"] (.tuple [Src.bin "|>" (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "msg"]) (Src.app (Src.v "always") [Src.v "model"]), Src.qv "Cmd" "none"])), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
-
 /-- tests/elm-core/src/CoreIssue1150CharToCodeLoneSurrogateTest.elm -/
 def s_elm_core_CoreIssue1150CharToCodeLoneSurrogateTest : Src.SProgram := Src.canonOrder <| Src.prog "elm-core" "CoreIssue1150CharToCodeLoneSurrogateTest" [
   Src.mdl (Src.hdr false "CoreIssue1150CharToCodeLoneSurrogateTest" (.items [.var "main"]))
@@ -246,8 +240,7 @@ def s_elm_core_FloatRoundTest : Src.SProgram := Src.canonOrder <| Src.prog "elm-
 
 /-- The programs of this shard, by test name. -/
 def srcShard_SrcElmCore_CoreIssue112 : List (String × Src.SProgram) :=
-  [("CoreIssue1123NestedCmdBatchStackOverflowTest", s_elm_core_CoreIssue1123NestedCmdBatchStackOverflowTest),
-   ("CoreIssue1150CharToCodeLoneSurrogateTest", s_elm_core_CoreIssue1150CharToCodeLoneSurrogateTest),
+  [("CoreIssue1150CharToCodeLoneSurrogateTest", s_elm_core_CoreIssue1150CharToCodeLoneSurrogateTest),
    ("CoreIssue1154PortSubscribedWithCmdTest", s_elm_core_CoreIssue1154PortSubscribedWithCmdTest),
    ("CoreIssue955KillProcessTwiceTest", s_elm_core_CoreIssue955KillProcessTwiceTest),
    ("CoreIssue960PowNegativeExponentIntTest", s_elm_core_CoreIssue960PowNegativeExponentIntTest),

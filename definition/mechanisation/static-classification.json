@@ -13,11 +13,11 @@
       "inference": 217
     },
     "compileSuccess": {
-      "B0": 43,
-      "harness": 546,
+      "B0": 52,
+      "harness": 540,
       "library": 28,
       "helper": 9,
-      "outside": 1,
+      "outside": 0,
       "parse-fail": 0
     }
   },
@@ -10579,23 +10579,6 @@
     },
     {
       "project": "elm",
-      "name": "EtaExpandSeventeenArgumentAliasTest",
-      "modules": [
-        {
-          "path": "tests/elm/src/EtaExpandSeventeenArgumentAliasTest.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "harness",
-      "needs": [
-        "harness"
-      ],
-      "main": "other",
-      "mainAnnotated": false
-    },
-    {
-      "project": "elm",
       "name": "EtaExpandStateFunctionSequenceTest",
       "modules": [
         {
@@ -14047,6 +14030,156 @@
     },
     {
       "project": "elm",
+      "name": "PortPipeBytesRejectTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/PortPipeBytesRejectTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "PortPipeBytesTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/PortPipeBytesTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "PortPipeListArrayTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/PortPipeListArrayTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "PortPipeMaybeTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/PortPipeMaybeTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "PortPipeRecordTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/PortPipeRecordTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "PortPipeRejectTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/PortPipeRejectTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "PortPipeScalarsTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/PortPipeScalarsTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "PortPipeTupleTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/PortPipeTupleTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "PortPipeValueRejectsBytesTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/PortPipeValueRejectsBytesTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "PortPipeValueTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/PortPipeValueTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
       "name": "PureMutualRecursiveValueTest",
       "modules": [
         {
@@ -14905,26 +15038,6 @@
     },
     {
       "project": "elm",
-      "name": "StandardA92BytesPortTest",
-      "modules": [
-        {
-          "path": "tests/elm/src/StandardA92BytesPortTest.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "outside",
-      "needs": [
-        "outside:Bytes.Decode",
-        "outside:Bytes.Encode",
-        "library:Maybe.withDefault",
-        "library:List.map"
-      ],
-      "main": "program",
-      "mainAnnotated": true
-    },
-    {
-      "project": "elm",
       "name": "StandardA93MutualNumberDefaultTest",
       "modules": [
         {
@@ -15537,23 +15650,6 @@
     },
     {
       "project": "elm",
-      "name": "WideClosureArity300Test",
-      "modules": [
-        {
-          "path": "tests/elm/src/WideClosureArity300Test.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "harness",
-      "needs": [
-        "harness"
-      ],
-      "main": "other",
-      "mainAnnotated": false
-    },
-    {
-      "project": "elm",
       "name": "WideClosureSat26Test",
       "modules": [
         {
@@ -15605,23 +15701,6 @@
     },
     {
       "project": "elm",
-      "name": "WideRecord1100Test",
-      "modules": [
-        {
-          "path": "tests/elm/src/WideRecord1100Test.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "harness",
-      "needs": [
-        "harness"
-      ],
-      "main": "other",
-      "mainAnnotated": false
-    },
-    {
-      "project": "elm",
       "name": "WideRecord33Test",
       "modules": [
         {
@@ -15656,44 +15735,10 @@
     },
     {
       "project": "elm",
-      "name": "WideRecord600Test",
-      "modules": [
-        {
-          "path": "tests/elm/src/WideRecord600Test.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "harness",
-      "needs": [
-        "harness"
-      ],
-      "main": "other",
-      "mainAnnotated": false
-    },
-    {
-      "project": "elm",
       "name": "WideRecordDecoder26Test",
       "modules": [
         {
           "path": "tests/elm/src/WideRecordDecoder26Test.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "harness",
-      "needs": [
-        "harness"
-      ],
-      "main": "other",
-      "mainAnnotated": false
-    },
-    {
-      "project": "elm",
-      "name": "WideRecordDecoder300Test",
-      "modules": [
-        {
-          "path": "tests/elm/src/WideRecordDecoder300Test.elm",
           "parse": "ok"
         }
       ],
@@ -15728,23 +15773,6 @@
       "modules": [
         {
           "path": "tests/elm/src/WideRecordDecoder70Test.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "harness",
-      "needs": [
-        "harness"
-      ],
-      "main": "other",
-      "mainAnnotated": false
-    },
-    {
-      "project": "elm",
-      "name": "WideRecordGcBitmapTest",
-      "modules": [
-        {
-          "path": "tests/elm/src/WideRecordGcBitmapTest.elm",
           "parse": "ok"
         }
       ],
@@ -16516,21 +16544,6 @@
       ],
       "main": "other",
       "mainAnnotated": false
-    },
-    {
-      "project": "elm-core",
-      "name": "CoreIssue1123NestedCmdBatchStackOverflowTest",
-      "modules": [
-        {
-          "path": "tests/elm-core/src/CoreIssue1123NestedCmdBatchStackOverflowTest.elm",
-          "parse": "ok"
-        }
-      ],
-      "parse": "ok",
-      "basis": "B0",
-      "needs": [],
-      "main": "program",
-      "mainAnnotated": true
     },
     {
       "project": "elm-core",

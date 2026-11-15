@@ -1,6 +1,6 @@
 # Standard Elm mechanisation: example run
 
-Programs: 618 (42 workers), in 34 shards; checks: 1815.
+Programs: 628 (52 workers), in 34 shards; checks: 1835.
 
 ## ElmCore
 
@@ -1992,6 +1992,26 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 | PortEchoUnitTest | PortEchoUnitTest | "done" | "done" | agree | t_elm_PortEchoUnitTest |
 | PortIncomingRejectTest | received | "ok" | "ok" | agree | t_elm_PortIncomingRejectTest |
 | PortIncomingRejectTest | received: null | (no value) | (not logged) | agree | t_elm_PortIncomingRejectTest (native) |
+| PortPipeBytesRejectTest | bytesOut sent | [1,bytes(01)] | [1,bytes(01)] | agree | t_elm_PortPipeBytesRejectTest |
+| PortPipeBytesTest | bytesOut sent | bytes(00 ff 10) | bytes(00 ff 10) or bytes() | agree | t_elm_PortPipeBytesTest |
+| PortPipeBytesTest | bytesOut sent | bytes() | bytes(00 ff 10) or bytes() | agree | t_elm_PortPipeBytesTest |
+| PortPipeListArrayTest | listsOut sent | [[1,2,3],["a","b"]] | [[1,2,3],["a","b"]] or [[],[]] | agree | t_elm_PortPipeListArrayTest |
+| PortPipeListArrayTest | listsOut sent | [[],[]] | [[1,2,3],["a","b"]] or [[],[]] | agree | t_elm_PortPipeListArrayTest |
+| PortPipeMaybeTest | maybeOut sent | [null,null] | [null,null] or [5,7] | agree | t_elm_PortPipeMaybeTest |
+| PortPipeMaybeTest | maybeOut sent | [5,7] | [null,null] or [5,7] | agree | t_elm_PortPipeMaybeTest |
+| PortPipeRecordTest | recordOut sent | {"a":1,"b":{"c":"x"}} | {"a":1,"b":{"c":"x"}} | agree | t_elm_PortPipeRecordTest |
+| PortPipeRejectTest | numberOut sent | [1,3] | [1,3] or [2,4] | agree | t_elm_PortPipeRejectTest |
+| PortPipeRejectTest | numberOut sent | [2,4] | [1,3] or [2,4] | agree | t_elm_PortPipeRejectTest |
+| PortPipeScalarsTest | scalarsOut sent | {"f":2.5,"i":-3,"s":"x y","t":true,"u":null} | {"f":2.5,"i":-3,"s":"x y","t":true,"u":null} or {"f":3,"i":0,"s":"","t":false,"u":null} | agree | t_elm_PortPipeScalarsTest |
+| PortPipeScalarsTest | scalarsOut sent | {"f":3,"i":0,"s":"","t":false,"u":null} | {"f":2.5,"i":-3,"s":"x y","t":true,"u":null} or {"f":3,"i":0,"s":"","t":false,"u":null} | agree | t_elm_PortPipeScalarsTest |
+| PortPipeTupleTest | tupleOut sent | [1,["a",false],7] | [1,["a",false],7] or [2,["b",false],8] | agree | t_elm_PortPipeTupleTest |
+| PortPipeTupleTest | tupleOut sent | [2,["b",false],8] | [1,["a",false],7] or [2,["b",false],8] | agree | t_elm_PortPipeTupleTest |
+| PortPipeValueRejectsBytesTest | valueOut sent | [1,null] | [1,null] | agree | t_elm_PortPipeValueRejectsBytesTest |
+| PortPipeValueTest | valueOut sent | {"a":"x","b":[1,true,null],"c":{}} | {"a":"x","b":[1,true,null],"c":{}} or "plain" or -2.5 or null or [[],{"k":[{}]}] | agree | t_elm_PortPipeValueTest |
+| PortPipeValueTest | valueOut sent | "plain" | {"a":"x","b":[1,true,null],"c":{}} or "plain" or -2.5 or null or [[],{"k":[{}]}] | agree | t_elm_PortPipeValueTest |
+| PortPipeValueTest | valueOut sent | -2.5 | {"a":"x","b":[1,true,null],"c":{}} or "plain" or -2.5 or null or [[],{"k":[{}]}] | agree | t_elm_PortPipeValueTest |
+| PortPipeValueTest | valueOut sent | null | {"a":"x","b":[1,true,null],"c":{}} or "plain" or -2.5 or null or [[],{"k":[{}]}] | agree | t_elm_PortPipeValueTest |
+| PortPipeValueTest | valueOut sent | [[],{"k":[{}]}] | {"a":"x","b":[1,true,null],"c":{}} or "plain" or -2.5 or null or [[],{"k":[{}]}] | agree | t_elm_PortPipeValueTest |
 | StandardA72AbsentFlagsTest | flags | Nothing | Nothing | agree | t_elm_StandardA72AbsentFlagsTest |
 | StandardA88PortNegativeZeroTest | 1 / received > 0 | True | True | agree | t_elm_StandardA88PortNegativeZeroTest |
 | StandardA88PortNonFiniteTest | got | Nothing | Nothing or Nothing | agree | t_elm_StandardA88PortNonFiniteTest |
@@ -2053,6 +2073,6 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 | TimerEffectTest | TimerEffectTest | "fired 5" | "fired 1" or "fired 2" or "fired 3" or "fired 4" or "fired 5" or "done" | agree | t_elm_core_TimerEffectTest (native) |
 | TimerEffectTest | TimerEffectTest | "done" | "fired 1" or "fired 2" or "fired 3" or "fired 4" or "fired 5" or "done" | agree | t_elm_core_TimerEffectTest (native) |
 
-Worker01: 42 programs, 132 checks, 132 agree.
+Worker01: 52 programs, 152 checks, 152 agree.
 
-Total: 1815 checks, 1815 agree, 0 diverge (0 known); 1574 checks by decide +kernel, 239 by native_decide, in 618 program theorems.
+Total: 1835 checks, 1835 agree, 0 diverge (0 known); 1594 checks by decide +kernel, 239 by native_decide, in 628 program theorems.

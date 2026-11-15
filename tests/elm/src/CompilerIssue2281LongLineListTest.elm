@@ -14,9 +14,17 @@ Fixed in Elm 0.19.2.
 The issue's own program used the library function `List.length` to count the list; this version
 reproduces the same bug with a local tail-recursive `length` in its place.
 
+A Standard Definition of Elm? places no bound on the size of a phrase; the limits an implementation
+sets are implementation-dependent details (Appendix, Implementation-Dependent Details, Resource
+Limits). The book's result for this program is the one the test expects, but a compiler that rejects
+the program for its size does not contradict the book, so the test is tagged `elm-unspecced`: it
+checks that an implementation's limits are not too small.
+
+<https://elm-test-suite.netlify.app/standard/appendix-implementation#sec-appendix-implementation-limits>
+
 -}
 
--- TAGS: elm19-bug-fix
+-- TAGS: elm19-bug-fix, elm-unspecced
 -- CHECK: length: 22000
 
 import Html exposing (text)

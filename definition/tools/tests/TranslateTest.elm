@@ -538,6 +538,23 @@ suite =
                 \_ ->
                     workerOutcome { ports = echoPorts, flagsType = "()", flags = Nothing, init = "echoOut 1", subs = "Sub.none" }
                         [ "host := .none" ]
+            , test "a byte sequence is a boundary value, not JSON (plans/host-pipe-tests.md)" <|
+                \_ ->
+                    ( Json.parseBoundary "[bytes(00 ff), bytes()]", Json.parse "bytes(00)" )
+                        |> Expect.equal ( Just (Json.JArr [ Json.JBytes [ 0, 255 ], Json.JBytes [] ]), Nothing )
+            , test "HOST-SEND lines and their sent: CHECK lines make a pipe test" <|
+                \_ ->
+                    Directives.read "-- HOST-SEND: valueIn [1,bytes(0a)]\n-- CHECK: valueOut sent: [1,bytes(0a)]\n-- CHECK: other: 2\n"
+                        |> (\d -> ( d.sends, d.sent, List.map .text d.lines ))
+                        |> Expect.equal
+                            ( [ ( "valueIn", Json.JArr [ Json.JNum "1" 0, Json.JBytes [ 10 ] ] ) ]
+                            , [ ( "valueOut", Json.JArr [ Json.JNum "1" 0, Json.JBytes [ 10 ] ] ) ]
+                            , [ "other: 2" ]
+                            )
+            , test "HOST-SEND lines on two ports are refused" <|
+                \_ ->
+                    (Directives.read "-- HOST-SEND: a 1\n-- HOST-SEND: b 2\n").refusal
+                        |> Expect.equal (Just "construct:host-send-ports")
             ]
         , describe "literals"
             [ test "hex to decimal" <|

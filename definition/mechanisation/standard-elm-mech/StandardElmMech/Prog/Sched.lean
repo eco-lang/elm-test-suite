@@ -141,6 +141,7 @@ def hostAfter (h : Host) (hs : List BVal) : Option Event → Option (List BVal)
     | .any => some hs
     | .none => some hs
     | .echo o _ => if p = o then some (hs ++ [j]) else some hs
+    | .feed _ _ => some hs
   | some (.inn p j) =>
     match h with
     | .any => some hs
@@ -149,6 +150,14 @@ def hostAfter (h : Host) (hs : List BVal) : Option Event → Option (List BVal)
       match hs with
       | j' :: rest => if p = i ∧ j = j' then some rest else none
       | [] => none
+    | .feed i js => if p = i ∧ (hs ++ [j]).isPrefixOf js = true then some (hs ++ [j]) else none
+
+/-- The value the host sends next, and on which port, if it sends one: the echo host's oldest
+    pending value, or the feeding host's next value. -/
+def Host.pending : Host → List BVal → Option (String × BVal)
+  | .echo _ i, j :: _ => some (i, j)
+  | .feed i js, hs => (js.drop hs.length).head?.map (i, ·)
+  | _, _ => Option.none
 
 theorem hostAfter_sound {h : Host} {hs : List BVal} {a : Option Event} {hs' : List BVal}
     (e : hostAfter h hs a = some hs') : HostAllows h hs a hs' := by
@@ -184,6 +193,19 @@ theorem hostAfter_sound {h : Host} {hs : List BVal} {a : Option Event} {hs' : Li
         split at e
         · rename_i hp; subst hp; cases e; exact .out_echo _ _ _ _
         · rename_i hp; cases e; exact .out_other _ _ _ _ _ hp
+      | act x => simp [hostAfter] at e; subst e; exact .act _ _ _
+      | wait d => simp [hostAfter] at e; subst e; exact .wait _ _ _
+  | feed i js =>
+    cases a with
+    | none => simp [hostAfter] at e; subst e; exact .silent _ _
+    | some ev =>
+      cases ev with
+      | inn p j =>
+        simp only [hostAfter] at e
+        split at e
+        · rename_i hc; obtain ⟨rfl, hp⟩ := hc; cases e; exact .in_feed _ _ _ _ hp
+        · cases e
+      | out p j => simp [hostAfter] at e; subst e; exact .out_feed _ _ _ _ _
       | act x => simp [hostAfter] at e; subst e; exact .act _ _ _
       | wait d => simp [hostAfter] at e; subst e; exact .wait _ _ _
 
@@ -282,10 +304,10 @@ def doOut (c : Ctx) (st : SchedState) (p : String) : ChoiceOut :=
     | none => .stuck
   | _ => .stuck
 
-/-- The echo host sends back its oldest pending value: r:p-in-accept or r:p-in-reject. -/
+/-- The host sends its next value (`Host.pending`): r:p-in-accept or r:p-in-reject. -/
 def doInn (c : Ctx) (st : SchedState) : ChoiceOut :=
-  match c.host, st.hs with
-  | .echo _ i, j :: _ =>
+  match c.host.pending st.hs with
+  | some (i, j) =>
     match fmLookup c.PE i, hostAfter c.host st.hs (some (.inn i j)) with
     | some (.inn, τ), some hs' =>
       match dec τ j with
@@ -300,7 +322,7 @@ def doInn (c : Ctx) (st : SchedState) : ChoiceOut :=
         | none => .stuck
       | none => .trans ⟨some (.inn i j), [], st.K, hs'⟩ { st with hs := hs' }
     | _, _ => .stuck
-  | _, _ => .stuck
+  | none => .stuck
 
 /-- r:p-wait. -/
 def doWait (c : Ctx) (st : SchedState) (d : Rat) : ChoiceOut :=
@@ -336,7 +358,7 @@ def minDeadline (now : Rat) (sl : List (Nat × Option Rat)) : Option Rat :=
 
 /-- The default strategy, in priority order. -/
 def defaultChoice (c : Ctx) (st : SchedState) : Choice :=
-  if (match c.host with | .echo .. => true | _ => false) && !st.hs.isEmpty then .inn
+  if (c.host.pending st.hs).isSome then .inn
   else match st.K.outq.find? (fun (_, js) => !js.isEmpty) with
   | some (p, _) => .out p
   | none =>
@@ -520,7 +542,7 @@ theorem doInn_sound {c : Ctx} {st : SchedState} {t : Taken} {st' : SchedState}
   unfold doInn at h
   simp only [hK] at h
   split at h
-  · rename_i _ _ o i j rest hhost hhs
+  · rename_i i j hpend
     split at h
     · rename_i _ _ τ hs' hpe hh
       split at h

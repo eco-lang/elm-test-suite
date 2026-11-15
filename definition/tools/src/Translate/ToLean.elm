@@ -650,8 +650,8 @@ lineKindName k =
 {-| The worker test of a program whose `main` is a worker: its flags type and flags (absent flags
 are null, A72) and its host; the checks are filled in by `#worker_theorems`.
 -}
-workerDef : { defName : String, name : String, project : String } -> Payload -> String -> Maybe ( String, String ) -> List String -> String
-workerDef info flagsType flags host checkNots =
+workerDef : { defName : String, name : String, project : String } -> Payload -> String -> String -> List ( String, String ) -> List String -> String
+workerDef info flagsType flags host sent checkNots =
     "/-- The worker test of "
         ++ info.name
         ++ ". -/\ndef w"
@@ -663,12 +663,12 @@ workerDef info flagsType flags host checkNots =
         ++ ",\n  flags := "
         ++ flags
         ++ ",\n  host := "
-        ++ (case host of
-                Just ( o, i ) ->
-                    ".echo " ++ str o ++ " " ++ str i
+        ++ host
+        ++ (if List.isEmpty sent then
+                ""
 
-                Nothing ->
-                    ".none"
+            else
+                ",\n  sent := [" ++ String.join ", " (List.map (\( p, j ) -> "(" ++ str p ++ ", " ++ j ++ ")") sent) ++ "]"
            )
         ++ (if List.isEmpty checkNots then
                 ""

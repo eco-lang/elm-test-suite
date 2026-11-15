@@ -8,7 +8,7 @@ both declarations elaborate. <https://elm-test-suite.netlify.app/standard/static
 The ports are declared and never used: the program logs a constant and ends. Within the book's
 basis no program can make a value of type `Bytes` (its functions lie outside the definition, and
 no JSON flag decodes at `Bytes`), so this test checks only the declarations.
-`StandardA92BytesPortTest` sends bytes through the ports and back, with elm/bytes. Elm 0.19.1
+`PortPipeBytesTest` has the test driver send bytes in and checks what comes out. Elm 0.19.1
 rejects a port whose type holds `Bytes`.
 
 -}

@@ -1,4 +1,4 @@
-module Translate.Json exposing (Json(..), parse, toLean)
+module Translate.Json exposing (Json(..), parse, parseBoundary, toLean)
 
 {-| A parser of RFC 8259 JSON text, for the flags of a worker test (`-- FLAGS:`), that keeps every
 number exact: a number is its digits and exponent, written in Lean as `jnum m e` (m × 10^e), never
@@ -6,6 +6,10 @@ converted to an Elm `Float` (binary64 is inexact for large integers and most dec
 `jnum 0 0`: a JSON number has no sign apart from its value (A88). Objects are written through
 `BVal.mkObj`, which sorts the keys and keeps the last value of a repeated key, as a JSON parser
 reads it.
+
+`parseBoundary` reads the boundary values of a pipe test (`-- HOST-SEND:` and its `<port> sent:`
+CHECK lines, plans/host-pipe-tests.md): JSON, and a byte sequence `bytes(00 ff 10)`, which `parse`
+does not accept (the runner gives FLAGS to `JSON.parse`).
 -}
 
 import Translate.Literal exposing (leanString)
@@ -20,10 +24,25 @@ type Json
     | JStr String
     | JArr (List Json)
     | JObj (List ( String, Json ))
+      -- a byte sequence (A92), each byte below 256
+    | JBytes (List Int)
 
 
 parse : String -> Maybe Json
 parse text =
+    parseBoundary text
+        |> Maybe.andThen
+            (\j ->
+                if hasBytes j then
+                    Nothing
+
+                else
+                    Just j
+            )
+
+
+parseBoundary : String -> Maybe Json
+parseBoundary text =
     case value (String.toList text |> skipWs) of
         Just ( j, rest ) ->
             if List.isEmpty (skipWs rest) then
@@ -33,6 +52,50 @@ parse text =
                 Nothing
 
         Nothing ->
+            Nothing
+
+
+hasBytes : Json -> Bool
+hasBytes j =
+    case j of
+        JBytes _ ->
+            True
+
+        JArr js ->
+            List.any hasBytes js
+
+        JObj kvs ->
+            List.any (Tuple.second >> hasBytes) kvs
+
+        _ ->
+            False
+
+
+{-| The bytes of `bytes(...)`, after the opening parenthesis: two hex digits a byte, separated by
+spaces.
+-}
+bytesLit : List Char -> Maybe ( Json, List Char )
+bytesLit cs =
+    let
+        ( body, rest ) =
+            span (\c -> c /= ')') cs
+    in
+    case rest of
+        ')' :: r ->
+            String.words (String.fromList body)
+                |> List.filter (not << String.isEmpty)
+                |> List.map
+                    (\w ->
+                        if String.length w == 2 then
+                            hex (String.toList w)
+
+                        else
+                            Nothing
+                    )
+                |> List.foldr (Maybe.map2 (::)) (Just [])
+                |> Maybe.map (\os -> ( JBytes os, r ))
+
+        _ ->
             Nothing
 
 
@@ -61,6 +124,9 @@ value cs =
 
         'f' :: 'a' :: 'l' :: 's' :: 'e' :: rest ->
             Just ( JFalse, rest )
+
+        'b' :: 'y' :: 't' :: 'e' :: 's' :: '(' :: rest ->
+            bytesLit rest
 
         '"' :: rest ->
             string rest [] |> Maybe.map (\( s, r ) -> ( JStr s, r ))
@@ -377,6 +443,9 @@ toLean j =
 
         JArr js ->
             "(Eff.BVal.array [" ++ String.join ", " (List.map toLean js) ++ "])"
+
+        JBytes os ->
+            "(.bytes [" ++ String.join ", " (List.map String.fromInt os) ++ "])"
 
         JObj kvs ->
             "(Eff.BVal.mkObj [" ++ String.join ", " (List.map (\( k, v ) -> "(" ++ leanString k ++ ", " ++ toLean v ++ ")") kvs) ++ "])"

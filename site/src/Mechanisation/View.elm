@@ -830,17 +830,28 @@ translationSection t =
                                             Html.text "no flags (null, A72)"
                                     , Html.text
                                         (", and runs it by the transitions of Chapter 9 under "
-                                            ++ (if t.host == Just "echo" then
-                                                    "the test runner's echo host, which sends every value delivered on echoOut back on echoIn, in order"
+                                            ++ (case t.host of
+                                                    Just "echo" ->
+                                                        "the test runner's echo host, which sends every value delivered on echoOut back on echoIn, in order"
 
-                                                else
-                                                    "a host that sends nothing"
+                                                    Just "feed" ->
+                                                        "the test driver of a pipe test, which sends the test's HOST-SEND values on its incoming port, in order, and takes every value sent out"
+
+                                                    _ ->
+                                                        "a host that sends nothing"
                                                )
                                             ++ ". Its checks become one "
                                         )
                                     , Html.a [ Attr.href (proofHref Mechanisation.generatedSlug) ] [ Html.text "generated theorem" ]
                                     , Html.text
-                                        (": some execution the book allows, under that host, has a log (the modules', then the start's, then each step's) that meets every check. The theorem trusts the parser and the translator's elaboration ([parse] [elab]), the test basis ([harness]) and the parameters of the basis ([params])"
+                                        (": some execution the book allows, under that host, has a log (the modules', then the start's, then each step's) that meets every check"
+                                            ++ (if t.host == Just "feed" then
+                                                    ", and sends out the values of the CHECK lines \u{201C}<port> sent: <value>\u{201D}, in the order written"
+
+                                                else
+                                                    ""
+                                               )
+                                            ++ ". The theorem trusts the parser and the translator's elaboration ([parse] [elab]), the test basis ([harness]) and the parameters of the basis ([params])"
                                             ++ (if t.native then
                                                     ", and is proved by native_decide ([native])."
 

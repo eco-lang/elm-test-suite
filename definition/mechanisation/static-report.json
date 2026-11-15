@@ -13,8 +13,6 @@
    "mean": "mean_elm_WideRecordPatternTest",
    "legal": "legal_elm_WideRecordPatternTest",
    "ident": "ident_elm_WideRecordPatternTest"},
-  "elm/WideRecordGcBitmapTest":
-  {"native": false, "legal": "legal_elm_WideRecordGcBitmapTest"},
   "elm/WideRecordDecoder70Test":
   {"wcheck": "wcheck_elm_WideRecordDecoder70Test",
    "spec": "spec_elm_WideRecordDecoder70Test",
@@ -29,8 +27,6 @@
    "mean": "mean_elm_WideRecordDecoder30Test",
    "legal": "legal_elm_WideRecordDecoder30Test",
    "ident": "ident_elm_WideRecordDecoder30Test"},
-  "elm/WideRecordDecoder300Test":
-  {"native": true, "legal": "legal_elm_WideRecordDecoder300Test"},
   "elm/WideRecordDecoder26Test":
   {"wcheck": "wcheck_elm_WideRecordDecoder26Test",
    "spec": "spec_elm_WideRecordDecoder26Test",
@@ -38,8 +34,6 @@
    "mean": "mean_elm_WideRecordDecoder26Test",
    "legal": "legal_elm_WideRecordDecoder26Test",
    "ident": "ident_elm_WideRecordDecoder26Test"},
-  "elm/WideRecord600Test":
-  {"native": true, "legal": "legal_elm_WideRecord600Test"},
   "elm/WideRecord40Test":
   {"wcheck": "wcheck_elm_WideRecord40Test",
    "spec": "spec_elm_WideRecord40Test",
@@ -54,8 +48,6 @@
    "mean": "mean_elm_WideRecord33Test",
    "legal": "legal_elm_WideRecord33Test",
    "ident": "ident_elm_WideRecord33Test"},
-  "elm/WideRecord1100Test":
-  {"native": true, "legal": "legal_elm_WideRecord1100Test"},
   "elm/WideCtorMixedTest":
   {"wcheck": "wcheck_elm_WideCtorMixedTest",
    "spec": "spec_elm_WideCtorMixedTest",
@@ -77,8 +69,6 @@
    "mean": "mean_elm_WideClosureSat26Test",
    "legal": "legal_elm_WideClosureSat26Test",
    "ident": "ident_elm_WideClosureSat26Test"},
-  "elm/WideClosureArity300Test":
-  {"native": true, "legal": "legal_elm_WideClosureArity300Test"},
   "elm/UserBoolNamedCtorTest":
   {"wcheck": "wcheck_elm_UserBoolNamedCtorTest",
    "spec": "spec_elm_UserBoolNamedCtorTest",
@@ -1075,6 +1065,76 @@
    "ident": "ident_elm_PureMutualRecursiveValueTest"},
   "elm/PortProblemCharPayloadTest":
   {"refuse": "refuse_elm_PortProblemCharPayloadTest"},
+  "elm/PortPipeValueTest":
+  {"wcheck": "wcheck_elm_PortPipeValueTest",
+   "spec": "spec_elm_PortPipeValueTest",
+   "native": false,
+   "mean": "mean_elm_PortPipeValueTest",
+   "legal": "legal_elm_PortPipeValueTest",
+   "ident": "ident_elm_PortPipeValueTest"},
+  "elm/PortPipeValueRejectsBytesTest":
+  {"wcheck": "wcheck_elm_PortPipeValueRejectsBytesTest",
+   "spec": "spec_elm_PortPipeValueRejectsBytesTest",
+   "native": false,
+   "mean": "mean_elm_PortPipeValueRejectsBytesTest",
+   "legal": "legal_elm_PortPipeValueRejectsBytesTest",
+   "ident": "ident_elm_PortPipeValueRejectsBytesTest"},
+  "elm/PortPipeTupleTest":
+  {"wcheck": "wcheck_elm_PortPipeTupleTest",
+   "spec": "spec_elm_PortPipeTupleTest",
+   "native": false,
+   "mean": "mean_elm_PortPipeTupleTest",
+   "legal": "legal_elm_PortPipeTupleTest",
+   "ident": "ident_elm_PortPipeTupleTest"},
+  "elm/PortPipeScalarsTest":
+  {"wcheck": "wcheck_elm_PortPipeScalarsTest",
+   "spec": "spec_elm_PortPipeScalarsTest",
+   "native": false,
+   "mean": "mean_elm_PortPipeScalarsTest",
+   "legal": "legal_elm_PortPipeScalarsTest",
+   "ident": "ident_elm_PortPipeScalarsTest"},
+  "elm/PortPipeRejectTest":
+  {"wcheck": "wcheck_elm_PortPipeRejectTest",
+   "spec": "spec_elm_PortPipeRejectTest",
+   "native": false,
+   "mean": "mean_elm_PortPipeRejectTest",
+   "legal": "legal_elm_PortPipeRejectTest",
+   "ident": "ident_elm_PortPipeRejectTest"},
+  "elm/PortPipeRecordTest":
+  {"wcheck": "wcheck_elm_PortPipeRecordTest",
+   "spec": "spec_elm_PortPipeRecordTest",
+   "native": false,
+   "mean": "mean_elm_PortPipeRecordTest",
+   "legal": "legal_elm_PortPipeRecordTest",
+   "ident": "ident_elm_PortPipeRecordTest"},
+  "elm/PortPipeMaybeTest":
+  {"wcheck": "wcheck_elm_PortPipeMaybeTest",
+   "spec": "spec_elm_PortPipeMaybeTest",
+   "native": false,
+   "mean": "mean_elm_PortPipeMaybeTest",
+   "legal": "legal_elm_PortPipeMaybeTest",
+   "ident": "ident_elm_PortPipeMaybeTest"},
+  "elm/PortPipeListArrayTest":
+  {"wcheck": "wcheck_elm_PortPipeListArrayTest",
+   "spec": "spec_elm_PortPipeListArrayTest",
+   "native": false,
+   "mean": "mean_elm_PortPipeListArrayTest",
+   "legal": "legal_elm_PortPipeListArrayTest",
+   "ident": "ident_elm_PortPipeListArrayTest"},
+  "elm/PortPipeBytesTest":
+  {"wcheck": "wcheck_elm_PortPipeBytesTest",
+   "spec": "spec_elm_PortPipeBytesTest",
+   "native": false,
+   "mean": "mean_elm_PortPipeBytesTest",
+   "legal": "legal_elm_PortPipeBytesTest",
+   "ident": "ident_elm_PortPipeBytesTest"},
+  "elm/PortPipeBytesRejectTest":
+  {"wcheck": "wcheck_elm_PortPipeBytesRejectTest",
+   "spec": "spec_elm_PortPipeBytesRejectTest",
+   "native": false,
+   "mean": "mean_elm_PortPipeBytesRejectTest",
+   "legal": "legal_elm_PortPipeBytesRejectTest",
+   "ident": "ident_elm_PortPipeBytesRejectTest"},
   "elm/PortIncomingRejectTest":
   {"wcheck": "wcheck_elm_PortIncomingRejectTest",
    "spec": "spec_elm_PortIncomingRejectTest",
@@ -2539,8 +2599,6 @@
    "mean": "mean_elm_EtaExpandStateFunctionSequenceTest",
    "legal": "legal_elm_EtaExpandStateFunctionSequenceTest",
    "ident": "ident_elm_EtaExpandStateFunctionSequenceTest"},
-  "elm/EtaExpandSeventeenArgumentAliasTest":
-  {"native": false, "legal": "legal_elm_EtaExpandSeventeenArgumentAliasTest"},
   "elm/EscapeTopLevelTupleTest":
   {"wcheck": "wcheck_elm_EscapeTopLevelTupleTest",
    "spec": "spec_elm_EscapeTopLevelTupleTest",
@@ -4653,9 +4711,6 @@
    "mean": "mean_elm_core_CoreIssue1150CharToCodeLoneSurrogateTest",
    "legal": "legal_elm_core_CoreIssue1150CharToCodeLoneSurrogateTest",
    "ident": "ident_elm_core_CoreIssue1150CharToCodeLoneSurrogateTest"},
-  "elm-core/CoreIssue1123NestedCmdBatchStackOverflowTest":
-  {"native": false,
-   "legal": "legal_elm_core_CoreIssue1123NestedCmdBatchStackOverflowTest"},
   "elm-core/CoreIssue1115NanEqualsLiteralZeroTest":
   {"wcheck": "wcheck_elm_core_CoreIssue1115NanEqualsLiteralZeroTest",
    "spec": "spec_elm_core_CoreIssue1115NanEqualsLiteralZeroTest",
@@ -4958,7 +5013,7 @@
    "legal": "legal_elm_core_BasicsClampTest",
    "ident": "ident_elm_core_BasicsClampTest"}},
  "summary":
- "static semantics: 626 legal (617 of one module, 9 of several), 0 without a theorem, 11 by native_decide, 0 conditional on D11",
+ "static semantics: 629 legal (620 of one module, 9 of several), 0 without a theorem, 7 by native_decide, 0 conditional on D11",
  "specNative":
  ["elm/WideClosureSat26Test",
   "elm/WideCtorMixedTest",
@@ -4968,26 +5023,22 @@
   "elm/WideRecordDecoder30Test",
   "elm/WideRecordDecoder70Test"],
  "shards":
- "shards: 77 (29 Ctx_, 7 Legal_, 8 Refusals_, 33 EndToEnd_); no shard imports another but for the Ctx_ files of its tests' imports",
+ "shards: 70 (28 Ctx_, 1 Legal_, 8 Refusals_, 33 EndToEnd_); no shard imports another but for the Ctx_ files of its tests' imports",
  "refusedSummary":
  "refused: 287 (Stat.not_legal_of_wMainVar_test 1, Stat.not_legal_of_typesFailB 13, Stat.not_legal_of_scopeFailB 6, Stat.not_legal_of_wRefutes Stat.Btest_inv 15, Stat.not_legal_of_coreRefutes 201, Stat.not_legal_of_modsyn 9, Stat.not_legal_of_furtherFailB 9, Stat.not_legal_of_mainFailB 8, Stat.not_legal_of_syn 23, Stat.not_legal_of_imports 2), 0 not refused",
  "refused": 287,
  "notRefused": [],
  "native":
- ["elm/WideClosureArity300Test",
-  "elm/WideClosureSat26Test",
+ ["elm/WideClosureSat26Test",
   "elm/WideCtorMixedTest",
-  "elm/WideRecord1100Test",
   "elm/WideRecord33Test",
   "elm/WideRecord40Test",
-  "elm/WideRecord600Test",
   "elm/WideRecordDecoder26Test",
-  "elm/WideRecordDecoder300Test",
   "elm/WideRecordDecoder30Test",
   "elm/WideRecordDecoder70Test"],
- "legal": 626,
+ "legal": 629,
  "generatedBy": "lake exe certify (Certify.lean)",
  "failed": [],
  "endToEnd":
- "end to end: 618 spec_ theorems (0 by native_decide, 7 from a wcheck_ by native_decide), 616 mean_ theorems, 618 ident_ theorems, 0 translated tests skipped",
+ "end to end: 628 spec_ theorems (0 by native_decide, 7 from a wcheck_ by native_decide), 626 mean_ theorems, 628 ident_ theorems, 0 translated tests skipped",
  "conditional": []}

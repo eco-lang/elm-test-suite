@@ -1,5 +1,38 @@
 # Mechanisation Report
 
+> **Update, 2026-11-15 (pipe tests; plans/host-pipe-tests.md).** The test driver can now send
+> boundary values in on a port and check what the program sends out: `-- HOST-SEND: <port> <value>`
+> lines, and CHECK lines `<port> sent: <value>` (JSON, plus byte sequences written
+> `bytes(00 ff 10)`). Ten `PortPipe*Test`s check the Encoding and Decoding rules of Chapter 8 this
+> way, `e-dec-bytes`, `e-enc-bytes` and the byte-sequence side condition of `e-dec-value` among
+> them, with no library function and no `Debug.log`. StandardA92BytesPortTest, which built its
+> bytes with elm/bytes, is deleted: PortPipeBytesTest and StandardA92BytesPortDeclarationTest
+> cover ruling A92 within the basis. Seven tests of an implementation's limits on size, stack or
+> memory (WideRecord1100Test and the like, CoreIssue1123NestedCmdBatchStackOverflowTest) are now
+> `elm-unspecced`, not `elm-spec`: the book places no bound on either (Appendix, Resource Limits).
+> - Lean: `Host.feed i js` (Prog/Exec.lean) sends the values js on port i in order and takes every
+>   value sent out; its state is the values sent so far, so `WorkerExec` and the hand theorems of
+>   Prog/Inv are unchanged. `WorkerTest.sent` lists the values the test says are sent out;
+>   `WorkerTest.Holds` states that they are a sublist of the execution's Out events
+>   (`WorkerExecO`, `PathL.outs`), and `holds_of_run` proves it from the scheduler's run, by the
+>   kernel.
+> - Compilers: the seven JSON pipe tests pass on all four. The two Bytes pipe tests are
+>   `elm19-bug` (Elm 0.19.x rejects `Bytes` ports) and fail on Lamdera 1.5.0 too (it needs the
+>   lamdera/codecs package). PortPipeValueRejectsBytesTest is XFAIL: no compiler the suite runs
+>   represents a byte sequence at the host, and Elm/JS passes the driver's `Uint8Array` through a
+>   `Value` port.
+>
+> Counts (`scripts/verify.sh full`, 3 min 11 s wall after the retagging; largest process 5.89 GB):
+> - translator: 628 of the 942 `elm-spec` tests translated, 916 source programs written (26
+>   refused); 884 meet the AST-decidable restrictions, 32 do not.
+> - `legal_`: 629 (7 by `native_decide`; the seven retagged tests had the other 7), `refuse_`: 287,
+>   0 conditional on D11; every compile-success `elm-spec` test has one.
+> - 628 `spec_`, 626 `mean_`, 628 `ident_`.
+> - run-examples: 1,835 of 1,835 checks agree (20 of them `sent` checks); 1,594 by the kernel, 239
+>   by `native_decide`, in 628 program theorems.
+> - check-axioms: 15,774 theorems, 0 problems; measure-w: W refutes none of the 629
+>   compile-success tests.
+
 > **Update, 2026-11-14 (the `elm-spec` tests that left the basis; plans/untranslated-tests.md,
 > groups H and J).** Each `elm-spec` test that used a module or library function outside the
 > book's basis was asked what it checks, and whether it could check that within the basis:

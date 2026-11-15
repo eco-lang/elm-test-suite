@@ -11,9 +11,17 @@ The test checks:
   - `==` against a record built from the same input (`True`) and against the
     updated record (`False`).
 
+A Standard Definition of Elm? places no bound on the size of a phrase; the limits an implementation
+sets are implementation-dependent details (Appendix, Implementation-Dependent Details, Resource
+Limits). The book's result for this program is the one the test expects, but a compiler that rejects
+the program for its size does not contradict the book, so the test is tagged `elm-unspecced`: it
+checks that an implementation's limits are not too small.
+
+<https://elm-test-suite.netlify.app/standard/appendix-implementation#sec-appendix-implementation-limits>
+
 -}
 
--- TAGS: elm-spec, d-atexp-record, d-exprow-field, d-atpat-record, d-patrow-field, d-atexp-update
+-- TAGS: elm-unspecced
 -- CHECK: f0000: 1000
 -- CHECK: f0031: 31.5
 -- CHECK: f0032: 'g'

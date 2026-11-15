@@ -10,9 +10,17 @@ at that position. Starting from the list `[ big ]`, `main` maps `step0` to
 arguments. Every list but the last holds a partially applied function; the last
 holds the result, `[1882518]`.
 
+A Standard Definition of Elm? places no bound on the size of a phrase; the limits an implementation
+sets are implementation-dependent details (Appendix, Implementation-Dependent Details, Resource
+Limits). The book's result for this program is the one the test expects, but a compiler that rejects
+the program for its size does not contradict the book, so the test is tagged `elm-unspecced`: it
+checks that an implementation's limits are not too small.
+
+<https://elm-test-suite.netlify.app/standard/appendix-implementation#sec-appendix-implementation-limits>
+
 -}
 
--- TAGS: elm-spec, d-exp-lambda, d-app-closure
+-- TAGS: elm-unspecced
 -- CHECK: res: [1882518]
 
 import Html exposing (text)

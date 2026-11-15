@@ -36,7 +36,9 @@
 //   3. The program runs in its own process. On the js target that is `node <Name>.run.js`, a
 //      launcher that installs a minimal `document` (runner/dom.js, so that `main = Html.text ...`
 //      starts), calls Elm.<Name>.init({ node, flags }) with the `-- FLAGS:` JSON, and echoes each
-//      value sent out through a port `echoOut` back in through a port `echoIn`. On the native
+//      value sent out through a port `echoOut` back in through a port `echoIn`; or, for a test with
+//      `-- HOST-SEND: <port> <value>` lines, sends those values on that port and prints
+//      `<port> sent: <value>` for each value sent out (runner/host.js). On the native
 //      target the executable runs, and tests that need a JavaScript host (`-- FLAGS:`, or a port
 //      module) are skipped. stdin is the `-- STDIN:` text (else /dev/null), the environment has the
 //      `-- ENV:` lines, and the test passes iff the program exits on its own within the timeout
@@ -74,6 +76,7 @@ const os = require('os');
 const path = require('path');
 const { spawn, spawnSync } = require('child_process');
 const D = require('./directives');
+const H = require('./host');
 
 const ROOT = path.resolve(__dirname, '..');
 
@@ -232,15 +235,19 @@ async function pool(items, jobs, fn) {
 }
 
 // The launcher of a js-target test: a minimal DOM for static Html programs, the program with its
-// `-- FLAGS:` JSON, and the port echo.
+// `-- FLAGS:` JSON, and either the port echo or, for a test with `-- HOST-SEND:` lines, the pipe
+// driver of runner/host.js (plans/host-pipe-tests.md).
 const domShim = path.join(__dirname, 'dom.js');
-function launcher(name, flags) {
+const hostDriver = path.join(__dirname, 'host.js');
+function launcher(name, flags, sends) {
     return 'const node = require(' + JSON.stringify(domShim) + ').install();\n' +
         "const app = require('./" + name + ".js').Elm." + name + '.init({ node' +
         (flags === null ? '' : ', flags: ' + flags) + ' });\n' +
-        'if (app && app.ports && app.ports.echoOut && app.ports.echoIn) {\n' +
-        '    app.ports.echoOut.subscribe((v) => app.ports.echoIn.send(v));\n' +
-        '}\n';
+        (sends.length
+            ? 'require(' + JSON.stringify(hostDriver) + ').drive(app, ' + JSON.stringify(sends) + ');\n'
+            : 'if (app && app.ports && app.ports.echoOut && app.ports.echoIn) {\n' +
+              '    app.ports.echoOut.subscribe((v) => app.ports.echoIn.send(v));\n' +
+              '}\n');
 }
 
 // --- Projects ----------------------------------------------------------------------------------
@@ -336,7 +343,7 @@ function executable(command) {
 function openCache(opts, compiler) {
     const enabled = !opts.noCache && !opts.record;
     const exe = executable(compiler.command);
-    const judge = ['run.js', 'directives.js', 'dom.js'].map((f) => [f, sha256(fs.readFileSync(path.join(__dirname, f)))]);
+    const judge = ['run.js', 'directives.js', 'dom.js', 'host.js'].map((f) => [f, sha256(fs.readFileSync(path.join(__dirname, f)))]);
     const common = {
         format: CACHE_FORMAT,
         compiler: {
@@ -486,6 +493,12 @@ async function runProject(spec, opts, compiler, cache, projectNames) {
             t.stdinDelay = D.extractCount(t.content, '-- STDIN-DELAY-MS:');
             const flags = D.directiveLines(t.content, '-- FLAGS:');
             t.flags = flags.length ? (JSON.parse(flags[0].trim()), flags[0].trim()) : null;
+            t.sends = D.directiveLines(t.content, '-- HOST-SEND:').map((l) => {
+                const m = /^\s*(\w+)\s+(.*\S)\s*$/.exec(l);
+                if (!m) throw new Error('HOST-SEND needs a port and a value: ' + l);
+                H.parse(m[2]);
+                return [m[1], m[2]];
+            });
             t.compileError = D.directiveLines(t.content, '-- COMPILE-ERROR:').length > 0;
             if (t.compileError && !t.patterns.length) {
                 throw new Error('a COMPILE-ERROR test needs a CHECK line (the report title)');
@@ -598,7 +611,7 @@ async function runProject(spec, opts, compiler, cache, projectNames) {
         }));
     }
     if (compiler.target === 'js') {
-        for (const t of toRun) D.writeIfChanged(path.join(outDir, t.name + '.run.js'), launcher(t.name, t.flags));
+        for (const t of toRun) D.writeIfChanged(path.join(outDir, t.name + '.run.js'), launcher(t.name, t.flags, t.sends));
     }
 
     // 3. Run.

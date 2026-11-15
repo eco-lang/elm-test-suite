@@ -5,8 +5,10 @@
   An execution is a sequence of transitions from a start configuration, each allowed by the host.
   `Host.any` is the book's (the host may send any value on any incoming port at any time); `none`
   sends nothing; `echo o i` is the test runner's launcher, which sends back on i, in order, every
-  value delivered on o. The host carries its own state: the values delivered on o and not yet
-  sent back. The log of a worker's execution is the log of the evaluation of its modules, then of
+  value delivered on o; `feed i js` is the runner's pipe driver (plans/host-pipe-tests.md), which
+  sends the values js on i, in order, and takes every value sent out. The host carries its own
+  state: for `echo`, the values delivered on o and not yet sent back; for `feed`, the values sent
+  so far. The log of a worker's execution is the log of the evaluation of its modules, then of
   its start, then of each step (D9). Tr(program, j) is the set of traces of the executions under
   `Host.any`.
 -/
@@ -21,6 +23,7 @@ inductive Host where
   | any
   | none
   | echo (outPort inPort : String)
+  | feed (inPort : String) (js : List BVal)
   deriving Inhabited
 
 /-- With host h in state hs, the event ℓ may happen, leaving hs'. -/
@@ -34,6 +37,10 @@ inductive HostAllows : Host → List BVal → Option Event → List BVal → Pro
   | out_other (o i p : String) (hs : List BVal) (j : BVal) : p ≠ o →
       HostAllows (.echo o i) hs (some (.out p j)) hs
   | in_echo (o i : String) (j : BVal) (hs : List BVal) : HostAllows (.echo o i) (j :: hs) (some (.inn i j)) hs
+  | out_feed (i : String) (js hs : List BVal) (p : String) (j : BVal) :
+      HostAllows (.feed i js) hs (some (.out p j)) hs
+  | in_feed (i : String) (js hs : List BVal) (j : BVal) : (hs ++ [j]).isPrefixOf js = true →
+      HostAllows (.feed i js) hs (some (.inn i j)) (hs ++ [j])
 
 /-- An execution path: each step's event, log and resulting configuration. -/
 abbrev PathL := List (Option Event × Log × Config)
@@ -58,6 +65,12 @@ inductive Exec (PE : PortEnv) (r : List (String × Val)) (h : Host) :
       Exec PE r h K hs ((a, K') :: π) hs''
 
 def PathL.log (π : PathL) : Log := (π.map (·.2.1)).flatten
+
+/-- The values sent out through the ports along a path, in order, with their ports: its Out events. -/
+def PathL.outs (π : PathL) : List (String × BVal) :=
+  π.filterMap fun x => match x.1 with
+    | some (.out p j) => some (p, j)
+    | _ => none
 def PathL.forgetLog (π : PathL) : Path := π.map fun (a, _, K) => (a, K)
 
 theorem ExecL.forget {PE : PortEnv} {r : List (String × Val)} {h : Host} :
@@ -79,6 +92,19 @@ theorem Exec.lift {PE : PortEnv} {r : List (String × Val)} {h : Host} :
 def WorkerExec (B : Mod.Basis) (ms : List Mod.Module) (τ1 : PTy) (j : BVal) (h : Host) (lg : Log) : Prop :=
   ∃ r lm K0 ls π hs, Mod.EvalProgramL B ms (.prog r) lm ∧ StartL (portEnv ms) τ1 j r K0 ls ∧
     ExecL (portEnv ms) r h K0 [] π hs ∧ lg = lm ++ ls ++ π.log
+
+/-- A worker's execution as `WorkerExec`, with the values it sends out (`PathL.outs`), which the
+    test driver of a pipe test sees (plans/host-pipe-tests.md). -/
+def WorkerExecO (B : Mod.Basis) (ms : List Mod.Module) (τ1 : PTy) (j : BVal) (h : Host) (lg : Log)
+    (outs : List (String × BVal)) : Prop :=
+  ∃ r lm K0 ls π hs, Mod.EvalProgramL B ms (.prog r) lm ∧ StartL (portEnv ms) τ1 j r K0 ls ∧
+    ExecL (portEnv ms) r h K0 [] π hs ∧ lg = lm ++ ls ++ π.log ∧ outs = π.outs
+
+theorem WorkerExecO.exec {B : Mod.Basis} {ms : List Mod.Module} {τ1 : PTy} {j : BVal} {h : Host}
+    {lg : Log} {outs : List (String × BVal)} (hx : WorkerExecO B ms τ1 j h lg outs) :
+    WorkerExec B ms τ1 j h lg := by
+  obtain ⟨r, lm, K0, ls, π, hs, h1, h2, h3, h4, -⟩ := hx
+  exact ⟨r, lm, K0, ls, π, hs, h1, h2, h3, h4⟩
 
 /-- Observable events (sec:programs-behaviour): In, Out, wait, and actions of platform
     primitives; the actions of sleep, spawn and kill are not observable. -/

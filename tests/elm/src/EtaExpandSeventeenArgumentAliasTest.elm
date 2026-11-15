@@ -3,9 +3,18 @@ module EtaExpandSeventeenArgumentAliasTest exposing (..)
 {-| A module whose functions are annotated with a type alias for a function of 2,049 `Int` arguments compiles and runs.
 
 `wide` and `wider` are defined with one parameter against the `Big` alias, and `unused` passes a lambda to `useBig`, which takes a `Big`. None of them is called at run time; the program only logs `testValue`, which is 1.
+
+A Standard Definition of Elm? places no bound on the size of a phrase; the limits an implementation
+sets are implementation-dependent details (Appendix, Implementation-Dependent Details, Resource
+Limits). The book's result for this program is the one the test expects, but a compiler that rejects
+the program for its size does not contradict the book, so the test is tagged `elm-unspecced`: it
+checks that an implementation's limits are not too small.
+
+<https://elm-test-suite.netlify.app/standard/appendix-implementation#sec-appendix-implementation-limits>
+
 -}
 
--- TAGS: elm-spec, sm-typbind, s-ty-con, s-valbind-var
+-- TAGS: elm-unspecced
 -- CHECK: testValue: 1
 
 import Basics exposing (..)

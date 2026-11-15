@@ -154,6 +154,66 @@ def s_elm_PortIncomingRejectTest : Src.SProgram := Src.canonOrder <| Src.prog "e
     []
     [.port "echoOut" (.fn (Src.tc "Maybe" [Src.tc "String" []]) (Src.tc "Cmd" [Src.tv "msg"])), .port "echoIn" (.fn (.fn (Src.tc "String" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .custom "Msg" [] [("Received", [Src.tc "String" []])], Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.app (Src.qv "Cmd" "batch") [.list [Src.app (Src.v "echoOut") [Src.c "Nothing"], Src.app (Src.v "echoOut") [.paren (Src.app (Src.c "Just") [Src.str "ok"])]]]])), ("update", .lam [.paren (Src.pc "Received" [Src.pv "s"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "received", Src.v "s"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"]))), ("subscriptions", .lam [.wild] (Src.app (Src.v "echoIn") [Src.c "Received"]))]])] ]
 
+/-- tests/elm/src/PortPipeBytesRejectTest.elm -/
+def s_elm_PortPipeBytesRejectTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortPipeBytesRejectTest" [
+  Src.mdl (Src.hdr true "PortPipeBytesRejectTest" (.items [.var "main"]))
+    [Src.imp "Bytes" none (some (.items [.ty "Bytes"])), Src.imp "Platform" none none]
+    [.port "bytesIn" (.fn (.fn (Src.tc "Bytes" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "bytesOut" (.fn (.tuple [Src.tc "Int" [], Src.tc "Bytes" []]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Bytes" []])], Src.val "init" (some (.fn (.unit) (.tuple [Src.tc "Int" [], Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [Src.i 0, Src.qv "Cmd" "none"]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (Src.tc "Int" []) (.tuple [Src.tc "Int" [], Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.bin "+" (Src.v "model") (Src.i 1), Src.app (Src.v "bytesOut") [.tuple [Src.bin "+" (Src.v "model") (Src.i 1), Src.v "v"]]]), Src.val "subscriptions" (some (.fn (Src.tc "Int" []) (Src.tc "Sub" [Src.tc "Msg" []]))) [.wild] (Src.app (Src.v "bytesIn") [Src.c "Got"]), Src.val "main" (some (Src.tc "Program" [.unit, Src.tc "Int" [], Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", Src.v "subscriptions")]])] ]
+
+/-- tests/elm/src/PortPipeBytesTest.elm -/
+def s_elm_PortPipeBytesTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortPipeBytesTest" [
+  Src.mdl (Src.hdr true "PortPipeBytesTest" (.items [.var "main"]))
+    [Src.imp "Bytes" none (some (.items [.ty "Bytes"])), Src.imp "Platform" none none]
+    [.port "bytesIn" (.fn (.fn (Src.tc "Bytes" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "bytesOut" (.fn (Src.tc "Bytes" []) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Bytes" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.qv "Cmd" "none"]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "bytesOut") [Src.v "v"]]), Src.val "subscriptions" (some (.fn (.unit) (Src.tc "Sub" [Src.tc "Msg" []]))) [.wild] (Src.app (Src.v "bytesIn") [Src.c "Got"]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", Src.v "subscriptions")]])] ]
+
+/-- tests/elm/src/PortPipeListArrayTest.elm -/
+def s_elm_PortPipeListArrayTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortPipeListArrayTest" [
+  Src.mdl (Src.hdr true "PortPipeListArrayTest" (.items [.var "main"]))
+    [Src.imp "Array" none (some (.items [.ty "Array"])), Src.imp "Platform" none none]
+    [.port "listsIn" (.fn (.fn (.tuple [Src.tc "List" [Src.tc "Int" []], Src.tc "Array" [Src.tc "String" []]]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "listsOut" (.fn (.tuple [Src.tc "List" [Src.tc "Int" []], Src.tc "Array" [Src.tc "String" []]]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [.tuple [Src.tc "List" [Src.tc "Int" []], Src.tc "Array" [Src.tc "String" []]]])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.qv "Cmd" "none"]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "listsOut") [Src.v "v"]]), Src.val "subscriptions" (some (.fn (.unit) (Src.tc "Sub" [Src.tc "Msg" []]))) [.wild] (Src.app (Src.v "listsIn") [Src.c "Got"]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", Src.v "subscriptions")]])] ]
+
+/-- tests/elm/src/PortPipeMaybeTest.elm -/
+def s_elm_PortPipeMaybeTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortPipeMaybeTest" [
+  Src.mdl (Src.hdr true "PortPipeMaybeTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "maybeIn" (.fn (.fn (.tuple [Src.tc "Maybe" [Src.tc "Int" []], Src.tc "Maybe" [Src.tc "Maybe" [Src.tc "Int" []]]]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "maybeOut" (.fn (.tuple [Src.tc "Maybe" [Src.tc "Int" []], Src.tc "Maybe" [Src.tc "Maybe" [Src.tc "Int" []]]]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [.tuple [Src.tc "Maybe" [Src.tc "Int" []], Src.tc "Maybe" [Src.tc "Maybe" [Src.tc "Int" []]]]])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.qv "Cmd" "none"]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "maybeOut") [Src.v "v"]]), Src.val "subscriptions" (some (.fn (.unit) (Src.tc "Sub" [Src.tc "Msg" []]))) [.wild] (Src.app (Src.v "maybeIn") [Src.c "Got"]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", Src.v "subscriptions")]])] ]
+
+/-- tests/elm/src/PortPipeRecordTest.elm -/
+def s_elm_PortPipeRecordTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortPipeRecordTest" [
+  Src.mdl (Src.hdr true "PortPipeRecordTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "recordIn" (.fn (.fn (.record [("a", Src.tc "Int" []), ("b", .record [("c", Src.tc "String" [])])]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "recordOut" (.fn (.record [("a", Src.tc "Int" []), ("b", .record [("c", Src.tc "String" [])])]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [.record [("a", Src.tc "Int" []), ("b", .record [("c", Src.tc "String" [])])]])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.qv "Cmd" "none"]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "recordOut") [Src.v "v"]]), Src.val "subscriptions" (some (.fn (.unit) (Src.tc "Sub" [Src.tc "Msg" []]))) [.wild] (Src.app (Src.v "recordIn") [Src.c "Got"]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", Src.v "subscriptions")]])] ]
+
+/-- tests/elm/src/PortPipeRejectTest.elm -/
+def s_elm_PortPipeRejectTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortPipeRejectTest" [
+  Src.mdl (Src.hdr true "PortPipeRejectTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "numberIn" (.fn (.fn (Src.tc "Int" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "numberOut" (.fn (.tuple [Src.tc "Int" [], Src.tc "Int" []]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "init" (some (.fn (.unit) (.tuple [Src.tc "Int" [], Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [Src.i 0, Src.qv "Cmd" "none"]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (Src.tc "Int" []) (.tuple [Src.tc "Int" [], Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.bin "+" (Src.v "model") (Src.i 1), Src.app (Src.v "numberOut") [.tuple [Src.bin "+" (Src.v "model") (Src.i 1), Src.v "v"]]]), Src.val "subscriptions" (some (.fn (Src.tc "Int" []) (Src.tc "Sub" [Src.tc "Msg" []]))) [.wild] (Src.app (Src.v "numberIn") [Src.c "Got"]), Src.val "main" (some (Src.tc "Program" [.unit, Src.tc "Int" [], Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", Src.v "subscriptions")]])] ]
+
+/-- tests/elm/src/PortPipeScalarsTest.elm -/
+def s_elm_PortPipeScalarsTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortPipeScalarsTest" [
+  Src.mdl (Src.hdr true "PortPipeScalarsTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "scalarsIn" (.fn (.fn (.record [("f", Src.tc "Float" []), ("i", Src.tc "Int" []), ("s", Src.tc "String" []), ("t", Src.tc "Bool" []), ("u", .unit)]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "scalarsOut" (.fn (.record [("f", Src.tc "Float" []), ("i", Src.tc "Int" []), ("s", Src.tc "String" []), ("t", Src.tc "Bool" []), ("u", .unit)]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [.record [("f", Src.tc "Float" []), ("i", Src.tc "Int" []), ("s", Src.tc "String" []), ("t", Src.tc "Bool" []), ("u", .unit)]])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.qv "Cmd" "none"]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "scalarsOut") [Src.v "v"]]), Src.val "subscriptions" (some (.fn (.unit) (Src.tc "Sub" [Src.tc "Msg" []]))) [.wild] (Src.app (Src.v "scalarsIn") [Src.c "Got"]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", Src.v "subscriptions")]])] ]
+
+/-- tests/elm/src/PortPipeTupleTest.elm -/
+def s_elm_PortPipeTupleTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortPipeTupleTest" [
+  Src.mdl (Src.hdr true "PortPipeTupleTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "tupleIn" (.fn (.fn (.tuple [Src.tc "Int" [], .tuple [Src.tc "String" [], Src.tc "Bool" []], Src.tc "Int" []]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "tupleOut" (.fn (.tuple [Src.tc "Int" [], .tuple [Src.tc "String" [], Src.tc "Bool" []], Src.tc "Int" []]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [.tuple [Src.tc "Int" [], .tuple [Src.tc "String" [], Src.tc "Bool" []], Src.tc "Int" []]])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.qv "Cmd" "none"]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "tupleOut") [Src.v "v"]]), Src.val "subscriptions" (some (.fn (.unit) (Src.tc "Sub" [Src.tc "Msg" []]))) [.wild] (Src.app (Src.v "tupleIn") [Src.c "Got"]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", Src.v "subscriptions")]])] ]
+
+/-- tests/elm/src/PortPipeValueRejectsBytesTest.elm -/
+def s_elm_PortPipeValueRejectsBytesTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortPipeValueRejectsBytesTest" [
+  Src.mdl (Src.hdr true "PortPipeValueRejectsBytesTest" (.items [.var "main"]))
+    [Src.imp "Json.Encode" none (some (.items [.ty "Value"])), Src.imp "Platform" none none]
+    [.port "valueIn" (.fn (.fn (Src.tc "Value" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "valueOut" (.fn (.tuple [Src.tc "Int" [], Src.tc "Value" []]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Value" []])], Src.val "init" (some (.fn (.unit) (.tuple [Src.tc "Int" [], Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [Src.i 0, Src.qv "Cmd" "none"]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (Src.tc "Int" []) (.tuple [Src.tc "Int" [], Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.bin "+" (Src.v "model") (Src.i 1), Src.app (Src.v "valueOut") [.tuple [Src.bin "+" (Src.v "model") (Src.i 1), Src.v "v"]]]), Src.val "subscriptions" (some (.fn (Src.tc "Int" []) (Src.tc "Sub" [Src.tc "Msg" []]))) [.wild] (Src.app (Src.v "valueIn") [Src.c "Got"]), Src.val "main" (some (Src.tc "Program" [.unit, Src.tc "Int" [], Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", Src.v "subscriptions")]])] ]
+
+/-- tests/elm/src/PortPipeValueTest.elm -/
+def s_elm_PortPipeValueTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortPipeValueTest" [
+  Src.mdl (Src.hdr true "PortPipeValueTest" (.items [.var "main"]))
+    [Src.imp "Json.Encode" none (some (.items [.ty "Value"])), Src.imp "Platform" none none]
+    [.port "valueIn" (.fn (.fn (Src.tc "Value" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "valueOut" (.fn (Src.tc "Value" []) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Value" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.qv "Cmd" "none"]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "valueOut") [Src.v "v"]]), Src.val "subscriptions" (some (.fn (.unit) (Src.tc "Sub" [Src.tc "Msg" []]))) [.wild] (Src.app (Src.v "valueIn") [Src.c "Got"]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", Src.v "subscriptions")]])] ]
+
 /-- tests/elm/src/PortProblemCharPayloadTest.elm -/
 def s_elm_PortProblemCharPayloadTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "PortProblemCharPayloadTest" [
   Src.mdl (Src.hdr true "PortProblemCharPayloadTest" (.all))
@@ -271,6 +331,16 @@ def srcShard_SrcElm_PolyStepLoopFo : List (String × Src.SProgram) :=
    ("PortEncodingEncodeTuple2Test", s_elm_PortEncodingEncodeTuple2Test),
    ("PortEncodingPortWithArrayTest", s_elm_PortEncodingPortWithArrayTest),
    ("PortIncomingRejectTest", s_elm_PortIncomingRejectTest),
+   ("PortPipeBytesRejectTest", s_elm_PortPipeBytesRejectTest),
+   ("PortPipeBytesTest", s_elm_PortPipeBytesTest),
+   ("PortPipeListArrayTest", s_elm_PortPipeListArrayTest),
+   ("PortPipeMaybeTest", s_elm_PortPipeMaybeTest),
+   ("PortPipeRecordTest", s_elm_PortPipeRecordTest),
+   ("PortPipeRejectTest", s_elm_PortPipeRejectTest),
+   ("PortPipeScalarsTest", s_elm_PortPipeScalarsTest),
+   ("PortPipeTupleTest", s_elm_PortPipeTupleTest),
+   ("PortPipeValueRejectsBytesTest", s_elm_PortPipeValueRejectsBytesTest),
+   ("PortPipeValueTest", s_elm_PortPipeValueTest),
    ("PortProblemCharPayloadTest", s_elm_PortProblemCharPayloadTest),
    ("PureMutualRecursiveValueTest", s_elm_PureMutualRecursiveValueTest),
    ("PureRecursiveValueThunkTest", s_elm_PureRecursiveValueThunkTest),

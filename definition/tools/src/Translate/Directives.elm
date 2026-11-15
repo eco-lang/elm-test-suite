@@ -19,6 +19,12 @@ type alias Directives =
     , flags : Maybe Json
     , flagsText : Maybe String
 
+    -- a pipe test's values (plans/host-pipe-tests.md): what the driver sends (`-- HOST-SEND:`), on
+    -- one incoming port, and what it must see sent out (CHECK lines `<port> sent: <value>`, which
+    -- are not in `lines`)
+    , sends : List ( String, Json )
+    , sent : List ( String, Json )
+
     -- the CHECK-NOT lines dropped by `dropCheckNots`, with the reason
     , dropped : List String
 
@@ -74,8 +80,52 @@ read source =
                 |> List.filterMap (\( p, k ) -> prefix p l |> Maybe.map (\t -> { kind = k, text = String.trim t }))
                 |> List.head
 
-        checkLines =
+        sendTexts =
+            lines |> List.filterMap (prefix "-- HOST-SEND:") |> List.map String.trim
+
+        -- `<port> <value>`, or `<port> sent: <value>`
+        portAndValue sep text =
+            case String.indexes sep text of
+                i :: _ ->
+                    let
+                        name =
+                            String.left i text
+                    in
+                    if not (String.isEmpty name) && String.all (\c -> Char.isAlphaNum c || c == '_') name then
+                        Just ( name, String.dropLeft (i + String.length sep) text |> String.trim )
+
+                    else
+                        Nothing
+
+                [] ->
+                    Nothing
+
+        sends =
+            sendTexts |> List.map (\t -> portAndValue " " t |> Maybe.andThen (\( p, v ) -> Json.parseBoundary v |> Maybe.map (Tuple.pair p)))
+
+        allLines =
             List.filterMap lineOf lines |> List.filter (\l -> not (String.isEmpty l.text))
+
+        isSentLine l =
+            not (List.isEmpty sendTexts) && l.kind == LCheck && portAndValue " sent: " l.text /= Nothing
+
+        sent =
+            allLines
+                |> List.filter isSentLine
+                |> List.map (\l -> portAndValue " sent: " l.text |> Maybe.andThen (\( p, v ) -> Json.parseBoundary v |> Maybe.map (Tuple.pair p)))
+
+        sendRefusal =
+            if List.any ((==) Nothing) (sends ++ sent) then
+                [ "construct:host-send" ]
+
+            else if List.length (List.foldl (\x acc -> if List.member x acc then acc else x :: acc) [] (List.filterMap (Maybe.map Tuple.first) sends)) > 1 then
+                [ "construct:host-send-ports" ]
+
+            else
+                []
+
+        checkLines =
+            List.filter (not << isSentLine) allLines
 
         notLines =
             List.filter (\l -> l.kind == LNot) checkLines
@@ -120,7 +170,7 @@ read source =
                     []
 
         problems =
-            refusedBy ++ notRefusal ++ exitRefusal ++ flagsRefusal
+            refusedBy ++ notRefusal ++ exitRefusal ++ flagsRefusal ++ sendRefusal
     in
     { tags = tags
     , helper = has "-- HELPER:"
@@ -128,6 +178,8 @@ read source =
     , meaning = exit /= Just "1"
     , flags = flags
     , flagsText = flagsText
+    , sends = List.filterMap identity sends
+    , sent = List.filterMap identity sent
     , dropped = []
     , checkNots = []
     , refusal = List.head problems

@@ -533,6 +533,236 @@ def w_elm_PortIncomingRejectTest : Prog.WorkerTest := {
   checkNots := ["received: null"],
   checks := [] }
 
+/-- tests/elm/src/PortPipeBytesRejectTest.elm -/
+def g_elm_PortPipeBytesRejectTest : Program := {
+  name := "PortPipeBytesRejectTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Bytes", "Bytes", some (.items [.tycon "Bytes"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("bytesIn", .inn, .bytes), ("bytesOut", .out, (.tuple2 .int .bytes))],
+  defs := [
+    .fn "init" [pw] (tup2 (i 0) (qv "Cmd" "none")),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (bin "+" (v "model") (i 1)) (ap (v "bytesOut") [tup2 (bin "+" (v "model") (i 1)) (v "v")])),
+    .fn "subscriptions" [pw] (ap (v "bytesIn") [c "Got"]),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [ ] }
+
+/-- The worker test of PortPipeBytesRejectTest. -/
+def w_elm_PortPipeBytesRejectTest : Prog.WorkerTest := {
+  prog := g_elm_PortPipeBytesRejectTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "bytesIn" [(.str "00ff10"), (Eff.BVal.array [(.num (Eff.jnum (0) (0))), (.num (Eff.jnum (255) (0))), (.num (Eff.jnum (16) (0)))]), .null, (.bytes [1])],
+  sent := [("bytesOut", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.bytes [1])]))],
+  checks := [] }
+
+/-- tests/elm/src/PortPipeBytesTest.elm -/
+def g_elm_PortPipeBytesTest : Program := {
+  name := "PortPipeBytesTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Bytes", "Bytes", some (.items [.tycon "Bytes"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("bytesIn", .inn, .bytes), ("bytesOut", .out, .bytes)],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (qv "Cmd" "none")),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "bytesOut") [v "v"])),
+    .fn "subscriptions" [pw] (ap (v "bytesIn") [c "Got"]),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [ ] }
+
+/-- The worker test of PortPipeBytesTest. -/
+def w_elm_PortPipeBytesTest : Prog.WorkerTest := {
+  prog := g_elm_PortPipeBytesTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "bytesIn" [(.bytes [0, 255, 16]), (.bytes [])],
+  sent := [("bytesOut", (.bytes [0, 255, 16])), ("bytesOut", (.bytes []))],
+  checks := [] }
+
+/-- tests/elm/src/PortPipeListArrayTest.elm -/
+def g_elm_PortPipeListArrayTest : Program := {
+  name := "PortPipeListArrayTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Array", "Array", some (.items [.tycon "Array"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("listsIn", .inn, (.tuple2 (.list .int) (.array .string))), ("listsOut", .out, (.tuple2 (.list .int) (.array .string)))],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (qv "Cmd" "none")),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "listsOut") [v "v"])),
+    .fn "subscriptions" [pw] (ap (v "listsIn") [c "Got"]),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [ ] }
+
+/-- The worker test of PortPipeListArrayTest. -/
+def w_elm_PortPipeListArrayTest : Prog.WorkerTest := {
+  prog := g_elm_PortPipeListArrayTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "listsIn" [(Eff.BVal.array [(Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0))), (.num (Eff.jnum (3) (0)))]), (Eff.BVal.array [(.str "a"), (.str "b")])]), (Eff.BVal.array [(Eff.BVal.array []), (Eff.BVal.array [])])],
+  sent := [("listsOut", (Eff.BVal.array [(Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0))), (.num (Eff.jnum (3) (0)))]), (Eff.BVal.array [(.str "a"), (.str "b")])])), ("listsOut", (Eff.BVal.array [(Eff.BVal.array []), (Eff.BVal.array [])]))],
+  checks := [] }
+
+/-- tests/elm/src/PortPipeMaybeTest.elm -/
+def g_elm_PortPipeMaybeTest : Program := {
+  name := "PortPipeMaybeTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("maybeIn", .inn, (.tuple2 (.maybe .int) (.maybe (.maybe .int)))), ("maybeOut", .out, (.tuple2 (.maybe .int) (.maybe (.maybe .int))))],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (qv "Cmd" "none")),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "maybeOut") [v "v"])),
+    .fn "subscriptions" [pw] (ap (v "maybeIn") [c "Got"]),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [ ] }
+
+/-- The worker test of PortPipeMaybeTest. -/
+def w_elm_PortPipeMaybeTest : Prog.WorkerTest := {
+  prog := g_elm_PortPipeMaybeTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "maybeIn" [(Eff.BVal.array [.null, .null]), (Eff.BVal.array [(.num (Eff.jnum (5) (0))), (.num (Eff.jnum (7) (0)))])],
+  sent := [("maybeOut", (Eff.BVal.array [.null, .null])), ("maybeOut", (Eff.BVal.array [(.num (Eff.jnum (5) (0))), (.num (Eff.jnum (7) (0)))]))],
+  checks := [] }
+
+/-- tests/elm/src/PortPipeRecordTest.elm -/
+def g_elm_PortPipeRecordTest : Program := {
+  name := "PortPipeRecordTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("recordIn", .inn, (.record (.cons "a" .int (.cons "b" (.record (.cons "c" .string .nil)) .nil)))), ("recordOut", .out, (.record (.cons "a" .int (.cons "b" (.record (.cons "c" .string .nil)) .nil))))],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (qv "Cmd" "none")),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "recordOut") [v "v"])),
+    .fn "subscriptions" [pw] (ap (v "recordIn") [c "Got"]),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [ ] }
+
+/-- The worker test of PortPipeRecordTest. -/
+def w_elm_PortPipeRecordTest : Prog.WorkerTest := {
+  prog := g_elm_PortPipeRecordTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "recordIn" [(Eff.BVal.mkObj [("z", (.num (Eff.jnum (0) (0)))), ("b", (Eff.BVal.mkObj [("d", (.num (Eff.jnum (1) (0)))), ("c", (.str "x"))])), ("a", (.num (Eff.jnum (1) (0))))])],
+  sent := [("recordOut", (Eff.BVal.mkObj [("a", (.num (Eff.jnum (1) (0)))), ("b", (Eff.BVal.mkObj [("c", (.str "x"))]))]))],
+  checks := [] }
+
+/-- tests/elm/src/PortPipeRejectTest.elm -/
+def g_elm_PortPipeRejectTest : Program := {
+  name := "PortPipeRejectTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("numberIn", .inn, .int), ("numberOut", .out, (.tuple2 .int .int))],
+  defs := [
+    .fn "init" [pw] (tup2 (i 0) (qv "Cmd" "none")),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (bin "+" (v "model") (i 1)) (ap (v "numberOut") [tup2 (bin "+" (v "model") (i 1)) (v "v")])),
+    .fn "subscriptions" [pw] (ap (v "numberIn") [c "Got"]),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [ ] }
+
+/-- The worker test of PortPipeRejectTest. -/
+def w_elm_PortPipeRejectTest : Prog.WorkerTest := {
+  prog := g_elm_PortPipeRejectTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "numberIn" [(.num (Eff.jnum (15) (-1))), (.str "3"), .null, (.num (Eff.jnum (3) (0))), (.num (Eff.jnum (4) (0)))],
+  sent := [("numberOut", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (3) (0)))])), ("numberOut", (Eff.BVal.array [(.num (Eff.jnum (2) (0))), (.num (Eff.jnum (4) (0)))]))],
+  checks := [] }
+
+/-- tests/elm/src/PortPipeScalarsTest.elm -/
+def g_elm_PortPipeScalarsTest : Program := {
+  name := "PortPipeScalarsTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("scalarsIn", .inn, (.record (.cons "f" .float (.cons "i" .int (.cons "s" .string (.cons "t" .bool (.cons "u" .unit .nil))))))), ("scalarsOut", .out, (.record (.cons "f" .float (.cons "i" .int (.cons "s" .string (.cons "t" .bool (.cons "u" .unit .nil)))))))],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (qv "Cmd" "none")),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "scalarsOut") [v "v"])),
+    .fn "subscriptions" [pw] (ap (v "scalarsIn") [c "Got"]),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [ ] }
+
+/-- The worker test of PortPipeScalarsTest. -/
+def w_elm_PortPipeScalarsTest : Prog.WorkerTest := {
+  prog := g_elm_PortPipeScalarsTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "scalarsIn" [(Eff.BVal.mkObj [("f", (.num (Eff.jnum (25) (-1)))), ("i", (.num (Eff.jnum (-3) (0)))), ("s", (.str "x y")), ("t", .tru), ("u", .null)]), (Eff.BVal.mkObj [("f", (.num (Eff.jnum (3) (0)))), ("i", (.num (Eff.jnum (0) (0)))), ("s", (.str "")), ("t", .fls), ("u", .null)])],
+  sent := [("scalarsOut", (Eff.BVal.mkObj [("f", (.num (Eff.jnum (25) (-1)))), ("i", (.num (Eff.jnum (-3) (0)))), ("s", (.str "x y")), ("t", .tru), ("u", .null)])), ("scalarsOut", (Eff.BVal.mkObj [("f", (.num (Eff.jnum (3) (0)))), ("i", (.num (Eff.jnum (0) (0)))), ("s", (.str "")), ("t", .fls), ("u", .null)]))],
+  checks := [] }
+
+/-- tests/elm/src/PortPipeTupleTest.elm -/
+def g_elm_PortPipeTupleTest : Program := {
+  name := "PortPipeTupleTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("tupleIn", .inn, (.tuple3 .int (.tuple2 .string .bool) .int)), ("tupleOut", .out, (.tuple3 .int (.tuple2 .string .bool) .int))],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (qv "Cmd" "none")),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "tupleOut") [v "v"])),
+    .fn "subscriptions" [pw] (ap (v "tupleIn") [c "Got"]),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [ ] }
+
+/-- The worker test of PortPipeTupleTest. -/
+def w_elm_PortPipeTupleTest : Prog.WorkerTest := {
+  prog := g_elm_PortPipeTupleTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "tupleIn" [(Eff.BVal.array [(.num (Eff.jnum (1) (0))), (Eff.BVal.array [(.str "a"), .fls, (.str "extra")]), (.num (Eff.jnum (7) (0)))]), (Eff.BVal.array [(.num (Eff.jnum (2) (0))), (Eff.BVal.array [(.str "b"), .fls]), (.num (Eff.jnum (8) (0))), .null, (.str "more")])],
+  sent := [("tupleOut", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (Eff.BVal.array [(.str "a"), .fls]), (.num (Eff.jnum (7) (0)))])), ("tupleOut", (Eff.BVal.array [(.num (Eff.jnum (2) (0))), (Eff.BVal.array [(.str "b"), .fls]), (.num (Eff.jnum (8) (0)))]))],
+  checks := [] }
+
+/-- tests/elm/src/PortPipeValueRejectsBytesTest.elm -/
+def g_elm_PortPipeValueRejectsBytesTest : Program := {
+  name := "PortPipeValueRejectsBytesTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Json.Encode", "Json.Encode", some (.items [.tycon "Value"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("valueIn", .inn, .value), ("valueOut", .out, (.tuple2 .int .value))],
+  defs := [
+    .fn "init" [pw] (tup2 (i 0) (qv "Cmd" "none")),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (bin "+" (v "model") (i 1)) (ap (v "valueOut") [tup2 (bin "+" (v "model") (i 1)) (v "v")])),
+    .fn "subscriptions" [pw] (ap (v "valueIn") [c "Got"]),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [ ] }
+
+/-- The worker test of PortPipeValueRejectsBytesTest. -/
+def w_elm_PortPipeValueRejectsBytesTest : Prog.WorkerTest := {
+  prog := g_elm_PortPipeValueRejectsBytesTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "valueIn" [(.bytes [1]), (Eff.BVal.mkObj [("a", (.bytes [2]))]), .null],
+  sent := [("valueOut", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), .null]))],
+  checks := [] }
+
+/-- tests/elm/src/PortPipeValueTest.elm -/
+def g_elm_PortPipeValueTest : Program := {
+  name := "PortPipeValueTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Json.Encode", "Json.Encode", some (.items [.tycon "Value"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("valueIn", .inn, .value), ("valueOut", .out, .value)],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (qv "Cmd" "none")),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "valueOut") [v "v"])),
+    .fn "subscriptions" [pw] (ap (v "valueIn") [c "Got"]),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", v "subscriptions")]]) ],
+  checks := [ ] }
+
+/-- The worker test of PortPipeValueTest. -/
+def w_elm_PortPipeValueTest : Prog.WorkerTest := {
+  prog := g_elm_PortPipeValueTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "valueIn" [(Eff.BVal.mkObj [("b", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), .tru, .null])), ("a", (.str "x")), ("c", (Eff.BVal.mkObj []))]), (.str "plain"), (.num (Eff.jnum (-25) (-1))), .null, (Eff.BVal.array [(Eff.BVal.array []), (Eff.BVal.mkObj [("k", (Eff.BVal.array [(Eff.BVal.mkObj [])]))])])],
+  sent := [("valueOut", (Eff.BVal.mkObj [("a", (.str "x")), ("b", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), .tru, .null])), ("c", (Eff.BVal.mkObj []))])), ("valueOut", (.str "plain")), ("valueOut", (.num (Eff.jnum (-25) (-1)))), ("valueOut", .null), ("valueOut", (Eff.BVal.array [(Eff.BVal.array []), (Eff.BVal.mkObj [("k", (Eff.BVal.array [(Eff.BVal.mkObj [])]))])]))],
+  checks := [] }
+
 /-- tests/elm/src/StandardA72AbsentFlagsTest.elm -/
 def g_elm_StandardA72AbsentFlagsTest : Program := {
   name := "StandardA72AbsentFlagsTest", source := "tests/elm/src",
@@ -1065,6 +1295,16 @@ def shard_Worker01 : List Prog.WorkerTest :=
    w_elm_PortEchoTuple3Test,
    w_elm_PortEchoUnitTest,
    w_elm_PortIncomingRejectTest,
+   w_elm_PortPipeBytesRejectTest,
+   w_elm_PortPipeBytesTest,
+   w_elm_PortPipeListArrayTest,
+   w_elm_PortPipeMaybeTest,
+   w_elm_PortPipeRecordTest,
+   w_elm_PortPipeRejectTest,
+   w_elm_PortPipeScalarsTest,
+   w_elm_PortPipeTupleTest,
+   w_elm_PortPipeValueRejectsBytesTest,
+   w_elm_PortPipeValueTest,
    w_elm_StandardA72AbsentFlagsTest,
    w_elm_StandardA88PortNegativeZeroTest,
    w_elm_StandardA88PortNonFiniteTest,

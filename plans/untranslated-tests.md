@@ -190,6 +190,17 @@ compiler's limits (records of 1100 fields, 300-argument closures, lists of 15000
 type of hundreds of arrows). Lean could take some of them with more fuel and recursion depth, at a
 large cost in build time and memory, and they say little about the semantics.
 
+**Update (2026-11-15): none of them is `elm-spec` now.** The book places no bound on the size of a
+phrase or on the resources evaluation uses, and Appendix "Implementation-Dependent Details",
+"Resource Limits", lists the limits of each implementation: a compiler that rejects one of these
+programs for its size, or stops for lack of stack or memory, does not contradict the book. So
+WideClosureArity300Test, WideRecord1100Test, WideRecord600Test, WideRecordDecoder300Test,
+WideRecordGcBitmapTest, EtaExpandSeventeenArgumentAliasTest and
+CoreIssue1123NestedCmdBatchStackOverflowTest (group J, the `Cmd.batch` nested 100000 deep) are
+tagged `elm-unspecced`, with no rule tags, and each says why in its comment; CoreIssue1123 keeps
+`elm19-bug`. CompilerIssue2281LongLineListTest (a line
+of 66000 columns), already not `elm-spec`, is tagged `elm-unspecced` too and keeps `elm19-bug-fix`.
+
 ## J. Effects and programs (60)
 
 `effects` (54): 37 port modules (16 of them import Json modules, but only PortEchoJsonValueTest
@@ -216,6 +227,14 @@ StandardA92BytesPortTest stays `elm-spec` and untranslated, as the only test of 
 StandardA92BytesPortDeclarationTest checks the static half of ruling A92 (`Port(Bytes)`, with
 `b:Bytes.Bytes`) and is translated and proved; Elm 0.19.1 to 0.19.3 reject it, and Lamdera 1.5.0
 accepts it.
+
+**Update (2026-11-15): pipe tests ([host-pipe-tests.md](host-pipe-tests.md)).** The test driver
+can now send boundary values in on a port (`-- HOST-SEND:`) and check what the program sends out
+(`<port> sent:` CHECK lines), and Lean's `Host.feed` models it. Ten `PortPipe*Test`s check the
+Encoding and Decoding rules this way, `e-dec-bytes` and `e-enc-bytes` among them, with byte
+sequences the driver sends, and all ten are translated and proved. StandardA92BytesPortTest, which
+built its bytes with elm/bytes, is deleted: PortPipeBytesTest checks the round trip within the
+basis, and StandardA92BytesPortDeclarationTest the declarations.
 
 ## K. Compile errors (308)
 

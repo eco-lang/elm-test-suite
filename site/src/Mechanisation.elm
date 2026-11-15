@@ -126,7 +126,7 @@ type alias Generated =
 {-| An `elm-spec` test as the mechanisation sees it: `status` is "translated" (by the translator,
 in the shard `shard`), "hand" (refused by the translator, but translated in part by hand) or
 "refused" (with its `reason`). `current` is false when the test has changed since its translation
-was made. A worker test (`kind` "worker", plan step 5) has a `host` ("none" or "echo") and its
+was made. A worker test (`kind` "worker", plan step 5) has a `host` ("none", "echo" or "feed") and its
 FLAGS text (`Nothing`: absent, so null); `dropped` lists the CHECK-NOT lines its theorem does not
 state, with the reason.
 -}

@@ -3,7 +3,8 @@
 
   `#worker_theorems w1 w2 ...` emits, for each worker test `w` (Prog/Worker.lean), the theorem
   `t_<project>_<Name> : ({ w with checks := [...] } : Prog.WorkerTest).Holds`: some execution the
-  book allows, under the test's host, has a log that meets every check of the test (D9). It is
+  book allows, under the test's host, has a log that meets every check of the test (D9), and sends
+  out the values of the test's `sent` lines in order (a pipe test, plans/host-pipe-tests.md). It is
   proved by `Prog.holds_of_run` from a run of the scheduler, by `decide +kernel`, or by
   `native_decide` when the program uses a value only the C library computes (a float), prints a
   value with Debug.toString, or has a statement about its printed log; such a theorem is tagged

@@ -145,7 +145,7 @@ project depends on the latest release of each package it uses.
 
 | Project | Tests | What they cover |
 |---|---|---|
-| `elm` | 810 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
+| `elm` | 819 | the language: every construct, literals and escapes, closures, recursion, pattern matching, records, custom types, the typing of `number`, ports, flags and `main`, and the programs a compiler must reject |
 | `elm-core` | 370 | elm/core, the basis library: arithmetic, equality and order, and every module, function by function |
 | `elm-bytes` | 88 | elm/bytes encoders and decoders |
 | `elm-parser` | 51 | elm/parser |
@@ -165,11 +165,11 @@ with its own project. The results website shows the tests by project and by tag.
 
 | Tag | Tests | What they are |
 |---|---|---|
-| `elm-spec` | 940 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
+| `elm-spec` | 942 | tests of `elm` and `elm-core` whose expected outcome A Standard Definition of Elm? determines: its rules and restrictions, derived forms and initial basis |
 | `elm19-compile-error` | 224 | programs the compiler must reject, checked by the title of Elm 0.19.1's error report |
-| `elm19-bug` | 156 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
+| `elm19-bug` | 157 | bugs in Elm 0.19.1 and its packages reported in open GitHub issues, and its divergences from A Standard Definition of Elm?; each test links its issue or ruling and expects the correct behaviour |
 | `elm19-bug-fix` | 9 | bugs in Elm 0.19.1 fixed in a later official Elm release; each test expects the fixed behaviour and says in its comment which release fixed it |
-| `elm-unspecced` | 23 | tests whose expected outcome A Standard Definition of Elm? leaves open or puts outside the definition: what `Debug.log` prints, arrays built by the library functions of `Array`, the value of an integer constant outside the Int range, the text of a crash, shader blocks; each says why in its comment |
+| `elm-unspecced` | 31 | tests whose expected outcome A Standard Definition of Elm? leaves open or puts outside the definition: what `Debug.log` prints, arrays built by the library functions of `Array`, the value of an integer constant outside the Int range, the text of a crash, shader blocks, programs beyond an implementation's limits on size, stack or memory; each says why in its comment |
 | `elm-spec-contradicts` | 6 | reported bugs whose expected outcome A Standard Definition of Elm? contradicts: the book decides the program the other way, so the report is not a bug against it; each is marked XFAIL and says why in its comment |
 | `error-message` | 17 | requests for a better error report: what a compiler's report says or how it is laid out, which A Standard Definition of Elm? does not define; named `ErrorMessages…` or `ErrorMessage…` after their issue, and kept in the project `elm-error-catalogue` |
 
@@ -273,6 +273,7 @@ main =
 | `-- STDIN: <text>` | text fed to stdin (`\n`, `\t`, `\\` unescaped; lines concatenate) |
 | `-- ENV: NAME=VALUE`, `-- UNSETENV: NAME` | the program's environment |
 | `-- FLAGS: <json>` | the flags passed to `init` |
+| `-- HOST-SEND: <port> <value>` | after `init`, the test driver sends the value on the incoming port, in the order written, and prints `<port> sent: <value>` for each value sent out on any outgoing port; see below |
 | `-- COMPILE-ERROR: <what>` | the compiler must reject the program; the CHECK lines (the report title, such as `-- CHECK: -- TYPE MISMATCH -`) are matched against its output |
 | `-- LINUX-ONLY: <reason>` | skipped on other hosts |
 | `-- NO-SKIP: <reason>` | a skip (on another host, or on a compiler with no JavaScript host for flags and ports) is a failure instead |
@@ -291,6 +292,21 @@ To record a new test's expected output from a compiler you trust, give it no CHE
 
 A port module with an outgoing port `echoOut` and an incoming port `echoIn` gets each value sent
 out through `echoOut` back through `echoIn`, to test ports end to end.
+
+A port module with `-- HOST-SEND:` lines is a pipe test ([plans/host-pipe-tests.md](plans/host-pipe-tests.md)):
+the test driver (`runner/host.js`) sends the values, one per turn of the event loop, on one incoming
+port, drops a value the port rejects (Elm/JS throws from `send`), and prints what the program sends
+out, which the test's CHECK lines match:
+
+```elm
+-- HOST-SEND: valueIn {"b":[1,true,null],"a":"x"}
+-- CHECK: valueOut sent: {"a":"x","b":[1,true,null]}
+```
+
+Values are JSON, printed canonically (no spaces, object keys in increasing order, numbers as
+`JSON.stringify` prints them), plus a byte sequence written `bytes(00 ff 10)` and given to the
+program as a `Uint8Array`. The Lean translation states that the values of the `sent:` lines are
+sent out in the order written.
 
 ## Adding a compiler
 
@@ -431,7 +447,7 @@ The site also carries *A Standard Definition of Elm?*, a formal definition of th
 the initial basis (`/standard/basis/Basics/modBy`), the PDF, and the Lean proofs of its mechanisation
 (`/standard/proofs`, a page per theorem, read from `definition/mechanisation/` by
 `runner/mechanisation-data.js`). The examples of the mechanisation are the tests tagged `elm-spec`,
-translated into Lean by a program, `definition/tools/src/Translate.elm` (618 of the 940 today; the
+translated into Lean by a program, `definition/tools/src/Translate.elm` (628 of the 942 today; the
 others are listed with the reason they are not, from compile-error tests to library functions the
 encoding does not include). Every such test shows on its page its Lean translation, with the Lean
 evaluator's value for each check and the theorem that proves it, or why it is not translated; a

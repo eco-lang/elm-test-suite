@@ -135,6 +135,19 @@ def runWorkerShard (name : String) (ws : List Prog.WorkerTest) : List Row := Id.
         values := vs, status := if ok then "agree" else "DIVERGENCE",
         theorem_ := some s!"t_{p.project}_{p.name}", proof := some (if w.proofNative then "native" else "kernel"),
         skipped := none }
+    -- a pipe test's `<port> sent: <value>` line (plans/host-pipe-tests.md): the values the run
+    -- sends out on the port; the theorem states that `sent` is a sublist of what is sent out
+    let outs := (run.map (·.2.path.outs)).getD []
+    let inOrder := run.isSome && w.sent.isSublist outs
+    for (port, j) in w.sent do
+      let mine := (outs.filter (·.1 == port)).map (showBV ·.2)
+      rows := rows.push {
+        shard := name, program := p.name, project := projectOf p, label := port ++ " sent",
+        expected := showBV j, kind := "data",
+        values := if run.isNone then ["(does not start)"] else if mine.isEmpty then ["(not sent)"] else mine,
+        status := if inOrder && mine.contains (showBV j) then "agree" else "DIVERGENCE",
+        theorem_ := some s!"t_{p.project}_{p.name}", proof := some (if w.proofNative then "native" else "kernel"),
+        skipped := none }
     -- a CHECK-NOT proved by hand (plan step 6): this run's printed log has no entry with the pattern
     for pat in w.checkNots do
       let hits := lg.filter fun e => Prog.containsStr pat (Prog.renderEntry e)

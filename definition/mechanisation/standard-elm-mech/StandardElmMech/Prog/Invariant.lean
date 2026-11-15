@@ -374,6 +374,8 @@ theorem hostAllows_other {h : Host} {hs hs' : List BVal} {a : Option Event}
   cases hh with
   | out_echo => exact absurd rfl (ho _ _)
   | in_echo => exact absurd rfl (hn _ _)
+  | out_feed => exact absurd rfl (ho _ _)
+  | in_feed => exact absurd rfl (hn _ _)
   | _ => rfl
 
 /-- The messages of one subscription c that receives x as the evaluator computes, with no choice. -/

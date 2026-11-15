@@ -8,9 +8,17 @@ fields cycle through `Int`, `Float`, `Char`, `String` and `Bool`, and the test
 reads back fields 0, 19, 20, 31, 32, 63, 64, 95, 96, 255, 256 and 299.
 The local `mapMaybe` reads each field inside the `Maybe`.
 
+A Standard Definition of Elm? places no bound on the size of a phrase; the limits an implementation
+sets are implementation-dependent details (Appendix, Implementation-Dependent Details, Resource
+Limits). The book's result for this program is the one the test expects, but a compiler that rejects
+the program for its size does not contradict the book, so the test is tagged `elm-unspecced`: it
+checks that an implementation's limits are not too small.
+
+<https://elm-test-suite.netlify.app/standard/appendix-implementation#sec-appendix-implementation-limits>
+
 -}
 
--- TAGS: elm-spec, sm-typbind-record, dm-typbind, d-app-basic-partial, d-app-basic-apply
+-- TAGS: elm-unspecced
 -- CHECK: f0000: Just 1000
 -- CHECK: f0019: Just False
 -- CHECK: f0020: Just 1020

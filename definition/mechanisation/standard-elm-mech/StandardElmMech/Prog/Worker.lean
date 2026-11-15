@@ -4,9 +4,11 @@
   A worker test is a program whose `main` is a worker, with its flags type and flags (absent flags
   are null, A72), a host and the scheduler's configuration, and its checks as statements about the
   log of an execution (D9). `WorkerTest.Holds` states, existentially, that some execution the book
-  allows under the test's host has a log meeting every check. `runWorker` evaluates the program's
-  modules, starts it and runs the scheduler; `holds_of_run` proves the statement from a run whose
-  log meets the checks, so a worker theorem is `decide +kernel` (or `native_decide`) on `checkB`.
+  allows under the test's host has a log meeting every check, and sends out, in order, the values
+  the test's `sent` lines name (a pipe test, plans/host-pipe-tests.md). `runWorker` evaluates the
+  program's modules, starts it and runs the scheduler; `holds_of_run` proves the statement from a
+  run whose log meets the checks, so a worker theorem is `decide +kernel` (or `native_decide`) on
+  `checkB`.
 -/
 import StandardElmMech.Prog.Sched
 import StandardElmMech.Mod.Program
@@ -80,13 +82,16 @@ structure WorkerTest where
   fuel : Nat := 5000
   /-- The patterns of the test's CHECK-NOT lines proved by hand (plan step 6). -/
   checkNots : List String := []
+  /-- The values the test driver sees sent out, in order, with their ports (CHECK lines
+      `<port> sent: <value>` of a pipe test). -/
+  sent : List (String × BVal) := []
   checks : List LogCheck
 
 /-- D9 for a worker: some execution the book allows, under the test's host, has a log that meets
-    every check. -/
+    every check, and sends out the values of `sent`, in that order among the values it sends. -/
 def WorkerTest.Holds (w : WorkerTest) : Prop :=
-  ∃ lg, WorkerExec (Mod.Btest []) w.prog.modules w.flagsType w.flags w.host lg ∧
-    ∀ ck ∈ w.checks, LogCheck.Holds lg ck
+  ∃ lg outs, WorkerExecO (Mod.Btest []) w.prog.modules w.flagsType w.flags w.host lg outs ∧
+    (∀ ck ∈ w.checks, LogCheck.Holds lg ck) ∧ w.sent.Sublist outs
 
 /-- The fuel of each evaluation (Theorems.lean's). -/
 def workerFuel : Nat := 100000
@@ -107,11 +112,11 @@ def runWorker (w : WorkerTest) : Option (Log × RunResult) :=
 
 def WorkerTest.checkB (w : WorkerTest) : Bool :=
   match runWorker w with
-  | some (lg, _) => w.checks.all (fun ck => ck.check lg)
+  | some (lg, res) => w.checks.all (fun ck => ck.check lg) && w.sent.isSublist res.path.outs
   | none => false
 
-theorem runWorker_sound {w : WorkerTest} {lg : Log} {res : RunResult} (h : runWorker w = some (lg, res)) :
-    WorkerExec (Mod.Btest []) w.prog.modules w.flagsType w.flags w.host lg := by
+theorem runWorker_soundO {w : WorkerTest} {lg : Log} {res : RunResult} (h : runWorker w = some (lg, res)) :
+    WorkerExecO (Mod.Btest []) w.prog.modules w.flagsType w.flags w.host lg res.path.outs := by
   unfold runWorker at h
   simp only at h
   split at h
@@ -122,16 +127,23 @@ theorem runWorker_sound {w : WorkerTest} {lg : Log} {res : RunResult} (h : runWo
       obtain ⟨rfl, rfl⟩ := h
       have hx := run_sound ⟨portEnv w.prog.modules, r, w.host, w.sched, workerFuel⟩ K0 [] w.fuel
         ⟨K0, [], ns, [], .const false, k2, 0⟩ [] (.nil _ _) rfl
-      exact ⟨r, lm, K0, ls, _, _, Mod.evProgram_sound_l he, startFn_sound hs, hx, rfl⟩
+      exact ⟨r, lm, K0, ls, _, _, Mod.evProgram_sound_l he, startFn_sound hs, hx, rfl, rfl⟩
     · cases h
   · cases h
 
-/-- A run whose log meets every check proves the worker's statement. -/
+theorem runWorker_sound {w : WorkerTest} {lg : Log} {res : RunResult} (h : runWorker w = some (lg, res)) :
+    WorkerExec (Mod.Btest []) w.prog.modules w.flagsType w.flags w.host lg :=
+  (runWorker_soundO h).exec
+
+/-- A run whose log meets every check, and which sends out the values of `sent`, proves the
+    worker's statement. -/
 theorem holds_of_run {w : WorkerTest} (h : w.checkB = true) : w.Holds := by
   unfold WorkerTest.checkB at h
   split at h
   · rename_i lg res hr
-    exact ⟨lg, runWorker_sound hr, fun ck hm => LogCheck.check_sound (List.all_eq_true.mp h ck hm)⟩
+    simp only [Bool.and_eq_true] at h
+    exact ⟨lg, res.path.outs, runWorker_soundO hr,
+      fun ck hm => LogCheck.check_sound (List.all_eq_true.mp h.1 ck hm), List.isSublist_iff_sublist.mp h.2⟩
   · cases h
 
 end StandardElm.Prog

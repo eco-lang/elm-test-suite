@@ -16,12 +16,6 @@ def s_elm_StandardA92BytesPortDeclarationTest : Src.SProgram := Src.canonOrder <
     [Src.imp "Bytes" none (some (.items [.ty "Bytes"])), Src.imp "Platform" none none]
     [.port "echoOut" (.fn (Src.tc "Bytes" []) (Src.tc "Cmd" [Src.tv "msg"])), .port "echoIn" (.fn (.fn (Src.tc "Bytes" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tv "msg"]]))) [.wild] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "declared", Src.c "True"])] (.tuple [.unit, Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tv "msg"])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", .lam [.wild, Src.pv "model"] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
 
-/-- tests/elm/src/StandardA92BytesPortTest.elm -/
-def s_elm_StandardA92BytesPortTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA92BytesPortTest" [
-  Src.mdl (Src.hdr true "StandardA92BytesPortTest" (.items [.var "main"]))
-    [Src.imp "Bytes" none (some (.items [.ty "Bytes"])), Src.imp "Bytes.Decode" none none, Src.imp "Bytes.Encode" none none, Src.imp "Process" none none, Src.imp "Task" none none]
-    [.port "echoOut" (.fn (Src.tc "Bytes" []) (Src.tc "Cmd" [Src.tv "msg"])), .port "echoIn" (.fn (.fn (Src.tc "Bytes" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .custom "Msg" [] [("Start", []), ("Got", [Src.tc "Bytes" []])], Src.val "threeBytes" (some (Src.tc "Bytes" [])) [] (Src.app (Src.qv "Bytes.Encode" "encode") [.paren (Src.app (Src.qv "Bytes.Encode" "sequence") [.paren (Src.app (Src.qv "List" "map") [Src.qv "Bytes.Encode" "unsignedInt8", .list [Src.i 1, Src.i 2, Src.i 255]])])]), Src.val "decodeAll" (some (.fn (Src.tc "Bytes" []) (Src.tc "Maybe" [Src.tc "List" [Src.tc "Int" []]]))) [Src.pv "b"] (Src.app (Src.qv "Bytes.Decode" "decode") [.paren (Src.app (Src.qv "Bytes.Decode" "map3") [.paren (.lam [Src.pv "p", Src.pv "q", Src.pv "r"] (.list [Src.v "p", Src.v "q", Src.v "r"])), Src.qv "Bytes.Decode" "unsignedInt8", Src.qv "Bytes.Decode" "unsignedInt8", Src.qv "Bytes.Decode" "unsignedInt8"]), Src.v "b"]), Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "perform") [.paren (Src.app (Src.v "always") [Src.c "Start"]), .paren (Src.app (Src.qv "Process" "sleep") [Src.i 10])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [Src.pv "msg", Src.pv "model"] (.caseE (Src.v "msg") [(Src.pc "Start" [], .tuple [Src.v "model", Src.app (Src.v "echoOut") [Src.v "threeBytes"]]), (Src.pc "Got" [Src.pv "b"], .letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "received", .paren (Src.app (Src.qv "Maybe" "withDefault") [.list [], .paren (Src.app (Src.v "decodeAll") [Src.v "b"])])])] (.tuple [Src.v "model", Src.qv "Cmd" "none"]))]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "echoIn") [Src.c "Got"]))]])] ]
-
 /-- tests/elm/src/StandardA93MutualNumberDefaultTest.elm -/
 def s_elm_StandardA93MutualNumberDefaultTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "StandardA93MutualNumberDefaultTest" [
   Src.mdl (Src.hdr false "StandardA93MutualNumberDefaultTest" (.items [.var "main"]))
@@ -254,7 +248,6 @@ def s_elm_TooManyArgsTooManyArgumentsToALocalTest : Src.SProgram := Src.canonOrd
 def srcShard_SrcElm_StandardA9 : List (String × Src.SProgram) :=
   [("StandardA91BasicsAliasTest", s_elm_StandardA91BasicsAliasTest),
    ("StandardA92BytesPortDeclarationTest", s_elm_StandardA92BytesPortDeclarationTest),
-   ("StandardA92BytesPortTest", s_elm_StandardA92BytesPortTest),
    ("StandardA93MutualNumberDefaultTest", s_elm_StandardA93MutualNumberDefaultTest),
    ("StandardA96NumberFlagsTest", s_elm_StandardA96NumberFlagsTest),
    ("StandardA97MaybeNeverMissingJustTest", s_elm_StandardA97MaybeNeverMissingJustTest),

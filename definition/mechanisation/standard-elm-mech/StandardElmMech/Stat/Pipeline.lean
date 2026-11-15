@@ -501,7 +501,7 @@ theorem value_of_viewChecks {B : Mod.Basis} {ms : List Mod.Module} {cs : List Lo
 /-- A worker's execution starts from the value of `main`. -/
 theorem value_of_holds {w : Prog.WorkerTest} (h : w.Holds) :
     ∃ v, Mod.EvalProgram (Mod.Btest []) w.prog.modules v := by
-  obtain ⟨lg, ⟨r, lm, K0, ls, π, hs, he, -⟩, -⟩ := h
+  obtain ⟨lg, outs, ⟨r, lm, K0, ls, π, hs, he, -⟩, -⟩ := h
   exact ⟨_, he.forget⟩
 
 theorem dynOf_view {g : Program} {v : Val} : DynOf g.reduced v ↔ Mod.EvalProgram Lib.Btest g.modules v :=

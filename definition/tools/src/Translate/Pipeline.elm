@@ -12,6 +12,7 @@ import Translate.FrontEnd as FrontEnd
 import Translate.Infer as Infer
 import Translate.Ir as Ir exposing (Decl(..), Expr(..), Name(..), TestProgram, anyExpr)
 import Translate.Json as Json
+import Translate.Literal as Literal
 import Translate.Library as Library exposing (Library)
 import Translate.Parse as Parse exposing (Parsed)
 import Translate.Region as Region
@@ -35,7 +36,7 @@ type Outcome
         -- whether the theorem is proved by `native_decide`
         , native : Bool
 
-        -- a worker's host ("none" or "echo") and its FLAGS text (`Nothing`: absent, null)
+        -- a worker's host ("none", "echo" or "feed") and its FLAGS text (`Nothing`: absent, null)
         , host : Maybe String
         , flags : Maybe String
 
@@ -257,6 +258,21 @@ parseAndTranslate lib lookup info source directives =
 
                                                 host =
                                                     echoHost specialised.program specialised.ports
+
+                                                -- the pipe driver, for a test with HOST-SEND lines
+                                                -- (plans/host-pipe-tests.md); else the echo host, or none
+                                                ( hostName, hostLean ) =
+                                                    case ( directives.sends, host ) of
+                                                        ( ( i, _ ) :: _, _ ) ->
+                                                            ( "feed"
+                                                            , ".feed " ++ Literal.leanString i ++ " [" ++ String.join ", " (List.map (Tuple.second >> Json.toLean) directives.sends) ++ "]"
+                                                            )
+
+                                                        ( [], Just ( o, i ) ) ->
+                                                            ( "echo", ".echo " ++ Literal.leanString o ++ " " ++ Literal.leanString i )
+
+                                                        ( [], Nothing ) ->
+                                                            ( "none", ".none" )
                                             in
                                             Translated
                                                 { lean =
@@ -267,12 +283,13 @@ parseAndTranslate lib lookup info source directives =
                                                                 ++ ToLean.workerDef info
                                                                     flagsType
                                                                     (directives.flags |> Maybe.map Json.toLean |> Maybe.withDefault ".null")
-                                                                    host
+                                                                    hostLean
+                                                                    (List.map (Tuple.mapSecond Json.toLean) directives.sent)
                                                                     directives.checkNots
 
                                                         Nothing ->
                                                             programText
-                                                , checks = List.length specialised.program.checks
+                                                , checks = List.length specialised.program.checks + List.length directives.sent
                                                 , sources = List.map .path sources
                                                 , kind =
                                                     if specialised.flags == Nothing then
@@ -282,15 +299,7 @@ parseAndTranslate lib lookup info source directives =
                                                         "worker"
                                                 , native = native
                                                 , host =
-                                                    specialised.flags
-                                                        |> Maybe.map
-                                                            (\_ ->
-                                                                if host == Nothing then
-                                                                    "none"
-
-                                                                else
-                                                                    "echo"
-                                                            )
+                                                    specialised.flags |> Maybe.map (\_ -> hostName)
                                                 , flags = directives.flagsText
                                                 , dropped = directives.dropped
                                                 , checkNots = directives.checkNots

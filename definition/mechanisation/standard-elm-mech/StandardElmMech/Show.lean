@@ -110,17 +110,23 @@ def showFloat (x : Float) : String :=
   else if x < 0 then "-" ++ showPositive (-x)
   else showPositive x
 
+/-- A byte as two lowercase hex digits (the pipe tests' notation, plans/host-pipe-tests.md). -/
+def hexByte (o : Nat) : String :=
+  let d (n : Nat) : Char := if n < 10 then Char.ofNat (48 + n) else Char.ofNat (87 + n)
+  String.ofList [d (o / 16 % 16), d (o % 16)]
+
 mutual
   /-- A boundary value as JSON text: keys in canonical order, an integral number as the integer,
-      any other by `showFloat` of its nearest float, a byte sequence as `<k bytes>` (A62: the
-      printing of an effect value is implementation-dependent; this is Elm/JS's). -/
+      any other by `showFloat` of its nearest float, a byte sequence as `bytes(00 ff)` (the pipe
+      tests' notation, plans/host-pipe-tests.md; A62: the printing of an effect value is
+      implementation-dependent). -/
   def showBV : Eff.BVal → String
     | .null => "null"
     | .tru => "true"
     | .fls => "false"
     | .num q => if q.den == 1 then toString q.num else showFloat (Eff.ratToFloat q)
     | .str s => showStr s
-    | .bytes os => "<" ++ toString os.length ++ " bytes>"
+    | .bytes os => "bytes(" ++ " ".intercalate (os.map hexByte) ++ ")"
     | .arr js => "[" ++ ",".intercalate (showBArr js) ++ "]"
     | .obj kvs => "{" ++ ",".intercalate (showBObj kvs) ++ "}"
   def showBArr : Eff.BArr → List String

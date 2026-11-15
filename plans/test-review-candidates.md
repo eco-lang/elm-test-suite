@@ -48,6 +48,10 @@ allows (group J of that file): PortEchoJsonValueTest as its correction says, wit
 StandardA92BytesPortDeclarationTest for the static half. The round trip of bytes still needs the
 host below.
 
+**Resolved (2026-11-15).** The host now exists ([host-pipe-tests.md](host-pipe-tests.md)):
+PortPipeBytesTest has the test driver send byte sequences in and checks what comes out, so
+StandardA92BytesPortTest is deleted.
+
 | Test | What it checks | Why it leaves the basis | Possible correction |
 |------|----------------|-------------------------|---------------------|
 | PortEchoJsonValueTest | `e-enc-value`, `e-dec-value`: a JSON `Value` crosses a port as it is | builds its Values with `Json.Encode` and prints them with `Json.Encode.encode`. Within the basis a Value comes only from flags or a port, and neither `Debug.log` nor `==` can observe it portably: Elm 0.19.1 prints a Value as `<internals>` (Lean prints JSON text), and its `==` on Values is not the book's (below) | take the Values from flags typed `Value`, send them out on `echoOut : Value -> Cmd msg`, and receive them on an `echoIn` of a concrete type (a record, a tuple), logging the typed result; the mixed array `[1,true,null]` would become a sample that some Elm type decodes |
@@ -62,3 +66,8 @@ equal only when they have the same set of keys. Elm 0.19.1 gives `True` for `{"a
 comparison of Values received through a port crashed with a `TypeError` inside `_Utils_eqHelp`. A
 test with Values from flags would record this as an `elm19-bug`, if the book's clause is meant to
 hold of `Json.Encode.Value`.
+
+The same loop makes any two `Bytes` values equal in Elm/JS: a `DataView` has no enumerable keys
+for `_Utils_eqHelp` to walk (read from elm/core 1.0.5's `Utils.js`; not run, since Elm 0.19.1
+rejects `Bytes` ports). The pipe tests ([host-pipe-tests.md](host-pipe-tests.md), 2026-11-15)
+avoid `==` for this reason: the test driver compares what goes in with what comes out.
