@@ -1,6 +1,6 @@
 # Standard Elm mechanisation: example run
 
-Programs: 640 (52 workers), in 34 shards; checks: 1847.
+Programs: 702 (77 workers), in 34 shards; checks: 1909.
 
 ## ElmCore
 
@@ -1542,6 +1542,43 @@ Elm_Li: 19 programs, 34 checks, 34 agree.
 | MaybeNothingTest | nothing | Nothing | Nothing | agree | t_elm_MaybeNothingTest |
 | MaybePatternMatchTest | match1 | 42 | 42 | agree | t_elm_MaybePatternMatchTest |
 | MaybePatternMatchTest | match2 | 0 | 0 | agree | t_elm_MaybePatternMatchTest |
+| MinimalAsPatternTest | testValue | 7 | 7 | agree | t_elm_MinimalAsPatternTest |
+| MinimalCaseNextRuleTest | testValue | 20 | 20 | agree | t_elm_MinimalCaseNextRuleTest |
+| MinimalCaseTest | testValue | 7 | 7 | agree | t_elm_MinimalCaseTest |
+| MinimalConsPatternFailTest | testValue | "none" | "none" | agree | t_elm_MinimalConsPatternFailTest |
+| MinimalConsPatternTest | testValue | 1 | 1 | agree | t_elm_MinimalConsPatternTest |
+| MinimalConstantPatternTest | testValue | 10 | 10 | agree | t_elm_MinimalConstantPatternTest |
+| MinimalConstantTest | testValue | 7 | 7 | agree | t_elm_MinimalConstantTest |
+| MinimalConstructedPatternFailTest | testValue | 0 | 0 | agree | t_elm_MinimalConstructedPatternFailTest |
+| MinimalConstructedPatternTest | testValue | 3 | 3 | agree | t_elm_MinimalConstructedPatternTest |
+| MinimalConstructorPatternFailTest | testValue | 0 | 0 | agree | t_elm_MinimalConstructorPatternFailTest |
+| MinimalConstructorPatternTest | testValue | 1 | 1 | agree | t_elm_MinimalConstructorPatternTest |
+| MinimalCustomTypeTest | testValue | A | A | agree | t_elm_MinimalCustomTypeTest |
+| MinimalDestructuringTest | testValue | 2 | 2 | agree | t_elm_MinimalDestructuringTest |
+| MinimalEmptyListTest | testValue | [] | [] | agree | t_elm_MinimalEmptyListTest |
+| MinimalExposingAliasTest | testValue | { a = 1 } | { a = 1 } | agree | t_elm_MinimalExposingAliasTest |
+| MinimalExposingAllTest | testValue | 8 | 8 | agree | t_elm_MinimalExposingAllTest |
+| MinimalExposingOpenTest | testValue | B | B | agree | t_elm_MinimalExposingOpenTest |
+| MinimalImportValueTest | testValue | 7 | 7 | agree | t_elm_MinimalImportValueTest |
+| MinimalLetRecursionTest | testValue | 0 | 0 | agree | t_elm_MinimalLetRecursionTest |
+| MinimalLetTest | testValue | 1 | 1 | agree | t_elm_MinimalLetTest |
+| MinimalNilPatternFailTest | testValue | 1 | 1 | agree | t_elm_MinimalNilPatternFailTest |
+| MinimalNilPatternTest | testValue | 1 | 1 | agree | t_elm_MinimalNilPatternTest |
+| MinimalParenthesesTest | testValue | 7 | 7 | agree | t_elm_MinimalParenthesesTest |
+| MinimalParenthesisedPatternTest | testValue | 7 | 7 | agree | t_elm_MinimalParenthesisedPatternTest |
+| MinimalParenthesisedTypeTest | testValue | 7 | 7 | agree | t_elm_MinimalParenthesisedTypeTest |
+| MinimalRecordAliasConstructorTest | testValue | { a = 1 } | { a = 1 } | agree | t_elm_MinimalRecordAliasConstructorTest |
+| MinimalRecordPatternTest | testValue | 1 | 1 | agree | t_elm_MinimalRecordPatternTest |
+| MinimalRecordTest | testValue | { a = 1 } | { a = 1 } | agree | t_elm_MinimalRecordTest |
+| MinimalRecordTypeTest | testValue | { a = 1 } | { a = 1 } | agree | t_elm_MinimalRecordTypeTest |
+| MinimalRecordUpdateTest | testValue | { a = 2 } | { a = 2 } | agree | t_elm_MinimalRecordUpdateTest |
+| MinimalRowVariableTest | testValue | 1 | 1 | agree | t_elm_MinimalRowVariableTest |
+| MinimalTuplePatternTest | testValue | 2 | 2 | agree | t_elm_MinimalTuplePatternTest |
+| MinimalTypeAliasTest | testValue | 7 | 7 | agree | t_elm_MinimalTypeAliasTest |
+| MinimalTypeVariableTest | testValue | 7 | 7 | agree | t_elm_MinimalTypeVariableTest |
+| MinimalUnitPatternTest | testValue | 1 | 1 | agree | t_elm_MinimalUnitPatternTest |
+| MinimalUnitTest | testValue | () | () | agree | t_elm_MinimalUnitTest |
+| MinimalVariableTest | testValue | 7 | 7 | agree | t_elm_MinimalVariableTest |
 | MultiLocalTailRecTest | result | 15 | 15 | agree | t_elm_MultiLocalTailRecTest |
 | MutualLetRecClosuresTest | evenResult | True | True | agree | t_elm_MutualLetRecClosuresTest |
 | MutualLetRecClosuresTest | oddResult | False | False | agree | t_elm_MutualLetRecClosuresTest |
@@ -1590,7 +1627,7 @@ Elm_Li: 19 programs, 34 checks, 34 agree.
 | PartialAppCaptureTypesTest | string_cap | "hello" | "hello" | agree | t_elm_PartialAppCaptureTypesTest |
 | PartialAppCaptureTypesTest | combined | 3.5 | 3.5 | agree | t_elm_PartialAppCaptureTypesTest |
 
-Elm_M: 20 programs, 53 checks, 53 agree.
+Elm_M: 57 programs, 90 checks, 90 agree.
 
 ## Elm_PartialAppCh
 
@@ -1952,6 +1989,31 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 | ListLiteralDebugLogKindTest | floatLit | True | True | agree | t_elm_ListLiteralDebugLogKindTest |
 | ListLiteralDebugLogKindTest | charLit | ['q','q'] | ['q','q'] | agree | t_elm_ListLiteralDebugLogKindTest |
 | ListLiteralDebugLogKindTest | boolLit | True | True | agree | t_elm_ListLiteralDebugLogKindTest |
+| MinimalCmdMapTest | got | 1 | 1 | agree | t_elm_MinimalCmdMapTest |
+| MinimalKillTest | got | 3 | 3 | agree | t_elm_MinimalKillTest |
+| MinimalPipeArrayTest | arrayOut sent | [1,2] | [1,2] | agree | t_elm_MinimalPipeArrayTest |
+| MinimalPipeFalseTest | boolOut sent | false | false | agree | t_elm_MinimalPipeFalseTest |
+| MinimalPipeFloatTest | floatOut sent | 2.5 | 2.5 | agree | t_elm_MinimalPipeFloatTest |
+| MinimalPipeIntTest | intOut sent | 3 | 3 | agree | t_elm_MinimalPipeIntTest |
+| MinimalPipeJustTest | maybeOut sent | 5 | 5 | agree | t_elm_MinimalPipeJustTest |
+| MinimalPipeListTest | listOut sent | [1,2] | [1,2] | agree | t_elm_MinimalPipeListTest |
+| MinimalPipeNothingTest | maybeOut sent | null | null | agree | t_elm_MinimalPipeNothingTest |
+| MinimalPipeRecordTest | recordOut sent | {"a":1} | {"a":1} | agree | t_elm_MinimalPipeRecordTest |
+| MinimalPipeStringTest | stringOut sent | "a" | "a" | agree | t_elm_MinimalPipeStringTest |
+| MinimalPipeTrueTest | boolOut sent | true | true | agree | t_elm_MinimalPipeTrueTest |
+| MinimalPipeTupleTest | pairOut sent | [1,2] | [1,2] | agree | t_elm_MinimalPipeTupleTest |
+| MinimalPipeUnitTest | unitOut sent | null | null | agree | t_elm_MinimalPipeUnitTest |
+| MinimalPipeValueTest | valueOut sent | {"a":[1,true]} | {"a":[1,true]} | agree | t_elm_MinimalPipeValueTest |
+| MinimalPortSubscriptionTest | got | 5 | 5 | agree | t_elm_MinimalPortSubscriptionTest |
+| MinimalSleepTest | got | () | () | agree | t_elm_MinimalSleepTest |
+| MinimalSpawnTest | got | 2 | 2 | agree | t_elm_MinimalSpawnTest |
+| MinimalTaskAndThenFailTest | got | Err 1 | Err 1 | agree | t_elm_MinimalTaskAndThenFailTest |
+| MinimalTaskAndThenInnerTest | got | 2 | 2 | agree | t_elm_MinimalTaskAndThenInnerTest |
+| MinimalTaskAndThenTest | got | 2 | 2 | agree | t_elm_MinimalTaskAndThenTest |
+| MinimalTaskOnErrorInnerTest | got | 3 | 3 | agree | t_elm_MinimalTaskOnErrorInnerTest |
+| MinimalTaskOnErrorSucceedTest | got | 1 | 1 | agree | t_elm_MinimalTaskOnErrorSucceedTest |
+| MinimalTaskOnErrorTest | got | 2 | 2 | agree | t_elm_MinimalTaskOnErrorTest |
+| MinimalTaskPerformTest | got | 1 | 1 | agree | t_elm_MinimalTaskPerformTest |
 | NoImportsTest | no imports | 3 | 3 | agree | t_elm_NoImportsTest |
 | OutgoingPortTuple3KeepsRunningTest | OutgoingPortTuple3Test | "sent" | "sent" or "after" | agree | t_elm_OutgoingPortTuple3KeepsRunningTest |
 | OutgoingPortTuple3KeepsRunningTest | OutgoingPortTuple3Test | "after" | "sent" or "after" | agree | t_elm_OutgoingPortTuple3KeepsRunningTest |
@@ -2085,6 +2147,6 @@ Elm_TailRecT: 20 programs, 81 checks, 81 agree.
 | TimerEffectTest | TimerEffectTest | "fired 5" | "fired 1" or "fired 2" or "fired 3" or "fired 4" or "fired 5" or "done" | agree | t_elm_core_TimerEffectTest (native) |
 | TimerEffectTest | TimerEffectTest | "done" | "fired 1" or "fired 2" or "fired 3" or "fired 4" or "fired 5" or "done" | agree | t_elm_core_TimerEffectTest (native) |
 
-Worker01: 52 programs, 152 checks, 152 agree.
+Worker01: 77 programs, 177 checks, 177 agree.
 
-Total: 1847 checks, 1847 agree, 0 diverge (0 known); 1606 checks by decide +kernel, 239 by native_decide, in 640 program theorems.
+Total: 1909 checks, 1909 agree, 0 diverge (0 known); 1668 checks by decide +kernel, 239 by native_decide, in 702 program theorems.

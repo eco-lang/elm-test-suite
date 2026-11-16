@@ -10130,6 +10130,1688 @@
     },
     {
       "project": "elm",
+      "name": "MinimalAsPatternTest",
+      "sha256": "21cacee9e268897d277fffa761bc6d469dbd5f6f7c96c005b09f0f1514ac3bd3",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalAsPatternTest.elm",
+          "sha256": "21cacee9e268897d277fffa761bc6d469dbd5f6f7c96c005b09f0f1514ac3bd3"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalAsPatternTest",
+        "modules": [
+          "tests/elm/src/MinimalAsPatternTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalAsPatternTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalAsPatternTest.elm -/\ndef g_elm_MinimalAsPatternTest : Program := {\n  name := \"MinimalAsPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (.atexp (.scon (.intF 7))) [(.as (P pw) \"m\", v \"m\")]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 7\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalCaseNextRuleTest",
+      "sha256": "77364dd497a52b0f7637dd8cfac7021fc90b4950bde68fa20d0b4f0aa2f50e04",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalCaseNextRuleTest.elm",
+          "sha256": "77364dd497a52b0f7637dd8cfac7021fc90b4950bde68fa20d0b4f0aa2f50e04"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalCaseNextRuleTest",
+        "modules": [
+          "tests/elm/src/MinimalCaseNextRuleTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalCaseNextRuleTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalCaseNextRuleTest.elm -/\ndef g_elm_MinimalCaseNextRuleTest : Program := {\n  name := \"MinimalCaseNextRuleTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (i 2) [(P (pint 1), .atexp (.scon (.intF 10))), (P pw, .atexp (.scon (.intF 20)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 20\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalCaseTest",
+      "sha256": "ddf8863303147580a38283f51e3193cd4b684732c6c8e925819695f3a7dbadae",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalCaseTest.elm",
+          "sha256": "ddf8863303147580a38283f51e3193cd4b684732c6c8e925819695f3a7dbadae"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalCaseTest",
+        "modules": [
+          "tests/elm/src/MinimalCaseTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalCaseTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalCaseTest.elm -/\ndef g_elm_MinimalCaseTest : Program := {\n  name := \"MinimalCaseTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (.atexp (.scon (.intF 7))) [(P (pv \"n\"), v \"n\")]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 7\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalCmdMapTest",
+      "sha256": "7126eac8e80c36023675cd99eb75c3eec123c0c6c7f1ce797007049bdd804be7",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalCmdMapTest.elm",
+          "sha256": "7126eac8e80c36023675cd99eb75c3eec123c0c6c7f1ce797007049bdd804be7"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalCmdMapTest",
+        "modules": [
+          "tests/elm/src/MinimalCmdMapTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalCmdMapTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalCmdMapTest.elm -/\ndef g_elm_MinimalCmdMapTest : Program := {\n  name := \"MinimalCmdMapTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Cmd\" \"map\") [c \"Got\", .atexp (.paren (ap (qv \"Task\" \"perform\") [v \"identity\", .atexp (.paren (ap (qv \"Task\" \"succeed\") [i 1]))]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: 1\" .int ] }\n\n/-- The worker test of MinimalCmdMapTest. -/\ndef w_elm_MinimalCmdMapTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalCmdMapTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConsPatternFailTest",
+      "sha256": "deefc8cbf2c9f35517064a3e563a7d26f31ea0c90071f19ec01ccc0219f24df2",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalConsPatternFailTest.elm",
+          "sha256": "deefc8cbf2c9f35517064a3e563a7d26f31ea0c90071f19ec01ccc0219f24df2"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalConsPatternFailTest",
+        "modules": [
+          "tests/elm/src/MinimalConsPatternFailTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalConsPatternFailTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalConsPatternFailTest.elm -/\ndef g_elm_MinimalConsPatternFailTest : Program := {\n  name := \"MinimalConsPatternFailTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (listE []) [(.cons (P (pv \"x\")) (P pw), v \"x\"), (P (listP []), str \"none\")]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: \\\"none\\\"\" .string ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConsPatternTest",
+      "sha256": "ec82347659d07850508ec0a8dc75f9c8e4c8cc3d73160ba668e7d8b5f8d0fee8",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalConsPatternTest.elm",
+          "sha256": "ec82347659d07850508ec0a8dc75f9c8e4c8cc3d73160ba668e7d8b5f8d0fee8"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalConsPatternTest",
+        "modules": [
+          "tests/elm/src/MinimalConsPatternTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalConsPatternTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalConsPatternTest.elm -/\ndef g_elm_MinimalConsPatternTest : Program := {\n  name := \"MinimalConsPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (listE [.atexp (.scon (.intF 1))]) [(.cons (P (pv \"x\")) (P pw), v \"x\"), (P (listP []), .atexp (.scon (.intF 0)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 1\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstantPatternTest",
+      "sha256": "1d52ce0d4e1b7b216164edd427fa3592ab158b2f2aba74cb973ff205d3444af2",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalConstantPatternTest.elm",
+          "sha256": "1d52ce0d4e1b7b216164edd427fa3592ab158b2f2aba74cb973ff205d3444af2"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalConstantPatternTest",
+        "modules": [
+          "tests/elm/src/MinimalConstantPatternTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalConstantPatternTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalConstantPatternTest.elm -/\ndef g_elm_MinimalConstantPatternTest : Program := {\n  name := \"MinimalConstantPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (i 1) [(P (pint 1), .atexp (.scon (.intF 10))), (P pw, .atexp (.scon (.intF 20)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 10\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstantTest",
+      "sha256": "4a2631e5620f3a39a290c09ae300b3fe23918017d6c6b3434c8ca7f826372002",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalConstantTest.elm",
+          "sha256": "4a2631e5620f3a39a290c09ae300b3fe23918017d6c6b3434c8ca7f826372002"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalConstantTest",
+        "modules": [
+          "tests/elm/src/MinimalConstantTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalConstantTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalConstantTest.elm -/\ndef g_elm_MinimalConstantTest : Program := {\n  name := \"MinimalConstantTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (.atexp (.scon (.intF 7))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 7\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstructedPatternFailTest",
+      "sha256": "c93e7db93094de99cd779bd1a020ad27c971dd1455b89200feecb2ebbf40febf",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalConstructedPatternFailTest.elm",
+          "sha256": "c93e7db93094de99cd779bd1a020ad27c971dd1455b89200feecb2ebbf40febf"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalConstructedPatternFailTest",
+        "modules": [
+          "tests/elm/src/MinimalConstructedPatternFailTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalConstructedPatternFailTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalConstructedPatternFailTest.elm -/\ndef g_elm_MinimalConstructedPatternFailTest : Program := {\n  name := \"MinimalConstructedPatternFailTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (c \"Nothing\") [(pcon \"Just\" [pv \"n\"], v \"n\"), (P (pcA \"Nothing\"), .atexp (.scon (.intF 0)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 0\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstructedPatternTest",
+      "sha256": "001d921134bb404b618a33659977accb7ad7696ffa84ede6d7b5fe8537334999",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalConstructedPatternTest.elm",
+          "sha256": "001d921134bb404b618a33659977accb7ad7696ffa84ede6d7b5fe8537334999"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalConstructedPatternTest",
+        "modules": [
+          "tests/elm/src/MinimalConstructedPatternTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalConstructedPatternTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalConstructedPatternTest.elm -/\ndef g_elm_MinimalConstructedPatternTest : Program := {\n  name := \"MinimalConstructedPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (ap (c \"Just\") [.atexp (.scon (.intF 3))]) [(pcon \"Just\" [pv \"n\"], v \"n\"), (P (pcA \"Nothing\"), .atexp (.scon (.intF 0)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 3\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstructorPatternFailTest",
+      "sha256": "5809a140c8a313488f91ba79919a0ae803affbc6a0180c3726e978cec42b83e7",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalConstructorPatternFailTest.elm",
+          "sha256": "5809a140c8a313488f91ba79919a0ae803affbc6a0180c3726e978cec42b83e7"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalConstructorPatternFailTest",
+        "modules": [
+          "tests/elm/src/MinimalConstructorPatternFailTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalConstructorPatternFailTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalConstructorPatternFailTest.elm -/\ndef g_elm_MinimalConstructorPatternFailTest : Program := {\n  name := \"MinimalConstructorPatternFailTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (c \"False\") [(P (pcA \"True\"), .atexp (.scon (.intF 1))), (P (pcA \"False\"), .atexp (.scon (.intF 0)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 0\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstructorPatternTest",
+      "sha256": "970ea69de06f414b1f9e8eb798409b57a8343a8d243534c02d6f474e456f98f3",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalConstructorPatternTest.elm",
+          "sha256": "970ea69de06f414b1f9e8eb798409b57a8343a8d243534c02d6f474e456f98f3"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalConstructorPatternTest",
+        "modules": [
+          "tests/elm/src/MinimalConstructorPatternTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalConstructorPatternTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalConstructorPatternTest.elm -/\ndef g_elm_MinimalConstructorPatternTest : Program := {\n  name := \"MinimalConstructorPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (c \"True\") [(P (pcA \"True\"), .atexp (.scon (.intF 1))), (P (pcA \"False\"), .atexp (.scon (.intF 0)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 1\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalCustomTypeTest",
+      "sha256": "b5feecf23eb520e486e1b4fd834f6108010490aa65929470ff4c2874ddf05dea",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalCustomTypeTest.elm",
+          "sha256": "b5feecf23eb520e486e1b4fd834f6108010490aa65929470ff4c2874ddf05dea"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalCustomTypeTest",
+        "modules": [
+          "tests/elm/src/MinimalCustomTypeTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalCustomTypeTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalCustomTypeTest.elm -/\ndef g_elm_MinimalCustomTypeTest : Program := {\n  name := \"MinimalCustomTypeTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [(\"T\", [(\"A\", 0)])],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (c \"A\"),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: A\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalDestructuringTest",
+      "sha256": "268551e8fb0a18b0b0fb592d54980f72e6573926d1b61d6b5109e6a2058b0bcd",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalDestructuringTest.elm",
+          "sha256": "268551e8fb0a18b0b0fb592d54980f72e6573926d1b61d6b5109e6a2058b0bcd"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalDestructuringTest",
+        "modules": [
+          "tests/elm/src/MinimalDestructuringTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalDestructuringTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalDestructuringTest.elm -/\ndef g_elm_MinimalDestructuringTest : Program := {\n  name := \"MinimalDestructuringTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.pat (ptup2 (P (pv \"a\")) (P (pv \"b\"))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))))] (v \"b\")),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 2\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalEmptyListTest",
+      "sha256": "7018200603ed4a8c4f5daa462946079bdb8c1a5689d8c48a5178cc77172c16cf",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalEmptyListTest.elm",
+          "sha256": "7018200603ed4a8c4f5daa462946079bdb8c1a5689d8c48a5178cc77172c16cf"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalEmptyListTest",
+        "modules": [
+          "tests/elm/src/MinimalEmptyListTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalEmptyListTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalEmptyListTest.elm -/\ndef g_elm_MinimalEmptyListTest : Program := {\n  name := \"MinimalEmptyListTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (listE []),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: []\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalExposingAliasTest",
+      "sha256": "0d2c17c21adbcb27fd8147aba57c98a4a9967105c9b5d1d761d4ff90aa7523fb",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalHelperAlias.elm",
+          "sha256": "af5b8eb58e5c9cb1dc8267d654067564f61871c4e38910a8c999fcc97b1d7792"
+        },
+        {
+          "path": "tests/elm/src/MinimalExposingAliasTest.elm",
+          "sha256": "0d2c17c21adbcb27fd8147aba57c98a4a9967105c9b5d1d761d4ff90aa7523fb"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalExposingAliasTest",
+        "modules": [
+          "tests/elm/src/MinimalExposingAliasTest.elm",
+          "tests/elm/src/MinimalHelperAlias.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalExposingAliasTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalExposingAliasTest.elm, tests/elm/src/MinimalHelperAlias.elm -/\ndef g_elm_MinimalExposingAliasTest : Program := {\n  name := \"MinimalExposingAliasTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩, ⟨\"MinimalHelperAlias\", \"MinimalHelperAlias\", some (.items [.tycon \"P\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (ap (c \"P\") [i 1]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  helpers := [\n   { name := \"MinimalHelperAlias\", path := \"tests/elm/src/MinimalHelperAlias.elm\",\n     exposing := (.items [.tycon \"P\"]), imports := [],\n     types := [],\n     aliases := [(\"P\", some [\"a\"])],\n     defs := [ ] } ],\n  checks := [\n    chk .check \"testValue: { a = 1 }\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalExposingAllTest",
+      "sha256": "dd2cd6801599cc6004d98b6f055f52c43476192ee26c784921293b6a2285da2f",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalHelperAll.elm",
+          "sha256": "73d59b605edf045251b5cc234ddceef6d5d013cdadc00b9c0607d9c8646bcb8e"
+        },
+        {
+          "path": "tests/elm/src/MinimalExposingAllTest.elm",
+          "sha256": "dd2cd6801599cc6004d98b6f055f52c43476192ee26c784921293b6a2285da2f"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalExposingAllTest",
+        "modules": [
+          "tests/elm/src/MinimalExposingAllTest.elm",
+          "tests/elm/src/MinimalHelperAll.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalExposingAllTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalExposingAllTest.elm, tests/elm/src/MinimalHelperAll.elm -/\ndef g_elm_MinimalExposingAllTest : Program := {\n  name := \"MinimalExposingAllTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩, ⟨\"MinimalHelperAll\", \"MinimalHelperAll\", some (.items [.var \"eight\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (v \"eight\"),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  helpers := [\n   { name := \"MinimalHelperAll\", path := \"tests/elm/src/MinimalHelperAll.elm\",\n     exposing := .all, imports := [],\n     types := [],\n     aliases := [],\n     defs := [\n      .fn \"eight\" [] (.atexp (.scon (.intF 8))) ] } ],\n  checks := [\n    chk .check \"testValue: 8\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalExposingOpenTest",
+      "sha256": "83266a2b0feadb416381ba26f2935ff37b2a8ecd70fb1def453805a11494541e",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalHelperOpen.elm",
+          "sha256": "b02c57c83934898f95e24341ed752b8477c4ad12594e849484fe2e1f8b26f02c"
+        },
+        {
+          "path": "tests/elm/src/MinimalExposingOpenTest.elm",
+          "sha256": "83266a2b0feadb416381ba26f2935ff37b2a8ecd70fb1def453805a11494541e"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalExposingOpenTest",
+        "modules": [
+          "tests/elm/src/MinimalExposingOpenTest.elm",
+          "tests/elm/src/MinimalHelperOpen.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalExposingOpenTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalExposingOpenTest.elm, tests/elm/src/MinimalHelperOpen.elm -/\ndef g_elm_MinimalExposingOpenTest : Program := {\n  name := \"MinimalExposingOpenTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩, ⟨\"MinimalHelperOpen\", \"MinimalHelperOpen\", some (.items [.opened \"T\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (c \"B\"),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  helpers := [\n   { name := \"MinimalHelperOpen\", path := \"tests/elm/src/MinimalHelperOpen.elm\",\n     exposing := (.items [.opened \"T\"]), imports := [],\n     types := [(\"T\", [(\"A\", 0), (\"B\", 0)])],\n     aliases := [],\n     defs := [ ] } ],\n  checks := [\n    chk .check \"testValue: B\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalImportValueTest",
+      "sha256": "fc3d827ded314a1b478a3e4c7e7a714e9567729a582b57b02e43c95fda4492de",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalHelperValue.elm",
+          "sha256": "9b907dff37c293520a9745683a86b39345f283227be3ed467b38d67cb0f53f2f"
+        },
+        {
+          "path": "tests/elm/src/MinimalImportValueTest.elm",
+          "sha256": "fc3d827ded314a1b478a3e4c7e7a714e9567729a582b57b02e43c95fda4492de"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalImportValueTest",
+        "modules": [
+          "tests/elm/src/MinimalImportValueTest.elm",
+          "tests/elm/src/MinimalHelperValue.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalImportValueTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalImportValueTest.elm, tests/elm/src/MinimalHelperValue.elm -/\ndef g_elm_MinimalImportValueTest : Program := {\n  name := \"MinimalImportValueTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩, ⟨\"MinimalHelperValue\", \"MinimalHelperValue\", some (.items [.var \"seven\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (v \"seven\"),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  helpers := [\n   { name := \"MinimalHelperValue\", path := \"tests/elm/src/MinimalHelperValue.elm\",\n     exposing := (.items [.var \"seven\"]), imports := [],\n     types := [],\n     aliases := [],\n     defs := [\n      .fn \"seven\" [] (.atexp (.scon (.intF 7))) ] } ],\n  checks := [\n    chk .check \"testValue: 7\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalKillTest",
+      "sha256": "dfb02d8ff1f89afa91238d4c52c9b8b6a68dd81ebcc44084226e578921192044",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalKillTest.elm",
+          "sha256": "dfb02d8ff1f89afa91238d4c52c9b8b6a68dd81ebcc44084226e578921192044"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalKillTest",
+        "modules": [
+          "tests/elm/src/MinimalKillTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalKillTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalKillTest.elm -/\ndef g_elm_MinimalKillTest : Program := {\n  name := \"MinimalKillTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Process\", \"Process\", none⟩, ⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Task\" \"perform\") [c \"Got\", .atexp (.paren (ap (qv \"Task\" \"andThen\") [.atexp (.paren (lams [pw] (ap (qv \"Task\" \"succeed\") [i 3]))), .atexp (.paren (ap (qv \"Task\" \"andThen\") [qv \"Process\" \"kill\", .atexp (.paren (ap (qv \"Process\" \"spawn\") [.atexp (.paren (ap (qv \"Process\" \"sleep\") [.atexp (.scon (.intF 1000))]))]))]))]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: 3\" .int ] }\n\n/-- The worker test of MinimalKillTest. -/\ndef w_elm_MinimalKillTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalKillTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalLetRecursionTest",
+      "sha256": "dbf94a5ce0fd5def8e33315ff0fc4aedc7001234e23ab5cd553aba0f708ed2b1",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalLetRecursionTest.elm",
+          "sha256": "dbf94a5ce0fd5def8e33315ff0fc4aedc7001234e23ab5cd553aba0f708ed2b1"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalLetRecursionTest",
+        "modules": [
+          "tests/elm/src/MinimalLetRecursionTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalLetRecursionTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalLetRecursionTest.elm -/\ndef g_elm_MinimalLetRecursionTest : Program := {\n  name := \"MinimalLetRecursionTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.fn \"f\" [pv \"l\"] (caseOf (v \"l\") [(P (listP []), .atexp (.scon (.intF 0))), (.cons (P pw) (P (pv \"rest\")), ap (v \"f\") [v \"rest\"])])] (ap (v \"f\") [listE [.atexp (.scon (.intF 1))]])),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 0\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalLetTest",
+      "sha256": "7aa3890847d4b0aba89f36d5ba30524931dd51fe463883e12349a75e06542442",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalLetTest.elm",
+          "sha256": "7aa3890847d4b0aba89f36d5ba30524931dd51fe463883e12349a75e06542442"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalLetTest",
+        "modules": [
+          "tests/elm/src/MinimalLetTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalLetTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalLetTest.elm -/\ndef g_elm_MinimalLetTest : Program := {\n  name := \"MinimalLetTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (letDefs [.fn \"x\" [] (.atexp (.scon (.intF 1)))] (v \"x\")),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 1\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalNilPatternFailTest",
+      "sha256": "3bcfffff87213270140a5b92dbcde7aa63a0801929ebdd945c42945d810ef5b3",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalNilPatternFailTest.elm",
+          "sha256": "3bcfffff87213270140a5b92dbcde7aa63a0801929ebdd945c42945d810ef5b3"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalNilPatternFailTest",
+        "modules": [
+          "tests/elm/src/MinimalNilPatternFailTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalNilPatternFailTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalNilPatternFailTest.elm -/\ndef g_elm_MinimalNilPatternFailTest : Program := {\n  name := \"MinimalNilPatternFailTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (listE [.atexp (.scon (.intF 5))]) [(P (listP []), .atexp (.scon (.intF 0))), (P pw, .atexp (.scon (.intF 1)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 1\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalNilPatternTest",
+      "sha256": "09a4221d256b494fd21784b751b4b6311d3195b9ab0ee7f109b37db99eb6d19f",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalNilPatternTest.elm",
+          "sha256": "09a4221d256b494fd21784b751b4b6311d3195b9ab0ee7f109b37db99eb6d19f"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalNilPatternTest",
+        "modules": [
+          "tests/elm/src/MinimalNilPatternTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalNilPatternTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalNilPatternTest.elm -/\ndef g_elm_MinimalNilPatternTest : Program := {\n  name := \"MinimalNilPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (listE []) [(P (listP []), .atexp (.scon (.intF 1))), (P pw, .atexp (.scon (.intF 2)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 1\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalParenthesesTest",
+      "sha256": "de9db1a79fa078beee97b05bc9faf6f916d8e79776600c115bebd8b47f63678a",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalParenthesesTest.elm",
+          "sha256": "de9db1a79fa078beee97b05bc9faf6f916d8e79776600c115bebd8b47f63678a"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalParenthesesTest",
+        "modules": [
+          "tests/elm/src/MinimalParenthesesTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalParenthesesTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalParenthesesTest.elm -/\ndef g_elm_MinimalParenthesesTest : Program := {\n  name := \"MinimalParenthesesTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (.atexp (.paren (.atexp (.scon (.intF 7))))),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 7\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalParenthesisedPatternTest",
+      "sha256": "b7a674e59d96d8acf55f0009acfbaef5d56ebd1720badc0c5b0618f13c06e9c8",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalParenthesisedPatternTest.elm",
+          "sha256": "b7a674e59d96d8acf55f0009acfbaef5d56ebd1720badc0c5b0618f13c06e9c8"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalParenthesisedPatternTest",
+        "modules": [
+          "tests/elm/src/MinimalParenthesisedPatternTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalParenthesisedPatternTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalParenthesisedPatternTest.elm -/\ndef g_elm_MinimalParenthesisedPatternTest : Program := {\n  name := \"MinimalParenthesisedPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (.atexp (.scon (.intF 7))) [(P (.paren (P (pv \"n\"))), v \"n\")]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 7\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalParenthesisedTypeTest",
+      "sha256": "0723209ff0397ca73176c4124ab80a82c356435bc320c7dfe3cda6556c92ba06",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalParenthesisedTypeTest.elm",
+          "sha256": "0723209ff0397ca73176c4124ab80a82c356435bc320c7dfe3cda6556c92ba06"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalParenthesisedTypeTest",
+        "modules": [
+          "tests/elm/src/MinimalParenthesisedTypeTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalParenthesisedTypeTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalParenthesisedTypeTest.elm -/\ndef g_elm_MinimalParenthesisedTypeTest : Program := {\n  name := \"MinimalParenthesisedTypeTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (i 7),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 7\" .int ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeArrayTest",
+      "sha256": "68b066d79ea80dac5638289a47d4eaf1d45e00e87495ef284ca995528412fce6",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeArrayTest.elm",
+          "sha256": "68b066d79ea80dac5638289a47d4eaf1d45e00e87495ef284ca995528412fce6"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeArrayTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeArrayTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeArrayTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeArrayTest.elm -/\ndef g_elm_MinimalPipeArrayTest : Program := {\n  name := \"MinimalPipeArrayTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Array\", \"Array\", some (.items [.tycon \"Array\"])⟩, ⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"arrayIn\", .inn, (.array .int)), (\"arrayOut\", .out, (.array .int))],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"arrayOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"arrayIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeArrayTest. -/\ndef w_elm_MinimalPipeArrayTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeArrayTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"arrayIn\" [(Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))])],\n  sent := [(\"arrayOut\", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))]))],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeFalseTest",
+      "sha256": "db02658d7f2b5b44fe04a814b30e91812a003baaa3a653754e24d334033e215a",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeFalseTest.elm",
+          "sha256": "db02658d7f2b5b44fe04a814b30e91812a003baaa3a653754e24d334033e215a"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeFalseTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeFalseTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeFalseTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeFalseTest.elm -/\ndef g_elm_MinimalPipeFalseTest : Program := {\n  name := \"MinimalPipeFalseTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"boolIn\", .inn, .bool), (\"boolOut\", .out, .bool)],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"boolOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"boolIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeFalseTest. -/\ndef w_elm_MinimalPipeFalseTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeFalseTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"boolIn\" [.fls],\n  sent := [(\"boolOut\", .fls)],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeFloatTest",
+      "sha256": "22b5fe85aa718a5caaeec6968bc6f5e4f13650d86cae93f2f517c97a0177b50e",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeFloatTest.elm",
+          "sha256": "22b5fe85aa718a5caaeec6968bc6f5e4f13650d86cae93f2f517c97a0177b50e"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeFloatTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeFloatTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeFloatTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeFloatTest.elm -/\ndef g_elm_MinimalPipeFloatTest : Program := {\n  name := \"MinimalPipeFloatTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"floatIn\", .inn, .float), (\"floatOut\", .out, .float)],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"floatOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"floatIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeFloatTest. -/\ndef w_elm_MinimalPipeFloatTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeFloatTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"floatIn\" [(.num (Eff.jnum (25) (-1)))],\n  sent := [(\"floatOut\", (.num (Eff.jnum (25) (-1))))],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeIntTest",
+      "sha256": "5acc8f620ed85280b53895759305e4020096cd24f40f7dbf26d4d863857780f7",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeIntTest.elm",
+          "sha256": "5acc8f620ed85280b53895759305e4020096cd24f40f7dbf26d4d863857780f7"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeIntTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeIntTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeIntTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeIntTest.elm -/\ndef g_elm_MinimalPipeIntTest : Program := {\n  name := \"MinimalPipeIntTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"intIn\", .inn, .int), (\"intOut\", .out, .int)],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"intOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"intIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeIntTest. -/\ndef w_elm_MinimalPipeIntTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeIntTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"intIn\" [(.num (Eff.jnum (3) (0)))],\n  sent := [(\"intOut\", (.num (Eff.jnum (3) (0))))],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeJustTest",
+      "sha256": "8ef627de22ccffa3d6bacaee176935d7fab0c8807dd0ad66ccd3cbf84726db5e",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeJustTest.elm",
+          "sha256": "8ef627de22ccffa3d6bacaee176935d7fab0c8807dd0ad66ccd3cbf84726db5e"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeJustTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeJustTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeJustTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeJustTest.elm -/\ndef g_elm_MinimalPipeJustTest : Program := {\n  name := \"MinimalPipeJustTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"maybeIn\", .inn, (.maybe .int)), (\"maybeOut\", .out, (.maybe .int))],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"maybeOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"maybeIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeJustTest. -/\ndef w_elm_MinimalPipeJustTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeJustTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"maybeIn\" [(.num (Eff.jnum (5) (0)))],\n  sent := [(\"maybeOut\", (.num (Eff.jnum (5) (0))))],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeListTest",
+      "sha256": "52c9410771fb3d3a57988485fbb06f84e75a36f0e5bc43f2fe9f68e013d86b35",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeListTest.elm",
+          "sha256": "52c9410771fb3d3a57988485fbb06f84e75a36f0e5bc43f2fe9f68e013d86b35"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeListTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeListTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeListTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeListTest.elm -/\ndef g_elm_MinimalPipeListTest : Program := {\n  name := \"MinimalPipeListTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"listIn\", .inn, (.list .int)), (\"listOut\", .out, (.list .int))],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"listOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"listIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeListTest. -/\ndef w_elm_MinimalPipeListTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeListTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"listIn\" [(Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))])],\n  sent := [(\"listOut\", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))]))],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeNothingTest",
+      "sha256": "9bef6b3d401347fc06f4f39f4939af457e4a256601fb2d0e2574c31cbb44af16",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeNothingTest.elm",
+          "sha256": "9bef6b3d401347fc06f4f39f4939af457e4a256601fb2d0e2574c31cbb44af16"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeNothingTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeNothingTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeNothingTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeNothingTest.elm -/\ndef g_elm_MinimalPipeNothingTest : Program := {\n  name := \"MinimalPipeNothingTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"maybeIn\", .inn, (.maybe .int)), (\"maybeOut\", .out, (.maybe .int))],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"maybeOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"maybeIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeNothingTest. -/\ndef w_elm_MinimalPipeNothingTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeNothingTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"maybeIn\" [.null],\n  sent := [(\"maybeOut\", .null)],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeRecordTest",
+      "sha256": "ee31ea9e75e3cf347293a5797f6cf2b6ec8efe267075c02c6914f62b970ce1cb",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeRecordTest.elm",
+          "sha256": "ee31ea9e75e3cf347293a5797f6cf2b6ec8efe267075c02c6914f62b970ce1cb"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeRecordTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeRecordTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeRecordTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeRecordTest.elm -/\ndef g_elm_MinimalPipeRecordTest : Program := {\n  name := \"MinimalPipeRecordTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"recordIn\", .inn, (.record (.cons \"a\" .int .nil))), (\"recordOut\", .out, (.record (.cons \"a\" .int .nil)))],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"recordOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"recordIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeRecordTest. -/\ndef w_elm_MinimalPipeRecordTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeRecordTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"recordIn\" [(Eff.BVal.mkObj [(\"a\", (.num (Eff.jnum (1) (0))))])],\n  sent := [(\"recordOut\", (Eff.BVal.mkObj [(\"a\", (.num (Eff.jnum (1) (0))))]))],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeStringTest",
+      "sha256": "0b444c651dbd9b60fe3b9cd21c03c8f3cec30d23b472b6ba8db2fe2c0616b295",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeStringTest.elm",
+          "sha256": "0b444c651dbd9b60fe3b9cd21c03c8f3cec30d23b472b6ba8db2fe2c0616b295"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeStringTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeStringTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeStringTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeStringTest.elm -/\ndef g_elm_MinimalPipeStringTest : Program := {\n  name := \"MinimalPipeStringTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"stringIn\", .inn, .string), (\"stringOut\", .out, .string)],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"stringOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"stringIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeStringTest. -/\ndef w_elm_MinimalPipeStringTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeStringTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"stringIn\" [(.str \"a\")],\n  sent := [(\"stringOut\", (.str \"a\"))],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeTrueTest",
+      "sha256": "82322f129100b8e2ee65cc488981aa7d922bbc1c9e7a2bfea61e86ddb506bf67",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeTrueTest.elm",
+          "sha256": "82322f129100b8e2ee65cc488981aa7d922bbc1c9e7a2bfea61e86ddb506bf67"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeTrueTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeTrueTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeTrueTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeTrueTest.elm -/\ndef g_elm_MinimalPipeTrueTest : Program := {\n  name := \"MinimalPipeTrueTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"boolIn\", .inn, .bool), (\"boolOut\", .out, .bool)],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"boolOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"boolIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeTrueTest. -/\ndef w_elm_MinimalPipeTrueTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeTrueTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"boolIn\" [.tru],\n  sent := [(\"boolOut\", .tru)],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeTupleTest",
+      "sha256": "40bd3724f2dff96f5b4afc12d7cfa9e893042b5df06f7de3b48c78444c58f7aa",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeTupleTest.elm",
+          "sha256": "40bd3724f2dff96f5b4afc12d7cfa9e893042b5df06f7de3b48c78444c58f7aa"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeTupleTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeTupleTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeTupleTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeTupleTest.elm -/\ndef g_elm_MinimalPipeTupleTest : Program := {\n  name := \"MinimalPipeTupleTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"pairIn\", .inn, (.tuple2 .int .int)), (\"pairOut\", .out, (.tuple2 .int .int))],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"pairOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"pairIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeTupleTest. -/\ndef w_elm_MinimalPipeTupleTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeTupleTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"pairIn\" [(Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))])],\n  sent := [(\"pairOut\", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))]))],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeUnitTest",
+      "sha256": "d05c5f705d41f87adba7770bf3c341933ea53be7137a80ae78e28106c8222e4f",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeUnitTest.elm",
+          "sha256": "d05c5f705d41f87adba7770bf3c341933ea53be7137a80ae78e28106c8222e4f"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeUnitTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeUnitTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeUnitTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeUnitTest.elm -/\ndef g_elm_MinimalPipeUnitTest : Program := {\n  name := \"MinimalPipeUnitTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"unitIn\", .inn, .unit), (\"unitOut\", .out, .unit)],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"unitOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"unitIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeUnitTest. -/\ndef w_elm_MinimalPipeUnitTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeUnitTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"unitIn\" [.null],\n  sent := [(\"unitOut\", .null)],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeValueTest",
+      "sha256": "f42c001bd919a67b8071b4ec4c928858bb076d971d511d83ef5c7d411bfa82e1",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPipeValueTest.elm",
+          "sha256": "f42c001bd919a67b8071b4ec4c928858bb076d971d511d83ef5c7d411bfa82e1"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPipeValueTest",
+        "modules": [
+          "tests/elm/src/MinimalPipeValueTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPipeValueTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPipeValueTest.elm -/\ndef g_elm_MinimalPipeValueTest : Program := {\n  name := \"MinimalPipeValueTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Json.Encode\", \"Json.Encode\", some (.items [.tycon \"Value\"])⟩, ⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"valueIn\", .inn, .value), (\"valueOut\", .out, .value)],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (tup2 (v \"model\") (ap (v \"valueOut\") [v \"v\"])),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"valueIn\") [c \"Got\"]))]]) ],\n  checks := [ ] }\n\n/-- The worker test of MinimalPipeValueTest. -/\ndef w_elm_MinimalPipeValueTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPipeValueTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"valueIn\" [(Eff.BVal.mkObj [(\"a\", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), .tru]))])],\n  sent := [(\"valueOut\", (Eff.BVal.mkObj [(\"a\", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), .tru]))]))],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPortSubscriptionTest",
+      "sha256": "dc4992e07b1594c5fb680acedc2ff19167b60b1ec73585f22d2e232d1190cfaf",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalPortSubscriptionTest.elm",
+          "sha256": "dc4992e07b1594c5fb680acedc2ff19167b60b1ec73585f22d2e232d1190cfaf"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalPortSubscriptionTest",
+        "modules": [
+          "tests/elm/src/MinimalPortSubscriptionTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalPortSubscriptionTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "feed",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalPortSubscriptionTest.elm -/\ndef g_elm_MinimalPortSubscriptionTest : Program := {\n  name := \"MinimalPortSubscriptionTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Platform\", \"Platform\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  ports := [(\"numIn\", .inn, .int)],\n  defs := [\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", lams [pw] (tup2 (.atexp .unit) (qv \"Cmd\" \"none\"))), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (ap (v \"numIn\") [c \"Got\"]))]]) ],\n  checks := [\n    chk .check \"got: 5\" .int ] }\n\n/-- The worker test of MinimalPortSubscriptionTest. -/\ndef w_elm_MinimalPortSubscriptionTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalPortSubscriptionTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .feed \"numIn\" [(.num (Eff.jnum (5) (0)))],\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRecordAliasConstructorTest",
+      "sha256": "39786d86d9b9d5db1253c83bcfd9a80eca653674d8086dd84bee15130af166a5",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalRecordAliasConstructorTest.elm",
+          "sha256": "39786d86d9b9d5db1253c83bcfd9a80eca653674d8086dd84bee15130af166a5"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalRecordAliasConstructorTest",
+        "modules": [
+          "tests/elm/src/MinimalRecordAliasConstructorTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalRecordAliasConstructorTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalRecordAliasConstructorTest.elm -/\ndef g_elm_MinimalRecordAliasConstructorTest : Program := {\n  name := \"MinimalRecordAliasConstructorTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [(\"P\", some [\"a\"])],\n  defs := [\n    .fn \"testValue\" [] (ap (c \"P\") [i 1]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: { a = 1 }\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRecordPatternTest",
+      "sha256": "fbb3bc5180a27fb4b9123701877a6e731711f8eceeed30a11398d8b82537d501",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalRecordPatternTest.elm",
+          "sha256": "fbb3bc5180a27fb4b9123701877a6e731711f8eceeed30a11398d8b82537d501"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalRecordPatternTest",
+        "modules": [
+          "tests/elm/src/MinimalRecordPatternTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalRecordPatternTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalRecordPatternTest.elm -/\ndef g_elm_MinimalRecordPatternTest : Program := {\n  name := \"MinimalRecordPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (recE [(\"a\", .atexp (.scon (.intF 1)))]) [(P (precord [(\"a\", \"a\")]), v \"a\")]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 1\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRecordTest",
+      "sha256": "29920b78d437fb68aa95d3219f02dd64af1133630f87722e82e8c583e1dad807",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalRecordTest.elm",
+          "sha256": "29920b78d437fb68aa95d3219f02dd64af1133630f87722e82e8c583e1dad807"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalRecordTest",
+        "modules": [
+          "tests/elm/src/MinimalRecordTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalRecordTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalRecordTest.elm -/\ndef g_elm_MinimalRecordTest : Program := {\n  name := \"MinimalRecordTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (recE [(\"a\", .atexp (.scon (.intF 1)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: { a = 1 }\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRecordTypeTest",
+      "sha256": "54b02e31a80dede7b4fbb3b053b35c587ebae1d8c94fc555125fb4e15eab088f",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalRecordTypeTest.elm",
+          "sha256": "54b02e31a80dede7b4fbb3b053b35c587ebae1d8c94fc555125fb4e15eab088f"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalRecordTypeTest",
+        "modules": [
+          "tests/elm/src/MinimalRecordTypeTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalRecordTypeTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalRecordTypeTest.elm -/\ndef g_elm_MinimalRecordTypeTest : Program := {\n  name := \"MinimalRecordTypeTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (recE [(\"a\", i 1)]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: { a = 1 }\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRecordUpdateTest",
+      "sha256": "1e5f8d57b7b80f55feea7392634b427bc67015083eb1c21249dd30ab9e453127",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalRecordUpdateTest.elm",
+          "sha256": "1e5f8d57b7b80f55feea7392634b427bc67015083eb1c21249dd30ab9e453127"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalRecordUpdateTest",
+        "modules": [
+          "tests/elm/src/MinimalRecordUpdateTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalRecordUpdateTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalRecordUpdateTest.elm -/\ndef g_elm_MinimalRecordUpdateTest : Program := {\n  name := \"MinimalRecordUpdateTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"r\" [] (recE [(\"a\", .atexp (.scon (.intF 1)))]),\n    .fn \"testValue\" [] (updE \"r\" [(\"a\", .atexp (.scon (.intF 2)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: { a = 2 }\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRowVariableTest",
+      "sha256": "eb9d02f18c72acf3e8ce834d779ebe2c8635c3e4aa0e1ef03ff8fd92c11629df",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalRowVariableTest.elm",
+          "sha256": "eb9d02f18c72acf3e8ce834d779ebe2c8635c3e4aa0e1ef03ff8fd92c11629df"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalRowVariableTest",
+        "modules": [
+          "tests/elm/src/MinimalRowVariableTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalRowVariableTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalRowVariableTest.elm -/\ndef g_elm_MinimalRowVariableTest : Program := {\n  name := \"MinimalRowVariableTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"getA\" [precord [(\"a\", \"a\")]] (v \"a\"),\n    .fn \"testValue\" [] (ap (v \"getA\") [recE [(\"a\", i 1), (\"b\", .atexp (.scon (.intF 2)))]]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 1\" .int ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalSleepTest",
+      "sha256": "2f3084b9f9016550328f82fe4cec8526cce65061b729890106503b0536c2bb88",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalSleepTest.elm",
+          "sha256": "2f3084b9f9016550328f82fe4cec8526cce65061b729890106503b0536c2bb88"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalSleepTest",
+        "modules": [
+          "tests/elm/src/MinimalSleepTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalSleepTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalSleepTest.elm -/\ndef g_elm_MinimalSleepTest : Program := {\n  name := \"MinimalSleepTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Process\", \"Process\", none⟩, ⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Task\" \"perform\") [c \"Got\", .atexp (.paren (ap (qv \"Process\" \"sleep\") [.atexp (.scon (.intF 10))]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: ()\" .data ] }\n\n/-- The worker test of MinimalSleepTest. -/\ndef w_elm_MinimalSleepTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalSleepTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalSpawnTest",
+      "sha256": "407e91291aa2c9652cd39f605a9053755651bf676a799bb8f094eb2324d2150b",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalSpawnTest.elm",
+          "sha256": "407e91291aa2c9652cd39f605a9053755651bf676a799bb8f094eb2324d2150b"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalSpawnTest",
+        "modules": [
+          "tests/elm/src/MinimalSpawnTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalSpawnTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalSpawnTest.elm -/\ndef g_elm_MinimalSpawnTest : Program := {\n  name := \"MinimalSpawnTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Process\", \"Process\", none⟩, ⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Task\" \"perform\") [c \"Got\", .atexp (.paren (ap (qv \"Task\" \"andThen\") [.atexp (.paren (lams [pw] (ap (qv \"Task\" \"succeed\") [i 2]))), .atexp (.paren (ap (qv \"Process\" \"spawn\") [.atexp (.paren (ap (qv \"Task\" \"succeed\") [.atexp (.scon (.intF 1))]))]))]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: 2\" .int ] }\n\n/-- The worker test of MinimalSpawnTest. -/\ndef w_elm_MinimalSpawnTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalSpawnTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskAndThenFailTest",
+      "sha256": "ade4c1be7e0edd00d3a6429d4a4affc72026d0dbc49910633aa5bb8297399b52",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalTaskAndThenFailTest.elm",
+          "sha256": "ade4c1be7e0edd00d3a6429d4a4affc72026d0dbc49910633aa5bb8297399b52"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalTaskAndThenFailTest",
+        "modules": [
+          "tests/elm/src/MinimalTaskAndThenFailTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalTaskAndThenFailTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalTaskAndThenFailTest.elm -/\ndef g_elm_MinimalTaskAndThenFailTest : Program := {\n  name := \"MinimalTaskAndThenFailTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Task\" \"attempt\") [c \"Got\", .atexp (.paren (ap (qv \"Task\" \"andThen\") [.atexp (.paren (lams [pw] (ap (qv \"Task\" \"succeed\") [i 2]))), .atexp (.paren (ap (qv \"Task\" \"fail\") [i 1]))]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: Err 1\" .data ] }\n\n/-- The worker test of MinimalTaskAndThenFailTest. -/\ndef w_elm_MinimalTaskAndThenFailTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalTaskAndThenFailTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskAndThenInnerTest",
+      "sha256": "e2e28886076279a389c44c19a0bf53e24bc62e3cb7adeca61d8acd902de4043f",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalTaskAndThenInnerTest.elm",
+          "sha256": "e2e28886076279a389c44c19a0bf53e24bc62e3cb7adeca61d8acd902de4043f"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalTaskAndThenInnerTest",
+        "modules": [
+          "tests/elm/src/MinimalTaskAndThenInnerTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalTaskAndThenInnerTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalTaskAndThenInnerTest.elm -/\ndef g_elm_MinimalTaskAndThenInnerTest : Program := {\n  name := \"MinimalTaskAndThenInnerTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Task\" \"perform\") [c \"Got\", .atexp (.paren (ap (qv \"Task\" \"andThen\") [.atexp (.paren (lams [pw] (ap (qv \"Task\" \"succeed\") [i 2]))), .atexp (.paren (ap (qv \"Task\" \"andThen\") [.atexp (.paren (lams [pw] (ap (qv \"Task\" \"succeed\") [.atexp (.scon (.intF 1))]))), .atexp (.paren (ap (qv \"Task\" \"succeed\") [.atexp (.scon (.intF 0))]))]))]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: 2\" .int ] }\n\n/-- The worker test of MinimalTaskAndThenInnerTest. -/\ndef w_elm_MinimalTaskAndThenInnerTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalTaskAndThenInnerTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskAndThenTest",
+      "sha256": "8ef0daa8d68c464d70abd1ad4c51e48371ace302afb9bb50d8d5c20f557a35ac",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalTaskAndThenTest.elm",
+          "sha256": "8ef0daa8d68c464d70abd1ad4c51e48371ace302afb9bb50d8d5c20f557a35ac"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalTaskAndThenTest",
+        "modules": [
+          "tests/elm/src/MinimalTaskAndThenTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalTaskAndThenTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalTaskAndThenTest.elm -/\ndef g_elm_MinimalTaskAndThenTest : Program := {\n  name := \"MinimalTaskAndThenTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Task\" \"perform\") [c \"Got\", .atexp (.paren (ap (qv \"Task\" \"andThen\") [.atexp (.paren (lams [pw] (ap (qv \"Task\" \"succeed\") [i 2]))), .atexp (.paren (ap (qv \"Task\" \"succeed\") [.atexp (.scon (.intF 1))]))]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: 2\" .int ] }\n\n/-- The worker test of MinimalTaskAndThenTest. -/\ndef w_elm_MinimalTaskAndThenTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalTaskAndThenTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskOnErrorInnerTest",
+      "sha256": "8b3a6ae014547ed3e1dee9bc44dd8067b8d1c82a25a06902e9f4136676532585",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalTaskOnErrorInnerTest.elm",
+          "sha256": "8b3a6ae014547ed3e1dee9bc44dd8067b8d1c82a25a06902e9f4136676532585"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalTaskOnErrorInnerTest",
+        "modules": [
+          "tests/elm/src/MinimalTaskOnErrorInnerTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalTaskOnErrorInnerTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalTaskOnErrorInnerTest.elm -/\ndef g_elm_MinimalTaskOnErrorInnerTest : Program := {\n  name := \"MinimalTaskOnErrorInnerTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Task\" \"perform\") [c \"Got\", .atexp (.paren (ap (qv \"Task\" \"onError\") [.atexp (.paren (lams [pw] (ap (qv \"Task\" \"succeed\") [i 3]))), .atexp (.paren (ap (qv \"Task\" \"andThen\") [.atexp (.paren (lams [pw] (ap (qv \"Task\" \"succeed\") [i 1]))), .atexp (.paren (ap (qv \"Task\" \"fail\") [.atexp (.scon (.intF 0))]))]))]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: 3\" .int ] }\n\n/-- The worker test of MinimalTaskOnErrorInnerTest. -/\ndef w_elm_MinimalTaskOnErrorInnerTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalTaskOnErrorInnerTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskOnErrorSucceedTest",
+      "sha256": "ff476b46ad1f9a6bfb718efab58a9ba3dd0b2c191327ae0a637b68f007cbc1b7",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalTaskOnErrorSucceedTest.elm",
+          "sha256": "ff476b46ad1f9a6bfb718efab58a9ba3dd0b2c191327ae0a637b68f007cbc1b7"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalTaskOnErrorSucceedTest",
+        "modules": [
+          "tests/elm/src/MinimalTaskOnErrorSucceedTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalTaskOnErrorSucceedTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalTaskOnErrorSucceedTest.elm -/\ndef g_elm_MinimalTaskOnErrorSucceedTest : Program := {\n  name := \"MinimalTaskOnErrorSucceedTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Task\" \"perform\") [c \"Got\", .atexp (.paren (ap (qv \"Task\" \"onError\") [.atexp (.paren (lams [pw] (ap (qv \"Task\" \"succeed\") [i 2]))), .atexp (.paren (ap (qv \"Task\" \"succeed\") [i 1]))]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: 1\" .int ] }\n\n/-- The worker test of MinimalTaskOnErrorSucceedTest. -/\ndef w_elm_MinimalTaskOnErrorSucceedTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalTaskOnErrorSucceedTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskOnErrorTest",
+      "sha256": "aa8ec0a9035610588abf815f13b86e53895b2ac7898c96633183b11704e754a0",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalTaskOnErrorTest.elm",
+          "sha256": "aa8ec0a9035610588abf815f13b86e53895b2ac7898c96633183b11704e754a0"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalTaskOnErrorTest",
+        "modules": [
+          "tests/elm/src/MinimalTaskOnErrorTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalTaskOnErrorTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalTaskOnErrorTest.elm -/\ndef g_elm_MinimalTaskOnErrorTest : Program := {\n  name := \"MinimalTaskOnErrorTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Task\" \"perform\") [c \"Got\", .atexp (.paren (ap (qv \"Task\" \"onError\") [.atexp (.paren (lams [pw] (ap (qv \"Task\" \"succeed\") [i 2]))), .atexp (.paren (ap (qv \"Task\" \"fail\") [.atexp (.scon (.intF 1))]))]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: 2\" .int ] }\n\n/-- The worker test of MinimalTaskOnErrorTest. -/\ndef w_elm_MinimalTaskOnErrorTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalTaskOnErrorTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskPerformTest",
+      "sha256": "074c5e855a5f143bc5e3b762073fcd19063776ab874b62db39c70ba21a83930b",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalTaskPerformTest.elm",
+          "sha256": "074c5e855a5f143bc5e3b762073fcd19063776ab874b62db39c70ba21a83930b"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalTaskPerformTest",
+        "modules": [
+          "tests/elm/src/MinimalTaskPerformTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Worker01",
+      "def": "g_elm_MinimalTaskPerformTest",
+      "checks": 1,
+      "kind": "worker",
+      "native": false,
+      "host": "none",
+      "flags": null,
+      "lean": "/-- tests/elm/src/MinimalTaskPerformTest.elm -/\ndef g_elm_MinimalTaskPerformTest : Program := {\n  name := \"MinimalTaskPerformTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Task\", \"Task\", none⟩],\n  types := [(\"Msg\", [(\"Got\", 1)])],\n  aliases := [],\n  defs := [\n    .fn \"init\" [pw] (tup2 (.atexp .unit) (ap (qv \"Task\" \"perform\") [c \"Got\", .atexp (.paren (ap (qv \"Task\" \"succeed\") [i 1]))])),\n    .fn \"update\" [.paren (pcon \"Got\" [pv \"v\"]), pv \"model\"] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"got\", v \"v\"])] (tup2 (v \"model\") (qv \"Cmd\" \"none\"))),\n    .fn \"main\" [] (ap (qv \"Platform\" \"worker\") [recE [(\"init\", v \"init\"), (\"update\", v \"update\"), (\"subscriptions\", lams [pw] (qv \"Sub\" \"none\"))]]) ],\n  checks := [\n    chk .check \"got: 1\" .int ] }\n\n/-- The worker test of MinimalTaskPerformTest. -/\ndef w_elm_MinimalTaskPerformTest : Prog.WorkerTest := {\n  prog := g_elm_MinimalTaskPerformTest,\n  flagsType := .unit,\n  flags := .null,\n  host := .none,\n  checks := [] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTuplePatternTest",
+      "sha256": "0f272e714fd57f9e344b11bc8e87f300e1ae66441287288d46fcd8dc771208ee",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalTuplePatternTest.elm",
+          "sha256": "0f272e714fd57f9e344b11bc8e87f300e1ae66441287288d46fcd8dc771208ee"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalTuplePatternTest",
+        "modules": [
+          "tests/elm/src/MinimalTuplePatternTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalTuplePatternTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalTuplePatternTest.elm -/\ndef g_elm_MinimalTuplePatternTest : Program := {\n  name := \"MinimalTuplePatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) [(P (ptup2 (P (pv \"a\")) (P (pv \"b\"))), v \"b\")]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 2\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTypeAliasTest",
+      "sha256": "9eb6cfda3e8585f14d34244dddeceefe4bc1663bf06814db7bf773191d4e2206",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalTypeAliasTest.elm",
+          "sha256": "9eb6cfda3e8585f14d34244dddeceefe4bc1663bf06814db7bf773191d4e2206"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalTypeAliasTest",
+        "modules": [
+          "tests/elm/src/MinimalTypeAliasTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalTypeAliasTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalTypeAliasTest.elm -/\ndef g_elm_MinimalTypeAliasTest : Program := {\n  name := \"MinimalTypeAliasTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [(\"A\", none)],\n  defs := [\n    .fn \"testValue\" [] (i 7),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 7\" .int ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTypeVariableTest",
+      "sha256": "637a5058147fc193a027e1195628bfbd9a2bf79b7f05ca647c21bc07a56c0783",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalTypeVariableTest.elm",
+          "sha256": "637a5058147fc193a027e1195628bfbd9a2bf79b7f05ca647c21bc07a56c0783"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalTypeVariableTest",
+        "modules": [
+          "tests/elm/src/MinimalTypeVariableTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalTypeVariableTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalTypeVariableTest.elm -/\ndef g_elm_MinimalTypeVariableTest : Program := {\n  name := \"MinimalTypeVariableTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"same\" [pv \"x\"] (v \"x\"),\n    .fn \"testValue\" [] (ap (v \"same\") [.atexp (.scon (.intF 7))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 7\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalUnitPatternTest",
+      "sha256": "16c2a90dc79aa0b6134f5c6b1a479cdaa52fbdc42c15cd4556b95af6743a05f9",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalUnitPatternTest.elm",
+          "sha256": "16c2a90dc79aa0b6134f5c6b1a479cdaa52fbdc42c15cd4556b95af6743a05f9"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalUnitPatternTest",
+        "modules": [
+          "tests/elm/src/MinimalUnitPatternTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalUnitPatternTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalUnitPatternTest.elm -/\ndef g_elm_MinimalUnitPatternTest : Program := {\n  name := \"MinimalUnitPatternTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (caseOf (.atexp .unit) [(P .unit, .atexp (.scon (.intF 1)))]),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 1\" .float ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalUnitTest",
+      "sha256": "5f35c787819e3bb54ecc66c5a0eea9a531bc0784780c3368a6fd9e7aade42016",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalUnitTest.elm",
+          "sha256": "5f35c787819e3bb54ecc66c5a0eea9a531bc0784780c3368a6fd9e7aade42016"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalUnitTest",
+        "modules": [
+          "tests/elm/src/MinimalUnitTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalUnitTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalUnitTest.elm -/\ndef g_elm_MinimalUnitTest : Program := {\n  name := \"MinimalUnitTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"testValue\" [] (.atexp .unit),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: ()\" .data ] }"
+    },
+    {
+      "project": "elm",
+      "name": "MinimalVariableTest",
+      "sha256": "e9a4434f0485cf837bdd4992925ba596f171cb64f28a372f957f2f5925671336",
+      "sources": [
+        {
+          "path": "tests/elm/src/MinimalVariableTest.elm",
+          "sha256": "e9a4434f0485cf837bdd4992925ba596f171cb64f28a372f957f2f5925671336"
+        }
+      ],
+      "src": {
+        "status": "written",
+        "shard": "SrcElm_LetNumberRecordM",
+        "def": "s_elm_MinimalVariableTest",
+        "modules": [
+          "tests/elm/src/MinimalVariableTest.elm"
+        ]
+      },
+      "status": "translated",
+      "shard": "Elm_M",
+      "def": "g_elm_MinimalVariableTest",
+      "checks": 1,
+      "kind": "view",
+      "native": false,
+      "lean": "/-- tests/elm/src/MinimalVariableTest.elm -/\ndef g_elm_MinimalVariableTest : Program := {\n  name := \"MinimalVariableTest\", source := \"tests/elm/src\",\n  exposing := (.items [.var \"main\"]), imports := [⟨\"Html\", \"Html\", some (.items [.var \"text\"])⟩],\n  types := [],\n  aliases := [],\n  defs := [\n    .fn \"seven\" [] (.atexp (.scon (.intF 7))),\n    .fn \"testValue\" [] (v \"seven\"),\n    .fn \"main\" [] (letDefs [.pat pw (ap (qv \"Debug\" \"log\") [str \"testValue\", v \"testValue\"])] (ap (v \"text\") [str \"done\"])) ],\n  checks := [\n    chk .check \"testValue: 7\" .float ] }"
+    },
+    {
+      "project": "elm",
       "name": "MissingPatternsAMissingListLengthTest",
       "sha256": "038f6fc1b186cfd9aa8f2a52676e096075ed3cf542d77f180a153e3749545dac",
       "sources": [

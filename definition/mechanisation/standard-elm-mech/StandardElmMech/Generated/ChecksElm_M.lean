@@ -13,6 +13,43 @@ open StandardElm.D
   g_elm_MaybeJustTest
   g_elm_MaybeNothingTest
   g_elm_MaybePatternMatchTest
+  g_elm_MinimalAsPatternTest
+  g_elm_MinimalCaseNextRuleTest
+  g_elm_MinimalCaseTest
+  g_elm_MinimalConsPatternFailTest
+  g_elm_MinimalConsPatternTest
+  g_elm_MinimalConstantPatternTest
+  g_elm_MinimalConstantTest
+  g_elm_MinimalConstructedPatternFailTest
+  g_elm_MinimalConstructedPatternTest
+  g_elm_MinimalConstructorPatternFailTest
+  g_elm_MinimalConstructorPatternTest
+  g_elm_MinimalCustomTypeTest
+  g_elm_MinimalDestructuringTest
+  g_elm_MinimalEmptyListTest
+  g_elm_MinimalExposingAliasTest
+  g_elm_MinimalExposingAllTest
+  g_elm_MinimalExposingOpenTest
+  g_elm_MinimalImportValueTest
+  g_elm_MinimalLetRecursionTest
+  g_elm_MinimalLetTest
+  g_elm_MinimalNilPatternFailTest
+  g_elm_MinimalNilPatternTest
+  g_elm_MinimalParenthesesTest
+  g_elm_MinimalParenthesisedPatternTest
+  g_elm_MinimalParenthesisedTypeTest
+  g_elm_MinimalRecordAliasConstructorTest
+  g_elm_MinimalRecordPatternTest
+  g_elm_MinimalRecordTest
+  g_elm_MinimalRecordTypeTest
+  g_elm_MinimalRecordUpdateTest
+  g_elm_MinimalRowVariableTest
+  g_elm_MinimalTuplePatternTest
+  g_elm_MinimalTypeAliasTest
+  g_elm_MinimalTypeVariableTest
+  g_elm_MinimalUnitPatternTest
+  g_elm_MinimalUnitTest
+  g_elm_MinimalVariableTest
   g_elm_MultiLocalTailRecTest
   g_elm_MutualLetRecClosuresTest
   g_elm_MutualLetRecManyCapturesTest

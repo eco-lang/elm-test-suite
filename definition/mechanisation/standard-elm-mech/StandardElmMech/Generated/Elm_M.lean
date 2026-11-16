@@ -41,6 +41,480 @@ def g_elm_MaybePatternMatchTest : Program := {
     chk .check "match1: 42" .float,
     chk .check "match2: 0" .float ] }
 
+/-- tests/elm/src/MinimalAsPatternTest.elm -/
+def g_elm_MinimalAsPatternTest : Program := {
+  name := "MinimalAsPatternTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (.atexp (.scon (.intF 7))) [(.as (P pw) "m", v "m")]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 7" .float ] }
+
+/-- tests/elm/src/MinimalCaseNextRuleTest.elm -/
+def g_elm_MinimalCaseNextRuleTest : Program := {
+  name := "MinimalCaseNextRuleTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (i 2) [(P (pint 1), .atexp (.scon (.intF 10))), (P pw, .atexp (.scon (.intF 20)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 20" .float ] }
+
+/-- tests/elm/src/MinimalCaseTest.elm -/
+def g_elm_MinimalCaseTest : Program := {
+  name := "MinimalCaseTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (.atexp (.scon (.intF 7))) [(P (pv "n"), v "n")]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 7" .float ] }
+
+/-- tests/elm/src/MinimalConsPatternFailTest.elm -/
+def g_elm_MinimalConsPatternFailTest : Program := {
+  name := "MinimalConsPatternFailTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (listE []) [(.cons (P (pv "x")) (P pw), v "x"), (P (listP []), str "none")]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: \"none\"" .string ] }
+
+/-- tests/elm/src/MinimalConsPatternTest.elm -/
+def g_elm_MinimalConsPatternTest : Program := {
+  name := "MinimalConsPatternTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (listE [.atexp (.scon (.intF 1))]) [(.cons (P (pv "x")) (P pw), v "x"), (P (listP []), .atexp (.scon (.intF 0)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 1" .float ] }
+
+/-- tests/elm/src/MinimalConstantPatternTest.elm -/
+def g_elm_MinimalConstantPatternTest : Program := {
+  name := "MinimalConstantPatternTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (i 1) [(P (pint 1), .atexp (.scon (.intF 10))), (P pw, .atexp (.scon (.intF 20)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 10" .float ] }
+
+/-- tests/elm/src/MinimalConstantTest.elm -/
+def g_elm_MinimalConstantTest : Program := {
+  name := "MinimalConstantTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (.atexp (.scon (.intF 7))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 7" .float ] }
+
+/-- tests/elm/src/MinimalConstructedPatternFailTest.elm -/
+def g_elm_MinimalConstructedPatternFailTest : Program := {
+  name := "MinimalConstructedPatternFailTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (c "Nothing") [(pcon "Just" [pv "n"], v "n"), (P (pcA "Nothing"), .atexp (.scon (.intF 0)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 0" .float ] }
+
+/-- tests/elm/src/MinimalConstructedPatternTest.elm -/
+def g_elm_MinimalConstructedPatternTest : Program := {
+  name := "MinimalConstructedPatternTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (ap (c "Just") [.atexp (.scon (.intF 3))]) [(pcon "Just" [pv "n"], v "n"), (P (pcA "Nothing"), .atexp (.scon (.intF 0)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 3" .float ] }
+
+/-- tests/elm/src/MinimalConstructorPatternFailTest.elm -/
+def g_elm_MinimalConstructorPatternFailTest : Program := {
+  name := "MinimalConstructorPatternFailTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (c "False") [(P (pcA "True"), .atexp (.scon (.intF 1))), (P (pcA "False"), .atexp (.scon (.intF 0)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 0" .float ] }
+
+/-- tests/elm/src/MinimalConstructorPatternTest.elm -/
+def g_elm_MinimalConstructorPatternTest : Program := {
+  name := "MinimalConstructorPatternTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (c "True") [(P (pcA "True"), .atexp (.scon (.intF 1))), (P (pcA "False"), .atexp (.scon (.intF 0)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 1" .float ] }
+
+/-- tests/elm/src/MinimalCustomTypeTest.elm -/
+def g_elm_MinimalCustomTypeTest : Program := {
+  name := "MinimalCustomTypeTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [("T", [("A", 0)])],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (c "A"),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: A" .data ] }
+
+/-- tests/elm/src/MinimalDestructuringTest.elm -/
+def g_elm_MinimalDestructuringTest : Program := {
+  name := "MinimalDestructuringTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.pat (ptup2 (P (pv "a")) (P (pv "b"))) (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2))))] (v "b")),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 2" .float ] }
+
+/-- tests/elm/src/MinimalEmptyListTest.elm -/
+def g_elm_MinimalEmptyListTest : Program := {
+  name := "MinimalEmptyListTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (listE []),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: []" .data ] }
+
+/-- tests/elm/src/MinimalExposingAliasTest.elm, tests/elm/src/MinimalHelperAlias.elm -/
+def g_elm_MinimalExposingAliasTest : Program := {
+  name := "MinimalExposingAliasTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩, ⟨"MinimalHelperAlias", "MinimalHelperAlias", some (.items [.tycon "P"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (ap (c "P") [i 1]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  helpers := [
+   { name := "MinimalHelperAlias", path := "tests/elm/src/MinimalHelperAlias.elm",
+     exposing := (.items [.tycon "P"]), imports := [],
+     types := [],
+     aliases := [("P", some ["a"])],
+     defs := [ ] } ],
+  checks := [
+    chk .check "testValue: { a = 1 }" .data ] }
+
+/-- tests/elm/src/MinimalExposingAllTest.elm, tests/elm/src/MinimalHelperAll.elm -/
+def g_elm_MinimalExposingAllTest : Program := {
+  name := "MinimalExposingAllTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩, ⟨"MinimalHelperAll", "MinimalHelperAll", some (.items [.var "eight"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (v "eight"),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  helpers := [
+   { name := "MinimalHelperAll", path := "tests/elm/src/MinimalHelperAll.elm",
+     exposing := .all, imports := [],
+     types := [],
+     aliases := [],
+     defs := [
+      .fn "eight" [] (.atexp (.scon (.intF 8))) ] } ],
+  checks := [
+    chk .check "testValue: 8" .float ] }
+
+/-- tests/elm/src/MinimalExposingOpenTest.elm, tests/elm/src/MinimalHelperOpen.elm -/
+def g_elm_MinimalExposingOpenTest : Program := {
+  name := "MinimalExposingOpenTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩, ⟨"MinimalHelperOpen", "MinimalHelperOpen", some (.items [.opened "T"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (c "B"),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  helpers := [
+   { name := "MinimalHelperOpen", path := "tests/elm/src/MinimalHelperOpen.elm",
+     exposing := (.items [.opened "T"]), imports := [],
+     types := [("T", [("A", 0), ("B", 0)])],
+     aliases := [],
+     defs := [ ] } ],
+  checks := [
+    chk .check "testValue: B" .data ] }
+
+/-- tests/elm/src/MinimalImportValueTest.elm, tests/elm/src/MinimalHelperValue.elm -/
+def g_elm_MinimalImportValueTest : Program := {
+  name := "MinimalImportValueTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩, ⟨"MinimalHelperValue", "MinimalHelperValue", some (.items [.var "seven"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (v "seven"),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  helpers := [
+   { name := "MinimalHelperValue", path := "tests/elm/src/MinimalHelperValue.elm",
+     exposing := (.items [.var "seven"]), imports := [],
+     types := [],
+     aliases := [],
+     defs := [
+      .fn "seven" [] (.atexp (.scon (.intF 7))) ] } ],
+  checks := [
+    chk .check "testValue: 7" .float ] }
+
+/-- tests/elm/src/MinimalLetRecursionTest.elm -/
+def g_elm_MinimalLetRecursionTest : Program := {
+  name := "MinimalLetRecursionTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.fn "f" [pv "l"] (caseOf (v "l") [(P (listP []), .atexp (.scon (.intF 0))), (.cons (P pw) (P (pv "rest")), ap (v "f") [v "rest"])])] (ap (v "f") [listE [.atexp (.scon (.intF 1))]])),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 0" .float ] }
+
+/-- tests/elm/src/MinimalLetTest.elm -/
+def g_elm_MinimalLetTest : Program := {
+  name := "MinimalLetTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (letDefs [.fn "x" [] (.atexp (.scon (.intF 1)))] (v "x")),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 1" .float ] }
+
+/-- tests/elm/src/MinimalNilPatternFailTest.elm -/
+def g_elm_MinimalNilPatternFailTest : Program := {
+  name := "MinimalNilPatternFailTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (listE [.atexp (.scon (.intF 5))]) [(P (listP []), .atexp (.scon (.intF 0))), (P pw, .atexp (.scon (.intF 1)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 1" .float ] }
+
+/-- tests/elm/src/MinimalNilPatternTest.elm -/
+def g_elm_MinimalNilPatternTest : Program := {
+  name := "MinimalNilPatternTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (listE []) [(P (listP []), .atexp (.scon (.intF 1))), (P pw, .atexp (.scon (.intF 2)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 1" .float ] }
+
+/-- tests/elm/src/MinimalParenthesesTest.elm -/
+def g_elm_MinimalParenthesesTest : Program := {
+  name := "MinimalParenthesesTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (.atexp (.paren (.atexp (.scon (.intF 7))))),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 7" .float ] }
+
+/-- tests/elm/src/MinimalParenthesisedPatternTest.elm -/
+def g_elm_MinimalParenthesisedPatternTest : Program := {
+  name := "MinimalParenthesisedPatternTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (.atexp (.scon (.intF 7))) [(P (.paren (P (pv "n"))), v "n")]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 7" .float ] }
+
+/-- tests/elm/src/MinimalParenthesisedTypeTest.elm -/
+def g_elm_MinimalParenthesisedTypeTest : Program := {
+  name := "MinimalParenthesisedTypeTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (i 7),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 7" .int ] }
+
+/-- tests/elm/src/MinimalRecordAliasConstructorTest.elm -/
+def g_elm_MinimalRecordAliasConstructorTest : Program := {
+  name := "MinimalRecordAliasConstructorTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [("P", some ["a"])],
+  defs := [
+    .fn "testValue" [] (ap (c "P") [i 1]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: { a = 1 }" .data ] }
+
+/-- tests/elm/src/MinimalRecordPatternTest.elm -/
+def g_elm_MinimalRecordPatternTest : Program := {
+  name := "MinimalRecordPatternTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (recE [("a", .atexp (.scon (.intF 1)))]) [(P (precord [("a", "a")]), v "a")]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 1" .float ] }
+
+/-- tests/elm/src/MinimalRecordTest.elm -/
+def g_elm_MinimalRecordTest : Program := {
+  name := "MinimalRecordTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (recE [("a", .atexp (.scon (.intF 1)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: { a = 1 }" .data ] }
+
+/-- tests/elm/src/MinimalRecordTypeTest.elm -/
+def g_elm_MinimalRecordTypeTest : Program := {
+  name := "MinimalRecordTypeTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (recE [("a", i 1)]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: { a = 1 }" .data ] }
+
+/-- tests/elm/src/MinimalRecordUpdateTest.elm -/
+def g_elm_MinimalRecordUpdateTest : Program := {
+  name := "MinimalRecordUpdateTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "r" [] (recE [("a", .atexp (.scon (.intF 1)))]),
+    .fn "testValue" [] (updE "r" [("a", .atexp (.scon (.intF 2)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: { a = 2 }" .data ] }
+
+/-- tests/elm/src/MinimalRowVariableTest.elm -/
+def g_elm_MinimalRowVariableTest : Program := {
+  name := "MinimalRowVariableTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "getA" [precord [("a", "a")]] (v "a"),
+    .fn "testValue" [] (ap (v "getA") [recE [("a", i 1), ("b", .atexp (.scon (.intF 2)))]]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 1" .int ] }
+
+/-- tests/elm/src/MinimalTuplePatternTest.elm -/
+def g_elm_MinimalTuplePatternTest : Program := {
+  name := "MinimalTuplePatternTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (tup2 (.atexp (.scon (.intF 1))) (.atexp (.scon (.intF 2)))) [(P (ptup2 (P (pv "a")) (P (pv "b"))), v "b")]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 2" .float ] }
+
+/-- tests/elm/src/MinimalTypeAliasTest.elm -/
+def g_elm_MinimalTypeAliasTest : Program := {
+  name := "MinimalTypeAliasTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [("A", none)],
+  defs := [
+    .fn "testValue" [] (i 7),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 7" .int ] }
+
+/-- tests/elm/src/MinimalTypeVariableTest.elm -/
+def g_elm_MinimalTypeVariableTest : Program := {
+  name := "MinimalTypeVariableTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "same" [pv "x"] (v "x"),
+    .fn "testValue" [] (ap (v "same") [.atexp (.scon (.intF 7))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 7" .float ] }
+
+/-- tests/elm/src/MinimalUnitPatternTest.elm -/
+def g_elm_MinimalUnitPatternTest : Program := {
+  name := "MinimalUnitPatternTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (caseOf (.atexp .unit) [(P .unit, .atexp (.scon (.intF 1)))]),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 1" .float ] }
+
+/-- tests/elm/src/MinimalUnitTest.elm -/
+def g_elm_MinimalUnitTest : Program := {
+  name := "MinimalUnitTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "testValue" [] (.atexp .unit),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: ()" .data ] }
+
+/-- tests/elm/src/MinimalVariableTest.elm -/
+def g_elm_MinimalVariableTest : Program := {
+  name := "MinimalVariableTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Html", "Html", some (.items [.var "text"])⟩],
+  types := [],
+  aliases := [],
+  defs := [
+    .fn "seven" [] (.atexp (.scon (.intF 7))),
+    .fn "testValue" [] (v "seven"),
+    .fn "main" [] (letDefs [.pat pw (ap (qv "Debug" "log") [str "testValue", v "testValue"])] (ap (v "text") [str "done"])) ],
+  checks := [
+    chk .check "testValue: 7" .float ] }
+
 /-- tests/elm/src/MultiLocalTailRecTest.elm -/
 def g_elm_MultiLocalTailRecTest : Program := {
   name := "MultiLocalTailRecTest", source := "tests/elm/src",
@@ -290,6 +764,43 @@ def shard_Elm_M : List Program :=
   [g_elm_MaybeJustTest,
    g_elm_MaybeNothingTest,
    g_elm_MaybePatternMatchTest,
+   g_elm_MinimalAsPatternTest,
+   g_elm_MinimalCaseNextRuleTest,
+   g_elm_MinimalCaseTest,
+   g_elm_MinimalConsPatternFailTest,
+   g_elm_MinimalConsPatternTest,
+   g_elm_MinimalConstantPatternTest,
+   g_elm_MinimalConstantTest,
+   g_elm_MinimalConstructedPatternFailTest,
+   g_elm_MinimalConstructedPatternTest,
+   g_elm_MinimalConstructorPatternFailTest,
+   g_elm_MinimalConstructorPatternTest,
+   g_elm_MinimalCustomTypeTest,
+   g_elm_MinimalDestructuringTest,
+   g_elm_MinimalEmptyListTest,
+   g_elm_MinimalExposingAliasTest,
+   g_elm_MinimalExposingAllTest,
+   g_elm_MinimalExposingOpenTest,
+   g_elm_MinimalImportValueTest,
+   g_elm_MinimalLetRecursionTest,
+   g_elm_MinimalLetTest,
+   g_elm_MinimalNilPatternFailTest,
+   g_elm_MinimalNilPatternTest,
+   g_elm_MinimalParenthesesTest,
+   g_elm_MinimalParenthesisedPatternTest,
+   g_elm_MinimalParenthesisedTypeTest,
+   g_elm_MinimalRecordAliasConstructorTest,
+   g_elm_MinimalRecordPatternTest,
+   g_elm_MinimalRecordTest,
+   g_elm_MinimalRecordTypeTest,
+   g_elm_MinimalRecordUpdateTest,
+   g_elm_MinimalRowVariableTest,
+   g_elm_MinimalTuplePatternTest,
+   g_elm_MinimalTypeAliasTest,
+   g_elm_MinimalTypeVariableTest,
+   g_elm_MinimalUnitPatternTest,
+   g_elm_MinimalUnitTest,
+   g_elm_MinimalVariableTest,
    g_elm_MultiLocalTailRecTest,
    g_elm_MutualLetRecClosuresTest,
    g_elm_MutualLetRecManyCapturesTest,

@@ -13,10 +13,10 @@
       "inference": 217
     },
     "compileSuccess": {
-      "B0": 52,
-      "harness": 551,
+      "B0": 77,
+      "harness": 584,
       "library": 28,
-      "helper": 9,
+      "helper": 13,
       "outside": 0,
       "parse-fail": 0
     }
@@ -13103,6 +13103,1030 @@
       "modules": [
         {
           "path": "tests/elm/src/MaybePatternMatchTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalAsPatternTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalAsPatternTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalCaseNextRuleTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalCaseNextRuleTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalCaseTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalCaseTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalCmdMapTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalCmdMapTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConsPatternFailTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalConsPatternFailTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConsPatternTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalConsPatternTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstantPatternTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalConstantPatternTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstantTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalConstantTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstructedPatternFailTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalConstructedPatternFailTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstructedPatternTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalConstructedPatternTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstructorPatternFailTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalConstructorPatternFailTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalConstructorPatternTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalConstructorPatternTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalCustomTypeTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalCustomTypeTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalDestructuringTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalDestructuringTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalEmptyListTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalEmptyListTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalExposingAliasTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalExposingAliasTest.elm",
+          "parse": "ok"
+        },
+        {
+          "path": "tests/elm/src/MinimalHelperAlias.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "helper",
+      "needs": [
+        "helper:MinimalHelperAlias",
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalExposingAllTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalExposingAllTest.elm",
+          "parse": "ok"
+        },
+        {
+          "path": "tests/elm/src/MinimalHelperAll.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "helper",
+      "needs": [
+        "helper:MinimalHelperAll",
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalExposingOpenTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalExposingOpenTest.elm",
+          "parse": "ok"
+        },
+        {
+          "path": "tests/elm/src/MinimalHelperOpen.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "helper",
+      "needs": [
+        "helper:MinimalHelperOpen",
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalImportValueTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalImportValueTest.elm",
+          "parse": "ok"
+        },
+        {
+          "path": "tests/elm/src/MinimalHelperValue.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "helper",
+      "needs": [
+        "helper:MinimalHelperValue",
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalKillTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalKillTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalLetRecursionTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalLetRecursionTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalLetTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalLetTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalNilPatternFailTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalNilPatternFailTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalNilPatternTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalNilPatternTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalParenthesesTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalParenthesesTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalParenthesisedPatternTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalParenthesisedPatternTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalParenthesisedTypeTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalParenthesisedTypeTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeArrayTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeArrayTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeFalseTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeFalseTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeFloatTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeFloatTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeIntTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeIntTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeJustTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeJustTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeListTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeListTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeNothingTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeNothingTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeRecordTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeRecordTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeStringTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeStringTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeTrueTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeTrueTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeTupleTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeTupleTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeUnitTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeUnitTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPipeValueTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPipeValueTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalPortSubscriptionTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalPortSubscriptionTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRecordAliasConstructorTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalRecordAliasConstructorTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRecordPatternTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalRecordPatternTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRecordTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalRecordTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRecordTypeTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalRecordTypeTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRecordUpdateTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalRecordUpdateTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalRowVariableTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalRowVariableTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalSleepTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalSleepTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalSpawnTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalSpawnTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskAndThenFailTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalTaskAndThenFailTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskAndThenInnerTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalTaskAndThenInnerTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskAndThenTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalTaskAndThenTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskOnErrorInnerTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalTaskOnErrorInnerTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskOnErrorSucceedTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalTaskOnErrorSucceedTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskOnErrorTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalTaskOnErrorTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTaskPerformTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalTaskPerformTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "B0",
+      "needs": [],
+      "main": "program",
+      "mainAnnotated": true
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTuplePatternTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalTuplePatternTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTypeAliasTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalTypeAliasTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalTypeVariableTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalTypeVariableTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalUnitPatternTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalUnitPatternTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalUnitTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalUnitTest.elm",
+          "parse": "ok"
+        }
+      ],
+      "parse": "ok",
+      "basis": "harness",
+      "needs": [
+        "harness"
+      ],
+      "main": "other",
+      "mainAnnotated": false
+    },
+    {
+      "project": "elm",
+      "name": "MinimalVariableTest",
+      "modules": [
+        {
+          "path": "tests/elm/src/MinimalVariableTest.elm",
           "parse": "ok"
         }
       ],

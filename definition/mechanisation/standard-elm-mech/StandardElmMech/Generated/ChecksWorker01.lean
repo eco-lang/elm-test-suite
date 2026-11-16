@@ -18,6 +18,31 @@ open StandardElm.D
   w_elm_CoreIssue1141UnusedPortCallBreaksSubscriptionTest
   w_elm_FlagsRecordTest
   w_elm_ListLiteralDebugLogKindTest
+  w_elm_MinimalCmdMapTest
+  w_elm_MinimalKillTest
+  w_elm_MinimalPipeArrayTest
+  w_elm_MinimalPipeFalseTest
+  w_elm_MinimalPipeFloatTest
+  w_elm_MinimalPipeIntTest
+  w_elm_MinimalPipeJustTest
+  w_elm_MinimalPipeListTest
+  w_elm_MinimalPipeNothingTest
+  w_elm_MinimalPipeRecordTest
+  w_elm_MinimalPipeStringTest
+  w_elm_MinimalPipeTrueTest
+  w_elm_MinimalPipeTupleTest
+  w_elm_MinimalPipeUnitTest
+  w_elm_MinimalPipeValueTest
+  w_elm_MinimalPortSubscriptionTest
+  w_elm_MinimalSleepTest
+  w_elm_MinimalSpawnTest
+  w_elm_MinimalTaskAndThenFailTest
+  w_elm_MinimalTaskAndThenInnerTest
+  w_elm_MinimalTaskAndThenTest
+  w_elm_MinimalTaskOnErrorInnerTest
+  w_elm_MinimalTaskOnErrorSucceedTest
+  w_elm_MinimalTaskOnErrorTest
+  w_elm_MinimalTaskPerformTest
   w_elm_NoImportsTest
   w_elm_OutgoingPortTuple3KeepsRunningTest
   w_elm_OutgoingPortTuple3Test

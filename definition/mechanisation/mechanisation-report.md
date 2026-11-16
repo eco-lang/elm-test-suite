@@ -1,5 +1,18 @@
 # Mechanisation Report
 
+> **Update, 2026-11-15 (the simplest test of every rule; plans/simplest-tests.md).** Each rule and
+> restriction was checked for a small, focused `elm-spec` test in the `elm` project; 121 had none,
+> four rules (`dm-topdec-port-in`, `dm-topdec-port-out`, `p-disp-plat`, `p-platform`) had no
+> `elm-spec` test at all. 62 `Minimal*Test` programs fill the gaps (with four helper modules): one
+> expression per construct of the Core, one annotation per type expression, one exposing item per
+> helper module, one command per task and process rule, and one pipe per boundary type. All pass on
+> the four compilers and all translate. `d-match-fail` can have no test (an exhaustive match never
+> fails as a whole), and `p-disp-plat`/`p-platform` none within `elm-spec` (A83).
+>
+> Counts (`scripts/verify.sh full`): 702 of the 1017 `elm-spec` tests translated; 702 legal, 287
+> refused; 702 `spec_`, 700 `mean_`, 702 `ident_`, 702 of 702 agree end to end; run-examples 1,909
+> of 1,909 checks agree; check-axioms 16,285 theorems, 0 problems.
+
 > **Update, 2026-11-15 (record pattern rows; ruling A99, plans/record-pattern-rows.md).** Number
 > specialisation asked for a copy of `{ h } = e` at Int that binds a new variable to field `h`, which
 > no record pattern could write (step 10, Issues, item 4). The bare pattern row is now `lab = var`;

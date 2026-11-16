@@ -34,6 +34,8 @@ Rebuilt on 2026-11-13 after a compile-error test was added (LetCycleThroughLambd
 
 Rebuilt on 2026-11-15 after ruling A99 (plans/record-pattern-rows.md): the bare pattern row is `lab = var` (Figure "Grammar: Patterns" and the full grammar); a row written as a label alone is a new derived form, df:pattern-row-label, in a new block "Pattern Rows" of the figure "Derived forms of Patterns and Pattern Rows", and the field accessor's equivalent form is written in bare syntax `(\{ lab = lab } -> lab)`; Chapter 2 defines the variable of a pattern row and gains the restriction core-pattern-row-label-only, so the book has 39 restrictions; rules r:s-patrow and r:d-patrow-field bind the row's variable; number specialisation says that a copy renames the variables of pattern rows and never a label; the introduction, the derived-forms appendix and Appendix F's Records row say so. The preface's counts become 640 translated and legal programs and 287 of the 315 that must be refused. A first build put Appendix F's Types figure 38pt over its page; the Records row was shortened. 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
 
+Rebuilt on 2026-11-15 after 62 tests were added, the simplest test of each rule that had none (plans/simplest-tests.md): the preface's counts become 702 translated and legal programs. 187 pages, 194 rules, no warnings, the same 3 overfull boxes.
+
 ## Status
 
 | Field | Value |

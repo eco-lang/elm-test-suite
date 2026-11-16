@@ -71,3 +71,13 @@ The same loop makes any two `Bytes` values equal in Elm/JS: a `DataView` has no 
 for `_Utils_eqHelp` to walk (read from elm/core 1.0.5's `Utils.js`; not run, since Elm 0.19.1
 rejects `Bytes` ports). The pipe tests ([host-pipe-tests.md](host-pipe-tests.md), 2026-11-15)
 avoid `==` for this reason: the test driver compares what goes in with what comes out.
+
+## Tests tagged `d-match-fail`
+
+Found on 2026-11-15 while finding the simplest test of every rule ([simplest-tests.md](simplest-tests.md)).
+Rule `d-match-fail` gives FAIL for a match of one rule whose pattern fails. A match fails as a whole
+only when all its rules fail, which an exhaustive match never does (res:core-exhaustiveness), so no
+legal program uses the rule: in `case v of A -> 1 ; _ -> 2` the last match is `_ -> 2`, which
+matches. CaseOrderTest and CaseBranchSelectionTest tag it; their programs use `d-match-next` and
+`d-mrule-fail` instead. Possible correction: remove the tag from both (the rule then has no test,
+which is correct, and the book could say that it is there for completeness).

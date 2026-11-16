@@ -232,6 +232,390 @@ def s_elm_MaybePatternMatchTest : Src.SProgram := Src.canonOrder <| Src.prog "el
     [Src.imp "Html" none (some (.items [.var "text"]))]
     [Src.val "unwrap" none [Src.pv "maybe"] (.caseE (Src.v "maybe") [(Src.pc "Just" [Src.pv "x"], Src.v "x"), (Src.pc "Nothing" [], Src.i 0)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "match1", .paren (Src.app (Src.v "unwrap") [.paren (Src.app (Src.c "Just") [Src.i 42])])]), .pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "match2", .paren (Src.app (Src.v "unwrap") [Src.c "Nothing"])])] (Src.app (Src.v "text") [Src.str "done"]))] ]
 
+/-- tests/elm/src/MinimalAsPatternTest.elm -/
+def s_elm_MinimalAsPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalAsPatternTest" [
+  Src.mdl (Src.hdr false "MinimalAsPatternTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (Src.i 7) [(.as (.wild) "m", Src.v "m")]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalCaseNextRuleTest.elm -/
+def s_elm_MinimalCaseNextRuleTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalCaseNextRuleTest" [
+  Src.mdl (Src.hdr false "MinimalCaseNextRuleTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (Src.i 2) [(.lit (.int 1), Src.i 10), (.wild, Src.i 20)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalCaseTest.elm -/
+def s_elm_MinimalCaseTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalCaseTest" [
+  Src.mdl (Src.hdr false "MinimalCaseTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (Src.i 7) [(Src.pv "n", Src.v "n")]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalCmdMapTest.elm -/
+def s_elm_MinimalCmdMapTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalCmdMapTest" [
+  Src.mdl (Src.hdr false "MinimalCmdMapTest" (.items [.var "main"]))
+    [Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Cmd" "map") [Src.c "Got", .paren (Src.app (Src.qv "Task" "perform") [Src.v "identity", .paren (Src.app (Src.qv "Task" "succeed") [Src.i 1])])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalConsPatternFailTest.elm -/
+def s_elm_MinimalConsPatternFailTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalConsPatternFailTest" [
+  Src.mdl (Src.hdr false "MinimalConsPatternFailTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (.list []) [(.cons (Src.pv "x") (.wild), Src.v "x"), (.list [], Src.str "none")]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalConsPatternTest.elm -/
+def s_elm_MinimalConsPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalConsPatternTest" [
+  Src.mdl (Src.hdr false "MinimalConsPatternTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (.list [Src.i 1]) [(.cons (Src.pv "x") (.wild), Src.v "x"), (.list [], Src.i 0)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalConstantPatternTest.elm -/
+def s_elm_MinimalConstantPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalConstantPatternTest" [
+  Src.mdl (Src.hdr false "MinimalConstantPatternTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (Src.i 1) [(.lit (.int 1), Src.i 10), (.wild, Src.i 20)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalConstantTest.elm -/
+def s_elm_MinimalConstantTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalConstantTest" [
+  Src.mdl (Src.hdr false "MinimalConstantTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (Src.i 7), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalConstructedPatternFailTest.elm -/
+def s_elm_MinimalConstructedPatternFailTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalConstructedPatternFailTest" [
+  Src.mdl (Src.hdr false "MinimalConstructedPatternFailTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (Src.c "Nothing") [(Src.pc "Just" [Src.pv "n"], Src.v "n"), (Src.pc "Nothing" [], Src.i 0)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalConstructedPatternTest.elm -/
+def s_elm_MinimalConstructedPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalConstructedPatternTest" [
+  Src.mdl (Src.hdr false "MinimalConstructedPatternTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (Src.app (Src.c "Just") [Src.i 3]) [(Src.pc "Just" [Src.pv "n"], Src.v "n"), (Src.pc "Nothing" [], Src.i 0)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalConstructorPatternFailTest.elm -/
+def s_elm_MinimalConstructorPatternFailTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalConstructorPatternFailTest" [
+  Src.mdl (Src.hdr false "MinimalConstructorPatternFailTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (Src.c "False") [(Src.pc "True" [], Src.i 1), (Src.pc "False" [], Src.i 0)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalConstructorPatternTest.elm -/
+def s_elm_MinimalConstructorPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalConstructorPatternTest" [
+  Src.mdl (Src.hdr false "MinimalConstructorPatternTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (Src.c "True") [(Src.pc "True" [], Src.i 1), (Src.pc "False" [], Src.i 0)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalCustomTypeTest.elm -/
+def s_elm_MinimalCustomTypeTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalCustomTypeTest" [
+  Src.mdl (Src.hdr false "MinimalCustomTypeTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [.custom "T" [] [("A", [])], Src.val "testValue" none [] (Src.c "A"), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalDestructuringTest.elm -/
+def s_elm_MinimalDestructuringTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalDestructuringTest" [
+  Src.mdl (Src.hdr false "MinimalDestructuringTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.letE [.pat (.tuple [Src.pv "a", Src.pv "b"]) (.tuple [Src.i 1, Src.i 2])] (Src.v "b")), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalEmptyListTest.elm -/
+def s_elm_MinimalEmptyListTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalEmptyListTest" [
+  Src.mdl (Src.hdr false "MinimalEmptyListTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.list []), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalHelperAlias.elm, tests/elm/src/MinimalExposingAliasTest.elm -/
+def s_elm_MinimalExposingAliasTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalExposingAliasTest" [
+  Src.mdl (Src.hdr false "MinimalHelperAlias" (.items [.ty "P"]))
+    []
+    [.alias "P" [] (.record [("a", Src.tc "Int" [])])],
+  Src.mdl (Src.hdr false "MinimalExposingAliasTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"])), Src.imp "MinimalHelperAlias" none (some (.items [.ty "P"]))]
+    [Src.val "testValue" none [] (Src.app (Src.c "P") [Src.i 1]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalHelperAll.elm, tests/elm/src/MinimalExposingAllTest.elm -/
+def s_elm_MinimalExposingAllTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalExposingAllTest" [
+  Src.mdl (Src.hdr false "MinimalHelperAll" (.all))
+    []
+    [Src.val "eight" none [] (Src.i 8)],
+  Src.mdl (Src.hdr false "MinimalExposingAllTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"])), Src.imp "MinimalHelperAll" none (some (.items [.var "eight"]))]
+    [Src.val "testValue" none [] (Src.v "eight"), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalHelperOpen.elm, tests/elm/src/MinimalExposingOpenTest.elm -/
+def s_elm_MinimalExposingOpenTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalExposingOpenTest" [
+  Src.mdl (Src.hdr false "MinimalHelperOpen" (.items [.tyAll "T"]))
+    []
+    [.custom "T" [] [("A", []), ("B", [])]],
+  Src.mdl (Src.hdr false "MinimalExposingOpenTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"])), Src.imp "MinimalHelperOpen" none (some (.items [.tyAll "T"]))]
+    [Src.val "testValue" none [] (Src.c "B"), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalHelperValue.elm, tests/elm/src/MinimalImportValueTest.elm -/
+def s_elm_MinimalImportValueTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalImportValueTest" [
+  Src.mdl (Src.hdr false "MinimalHelperValue" (.items [.var "seven"]))
+    []
+    [Src.val "seven" none [] (Src.i 7)],
+  Src.mdl (Src.hdr false "MinimalImportValueTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"])), Src.imp "MinimalHelperValue" none (some (.items [.var "seven"]))]
+    [Src.val "testValue" none [] (Src.v "seven"), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalKillTest.elm -/
+def s_elm_MinimalKillTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalKillTest" [
+  Src.mdl (Src.hdr false "MinimalKillTest" (.items [.var "main"]))
+    [Src.imp "Process" none none, Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "perform") [Src.c "Got", .paren (Src.app (Src.qv "Task" "andThen") [.paren (.lam [.wild] (Src.app (Src.qv "Task" "succeed") [Src.i 3])), .paren (Src.app (Src.qv "Task" "andThen") [Src.qv "Process" "kill", .paren (Src.app (Src.qv "Process" "spawn") [.paren (Src.app (Src.qv "Process" "sleep") [Src.i 1000])])])])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalLetRecursionTest.elm -/
+def s_elm_MinimalLetRecursionTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalLetRecursionTest" [
+  Src.mdl (Src.hdr false "MinimalLetRecursionTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.letE [.fn "f" none [Src.pv "l"] (.caseE (Src.v "l") [(.list [], Src.i 0), (.cons (.wild) (Src.pv "rest"), Src.app (Src.v "f") [Src.v "rest"])])] (Src.app (Src.v "f") [.list [Src.i 1]])), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalLetTest.elm -/
+def s_elm_MinimalLetTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalLetTest" [
+  Src.mdl (Src.hdr false "MinimalLetTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.letE [.fn "x" none [] (Src.i 1)] (Src.v "x")), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalNilPatternFailTest.elm -/
+def s_elm_MinimalNilPatternFailTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalNilPatternFailTest" [
+  Src.mdl (Src.hdr false "MinimalNilPatternFailTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (.list [Src.i 5]) [(.list [], Src.i 0), (.wild, Src.i 1)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalNilPatternTest.elm -/
+def s_elm_MinimalNilPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalNilPatternTest" [
+  Src.mdl (Src.hdr false "MinimalNilPatternTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (.list []) [(.list [], Src.i 1), (.wild, Src.i 2)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalParenthesesTest.elm -/
+def s_elm_MinimalParenthesesTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalParenthesesTest" [
+  Src.mdl (Src.hdr false "MinimalParenthesesTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.paren (Src.i 7)), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalParenthesisedPatternTest.elm -/
+def s_elm_MinimalParenthesisedPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalParenthesisedPatternTest" [
+  Src.mdl (Src.hdr false "MinimalParenthesisedPatternTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (Src.i 7) [(.paren (Src.pv "n"), Src.v "n")]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalParenthesisedTypeTest.elm -/
+def s_elm_MinimalParenthesisedTypeTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalParenthesisedTypeTest" [
+  Src.mdl (Src.hdr false "MinimalParenthesisedTypeTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (Src.tc "Int" [])) [] (Src.i 7), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalPipeArrayTest.elm -/
+def s_elm_MinimalPipeArrayTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeArrayTest" [
+  Src.mdl (Src.hdr true "MinimalPipeArrayTest" (.items [.var "main"]))
+    [Src.imp "Array" none (some (.items [.ty "Array"])), Src.imp "Platform" none none]
+    [.port "arrayIn" (.fn (.fn (Src.tc "Array" [Src.tc "Int" []]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "arrayOut" (.fn (Src.tc "Array" [Src.tc "Int" []]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Array" [Src.tc "Int" []]])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "arrayOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "arrayIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeFalseTest.elm -/
+def s_elm_MinimalPipeFalseTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeFalseTest" [
+  Src.mdl (Src.hdr true "MinimalPipeFalseTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "boolIn" (.fn (.fn (Src.tc "Bool" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "boolOut" (.fn (Src.tc "Bool" []) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Bool" []])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "boolOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "boolIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeFloatTest.elm -/
+def s_elm_MinimalPipeFloatTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeFloatTest" [
+  Src.mdl (Src.hdr true "MinimalPipeFloatTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "floatIn" (.fn (.fn (Src.tc "Float" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "floatOut" (.fn (Src.tc "Float" []) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Float" []])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "floatOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "floatIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeIntTest.elm -/
+def s_elm_MinimalPipeIntTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeIntTest" [
+  Src.mdl (Src.hdr true "MinimalPipeIntTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "intIn" (.fn (.fn (Src.tc "Int" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "intOut" (.fn (Src.tc "Int" []) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "intOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "intIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeJustTest.elm -/
+def s_elm_MinimalPipeJustTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeJustTest" [
+  Src.mdl (Src.hdr true "MinimalPipeJustTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "maybeIn" (.fn (.fn (Src.tc "Maybe" [Src.tc "Int" []]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "maybeOut" (.fn (Src.tc "Maybe" [Src.tc "Int" []]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Maybe" [Src.tc "Int" []]])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "maybeOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "maybeIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeListTest.elm -/
+def s_elm_MinimalPipeListTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeListTest" [
+  Src.mdl (Src.hdr true "MinimalPipeListTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "listIn" (.fn (.fn (Src.tc "List" [Src.tc "Int" []]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "listOut" (.fn (Src.tc "List" [Src.tc "Int" []]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "List" [Src.tc "Int" []]])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "listOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "listIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeNothingTest.elm -/
+def s_elm_MinimalPipeNothingTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeNothingTest" [
+  Src.mdl (Src.hdr true "MinimalPipeNothingTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "maybeIn" (.fn (.fn (Src.tc "Maybe" [Src.tc "Int" []]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "maybeOut" (.fn (Src.tc "Maybe" [Src.tc "Int" []]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Maybe" [Src.tc "Int" []]])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "maybeOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "maybeIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeRecordTest.elm -/
+def s_elm_MinimalPipeRecordTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeRecordTest" [
+  Src.mdl (Src.hdr true "MinimalPipeRecordTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "recordIn" (.fn (.fn (.record [("a", Src.tc "Int" [])]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "recordOut" (.fn (.record [("a", Src.tc "Int" [])]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [.record [("a", Src.tc "Int" [])]])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "recordOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "recordIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeStringTest.elm -/
+def s_elm_MinimalPipeStringTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeStringTest" [
+  Src.mdl (Src.hdr true "MinimalPipeStringTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "stringIn" (.fn (.fn (Src.tc "String" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "stringOut" (.fn (Src.tc "String" []) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "String" []])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "stringOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "stringIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeTrueTest.elm -/
+def s_elm_MinimalPipeTrueTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeTrueTest" [
+  Src.mdl (Src.hdr true "MinimalPipeTrueTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "boolIn" (.fn (.fn (Src.tc "Bool" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "boolOut" (.fn (Src.tc "Bool" []) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Bool" []])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "boolOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "boolIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeTupleTest.elm -/
+def s_elm_MinimalPipeTupleTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeTupleTest" [
+  Src.mdl (Src.hdr true "MinimalPipeTupleTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "pairIn" (.fn (.fn (.tuple [Src.tc "Int" [], Src.tc "Int" []]) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "pairOut" (.fn (.tuple [Src.tc "Int" [], Src.tc "Int" []]) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [.tuple [Src.tc "Int" [], Src.tc "Int" []]])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "pairOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "pairIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeUnitTest.elm -/
+def s_elm_MinimalPipeUnitTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeUnitTest" [
+  Src.mdl (Src.hdr true "MinimalPipeUnitTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "unitIn" (.fn (.fn (.unit) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "unitOut" (.fn (.unit) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [.unit])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "unitOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "unitIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPipeValueTest.elm -/
+def s_elm_MinimalPipeValueTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPipeValueTest" [
+  Src.mdl (Src.hdr true "MinimalPipeValueTest" (.items [.var "main"]))
+    [Src.imp "Json.Encode" none (some (.items [.ty "Value"])), Src.imp "Platform" none none]
+    [.port "valueIn" (.fn (.fn (Src.tc "Value" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .port "valueOut" (.fn (Src.tc "Value" []) (Src.tc "Cmd" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Value" []])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.tuple [Src.v "model", Src.app (Src.v "valueOut") [Src.v "v"]]), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "valueIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalPortSubscriptionTest.elm -/
+def s_elm_MinimalPortSubscriptionTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalPortSubscriptionTest" [
+  Src.mdl (Src.hdr true "MinimalPortSubscriptionTest" (.items [.var "main"]))
+    [Src.imp "Platform" none none]
+    [.port "numIn" (.fn (.fn (Src.tc "Int" []) (Src.tv "msg")) (Src.tc "Sub" [Src.tv "msg"])), .custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", .lam [.wild] (.tuple [.unit, Src.qv "Cmd" "none"])), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.app (Src.v "numIn") [Src.c "Got"]))]])] ]
+
+/-- tests/elm/src/MinimalRecordAliasConstructorTest.elm -/
+def s_elm_MinimalRecordAliasConstructorTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalRecordAliasConstructorTest" [
+  Src.mdl (Src.hdr false "MinimalRecordAliasConstructorTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [.alias "P" [] (.record [("a", Src.tc "Int" [])]), Src.val "testValue" none [] (Src.app (Src.c "P") [Src.i 1]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalRecordPatternTest.elm -/
+def s_elm_MinimalRecordPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalRecordPatternTest" [
+  Src.mdl (Src.hdr false "MinimalRecordPatternTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (.record [("a", Src.i 1)]) [(.record ["a"], Src.v "a")]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalRecordTest.elm -/
+def s_elm_MinimalRecordTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalRecordTest" [
+  Src.mdl (Src.hdr false "MinimalRecordTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.record [("a", Src.i 1)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalRecordTypeTest.elm -/
+def s_elm_MinimalRecordTypeTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalRecordTypeTest" [
+  Src.mdl (Src.hdr false "MinimalRecordTypeTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (.record [("a", Src.tc "Int" [])])) [] (.record [("a", Src.i 1)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalRecordUpdateTest.elm -/
+def s_elm_MinimalRecordUpdateTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalRecordUpdateTest" [
+  Src.mdl (Src.hdr false "MinimalRecordUpdateTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "r" none [] (.record [("a", Src.i 1)]), Src.val "testValue" none [] (.update "r" [("a", Src.i 2)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalRowVariableTest.elm -/
+def s_elm_MinimalRowVariableTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalRowVariableTest" [
+  Src.mdl (Src.hdr false "MinimalRowVariableTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "getA" (some (.fn (.ext "r" [("a", Src.tc "Int" [])]) (Src.tc "Int" []))) [.record ["a"]] (Src.v "a"), Src.val "testValue" none [] (Src.app (Src.v "getA") [.record [("a", Src.i 1), ("b", Src.i 2)]]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalSleepTest.elm -/
+def s_elm_MinimalSleepTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalSleepTest" [
+  Src.mdl (Src.hdr false "MinimalSleepTest" (.items [.var "main"]))
+    [Src.imp "Process" none none, Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [.unit])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "perform") [Src.c "Got", .paren (Src.app (Src.qv "Process" "sleep") [Src.i 10])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalSpawnTest.elm -/
+def s_elm_MinimalSpawnTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalSpawnTest" [
+  Src.mdl (Src.hdr false "MinimalSpawnTest" (.items [.var "main"]))
+    [Src.imp "Process" none none, Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "perform") [Src.c "Got", .paren (Src.app (Src.qv "Task" "andThen") [.paren (.lam [.wild] (Src.app (Src.qv "Task" "succeed") [Src.i 2])), .paren (Src.app (Src.qv "Process" "spawn") [.paren (Src.app (Src.qv "Task" "succeed") [Src.i 1])])])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalTaskAndThenFailTest.elm -/
+def s_elm_MinimalTaskAndThenFailTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalTaskAndThenFailTest" [
+  Src.mdl (Src.hdr false "MinimalTaskAndThenFailTest" (.items [.var "main"]))
+    [Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [Src.tc "Result" [Src.tc "Int" [], Src.tc "Int" []]])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "attempt") [Src.c "Got", .paren (Src.app (Src.qv "Task" "andThen") [.paren (.lam [.wild] (Src.app (Src.qv "Task" "succeed") [Src.i 2])), .paren (Src.app (Src.qv "Task" "fail") [Src.i 1])])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalTaskAndThenInnerTest.elm -/
+def s_elm_MinimalTaskAndThenInnerTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalTaskAndThenInnerTest" [
+  Src.mdl (Src.hdr false "MinimalTaskAndThenInnerTest" (.items [.var "main"]))
+    [Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "perform") [Src.c "Got", .paren (Src.app (Src.qv "Task" "andThen") [.paren (.lam [.wild] (Src.app (Src.qv "Task" "succeed") [Src.i 2])), .paren (Src.app (Src.qv "Task" "andThen") [.paren (.lam [.wild] (Src.app (Src.qv "Task" "succeed") [Src.i 1])), .paren (Src.app (Src.qv "Task" "succeed") [Src.i 0])])])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalTaskAndThenTest.elm -/
+def s_elm_MinimalTaskAndThenTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalTaskAndThenTest" [
+  Src.mdl (Src.hdr false "MinimalTaskAndThenTest" (.items [.var "main"]))
+    [Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "perform") [Src.c "Got", .paren (Src.app (Src.qv "Task" "andThen") [.paren (.lam [.wild] (Src.app (Src.qv "Task" "succeed") [Src.i 2])), .paren (Src.app (Src.qv "Task" "succeed") [Src.i 1])])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalTaskOnErrorInnerTest.elm -/
+def s_elm_MinimalTaskOnErrorInnerTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalTaskOnErrorInnerTest" [
+  Src.mdl (Src.hdr false "MinimalTaskOnErrorInnerTest" (.items [.var "main"]))
+    [Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "perform") [Src.c "Got", .paren (Src.app (Src.qv "Task" "onError") [.paren (.lam [.wild] (Src.app (Src.qv "Task" "succeed") [Src.i 3])), .paren (Src.app (Src.qv "Task" "andThen") [.paren (.lam [.wild] (Src.app (Src.qv "Task" "succeed") [Src.i 1])), .paren (Src.app (Src.qv "Task" "fail") [Src.i 0])])])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalTaskOnErrorSucceedTest.elm -/
+def s_elm_MinimalTaskOnErrorSucceedTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalTaskOnErrorSucceedTest" [
+  Src.mdl (Src.hdr false "MinimalTaskOnErrorSucceedTest" (.items [.var "main"]))
+    [Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "perform") [Src.c "Got", .paren (Src.app (Src.qv "Task" "onError") [.paren (.lam [.wild] (Src.app (Src.qv "Task" "succeed") [Src.i 2])), .paren (Src.app (Src.qv "Task" "succeed") [Src.i 1])])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalTaskOnErrorTest.elm -/
+def s_elm_MinimalTaskOnErrorTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalTaskOnErrorTest" [
+  Src.mdl (Src.hdr false "MinimalTaskOnErrorTest" (.items [.var "main"]))
+    [Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "perform") [Src.c "Got", .paren (Src.app (Src.qv "Task" "onError") [.paren (.lam [.wild] (Src.app (Src.qv "Task" "succeed") [Src.i 2])), .paren (Src.app (Src.qv "Task" "fail") [Src.i 1])])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalTaskPerformTest.elm -/
+def s_elm_MinimalTaskPerformTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalTaskPerformTest" [
+  Src.mdl (Src.hdr false "MinimalTaskPerformTest" (.items [.var "main"]))
+    [Src.imp "Task" none none]
+    [.custom "Msg" [] [("Got", [Src.tc "Int" []])], Src.val "init" (some (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]]))) [.wild] (.tuple [.unit, Src.app (Src.qv "Task" "perform") [Src.c "Got", .paren (Src.app (Src.qv "Task" "succeed") [Src.i 1])]]), Src.val "update" (some (.fn (Src.tc "Msg" []) (.fn (.unit) (.tuple [.unit, Src.tc "Cmd" [Src.tc "Msg" []]])))) [.paren (Src.pc "Got" [Src.pv "v"]), Src.pv "model"] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "got", Src.v "v"])] (.tuple [Src.v "model", Src.qv "Cmd" "none"])), Src.val "main" (some (Src.tc "Program" [.unit, .unit, Src.tc "Msg" []])) [] (Src.app (Src.qv "Platform" "worker") [.record [("init", Src.v "init"), ("update", Src.v "update"), ("subscriptions", .lam [.wild] (Src.qv "Sub" "none"))]])] ]
+
+/-- tests/elm/src/MinimalTuplePatternTest.elm -/
+def s_elm_MinimalTuplePatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalTuplePatternTest" [
+  Src.mdl (Src.hdr false "MinimalTuplePatternTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (.tuple [Src.i 1, Src.i 2]) [(.tuple [Src.pv "a", Src.pv "b"], Src.v "b")]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalTypeAliasTest.elm -/
+def s_elm_MinimalTypeAliasTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalTypeAliasTest" [
+  Src.mdl (Src.hdr false "MinimalTypeAliasTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [.alias "A" [] (Src.tc "Int" []), Src.val "testValue" (some (Src.tc "A" [])) [] (Src.i 7), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalTypeVariableTest.elm -/
+def s_elm_MinimalTypeVariableTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalTypeVariableTest" [
+  Src.mdl (Src.hdr false "MinimalTypeVariableTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "same" (some (.fn (Src.tv "a") (Src.tv "a"))) [Src.pv "x"] (Src.v "x"), Src.val "testValue" none [] (Src.app (Src.v "same") [Src.i 7]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalUnitPatternTest.elm -/
+def s_elm_MinimalUnitPatternTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalUnitPatternTest" [
+  Src.mdl (Src.hdr false "MinimalUnitPatternTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" none [] (.caseE (.unit) [(.unit, Src.i 1)]), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalUnitTest.elm -/
+def s_elm_MinimalUnitTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalUnitTest" [
+  Src.mdl (Src.hdr false "MinimalUnitTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "testValue" (some (.unit)) [] (.unit), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
+/-- tests/elm/src/MinimalVariableTest.elm -/
+def s_elm_MinimalVariableTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MinimalVariableTest" [
+  Src.mdl (Src.hdr false "MinimalVariableTest" (.items [.var "main"]))
+    [Src.imp "Html" none (some (.items [.var "text"]))]
+    [Src.val "seven" none [] (Src.i 7), Src.val "testValue" none [] (Src.v "seven"), Src.val "main" none [] (.letE [.pat (.wild) (Src.app (Src.qv "Debug" "log") [Src.str "testValue", Src.v "testValue"])] (Src.app (Src.v "text") [Src.str "done"]))] ]
+
 /-- tests/elm/src/MissingPatternsAMissingListLengthTest.elm -/
 def s_elm_MissingPatternsAMissingListLengthTest : Src.SProgram := Src.canonOrder <| Src.prog "elm" "MissingPatternsAMissingListLengthTest" [
   Src.mdl (Src.hdr false "MissingPatternsAMissingListLengthTest" (.all))
@@ -284,6 +668,68 @@ def srcShard_SrcElm_LetNumberRecordM : List (String × Src.SProgram) :=
    ("MaybeJustTest", s_elm_MaybeJustTest),
    ("MaybeNothingTest", s_elm_MaybeNothingTest),
    ("MaybePatternMatchTest", s_elm_MaybePatternMatchTest),
+   ("MinimalAsPatternTest", s_elm_MinimalAsPatternTest),
+   ("MinimalCaseNextRuleTest", s_elm_MinimalCaseNextRuleTest),
+   ("MinimalCaseTest", s_elm_MinimalCaseTest),
+   ("MinimalCmdMapTest", s_elm_MinimalCmdMapTest),
+   ("MinimalConsPatternFailTest", s_elm_MinimalConsPatternFailTest),
+   ("MinimalConsPatternTest", s_elm_MinimalConsPatternTest),
+   ("MinimalConstantPatternTest", s_elm_MinimalConstantPatternTest),
+   ("MinimalConstantTest", s_elm_MinimalConstantTest),
+   ("MinimalConstructedPatternFailTest", s_elm_MinimalConstructedPatternFailTest),
+   ("MinimalConstructedPatternTest", s_elm_MinimalConstructedPatternTest),
+   ("MinimalConstructorPatternFailTest", s_elm_MinimalConstructorPatternFailTest),
+   ("MinimalConstructorPatternTest", s_elm_MinimalConstructorPatternTest),
+   ("MinimalCustomTypeTest", s_elm_MinimalCustomTypeTest),
+   ("MinimalDestructuringTest", s_elm_MinimalDestructuringTest),
+   ("MinimalEmptyListTest", s_elm_MinimalEmptyListTest),
+   ("MinimalExposingAliasTest", s_elm_MinimalExposingAliasTest),
+   ("MinimalExposingAllTest", s_elm_MinimalExposingAllTest),
+   ("MinimalExposingOpenTest", s_elm_MinimalExposingOpenTest),
+   ("MinimalImportValueTest", s_elm_MinimalImportValueTest),
+   ("MinimalKillTest", s_elm_MinimalKillTest),
+   ("MinimalLetRecursionTest", s_elm_MinimalLetRecursionTest),
+   ("MinimalLetTest", s_elm_MinimalLetTest),
+   ("MinimalNilPatternFailTest", s_elm_MinimalNilPatternFailTest),
+   ("MinimalNilPatternTest", s_elm_MinimalNilPatternTest),
+   ("MinimalParenthesesTest", s_elm_MinimalParenthesesTest),
+   ("MinimalParenthesisedPatternTest", s_elm_MinimalParenthesisedPatternTest),
+   ("MinimalParenthesisedTypeTest", s_elm_MinimalParenthesisedTypeTest),
+   ("MinimalPipeArrayTest", s_elm_MinimalPipeArrayTest),
+   ("MinimalPipeFalseTest", s_elm_MinimalPipeFalseTest),
+   ("MinimalPipeFloatTest", s_elm_MinimalPipeFloatTest),
+   ("MinimalPipeIntTest", s_elm_MinimalPipeIntTest),
+   ("MinimalPipeJustTest", s_elm_MinimalPipeJustTest),
+   ("MinimalPipeListTest", s_elm_MinimalPipeListTest),
+   ("MinimalPipeNothingTest", s_elm_MinimalPipeNothingTest),
+   ("MinimalPipeRecordTest", s_elm_MinimalPipeRecordTest),
+   ("MinimalPipeStringTest", s_elm_MinimalPipeStringTest),
+   ("MinimalPipeTrueTest", s_elm_MinimalPipeTrueTest),
+   ("MinimalPipeTupleTest", s_elm_MinimalPipeTupleTest),
+   ("MinimalPipeUnitTest", s_elm_MinimalPipeUnitTest),
+   ("MinimalPipeValueTest", s_elm_MinimalPipeValueTest),
+   ("MinimalPortSubscriptionTest", s_elm_MinimalPortSubscriptionTest),
+   ("MinimalRecordAliasConstructorTest", s_elm_MinimalRecordAliasConstructorTest),
+   ("MinimalRecordPatternTest", s_elm_MinimalRecordPatternTest),
+   ("MinimalRecordTest", s_elm_MinimalRecordTest),
+   ("MinimalRecordTypeTest", s_elm_MinimalRecordTypeTest),
+   ("MinimalRecordUpdateTest", s_elm_MinimalRecordUpdateTest),
+   ("MinimalRowVariableTest", s_elm_MinimalRowVariableTest),
+   ("MinimalSleepTest", s_elm_MinimalSleepTest),
+   ("MinimalSpawnTest", s_elm_MinimalSpawnTest),
+   ("MinimalTaskAndThenFailTest", s_elm_MinimalTaskAndThenFailTest),
+   ("MinimalTaskAndThenInnerTest", s_elm_MinimalTaskAndThenInnerTest),
+   ("MinimalTaskAndThenTest", s_elm_MinimalTaskAndThenTest),
+   ("MinimalTaskOnErrorInnerTest", s_elm_MinimalTaskOnErrorInnerTest),
+   ("MinimalTaskOnErrorSucceedTest", s_elm_MinimalTaskOnErrorSucceedTest),
+   ("MinimalTaskOnErrorTest", s_elm_MinimalTaskOnErrorTest),
+   ("MinimalTaskPerformTest", s_elm_MinimalTaskPerformTest),
+   ("MinimalTuplePatternTest", s_elm_MinimalTuplePatternTest),
+   ("MinimalTypeAliasTest", s_elm_MinimalTypeAliasTest),
+   ("MinimalTypeVariableTest", s_elm_MinimalTypeVariableTest),
+   ("MinimalUnitPatternTest", s_elm_MinimalUnitPatternTest),
+   ("MinimalUnitTest", s_elm_MinimalUnitTest),
+   ("MinimalVariableTest", s_elm_MinimalVariableTest),
    ("MissingPatternsAMissingListLengthTest", s_elm_MissingPatternsAMissingListLengthTest),
    ("MissingPatternsAMissingTupleShapeTest", s_elm_MissingPatternsAMissingTupleShapeTest)]
 

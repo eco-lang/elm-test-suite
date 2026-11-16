@@ -108,6 +108,531 @@ def w_elm_ListLiteralDebugLogKindTest : Prog.WorkerTest := {
   host := .none,
   checks := [] }
 
+/-- tests/elm/src/MinimalCmdMapTest.elm -/
+def g_elm_MinimalCmdMapTest : Program := {
+  name := "MinimalCmdMapTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Cmd" "map") [c "Got", .atexp (.paren (ap (qv "Task" "perform") [v "identity", .atexp (.paren (ap (qv "Task" "succeed") [i 1]))]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: 1" .int ] }
+
+/-- The worker test of MinimalCmdMapTest. -/
+def w_elm_MinimalCmdMapTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalCmdMapTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
+/-- tests/elm/src/MinimalKillTest.elm -/
+def g_elm_MinimalKillTest : Program := {
+  name := "MinimalKillTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Process", "Process", none⟩, ⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Task" "perform") [c "Got", .atexp (.paren (ap (qv "Task" "andThen") [.atexp (.paren (lams [pw] (ap (qv "Task" "succeed") [i 3]))), .atexp (.paren (ap (qv "Task" "andThen") [qv "Process" "kill", .atexp (.paren (ap (qv "Process" "spawn") [.atexp (.paren (ap (qv "Process" "sleep") [.atexp (.scon (.intF 1000))]))]))]))]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: 3" .int ] }
+
+/-- The worker test of MinimalKillTest. -/
+def w_elm_MinimalKillTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalKillTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeArrayTest.elm -/
+def g_elm_MinimalPipeArrayTest : Program := {
+  name := "MinimalPipeArrayTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Array", "Array", some (.items [.tycon "Array"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("arrayIn", .inn, (.array .int)), ("arrayOut", .out, (.array .int))],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "arrayOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "arrayIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeArrayTest. -/
+def w_elm_MinimalPipeArrayTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeArrayTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "arrayIn" [(Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))])],
+  sent := [("arrayOut", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))]))],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeFalseTest.elm -/
+def g_elm_MinimalPipeFalseTest : Program := {
+  name := "MinimalPipeFalseTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("boolIn", .inn, .bool), ("boolOut", .out, .bool)],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "boolOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "boolIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeFalseTest. -/
+def w_elm_MinimalPipeFalseTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeFalseTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "boolIn" [.fls],
+  sent := [("boolOut", .fls)],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeFloatTest.elm -/
+def g_elm_MinimalPipeFloatTest : Program := {
+  name := "MinimalPipeFloatTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("floatIn", .inn, .float), ("floatOut", .out, .float)],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "floatOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "floatIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeFloatTest. -/
+def w_elm_MinimalPipeFloatTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeFloatTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "floatIn" [(.num (Eff.jnum (25) (-1)))],
+  sent := [("floatOut", (.num (Eff.jnum (25) (-1))))],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeIntTest.elm -/
+def g_elm_MinimalPipeIntTest : Program := {
+  name := "MinimalPipeIntTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("intIn", .inn, .int), ("intOut", .out, .int)],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "intOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "intIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeIntTest. -/
+def w_elm_MinimalPipeIntTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeIntTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "intIn" [(.num (Eff.jnum (3) (0)))],
+  sent := [("intOut", (.num (Eff.jnum (3) (0))))],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeJustTest.elm -/
+def g_elm_MinimalPipeJustTest : Program := {
+  name := "MinimalPipeJustTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("maybeIn", .inn, (.maybe .int)), ("maybeOut", .out, (.maybe .int))],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "maybeOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "maybeIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeJustTest. -/
+def w_elm_MinimalPipeJustTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeJustTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "maybeIn" [(.num (Eff.jnum (5) (0)))],
+  sent := [("maybeOut", (.num (Eff.jnum (5) (0))))],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeListTest.elm -/
+def g_elm_MinimalPipeListTest : Program := {
+  name := "MinimalPipeListTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("listIn", .inn, (.list .int)), ("listOut", .out, (.list .int))],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "listOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "listIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeListTest. -/
+def w_elm_MinimalPipeListTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeListTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "listIn" [(Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))])],
+  sent := [("listOut", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))]))],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeNothingTest.elm -/
+def g_elm_MinimalPipeNothingTest : Program := {
+  name := "MinimalPipeNothingTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("maybeIn", .inn, (.maybe .int)), ("maybeOut", .out, (.maybe .int))],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "maybeOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "maybeIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeNothingTest. -/
+def w_elm_MinimalPipeNothingTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeNothingTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "maybeIn" [.null],
+  sent := [("maybeOut", .null)],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeRecordTest.elm -/
+def g_elm_MinimalPipeRecordTest : Program := {
+  name := "MinimalPipeRecordTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("recordIn", .inn, (.record (.cons "a" .int .nil))), ("recordOut", .out, (.record (.cons "a" .int .nil)))],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "recordOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "recordIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeRecordTest. -/
+def w_elm_MinimalPipeRecordTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeRecordTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "recordIn" [(Eff.BVal.mkObj [("a", (.num (Eff.jnum (1) (0))))])],
+  sent := [("recordOut", (Eff.BVal.mkObj [("a", (.num (Eff.jnum (1) (0))))]))],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeStringTest.elm -/
+def g_elm_MinimalPipeStringTest : Program := {
+  name := "MinimalPipeStringTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("stringIn", .inn, .string), ("stringOut", .out, .string)],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "stringOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "stringIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeStringTest. -/
+def w_elm_MinimalPipeStringTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeStringTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "stringIn" [(.str "a")],
+  sent := [("stringOut", (.str "a"))],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeTrueTest.elm -/
+def g_elm_MinimalPipeTrueTest : Program := {
+  name := "MinimalPipeTrueTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("boolIn", .inn, .bool), ("boolOut", .out, .bool)],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "boolOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "boolIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeTrueTest. -/
+def w_elm_MinimalPipeTrueTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeTrueTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "boolIn" [.tru],
+  sent := [("boolOut", .tru)],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeTupleTest.elm -/
+def g_elm_MinimalPipeTupleTest : Program := {
+  name := "MinimalPipeTupleTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("pairIn", .inn, (.tuple2 .int .int)), ("pairOut", .out, (.tuple2 .int .int))],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "pairOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "pairIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeTupleTest. -/
+def w_elm_MinimalPipeTupleTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeTupleTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "pairIn" [(Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))])],
+  sent := [("pairOut", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), (.num (Eff.jnum (2) (0)))]))],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeUnitTest.elm -/
+def g_elm_MinimalPipeUnitTest : Program := {
+  name := "MinimalPipeUnitTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("unitIn", .inn, .unit), ("unitOut", .out, .unit)],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "unitOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "unitIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeUnitTest. -/
+def w_elm_MinimalPipeUnitTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeUnitTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "unitIn" [.null],
+  sent := [("unitOut", .null)],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPipeValueTest.elm -/
+def g_elm_MinimalPipeValueTest : Program := {
+  name := "MinimalPipeValueTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Json.Encode", "Json.Encode", some (.items [.tycon "Value"])⟩, ⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("valueIn", .inn, .value), ("valueOut", .out, .value)],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (tup2 (v "model") (ap (v "valueOut") [v "v"])),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "valueIn") [c "Got"]))]]) ],
+  checks := [ ] }
+
+/-- The worker test of MinimalPipeValueTest. -/
+def w_elm_MinimalPipeValueTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPipeValueTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "valueIn" [(Eff.BVal.mkObj [("a", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), .tru]))])],
+  sent := [("valueOut", (Eff.BVal.mkObj [("a", (Eff.BVal.array [(.num (Eff.jnum (1) (0))), .tru]))]))],
+  checks := [] }
+
+/-- tests/elm/src/MinimalPortSubscriptionTest.elm -/
+def g_elm_MinimalPortSubscriptionTest : Program := {
+  name := "MinimalPortSubscriptionTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Platform", "Platform", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  ports := [("numIn", .inn, .int)],
+  defs := [
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", lams [pw] (tup2 (.atexp .unit) (qv "Cmd" "none"))), ("update", v "update"), ("subscriptions", lams [pw] (ap (v "numIn") [c "Got"]))]]) ],
+  checks := [
+    chk .check "got: 5" .int ] }
+
+/-- The worker test of MinimalPortSubscriptionTest. -/
+def w_elm_MinimalPortSubscriptionTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalPortSubscriptionTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .feed "numIn" [(.num (Eff.jnum (5) (0)))],
+  checks := [] }
+
+/-- tests/elm/src/MinimalSleepTest.elm -/
+def g_elm_MinimalSleepTest : Program := {
+  name := "MinimalSleepTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Process", "Process", none⟩, ⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Task" "perform") [c "Got", .atexp (.paren (ap (qv "Process" "sleep") [.atexp (.scon (.intF 10))]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: ()" .data ] }
+
+/-- The worker test of MinimalSleepTest. -/
+def w_elm_MinimalSleepTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalSleepTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
+/-- tests/elm/src/MinimalSpawnTest.elm -/
+def g_elm_MinimalSpawnTest : Program := {
+  name := "MinimalSpawnTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Process", "Process", none⟩, ⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Task" "perform") [c "Got", .atexp (.paren (ap (qv "Task" "andThen") [.atexp (.paren (lams [pw] (ap (qv "Task" "succeed") [i 2]))), .atexp (.paren (ap (qv "Process" "spawn") [.atexp (.paren (ap (qv "Task" "succeed") [.atexp (.scon (.intF 1))]))]))]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: 2" .int ] }
+
+/-- The worker test of MinimalSpawnTest. -/
+def w_elm_MinimalSpawnTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalSpawnTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
+/-- tests/elm/src/MinimalTaskAndThenFailTest.elm -/
+def g_elm_MinimalTaskAndThenFailTest : Program := {
+  name := "MinimalTaskAndThenFailTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Task" "attempt") [c "Got", .atexp (.paren (ap (qv "Task" "andThen") [.atexp (.paren (lams [pw] (ap (qv "Task" "succeed") [i 2]))), .atexp (.paren (ap (qv "Task" "fail") [i 1]))]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: Err 1" .data ] }
+
+/-- The worker test of MinimalTaskAndThenFailTest. -/
+def w_elm_MinimalTaskAndThenFailTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalTaskAndThenFailTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
+/-- tests/elm/src/MinimalTaskAndThenInnerTest.elm -/
+def g_elm_MinimalTaskAndThenInnerTest : Program := {
+  name := "MinimalTaskAndThenInnerTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Task" "perform") [c "Got", .atexp (.paren (ap (qv "Task" "andThen") [.atexp (.paren (lams [pw] (ap (qv "Task" "succeed") [i 2]))), .atexp (.paren (ap (qv "Task" "andThen") [.atexp (.paren (lams [pw] (ap (qv "Task" "succeed") [.atexp (.scon (.intF 1))]))), .atexp (.paren (ap (qv "Task" "succeed") [.atexp (.scon (.intF 0))]))]))]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: 2" .int ] }
+
+/-- The worker test of MinimalTaskAndThenInnerTest. -/
+def w_elm_MinimalTaskAndThenInnerTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalTaskAndThenInnerTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
+/-- tests/elm/src/MinimalTaskAndThenTest.elm -/
+def g_elm_MinimalTaskAndThenTest : Program := {
+  name := "MinimalTaskAndThenTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Task" "perform") [c "Got", .atexp (.paren (ap (qv "Task" "andThen") [.atexp (.paren (lams [pw] (ap (qv "Task" "succeed") [i 2]))), .atexp (.paren (ap (qv "Task" "succeed") [.atexp (.scon (.intF 1))]))]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: 2" .int ] }
+
+/-- The worker test of MinimalTaskAndThenTest. -/
+def w_elm_MinimalTaskAndThenTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalTaskAndThenTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
+/-- tests/elm/src/MinimalTaskOnErrorInnerTest.elm -/
+def g_elm_MinimalTaskOnErrorInnerTest : Program := {
+  name := "MinimalTaskOnErrorInnerTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Task" "perform") [c "Got", .atexp (.paren (ap (qv "Task" "onError") [.atexp (.paren (lams [pw] (ap (qv "Task" "succeed") [i 3]))), .atexp (.paren (ap (qv "Task" "andThen") [.atexp (.paren (lams [pw] (ap (qv "Task" "succeed") [i 1]))), .atexp (.paren (ap (qv "Task" "fail") [.atexp (.scon (.intF 0))]))]))]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: 3" .int ] }
+
+/-- The worker test of MinimalTaskOnErrorInnerTest. -/
+def w_elm_MinimalTaskOnErrorInnerTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalTaskOnErrorInnerTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
+/-- tests/elm/src/MinimalTaskOnErrorSucceedTest.elm -/
+def g_elm_MinimalTaskOnErrorSucceedTest : Program := {
+  name := "MinimalTaskOnErrorSucceedTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Task" "perform") [c "Got", .atexp (.paren (ap (qv "Task" "onError") [.atexp (.paren (lams [pw] (ap (qv "Task" "succeed") [i 2]))), .atexp (.paren (ap (qv "Task" "succeed") [i 1]))]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: 1" .int ] }
+
+/-- The worker test of MinimalTaskOnErrorSucceedTest. -/
+def w_elm_MinimalTaskOnErrorSucceedTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalTaskOnErrorSucceedTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
+/-- tests/elm/src/MinimalTaskOnErrorTest.elm -/
+def g_elm_MinimalTaskOnErrorTest : Program := {
+  name := "MinimalTaskOnErrorTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Task" "perform") [c "Got", .atexp (.paren (ap (qv "Task" "onError") [.atexp (.paren (lams [pw] (ap (qv "Task" "succeed") [i 2]))), .atexp (.paren (ap (qv "Task" "fail") [.atexp (.scon (.intF 1))]))]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: 2" .int ] }
+
+/-- The worker test of MinimalTaskOnErrorTest. -/
+def w_elm_MinimalTaskOnErrorTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalTaskOnErrorTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
+/-- tests/elm/src/MinimalTaskPerformTest.elm -/
+def g_elm_MinimalTaskPerformTest : Program := {
+  name := "MinimalTaskPerformTest", source := "tests/elm/src",
+  exposing := (.items [.var "main"]), imports := [⟨"Task", "Task", none⟩],
+  types := [("Msg", [("Got", 1)])],
+  aliases := [],
+  defs := [
+    .fn "init" [pw] (tup2 (.atexp .unit) (ap (qv "Task" "perform") [c "Got", .atexp (.paren (ap (qv "Task" "succeed") [i 1]))])),
+    .fn "update" [.paren (pcon "Got" [pv "v"]), pv "model"] (letDefs [.pat pw (ap (qv "Debug" "log") [str "got", v "v"])] (tup2 (v "model") (qv "Cmd" "none"))),
+    .fn "main" [] (ap (qv "Platform" "worker") [recE [("init", v "init"), ("update", v "update"), ("subscriptions", lams [pw] (qv "Sub" "none"))]]) ],
+  checks := [
+    chk .check "got: 1" .int ] }
+
+/-- The worker test of MinimalTaskPerformTest. -/
+def w_elm_MinimalTaskPerformTest : Prog.WorkerTest := {
+  prog := g_elm_MinimalTaskPerformTest,
+  flagsType := .unit,
+  flags := .null,
+  host := .none,
+  checks := [] }
+
 /-- tests/elm/src/NoImportsTest.elm -/
 def g_elm_NoImportsTest : Program := {
   name := "NoImportsTest", source := "tests/elm/src",
@@ -1278,6 +1803,31 @@ def shard_Worker01 : List Prog.WorkerTest :=
    w_elm_CoreIssue1141UnusedPortCallBreaksSubscriptionTest,
    w_elm_FlagsRecordTest,
    w_elm_ListLiteralDebugLogKindTest,
+   w_elm_MinimalCmdMapTest,
+   w_elm_MinimalKillTest,
+   w_elm_MinimalPipeArrayTest,
+   w_elm_MinimalPipeFalseTest,
+   w_elm_MinimalPipeFloatTest,
+   w_elm_MinimalPipeIntTest,
+   w_elm_MinimalPipeJustTest,
+   w_elm_MinimalPipeListTest,
+   w_elm_MinimalPipeNothingTest,
+   w_elm_MinimalPipeRecordTest,
+   w_elm_MinimalPipeStringTest,
+   w_elm_MinimalPipeTrueTest,
+   w_elm_MinimalPipeTupleTest,
+   w_elm_MinimalPipeUnitTest,
+   w_elm_MinimalPipeValueTest,
+   w_elm_MinimalPortSubscriptionTest,
+   w_elm_MinimalSleepTest,
+   w_elm_MinimalSpawnTest,
+   w_elm_MinimalTaskAndThenFailTest,
+   w_elm_MinimalTaskAndThenInnerTest,
+   w_elm_MinimalTaskAndThenTest,
+   w_elm_MinimalTaskOnErrorInnerTest,
+   w_elm_MinimalTaskOnErrorSucceedTest,
+   w_elm_MinimalTaskOnErrorTest,
+   w_elm_MinimalTaskPerformTest,
    w_elm_NoImportsTest,
    w_elm_OutgoingPortTuple3KeepsRunningTest,
    w_elm_OutgoingPortTuple3Test,
