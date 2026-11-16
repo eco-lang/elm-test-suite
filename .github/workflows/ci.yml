@@ -84,11 +84,14 @@ jobs:
       # The suite reports on compilers already released, so no test result ever fails the job:
       # run-all.js exits 0 whatever the tests' outcomes. The
       # weekly run, and a manual run with "fresh", run every test (--refresh): the cache is renewed,
-      # and any result that differs from the cached one is listed in the report.
+      # and any result that differs from the cached one is listed in the report. A hosted runner has
+      # 4 CPUs and 16 GB, so at most 3 compiles (up to 4 GB each) and 6 test programs run at once,
+      # fewer than run.js's defaults (4 and 8 here): a run with no cached results lost the runner
+      # with the defaults (2026-11-16).
       - name: Run the suite under every compiler
         env:
           REFRESH: ${{ (github.event_name == 'schedule' || inputs.fresh) && '--refresh' || '' }}
-        run: pnpm test:all -- $REFRESH 2>&1 | tee test-output.txt
+        run: pnpm test:all -- --compile-jobs 3 --jobs 6 $REFRESH 2>&1 | tee test-output.txt
 
       - name: Save the result cache
         if: always()
